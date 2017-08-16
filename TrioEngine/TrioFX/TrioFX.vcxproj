@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{04F7BD0E-332D-473E-81A0-E117BFB77B67}</ProjectGuid>
+    <ProjectGuid>{47E8042D-F247-4C5B-8D89-8F5F7ADD485E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TrioAPI</RootNamespace>
+    <RootNamespace>TrioFX</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,7 +71,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -87,13 +86,12 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TRIOAPI_EXPORTS;TRIO_DIRECTX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TRIOFX_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -101,7 +99,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;TRIOAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;TRIOFX_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -116,7 +114,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;TRIOAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;TRIOFX_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -133,7 +131,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;TRIOAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;TRIOFX_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -147,67 +145,23 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Event.h" />
-    <ClInclude Include="Graphics\BlendState.h" />
-    <ClInclude Include="Graphics\ConstantBuffer.h" />
-    <ClInclude Include="Graphics\ConstantBufferCollection.h" />
-    <ClInclude Include="Graphics\DepthStencilBuffer.h" />
-    <ClInclude Include="Graphics\DepthStencilState.h" />
-    <ClInclude Include="Graphics\DeviceFormats.h" />
-    <ClInclude Include="Graphics\DirectxHelpers.h" />
-    <ClInclude Include="Graphics\DisplayMode.h" />
-    <ClInclude Include="Graphics\Effect.h" />
-    <ClInclude Include="Graphics\EffectCompiler.h" />
-    <ClInclude Include="Graphics\EffectParameter.h" />
-    <ClInclude Include="Graphics\EffectParameterCollection.h" />
-    <ClInclude Include="Graphics\EffectPass.h" />
-    <ClInclude Include="Graphics\EffectPassCollection.h" />
-    <ClInclude Include="Graphics\EffectTechnique.h" />
-    <ClInclude Include="Graphics\EffectTechniqueCollection.h" />
-    <ClInclude Include="Graphics\FormatHelper.h" />
-    <ClInclude Include="Graphics\Game.h" />
-    <ClInclude Include="Graphics\GameHost.h" />
-    <ClInclude Include="Graphics\GameServiceContainer.h" />
-    <ClInclude Include="Graphics\GameWindow.h" />
-    <ClInclude Include="Graphics\GraphicsAdapter.h" />
-    <ClInclude Include="Graphics\GraphicsCapabilities.h" />
-    <ClInclude Include="Graphics\GraphicsDevice.h" />
-    <ClInclude Include="Graphics\GraphicsDeviceInformation.h" />
-    <ClInclude Include="Graphics\GraphicsDeviceManager.h" />
-    <ClInclude Include="Graphics\IGraphicsDeviceManager.h" />
-    <ClInclude Include="Graphics\IGraphicsDeviceService.h" />
-    <ClInclude Include="Graphics\IndexBuffer.h" />
-    <ClInclude Include="Graphics\IRenderTarget.h" />
-    <ClInclude Include="Graphics\IServiceBase.h" />
-    <ClInclude Include="Graphics\IServiceProvider.h" />
-    <ClInclude Include="Graphics\PresentationParameters.h" />
-    <ClInclude Include="Graphics\PrimitiveType.h" />
-    <ClInclude Include="Graphics\RasterizerState.h" />
-    <ClInclude Include="Graphics\Rectangles.h" />
-    <ClInclude Include="Graphics\RenderTarget2D.h" />
-    <ClInclude Include="Graphics\RenderTargetBinding.h" />
-    <ClInclude Include="Graphics\ResourceEnums.h" />
-    <ClInclude Include="Graphics\SamplerState.h" />
-    <ClInclude Include="Graphics\SamplerStateCollection.h" />
-    <ClInclude Include="Graphics\Shader.h" />
-    <ClInclude Include="Graphics\SimpleMath.h" />
-    <ClInclude Include="Graphics\StatesEnums.h" />
-    <ClInclude Include="Graphics\Texture.h" />
-    <ClInclude Include="Graphics\Texture2D.h" />
-    <ClInclude Include="Graphics\TextureCollection.h" />
-    <ClInclude Include="Graphics\VertexBuffer.h" />
-    <ClInclude Include="Graphics\VertexBufferBinding.h" />
-    <ClInclude Include="Graphics\VertexDeclaration.h" />
-    <ClInclude Include="Graphics\VertexElement.h" />
-    <ClInclude Include="Graphics\WindowsGameHost.h" />
-    <ClInclude Include="Graphics\WindowsGameWindow.h" />
+    <ClInclude Include="AssertFX.h" />
+    <ClInclude Include="CodeWriter.h" />
+    <ClInclude Include="CommonHeader.h" />
+    <ClInclude Include="GLSLGenerator.h" />
+    <ClInclude Include="HLSLGenerator.h" />
+    <ClInclude Include="HLSLParser.h" />
+    <ClInclude Include="HLSLPreprocessor.h" />
+    <ClInclude Include="HLSLTokenizer.h" />
+    <ClInclude Include="HLSLTree.h" />
+    <ClInclude Include="Log.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="StepTimer.h" />
+    <ClInclude Include="StringHelpers.h" />
+    <ClInclude Include="StringPool.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="TrioAPI.h" />
-    <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CodeWriter.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -222,56 +176,22 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Graphics\BlendState.cpp" />
-    <ClCompile Include="Graphics\ConstantBuffer.cpp" />
-    <ClCompile Include="Graphics\ConstantBufferCollection.cpp" />
-    <ClCompile Include="Graphics\DepthStencilBuffer.cpp" />
-    <ClCompile Include="Graphics\DepthStencilState.cpp" />
-    <ClCompile Include="Graphics\Effect.cpp" />
-    <ClCompile Include="Graphics\EffectCompiler.cpp" />
-    <ClCompile Include="Graphics\EffectParameter.cpp" />
-    <ClCompile Include="Graphics\EffectParameterCollection.cpp" />
-    <ClCompile Include="Graphics\EffectPass.cpp" />
-    <ClCompile Include="Graphics\EffectPassCollection.cpp" />
-    <ClCompile Include="Graphics\EffectTechnique.cpp" />
-    <ClCompile Include="Graphics\EffectTechniqueCollection.cpp" />
-    <ClCompile Include="Graphics\FormatHelper.cpp" />
-    <ClCompile Include="Graphics\Game.cpp" />
-    <ClCompile Include="Graphics\GameHost.cpp" />
-    <ClCompile Include="Graphics\GameServiceContainer.cpp" />
-    <ClCompile Include="Graphics\GraphicsAdapter.cpp" />
-    <ClCompile Include="Graphics\GraphicsCapabilities.cpp" />
-    <ClCompile Include="Graphics\GraphicsDevice.cpp" />
-    <ClCompile Include="Graphics\GraphicsDeviceManager.cpp" />
-    <ClCompile Include="Graphics\IndexBuffer.cpp" />
-    <ClCompile Include="Graphics\PresentationParameters.cpp" />
-    <ClCompile Include="Graphics\RasterizerState.cpp" />
-    <ClCompile Include="Graphics\RenderTarget2D.cpp" />
-    <ClCompile Include="Graphics\SamplerState.cpp" />
-    <ClCompile Include="Graphics\SamplerStateCollection.cpp" />
-    <ClCompile Include="Graphics\Shader.cpp" />
-    <ClCompile Include="Graphics\Texture.cpp" />
-    <ClCompile Include="Graphics\Texture2D.cpp" />
-    <ClCompile Include="Graphics\TextureCollection.cpp" />
-    <ClCompile Include="Graphics\VertexBuffer.cpp" />
-    <ClCompile Include="Graphics\VertexBufferBinding.cpp" />
-    <ClCompile Include="Graphics\VertexDeclaration.cpp" />
-    <ClCompile Include="Graphics\VertexElement.cpp" />
-    <ClCompile Include="Graphics\WindowsGameHost.cpp" />
-    <ClCompile Include="Graphics\WindowsGameWindow.cpp" />
+    <ClCompile Include="GLSLGenerator.cpp" />
+    <ClCompile Include="HLSLGenerator.cpp" />
+    <ClCompile Include="HLSLParser.cpp" />
+    <ClCompile Include="HLSLPreprocessor.cpp" />
+    <ClCompile Include="HLSLTokenizer.cpp" />
+    <ClCompile Include="HLSLTree.cpp" />
+    <ClCompile Include="Log.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TrioAPI.cpp" />
-    <ClCompile Include="Utilities.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TrioFX\TrioFX.vcxproj">
-      <Project>{47e8042d-f247-4c5b-8d89-8f5f7add485e}</Project>
-    </ProjectReference>
+    <ClCompile Include="StringHelpers.cpp" />
+    <ClCompile Include="StringPool.cpp" />
+    <ClCompile Include="TrioFX.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

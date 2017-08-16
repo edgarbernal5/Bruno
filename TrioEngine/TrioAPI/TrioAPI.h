@@ -1,9 +1,9 @@
 #pragma once
 
 #ifdef TRIOAPI_EXPORTS
-#define TRIOAPI_EXPORTS __declspec(dllexport) 
+#define TRIOAPI_DLL __declspec(dllexport) 
 #else
-#define TRIOAPI_EXPORTS __declspec(dllimport) 
+#define TRIOAPI_DLL __declspec(dllimport) 
 #endif
 
 

@@ -1,0 +1,620 @@
+#include "stdafx.h"
+#include "GraphicsDevice.h"
+
+#include "DepthStencilBuffer.h"
+#include "FormatHelper.h"
+#include "DeviceFormats.h"
+#include "GraphicsAdapter.h"
+#include "IndexBuffer.h"
+#include "VertexBuffer.h"
+
+using namespace DirectX;
+using Microsoft::WRL::ComPtr;
+
+namespace
+{
+#if defined(_DEBUG)
+	// Check for SDK Layer support.
+	inline bool SdkLayersAvailable()
+	{
+		HRESULT hr = D3D11CreateDevice(
+			nullptr,
+			D3D_DRIVER_TYPE_NULL,       // There is no need to create a real hardware device.
+			0,
+			D3D11_CREATE_DEVICE_DEBUG,  // Check for the SDK layers.
+			nullptr,                    // Any feature level will do.
+			0,
+			D3D11_SDK_VERSION,
+			nullptr,                    // No need to keep the D3D device reference.
+			nullptr,                    // No need to know the feature level.
+			nullptr                     // No need to keep the D3D device context reference.
+		);
+
+		return SUCCEEDED(hr);
+	}
+#endif
+};
+
+namespace Cuado
+{
+	GraphicsDevice::GraphicsDevice(GraphicsAdapter* adapter, PresentationParameters parameters) :
+		m_depthStencilBuffer(nullptr),
+		m_currentDepthStencilBuffer(nullptr),
+		m_adapter(adapter),
+#ifdef TRIO_DIRECTX
+		m_d3dMinFeatureLevel(D3D_FEATURE_LEVEL_9_1),
+		m_d3dFeatureLevel(D3D_FEATURE_LEVEL_9_1),
+#elif OPENGL
+		m_programCache(nullptr),
+		//m_shaderProgram(nullptr),
+#endif
+		m_presentationParameters(parameters),
+
+		m_pTextureCollection(nullptr),
+		m_pSamplerCollection(nullptr),
+		m_backBufferCount(2)
+	{
+		CreateDeviceResources();
+		CreateWindowSizeDependentResources();
+
+#ifdef TRIO_DIRECTX
+		for (size_t i = 0; i < MaxVertexBuffers; i++)
+		{
+			m_aVertexBuffers[i] = nullptr;
+			m_aVertexOffsets[i] = 0;
+			m_aVertexStrides[i] = 0;
+		}
+#endif
+
+		m_bIndexBufferDirty = true;
+		m_bVertexBufferDirty = true;
+	}
+
+	GraphicsDevice::~GraphicsDevice()
+	{
+
+	}
+
+	void GraphicsDevice::ApplyState(bool applyShaders)
+	{
+		if (!applyShaders) {
+			return;
+		}
+
+		if (m_bIndexBufferDirty)
+		{
+			if (m_pIndexBuffer != nullptr)
+			{
+#ifdef TRIO_DIRECTX
+				m_d3dContext->IASetIndexBuffer(m_pIndexBuffer->m_pBuffer, ToFormat(m_pIndexBuffer->m_eElementSize), 0);
+#elif TRIO_OPENGL
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer->m_Buffer);
+				GraphicsExtensions::checkGLError("Apply State GL_ELEMENT_ARRAY_BUFFER");
+#endif
+			}
+			else
+			{
+#ifdef TRIO_DIRECTX
+				m_d3dContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+#elif TRIO_OPENGL
+				//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+#endif
+			}
+			m_bIndexBufferDirty = false;
+		}
+
+		if (m_bVertexBufferDirty)
+		{
+			if (m_vVertexBindings.size() > 0)
+			{
+#ifdef TRIO_DIRECTX
+				m_d3dContext->IASetVertexBuffers(0, m_vVertexBindings.size(), &m_aVertexBuffers[0], m_aVertexStrides, m_aVertexOffsets);
+#endif
+			}
+			else
+			{
+#ifdef TRIO_DIRECTX
+				m_d3dContext->IASetVertexBuffers(0, 0, nullptr, 0, 0);
+#endif
+			}
+		}
+	}
+
+	bool GraphicsDevice::AreSameVertexBindings(VertexBufferBindings &bindings)
+	{
+		if (bindings.size() != m_vVertexBindings.size())
+			return false;
+
+		for (int i = 0; i < bindings.size(); i++)
+		{
+			if (bindings[i].Buffer != m_vVertexBindings[i].Buffer ||
+				bindings[i].Offset != m_vVertexBindings[i].Offset ||
+				bindings[i].Stride != m_vVertexBindings[i].Stride)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	void GraphicsDevice::Clear(DirectX::SimpleMath::Color &color)
+	{
+		ClearOptions options = ClearOptions::Target;
+
+		if (m_depthStencilBuffer != nullptr)
+		{
+			options = options | ClearOptions::DepthBuffer;
+			if (HasStencil(m_depthStencilBuffer->GetDepthFormat()))
+				options = options | ClearOptions::Stencil;
+		}
+
+		Clear(options, color, m_screenViewport.MaxDepth, 0);
+	}
+
+	void GraphicsDevice::Clear(ClearOptions options, DirectX::SimpleMath::Color &color, float depth, uint8_t stencil)
+	{
+#ifdef TRIO_DIRECTX
+		if ((options & ClearOptions::Target) == ClearOptions::Target)
+		{
+			const float* colorFloat = reinterpret_cast<const float*>(&color);
+			for (int i = 0; i < m_currentRenderTargets.size() && m_currentRenderTargets[i] != nullptr; i++)
+			{
+				m_d3dContext->ClearRenderTargetView(m_currentRenderTargets[i], colorFloat);
+			}
+		}
+		uint32_t flags = 0;
+
+		if ((options & ClearOptions::DepthBuffer) == ClearOptions::DepthBuffer)
+			flags |= D3D11_CLEAR_DEPTH;
+
+		if ((options & ClearOptions::Stencil) == ClearOptions::Stencil)
+			flags |= D3D11_CLEAR_STENCIL;
+
+		if (flags != 0 && m_depthStencilBuffer != nullptr)
+		{
+			m_d3dContext->ClearDepthStencilView(m_depthStencilBuffer->GetDepthStencilView(), flags, depth, stencil);
+		}
+#endif
+	}
+
+	void GraphicsDevice::CreateDeviceResources()
+	{
+#ifdef TRIO_DIRECTX
+		UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+
+#if defined(_DEBUG)
+		if (SdkLayersAvailable())
+		{
+			// If the project is in a debug build, enable debugging via SDK Layers with this flag.
+			creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+		}
+		else
+		{
+			OutputDebugStringA("WARNING: Direct3D Debug Device is not available\n");
+		}
+#endif
+
+		// Determine DirectX hardware feature levels this app will support.
+		static const D3D_FEATURE_LEVEL s_featureLevels[] =
+		{
+			D3D_FEATURE_LEVEL_11_1,
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_1,
+			D3D_FEATURE_LEVEL_10_0,
+			D3D_FEATURE_LEVEL_9_3,
+			D3D_FEATURE_LEVEL_9_2,
+			D3D_FEATURE_LEVEL_9_1,
+		};
+
+		UINT featLevelCount = 0;
+		for (; featLevelCount < _countof(s_featureLevels); ++featLevelCount)
+		{
+			if (s_featureLevels[featLevelCount] < m_d3dMinFeatureLevel)
+				break;
+		}
+
+		if (!featLevelCount)
+		{
+			throw std::out_of_range("minFeatureLevel too high");
+		}
+
+		IDXGIAdapter1* adapter = m_adapter->GetD3DAdapter();
+
+		// Create the Direct3D 11 API device object and a corresponding context.
+		HRESULT hr = E_FAIL;
+		if (adapter)
+		{
+			hr = D3D11CreateDevice(
+				adapter,
+				D3D_DRIVER_TYPE_UNKNOWN,
+				0,
+				creationFlags,
+				s_featureLevels,
+				featLevelCount,
+				D3D11_SDK_VERSION,
+				m_d3dDevice.ReleaseAndGetAddressOf(),   // Returns the Direct3D device created.
+				&m_d3dFeatureLevel,                     // Returns feature level of device created.
+				m_d3dContext.ReleaseAndGetAddressOf()   // Returns the device immediate context.
+			);
+
+			if (hr == E_INVALIDARG && featLevelCount > 1)
+			{
+				assert(s_featureLevels[0] == D3D_FEATURE_LEVEL_11_1);
+
+				// DirectX 11.0 platforms will not recognize D3D_FEATURE_LEVEL_11_1 so we need to retry without it
+				hr = D3D11CreateDevice(
+					adapter,
+					D3D_DRIVER_TYPE_UNKNOWN,
+					nullptr,
+					creationFlags,
+					&s_featureLevels[1],
+					featLevelCount - 1,
+					D3D11_SDK_VERSION,
+					m_d3dDevice.ReleaseAndGetAddressOf(),
+					&m_d3dFeatureLevel,
+					m_d3dContext.ReleaseAndGetAddressOf()
+				);
+			}
+		}
+#if defined(NDEBUG)
+		else
+		{
+			throw std::exception("No Direct3D hardware device found");
+		}
+#else
+		if (FAILED(hr))
+		{
+			// If the initialization fails, fall back to the WARP device.
+			// For more information on WARP, see: 
+			// http://go.microsoft.com/fwlink/?LinkId=286690
+			hr = D3D11CreateDevice(
+				nullptr,
+				D3D_DRIVER_TYPE_WARP, // Create a WARP device instead of a hardware device.
+				0,
+				creationFlags,
+				s_featureLevels,
+				featLevelCount,
+				D3D11_SDK_VERSION,
+				m_d3dDevice.ReleaseAndGetAddressOf(),
+				&m_d3dFeatureLevel,
+				m_d3dContext.ReleaseAndGetAddressOf()
+			);
+
+			if (hr == E_INVALIDARG && featLevelCount > 1)
+			{
+				assert(s_featureLevels[0] == D3D_FEATURE_LEVEL_11_1);
+
+				// DirectX 11.0 platforms will not recognize D3D_FEATURE_LEVEL_11_1 so we need to retry without it
+				hr = D3D11CreateDevice(
+					nullptr,
+					D3D_DRIVER_TYPE_WARP,
+					nullptr,
+					creationFlags,
+					&s_featureLevels[1],
+					featLevelCount - 1,
+					D3D11_SDK_VERSION,
+					m_d3dDevice.ReleaseAndGetAddressOf(),
+					&m_d3dFeatureLevel,
+					m_d3dContext.ReleaseAndGetAddressOf()
+				);
+			}
+
+			if (SUCCEEDED(hr))
+			{
+				OutputDebugStringA("Direct3D Adapter - WARP\n");
+			}
+		}
+#endif
+
+		DX::ThrowIfFailed(hr);
+
+#ifndef NDEBUG
+		ComPtr<ID3D11Debug> d3dDebug;
+		if (SUCCEEDED(m_d3dDevice.As(&d3dDebug)))
+		{
+			ComPtr<ID3D11InfoQueue> d3dInfoQueue;
+			if (SUCCEEDED(d3dDebug.As(&d3dInfoQueue)))
+			{
+#ifdef _DEBUG
+				d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
+				d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
+#endif
+				D3D11_MESSAGE_ID hide[] =
+				{
+					D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
+				};
+				D3D11_INFO_QUEUE_FILTER filter = {};
+				filter.DenyList.NumIDs = _countof(hide);
+				filter.DenyList.pIDList = hide;
+				d3dInfoQueue->AddStorageFilterEntries(&filter);
+			}
+		}
+#endif
+
+		// Obtain Direct3D 11.1 interfaces (if available)
+		if (SUCCEEDED(m_d3dDevice.As(&m_d3dDevice1)))
+		{
+			(void)m_d3dContext.As(&m_d3dContext1);
+			(void)m_d3dContext.As(&m_d3dAnnotation);
+		}
+#endif
+
+	}
+
+	void GraphicsDevice::CreateWindowSizeDependentResources()
+	{
+
+#ifdef TRIO_DIRECTX
+		if (!m_presentationParameters.GetHostHWND())
+		{
+			throw std::exception("Call SetWindow with a valid Win32 window handle");
+		}
+
+		// Clear the previous window size specific context.
+		ID3D11RenderTargetView* nullViews[] = { nullptr };
+		m_d3dContext->OMSetRenderTargets(_countof(nullViews), nullViews, nullptr);
+		m_currentRenderTargets = std::vector<ID3D11RenderTargetView*>(4, nullptr);
+
+		if (m_depthStencilBuffer)
+		{
+			m_depthStencilBuffer.reset();
+		}
+
+		m_d3dRenderTargetView.Reset();
+		m_d3dContext->Flush();
+
+		// Determine the render target size in pixels.
+		uint32_t backBufferWidth = std::max<uint32_t>(m_presentationParameters.GetBackBufferWidth(), 1);
+		uint32_t backBufferHeight = std::max<uint32_t>(m_presentationParameters.GetBackBufferHeight(), 1);
+
+		if (m_swapChain)
+		{
+			// If the swap chain already exists, resize it.
+			HRESULT hr = m_swapChain->ResizeBuffers(
+				m_backBufferCount,
+				backBufferWidth,
+				backBufferHeight,
+				ToFormat(m_presentationParameters.GetBackBufferFormat()),
+				0
+			);
+
+			if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
+			{
+#ifdef _DEBUG
+				char buff[64] = {};
+				sprintf_s(buff, "Device Lost on ResizeBuffers: Reason code 0x%08X\n", (hr == DXGI_ERROR_DEVICE_REMOVED) ? m_d3dDevice->GetDeviceRemovedReason() : hr);
+				OutputDebugStringA(buff);
+#endif
+				// If the device was removed for any reason, a new device and swap chain will need to be created.
+				//HandleDeviceLost();
+				DeviceLost();
+
+				// Everything is set up now. Do not continue execution of this method. HandleDeviceLost will reenter this method 
+				// and correctly set up the new device.
+				return;
+			}
+			else
+			{
+				DX::ThrowIfFailed(hr);
+			}
+		}
+		else
+		{
+			// Otherwise, create a new one using the same adapter as the existing Direct3D device.
+
+			// This sequence obtains the DXGI factory that was used to create the Direct3D device above.
+			ComPtr<IDXGIDevice1> dxgiDevice;
+			DX::ThrowIfFailed(m_d3dDevice.As(&dxgiDevice));
+
+			ComPtr<IDXGIAdapter> dxgiAdapter;
+			DX::ThrowIfFailed(dxgiDevice->GetAdapter(dxgiAdapter.GetAddressOf()));
+
+			ComPtr<IDXGIFactory1> dxgiFactory;
+			DX::ThrowIfFailed(dxgiAdapter->GetParent(IID_PPV_ARGS(dxgiFactory.GetAddressOf())));
+
+			ComPtr<IDXGIFactory2> dxgiFactory2;
+			if (SUCCEEDED(dxgiFactory.As(&dxgiFactory2)))
+			{
+				// DirectX 11.1 or later
+				DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+				swapChainDesc.Width = backBufferWidth;
+				swapChainDesc.Height = backBufferHeight;
+				swapChainDesc.Format = ToFormat(m_presentationParameters.GetBackBufferFormat());
+				swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+				swapChainDesc.BufferCount = m_backBufferCount;
+				swapChainDesc.SampleDesc.Count = 1;
+				swapChainDesc.SampleDesc.Quality = 0;
+				swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+				swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+
+				DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = { 0 };
+				fsSwapChainDesc.Windowed = TRUE;
+
+				// Create a SwapChain from a Win32 window.
+				DX::ThrowIfFailed(dxgiFactory2->CreateSwapChainForHwnd(
+					m_d3dDevice.Get(),
+					m_presentationParameters.GetHostHWND(),
+					&swapChainDesc,
+					&fsSwapChainDesc,
+					nullptr, m_swapChain1.ReleaseAndGetAddressOf()
+				));
+
+				DX::ThrowIfFailed(m_swapChain1.As(&m_swapChain));
+			}
+			else
+			{
+				// DirectX 11.0
+				DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
+				swapChainDesc.BufferDesc.Width = backBufferWidth;
+				swapChainDesc.BufferDesc.Height = backBufferHeight;
+				swapChainDesc.BufferDesc.Format = ToFormat(m_presentationParameters.GetBackBufferFormat());
+				swapChainDesc.SampleDesc.Count = 1;
+				swapChainDesc.SampleDesc.Quality = 0;
+				swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+				swapChainDesc.BufferCount = m_backBufferCount;
+				swapChainDesc.OutputWindow = m_presentationParameters.GetHostHWND();
+				swapChainDesc.Windowed = TRUE;
+				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+				DX::ThrowIfFailed(dxgiFactory->CreateSwapChain(
+					m_d3dDevice.Get(),
+					&swapChainDesc,
+					m_swapChain.ReleaseAndGetAddressOf()
+				));
+			}
+
+			// This class does not support exclusive full-screen mode and prevents DXGI from responding to the ALT+ENTER shortcut
+			DX::ThrowIfFailed(dxgiFactory->MakeWindowAssociation(m_presentationParameters.GetHostHWND(), DXGI_MWA_NO_ALT_ENTER));
+		}
+
+		// Create a render target view of the swap chain back buffer.
+		ComPtr<ID3D11Texture2D> backBuffer;
+		DX::ThrowIfFailed(m_swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf())));
+
+		DX::ThrowIfFailed(m_d3dDevice->CreateRenderTargetView(
+			backBuffer.Get(),
+			nullptr,
+			m_d3dRenderTargetView.ReleaseAndGetAddressOf()
+		));
+
+		if (m_presentationParameters.GetDepthStencilFormat() != DepthFormat::None)
+		{
+			m_depthStencilBuffer.reset(new DepthStencilBuffer(this, backBufferWidth, backBufferHeight, m_presentationParameters.GetDepthStencilFormat()));
+		}
+
+		// Set the 3D rendering viewport to target the entire window.
+		m_screenViewport = CD3D11_VIEWPORT(
+			0.0f,
+			0.0f,
+			static_cast<float>(backBufferWidth),
+			static_cast<float>(backBufferHeight)
+		);
+
+		m_currentRenderTargets[0] = m_d3dRenderTargetView.Get();
+#endif
+	}
+
+	void GraphicsDevice::DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
+	{
+#ifdef TRIO_DIRECTX
+
+#endif
+	}
+	void GraphicsDevice::DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
+	{
+#ifdef TRIO_DIRECTX
+
+#endif
+	}
+
+	void GraphicsDevice::Reset(PresentationParameters presentationParameters)
+	{
+		m_presentationParameters = presentationParameters;
+		CreateWindowSizeDependentResources();
+	}
+
+	void GraphicsDevice::Reset(PresentationParameters presentationParameters, GraphicsAdapter* graphicsAdapter)
+	{
+		if (m_adapter != graphicsAdapter) {
+			//TO-DO:
+		}
+		m_adapter = graphicsAdapter;
+		m_presentationParameters = presentationParameters;
+		CreateWindowSizeDependentResources();
+	}
+
+	void GraphicsDevice::Present()
+	{
+#ifdef TRIO_DIRECTX
+		// The first argument instructs DXGI to block until VSync, putting the application
+		// to sleep until the next VSync. This ensures we don't waste any cycles rendering
+		// frames that will never be displayed to the screen.
+		HRESULT hr = m_swapChain->Present(1, 0);
+
+		if (m_d3dContext1)
+		{
+			// Discard the contents of the render target.
+			// This is a valid operation only when the existing contents will be entirely
+			// overwritten. If dirty or scroll rects are used, this call should be removed.
+			m_d3dContext1->DiscardView(m_d3dRenderTargetView.Get());
+
+			if (m_depthStencilBuffer->GetDepthStencilView())
+			{
+				// Discard the contents of the depth stencil.
+				m_d3dContext1->DiscardView(m_depthStencilBuffer->GetDepthStencilView());
+			}
+		}
+
+		// If the device was removed either by a disconnection or a driver upgrade, we 
+		// must recreate all device resources.
+		if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
+		{
+#ifdef _DEBUG
+			char buff[64] = {};
+			sprintf_s(buff, "Device Lost on Present: Reason code 0x%08X\n", (hr == DXGI_ERROR_DEVICE_REMOVED) ? m_d3dDevice->GetDeviceRemovedReason() : hr);
+			OutputDebugStringA(buff);
+#endif
+			//HandleDeviceLost();
+			DeviceLost();
+		}
+		else
+		{
+			DX::ThrowIfFailed(hr);
+		}
+#endif
+	}
+
+	void GraphicsDevice::SetIndexBuffer(IndexBuffer* indexBuffer)
+	{
+		if (m_pIndexBuffer == indexBuffer)
+			return;
+
+		m_pIndexBuffer = indexBuffer;
+		m_bIndexBufferDirty = true;
+	}
+
+	void GraphicsDevice::SetVertexBuffer(VertexBuffer* buffer)
+	{
+		if (m_vVertexBindings.size() == 1 && m_vVertexBindings[0].Buffer == buffer || 
+			m_vVertexBindings.size() == 0 && buffer == nullptr)
+			return;
+
+		m_bVertexBufferDirty = true;
+
+		if (buffer == nullptr)
+		{
+			m_vVertexBindings.clear();
+			return;
+		}
+		//TODO:
+		//m_vVertexBindings = std::vector<VertexBufferBinding>(1);
+		m_vVertexBindings[0].Buffer = buffer;
+		m_vVertexBindings[0].Offset = 0;
+		m_vVertexBindings[0].Stride = buffer->GetVertexDeclaration()->GetVertexStride();
+
+#ifdef TRIO_DIRECTX
+		m_aVertexBuffers[0] = buffer->m_pBuffer;
+		m_aVertexOffsets[0] = 0;
+		m_aVertexStrides[0] = m_vVertexBindings[0].Stride;
+#endif
+	}
+
+	void GraphicsDevice::SetVertexBuffer(VertexBufferBindings &bindings)
+	{
+		if (AreSameVertexBindings(bindings))
+			return;
+
+		m_vVertexBindings = bindings;
+#ifdef TRIO_DIRECTX
+		for (int i = 0; i < m_vVertexBindings.size(); i++)
+		{
+			m_aVertexBuffers[i] = m_vVertexBindings[i].Buffer->m_pBuffer;
+			m_aVertexOffsets[i] = m_vVertexBindings[i].Offset;
+			m_aVertexStrides[i] = m_vVertexBindings[i].Stride;
+		}
+#endif
+		m_bVertexBufferDirty = true;
+	}
+
+}
