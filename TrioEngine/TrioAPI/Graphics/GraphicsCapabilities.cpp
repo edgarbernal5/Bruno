@@ -17,7 +17,7 @@ namespace Cuado
 
 	void GraphicsCapabilities::Initialize(GraphicsDevice* device)
 	{
-#ifdef OPENGL
+#ifdef TRIO_OPENGL
 		char* extensions = (char*)glGetString(GL_EXTENSIONS);
 
 		vector<string> elems;

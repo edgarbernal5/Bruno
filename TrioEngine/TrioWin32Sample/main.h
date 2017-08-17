@@ -15,7 +15,13 @@
 #include <Graphics/Game.h>
 #include "StepTimer.h"
 
+
 using namespace Cuado;
+
+namespace Cuado {
+	class IndexBuffer;
+	class Effect;
+}
 
 class DemoGame : public Game {
 public:
@@ -25,6 +31,9 @@ protected:
 	void Draw(DX::StepTimer const& timer);
 	void Update(DX::StepTimer const& timer);
 	void Initialize();
+
+	IndexBuffer* m_pIndexBuffer;
+	Effect* m_pEffect;
 };
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow);

@@ -38,6 +38,7 @@ namespace Cuado
 
 	Effect::~Effect()
 	{
+		ClearData();
 	}
 
 	void Effect::ClearData()
@@ -63,9 +64,16 @@ namespace Cuado
 			if (buffer != nullptr) delete buffer;
 		}
 
+		for (size_t i = 0; i < m_Parameters.size(); i++)
+		{
+			EffectParameter* parameter = m_Parameters[i];
+			if (parameter != nullptr) delete parameter;
+		}
+
 		m_mShadersByName.clear();
 		m_Techniques.clear();
 		m_ConstantBuffers.clear();
+		m_Parameters.clear();
 	}
 
 	void Effect::CompileEffect(std::string filename, ShaderLanguageTarget target)

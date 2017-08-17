@@ -21,10 +21,10 @@ namespace Cuado
 #ifdef TRIO_DIRECTX
 		IDXGIAdapter1* GetD3DAdapter() { return m_adapter; }
 #endif
-		inline std::string& GetDeviceName() { return m_deviceName; }
-		DisplayMode* GetCurrentDisplayMode();
+		inline const std::string& GetDeviceName() { return m_deviceName; }
+		DisplayMode GetCurrentDisplayMode();
 
-		std::vector<DisplayMode>& GetSupportedDisplayModes() { return m_modes; }
+		const std::vector<DisplayMode>& GetSupportedDisplayModes() { return m_modes; }
 
 		inline bool GetIsDefaultAdapter() { return m_isDefaultAdapter; }
 		static GraphicsAdapter* GetDefaultAdapter();
@@ -44,7 +44,7 @@ namespace Cuado
 
 #endif
 		std::vector<DisplayMode> m_modes;
-		DisplayMode*			m_currentDisplayMode;
+		DisplayMode			m_currentDisplayMode;
 
 		static std::vector<GraphicsAdapter*> m_adapters;
 		static void PopulateAdapters();

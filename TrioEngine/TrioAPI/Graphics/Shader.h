@@ -9,6 +9,10 @@
 namespace Cuado
 {
 	class TRIOAPI_DLL GraphicsDevice;
+#if TRIO_DIRECTX
+	class TRIOAPI_DLL InputLayoutCache;
+#endif
+
 	class TRIOAPI_DLL Shader
 	{
 	public:
@@ -16,6 +20,8 @@ namespace Cuado
 		~Shader();
 
 		inline int GetHashKey() { return m_iHashKey; }
+
+		inline InputLayoutCache* GetInputLayouts() { return m_pInputLayoutCache; }
 
 		friend class Effect;
 		friend class EffectPass;
@@ -36,7 +42,9 @@ namespace Cuado
 
 		GraphicsDevice*			m_device;
 		std::vector<size_t>		m_bufferIndexes;
+
 #if TRIO_DIRECTX
+		InputLayoutCache*		m_pInputLayoutCache;
 
 		union InternalShader
 		{

@@ -18,7 +18,7 @@ namespace Cuado
 		EffectPass(HLSLPass11* pass, HLSLTree* tree, GraphicsDevice* device, Effect* effect);
 		EffectPass(const char* name, Shader* vertexShader, Shader* pixelShader, GraphicsDevice* device, Effect* effect);
 
-		inline std::string& GetName() { return m_Name; }
+		inline const std::string& GetName() { return m_Name; }
 
 	private:
 

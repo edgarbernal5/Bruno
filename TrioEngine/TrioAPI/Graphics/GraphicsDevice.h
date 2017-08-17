@@ -29,6 +29,7 @@ namespace Cuado
 	class TRIOAPI_DLL TextureCollection;
 	class TRIOAPI_DLL SamplerStateCollection;
 	class TRIOAPI_DLL DepthStencilBuffer;
+	class TRIOAPI_DLL Shader;
 	
 	struct TRIOAPI_DLL VertexBufferBinding;
 
@@ -87,6 +88,8 @@ namespace Cuado
 		//void SetRasterizerState(RasterizerState* state);
 		//void SetSamplerState(int index, SamplerState* state);
 
+		void SetVertexShader(Shader* shader);
+		void SetPixelShader(Shader* shader);
 		//void SetViewport(DirectX::SimpleMath::Viewport viewport);
 
 		void Reset(PresentationParameters presentationParameters);
@@ -115,6 +118,12 @@ namespace Cuado
 		VertexBuffer* m_pVertexBuffer;
 		bool m_bVertexBufferDirty;
 		VertexBufferBindings m_vVertexBindings;
+
+		Shader* m_pVertexShader;
+		bool m_bVertexShaderDirty;
+
+		Shader* m_pPixelShader;
+		bool m_bPixelShaderDirty;
 
 		UINT                                            m_backBufferCount;
 #ifdef TRIO_DIRECTX

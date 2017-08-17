@@ -43,8 +43,8 @@ namespace Cuado
 		void CompileEffect(std::string filename, ShaderLanguageTarget target = ShaderLanguageTarget::HLSL);
 	private:
 
-		GraphicsDevice* m_pDevice;
-		map<string, Shader*> m_mShadersByName;
+		GraphicsDevice*			m_pDevice;
+		map<string, Shader*>	m_mShadersByName;
 
 		EffectParameterCollection	m_Parameters;
 		EffectTechniqueCollection	m_Techniques;

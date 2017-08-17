@@ -76,11 +76,10 @@ namespace Cuado
 		bool m_synchronizeWithVerticalRetrace;
 		void CreateDevice(GraphicsDeviceInformation newInfo);
 
-		GraphicsDeviceInformation FindBestDevice(bool anySuitableDevice);
-
 		void AddDevices(bool anySuitableDevice, std::vector<GraphicsDeviceInformation>& foundDevices);
-		void AddDevices(GraphicsAdapter* adapter, DisplayMode* mode, GraphicsDeviceInformation baseDeviceInfo, std::vector<GraphicsDeviceInformation>& foundDevices);
+		void AddDevices(GraphicsAdapter* adapter, const DisplayMode& mode, GraphicsDeviceInformation baseDeviceInfo, std::vector<GraphicsDeviceInformation>& foundDevices);
 
+		GraphicsDeviceInformation FindBestDevice(bool anySuitableDevice);
 	protected:
 		virtual void RankDevices(std::vector<GraphicsDeviceInformation>& foundDevices);
 	};

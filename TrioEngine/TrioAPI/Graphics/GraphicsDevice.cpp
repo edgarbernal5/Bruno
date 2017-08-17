@@ -7,13 +7,17 @@
 #include "GraphicsAdapter.h"
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
+#include "Shader.h"
+#ifdef TRIO_DIRECTX
+#include "InputLayoutCache.h"
+#endif
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
 namespace
 {
-#if defined(_DEBUG)
+#if defined(_DEBUG) && defined(TRIO_DIRECTX)
 	// Check for SDK Layer support.
 	inline bool SdkLayersAvailable()
 	{
@@ -52,7 +56,13 @@ namespace Cuado
 
 		m_pTextureCollection(nullptr),
 		m_pSamplerCollection(nullptr),
-		m_backBufferCount(2)
+		m_backBufferCount(2),
+
+		m_pVertexShader(nullptr),
+		m_bVertexShaderDirty(false),
+
+		m_pPixelShader(nullptr),
+		m_bPixelShaderDirty(false)
 	{
 		CreateDeviceResources();
 		CreateWindowSizeDependentResources();
@@ -65,6 +75,7 @@ namespace Cuado
 			m_aVertexStrides[i] = 0;
 		}
 #endif
+
 
 		m_bIndexBufferDirty = true;
 		m_bVertexBufferDirty = true;
@@ -83,7 +94,7 @@ namespace Cuado
 
 		if (m_bIndexBufferDirty)
 		{
-			if (m_pIndexBuffer != nullptr)
+			if (m_pIndexBuffer)
 			{
 #ifdef TRIO_DIRECTX
 				m_d3dContext->IASetIndexBuffer(m_pIndexBuffer->m_pBuffer, ToFormat(m_pIndexBuffer->m_eElementSize), 0);
@@ -117,6 +128,29 @@ namespace Cuado
 				m_d3dContext->IASetVertexBuffers(0, 0, nullptr, 0, 0);
 #endif
 			}
+		}
+
+		if (m_bVertexShaderDirty || m_bVertexBufferDirty)
+		{
+#ifdef TRIO_DIRECTX
+			ID3D11InputLayout* layout = m_pVertexShader->GetInputLayouts()->Get(m_vVertexBindings[0].Buffer->m_pVertexDeclaration);
+			m_d3dContext->IASetInputLayout(layout);
+#elif TRIO_OPENGL
+
+#endif
+			m_bVertexShaderDirty = false;
+			m_bVertexBufferDirty = false;
+		}
+
+		if (m_bPixelShaderDirty)
+		{
+#ifdef TRIO_DIRECTX
+			if (m_pPixelShader)
+				m_d3dContext->PSSetShader(m_pPixelShader->m_shaderPtr.m_pixelShader, nullptr, 0);
+			else
+				m_d3dContext->PSSetShader(nullptr, nullptr, 0);
+#endif
+			m_bPixelShaderDirty = false;
 		}
 	}
 
@@ -617,4 +651,21 @@ namespace Cuado
 		m_bVertexBufferDirty = true;
 	}
 
+	void GraphicsDevice::SetPixelShader(Shader* shader)
+	{
+		if (m_pPixelShader == shader)
+			return;
+
+		m_pPixelShader = shader;
+		m_bPixelShaderDirty = true;
+	}
+
+	void GraphicsDevice::SetVertexShader(Shader* shader)
+	{
+		if (m_pVertexShader == shader)
+			return;
+
+		m_pVertexShader = shader;
+		m_bVertexShaderDirty = true;
+	}
 }

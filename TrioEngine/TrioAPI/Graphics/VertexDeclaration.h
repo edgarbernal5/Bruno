@@ -65,6 +65,7 @@ namespace Cuado
 		inline int GetHashKey()			{ return m_iHashKey; }
 
 		friend class GraphicsDevice;
+		friend class InputLayoutCache;
 	private:
 		int m_iVertexStride;
 		std::vector<VertexElement> m_vElements;

@@ -9,7 +9,7 @@ namespace Cuado
 {
 	std::vector<GraphicsAdapter*> GraphicsAdapter::m_adapters;
 
-	GraphicsAdapter::GraphicsAdapter(uint32_t adapterIndex) : m_currentDisplayMode(nullptr)
+	GraphicsAdapter::GraphicsAdapter(uint32_t adapterIndex) 
 	{
 		m_isDefaultAdapter = (adapterIndex == 0);
 		m_deviceName = "";
@@ -38,7 +38,7 @@ namespace Cuado
 		
 		m_modes.push_back(displayMode);
 
-#if OPENGL
+#if TRIO_OPENGL
 		DisplayMode currentResolution;
 		bool primary = false;
 
@@ -118,12 +118,11 @@ namespace Cuado
 
 #ifdef TRIO_DIRECTX
 	GraphicsAdapter::GraphicsAdapter(IDXGIAdapter1* adapter, uint32_t adapterIndex) :
-		m_adapter(adapter), 
-		m_currentDisplayMode(nullptr)
+		m_adapter(adapter)
 	{
 		m_isDefaultAdapter = (adapterIndex == 0);
 		m_adapter->GetDesc1(&m_adapter_desc);
-		
+
 		std::wstring wstr(m_adapter_desc.Description);
 
 		m_deviceName = std::string(wstr.begin(), wstr.end());
@@ -228,19 +227,15 @@ namespace Cuado
 	}
 
 
-	DisplayMode* GraphicsAdapter::GetCurrentDisplayMode()
+	DisplayMode GraphicsAdapter::GetCurrentDisplayMode()
 	{
-		if (m_currentDisplayMode == nullptr)
-		{
-			m_currentDisplayMode = new DisplayMode();
-		}
 		HDC hDc = GetDC(GetDesktopWindow());
 		int width = GetDeviceCaps(hDc, HORZRES);
 		int height = GetDeviceCaps(hDc, VERTRES);
 
-		m_currentDisplayMode->Format = SurfaceFormat::Color;
-		m_currentDisplayMode->Width = width;
-		m_currentDisplayMode->Height = height;
+		m_currentDisplayMode.Width = width;
+		m_currentDisplayMode.Height = height;
+		m_currentDisplayMode.Format = SurfaceFormat::Color;
 
 		return m_currentDisplayMode;
 	}

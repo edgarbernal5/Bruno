@@ -30,6 +30,8 @@ namespace Cuado
 		Discard = 1,
 		NoOverwrite = 2
 	};
+	DEFINE_ENUM_FLAG_OPERATORS(SetDataOptions);
+
 	enum class CpuAccessFlags
 	{
 		None = 0,

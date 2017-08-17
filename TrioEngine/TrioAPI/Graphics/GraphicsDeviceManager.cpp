@@ -176,7 +176,7 @@ namespace Cuado
 					{
 						if ((mode.Width >= 640) && (mode.Height >= 480))
 						{
-							AddDevices(adapter, &mode, gdi, foundDevices);
+							AddDevices(adapter, mode, gdi, foundDevices);
 						}
 					}
 				}
@@ -185,15 +185,15 @@ namespace Cuado
 
 	}
 
-	void GraphicsDeviceManager::AddDevices(GraphicsAdapter* adapter, DisplayMode* mode, GraphicsDeviceInformation baseDeviceInfo, std::vector<GraphicsDeviceInformation>& foundDevices)
+	void GraphicsDeviceManager::AddDevices(GraphicsAdapter* adapter, const DisplayMode& mode, GraphicsDeviceInformation baseDeviceInfo, std::vector<GraphicsDeviceInformation>& foundDevices)
 	{
 		SurfaceFormat format = this->m_backBufferFormat;
 		DepthFormat depthFormat = this->m_depthStencilFormat;
 
 		if (m_isFullScreen)
 		{
-			baseDeviceInfo.Parameters.setBackBufferHeight(mode->Height);
-			baseDeviceInfo.Parameters.setBackBufferWidth(mode->Width);
+			baseDeviceInfo.Parameters.setBackBufferHeight(mode.Height);
+			baseDeviceInfo.Parameters.setBackBufferWidth(mode.Width);
 		}
 		else if (m_useResizedBackBuffer)
 		{

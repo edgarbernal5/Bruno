@@ -7,6 +7,8 @@
 
 namespace Cuado
 {
+	class TRIOAPI_DLL VertexDeclaration;
+
 	class TRIOAPI_DLL VertexBuffer
 	{
 	public:
@@ -34,7 +36,7 @@ namespace Cuado
 	private:
 #ifdef TRIO_DIRECTX
 		ID3D11Buffer* m_pBuffer;
-		ID3D11InputLayout* m_InputLayout;
+		//ID3D11InputLayout* m_InputLayout;
 
 		void CreateBuffer(D3D11_SUBRESOURCE_DATA* subdata);
 #elif OPENGL

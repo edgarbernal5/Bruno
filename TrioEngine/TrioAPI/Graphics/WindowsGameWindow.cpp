@@ -22,6 +22,7 @@ namespace Cuado
 		m_hInstance = host->GetGame()->m_hInstance;
 		if (m_hInstance == NULL)
 			m_hInstance = GetModuleHandle(NULL);
+
 		GenerateWindow();		
 	}
 

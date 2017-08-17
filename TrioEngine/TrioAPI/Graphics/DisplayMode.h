@@ -11,7 +11,7 @@ namespace Cuado
 		int Width, Height;
 		SurfaceFormat Format;
 
-		DisplayMode() {}
+		DisplayMode() : Width(0), Height(0), Format(SurfaceFormat::Color) {}
 		DisplayMode(int width, int height, SurfaceFormat format) : Width(width), Height(height), Format(format) {}
 
 		bool operator ==(const DisplayMode& d1) {

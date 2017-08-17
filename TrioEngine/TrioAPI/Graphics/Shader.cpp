@@ -4,11 +4,16 @@
 #include "Utilities.h"
 #include "GraphicsDevice.h"
 
+#if TRIO_DIRECTX
+#include "InputLayoutCache.h"
+#endif
+
 namespace Cuado {
 
 
 	Shader::Shader(GraphicsDevice* device, ShaderStage stage, const std::vector<uint8_t>& bytes) :
 #if TRIO_DIRECTX
+		m_pInputLayoutCache(nullptr),
 #elif TRIO_OPENGL
 		m_shaderHandle(-1),
 #endif
@@ -37,7 +42,8 @@ namespace Cuado {
 #if TRIO_DIRECTX
 	Shader::Shader(GraphicsDevice* device, ShaderStage stage, ID3D11VertexShader* shader, const std::vector<uint8_t>& bytes, int hashKey) :
 		m_device(device),
-		m_stage(stage)
+		m_stage(stage),
+		m_pInputLayoutCache(nullptr)
 	{
 		m_shaderPtr.m_vertexShader = shader;
 
@@ -54,7 +60,8 @@ namespace Cuado {
 #if TRIO_DIRECTX
 	Shader::Shader(GraphicsDevice* device, ShaderStage stage, ID3D11PixelShader* shader) :
 		m_device(device),
-		m_stage(stage)
+		m_stage(stage),
+		m_pInputLayoutCache(nullptr)
 	{
 		m_shaderPtr.m_pixelShader = shader;
 
@@ -165,6 +172,8 @@ namespace Cuado {
 		{
 		case Cuado::ShaderStage::Vertex:
 			m_device->GetD3DDevice()->CreateVertexShader(&m_codeBytes[0], m_codeBytes.size(), nullptr, &m_shaderPtr.m_vertexShader);
+
+			m_pInputLayoutCache = new InputLayoutCache(m_device, this->m_codeBytes);
 
 			break;
 		case Cuado::ShaderStage::Pixel:

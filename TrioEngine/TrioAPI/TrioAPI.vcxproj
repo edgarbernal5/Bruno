@@ -177,6 +177,7 @@
     <ClInclude Include="Graphics\IGraphicsDeviceManager.h" />
     <ClInclude Include="Graphics\IGraphicsDeviceService.h" />
     <ClInclude Include="Graphics\IndexBuffer.h" />
+    <ClInclude Include="Graphics\InputLayoutCache.h" />
     <ClInclude Include="Graphics\IRenderTarget.h" />
     <ClInclude Include="Graphics\IServiceBase.h" />
     <ClInclude Include="Graphics\IServiceProvider.h" />
@@ -244,6 +245,7 @@
     <ClCompile Include="Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Graphics\GraphicsDeviceManager.cpp" />
     <ClCompile Include="Graphics\IndexBuffer.cpp" />
+    <ClCompile Include="Graphics\InputLayoutCache.cpp" />
     <ClCompile Include="Graphics\PresentationParameters.cpp" />
     <ClCompile Include="Graphics\RasterizerState.cpp" />
     <ClCompile Include="Graphics\RenderTarget2D.cpp" />

@@ -80,9 +80,9 @@ namespace Cuado
 				if ((graphics->GetPreferredBackBufferWidth() == 0) || (graphics->GetPreferredBackBufferHeight() == 0))
 				{
 					GraphicsAdapter* adapter = gdi1.Adapter;
-					num8 = adapter->GetCurrentDisplayMode()->Width * adapter->GetCurrentDisplayMode()->Height;
+					num8 = adapter->GetCurrentDisplayMode().Width * adapter->GetCurrentDisplayMode().Height;
 					GraphicsAdapter* adapter2 = gdi2.Adapter;
-					num9 = adapter2->GetCurrentDisplayMode()->Width * adapter2->GetCurrentDisplayMode()->Height;
+					num9 = adapter2->GetCurrentDisplayMode().Width * adapter2->GetCurrentDisplayMode().Height;
 				}
 				else
 				{
