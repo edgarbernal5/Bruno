@@ -201,6 +201,7 @@ namespace Cuado
 
 		std::vector <IDXGIAdapter*> vAdapters;
 
+		int idx = 0;
 		for (uint32_t adapterIndex = 0; dxgiFactory->EnumAdapters1(adapterIndex, &adapter) != DXGI_ERROR_NOT_FOUND; ++adapterIndex)
 		{
 			DXGI_ADAPTER_DESC1 desc;
@@ -209,7 +210,7 @@ namespace Cuado
 			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 			{
 				// Don't select the Basic Render Driver adapter.
-				//continue;
+				continue;
 			}
 
 #ifdef _DEBUG
@@ -218,7 +219,8 @@ namespace Cuado
 			//OutputDebugStringW(buff);
 #endif
 
-			m_adapters.push_back(new GraphicsAdapter(adapter.Detach(), adapterIndex));
+			m_adapters.push_back(new GraphicsAdapter(adapter.Detach(), idx));
+			++idx;
 		}
 		
 #elif TRIO_OPENGL

@@ -137,7 +137,6 @@ namespace Cuado
 
 				region.front = 0;
 				region.back = 1;
-
 				region.top = 0;
 				region.bottom = 1;
 				region.left = offsetInBytes;

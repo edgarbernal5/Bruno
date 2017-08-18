@@ -181,6 +181,7 @@
     <ClInclude Include="Graphics\IRenderTarget.h" />
     <ClInclude Include="Graphics\IServiceBase.h" />
     <ClInclude Include="Graphics\IServiceProvider.h" />
+    <ClInclude Include="Graphics\IVertexType.h" />
     <ClInclude Include="Graphics\PresentationParameters.h" />
     <ClInclude Include="Graphics\PrimitiveType.h" />
     <ClInclude Include="Graphics\RasterizerState.h" />
@@ -199,7 +200,10 @@
     <ClInclude Include="Graphics\VertexBuffer.h" />
     <ClInclude Include="Graphics\VertexBufferBinding.h" />
     <ClInclude Include="Graphics\VertexDeclaration.h" />
+    <ClInclude Include="Graphics\VertexDeclarationHelper.h" />
     <ClInclude Include="Graphics\VertexElement.h" />
+    <ClInclude Include="Graphics\VertexPosition.h" />
+    <ClInclude Include="Graphics\VertexPositionColor.h" />
     <ClInclude Include="Graphics\WindowsGameHost.h" />
     <ClInclude Include="Graphics\WindowsGameWindow.h" />
     <ClInclude Include="stdafx.h" />
@@ -258,7 +262,10 @@
     <ClCompile Include="Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Graphics\VertexBufferBinding.cpp" />
     <ClCompile Include="Graphics\VertexDeclaration.cpp" />
+    <ClCompile Include="Graphics\VertexDeclarationHelper.cpp" />
     <ClCompile Include="Graphics\VertexElement.cpp" />
+    <ClCompile Include="Graphics\VertexPosition.cpp" />
+    <ClCompile Include="Graphics\VertexPositionColor.cpp" />
     <ClCompile Include="Graphics\WindowsGameHost.cpp" />
     <ClCompile Include="Graphics\WindowsGameWindow.cpp" />
     <ClCompile Include="stdafx.cpp">

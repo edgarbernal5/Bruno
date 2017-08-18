@@ -20,6 +20,7 @@ using namespace Cuado;
 
 namespace Cuado {
 	class IndexBuffer;
+	class VertexBuffer;
 	class Effect;
 }
 
@@ -33,6 +34,8 @@ protected:
 	void Initialize();
 
 	IndexBuffer* m_pIndexBuffer;
+	VertexBuffer* m_pVertexBuffer;
+	
 	Effect* m_pEffect;
 };
 

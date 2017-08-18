@@ -17,7 +17,6 @@ namespace Cuado
 	class TRIOAPI_DLL Game {
 	public:
 		Game();
-		Game(HINSTANCE hInstance);
 		
 		virtual ~Game();
 

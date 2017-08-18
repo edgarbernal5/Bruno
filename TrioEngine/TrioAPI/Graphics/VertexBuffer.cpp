@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "VertexBuffer.h"
 
-#include "VertexDeclaration.h"
 
 namespace Cuado
 {

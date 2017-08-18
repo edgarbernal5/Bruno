@@ -4,6 +4,7 @@
 #include "ResourceEnums.h"
 
 #include "VertexBufferBinding.h"
+#include "VertexDeclaration.h"
 
 namespace Cuado
 {
@@ -43,7 +44,6 @@ namespace Cuado
 		GLuint m_pBuffer;
 #endif
 		GraphicsDevice * m_pDevice;
-
 
 		VertexDeclaration *m_pVertexDeclaration;
 		ResourceUsage m_eUsage;
@@ -130,8 +130,14 @@ namespace Cuado
 		switch (m_eUsage)
 		{
 		case ResourceUsage::Immutable:
-			if (m_pBuffer == nullptr) CreateBuffer(nullptr);
+			if (m_pBuffer == nullptr)
+			{
+				D3D11_SUBRESOURCE_DATA vinitData = { 0 };
+				vinitData.pSysMem = data;
 
+				CreateBuffer(&vinitData);
+			}
+			else 
 			{
 				//usar un ResourceRegion.
 
@@ -149,8 +155,14 @@ namespace Cuado
 			}
 			break;
 		case ResourceUsage::Dynamic:
-			if (m_pBuffer == nullptr) CreateBuffer(nullptr);
-			
+			if (m_pBuffer == nullptr)
+			{
+				D3D11_SUBRESOURCE_DATA vinitData = { 0 };
+				vinitData.pSysMem = data;
+
+				CreateBuffer(&vinitData);
+			}
+			else
 			{
 				MapMode mode = MapMode::WriteDiscard;
 				if ((options & SetDataOptions::NoOverwrite) == SetDataOptions::NoOverwrite)

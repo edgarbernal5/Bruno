@@ -9,6 +9,9 @@
 
 
 #include <Graphics\IndexBuffer.h>
+#include <Graphics\VertexBuffer.h>
+#include <Graphics\VertexPositionColor.h>
+#include <Graphics\VertexPosition.h>
 
 #include <memory>
 #include <iostream>
@@ -56,6 +59,30 @@ void DemoGame::Initialize()
 
 	m_pIndexBuffer->SetData<uint32_t>(indices, 36);
 
+	DirectX::SimpleMath::Color whiteColor(1, 1, 1);
+	DirectX::SimpleMath::Color blackColor(0, 0, 0);
+	DirectX::SimpleMath::Color redColor(1, 0, 0);
+	DirectX::SimpleMath::Color greenColor(0, 1, 0);
+	DirectX::SimpleMath::Color blueColor(0, 0, 1);
+	DirectX::SimpleMath::Color yellowColor(1, 0, 1);
+	DirectX::SimpleMath::Color cyanColor(0, 1, 1);
+	DirectX::SimpleMath::Color magentaColor(0, 0.5f, 1);
+
+	VertexPositionColor vertexs[] =
+	{
+		{ DirectX::SimpleMath::Vector3(-1.0f, -1.0f, -1.0f), whiteColor },
+		{ DirectX::SimpleMath::Vector3(-1.0f, +1.0f, -1.0f), blackColor },
+		{ DirectX::SimpleMath::Vector3(+1.0f, +1.0f, -1.0f), redColor },
+		{ DirectX::SimpleMath::Vector3(+1.0f, -1.0f, -1.0f), greenColor },
+		{ DirectX::SimpleMath::Vector3(-1.0f, -1.0f, +1.0f), blueColor },
+		{ DirectX::SimpleMath::Vector3(-1.0f, +1.0f, +1.0f), yellowColor },
+		{ DirectX::SimpleMath::Vector3(+1.0f, +1.0f, +1.0f), cyanColor },
+		{ DirectX::SimpleMath::Vector3(+1.0f, -1.0f, +1.0f), magentaColor }
+	};
+
+	int sizeVPC = sizeof(VertexPosition);
+	m_pVertexBuffer = new VertexBuffer(GetGraphicsDevice(), VertexPositionColor::GetVertexDeclaration(), 8);
+	m_pVertexBuffer->SetData<VertexPositionColor>(vertexs, 8);
 }
 
 void DemoGame::Draw(DX::StepTimer const & timer)
@@ -63,7 +90,6 @@ void DemoGame::Draw(DX::StepTimer const & timer)
 	DirectX::SimpleMath::Color black(0.0, 1.0f, 1.0f);
 	GetGraphicsDevice()->Clear(black);
 }
-
 
 void DemoGame::Update(DX::StepTimer const& timer)
 {
