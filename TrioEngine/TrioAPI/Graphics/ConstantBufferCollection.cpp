@@ -5,7 +5,6 @@
 
 namespace Cuado
 {
-
 	ConstantBufferCollection::ConstantBufferCollection() : m_count(0)
 	{
 		m_valid = 0;
@@ -16,7 +15,9 @@ namespace Cuado
 		}
 	}
 
-	ConstantBufferCollection::ConstantBufferCollection(ShaderStage stage) : m_count(0), m_stage(stage)
+	ConstantBufferCollection::ConstantBufferCollection(ShaderStage stage) : 
+		m_count(0), 
+		m_stage(stage)
 	{
 		m_valid = 0;
 		m_arrayBuffers = new ConstantBuffer*[16];
@@ -68,7 +69,7 @@ namespace Cuado
 			if (item != nullptr)
 			{
 #ifdef TRIO_DIRECTX
-				//item->Apply(m_stage, i);
+				item->Apply(m_stage, i);
 #elif TRIO_OPENGL
 				item->Apply(program);
 #endif

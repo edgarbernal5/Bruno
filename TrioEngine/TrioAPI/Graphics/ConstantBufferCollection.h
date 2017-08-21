@@ -33,11 +33,6 @@ namespace Cuado
 			return m_arrayBuffers[nIndex];
 		}
 
-#ifdef TRIO_DIRECTX
-		void SetConstantBuffers(GraphicsDevice* device);
-#elif TRIO_OPENGL
-		void SetConstantBuffers(GraphicsDevice* device, ShaderProgram* program);
-#endif
 
 		void clear();
 		void push_back(ConstantBuffer* item);
@@ -50,5 +45,11 @@ namespace Cuado
 
 		int m_valid;
 		int m_count;
+
+#ifdef TRIO_DIRECTX
+		void SetConstantBuffers(GraphicsDevice* device);
+#elif TRIO_OPENGL
+		void SetConstantBuffers(GraphicsDevice* device, ShaderProgram* program);
+#endif
 	};
 }

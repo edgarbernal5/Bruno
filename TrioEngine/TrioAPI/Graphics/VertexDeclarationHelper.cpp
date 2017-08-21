@@ -23,7 +23,7 @@ namespace Cuado
 			elements.push_back(item);
 
 			offset += GetTypeSize(temp.Format);
-	}
+		}
 
 		return new VertexDeclaration(elements);
 }

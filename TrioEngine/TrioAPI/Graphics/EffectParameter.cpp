@@ -32,7 +32,9 @@ namespace Cuado
 
 	void EffectParameter::SetValue(DirectX::SimpleMath::Matrix value)
 	{
-
+		DirectX::SimpleMath::Matrix transposed = value;
+		transposed = transposed.Transpose();
+		m_constantBuffer->SetInternalData((uint8_t*)&transposed.m[0][0], sizeof(value), m_offset);
 	}
 
 	void EffectParameter::SetValue(DirectX::SimpleMath::Vector2 value)

@@ -11,7 +11,8 @@ namespace Cuado
 		m_iN(0),
 		m_iCapacity(0)
 	{
-
+		m_iCapacity = 16;
+		m_pArray = new VertexBufferBinding[m_iCapacity];
 	}
 
 	VertexBufferBindings::~VertexBufferBindings() {
@@ -25,11 +26,14 @@ namespace Cuado
 
 	void VertexBufferBindings::clear()
 	{
-
+		m_iN = 0;
 	}
 
 	VertexBufferBindings::BaseType & VertexBufferBindings::operator[](int iIndex)
 	{
+		if (iIndex >= m_iN) {
+			m_iN = iIndex+1;
+		}
 		return m_pArray[iIndex];
 	}
 

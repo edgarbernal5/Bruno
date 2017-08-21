@@ -8,6 +8,15 @@
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
 #include "Shader.h"
+#include "ConstantBufferCollection.h"
+#include "TextureCollection.h"
+#include "SamplerStateCollection.h"
+
+#include "DepthStencilState.h"
+#include "RasterizerState.h"
+#include "BlendState.h"
+#include "SamplerState.h"
+
 #ifdef TRIO_DIRECTX
 #include "InputLayoutCache.h"
 #endif
@@ -41,6 +50,45 @@ namespace
 
 namespace Cuado
 {
+	int GetElementCountArray(PrimitiveType format, int primitiveCount)
+	{
+		switch (format)
+		{
+		case PrimitiveType::TriangleList:
+			return 3 * primitiveCount;
+		case PrimitiveType::TriangleStrip:
+			return 3 + (primitiveCount - 1); // ???
+		case PrimitiveType::LineList:
+			return primitiveCount * 2;
+		case PrimitiveType::LineStrip:
+			return primitiveCount + 1;
+		case PrimitiveType::PointList:
+			return primitiveCount;
+		default:
+			return 0;
+		}
+	}
+
+
+	D3D_PRIMITIVE_TOPOLOGY FormatToPrimitive(PrimitiveType format)
+	{
+		switch (format)
+		{
+		case PrimitiveType::TriangleList:
+			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		case PrimitiveType::TriangleStrip:
+			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+		case PrimitiveType::LineList:
+			return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+		case PrimitiveType::LineStrip:
+			return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+		case PrimitiveType::PointList:
+			return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+		default:
+			return (D3D_PRIMITIVE_TOPOLOGY)format;
+		}
+	}
+
 	GraphicsDevice::GraphicsDevice(GraphicsAdapter* adapter, PresentationParameters parameters) :
 		m_depthStencilBuffer(nullptr),
 		m_currentDepthStencilBuffer(nullptr),
@@ -61,11 +109,29 @@ namespace Cuado
 		m_pVertexShader(nullptr),
 		m_bVertexShaderDirty(false),
 
+		m_pVertexConstantBuffers(nullptr),
+		m_pPixelConstantBuffers(nullptr),
+
 		m_pPixelShader(nullptr),
-		m_bPixelShaderDirty(false)
+		m_bPixelShaderDirty(false),
+
+		m_RasterizerStateDirty(false),
+		m_RasterizerState(nullptr),
+
+		m_BlendStateDirty(false),
+		m_BlendState(nullptr),
+
+		m_DepthStencilStateDirty(false),
+		m_DepthStencilState(nullptr)
 	{
 		CreateDeviceResources();
 		CreateWindowSizeDependentResources();
+
+
+		DepthStencilState::InitStates();
+		RasterizerState::InitStates();
+		BlendState::InitStates();
+		SamplerState::InitStates();
 
 #ifdef TRIO_DIRECTX
 		for (size_t i = 0; i < MaxVertexBuffers; i++)
@@ -75,7 +141,11 @@ namespace Cuado
 			m_aVertexStrides[i] = 0;
 		}
 #endif
+		m_pTextureCollection = new TextureCollection(ShaderStage::Pixel);
+		m_pSamplerCollection = new SamplerStateCollection(ShaderStage::Pixel);
 
+		m_pVertexConstantBuffers = new ConstantBufferCollection(ShaderStage::Vertex);
+		m_pPixelConstantBuffers = new ConstantBufferCollection(ShaderStage::Pixel);
 
 		m_bIndexBufferDirty = true;
 		m_bVertexBufferDirty = true;
@@ -88,6 +158,22 @@ namespace Cuado
 
 	void GraphicsDevice::ApplyState(bool applyShaders)
 	{
+		if (m_BlendStateDirty)
+		{
+			m_BlendState->ApplyState(this);
+			m_BlendStateDirty = false;
+		}
+		if (m_DepthStencilStateDirty)
+		{
+			m_DepthStencilState->ApplyState(this);
+			m_DepthStencilStateDirty = false;
+		}
+		if (m_RasterizerStateDirty)
+		{
+			m_RasterizerState->ApplyState(this);
+			m_RasterizerStateDirty = false;
+		}
+
 		if (!applyShaders) {
 			return;
 		}
@@ -130,6 +216,16 @@ namespace Cuado
 			}
 		}
 
+		if (m_bVertexShaderDirty)
+		{
+#ifdef TRIO_DIRECTX
+			if (m_pVertexShader != nullptr)
+				m_d3dContext->VSSetShader(m_pVertexShader->m_shaderPtr.m_vertexShader, nullptr, 0);
+			else
+				m_d3dContext->VSSetShader(nullptr, nullptr, 0);
+#endif
+		}
+
 		if (m_bVertexShaderDirty || m_bVertexBufferDirty)
 		{
 #ifdef TRIO_DIRECTX
@@ -152,6 +248,11 @@ namespace Cuado
 #endif
 			m_bPixelShaderDirty = false;
 		}
+
+#ifdef TRIO_DIRECTX
+		m_pVertexConstantBuffers->SetConstantBuffers(this);
+		m_pPixelConstantBuffers->SetConstantBuffers(this);
+#endif
 	}
 
 	bool GraphicsDevice::AreSameVertexBindings(VertexBufferBindings &bindings)
@@ -525,6 +626,9 @@ namespace Cuado
 			static_cast<float>(backBufferHeight)
 		);
 
+		// Set the viewport.
+		m_d3dContext->RSSetViewports(1, &m_screenViewport);
+
 		m_currentRenderTargets[0] = m_d3dRenderTargetView.Get();
 #endif
 	}
@@ -533,8 +637,18 @@ namespace Cuado
 	{
 #ifdef TRIO_DIRECTX
 
+		ApplyState(true);
+
+		m_d3dContext->IASetPrimitiveTopology(FormatToPrimitive(primitiveType));
+		
+		m_pTextureCollection->BindAllTextures(this);
+		m_pSamplerCollection->BindAllSamplers(this);
+
+		int indexCount = GetElementCountArray(primitiveType, primitiveCount);
+		m_d3dContext->DrawIndexed(indexCount, startIndex, baseVertex);
 #endif
 	}
+
 	void GraphicsDevice::DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
 	{
 #ifdef TRIO_DIRECTX
@@ -599,10 +713,47 @@ namespace Cuado
 #endif
 	}
 
+	void GraphicsDevice::SetBlendState(BlendState* state)
+	{
+		if (m_BlendState == state)
+			return;
+
+		m_BlendState = state;
+		m_BlendStateDirty = true;
+	}
+
+	void GraphicsDevice::SetDepthStencilState(DepthStencilState* state)
+	{
+		if (m_DepthStencilState == state)
+			return;
+
+		m_DepthStencilState = state;
+		m_DepthStencilStateDirty = true;
+	}
+
+	void GraphicsDevice::SetConstantBuffer(ShaderStage stage, int slot, ConstantBuffer* buffer)
+	{
+		switch (stage)
+		{
+		case Cuado::ShaderStage::Vertex:
+			(*m_pVertexConstantBuffers)[slot] = buffer;
+			break;
+		case Cuado::ShaderStage::Pixel:
+			(*m_pPixelConstantBuffers)[slot] = buffer;
+			break;
+		case Cuado::ShaderStage::Geometry:
+			break;
+		case Cuado::ShaderStage::Compute:
+			break;
+		default:
+			break;
+		}
+	}
+
 	void GraphicsDevice::SetIndexBuffer(IndexBuffer* indexBuffer)
 	{
-		if (m_pIndexBuffer == indexBuffer)
-			return;
+		//if (m_pIndexBuffer == indexBuffer)
+		//	return;
 
 		m_pIndexBuffer = indexBuffer;
 		m_bIndexBufferDirty = true;
@@ -610,9 +761,9 @@ namespace Cuado
 
 	void GraphicsDevice::SetVertexBuffer(VertexBuffer* buffer)
 	{
-		if (m_vVertexBindings.size() == 1 && m_vVertexBindings[0].Buffer == buffer || 
-			m_vVertexBindings.size() == 0 && buffer == nullptr)
-			return;
+		//if (m_vVertexBindings.size() == 1 && m_vVertexBindings[0].Buffer == buffer || 
+		//	m_vVertexBindings.size() == 0 && buffer == nullptr)
+		//	return;
 
 		m_bVertexBufferDirty = true;
 
@@ -622,7 +773,7 @@ namespace Cuado
 			return;
 		}
 		//TODO:
-		//m_vVertexBindings = std::vector<VertexBufferBinding>(1);
+		m_vVertexBindings.clear();
 		m_vVertexBindings[0].Buffer = buffer;
 		m_vVertexBindings[0].Offset = 0;
 		m_vVertexBindings[0].Stride = buffer->GetVertexDeclaration()->GetVertexStride();
@@ -653,8 +804,8 @@ namespace Cuado
 
 	void GraphicsDevice::SetPixelShader(Shader* shader)
 	{
-		if (m_pPixelShader == shader)
-			return;
+		//if (m_pPixelShader == shader)
+		//	return;
 
 		m_pPixelShader = shader;
 		m_bPixelShaderDirty = true;
@@ -662,10 +813,18 @@ namespace Cuado
 
 	void GraphicsDevice::SetVertexShader(Shader* shader)
 	{
-		if (m_pVertexShader == shader)
-			return;
+		//if (m_pVertexShader == shader)
+		//	return;
 
 		m_pVertexShader = shader;
 		m_bVertexShaderDirty = true;
+	}
+	void GraphicsDevice::SetRasterizerState(RasterizerState* state)
+	{
+		//if (m_RasterizerState == state)
+		//	return;
+
+		m_RasterizerState = state;
+		m_RasterizerStateDirty = true;
 	}
 }

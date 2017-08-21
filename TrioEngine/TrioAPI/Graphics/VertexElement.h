@@ -64,7 +64,10 @@ namespace Cuado
 
 		bool operator ==(const VertexElement& other) const
 		{
-			return m_iOffset == other.m_iOffset && m_eFormat == other.m_eFormat && m_eUsage == other.m_eUsage && m_iUsageIndex == other.m_iUsageIndex;
+			return m_iOffset == other.m_iOffset && 
+				m_eFormat == other.m_eFormat &&
+				m_eUsage == other.m_eUsage &&
+				m_iUsageIndex == other.m_iUsageIndex;
 		}
 
 		bool operator !=(const VertexElement& other) const

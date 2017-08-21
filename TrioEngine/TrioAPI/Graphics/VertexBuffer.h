@@ -137,7 +137,7 @@ namespace Cuado
 
 				CreateBuffer(&vinitData);
 			}
-			else 
+			else
 			{
 				//usar un ResourceRegion.
 
@@ -218,7 +218,7 @@ namespace Cuado
 		glBufferSubData(GL_ARRAY_BUFFER, offsetInBytes, sizeInBytes, data);
 		GraphicsExtensions::checkGLError("vs glBufferSubData");
 #endif
-			}
+	}
 
 	template <class T>
 	void VertexBuffer::SetData(const T* data, int length)

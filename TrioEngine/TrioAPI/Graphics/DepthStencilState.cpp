@@ -38,8 +38,8 @@ namespace Cuado
 	void DepthStencilState::ApplyState(GraphicsDevice * device)
 	{
 
-#ifdef DIRECTX
-		if (m_State == nullptr)
+#ifdef TRIO_DIRECTX
+		if (m_state == nullptr)
         {
 			D3D11_DEPTH_STENCIL_DESC desc;
 			desc.DepthEnable = DepthBufferEnable;
@@ -74,10 +74,10 @@ namespace Cuado
 			desc.FrontFace.StencilFailOp = GetStencilOp(StencilFail);
 			desc.FrontFace.StencilPassOp = GetStencilOp(StencilPass);
 
-			HR(device->GetDevice()->CreateDepthStencilState(&desc, &m_State));
+			DX::ThrowIfFailed(device->GetD3DDevice()->CreateDepthStencilState(&desc, &m_state));
 		}
 
-		device->GetContext()->OMSetDepthStencilState(m_State, ReferenceStencil);
+		device->GetD3DDeviceContext()->OMSetDepthStencilState(m_state, ReferenceStencil);
 #elif OPENGL
 		if (DepthBufferEnable)
 			glEnable(GL_DEPTH_TEST);

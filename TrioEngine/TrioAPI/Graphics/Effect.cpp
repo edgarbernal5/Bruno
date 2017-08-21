@@ -119,7 +119,8 @@ namespace Cuado
 
 				for (size_t k = 0; k < pass11->numPassShader; k++)
 				{
-					if (strcmp(passShader->name, "VertexShader") == 0 || strcmp(passShader->name, "PixelShader") == 0) {
+					if (strcmp(passShader->name, "VertexShader") == 0 || strcmp(passShader->name, "PixelShader") == 0)
+					{
 						vector<size_t> bufferUsedIndex;
 						auto itm = m_mShadersByName.find(passShader->options->functionCallName);
 						if (itm == m_mShadersByName.end())

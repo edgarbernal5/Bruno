@@ -9,7 +9,7 @@ namespace Cuado
 {
 	class TRIOAPI_DLL VertexDeclaration;
 
-	class TRIOAPI_DLL VertexPositionColor : public IVertexType
+	struct TRIOAPI_DLL VertexPositionColor : IVertexType
 	{
 	public:
 		VertexPositionColor(DirectX::SimpleMath::Vector3 position, DirectX::SimpleMath::Color color);

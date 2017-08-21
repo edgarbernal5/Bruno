@@ -13,6 +13,7 @@
 #endif
 
 #include <Graphics/Game.h>
+#include <Graphics/SimpleMath.h>
 #include "StepTimer.h"
 
 
@@ -37,6 +38,11 @@ protected:
 	VertexBuffer* m_pVertexBuffer;
 	
 	Effect* m_pEffect;
+
+	void Magic();
+
+	float mRadius;
+	DirectX::SimpleMath::Vector3 m_position;
 };
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow);

@@ -10,10 +10,11 @@ namespace Cuado
 {
 	class TRIOAPI_DLL VertexDeclaration;
 
-	class TRIOAPI_DLL IVertexType
+	struct TRIOAPI_DLL IVertexType
 	{
 	public:
-		virtual ~IVertexType() {}
+		IVertexType(){ }
+		//virtual ~IVertexType() {}
 
 		//virtual VertexDeclaration* GetVertexDeclaration() = 0;
 	};

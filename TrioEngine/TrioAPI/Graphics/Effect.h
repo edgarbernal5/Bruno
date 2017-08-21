@@ -41,6 +41,8 @@ namespace Cuado
 		inline ConstantBufferCollection& GetConstantBuffers()	{ return m_ConstantBuffers; }
 
 		void CompileEffect(std::string filename, ShaderLanguageTarget target = ShaderLanguageTarget::HLSL);
+
+		friend class EffectPass;
 	private:
 
 		GraphicsDevice*			m_pDevice;

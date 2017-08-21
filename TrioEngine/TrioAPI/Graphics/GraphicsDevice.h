@@ -11,6 +11,7 @@
 #include "Event.h"
 #include "VertexBufferBinding.h"
 
+#include "StatesEnums.h"
 #include <vector>
 #include <memory>
 
@@ -30,6 +31,8 @@ namespace Cuado
 	class TRIOAPI_DLL SamplerStateCollection;
 	class TRIOAPI_DLL DepthStencilBuffer;
 	class TRIOAPI_DLL Shader;
+	class TRIOAPI_DLL ConstantBufferCollection;
+	class TRIOAPI_DLL ConstantBuffer;
 	
 	struct TRIOAPI_DLL VertexBufferBinding;
 
@@ -79,13 +82,13 @@ namespace Cuado
 
 		void Present();
 
-		//void SetBlendState(BlendState* state);
-		//void SetDepthStencilState(DepthStencilState* state);
+		void SetBlendState(BlendState* state);
+		void SetDepthStencilState(DepthStencilState* state);
 		void SetIndexBuffer(IndexBuffer *indexBuffer);
 		void SetVertexBuffer(VertexBuffer *buffer);
 		void SetVertexBuffer(VertexBufferBindings &bindings);
 
-		//void SetRasterizerState(RasterizerState* state);
+		void SetRasterizerState(RasterizerState* state);
 		//void SetSamplerState(int index, SamplerState* state);
 
 		void SetVertexShader(Shader* shader);
@@ -125,6 +128,18 @@ namespace Cuado
 		Shader* m_pPixelShader;
 		bool m_bPixelShaderDirty;
 
+		DepthStencilState* m_DepthStencilState;
+		bool m_DepthStencilStateDirty;
+
+		BlendState* m_BlendState;
+		bool m_BlendStateDirty;
+
+		RasterizerState* m_RasterizerState;
+		bool m_RasterizerStateDirty;
+
+		ConstantBufferCollection* m_pVertexConstantBuffers;
+		ConstantBufferCollection* m_pPixelConstantBuffers;
+
 		UINT                                            m_backBufferCount;
 #ifdef TRIO_DIRECTX
 		Microsoft::WRL::ComPtr<ID3D11Device>				m_d3dDevice;
@@ -154,6 +169,6 @@ namespace Cuado
 		bool AreSameVertexBindings(VertexBufferBindings &bindings);
 		void CreateDeviceResources();
 		void CreateWindowSizeDependentResources();
-
+		void SetConstantBuffer(ShaderStage stage, int slot, ConstantBuffer* buffer);
 	};
 }

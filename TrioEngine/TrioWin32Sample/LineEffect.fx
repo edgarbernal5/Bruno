@@ -26,7 +26,8 @@ VertexOut VS(VertexIn vin)
 	VertexOut vout;
 	
 	// Transform to homogeneous clip space.
-	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
+	//vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
+	vout.PosH = float4(vin.PosL, 1.0f);
 	
     vout.Color = vin.Color;
     
@@ -35,8 +36,9 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	float4 color = pin.Color;
-    return color;
+	//float4 color = pin.Color;
+    //return color;
+	return float4(1,0,0,1);
 }
 
 technique11 ColorTech

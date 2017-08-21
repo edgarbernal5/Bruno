@@ -11,11 +11,10 @@ struct VertexOut {
 };
 VertexOut VS(VertexIn vin) {
     VertexOut vout;
-    ((vout).PosH = mul(float4((vin).PosL, 1), gWorldViewProj));
+    ((vout).PosH = float4((vin).PosL, 1));
     ((vout).Color = (vin).Color);
     return vout;
 };
 float4 PS(VertexOut pin) : SV_Target {
-    float4 color = (pin).Color;
-    return color;
+    return float4(1, 0, 0, 1);
 };

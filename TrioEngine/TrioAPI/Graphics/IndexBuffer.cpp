@@ -45,6 +45,7 @@ namespace Cuado
 	{
 		D3D11_BUFFER_DESC ibd;
 		ResourceUsage usage = ResourceUsage::Default;
+		//ResourceUsage usage = m_eUsage;
 
 		ibd.ByteWidth = m_iIndexCount * (m_eElementSize == IndexElementSize::SixteenBits ? 2 : 4);
 		ibd.BindFlags = (uint32_t)BindFlags::IndexBuffer;

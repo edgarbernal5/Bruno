@@ -9,7 +9,7 @@ namespace Cuado
 {
 	class TRIOAPI_DLL VertexDeclaration;
 
-	class TRIOAPI_DLL VertexPosition : public IVertexType
+	struct TRIOAPI_DLL VertexPosition : IVertexType
 	{
 	public:
 		VertexPosition(DirectX::SimpleMath::Vector3 position);
