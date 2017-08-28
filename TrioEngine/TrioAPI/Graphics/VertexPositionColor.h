@@ -14,8 +14,8 @@ namespace Cuado
 	public:
 		VertexPositionColor(DirectX::SimpleMath::Vector3 position, DirectX::SimpleMath::Color color);
 
-		DirectX::SimpleMath::Vector3 GetPosition() { return m_position; }
-		DirectX::SimpleMath::Color GetColor() { return m_color; }
+		const DirectX::SimpleMath::Vector3& GetPosition()	{ return m_position; }
+		const DirectX::SimpleMath::Color& GetColor()		{ return m_color; }
 
 		static const int InputElementCount = 2;
 #if TRIO_DIRECTX
@@ -24,6 +24,7 @@ namespace Cuado
 		static const VertexElement InputElements[InputElementCount];
 #endif
 		static VertexDeclaration* GetVertexDeclaration();
+
 
 	private:
 		DirectX::SimpleMath::Vector3 m_position;

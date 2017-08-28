@@ -59,7 +59,6 @@ namespace Cuado
 		return m_array.size();
 	}
 
-
 	void EffectParameterCollection::push_back(EffectParameter* parameter)
 	{
 		if (parameter == nullptr)

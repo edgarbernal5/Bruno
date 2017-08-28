@@ -15,14 +15,14 @@ namespace Cuado
 			flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 
-		ID3DBlob* compiledShader;
-		ID3DBlob* errorMessages;
+		ID3DBlob* compiledShader = nullptr;
+		ID3DBlob* errorMessages = nullptr;
 
 		std::wstring pathWS(path.begin(), path.end());
 		//D3DX11CompileEffectFromFile
 		//TO-DO: tomar en cuenta las clases y funciones de Microsoft
 		//D3DX11CompileEffectFromFile
-
+		
 		HRESULT hr = D3DCompileFromFile(pathWS.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, functionName.c_str(),
 			profile.c_str(), flags, 0, &compiledShader, &errorMessages);
 

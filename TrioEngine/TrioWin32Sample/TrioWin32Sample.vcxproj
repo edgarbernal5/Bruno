@@ -158,11 +158,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TrioAPI\TrioAPI.vcxproj">
-      <Project>{04f7bd0e-332d-473e-81a0-e117bfb77b67}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

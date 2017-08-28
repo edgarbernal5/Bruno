@@ -25,7 +25,8 @@ namespace Cuado {
 	class Effect;
 }
 
-class DemoGame : public Game {
+class DemoGame : public Game
+{
 public:
 	DemoGame();
 

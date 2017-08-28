@@ -19,15 +19,14 @@ namespace Cuado
 		void BeginScreenDeviceChange(bool willBeFullScreen);
 		void EndScreenDeviceChange(std::string screenDeviceName, int clientWidth, int clientHeight);
 
-
 		Rectangle			GetClientBounds();
 		HWND				GetHandle();
 		std::string& const	GetScreenDeviceName();
 
-
 		Event<> Resume;
 		Event<> Suspend;
 
+		friend class WindowsGameHost;
 	private:
 		WindowsGameHost* m_host;
 		HWND m_hWnd;

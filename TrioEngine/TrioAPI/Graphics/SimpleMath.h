@@ -13,6 +13,7 @@
 
 #pragma once
 
+#if TRIO_DIRECTX
 #if !defined(__d3d11_h__) && !defined(__d3d11_x_h__) && !defined(__d3d12_h__) && !defined(__d3d12_x_h__)
 #error include d3d11.h or d3d12.h before including SimpleMath.h
 #endif
@@ -21,14 +22,17 @@
 #include <dxgi1_2.h>
 #endif
 
+#endif
+
 #include <functional>
 #include <assert.h>
 #include <memory.h>
 
+#if TRIO_DIRECTX
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXCollision.h>
-
+#endif
 
 namespace DirectX
 {
@@ -100,8 +104,13 @@ namespace DirectX
 
 		//------------------------------------------------------------------------------
 		// 2D vector
+#if TRIO_DIRECTX
 		struct Vector2 : public XMFLOAT2
+#elif TRIO_OPENGL
+		struct Vector2
+#endif
 		{
+#if TRIO_DIRECTX
 			Vector2() : XMFLOAT2(0.f, 0.f) {}
 			explicit Vector2(float x) : XMFLOAT2(x, x) {}
 			Vector2(float _x, float _y) : XMFLOAT2(_x, _y) {}
@@ -111,6 +120,14 @@ namespace DirectX
 			explicit Vector2(const XMVECTORF32& F) { this->x = F.f[0]; this->y = F.f[1]; }
 
 			operator XMVECTOR() const { return XMLoadFloat2(this); }
+#elif TRIO_OPENGL
+			float x;
+			float y;
+
+			Vector2() : x(0.0f), y(0.0f) {}
+			explicit Vector2(float _x) : x(_x), y(_x) {}
+			Vector2(float _x, float _y) : x(_x), y(_y) {}
+#endif
 
 			// Comparison operators
 			bool operator == (const Vector2& V) const;
@@ -118,8 +135,10 @@ namespace DirectX
 
 			// Assignment operators
 			Vector2& operator= (const Vector2& V) { x = V.x; y = V.y; return *this; }
+#if TRIO_DIRECTX
 			Vector2& operator= (const XMFLOAT2& V) { x = V.x; y = V.y; return *this; }
 			Vector2& operator= (const XMVECTORF32& F) { x = F.f[0]; y = F.f[1]; return *this; }
+#endif
 			Vector2& operator+= (const Vector2& V);
 			Vector2& operator-= (const Vector2& V);
 			Vector2& operator*= (const Vector2& V);
@@ -208,8 +227,13 @@ namespace DirectX
 
 		//------------------------------------------------------------------------------
 		// 3D vector
+#if TRIO_DIRECTX
 		struct Vector3 : public XMFLOAT3
+#elif TRIO_OPENGL
+		struct Vector3
+#endif
 		{
+#if TRIO_DIRECTX
 			Vector3() : XMFLOAT3(0.f, 0.f, 0.f) {}
 			explicit Vector3(float x) : XMFLOAT3(x, x, x) {}
 			Vector3(float _x, float _y, float _z) : XMFLOAT3(_x, _y, _z) {}
@@ -219,15 +243,26 @@ namespace DirectX
 			explicit Vector3(const XMVECTORF32& F) { this->x = F.f[0]; this->y = F.f[1]; this->z = F.f[2]; }
 
 			operator XMVECTOR() const { return XMLoadFloat3(this); }
+#elif TRIO_OPENGL
+			float x;
+			float y;
+			float z;
 
+
+			Vector3() : x(0.0f), y(0.0f), z(0.0f) {}
+			explicit Vector3(float _x) : x(_x), y(_x), z(_x) {}
+			Vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
+#endif
 			// Comparison operators
 			bool operator == (const Vector3& V) const;
 			bool operator != (const Vector3& V) const;
 
 			// Assignment operators
 			Vector3& operator= (const Vector3& V) { x = V.x; y = V.y; z = V.z; return *this; }
+#if TRIO_DIRECTX
 			Vector3& operator= (const XMFLOAT3& V) { x = V.x; y = V.y; z = V.z; return *this; }
 			Vector3& operator= (const XMVECTORF32& F) { x = F.f[0]; y = F.f[1]; z = F.f[2]; return *this; }
+#endif
 			Vector3& operator+= (const Vector3& V);
 			Vector3& operator-= (const Vector3& V);
 			Vector3& operator*= (const Vector3& V);
@@ -323,8 +358,13 @@ namespace DirectX
 
 		//------------------------------------------------------------------------------
 		// 4D vector
+#if TRIO_DIRECTX
 		struct Vector4 : public XMFLOAT4
+#elif TRIO_OPENGL
+		struct Vector4
+#endif
 		{
+#if TRIO_DIRECTX
 			Vector4() : XMFLOAT4(0.f, 0.f, 0.f, 0.f) {}
 			explicit Vector4(float x) : XMFLOAT4(x, x, x, x) {}
 			Vector4(float _x, float _y, float _z, float _w) : XMFLOAT4(_x, _y, _z, _w) {}
@@ -334,6 +374,16 @@ namespace DirectX
 			explicit Vector4(const XMVECTORF32& F) { this->x = F.f[0]; this->y = F.f[1]; this->z = F.f[2]; this->w = F.f[3]; }
 
 			operator XMVECTOR() const { return XMLoadFloat4(this); }
+#elif TRIO_OPENGL
+			float x;
+			float y;
+			float z;
+			float w;
+
+			Vector4() : x(0.f), y(0.f), z(0.f), w(0.f) {}
+			explicit Vector4(float _x) : x(_x), y(_x), z(_x), w(_x) {}
+			Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
+#endif
 
 			// Comparison operators
 			bool operator == (const Vector4& V) const;
@@ -341,8 +391,10 @@ namespace DirectX
 
 			// Assignment operators
 			Vector4& operator= (const Vector4& V) { x = V.x; y = V.y; z = V.z; w = V.w; return *this; }
+#if TRIO_DIRECTX
 			Vector4& operator= (const XMFLOAT4& V) { x = V.x; y = V.y; z = V.z; w = V.w; return *this; }
 			Vector4& operator= (const XMVECTORF32& F) { x = F.f[0]; y = F.f[1]; z = F.f[2]; w = F.f[3]; return *this; }
+#endif
 			Vector4& operator+= (const Vector4& V);
 			Vector4& operator-= (const Vector4& V);
 			Vector4& operator*= (const Vector4& V);
@@ -432,8 +484,13 @@ namespace DirectX
 
 		//------------------------------------------------------------------------------
 		// 4x4 Matrix (assumes right-handed cooordinates)
+#if TRIO_DIRECTX
 		struct Matrix : public XMFLOAT4X4
+#elif TRIO_OPENGL
+		struct Matrix
+#endif
 		{
+#if TRIO_DIRECTX
 			Matrix() : XMFLOAT4X4(1.f, 0, 0, 0,
 				0, 1.f, 0, 0,
 				0, 0, 1.f, 0,
@@ -461,16 +518,62 @@ namespace DirectX
 			Matrix(CXMMATRIX M) { XMStoreFloat4x4(this, M); }
 
 			operator XMMATRIX() const { return XMLoadFloat4x4(this); }
+#elif TRIO_OPENGL
 
+			union
+			{
+				struct
+				{
+					float _11, _12, _13, _14;
+					float _21, _22, _23, _24;
+					float _31, _32, _33, _34;
+					float _41, _42, _43, _44;
+				};
+				float m[4][4];
+			};
+
+			Matrix() : _11(1.f), _12(0), _13(0), _14(0),
+				_21(0), _22(1.f), _23(0), _24(0),
+				_31(0), _32(0), _33(1.f), _34(0),
+				_41(0), _42(0), _43(0), _44(1.f) {}
+
+			Matrix(float m00, float m01, float m02, float m03,
+				float m10, float m11, float m12, float m13,
+				float m20, float m21, float m22, float m23,
+				float m30, float m31, float m32, float m33)
+			{
+				m[0][0] = m00;
+				m[0][1] = m01;
+				m[0][2] = m02;
+				m[0][3] = m03;
+
+				m[1][0] = m10;
+				m[1][1] = m11;
+				m[1][2] = m12;
+				m[1][3] = m13;
+
+				m[2][0] = m20;
+				m[2][1] = m21;
+				m[2][2] = m22;
+				m[2][3] = m23;
+
+				m[3][0] = m30;
+				m[3][1] = m31;
+				m[3][2] = m32;
+				m[3][3] = m33;
+			}
+#endif
 			// Comparison operators
 			bool operator == (const Matrix& M) const;
 			bool operator != (const Matrix& M) const;
 
 			// Assignment operators
 			Matrix& operator= (const Matrix& M) { memcpy_s(this, sizeof(float) * 16, &M, sizeof(float) * 16); return *this; }
+#if TRIO_DIRECTX
 			Matrix& operator= (const XMFLOAT4X4& M) { memcpy_s(this, sizeof(float) * 16, &M, sizeof(XMFLOAT4X4)); return *this; }
 			Matrix& operator= (const XMFLOAT3X3& M);
 			Matrix& operator= (const XMFLOAT4X3& M);
+#endif
 			Matrix& operator+= (const Matrix& M);
 			Matrix& operator-= (const Matrix& M);
 			Matrix& operator*= (const Matrix& M);
@@ -577,8 +680,13 @@ namespace DirectX
 
 		//-----------------------------------------------------------------------------
 		// Plane
+#if TRIO_DIRECTX
 		struct Plane : public XMFLOAT4
+#elif TRIO_OPENGL
+		struct Plane
+#endif
 		{
+#if TRIO_DIRECTX
 			Plane() : XMFLOAT4(0.f, 1.f, 0.f, 0.f) {}
 			Plane(float _x, float _y, float _z, float _w) : XMFLOAT4(_x, _y, _z, _w) {}
 			Plane(const Vector3& normal, float d) : XMFLOAT4(normal.x, normal.y, normal.z, d) {}
@@ -591,6 +699,15 @@ namespace DirectX
 			explicit Plane(const XMVECTORF32& F) { this->x = F.f[0]; this->y = F.f[1]; this->z = F.f[2]; this->w = F.f[3]; }
 
 			operator XMVECTOR() const { return XMLoadFloat4(this); }
+#elif TRIO_OPENGL
+			float x;
+			float y;
+			float z;
+			float w;
+
+			Plane() : x(0.f), y(1.f), z(0.f), w(0.f) {}
+			Plane(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
+#endif
 
 			// Comparison operators
 			bool operator == (const Plane& p) const;
@@ -598,8 +715,10 @@ namespace DirectX
 
 			// Assignment operators
 			Plane& operator= (const Plane& p) { x = p.x; y = p.y; z = p.z; w = p.w; return *this; }
+#if TRIO_DIRECTX
 			Plane& operator= (const XMFLOAT4& p) { x = p.x; y = p.y; z = p.z; w = p.w; return *this; }
 			Plane& operator= (const XMVECTORF32& F) { x = F.f[0]; y = F.f[1]; z = F.f[2]; w = F.f[3]; return *this; }
+#endif
 
 			// Properties
 			Vector3 Normal() const { return Vector3(x, y, z); }
@@ -627,8 +746,13 @@ namespace DirectX
 
 		//------------------------------------------------------------------------------
 		// Quaternion
+#if TRIO_DIRECTX
 		struct Quaternion : public XMFLOAT4
+#elif TRIO_OPENGL
+		struct Quaternion
+#endif
 		{
+#if TRIO_DIRECTX
 			Quaternion() : XMFLOAT4(0, 0, 0, 1.f) {}
 			Quaternion(float _x, float _y, float _z, float _w) : XMFLOAT4(_x, _y, _z, _w) {}
 			Quaternion(const Vector3& v, float scalar) : XMFLOAT4(v.x, v.y, v.z, scalar) {}
@@ -639,6 +763,16 @@ namespace DirectX
 			explicit Quaternion(const XMVECTORF32& F) { this->x = F.f[0]; this->y = F.f[1]; this->z = F.f[2]; this->w = F.f[3]; }
 
 			operator XMVECTOR() const { return XMLoadFloat4(this); }
+#elif TRIO_OPENGL
+			float x;
+			float y;
+			float z;
+			float w;
+
+			Quaternion() : x(0.f), y(0.f), z(0.f), w(1.f) {}
+			Quaternion(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
+			Quaternion(const Vector3& v, float scalar) : x(v.x), y(v.y), z(v.z), w(scalar) {}
+#endif
 
 			// Comparison operators
 			bool operator == (const Quaternion& q) const;
@@ -646,8 +780,10 @@ namespace DirectX
 
 			// Assignment operators
 			Quaternion& operator= (const Quaternion& q) { x = q.x; y = q.y; z = q.z; w = q.w; return *this; }
+#if TRIO_DIRECTX
 			Quaternion& operator= (const XMFLOAT4& q) { x = q.x; y = q.y; z = q.z; w = q.w; return *this; }
 			Quaternion& operator= (const XMVECTORF32& F) { x = F.f[0]; y = F.f[1]; z = F.f[2]; w = F.f[3]; return *this; }
+#endif
 			Quaternion& operator+= (const Quaternion& q);
 			Quaternion& operator-= (const Quaternion& q);
 			Quaternion& operator*= (const Quaternion& q);
@@ -700,8 +836,13 @@ namespace DirectX
 
 		//------------------------------------------------------------------------------
 		// Color
+#if TRIO_DIRECTX
 		struct Color : public XMFLOAT4
+#elif TRIO_OPENGL
+		struct Color
+#endif
 		{
+#if TRIO_DIRECTX
 			Color() : XMFLOAT4(0, 0, 0, 1.f) {}
 			Color(float _r, float _g, float _b) : XMFLOAT4(_r, _g, _b, 1.f) {}
 			Color(float _r, float _g, float _b, float _a) : XMFLOAT4(_r, _g, _b, _a) {}
@@ -719,6 +860,20 @@ namespace DirectX
 			// RGBA XNA Game Studio packed color
 
 			operator XMVECTOR() const { return XMLoadFloat4(this); }
+#elif TRIO_OPENGL
+			float x;
+			float y;
+			float z;
+			float w;
+
+
+			Color() : x(0.f), y(0.f), z(0.f), w(1.f) {}
+			Color(float _r, float _g, float _b) : x(_r), y(_g), z(_b), w(1.0f) {}
+			Color(float _r, float _g, float _b, float _a) : x(_r), y(_g), z(_b), w(_a) {}
+			explicit Color(const Vector3& clr) : x(clr.x), y(clr.y), z(clr.z), w(1.0f) {}
+			explicit Color(const Vector4& clr) : x(clr.x), y(clr.y), z(clr.z), w(clr.w) {}
+#endif
+
 			operator const float*() const { return reinterpret_cast<const float*>(this); }
 
 			// Comparison operators
@@ -727,10 +882,12 @@ namespace DirectX
 
 			// Assignment operators
 			Color& operator= (const Color& c) { x = c.x; y = c.y; z = c.z; w = c.w; return *this; }
+#if TRIO_DIRECTX
 			Color& operator= (const XMFLOAT4& c) { x = c.x; y = c.y; z = c.z; w = c.w; return *this; }
 			Color& operator= (const XMVECTORF32& F) { x = F.f[0]; y = F.f[1]; z = F.f[2]; w = F.f[3]; return *this; }
 			Color& operator= (const DirectX::PackedVector::XMCOLOR& Packed);
 			Color& operator= (const DirectX::PackedVector::XMUBYTEN4& Packed);
+#endif
 			Color& operator+= (const Color& c);
 			Color& operator-= (const Color& c);
 			Color& operator*= (const Color& c);
@@ -754,10 +911,11 @@ namespace DirectX
 			float A() const { return w; }
 			void A(float a) { w = a; }
 
+#if TRIO_DIRECTX
 			// Color operations
 			DirectX::PackedVector::XMCOLOR BGRA() const;
 			DirectX::PackedVector::XMUBYTEN4 RGBA() const;
-
+#endif
 			Vector3 ToVector3() const;
 			Vector4 ToVector4() const;
 
@@ -791,6 +949,18 @@ namespace DirectX
 		Color operator* (const Color& C, float S);
 		Color operator/ (const Color& C1, const Color& C2);
 		Color operator* (float S, const Color& C);
+
+#if TRIO_OPENGL
+		struct BoundingSphere
+		{
+
+		};
+
+		struct BoundingBox
+		{
+
+		};
+#endif
 
 		//------------------------------------------------------------------------------
 		// Ray
@@ -876,10 +1046,11 @@ namespace DirectX
 
 			Vector3 Unproject(const Vector3& p, const Matrix& proj, const Matrix& view, const Matrix& world) const;
 			void Unproject(const Vector3& p, const Matrix& proj, const Matrix& view, const Matrix& world, Vector3& result) const;
-
+#if TRIO_DIRECTX
 			// Static methods
 			static RECT __cdecl ComputeDisplayArea(DXGI_SCALING scaling, UINT backBufferWidth, UINT backBufferHeight, int outputWidth, int outputHeight);
 			static RECT __cdecl ComputeTitleSafeArea(UINT backBufferWidth, UINT backBufferHeight);
+#endif
 		};
 
 #include "SimpleMath.inl"

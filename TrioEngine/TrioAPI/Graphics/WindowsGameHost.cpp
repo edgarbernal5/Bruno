@@ -27,6 +27,8 @@ namespace Cuado
 		m_pWindow->Suspend += ([=]() {
 			Suspend();
 		});
+
+		m_pWindow->GenerateWindow();
 	}
 
 	WindowsGameHost::~WindowsGameHost()
@@ -45,9 +47,6 @@ namespace Cuado
 
 	void WindowsGameHost::Run()
 	{
-		ShowWindow(m_pWindow->GetHandle(), SW_SHOW);
-		UpdateWindow(m_pWindow->GetHandle());
-
 		MSG msg = { 0 };
 		
 		while (msg.message != WM_QUIT)

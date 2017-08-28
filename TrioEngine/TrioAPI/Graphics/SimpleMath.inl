@@ -156,18 +156,26 @@ inline RECT Rectangle::Union(const RECT& rcta, const RECT& rctb)
 
 inline bool Vector2::operator == ( const Vector2& V ) const
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR v2 = XMLoadFloat2( &V );
     return XMVector2Equal( v1, v2 );
+#elif TRIO_OPENGL
+	return (x == V.x) && (y == V.y);
+#endif
 }
 
 inline bool Vector2::operator != ( const Vector2& V ) const
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR v2 = XMLoadFloat2( &V );
     return XMVector2NotEqual( v1, v2 );
+#elif TRIO_OPENGL
+	return (x != V.x) || (y != V.y);
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -176,50 +184,70 @@ inline bool Vector2::operator != ( const Vector2& V ) const
 
 inline Vector2& Vector2::operator+= (const Vector2& V)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR v2 = XMLoadFloat2( &V );
     XMVECTOR X = XMVectorAdd(v1,v2);
     XMStoreFloat2( this, X );
+#elif TRIO_OPENGL
+
+#endif
     return *this;
 }
 
 inline Vector2& Vector2::operator-= (const Vector2& V)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR v2 = XMLoadFloat2( &V );
     XMVECTOR X = XMVectorSubtract(v1,v2);
     XMStoreFloat2( this, X );
+#elif TRIO_OPENGL
+
+#endif
     return *this;
 }
 
 inline Vector2& Vector2::operator*= (const Vector2& V)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR v2 = XMLoadFloat2( &V );
     XMVECTOR X = XMVectorMultiply(v1,v2);
     XMStoreFloat2( this, X );
+#elif TRIO_OPENGL
+
+#endif
     return *this;
 }
 
 inline Vector2& Vector2::operator*= (float S)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR X = XMVectorScale(v1,S);
     XMStoreFloat2( this, X );
+#elif TRIO_OPENGL
+
+#endif
     return *this;
 } 
 
 inline Vector2& Vector2::operator/= (float S)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     assert( S != 0.0f );
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR X = XMVectorScale(v1, 1.f/S);
     XMStoreFloat2( this, X );
+#elif TRIO_OPENGL
+
+#endif
     return *this;
 } 
 
@@ -229,65 +257,101 @@ inline Vector2& Vector2::operator/= (float S)
 
 inline Vector2 operator+ (const Vector2& V1, const Vector2& V2)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( &V1 );
     XMVECTOR v2 = XMLoadFloat2( &V2 );
     XMVECTOR X = XMVectorAdd(v1,v2);
     Vector2 R;
     XMStoreFloat2( &R, X );
+#elif TRIO_OPENGL
+	Vector2 R;
+	R.x = V1.x + V2.x;
+	R.y = V1.y + V2.y;
+#endif
     return R;
 }
 
 inline Vector2 operator- (const Vector2& V1, const Vector2& V2)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( &V1 );
     XMVECTOR v2 = XMLoadFloat2( &V2 );
     XMVECTOR X = XMVectorSubtract(v1,v2);
     Vector2 R;
     XMStoreFloat2( &R, X );
+#elif TRIO_OPENGL
+	Vector2 R;
+	R.x = V1.x - V2.x;
+	R.y = V1.y - V2.y;
+#endif
     return R;
 }
 
 inline Vector2 operator* (const Vector2& V1, const Vector2& V2)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( &V1 );
     XMVECTOR v2 = XMLoadFloat2( &V2 );
     XMVECTOR X = XMVectorMultiply(v1,v2);
     Vector2 R;
     XMStoreFloat2( &R, X );
+#elif TRIO_OPENGL
+	Vector2 R;
+	R.x = V1.x * V2.x;
+	R.y = V1.y * V2.y;
+#endif
     return R;
 }
 
 inline Vector2 operator* (const Vector2& V, float S)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( &V );
     XMVECTOR X = XMVectorScale(v1,S);
     Vector2 R;
     XMStoreFloat2( &R, X );
+#elif TRIO_OPENGL
+	Vector2 R;
+	R.x = V.x * S;
+	R.y = V.y * S;
+#endif
     return R;
 }
 
 inline Vector2 operator/ (const Vector2& V1, const Vector2& V2)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( &V1 );
     XMVECTOR v2 = XMLoadFloat2( &V2 );
     XMVECTOR X = XMVectorDivide(v1,v2);
     Vector2 R;
     XMStoreFloat2( &R, X );
+#elif TRIO_OPENGL
+	Vector2 R;
+	R.x = V1.x / V2.x;
+	R.y = V1.y / V2.y;
+#endif
     return R;
 }
 
 inline Vector2 operator* (float S, const Vector2& V)
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( &V );
     XMVECTOR X = XMVectorScale(v1,S);
     Vector2 R;
     XMStoreFloat2( &R, X );
+#elif TRIO_OPENGL
+	Vector2 R;
+	R.x = V.x * S;
+	R.y = V.y * S;
+#endif
     return R;
 }
 
@@ -297,18 +361,26 @@ inline Vector2 operator* (float S, const Vector2& V)
 
 inline bool Vector2::InBounds( const Vector2& Bounds ) const
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR v2 = XMLoadFloat2( &Bounds );
     return XMVector2InBounds( v1, v2 );
+#elif TRIO_OPENGL
+	return false;
+#endif
 }
 
 inline float Vector2::Length() const
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR X = XMVector2Length( v1 );
     return XMVectorGetX( X );
+#elif TRIO_OPENGL
+	return false;
+#endif
 }
 
 inline float Vector2::LengthSquared() const

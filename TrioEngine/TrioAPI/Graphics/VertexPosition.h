@@ -12,9 +12,11 @@ namespace Cuado
 	struct TRIOAPI_DLL VertexPosition : IVertexType
 	{
 	public:
-		VertexPosition(DirectX::SimpleMath::Vector3 position);
+		VertexPosition() = default;
 
-		DirectX::SimpleMath::Vector3 GetPosition() { return m_position; }
+		VertexPosition(DirectX::SimpleMath::Vector3 const& position);
+
+		const DirectX::SimpleMath::Vector3& GetPosition() { return m_position; }
 
 		static const int InputElementCount = 1;
 #if TRIO_DIRECTX
@@ -23,6 +25,7 @@ namespace Cuado
 		static const VertexElement InputElements[InputElementCount];
 #endif
 		static VertexDeclaration* GetVertexDeclaration();
+
 
 	private:
 		DirectX::SimpleMath::Vector3 m_position;

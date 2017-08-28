@@ -64,7 +64,9 @@ namespace Cuado
 			desc.AntialiasedLineEnable = false;
 
 			desc.DepthBiasClamp = DepthBiasClamp;
-			DX::ThrowIfFailed(device->GetD3DDevice()->CreateRasterizerState(&desc, &m_State));
+			DX::ThrowIfFailed(
+				device->GetD3DDevice()->CreateRasterizerState(&desc, &m_State)
+			);
 		}
 
 		device->GetD3DDeviceContext()->RSSetState(m_State);

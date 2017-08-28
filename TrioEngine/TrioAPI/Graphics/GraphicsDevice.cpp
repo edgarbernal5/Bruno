@@ -478,7 +478,6 @@ namespace Cuado
 
 	void GraphicsDevice::CreateWindowSizeDependentResources()
 	{
-
 #ifdef TRIO_DIRECTX
 		if (!m_presentationParameters.GetHostHWND())
 		{
@@ -490,11 +489,7 @@ namespace Cuado
 		m_d3dContext->OMSetRenderTargets(_countof(nullViews), nullViews, nullptr);
 		m_currentRenderTargets = std::vector<ID3D11RenderTargetView*>(4, nullptr);
 
-		if (m_depthStencilBuffer)
-		{
-			m_depthStencilBuffer.reset();
-		}
-
+		m_depthStencilBuffer.reset();
 		m_d3dRenderTargetView.Reset();
 		m_d3dContext->Flush();
 
@@ -521,8 +516,7 @@ namespace Cuado
 				OutputDebugStringA(buff);
 #endif
 				// If the device was removed for any reason, a new device and swap chain will need to be created.
-				//HandleDeviceLost();
-				DeviceLost();
+				HandleDeviceLost();
 
 				// Everything is set up now. Do not continue execution of this method. HandleDeviceLost will reenter this method 
 				// and correctly set up the new device.
@@ -618,6 +612,9 @@ namespace Cuado
 			m_depthStencilBuffer.reset(new DepthStencilBuffer(this, backBufferWidth, backBufferHeight, m_presentationParameters.GetDepthStencilFormat()));
 		}
 
+		m_currentRenderTargets[0] = m_d3dRenderTargetView.Get();
+		m_d3dContext->OMSetRenderTargets(1, &m_currentRenderTargets[0], m_depthStencilBuffer->m_depthStencilView.Get());
+
 		// Set the 3D rendering viewport to target the entire window.
 		m_screenViewport = CD3D11_VIEWPORT(
 			0.0f,
@@ -629,20 +626,18 @@ namespace Cuado
 		// Set the viewport.
 		m_d3dContext->RSSetViewports(1, &m_screenViewport);
 
-		m_currentRenderTargets[0] = m_d3dRenderTargetView.Get();
 #endif
 	}
 
 	void GraphicsDevice::DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
 	{
 #ifdef TRIO_DIRECTX
-
 		ApplyState(true);
 
 		m_d3dContext->IASetPrimitiveTopology(FormatToPrimitive(primitiveType));
 		
-		m_pTextureCollection->BindAllTextures(this);
-		m_pSamplerCollection->BindAllSamplers(this);
+		//m_pTextureCollection->BindAllTextures(this);
+		//m_pSamplerCollection->BindAllSamplers(this);
 
 		int indexCount = GetElementCountArray(primitiveType, primitiveCount);
 		m_d3dContext->DrawIndexed(indexCount, startIndex, baseVertex);
@@ -656,6 +651,36 @@ namespace Cuado
 #endif
 	}
 
+	void GraphicsDevice::HandleDeviceLost()
+	{
+		DeviceLost();
+
+		m_depthStencilBuffer.reset();
+		m_d3dRenderTargetView.Reset();
+		m_swapChain.Reset();
+		m_swapChain1.Reset();
+		m_d3dContext.Reset();
+		m_d3dContext1.Reset();
+		m_d3dAnnotation.Reset();
+		m_d3dDevice1.Reset();
+
+#ifdef _DEBUG
+		{
+			ComPtr<ID3D11Debug> d3dDebug;
+			if (SUCCEEDED(m_d3dDevice.As(&d3dDebug)))
+			{
+				d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY);
+			}
+		}
+#endif
+		m_d3dDevice.Reset();
+
+		CreateDeviceResources();
+		CreateWindowSizeDependentResources();
+
+		DeviceRestored();
+	}
+
 	void GraphicsDevice::Reset(PresentationParameters presentationParameters)
 	{
 		m_presentationParameters = presentationParameters;
@@ -664,7 +689,8 @@ namespace Cuado
 
 	void GraphicsDevice::Reset(PresentationParameters presentationParameters, GraphicsAdapter* graphicsAdapter)
 	{
-		if (m_adapter != graphicsAdapter) {
+		if (m_adapter != graphicsAdapter)
+		{
 			//TO-DO:
 		}
 		m_adapter = graphicsAdapter;
@@ -703,8 +729,7 @@ namespace Cuado
 			sprintf_s(buff, "Device Lost on Present: Reason code 0x%08X\n", (hr == DXGI_ERROR_DEVICE_REMOVED) ? m_d3dDevice->GetDeviceRemovedReason() : hr);
 			OutputDebugStringA(buff);
 #endif
-			//HandleDeviceLost();
-			DeviceLost();
+			HandleDeviceLost();
 		}
 		else
 		{
@@ -752,8 +777,8 @@ namespace Cuado
 
 	void GraphicsDevice::SetIndexBuffer(IndexBuffer* indexBuffer)
 	{
-		//if (m_pIndexBuffer == indexBuffer)
-		//	return;
+		if (m_pIndexBuffer == indexBuffer)
+			return;
 
 		m_pIndexBuffer = indexBuffer;
 		m_bIndexBufferDirty = true;
@@ -761,9 +786,9 @@ namespace Cuado
 
 	void GraphicsDevice::SetVertexBuffer(VertexBuffer* buffer)
 	{
-		//if (m_vVertexBindings.size() == 1 && m_vVertexBindings[0].Buffer == buffer || 
-		//	m_vVertexBindings.size() == 0 && buffer == nullptr)
-		//	return;
+		if (m_vVertexBindings.size() == 1 && m_vVertexBindings[0].Buffer == buffer || 
+			m_vVertexBindings.size() == 0 && buffer == nullptr)
+			return;
 
 		m_bVertexBufferDirty = true;
 
@@ -804,8 +829,8 @@ namespace Cuado
 
 	void GraphicsDevice::SetPixelShader(Shader* shader)
 	{
-		//if (m_pPixelShader == shader)
-		//	return;
+		if (m_pPixelShader == shader)
+			return;
 
 		m_pPixelShader = shader;
 		m_bPixelShaderDirty = true;
@@ -813,16 +838,27 @@ namespace Cuado
 
 	void GraphicsDevice::SetVertexShader(Shader* shader)
 	{
-		//if (m_pVertexShader == shader)
-		//	return;
+		if (m_pVertexShader == shader)
+			return;
 
 		m_pVertexShader = shader;
 		m_bVertexShaderDirty = true;
 	}
+
+	void GraphicsDevice::SetViewport(DirectX::SimpleMath::Viewport viewport)
+	{
+		m_screenViewport = viewport;
+#ifdef TRIO_DIRECTX
+		m_d3dContext->RSSetViewports(1, &m_screenViewport);
+#elif TRIO_OPENGL
+
+#endif
+	}
+
 	void GraphicsDevice::SetRasterizerState(RasterizerState* state)
 	{
-		//if (m_RasterizerState == state)
-		//	return;
+		if (m_RasterizerState == state)
+			return;
 
 		m_RasterizerState = state;
 		m_RasterizerStateDirty = true;

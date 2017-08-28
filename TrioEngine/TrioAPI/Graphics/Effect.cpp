@@ -173,7 +173,7 @@ namespace Cuado
 							std::ofstream out(temporalFilename);
 							out << intermediario;
 							out.close();
-
+							
 							ID3DBlob* blob = EffectCompiler::CompileShader(temporalFilename, passShader->options->functionCallName, passShader->options->profile, nullptr, false);
 
 							vector<uint8_t> pData = vector<uint8_t>(blob->GetBufferSize());
@@ -349,6 +349,7 @@ namespace Cuado
 
 				field = (HLSLDeclaration*)field->nextStatement;
 			}
+
 			ConstantBuffer* nConstantBuffer = new ConstantBuffer(m_pDevice, buffer->name, bufferSize, constantFields);
 #if TRIO_OPENGL
 			nConstantBuffer->m_uniformBindingIndex = i;

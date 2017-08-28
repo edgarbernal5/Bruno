@@ -12,7 +12,6 @@ namespace Cuado
 
 	struct TRIOAPI_DLL IVertexType
 	{
-	public:
 		IVertexType(){ }
 		//virtual ~IVertexType() {}
 

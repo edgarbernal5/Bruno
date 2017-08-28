@@ -22,8 +22,6 @@ namespace Cuado
 		m_hInstance = host->GetGame()->m_hInstance;
 		if (m_hInstance == NULL)
 			m_hInstance = GetModuleHandle(NULL);
-
-		GenerateWindow();		
 	}
 
 
@@ -89,6 +87,9 @@ namespace Cuado
 		m_clientWidth = rc.right - rc.left;
 		m_clientHeight = rc.bottom - rc.top;
 
+		ShowWindow(m_hWnd, SW_SHOW);
+		UpdateWindow(m_hWnd);
+
 		return true;
 	}
 
@@ -102,9 +103,9 @@ namespace Cuado
 		switch (message)
 		{
 		case WM_PAINT:
+			//window->Paint();
 			hdc = BeginPaint(hWnd, &ps);
 			EndPaint(hWnd, &ps);
-			//window->Paint();
 			break;
 
 		case WM_SIZE:
@@ -151,9 +152,7 @@ namespace Cuado
 				
 				std::cout << "ClientSizeChanged" << std::endl;
 				window->ClientSizeChanged();
-			}
-			
-			
+			}			
 			break;
 
 		case WM_GETMINMAXINFO:

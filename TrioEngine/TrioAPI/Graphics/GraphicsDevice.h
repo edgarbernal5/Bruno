@@ -82,6 +82,9 @@ namespace Cuado
 
 		void Present();
 
+		void Reset(PresentationParameters presentationParameters);
+		void Reset(PresentationParameters presentationParameters, GraphicsAdapter* graphicsAdapter);
+
 		void SetBlendState(BlendState* state);
 		void SetDepthStencilState(DepthStencilState* state);
 		void SetIndexBuffer(IndexBuffer *indexBuffer);
@@ -93,12 +96,11 @@ namespace Cuado
 
 		void SetVertexShader(Shader* shader);
 		void SetPixelShader(Shader* shader);
-		//void SetViewport(DirectX::SimpleMath::Viewport viewport);
+		void SetViewport(DirectX::SimpleMath::Viewport viewport);
 
-		void Reset(PresentationParameters presentationParameters);
-		void Reset(PresentationParameters presentationParameters, GraphicsAdapter* graphicsAdapter);
 
 		Event<> DeviceLost;
+		Event<> DeviceRestored;
 
 		friend class GraphicsDeviceManager;
 		friend class EffectPass;
@@ -169,6 +171,7 @@ namespace Cuado
 		bool AreSameVertexBindings(VertexBufferBindings &bindings);
 		void CreateDeviceResources();
 		void CreateWindowSizeDependentResources();
+		void HandleDeviceLost();
 		void SetConstantBuffer(ShaderStage stage, int slot, ConstantBuffer* buffer);
 	};
 }

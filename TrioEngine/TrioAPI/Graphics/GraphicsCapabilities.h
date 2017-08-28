@@ -51,7 +51,7 @@ namespace Cuado
 		bool GetNonPowerOfTwo(GraphicsDevice* device);
 
 #ifdef TRIO_OPENGL
-		bool SearchExtension(vector<std::string>& extensions, std::string item);
+		bool SearchExtension(std::vector<std::string>& extensions, std::string item);
 #endif
 	};
 }

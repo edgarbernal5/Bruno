@@ -41,7 +41,7 @@ void DemoGame::Initialize()
 
 void DemoGame::Magic() {
 	m_pEffect = new Effect(GetGraphicsDevice(), "LineEffect.fx");
-	/*
+	
 	m_pIndexBuffer = new IndexBuffer(GetGraphicsDevice(), IndexElementSize::ThirtyTwoBits, 36, ResourceUsage::Immutable);
 
 	uint32_t indices[] = {
@@ -71,15 +71,7 @@ void DemoGame::Magic() {
 	};
 
 	m_pIndexBuffer->SetData<uint32_t>(indices, 36);
-	*/
-	m_pIndexBuffer = new IndexBuffer(GetGraphicsDevice(), IndexElementSize::ThirtyTwoBits, 3, ResourceUsage::Immutable);
-	uint32_t indices[] = {
-		// front face
-		2, 1, 0,
-		//0, 2, 3,
-	};
-	m_pIndexBuffer->SetData<uint32_t>(indices, 3);
-	/*
+	
 	DirectX::SimpleMath::Color whiteColor(1, 1, 1);
 	DirectX::SimpleMath::Color blackColor(0, 0, 0);
 	DirectX::SimpleMath::Color redColor(1, 0, 0);
@@ -101,40 +93,47 @@ void DemoGame::Magic() {
 		{ DirectX::SimpleMath::Vector3(+1.0f, -1.0f, +1.0f), magentaColor }
 	};
 
+	DirectX::SimpleMath::Vector3 tmpConst = vertexs[0].GetPosition();
+	tmpConst.x = 4.0f;
 	int sizeVPC = sizeof(VertexPositionColor);
 	m_pVertexBuffer = new VertexBuffer(GetGraphicsDevice(), VertexPositionColor::GetVertexDeclaration(), 8);
 	m_pVertexBuffer->SetData<VertexPositionColor>(vertexs, 8);
+	
+	/*m_pIndexBuffer = new IndexBuffer(GetGraphicsDevice(), IndexElementSize::SixteenBits, 6);
+	uint16_t indices[] = {
+		// front face
+		0, 1, 2,
+		1, 3, 2,
+	};
+	m_pIndexBuffer->SetData<uint16_t>(indices, 6);
 	*/
 
-	DirectX::SimpleMath::Color whiteColor(1, 1, 1);
-	DirectX::SimpleMath::Color blackColor(0, 0, 0);
-	DirectX::SimpleMath::Color redColor(1, 0, 0);
-	DirectX::SimpleMath::Color greenColor(0, 1, 0);
-	DirectX::SimpleMath::Color blueColor(0, 0, 1);
-	DirectX::SimpleMath::Color yellowColor(1, 0, 1);
-	DirectX::SimpleMath::Color cyanColor(0, 1, 1);
-	DirectX::SimpleMath::Color magentaColor(0, 0.5f, 1);
+	//DirectX::SimpleMath::Color whiteColor(1, 1, 1);
+	//DirectX::SimpleMath::Color blackColor(0, 0, 0);
+	//DirectX::SimpleMath::Color redColor(1, 0, 0);
+	//DirectX::SimpleMath::Color greenColor(0, 1, 0);
+	//DirectX::SimpleMath::Color blueColor(0, 0, 1);
+	//DirectX::SimpleMath::Color yellowColor(1, 0, 1);
+	//DirectX::SimpleMath::Color cyanColor(0, 1, 1);
+	//DirectX::SimpleMath::Color magentaColor(0, 0.5f, 1);
 
-	VertexPositionColor vertexs[] =
-	{
-		{ DirectX::SimpleMath::Vector3(+1.0f, -1.0f, 0.0f), redColor },
-		{ DirectX::SimpleMath::Vector3(-1.0f, -1.0f, 0.0f), redColor },
-		{ DirectX::SimpleMath::Vector3(-1.0f, +1.0f, 0.0f), redColor }
-	};
+	//VertexPositionColor vertexs[] =
+	//{
+	//	{ DirectX::SimpleMath::Vector3(-1.0f, +1.0f, 0.5f), redColor },
+	//	{ DirectX::SimpleMath::Vector3(+1.0f, +1.0f, 0.5f), blueColor },
+	//	{ DirectX::SimpleMath::Vector3(-1.0f, -1.0f, 0.5f), greenColor },
+	//	{ DirectX::SimpleMath::Vector3(+1.0f, -1.0f, 0.5f), redColor }
+	//};
+	
 
-	int sizeVPC = sizeof(VertexPositionColor);
-	m_pVertexBuffer = new VertexBuffer(GetGraphicsDevice(), VertexPositionColor::GetVertexDeclaration(), 3);
-	m_pVertexBuffer->SetData<VertexPositionColor>(vertexs, 3);
+	//int sizeVPC = sizeof(VertexPosition);
+
+	//m_pVertexBuffer = new VertexBuffer(GetGraphicsDevice(), VertexPosition::GetVertexDeclaration(), 4);
+	//m_pVertexBuffer->SetData<VertexPosition>(vertexs, 4);
 }
 
 void DemoGame::Draw(DX::StepTimer const & timer)
 {
-	//static bool firstDraw = true;
-	//if (firstDraw) {
-
-	//	firstDraw = false;
-	//	return;
-	//}
 	using namespace DirectX::SimpleMath;
 	Color LightSteelBlue(0.69f, 0.77f, 0.87f);
 
@@ -146,7 +145,7 @@ void DemoGame::Draw(DX::StepTimer const & timer)
 
 	//device->SetDepthStencilState(DepthStencilState::Default);
 	//device->SetBlendState(BlendState::Opaque);
-	device->SetRasterizerState(RasterizerState::CullNone);
+	device->SetRasterizerState(RasterizerState::CullClockwise);
 
 	Matrix view;
 	Matrix proj;
@@ -160,13 +159,12 @@ void DemoGame::Draw(DX::StepTimer const & timer)
 
 	view = Matrix::CreateLookAt(m_position, zero, up);
 
-	//viewProj = view*proj;
-	viewProj = Matrix();
+	viewProj = view*proj;
 
-//	m_pEffect->GetParameters()[0]->SetValue(viewProj);
+	m_pEffect->GetParameters()[0]->SetValue(viewProj);
 	m_pEffect->GetTechniques()[0]->GetPasses()[0]->Apply();
 
-	device->DrawIndexedPrimitives(PrimitiveType::TriangleList, 0, 0, 0, 0, 1);
+	device->DrawIndexedPrimitives(PrimitiveType::TriangleList, 0, 0, 8, 0, 12);
 }
 
 void DemoGame::Update(DX::StepTimer const& timer)
