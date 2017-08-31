@@ -182,6 +182,7 @@
     <ClInclude Include="Graphics\IServiceBase.h" />
     <ClInclude Include="Graphics\IServiceProvider.h" />
     <ClInclude Include="Graphics\IVertexType.h" />
+    <ClInclude Include="Graphics\OpenGLMath.h" />
     <ClInclude Include="Graphics\PresentationParameters.h" />
     <ClInclude Include="Graphics\PrimitiveType.h" />
     <ClInclude Include="Graphics\RasterizerState.h" />

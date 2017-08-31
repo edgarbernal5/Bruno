@@ -32,14 +32,14 @@
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXCollision.h>
+#elif TRIO_OPENGL
+#include "OpenGLMath.h"
 #endif
 
 namespace DirectX
 {
-
 	namespace SimpleMath
 	{
-
 		struct Vector2;
 		struct Vector4;
 		struct Matrix;
@@ -107,7 +107,7 @@ namespace DirectX
 #if TRIO_DIRECTX
 		struct Vector2 : public XMFLOAT2
 #elif TRIO_OPENGL
-		struct Vector2
+		struct Vector2 : public GLMFLOAT2
 #endif
 		{
 #if TRIO_DIRECTX
@@ -121,12 +121,10 @@ namespace DirectX
 
 			operator XMVECTOR() const { return XMLoadFloat2(this); }
 #elif TRIO_OPENGL
-			float x;
-			float y;
-
-			Vector2() : x(0.0f), y(0.0f) {}
-			explicit Vector2(float _x) : x(_x), y(_x) {}
-			Vector2(float _x, float _y) : x(_x), y(_y) {}
+			Vector2() : GLMFLOAT2(0.f, 0.f) {}
+			explicit Vector2(float x) : GLMFLOAT2(x, x) {}
+			Vector2(float _x, float _y) : GLMFLOAT2(_x, _y) {}
+			explicit Vector2(_In_reads_(2) const float *pArray) : GLMFLOAT2(pArray) {}
 #endif
 
 			// Comparison operators

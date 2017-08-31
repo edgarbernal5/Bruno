@@ -162,7 +162,10 @@ inline bool Vector2::operator == ( const Vector2& V ) const
     XMVECTOR v2 = XMLoadFloat2( &V );
     return XMVector2Equal( v1, v2 );
 #elif TRIO_OPENGL
-	return (x == V.x) && (y == V.y);
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 v2 = GXMLoadFloat2(&V);
+
+	return GLMVector2Equal(v1, v2);
 #endif
 }
 
@@ -174,7 +177,10 @@ inline bool Vector2::operator != ( const Vector2& V ) const
     XMVECTOR v2 = XMLoadFloat2( &V );
     return XMVector2NotEqual( v1, v2 );
 #elif TRIO_OPENGL
-	return (x != V.x) || (y != V.y);
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 v2 = GXMLoadFloat2(&V);
+
+	return GLMVector2NotEqual(v1, v2);
 #endif
 }
 
@@ -191,7 +197,10 @@ inline Vector2& Vector2::operator+= (const Vector2& V)
     XMVECTOR X = XMVectorAdd(v1,v2);
     XMStoreFloat2( this, X );
 #elif TRIO_OPENGL
-
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 v2 = GXMLoadFloat2(&V);
+	__m128 X = GLMVectorAdd(v1, v2);
+	GLMStoreFloat2(this, X);
 #endif
     return *this;
 }
@@ -205,7 +214,10 @@ inline Vector2& Vector2::operator-= (const Vector2& V)
     XMVECTOR X = XMVectorSubtract(v1,v2);
     XMStoreFloat2( this, X );
 #elif TRIO_OPENGL
-
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 v2 = GXMLoadFloat2(&V);
+	__m128 X = GLMVectorSubtract(v1, v2);
+	GLMStoreFloat2(this, X);
 #endif
     return *this;
 }
@@ -219,7 +231,10 @@ inline Vector2& Vector2::operator*= (const Vector2& V)
     XMVECTOR X = XMVectorMultiply(v1,v2);
     XMStoreFloat2( this, X );
 #elif TRIO_OPENGL
-
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 v2 = GXMLoadFloat2(&V);
+	__m128 X = GLMVectorMultiply(v1, v2);
+	GLMStoreFloat2(this, X);
 #endif
     return *this;
 }
@@ -232,7 +247,9 @@ inline Vector2& Vector2::operator*= (float S)
     XMVECTOR X = XMVectorScale(v1,S);
     XMStoreFloat2( this, X );
 #elif TRIO_OPENGL
-
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 X = GLMVectorScale(v1, S);
+	GLMStoreFloat2(this, X);
 #endif
     return *this;
 } 
@@ -246,7 +263,9 @@ inline Vector2& Vector2::operator/= (float S)
     XMVECTOR X = XMVectorScale(v1, 1.f/S);
     XMStoreFloat2( this, X );
 #elif TRIO_OPENGL
-
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 X = GLMVectorScale(v1, 1.0f / S);
+	GLMStoreFloat2(this, X);
 #endif
     return *this;
 } 
@@ -265,9 +284,11 @@ inline Vector2 operator+ (const Vector2& V1, const Vector2& V2)
     Vector2 R;
     XMStoreFloat2( &R, X );
 #elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(&V1);
+	__m128 v2 = GXMLoadFloat2(&V2);
+	__m128 X = GLMVectorAdd(v1, v2);
 	Vector2 R;
-	R.x = V1.x + V2.x;
-	R.y = V1.y + V2.y;
+	GLMStoreFloat2(&R, X);
 #endif
     return R;
 }
@@ -282,9 +303,11 @@ inline Vector2 operator- (const Vector2& V1, const Vector2& V2)
     Vector2 R;
     XMStoreFloat2( &R, X );
 #elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(&V1);
+	__m128 v2 = GXMLoadFloat2(&V2);
+	__m128 X = GLMVectorSubtract(v1, v2);
 	Vector2 R;
-	R.x = V1.x - V2.x;
-	R.y = V1.y - V2.y;
+	GLMStoreFloat2(&R, X);
 #endif
     return R;
 }
@@ -299,9 +322,11 @@ inline Vector2 operator* (const Vector2& V1, const Vector2& V2)
     Vector2 R;
     XMStoreFloat2( &R, X );
 #elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(&V1);
+	__m128 v2 = GXMLoadFloat2(&V2);
+	__m128 X = GLMVectorMultiply(v1, v2);
 	Vector2 R;
-	R.x = V1.x * V2.x;
-	R.y = V1.y * V2.y;
+	GLMStoreFloat2(&R, X);
 #endif
     return R;
 }
@@ -315,9 +340,10 @@ inline Vector2 operator* (const Vector2& V, float S)
     Vector2 R;
     XMStoreFloat2( &R, X );
 #elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(&V);
+	__m128 X = GLMVectorScale(v1, S);
 	Vector2 R;
-	R.x = V.x * S;
-	R.y = V.y * S;
+	GLMStoreFloat2(&R, X);
 #endif
     return R;
 }
@@ -332,9 +358,11 @@ inline Vector2 operator/ (const Vector2& V1, const Vector2& V2)
     Vector2 R;
     XMStoreFloat2( &R, X );
 #elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(&V1);
+	__m128 v2 = GXMLoadFloat2(&V2);
+	__m128 X = GLMVectorDivide(v1, v2);
 	Vector2 R;
-	R.x = V1.x / V2.x;
-	R.y = V1.y / V2.y;
+	GLMStoreFloat2(&R, X);
 #endif
     return R;
 }
@@ -348,9 +376,10 @@ inline Vector2 operator* (float S, const Vector2& V)
     Vector2 R;
     XMStoreFloat2( &R, X );
 #elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(&V);
+	__m128 X = GLMVectorScale(v1, S);
 	Vector2 R;
-	R.x = V.x * S;
-	R.y = V.y * S;
+	GLMStoreFloat2(&R, X);
 #endif
     return R;
 }
@@ -379,38 +408,64 @@ inline float Vector2::Length() const
     XMVECTOR X = XMVector2Length( v1 );
     return XMVectorGetX( X );
 #elif TRIO_OPENGL
-	return false;
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 X = GXMVector2Length(v1);
+
+	return GXMVectorGetX(X);
 #endif
 }
 
 inline float Vector2::LengthSquared() const
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR X = XMVector2LengthSq( v1 );
     return XMVectorGetX( X );
+#elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 X = GXMVector2LengthSq(v1);
+
+	return GXMVectorGetX(X);
+#endif
 }
 
 inline float Vector2::Dot( const Vector2& V ) const
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR v2 = XMLoadFloat2( &V );
     XMVECTOR X = XMVector2Dot( v1, v2 );
     return XMVectorGetX( X );
+#elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 v2 = GXMLoadFloat2(&V);
+	__m128 X = GXMVector2Dot(v1, v2);
+
+	return GXMVectorGetX(X);
+#endif
 }
 
 inline void Vector2::Cross( const Vector2& V, Vector2& result ) const
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR v2 = XMLoadFloat2( &V );
     XMVECTOR R = XMVector2Cross( v1, v2 );
     XMStoreFloat2( &result, R );
+#elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 v2 = GXMLoadFloat2(&V);
+	__m128 R = GXMVector2Cross(v1, v2);
+	GXMStoreFloat2(&result, R);
+#endif
 }
 
 inline Vector2 Vector2::Cross( const Vector2& V ) const
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR v2 = XMLoadFloat2( &V );
@@ -418,15 +473,29 @@ inline Vector2 Vector2::Cross( const Vector2& V ) const
 
     Vector2 result;
     XMStoreFloat2( &result, R );
-    return result;
+#elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 v2 = GXMLoadFloat2(&V);
+	__m128 R = GXMVector2Cross(v1, v2);
+	Vector2 result;
+	GXMStoreFloat2(&result, R);
+#endif
+	return result;
 }
 
 inline void Vector2::Normalize()
 {
+#if TRIO_DIRECTX
     using namespace DirectX;
     XMVECTOR v1 = XMLoadFloat2( this );
     XMVECTOR X = XMVector2Normalize( v1 );
     XMStoreFloat2( this, X );
+#elif TRIO_OPENGL
+	__m128 v1 = GXMLoadFloat2(this);
+	__m128 X = GXMVector2Normalize(v1);
+	GXMStoreFloat2(this, X);
+
+#endif
 }
 
 inline void Vector2::Normalize( Vector2& result ) const
