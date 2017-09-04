@@ -105,6 +105,11 @@ namespace Cuado
 		}
 	}
 
+	bool HasStencil(DepthFormat format)
+	{
+		return format == DepthFormat::Depth24Stencil8;
+	}
+
 
 #if TRIO_DIRECTX
 
@@ -171,11 +176,6 @@ namespace Cuado
 	bool HasStencil(DXGI_FORMAT format)
 	{
 		return format == DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT || format == DXGI_FORMAT::DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
-	}
-
-	bool HasStencil(DepthFormat format)
-	{
-		return format == DepthFormat::Depth24Stencil8;
 	}
 
 

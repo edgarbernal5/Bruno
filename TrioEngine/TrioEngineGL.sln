@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TrioFX", "TrioFX\TrioFX.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TrioAPIGL", "TrioAPI\TrioAPIGL.vcxproj", "{C4C683A2-FD01-4659-83D4-3CD1F2D768FA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TrioWin32GLSample", "TrioWin32Sample\TrioWin32GLSample.vcxproj", "{E0851A79-611A-43D0-9660-4DB7096886A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{C4C683A2-FD01-4659-83D4-3CD1F2D768FA}.Release|x64.Build.0 = Release|x64
 		{C4C683A2-FD01-4659-83D4-3CD1F2D768FA}.Release|x86.ActiveCfg = Release|Win32
 		{C4C683A2-FD01-4659-83D4-3CD1F2D768FA}.Release|x86.Build.0 = Release|Win32
+		{E0851A79-611A-43D0-9660-4DB7096886A9}.Debug|x64.ActiveCfg = Debug|x64
+		{E0851A79-611A-43D0-9660-4DB7096886A9}.Debug|x64.Build.0 = Debug|x64
+		{E0851A79-611A-43D0-9660-4DB7096886A9}.Debug|x86.ActiveCfg = Debug|Win32
+		{E0851A79-611A-43D0-9660-4DB7096886A9}.Debug|x86.Build.0 = Debug|Win32
+		{E0851A79-611A-43D0-9660-4DB7096886A9}.Release|x64.ActiveCfg = Release|x64
+		{E0851A79-611A-43D0-9660-4DB7096886A9}.Release|x64.Build.0 = Release|x64
+		{E0851A79-611A-43D0-9660-4DB7096886A9}.Release|x86.ActiveCfg = Release|Win32
+		{E0851A79-611A-43D0-9660-4DB7096886A9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

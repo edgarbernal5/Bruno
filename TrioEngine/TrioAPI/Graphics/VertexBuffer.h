@@ -6,6 +6,12 @@
 #include "VertexBufferBinding.h"
 #include "VertexDeclaration.h"
 
+#if TRIO_OPENGL
+//#include "GL/glew.h"
+//#include <GL/gl.h>
+#include "GraphicsExtensions.h"
+#endif
+
 namespace Cuado
 {
 	class TRIOAPI_DLL VertexDeclaration;
@@ -194,16 +200,16 @@ namespace Cuado
 		{
 			first = false;
 			glGenBuffers(1, &m_pBuffer);
-			GraphicsExtensions::checkGLError("Vertexbuffer");
+			CHECK_GL_ERROR(glGenBuffers);
 			glBindBuffer(GL_ARRAY_BUFFER, m_pBuffer);
-			GraphicsExtensions::checkGLError("Vertexbuffer");
+			CHECK_GL_ERROR(glBindBuffer);
 			glBufferData(GL_ARRAY_BUFFER, bufferSize, nullptr, (m_eUsage == ResourceUsage::Dynamic ? GL_STREAM_DRAW : GL_STATIC_DRAW));
-			GraphicsExtensions::checkGLError("Vertexbuffer");
+			CHECK_GL_ERROR(glBufferData);
 		}
 
 		if (first) {
 			glBindBuffer(GL_ARRAY_BUFFER, m_pBuffer);
-			GraphicsExtensions::checkGLError("Vertexbuffer");
+			CHECK_GL_ERROR(glBindBuffer);
 		}
 
 		if (options == SetDataOptions::Discard)
@@ -211,12 +217,12 @@ namespace Cuado
 			// By assigning NULL data to the buffer this gives a hint
 			// to the device to discard the previous content.
 			glBufferData(GL_ARRAY_BUFFER, bufferSize, nullptr, (m_eUsage == ResourceUsage::Dynamic ? GL_STREAM_DRAW : GL_STATIC_DRAW));
-			GraphicsExtensions::checkGLError("vs glBufferData");
+			CHECK_GL_ERROR(glBufferData);
 		}
 
 		//glBufferSubData(GL_ARRAY_BUFFER, offsetInBytes, sizeInBytes, (uint8_t*)(data)+startIndex * elementSizeInBytes);
 		glBufferSubData(GL_ARRAY_BUFFER, offsetInBytes, sizeInBytes, data);
-		GraphicsExtensions::checkGLError("vs glBufferSubData");
+		CHECK_GL_ERROR(glBufferSubData);
 #endif
 	}
 

@@ -10,6 +10,7 @@
 
 #include "Event.h"
 #include "VertexBufferBinding.h"
+#include "SimpleMath.h"
 
 #include "StatesEnums.h"
 #include <vector>
@@ -74,13 +75,14 @@ namespace Cuado
 		ID3D11RenderTargetView*	GetBackBufferRenderTargetView() const		{ return m_d3dRenderTargetView.Get(); }
 		//ID3D11DepthStencilView* GetDepthStencilView() const					{ return m_depthStencilBuffer->m_d3dDepthStencilView.Get(); }
 
-		D3D11_VIEWPORT          GetScreenViewport() const					{ return m_screenViewport; }
 		UINT                    GetBackBufferCount() const					{ return m_backBufferCount; }
 #endif
 
 		inline GraphicsCapabilities GetGraphicsCapabilities()				{ return m_graphicsCapabilities; }
 		inline TextureCollection* GetTextures()								{ return m_pTextureCollection; }
 		inline PresentationParameters& GetPresentationParameters()			{ return m_presentationParameters; }
+
+		Viewport          GetScreenViewport() const { return m_screenViewport; }
 
 		void Present();
 
@@ -158,7 +160,6 @@ namespace Cuado
 
 		// Direct3D rendering objects. Required for 3D.
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_d3dRenderTargetView;
-		D3D11_VIEWPORT                                  m_screenViewport;
 
 		std::vector<ID3D11RenderTargetView *>			m_currentRenderTargets;
 
@@ -170,10 +171,11 @@ namespace Cuado
 		uint32_t		m_aVertexOffsets[MaxVertexBuffers];
 		uint32_t		m_aVertexStrides[MaxVertexBuffers];
 #elif TRIO_OPENGL
-		Viewport				m_screenViewport;
 		ShaderProgramCache*		m_programCache;
 		ShaderProgram*			m_currentShaderProgram;
 #endif
+		Viewport				m_screenViewport;
+
 #if TRIO_OPENGL
 		void ActivateShaderProgram();
 #endif

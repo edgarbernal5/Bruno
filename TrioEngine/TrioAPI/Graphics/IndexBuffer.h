@@ -3,9 +3,14 @@
 #include "TrioAPI.h"
 #include "ResourceEnums.h"
 
+#if TRIO_OPENGL
+//#include "GL/glew.h"
+//#include <GL/gl.h>
+#include "GraphicsExtensions.h"
+#endif
+
 namespace Cuado
 {
-
 	class TRIOAPI_DLL GraphicsDevice;
 
 
@@ -180,40 +185,26 @@ namespace Cuado
 		{
 			first = false;
 			glGenBuffers(1, &m_pBuffer);
-			GraphicsExtensions::checkGLError("Indexbuffer glGenBuffers");
+			CHECK_GL_ERROR(glGenBuffers);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pBuffer);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferSize, nullptr, (m_eUsage == ResourceUsage::Dynamic ? GL_STREAM_DRAW : GL_STATIC_DRAW));
-			GraphicsExtensions::checkGLError("Indexbuffer glBufferData m_pBuffer == 0");
+			CHECK_GL_ERROR(glBufferData);
 		}
 
 		if (first) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pBuffer);
-			GraphicsExtensions::checkGLError("Indexbuffer first=true");
+			CHECK_GL_ERROR(glBindBuffer);
 		}
 		if (options == SetDataOptions::Discard)
 		{
 			// By assigning NULL data to the buffer this gives a hint
 			// to the device to discard the previous content.
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferSize, nullptr, (m_eUsage == ResourceUsage::Dynamic ? GL_STREAM_DRAW : GL_STATIC_DRAW));
-			GraphicsExtensions::checkGLError("Indexbuffer Discard");
+			CHECK_GL_ERROR(glBufferData);
 		}
 		uint8_t* dataPTR = ((uint8_t*)(data)) + startIndex * elementSizeInBytes;
 		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offsetInBytes, sizeInBytes, dataPTR);
-		std::stringstream ss;
-		ss << "elementSizeInBytes " << elementSizeInBytes << endl;
-		ss << "m_pBuffer " << m_pBuffer << endl;
-		ss << "offsetInBytes " << offsetInBytes << endl;
-		ss << "bufferSize " << bufferSize << endl;
-		ss << "sizeInBytes " << sizeInBytes << endl;
-		ss << "direccion " << (int)data << endl;
-		ss << "m_eUsage " << (int)m_eUsage << endl;
-		ss << "Indexbuffer main glBufferSubData" << endl;
-		for (size_t i = 0; i < 16; i++)
-		{
-			ss << " " << (int)dataPTR[i];
-		}
-		ss << endl;
-		GraphicsExtensions::checkGLError((char*)ss.str().c_str());
+		CHECK_GL_ERROR(glBufferSubData);
 #endif
 	}
 

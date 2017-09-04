@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F7D4A630-C32A-4297-94A6-61AE41872A95}</ProjectGuid>
+    <ProjectGuid>{E0851A79-611A-43D0-9660-4DB7096886A9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TrioWin32Sample</RootNamespace>
+    <RootNamespace>TrioWin32GLSample</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,7 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
+    <IncludePath>..\TrioAPI\Libraries\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\TrioAPI\Libraries\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -88,15 +89,15 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;TRIO_DIRECTX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;TRIO_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\TrioAPI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\TrioAPI</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>F:\Usuarios\Edgar\Documentos\Proyectos\CG\VagoEngine\TrioEngine\Debug;..\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>TrioFX.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Debug;F:\Usuarios\Edgar\Documentos\Proyectos\CG\VagoEngine\TrioEngine\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -157,11 +158,6 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TrioAPI\TrioAPI.vcxproj">
-      <Project>{04f7bd0e-332d-473e-81a0-e117bfb77b67}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

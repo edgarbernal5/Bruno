@@ -644,7 +644,7 @@ namespace Cuado
 		m_d3dContext->OMSetRenderTargets(1, &m_currentRenderTargets[0], m_depthStencilBuffer->m_depthStencilView.Get());
 
 		// Set the 3D rendering viewport to target the entire window.
-		m_screenViewport = CD3D11_VIEWPORT(
+		m_screenViewport = Viewport(
 			0.0f,
 			0.0f,
 			static_cast<float>(backBufferWidth),
@@ -652,7 +652,7 @@ namespace Cuado
 		);
 
 		// Set the viewport.
-		m_d3dContext->RSSetViewports(1, &m_screenViewport);
+		m_d3dContext->RSSetViewports(1, &(D3D11_VIEWPORT)(m_screenViewport));
 
 #endif
 	}
@@ -880,7 +880,7 @@ namespace Cuado
 	{
 		m_screenViewport = viewport;
 #ifdef TRIO_DIRECTX
-		m_d3dContext->RSSetViewports(1, &m_screenViewport);
+		m_d3dContext->RSSetViewports(1, &(D3D11_VIEWPORT)m_screenViewport);
 #elif TRIO_OPENGL
 
 #endif

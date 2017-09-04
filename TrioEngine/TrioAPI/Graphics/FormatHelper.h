@@ -18,6 +18,7 @@ namespace Cuado
 	int GetTypeSize(VertexElementFormat elementFormat);
 
 	uint32_t GetFrameLatency(PresentInterval interval);
+	bool HasStencil(DepthFormat format);
 
 #if TRIO_DIRECTX
 	DXGI_FORMAT ToFormat(SurfaceFormat format);
@@ -25,7 +26,6 @@ namespace Cuado
 	DepthFormat FromFormat(DXGI_FORMAT format);
 	SurfaceFormat ToSurfaceFormat(DXGI_FORMAT format);
 	bool HasStencil(DXGI_FORMAT format);
-	bool HasStencil(DepthFormat format);
 	DXGI_FORMAT ToFormat(IndexElementSize size);
 
 	int GetTypeSize(DXGI_FORMAT format);

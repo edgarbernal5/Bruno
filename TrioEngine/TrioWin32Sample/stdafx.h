@@ -21,13 +21,17 @@
 #if TRIO_DIRECTX
 #pragma comment(lib, "TrioAPI.lib")
 #elif TRIO_OPENGL
-
-
+//
+//
 //#include <GL/glew.h>
 //#include <GL/wglew.h>
+//
+//#include <GL/gl.h>
+//#include <GL/glu.h>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+//#pragma comment(lib, "glew32.lib")
+//#pragma comment(lib, "glew32s.lib")
+//#pragma comment(lib, "opengl32.lib")
 
 #pragma comment(lib, "TrioAPIGL.lib")
 #endif

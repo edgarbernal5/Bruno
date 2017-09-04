@@ -71,9 +71,11 @@ namespace Cuado {
 
 	Shader::~Shader()
 	{
+#if TRIO_OPENGL
 		if (m_iShaderObject != -1)
 		{
 		}
+#endif
 	}
 
 #if TRIO_OPENGL
