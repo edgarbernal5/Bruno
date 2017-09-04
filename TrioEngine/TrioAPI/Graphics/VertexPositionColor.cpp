@@ -21,7 +21,7 @@ namespace Cuado
 	};
 #endif
 
-	VertexPositionColor::VertexPositionColor(DirectX::SimpleMath::Vector3 position, DirectX::SimpleMath::Color color) :
+	VertexPositionColor::VertexPositionColor(Vector3 position, Color color) :
 		m_position(position),
 		m_color(color)
 	{

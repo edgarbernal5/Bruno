@@ -71,7 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);Libraries\include;$(IncludePath)</IncludePath>
+    <LibraryPath>Libraries\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -148,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Event.h" />
+    <ClInclude Include="GraphicsExtensions.h" />
     <ClInclude Include="Graphics\BlendState.h" />
     <ClInclude Include="Graphics\ConstantBuffer.h" />
     <ClInclude Include="Graphics\ConstantBufferCollection.h" />
@@ -182,7 +184,6 @@
     <ClInclude Include="Graphics\IServiceBase.h" />
     <ClInclude Include="Graphics\IServiceProvider.h" />
     <ClInclude Include="Graphics\IVertexType.h" />
-    <ClInclude Include="Graphics\OpenGLMath.h" />
     <ClInclude Include="Graphics\PresentationParameters.h" />
     <ClInclude Include="Graphics\PrimitiveType.h" />
     <ClInclude Include="Graphics\RasterizerState.h" />
@@ -193,13 +194,18 @@
     <ClInclude Include="Graphics\SamplerState.h" />
     <ClInclude Include="Graphics\SamplerStateCollection.h" />
     <ClInclude Include="Graphics\Shader.h" />
+    <ClInclude Include="Graphics\ShaderProgram.h" />
     <ClInclude Include="Graphics\SimpleMath.h" />
     <ClInclude Include="Graphics\StatesEnums.h" />
     <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="Graphics\Texture2D.h" />
     <ClInclude Include="Graphics\TextureCollection.h" />
+    <ClInclude Include="Graphics\TrioCollision.h" />
+    <ClInclude Include="Graphics\TrioMath.h" />
+    <ClInclude Include="Graphics\TrioPackedVector.h" />
     <ClInclude Include="Graphics\VertexBuffer.h" />
     <ClInclude Include="Graphics\VertexBufferBinding.h" />
+    <ClInclude Include="Graphics\VertexChannelNames.h" />
     <ClInclude Include="Graphics\VertexDeclaration.h" />
     <ClInclude Include="Graphics\VertexDeclarationHelper.h" />
     <ClInclude Include="Graphics\VertexElement.h" />
@@ -228,6 +234,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="GraphicsExtensions.cpp" />
     <ClCompile Include="Graphics\BlendState.cpp" />
     <ClCompile Include="Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Graphics\ConstantBufferCollection.cpp" />
@@ -257,11 +264,13 @@
     <ClCompile Include="Graphics\SamplerState.cpp" />
     <ClCompile Include="Graphics\SamplerStateCollection.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
+    <ClCompile Include="Graphics\ShaderProgram.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="Graphics\Texture2D.cpp" />
     <ClCompile Include="Graphics\TextureCollection.cpp" />
     <ClCompile Include="Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Graphics\VertexBufferBinding.cpp" />
+    <ClCompile Include="Graphics\VertexChannelNames.cpp" />
     <ClCompile Include="Graphics\VertexDeclaration.cpp" />
     <ClCompile Include="Graphics\VertexDeclarationHelper.cpp" />
     <ClCompile Include="Graphics\VertexElement.cpp" />

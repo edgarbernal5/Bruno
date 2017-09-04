@@ -7,7 +7,7 @@
 
 namespace Cuado
 {
-	class TRIOAPI_DLL IServiceProvider
+	class TRIOAPI_DLL IServicesProvider
 	{
 	public:
 		virtual IServiceBase* GetService(std::string typeName) = 0;

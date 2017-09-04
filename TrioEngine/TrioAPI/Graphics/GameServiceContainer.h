@@ -11,7 +11,7 @@ using namespace std;
 namespace Cuado
 {
 	
-	class TRIOAPI_DLL GameServiceContainer : public IServiceProvider
+	class TRIOAPI_DLL GameServiceContainer : public Cuado::IServicesProvider
 	{
 	public:
 		GameServiceContainer();

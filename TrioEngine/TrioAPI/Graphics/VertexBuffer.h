@@ -40,7 +40,7 @@ namespace Cuado
 		//ID3D11InputLayout* m_InputLayout;
 
 		void CreateBuffer(D3D11_SUBRESOURCE_DATA* subdata);
-#elif OPENGL
+#elif TRIO_OPENGL
 		GLuint m_pBuffer;
 #endif
 		GraphicsDevice * m_pDevice;

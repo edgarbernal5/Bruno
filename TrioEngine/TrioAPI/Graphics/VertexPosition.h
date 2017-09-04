@@ -5,6 +5,10 @@
 #include "IVertexType.h"
 #include "SimpleMath.h"
 
+
+#if TRIO_OPENGL
+#include "VertexElement.h"
+#endif
 namespace Cuado
 {
 	class TRIOAPI_DLL VertexDeclaration;
@@ -14,9 +18,9 @@ namespace Cuado
 	public:
 		VertexPosition() = default;
 
-		VertexPosition(DirectX::SimpleMath::Vector3 const& position);
+		VertexPosition(Vector3 const& position);
 
-		const DirectX::SimpleMath::Vector3& GetPosition() { return m_position; }
+		const Vector3& GetPosition() { return m_position; }
 
 		static const int InputElementCount = 1;
 #if TRIO_DIRECTX
@@ -28,7 +32,7 @@ namespace Cuado
 
 
 	private:
-		DirectX::SimpleMath::Vector3 m_position;
+		Vector3 m_position;
 
 		static VertexDeclaration* g_VertexDeclaration;
 	};

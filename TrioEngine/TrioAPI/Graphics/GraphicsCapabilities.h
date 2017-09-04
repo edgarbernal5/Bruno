@@ -4,6 +4,7 @@
 #include "TrioAPI.h"
 #include <vector>
 #include <string>
+#include <sstream>
 
 namespace Cuado
 {

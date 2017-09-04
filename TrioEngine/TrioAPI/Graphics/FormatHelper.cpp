@@ -4,6 +4,111 @@
 
 namespace Cuado
 {
+
+	int GetTypeSize(SurfaceFormat format)
+	{
+		switch (format)
+		{
+		case SurfaceFormat::Dxt1:
+		case SurfaceFormat::Dxt1a:
+		case SurfaceFormat::RgbPvrtc2Bpp:
+		case SurfaceFormat::RgbaPvrtc2Bpp:
+		case SurfaceFormat::RgbEtc1:
+			// One texel in DXT1, PVRTC 2bpp and ETC1 is a minimum 4x4 block, which is 8 bytes
+			return 8;
+		case SurfaceFormat::Dxt3:
+		case SurfaceFormat::Dxt5:
+		case SurfaceFormat::RgbPvrtc4Bpp:
+		case SurfaceFormat::RgbaPvrtc4Bpp:
+			// One texel in DXT3, DXT5 and PVRTC 4bpp is a minimum 4x4 block, which is 16 bytes
+			return 16;
+		case SurfaceFormat::Alpha8:
+			return 1;
+		case SurfaceFormat::Bgr565:
+		case SurfaceFormat::Bgra4444:
+		case SurfaceFormat::Bgra5551:
+		case SurfaceFormat::HalfSingle:
+		case SurfaceFormat::NormalizedByte2:
+			return 2;
+		case SurfaceFormat::Color:
+		case SurfaceFormat::Single:
+		case SurfaceFormat::Rg32:
+		case SurfaceFormat::HalfVector2:
+		case SurfaceFormat::NormalizedByte4:
+		case SurfaceFormat::Rgba1010102:
+			return 4;
+		case SurfaceFormat::HalfVector4:
+		case SurfaceFormat::Rgba64:
+		case SurfaceFormat::Vector2:
+			return 8;
+		case SurfaceFormat::Vector4:
+			return 16;
+			return 0;
+		}
+	}
+
+	int GetTypeSize(VertexElementFormat elementFormat)
+	{
+		switch (elementFormat)
+		{
+		case VertexElementFormat::Single:
+			return 4;
+
+		case VertexElementFormat::Vector2:
+			return 8;
+
+		case VertexElementFormat::Vector3:
+			return 12;
+
+		case VertexElementFormat::Vector4:
+			return 16;
+
+		case VertexElementFormat::Color:
+			return 4;
+
+		case VertexElementFormat::Byte4:
+			return 4;
+
+		case VertexElementFormat::Short2:
+			return 4;
+
+		case VertexElementFormat::Short4:
+			return 8;
+
+		case VertexElementFormat::NormalizedShort2:
+			return 4;
+
+		case VertexElementFormat::NormalizedShort4:
+			return 8;
+
+		case VertexElementFormat::HalfVector2:
+			return 4;
+
+		case VertexElementFormat::HalfVector4:
+			return 8;
+		}
+		return 0;
+	}
+
+	uint32_t GetFrameLatency(PresentInterval interval)
+	{
+		switch (interval)
+		{
+		case PresentInterval::Immediate:
+			return 0;
+
+		case PresentInterval::Two:
+			return 2;
+
+		default:
+			return 1;
+		}
+	}
+
+
+#if TRIO_DIRECTX
+
+
 	//TO-DO: Faltan formatos...
 	DXGI_FORMAT ToFormat(SurfaceFormat format)
 	{
@@ -121,91 +226,6 @@ namespace Cuado
 		}
 	}
 
-	int GetTypeSize(SurfaceFormat format)
-	{
-		switch (format)
-		{
-		case SurfaceFormat::Dxt1:
-		case SurfaceFormat::Dxt1a:
-		case SurfaceFormat::RgbPvrtc2Bpp:
-		case SurfaceFormat::RgbaPvrtc2Bpp:
-		case SurfaceFormat::RgbEtc1:
-			// One texel in DXT1, PVRTC 2bpp and ETC1 is a minimum 4x4 block, which is 8 bytes
-			return 8;
-		case SurfaceFormat::Dxt3:
-		case SurfaceFormat::Dxt5:
-		case SurfaceFormat::RgbPvrtc4Bpp:
-		case SurfaceFormat::RgbaPvrtc4Bpp:
-			// One texel in DXT3, DXT5 and PVRTC 4bpp is a minimum 4x4 block, which is 16 bytes
-			return 16;
-		case SurfaceFormat::Alpha8:
-			return 1;
-		case SurfaceFormat::Bgr565:
-		case SurfaceFormat::Bgra4444:
-		case SurfaceFormat::Bgra5551:
-		case SurfaceFormat::HalfSingle:
-		case SurfaceFormat::NormalizedByte2:
-			return 2;
-		case SurfaceFormat::Color:
-		case SurfaceFormat::Single:
-		case SurfaceFormat::Rg32:
-		case SurfaceFormat::HalfVector2:
-		case SurfaceFormat::NormalizedByte4:
-		case SurfaceFormat::Rgba1010102:
-			return 4;
-		case SurfaceFormat::HalfVector4:
-		case SurfaceFormat::Rgba64:
-		case SurfaceFormat::Vector2:
-			return 8;
-		case SurfaceFormat::Vector4:
-			return 16;
-			return 0;
-		}
-	}
-
-	int GetTypeSize(VertexElementFormat elementFormat)
-	{
-		switch (elementFormat)
-		{
-		case VertexElementFormat::Single:
-			return 4;
-
-		case VertexElementFormat::Vector2:
-			return 8;
-
-		case VertexElementFormat::Vector3:
-			return 12;
-
-		case VertexElementFormat::Vector4:
-			return 16;
-
-		case VertexElementFormat::Color:
-			return 4;
-
-		case VertexElementFormat::Byte4:
-			return 4;
-
-		case VertexElementFormat::Short2:
-			return 4;
-
-		case VertexElementFormat::Short4:
-			return 8;
-
-		case VertexElementFormat::NormalizedShort2:
-			return 4;
-
-		case VertexElementFormat::NormalizedShort4:
-			return 8;
-
-		case VertexElementFormat::HalfVector2:
-			return 4;
-
-		case VertexElementFormat::HalfVector4:
-			return 8;
-		}
-		return 0;
-	}
-
 	DXGI_SWAP_EFFECT ToSwapEffect(PresentInterval presentInterval)
 	{
 		DXGI_SWAP_EFFECT effect = DXGI_SWAP_EFFECT_DISCARD;
@@ -223,19 +243,5 @@ namespace Cuado
 		}
 		return effect;
 	}
-
-	uint32_t GetFrameLatency(PresentInterval interval)
-	{
-		switch (interval)
-		{
-		case PresentInterval::Immediate:
-			return 0;
-
-		case PresentInterval::Two:
-			return 2;
-
-		default:
-			return 1;
-		}
-	}
+#endif
 }

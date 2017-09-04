@@ -16,7 +16,7 @@ namespace Cuado
 		BlendFunction AlphaBlendFunction;
 		Blend AlphaDestinationBlend;
 		Blend AlphaSourceBlend;
-		DirectX::SimpleMath::Vector4 BlendFactor;
+		Vector4 BlendFactor;
 		BlendFunction ColorBlendFunction;
 		Blend ColorDestinationBlend;
 		Blend ColorSourceBlend;
@@ -36,8 +36,8 @@ namespace Cuado
 #ifdef TRIO_DIRECTX
 		inline static D3D11_BLEND_OP GetBlendOperation(BlendFunction blend);
 		static D3D11_BLEND GetBlendOption(Blend blend, bool alpha);
-#endif
 		uint8_t GetColorWriteMask(ColorWriteChannels mask);
+#endif
 
 		friend class GraphicsDevice;
 	private:

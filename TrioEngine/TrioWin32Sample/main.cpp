@@ -72,28 +72,28 @@ void DemoGame::Magic() {
 
 	m_pIndexBuffer->SetData<uint32_t>(indices, 36);
 	
-	DirectX::SimpleMath::Color whiteColor(1, 1, 1);
-	DirectX::SimpleMath::Color blackColor(0, 0, 0);
-	DirectX::SimpleMath::Color redColor(1, 0, 0);
-	DirectX::SimpleMath::Color greenColor(0, 1, 0);
-	DirectX::SimpleMath::Color blueColor(0, 0, 1);
-	DirectX::SimpleMath::Color yellowColor(1, 0, 1);
-	DirectX::SimpleMath::Color cyanColor(0, 1, 1);
-	DirectX::SimpleMath::Color magentaColor(0, 0.5f, 1);
+	Color whiteColor(1, 1, 1);
+	Color blackColor(0, 0, 0);
+	Color redColor(1, 0, 0);
+	Color greenColor(0, 1, 0);
+	Color blueColor(0, 0, 1);
+	Color yellowColor(1, 0, 1);
+	Color cyanColor(0, 1, 1);
+	Color magentaColor(0, 0.5f, 1);
 
 	VertexPositionColor vertexs[] =
 	{
-		{ DirectX::SimpleMath::Vector3(-1.0f, -1.0f, -1.0f), whiteColor },
-		{ DirectX::SimpleMath::Vector3(-1.0f, +1.0f, -1.0f), blackColor },
-		{ DirectX::SimpleMath::Vector3(+1.0f, +1.0f, -1.0f), redColor },
-		{ DirectX::SimpleMath::Vector3(+1.0f, -1.0f, -1.0f), greenColor },
-		{ DirectX::SimpleMath::Vector3(-1.0f, -1.0f, +1.0f), blueColor },
-		{ DirectX::SimpleMath::Vector3(-1.0f, +1.0f, +1.0f), yellowColor },
-		{ DirectX::SimpleMath::Vector3(+1.0f, +1.0f, +1.0f), cyanColor },
-		{ DirectX::SimpleMath::Vector3(+1.0f, -1.0f, +1.0f), magentaColor }
+		{ Vector3(-1.0f, -1.0f, -1.0f), whiteColor },
+		{ Vector3(-1.0f, +1.0f, -1.0f), blackColor },
+		{ Vector3(+1.0f, +1.0f, -1.0f), redColor },
+		{ Vector3(+1.0f, -1.0f, -1.0f), greenColor },
+		{ Vector3(-1.0f, -1.0f, +1.0f), blueColor },
+		{ Vector3(-1.0f, +1.0f, +1.0f), yellowColor },
+		{ Vector3(+1.0f, +1.0f, +1.0f), cyanColor },
+		{ Vector3(+1.0f, -1.0f, +1.0f), magentaColor }
 	};
 
-	DirectX::SimpleMath::Vector3 tmpConst = vertexs[0].GetPosition();
+	Vector3 tmpConst = vertexs[0].GetPosition();
 	tmpConst.x = 4.0f;
 	int sizeVPC = sizeof(VertexPositionColor);
 	m_pVertexBuffer = new VertexBuffer(GetGraphicsDevice(), VertexPositionColor::GetVertexDeclaration(), 8);
@@ -108,21 +108,21 @@ void DemoGame::Magic() {
 	m_pIndexBuffer->SetData<uint16_t>(indices, 6);
 	*/
 
-	//DirectX::SimpleMath::Color whiteColor(1, 1, 1);
-	//DirectX::SimpleMath::Color blackColor(0, 0, 0);
-	//DirectX::SimpleMath::Color redColor(1, 0, 0);
-	//DirectX::SimpleMath::Color greenColor(0, 1, 0);
-	//DirectX::SimpleMath::Color blueColor(0, 0, 1);
-	//DirectX::SimpleMath::Color yellowColor(1, 0, 1);
-	//DirectX::SimpleMath::Color cyanColor(0, 1, 1);
-	//DirectX::SimpleMath::Color magentaColor(0, 0.5f, 1);
+	//Color whiteColor(1, 1, 1);
+	//Color blackColor(0, 0, 0);
+	//Color redColor(1, 0, 0);
+	//Color greenColor(0, 1, 0);
+	//Color blueColor(0, 0, 1);
+	//Color yellowColor(1, 0, 1);
+	//Color cyanColor(0, 1, 1);
+	//Color magentaColor(0, 0.5f, 1);
 
 	//VertexPositionColor vertexs[] =
 	//{
-	//	{ DirectX::SimpleMath::Vector3(-1.0f, +1.0f, 0.5f), redColor },
-	//	{ DirectX::SimpleMath::Vector3(+1.0f, +1.0f, 0.5f), blueColor },
-	//	{ DirectX::SimpleMath::Vector3(-1.0f, -1.0f, 0.5f), greenColor },
-	//	{ DirectX::SimpleMath::Vector3(+1.0f, -1.0f, 0.5f), redColor }
+	//	{ Vector3(-1.0f, +1.0f, 0.5f), redColor },
+	//	{ Vector3(+1.0f, +1.0f, 0.5f), blueColor },
+	//	{ Vector3(-1.0f, -1.0f, 0.5f), greenColor },
+	//	{ Vector3(+1.0f, -1.0f, 0.5f), redColor }
 	//};
 	
 
@@ -134,7 +134,6 @@ void DemoGame::Magic() {
 
 void DemoGame::Draw(DX::StepTimer const & timer)
 {
-	using namespace DirectX::SimpleMath;
 	Color LightSteelBlue(0.69f, 0.77f, 0.87f);
 
 	auto device = GetGraphicsDevice();
@@ -177,7 +176,7 @@ void DemoGame::Update(DX::StepTimer const& timer)
 	float z = mRadius * (float)sinf(mPhi) * (float)sinf(mTheta);
 	float y = mRadius * (float)cosf(mPhi);
 
-	m_position = DirectX::SimpleMath::Vector3(x, y, z);
+	m_position = Vector3(x, y, z);
 }
 
 

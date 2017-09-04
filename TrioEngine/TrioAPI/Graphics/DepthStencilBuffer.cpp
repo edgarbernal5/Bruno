@@ -14,7 +14,7 @@ namespace Cuado
 		m_depthStencilView(nullptr),
 		m_shaderResourceView(nullptr),
 #elif TRIO_OPENGL
-		: m_glDepthBuffer(0),
+		m_glDepthBuffer(0),
 #endif
 		m_device(nullptr) {
 

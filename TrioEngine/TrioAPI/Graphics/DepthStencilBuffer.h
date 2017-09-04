@@ -27,6 +27,7 @@ namespace Cuado
 		inline DepthFormat GetDepthFormat() { return m_depthFormat; }
 
 		friend class GraphicsDevice;
+		friend class RenderTarget2D;
 	protected:
 
 #ifdef TRIO_DIRECTX

@@ -43,7 +43,13 @@ namespace Cuado
 		void CompileEffect(std::string filename, ShaderLanguageTarget target = ShaderLanguageTarget::HLSL);
 
 		friend class EffectPass;
+#if TRIO_OPENGL
+		friend class ShaderProgramCache;
+#endif
 	private:
+#if TRIO_OPENGL
+		GLuint m_programID;
+#endif
 
 		GraphicsDevice*			m_pDevice;
 		map<string, Shader*>	m_mShadersByName;
@@ -53,6 +59,7 @@ namespace Cuado
 		ConstantBufferCollection	m_ConstantBuffers;
 
 		void ClearData();
+		HLSLStruct* FindStructByName(std::vector<HLSLStruct*> structures, const char *name);
 
 		class HLSLFunctionVisitor : public HLSLTreeVisitor
 		{

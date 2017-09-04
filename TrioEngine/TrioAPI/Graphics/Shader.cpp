@@ -15,7 +15,7 @@ namespace Cuado {
 #if TRIO_DIRECTX
 		m_pInputLayoutCache(nullptr),
 #elif TRIO_OPENGL
-		m_shaderHandle(-1),
+		m_iShaderObject(-1),
 #endif
 		m_device(device),
 		m_stage(stage)
@@ -23,7 +23,7 @@ namespace Cuado {
 #if TRIO_DIRECTX
 		m_shaderPtr.m_geometryShader = nullptr;
 #elif TRIO_OPENGL
-		m_glslCode = string(bytes.begin(), bytes.end());
+		m_glslCode = std::string(bytes.begin(), bytes.end());
 #endif
 		m_iHashKey = 0;
 		if (bytes.size() > 0)
@@ -55,9 +55,7 @@ namespace Cuado {
 			memcpy(&m_codeBytes[0], &bytes[0], bytes.size() * sizeof(uint8_t));
 		}
 	}
-#endif
 
-#if TRIO_DIRECTX
 	Shader::Shader(GraphicsDevice* device, ShaderStage stage, ID3D11PixelShader* shader) :
 		m_device(device),
 		m_stage(stage),
@@ -73,31 +71,33 @@ namespace Cuado {
 
 	Shader::~Shader()
 	{
+		if (m_iShaderObject != -1)
+		{
+		}
 	}
 
 #if TRIO_OPENGL
 
 	void Shader::GetVertexAttributeLocations(int program)
 	{
-
 		for (size_t i = 0; i < m_attributes.size(); i++)
 		{
 			//m_attributes[i].Location = glGetAttribLocation(program, m_attributes[i].Name.c_str());
-		std:stringstream ss;
+			std::stringstream ss;
 
 			glBindAttribLocation(program, i, m_attributes[i].Name.c_str());
 			m_attributes[i].Location = i;
 
-			ss << "GetVertexAttributeLocations" << endl;
-			ss << "program: " << program << endl;
-			ss << "location: " << m_attributes[i].Location << endl;
-			ss << "Index: " << m_attributes[i].Index << endl;
-			ss << "Usage: " << (int)m_attributes[i].Usage << endl;
-			ss << "name: " << m_attributes[i].Name << endl;
+			//ss << "GetVertexAttributeLocations" << endl;
+			//ss << "program: " << program << endl;
+			//ss << "location: " << m_attributes[i].Location << endl;
+			//ss << "Index: " << m_attributes[i].Index << endl;
+			//ss << "Usage: " << (int)m_attributes[i].Usage << endl;
+			//ss << "name: " << m_attributes[i].Name << endl;
 
-			ss << "glsl: " << endl << m_glslCode << endl;
+			//ss << "glsl: " << endl << m_glslCode << endl;
 
-			GraphicsExtensions::checkGLError((char*)ss.str().c_str());
+			CHECK_GL_ERROR(glBindAttribLocation);
 		}
 	}
 
@@ -113,11 +113,11 @@ namespace Cuado {
 		return -1;
 	}
 
-	int Shader::GetShaderHandle()
+	int Shader::GetShaderObject()
 	{
 		//std::stringstream ss;
-		if (m_shaderHandle != -1)
-			return m_shaderHandle;
+		if (m_iShaderObject != -1)
+			return m_iShaderObject;
 
 		GLenum shaderType = GL_VERTEX_SHADER;
 		if (m_stage == ShaderStage::Pixel)
@@ -126,40 +126,40 @@ namespace Cuado {
 		//ss << "m_glslCode " << m_glslCode << endl;
 
 		//MessageBoxA(0, ss.str().c_str(), 0, 0);
-		m_shaderHandle = glCreateShader(shaderType);
+		m_iShaderObject = glCreateShader(shaderType);
 		const GLchar *source = (const GLchar *)m_glslCode.c_str();
-		glShaderSource(m_shaderHandle, 1, &source, 0);
+		glShaderSource(m_iShaderObject, 1, &source, 0);
 
-		glCompileShader(m_shaderHandle);
+		glCompileShader(m_iShaderObject);
 
 		GLint isCompiled = 0;
-		glGetShaderiv(m_shaderHandle, GL_COMPILE_STATUS, &isCompiled);
+		glGetShaderiv(m_iShaderObject, GL_COMPILE_STATUS, &isCompiled);
 		if (isCompiled == GL_FALSE)
 		{
 			GLint maxLength = 0;
-			glGetShaderiv(m_shaderHandle, GL_INFO_LOG_LENGTH, &maxLength);
+			glGetShaderiv(m_iShaderObject, GL_INFO_LOG_LENGTH, &maxLength);
 
 			//The maxLength includes the NULL character
-			std::std::vector<GLchar> infoLog(maxLength);
-			glGetShaderInfoLog(m_shaderHandle, maxLength, &maxLength, &infoLog[0]);
+			std::vector<GLchar> infoLog(maxLength);
+			glGetShaderInfoLog(m_iShaderObject, maxLength, &maxLength, &infoLog[0]);
 
 			//We don't need the shader anymore.
-			glDeleteShader(m_shaderHandle);
+			glDeleteShader(m_iShaderObject);
 
 			//Use the infoLog as you see fit.
 
-			string infoLogStr(infoLog.begin(), infoLog.end());
+			std::string infoLogStr(infoLog.begin(), infoLog.end());
 
 
 			//ss << "infoLogStr " << infoLogStr << endl;
 			//MessageBoxA(0, ss.str().c_str(), 0, 0);
 
 			//In this simple program, we'll just leave
-			m_shaderHandle = -1;
+			m_iShaderObject = -1;
 			throw std::exception("shader compilation failed");
 		}
 
-		return m_shaderHandle;
+		return m_iShaderObject;
 	}
 #endif
 

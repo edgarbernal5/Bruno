@@ -5,6 +5,7 @@
 #include "IVertexType.h"
 #include "SimpleMath.h"
 
+#include "VertexElement.h"
 namespace Cuado
 {
 	class TRIOAPI_DLL VertexDeclaration;
@@ -12,10 +13,10 @@ namespace Cuado
 	struct TRIOAPI_DLL VertexPositionColor : IVertexType
 	{
 	public:
-		VertexPositionColor(DirectX::SimpleMath::Vector3 position, DirectX::SimpleMath::Color color);
+		VertexPositionColor(Vector3 position, Color color);
 
-		const DirectX::SimpleMath::Vector3& GetPosition()	{ return m_position; }
-		const DirectX::SimpleMath::Color& GetColor()		{ return m_color; }
+		const Vector3& GetPosition()	{ return m_position; }
+		const Color& GetColor()		{ return m_color; }
 
 		static const int InputElementCount = 2;
 #if TRIO_DIRECTX
@@ -27,8 +28,8 @@ namespace Cuado
 
 
 	private:
-		DirectX::SimpleMath::Vector3 m_position;
-		DirectX::SimpleMath::Color m_color;
+		Vector3 m_position;
+		Color m_color;
 
 		static VertexDeclaration* g_VertexDeclaration;
 	};

@@ -22,10 +22,10 @@ namespace Cuado
 
 		void SetValue(float value);
 		void SetValue(Texture* value);
-		void SetValue(DirectX::SimpleMath::Matrix value);
-		void SetValue(DirectX::SimpleMath::Vector2 value);
-		void SetValue(DirectX::SimpleMath::Vector3 value);
-		void SetValue(DirectX::SimpleMath::Vector4 value);
+		void SetValue(Matrix value);
+		void SetValue(Vector2 value);
+		void SetValue(Vector3 value);
+		void SetValue(Vector4 value);
 
 		inline std::string& GetName() { return m_Name; }
 

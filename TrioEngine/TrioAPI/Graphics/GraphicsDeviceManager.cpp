@@ -69,10 +69,10 @@ namespace Cuado
 
 	void GraphicsDeviceManager::WindowClientSizeChanged()
 	{
-		if (!m_inDeviceTransition && (m_game->GetWindow()->GetClientBounds().Height != 0) || (m_game->GetWindow()->GetClientBounds().Width != 0))
+		if (!m_inDeviceTransition && (m_game->GetWindow()->GetClientBounds().height != 0) || (m_game->GetWindow()->GetClientBounds().width != 0))
 		{
-			m_resizedBackBufferHeight = m_game->GetWindow()->GetClientBounds().Height;
-			m_resizedBackBufferWidth = m_game->GetWindow()->GetClientBounds().Width;
+			m_resizedBackBufferHeight = m_game->GetWindow()->GetClientBounds().height;
+			m_resizedBackBufferWidth = m_game->GetWindow()->GetClientBounds().width;
 			m_useResizedBackBuffer = true;
 			ChangeDevice(false);
 		}
@@ -83,8 +83,8 @@ namespace Cuado
 		m_inDeviceTransition = true;
 
 		std::string screenDeviceName = m_game->GetWindow()->GetScreenDeviceName();
-		int width = m_game->GetWindow()->GetClientBounds().Width;
-		int height = m_game->GetWindow()->GetClientBounds().Height;
+		int width = m_game->GetWindow()->GetClientBounds().width;
+		int height = m_game->GetWindow()->GetClientBounds().height;
 
 		GraphicsDeviceInformation graphicsDeviceInformation = FindBestDevice(forceCreate);
 

@@ -21,7 +21,7 @@ namespace Cuado
 	};
 #endif
 
-	VertexPosition::VertexPosition(DirectX::SimpleMath::Vector3 const& position) :
+	VertexPosition::VertexPosition(Vector3 const& position) :
 		m_position(position)
 	{
 

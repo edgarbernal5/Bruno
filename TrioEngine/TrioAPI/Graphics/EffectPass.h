@@ -21,6 +21,8 @@ namespace Cuado
 		void Apply();
 
 		inline const std::string& GetName() { return m_Name; }
+
+		friend class GraphicsDevice;
 	private:
 
 		Effect* m_Effect;

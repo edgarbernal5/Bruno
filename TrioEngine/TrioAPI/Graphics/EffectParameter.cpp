@@ -30,24 +30,24 @@ namespace Cuado
 
 	}
 
-	void EffectParameter::SetValue(DirectX::SimpleMath::Matrix value)
+	void EffectParameter::SetValue(Matrix value)
 	{
-		DirectX::SimpleMath::Matrix transposed = value;
+		Matrix transposed = value;
 		transposed = transposed.Transpose();
 		m_constantBuffer->SetInternalData((uint8_t*)&transposed.m[0][0], sizeof(value), m_offset);
 	}
 
-	void EffectParameter::SetValue(DirectX::SimpleMath::Vector2 value)
+	void EffectParameter::SetValue(Vector2 value)
 	{
 
 	}
 
-	void EffectParameter::SetValue(DirectX::SimpleMath::Vector3 value)
+	void EffectParameter::SetValue(Vector3 value)
 	{
 
 	}
 
-	void EffectParameter::SetValue(DirectX::SimpleMath::Vector4 value)
+	void EffectParameter::SetValue(Vector4 value)
 	{
 
 	}

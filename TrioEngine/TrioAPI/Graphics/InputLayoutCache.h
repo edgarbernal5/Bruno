@@ -1,5 +1,6 @@
 #pragma once
 
+#if TRIO_DIRECTX
 #include "TrioAPI.h"
 
 #include <vector>
@@ -26,3 +27,4 @@ namespace Cuado
 	};
 }
 
+#endif

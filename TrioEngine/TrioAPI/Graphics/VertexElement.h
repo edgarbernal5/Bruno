@@ -1,7 +1,6 @@
 #pragma once
 
 #include "TrioAPI.h"
-#include "VertexDeclaration.h"
 
 #include <string>
 #include <sstream>

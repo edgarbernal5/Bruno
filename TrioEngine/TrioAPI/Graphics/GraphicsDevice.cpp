@@ -17,8 +17,12 @@
 #include "BlendState.h"
 #include "SamplerState.h"
 
+#include "EffectPass.h"
+
 #ifdef TRIO_DIRECTX
 #include "InputLayoutCache.h"
+#elif TRIO_OPENGL
+#include "ShaderProgram.h"
 #endif
 
 using namespace DirectX;
@@ -69,7 +73,7 @@ namespace Cuado
 		}
 	}
 
-
+#if TRIO_DIRECTX
 	D3D_PRIMITIVE_TOPOLOGY FormatToPrimitive(PrimitiveType format)
 	{
 		switch (format)
@@ -88,6 +92,7 @@ namespace Cuado
 			return (D3D_PRIMITIVE_TOPOLOGY)format;
 		}
 	}
+#endif
 
 	GraphicsDevice::GraphicsDevice(GraphicsAdapter* adapter, PresentationParameters parameters) :
 		m_depthStencilBuffer(nullptr),
@@ -96,15 +101,18 @@ namespace Cuado
 #ifdef TRIO_DIRECTX
 		m_d3dMinFeatureLevel(D3D_FEATURE_LEVEL_9_1),
 		m_d3dFeatureLevel(D3D_FEATURE_LEVEL_9_1),
-#elif OPENGL
+#elif TRIO_OPENGL
 		m_programCache(nullptr),
-		//m_shaderProgram(nullptr),
+		m_currentShaderProgram(nullptr),
 #endif
 		m_presentationParameters(parameters),
 
+		
 		m_pTextureCollection(nullptr),
 		m_pSamplerCollection(nullptr),
 		m_backBufferCount(2),
+		
+		m_effectPass(nullptr),
 
 		m_pVertexShader(nullptr),
 		m_bVertexShaderDirty(false),
@@ -140,6 +148,8 @@ namespace Cuado
 			m_aVertexOffsets[i] = 0;
 			m_aVertexStrides[i] = 0;
 		}
+#elif TRIO_OPENGL
+		m_programCache = new ShaderProgramCache();
 #endif
 		m_pTextureCollection = new TextureCollection(ShaderStage::Pixel);
 		m_pSamplerCollection = new SamplerStateCollection(ShaderStage::Pixel);
@@ -153,8 +163,26 @@ namespace Cuado
 
 	GraphicsDevice::~GraphicsDevice()
 	{
-
 	}
+
+#if TRIO_OPENGL
+	void GraphicsDevice::ActivateShaderProgram()
+	{
+		ShaderProgram* shaderProgram = m_programCache->GetProgram(m_pVertexShader, m_pPixelShader, m_effectPass->m_Effect);
+		
+		if (shaderProgram == nullptr || shaderProgram->GetProgram() == -1) {
+			glUseProgram(0);
+			return;
+		}
+
+		if (m_currentShaderProgram != shaderProgram)
+		{
+			glUseProgram(shaderProgram->GetProgram());
+			CHECK_GL_ERROR(glUseProgram);
+			m_currentShaderProgram = shaderProgram;
+		}
+	}
+#endif
 
 	void GraphicsDevice::ApplyState(bool applyShaders)
 	{
@@ -185,8 +213,8 @@ namespace Cuado
 #ifdef TRIO_DIRECTX
 				m_d3dContext->IASetIndexBuffer(m_pIndexBuffer->m_pBuffer, ToFormat(m_pIndexBuffer->m_eElementSize), 0);
 #elif TRIO_OPENGL
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer->m_Buffer);
-				GraphicsExtensions::checkGLError("Apply State GL_ELEMENT_ARRAY_BUFFER");
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pIndexBuffer->m_pBuffer);
+				CHECK_GL_ERROR(glBindBuffer);
 #endif
 			}
 			else
@@ -232,7 +260,7 @@ namespace Cuado
 			ID3D11InputLayout* layout = m_pVertexShader->GetInputLayouts()->Get(m_vVertexBindings[0].Buffer->m_pVertexDeclaration);
 			m_d3dContext->IASetInputLayout(layout);
 #elif TRIO_OPENGL
-
+			ActivateShaderProgram();
 #endif
 			m_bVertexShaderDirty = false;
 			m_bVertexBufferDirty = false;
@@ -272,7 +300,7 @@ namespace Cuado
 		return true;
 	}
 
-	void GraphicsDevice::Clear(DirectX::SimpleMath::Color &color)
+	void GraphicsDevice::Clear(Color &color)
 	{
 		ClearOptions options = ClearOptions::Target;
 
@@ -283,10 +311,10 @@ namespace Cuado
 				options = options | ClearOptions::Stencil;
 		}
 
-		Clear(options, color, m_screenViewport.MaxDepth, 0);
+		Clear(options, color, m_screenViewport.maxDepth, 0);
 	}
 
-	void GraphicsDevice::Clear(ClearOptions options, DirectX::SimpleMath::Color &color, float depth, uint8_t stencil)
+	void GraphicsDevice::Clear(ClearOptions options, Color &color, float depth, uint8_t stencil)
 	{
 #ifdef TRIO_DIRECTX
 		if ((options & ClearOptions::Target) == ClearOptions::Target)
@@ -655,6 +683,7 @@ namespace Cuado
 	{
 		DeviceLost();
 
+#ifdef TRIO_DIRECTX
 		m_depthStencilBuffer.reset();
 		m_d3dRenderTargetView.Reset();
 		m_swapChain.Reset();
@@ -674,6 +703,8 @@ namespace Cuado
 		}
 #endif
 		m_d3dDevice.Reset();
+
+#endif
 
 		CreateDeviceResources();
 		CreateWindowSizeDependentResources();
@@ -845,7 +876,7 @@ namespace Cuado
 		m_bVertexShaderDirty = true;
 	}
 
-	void GraphicsDevice::SetViewport(DirectX::SimpleMath::Viewport viewport)
+	void GraphicsDevice::SetViewport(Cuado::Viewport viewport)
 	{
 		m_screenViewport = viewport;
 #ifdef TRIO_DIRECTX

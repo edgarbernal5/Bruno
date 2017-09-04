@@ -85,7 +85,7 @@ namespace Cuado
 		default:
 			break;
 		}
-		//#elif OPENGL
+		//#elif TRIO_OPENGL
 #else
 		GLSLGenerator generator;
 		switch (stage)

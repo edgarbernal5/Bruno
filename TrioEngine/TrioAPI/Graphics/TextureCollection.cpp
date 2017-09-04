@@ -8,7 +8,7 @@ namespace Cuado
 		m_eStage(stage)
 	{
 		CreateArray();
-#ifdef OPENGL
+#ifdef TRIO_OPENGL
 		for (size_t i = 0; i < 16; i++)
 		{
 			m_glTargets[i] = 0;
@@ -75,19 +75,23 @@ namespace Cuado
 				}
 			}
 #elif TRIO_OPENGL
+			glActiveTexture(GL_TEXTURE0 + i);
+			CHECK_GL_ERROR(glActiveTexture);
 
 			// Clear the previous binding if the 
 			// target is different from the new one.
-			if (m_glTargets[i] != 0 && (tex == nullptr || m_glTargets[i] != tex->m_glTarget))
+			if (m_glTargets[i] != 0 && (texture == nullptr || m_glTargets[i] != texture->m_glTarget))
 			{
 				glBindTexture(m_glTargets[i], 0);
+				CHECK_GL_ERROR(glBindTexture);
 				m_glTargets[i] = 0;
 			}
 
-			if (tex != nullptr)
+			if (texture != nullptr)
 			{
-				m_glTargets[i] = tex->m_glTarget;
-				glBindTexture(tex->m_glTarget, tex->m_glTexture);
+				m_glTargets[i] = texture->m_glTarget;
+				glBindTexture(texture->m_glTarget, texture->m_glTexture);
+				CHECK_GL_ERROR(glBindTexture);
 			}
 #endif
 			

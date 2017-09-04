@@ -20,9 +20,9 @@ namespace Cuado
 #ifdef TRIO_OPENGL
 		char* extensions = (char*)glGetString(GL_EXTENSIONS);
 
-		vector<string> elems;
-		stringstream ss(extensions);
-		string item;
+		std::vector<std::string> elems;
+		std::stringstream ss(extensions);
+		std::string item;
 		while (std::getline(ss, item, ' '))
 		{
 			elems.push_back(item);
@@ -31,7 +31,7 @@ namespace Cuado
 
 		m_supportsNonPowerOfTwo = GetNonPowerOfTwo(device);
 
-#ifdef OPENGL
+#ifdef TRIO_OPENGL
 		m_supportsTextureFilterAnisotropic = SearchExtension(elems, "GL_EXT_texture_filter_anisotropic");
 #else
 		m_supportsTextureFilterAnisotropic = true;
@@ -55,7 +55,7 @@ namespace Cuado
 		m_supportsPvrtc = false;
 		m_supportsEtc1 = false;
 		m_supportsAtitc = false;
-#elif OPENGL
+#elif TRIO_OPENGL
 
 		m_supportsS3tc = SearchExtension(elems, "GL_EXT_texture_compression_s3tc") ||
 			SearchExtension(elems, "GL_OES_texture_compression_S3TC") ||
@@ -69,7 +69,7 @@ namespace Cuado
 			SearchExtension(elems, "GL_AMD_compressed_ATC_texture");
 #endif
 
-#ifdef OPENGL
+#ifdef TRIO_OPENGL
 		m_supportsBlitFramebuffer = true;
 		m_supportsInvalidateFramebuffer = false;
 #ifdef GLES
@@ -84,17 +84,17 @@ namespace Cuado
 
 	bool GraphicsCapabilities::GetNonPowerOfTwo(GraphicsDevice* device)
 	{
-#ifdef OPENGL
+#ifdef TRIO_OPENGL
 		return true; // device._maxTextureSize >= 8192;
 #else
 		return true;
 #endif
 	}
 
-#ifdef OPENGL
-	bool GraphicsCapabilities::SearchExtension(vector<string>& extensions, string item)
+#ifdef TRIO_OPENGL
+	bool GraphicsCapabilities::SearchExtension(std::vector<std::string>& extensions, std::string item)
 	{
-		vector<string>::iterator it = find(extensions.begin(), extensions.end(), item);
+		auto it = find(extensions.begin(), extensions.end(), item);
 		if (it != extensions.end())
 			return true;
 		return false;

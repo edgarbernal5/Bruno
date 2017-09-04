@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "InputLayoutCache.h"
 
+#if TRIO_DIRECTX
 #include "VertexDeclaration.h"
 
 namespace Cuado {
@@ -36,3 +37,4 @@ namespace Cuado {
 		return it->second;
 	}
 }
+#endif

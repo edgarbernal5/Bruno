@@ -66,7 +66,7 @@ namespace Cuado
 	{
 		VertexDeclarationAttributeInfo attrInfo;
 		int shaderHash = shader->GetHashKey();
-		map<int, VertexDeclarationAttributeInfo>::iterator itm = m_shaderAttributeInfo.find(shaderHash);
+		auto itm = m_shaderAttributeInfo.find(shaderHash);
 		if (itm == m_shaderAttributeInfo.end())
 		{
 			int maxVertexAttribs = 0;
@@ -120,9 +120,10 @@ namespace Cuado
 					m_iVertexStride, (void*)(elem.Offset + offset)
 				);
 
-			ss << "VertexDecl Apply " << elem.AttributeLocation << " " << elem.NumberOfElements << endl;
+			CHECK_GL_ERROR(glVertexAttribPointer);
+			//ss << "VertexDecl Apply " << elem.AttributeLocation << " " << elem.NumberOfElements << endl;
 			
-			GraphicsExtensions::checkGLError((char*)ss.str().c_str());
+			//GraphicsExtensions::checkGLError((char*)ss.str().c_str());
 		}
 
 

@@ -74,7 +74,7 @@ namespace Cuado
 					//stencil = depth;
 				}
 			}
-			m_DepthBuffer = new DepthStencilBuffer(m_Device, m_Width, m_Height, m_DepthFormat);
+			m_DepthBuffer = new DepthStencilBuffer(m_pDevice, m_iWidth, m_iHeight, m_DepthFormat);
 			m_DepthBuffer->m_glDepthBuffer = depth;
 			m_DepthBuffer->m_glStencilBuffer = stencil;
 

@@ -18,5 +18,17 @@
 #include <tchar.h>
 
 
+#if TRIO_DIRECTX
 #pragma comment(lib, "TrioAPI.lib")
+#elif TRIO_OPENGL
+
+
+//#include <GL/glew.h>
+//#include <GL/wglew.h>
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#pragma comment(lib, "TrioAPIGL.lib")
+#endif
 // TODO: reference additional headers your program requires here

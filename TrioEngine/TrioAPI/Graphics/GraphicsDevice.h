@@ -33,6 +33,8 @@ namespace Cuado
 	class TRIOAPI_DLL Shader;
 	class TRIOAPI_DLL ConstantBufferCollection;
 	class TRIOAPI_DLL ConstantBuffer;
+	class TRIOAPI_DLL ShaderProgram;
+	class TRIOAPI_DLL ShaderProgramCache;
 	
 	struct TRIOAPI_DLL VertexBufferBinding;
 
@@ -42,8 +44,8 @@ namespace Cuado
 		GraphicsDevice(GraphicsAdapter* adapter, PresentationParameters parameters);
 		~GraphicsDevice();
 
-		void Clear(DirectX::SimpleMath::Color &color);
-		void Clear(ClearOptions options, DirectX::SimpleMath::Color &color, float depth, uint8_t stencil);
+		void Clear(Color &color);
+		void Clear(ClearOptions options, Color &color, float depth, uint8_t stencil);
 		
 		void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount);
 		void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount);
@@ -96,7 +98,7 @@ namespace Cuado
 
 		void SetVertexShader(Shader* shader);
 		void SetPixelShader(Shader* shader);
-		void SetViewport(DirectX::SimpleMath::Viewport viewport);
+		void SetViewport(Cuado::Viewport viewport);
 
 
 		Event<> DeviceLost;
@@ -142,6 +144,8 @@ namespace Cuado
 		ConstantBufferCollection* m_pVertexConstantBuffers;
 		ConstantBufferCollection* m_pPixelConstantBuffers;
 
+		EffectPass* m_effectPass;
+
 		UINT                                            m_backBufferCount;
 #ifdef TRIO_DIRECTX
 		Microsoft::WRL::ComPtr<ID3D11Device>				m_d3dDevice;
@@ -165,7 +169,13 @@ namespace Cuado
 		ID3D11Buffer*	m_aVertexBuffers[MaxVertexBuffers];
 		uint32_t		m_aVertexOffsets[MaxVertexBuffers];
 		uint32_t		m_aVertexStrides[MaxVertexBuffers];
-
+#elif TRIO_OPENGL
+		Viewport				m_screenViewport;
+		ShaderProgramCache*		m_programCache;
+		ShaderProgram*			m_currentShaderProgram;
+#endif
+#if TRIO_OPENGL
+		void ActivateShaderProgram();
 #endif
 		void ApplyState(bool applyShaders);
 		bool AreSameVertexBindings(VertexBufferBindings &bindings);

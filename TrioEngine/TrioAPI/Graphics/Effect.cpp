@@ -7,6 +7,9 @@
 #include "EffectTechnique.h"
 #include "EffectParameter.h"
 
+#if TRIO_OPENGL
+#include "VertexChannelNames.h"
+#endif
 
 namespace Cuado
 {
@@ -16,12 +19,16 @@ namespace Cuado
 
 #ifdef TRIO_DIRECTX
 #elif TRIO_OPENGL
+		, m_programID(0)
 #endif
 	{
 
 	}
 
 	Effect::Effect(GraphicsDevice* device, std::vector<uint8_t> compiledBytes)
+#if TRIO_OPENGL
+	 : m_programID(0)
+#endif
 	{
 
 	}
@@ -30,6 +37,8 @@ namespace Cuado
 		m_pDevice(device)
 #ifdef TRIO_DIRECTX
 
+#elif TRIO_OPENGL
+		, m_programID(0)
 #endif
 	{
 		CompileEffect(filename, target);
@@ -363,6 +372,18 @@ namespace Cuado
 			totalBufferFields += constantFields.size();
 		}
 		m_Parameters = EffectParameterCollection(parameters);
+	}
+
+	HLSLStruct* Effect::FindStructByName(std::vector<HLSLStruct*> structures, const char *name)
+	{
+		for (auto &stru : structures)
+		{
+			if (strcmp(stru->name, name) == 0)
+			{
+				return stru;
+			}
+		}
+		return nullptr;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

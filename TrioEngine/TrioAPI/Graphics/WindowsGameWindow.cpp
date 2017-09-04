@@ -244,10 +244,10 @@ namespace Cuado
 		GetClientRect(m_hWnd, &rcWindowClient);
 
 		Rectangle rect;
-		rect.X = rcWindowClient.left;
-		rect.Y = rcWindowClient.top;
-		rect.Height = rcWindowClient.bottom - rcWindowClient.top;
-		rect.Width = rcWindowClient.right - rcWindowClient.left;
+		rect.x = rcWindowClient.left;
+		rect.y = rcWindowClient.top;
+		rect.height = rcWindowClient.bottom - rcWindowClient.top;
+		rect.width = rcWindowClient.right - rcWindowClient.left;
 		return rect;
 	}
 

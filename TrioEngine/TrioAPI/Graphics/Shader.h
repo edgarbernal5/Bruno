@@ -6,11 +6,25 @@
 #include <vector>
 #include <string>
 
+#include "VertexElement.h"
+
 namespace Cuado
 {
 	class TRIOAPI_DLL GraphicsDevice;
 #if TRIO_DIRECTX
 	class TRIOAPI_DLL InputLayoutCache;
+#endif
+
+#if TRIO_OPENGL
+	struct Attribute
+	{
+		VertexElementUsage Usage;
+		int Index;
+		std::string Name;
+		GLint Location;
+		Attribute() {}
+		Attribute(VertexElementUsage usage, int index, std::string name, int location) : Usage(usage), Index(index), Name(name), Location(location) {}
+	};
 #endif
 
 	class TRIOAPI_DLL Shader
@@ -20,8 +34,9 @@ namespace Cuado
 		~Shader();
 
 		inline int GetHashKey() { return m_iHashKey; }
-
+#if TRIO_DIRECTX
 		inline InputLayoutCache* GetInputLayouts() { return m_pInputLayoutCache; }
+#endif
 
 		friend class Effect;
 		friend class EffectPass;
@@ -57,12 +72,11 @@ namespace Cuado
 
 		void CreateShader();
 
-
 #elif TRIO_OPENGL
 		std::string				m_glslCode;
 
-		int GetShaderHandle();
-		int m_shaderHandle;
+		int GetShaderObject();
+		int m_iShaderObject;
 
 		void GetVertexAttributeLocations(int program);
 		int GetAttribLocation(VertexElementUsage usage, int index);

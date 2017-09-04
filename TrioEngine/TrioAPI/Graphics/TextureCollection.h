@@ -33,7 +33,7 @@ namespace Cuado
 			return m_pTextures[iIndex];
 		}
 	private:
-#ifdef OPENGL
+#ifdef TRIO_OPENGL
 		GLenum		m_glTargets[16];
 #endif
 

@@ -78,7 +78,7 @@ namespace Cuado
 		}
 
 		device->GetD3DDeviceContext()->OMSetDepthStencilState(m_state, ReferenceStencil);
-#elif OPENGL
+#elif TRIO_OPENGL
 		if (DepthBufferEnable)
 			glEnable(GL_DEPTH_TEST);
 		else

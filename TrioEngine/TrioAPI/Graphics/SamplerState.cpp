@@ -28,7 +28,11 @@ namespace Cuado
 		MaxMipLevel = 0;
 		MipMapLevelOfDetailBias = 0.0f;
 		MinLOD = 0.0f;
+#ifdef TRIO_DIRECTX
 		MaxLOD = D3D11_FLOAT32_MAX;
+#else
+		MaxLOD = FLT_MAX;
+#endif
 
 		BorderColor.x = BorderColor.y = BorderColor.z = BorderColor.w = 0.0f;
 	}

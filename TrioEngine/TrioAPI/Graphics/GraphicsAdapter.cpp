@@ -46,7 +46,7 @@ namespace Cuado
 
 		dd.cb = sizeof(DISPLAY_DEVICE);
 
-		vector<DisplayMode> availableResolutions;
+		std::vector<DisplayMode> availableResolutions;
 
 		DWORD deviceNum = 0;
 		while (EnumDisplayDevices(nullptr, deviceNum, &dd, 0)){
@@ -103,7 +103,7 @@ namespace Cuado
 #endif
 	}
 
-#if OPENGL
+#if TRIO_OPENGL
 	float GraphicsAdapter::GetScale(DEVMODE& monitor_mode)
 	{
 		float num = 1.0f;

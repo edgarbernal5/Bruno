@@ -6,6 +6,9 @@
 #include <vector>
 #include <map>
 
+#if TRIO_OPENGL
+#include "VertexElement.h"
+#endif
 namespace Cuado
 {
 	class TRIOAPI_DLL VertexDeclaration;

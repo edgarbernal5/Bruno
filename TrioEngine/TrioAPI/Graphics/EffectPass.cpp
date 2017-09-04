@@ -23,6 +23,8 @@ namespace Cuado
 
 	void EffectPass::Apply() 
 	{
+		m_pDevice->m_effectPass = this;
+
 #if defined(TRIO_OPENGL) || defined(TRIO_DIRECTX)
 		if (m_vertexShader != nullptr)
 		{

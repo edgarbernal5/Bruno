@@ -18,7 +18,7 @@ namespace Cuado
 	VertexBuffer::VertexBuffer(GraphicsDevice* device, VertexDeclaration *vertexDeclaration, int vertexCount, ResourceUsage usage) :
 #ifdef TRIO_DIRECTX
 		m_pBuffer(nullptr),
-#elif OPENGL
+#elif TRIO_OPENGL
 		m_pBuffer(0),
 #endif
 		m_pVertexDeclaration(vertexDeclaration),
@@ -33,7 +33,7 @@ namespace Cuado
 	VertexBuffer::VertexBuffer(GraphicsDevice* device, VertexDeclaration *vertexDeclaration, int vertexCount) :
 #ifdef TRIO_DIRECTX
 		m_pBuffer(nullptr),
-#elif OPENGL
+#elif TRIO_OPENGL
 		m_pBuffer(0),
 #endif
 		m_pVertexDeclaration(vertexDeclaration),

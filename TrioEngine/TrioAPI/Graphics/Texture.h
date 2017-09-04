@@ -46,6 +46,10 @@ namespace Cuado
 		uint32_t					m_ArraySize;
 
 		bool						m_createUAV;
+
+#if TRIO_OPENGL
+		void GetGLFormat(SurfaceFormat format, GLint& glinternalFormat, GLenum& glformat, GLenum& gltype);
+#endif
 	};
 
 }

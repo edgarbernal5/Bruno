@@ -4,7 +4,6 @@
 
 #include <string>
 #include "../Event.h"
-#include "Rectangles.h"
 
 namespace Cuado
 {

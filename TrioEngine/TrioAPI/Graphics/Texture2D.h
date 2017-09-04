@@ -3,7 +3,6 @@
 #include "TrioAPI.h"
 #include "Texture.h"
 
-#include "Rectangles.h"
 #include "ResourceEnums.h"
 #include <string>
 

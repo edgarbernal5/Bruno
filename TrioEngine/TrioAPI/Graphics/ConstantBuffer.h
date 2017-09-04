@@ -37,7 +37,7 @@ namespace Cuado
 
 #ifdef TRIO_DIRECTX
 		void Apply(ShaderStage stage, int slot);
-#elif OPENGL
+#elif TRIO_OPENGL
 		void Apply(ShaderProgram* program);
 #endif
 		inline size_t GetFieldsCount() { return m_bufferFields.size(); }
@@ -68,7 +68,7 @@ namespace Cuado
 
 		//Efecto.
 		//D3DX11_EFFECT_VARIABLE_DESC m_Desc;
-#elif OPENGL
+#elif TRIO_OPENGL
 		ShaderProgram* m_shaderProgram;
 		GLuint m_location;
 		GLuint m_buffer;

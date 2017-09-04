@@ -91,16 +91,16 @@ namespace Cuado
 			if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0))
 				wrap = GL_CLAMP_TO_EDGE;
 
-			glTexParameteri(m_glTarget, GL_TEXTURE_MIN_FILTER, (m_LevelCount > 1) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-			glTexParameteri(m_glTarget, GL_TEXTURE_MAG_FILTER, (m_LevelCount > 1) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+			glTexParameteri(m_glTarget, GL_TEXTURE_MIN_FILTER, (m_uLevelCount > 1) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+			glTexParameteri(m_glTarget, GL_TEXTURE_MAG_FILTER, (m_uLevelCount > 1) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 			glTexParameteri(m_glTarget, GL_TEXTURE_WRAP_S, wrap);
 			glTexParameteri(m_glTarget, GL_TEXTURE_WRAP_T, wrap);
 		}
 
-		GetGLFormat(m_Format, m_glInternalFormat, m_glFormat, m_glType);
+		GetGLFormat(m_eFormat, m_glInternalFormat, m_glFormat, m_glType);
 		//TODO:
 		//OJO: el orden de los factores si altera el producto (colocar la siguiente linea luego de bindear)
-		glTexImage2D(GL_TEXTURE_2D, 0, m_glInternalFormat, m_Width, m_Height, 0, m_glFormat, m_glType, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_glInternalFormat, m_iWidth, m_iHeight, 0, m_glFormat, m_glType, nullptr);
 
 		glBindTexture(m_glTarget, prevTexture);
 #endif

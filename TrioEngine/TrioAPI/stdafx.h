@@ -40,14 +40,31 @@
 #include <Windows.UI.Core.h>
 #endif
 
-#ifdef TRIO_DIRECTX
+//#include <DirectXMath.h>
+//#include <DirectXPackedVector.h>
+//#include <DirectXCollision.h>
+#include "Graphics\TrioMath.h"
+#include "Graphics\TrioPackedVector.h"
+#include "Graphics\TrioCollision.h"
 
-#include <DirectXMath.h>
-#include <DirectXPackedVector.h>
-#include <DirectXCollision.h>
+#ifdef TRIO_DIRECTX
 #include <D3Dcompiler.h>
 
 #pragma comment(lib, "d3dcompiler.lib")
+#elif TRIO_OPENGL
+
+// Include GLEW
+#include <GL/glew.h>
+#include <GL/wglew.h>
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#pragma comment(lib, "glew32.lib")
+#pragma comment(lib, "glew32s.lib")
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "glu32.lib")
+
 #endif
 
 #include <algorithm>
@@ -72,6 +89,7 @@
 #include "Graphics\SimpleMath.h"
 #include "Graphics\GraphicsDevice.h"
 
+#include "GraphicsExtensions.h"
 #ifdef TRIO_DIRECTX
 namespace DX
 {
@@ -103,4 +121,15 @@ namespace DX
 
 #define ReleaseCOM(com) if(com) { com->Release(); com = nullptr; }
 }
+
+#elif TRIO_OPENGL
+
+#if _DEBUG
+#define CHECK_GL_ERROR_MSG(funcName, customMessage) Cuado::CheckGLError(#funcName, __FILE__, __LINE__, customMessage)
+#define CHECK_GL_ERROR(FUNCNAME) Cuado::CheckGLError(#FUNCNAME, __FILE__, __LINE__)
+#else
+#define CHECK_GL_ERROR_MSG(funcName, customMessage)
+#define CHECK_GL_ERROR(funcName)
+#endif
+
 #endif

@@ -46,7 +46,7 @@ namespace Cuado
 		float MinLOD;
 		float MaxLOD;
 
-		DirectX::SimpleMath::Vector4 BorderColor;
+		Vector4 BorderColor;
 		
 		static void InitStates();
 		static SamplerState * AnisotropicClamp;

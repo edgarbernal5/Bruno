@@ -19,7 +19,7 @@ namespace Cuado
 		AlphaBlendFunction = BlendFunction::Add;
 		AlphaDestinationBlend = Blend::Zero;
 		AlphaSourceBlend = Blend::One;
-		BlendFactor = DirectX::SimpleMath::Vector4 { 1.0f, 1.0f, 1.0f, 1.0f };
+		BlendFactor = Vector4 { 1.0f, 1.0f, 1.0f, 1.0f };
 		ColorBlendFunction = BlendFunction::Add;
 		ColorDestinationBlend = Blend::Zero;
 		ColorSourceBlend = Blend::One;
@@ -146,7 +146,6 @@ namespace Cuado
 			return D3D11_BLEND_ZERO;
 		}
 	}
-#endif
 
 	uint8_t BlendState::GetColorWriteMask(ColorWriteChannels mask)
 	{
@@ -155,6 +154,8 @@ namespace Cuado
 			((mask & ColorWriteChannels::Blue) == ColorWriteChannels::Blue ? D3D11_COLOR_WRITE_ENABLE_BLUE : 0) |
 			((mask & ColorWriteChannels::Alpha) == ColorWriteChannels::Alpha ? D3D11_COLOR_WRITE_ENABLE_ALPHA : 0);
 	}
+
+#endif
 
 	void BlendState::InitStates()
 	{
