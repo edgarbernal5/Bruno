@@ -1,4 +1,0 @@
-Activated
-ClientSizeChanged
-Update: dt = 0	 Total seconds: 0
-Update: dt = 0.0999999	 Total seconds: 0.0999999
