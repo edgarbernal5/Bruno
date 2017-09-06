@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir);..\Dependencies\include;..\TrioFX;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);..\Dependencies\include;$(IncludePath)</IncludePath>
     <LibraryPath>..\Dependencies\lib\32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

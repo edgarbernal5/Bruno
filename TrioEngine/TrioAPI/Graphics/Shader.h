@@ -11,11 +11,11 @@
 
 #if TRIO_OPENGL
 
-#include "GL/glew.h"
-#include "GL/wglew.h"
-
-#include <GL/gl.h>
-#include <GL/glu.h>
+//#include "GL/glew.h"
+//#include "GL/wglew.h"
+//
+//#include <GL/gl.h>
+//#include <GL/glu.h>
 #endif
 
 namespace Cuado
