@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "IndexBuffer.h"
 
+#include "GraphicsDevice.h"
 
 namespace Cuado
 {

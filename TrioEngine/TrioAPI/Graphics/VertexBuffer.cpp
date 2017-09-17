@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "VertexBuffer.h"
 
+#include "GraphicsDevice.h"
 
 namespace Cuado
 {

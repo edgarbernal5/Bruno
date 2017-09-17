@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DepthStencilState.h"
 
+#include "GraphicsDevice.h"
 namespace Cuado
 {
 	DepthStencilState * DepthStencilState::Default = nullptr;

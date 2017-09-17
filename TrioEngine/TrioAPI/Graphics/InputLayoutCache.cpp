@@ -2,6 +2,7 @@
 #include "InputLayoutCache.h"
 
 #if TRIO_DIRECTX
+#include "GraphicsDevice.h"
 #include "VertexDeclaration.h"
 
 namespace Cuado {

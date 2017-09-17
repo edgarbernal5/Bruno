@@ -87,7 +87,7 @@
 
 
 #include "Graphics\SimpleMath.h"
-#include "Graphics\GraphicsDevice.h"
+//#include "Graphics\GraphicsDevice.h"
 
 #include "GraphicsExtensions.h"
 #ifdef TRIO_DIRECTX

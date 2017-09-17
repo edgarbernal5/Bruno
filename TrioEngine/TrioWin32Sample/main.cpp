@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "main.h"
 
-#include <Graphics/SimpleMath.h>
+//#include <Graphics/SimpleMath.h>
 
 #include <Graphics/GraphicsDevice.h>
 #include <Graphics/GraphicsDeviceManager.h>

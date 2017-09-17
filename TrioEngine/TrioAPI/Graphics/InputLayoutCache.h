@@ -10,6 +10,7 @@
 namespace Cuado
 {
 	class TRIOAPI_DLL GraphicsDevice;
+	class TRIOAPI_DLL VertexDeclaration;
 
 	class TRIOAPI_DLL InputLayoutCache
 	{
