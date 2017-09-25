@@ -49,7 +49,7 @@ namespace Cuado
 		m_supportsTextureMaxLevel = true;
 #endif
 
-#if DIRECTX
+#if TRIO_DIRECTX
 		m_supportsDxt1 = true;
 		m_supportsS3tc = true;
 		m_supportsPvrtc = false;

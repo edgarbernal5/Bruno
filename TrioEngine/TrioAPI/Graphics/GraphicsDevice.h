@@ -13,8 +13,14 @@
 #include "SimpleMath.h"
 
 #include "StatesEnums.h"
+
+#if TRIO_OPENGL
+#include "OpenGLContext.h"
+#endif
 #include <vector>
 #include <memory>
+
+
 
 #include <wrl/client.h>
 namespace Cuado
@@ -36,6 +42,7 @@ namespace Cuado
 	class TRIOAPI_DLL ConstantBuffer;
 	class TRIOAPI_DLL ShaderProgram;
 	class TRIOAPI_DLL ShaderProgramCache;
+	class TRIOAPI_DLL OpenGLContext;
 	
 	struct TRIOAPI_DLL VertexBufferBinding;
 
@@ -171,6 +178,7 @@ namespace Cuado
 		uint32_t		m_aVertexOffsets[MaxVertexBuffers];
 		uint32_t		m_aVertexStrides[MaxVertexBuffers];
 #elif TRIO_OPENGL
+		OpenGLContext*			m_glContext;
 		ShaderProgramCache*		m_programCache;
 		ShaderProgram*			m_currentShaderProgram;
 #endif

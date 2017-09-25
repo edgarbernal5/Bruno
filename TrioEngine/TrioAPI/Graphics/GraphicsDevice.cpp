@@ -16,6 +16,9 @@
 #include "RasterizerState.h"
 #include "BlendState.h"
 #include "SamplerState.h"
+#if TRIO_OPENGL
+#include "OpenGLContext.h"
+#endif
 
 #include "EffectPass.h"
 
@@ -104,6 +107,7 @@ namespace Cuado
 #elif TRIO_OPENGL
 		m_programCache(nullptr),
 		m_currentShaderProgram(nullptr),
+		m_glContext(nullptr),
 #endif
 		m_presentationParameters(parameters),
 
@@ -133,6 +137,7 @@ namespace Cuado
 		m_DepthStencilState(nullptr)
 	{
 		CreateDeviceResources();
+		m_graphicsCapabilities.Initialize(this);
 		CreateWindowSizeDependentResources();
 
 
@@ -500,6 +505,23 @@ namespace Cuado
 			(void)m_d3dContext.As(&m_d3dContext1);
 			(void)m_d3dContext.As(&m_d3dAnnotation);
 		}
+#elif TRIO_OPENGL
+		m_glContext = new OpenGLContext();
+
+		if (!m_glContext->CreateContext(m_presentationParameters.GetHostHWND()))
+		{
+			return;
+		}
+
+		glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
+		glClearColor(0.0f, 0.0f, 0.0f, 0.5f);				// Black Background
+		glClearDepth(1.0f);									// Depth Buffer Setup
+		glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
+		glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
+		glDisable(GL_LIGHTING);
+
+		GraphicsAdapter::GetAdapters();
 #endif
 
 	}
@@ -654,6 +676,19 @@ namespace Cuado
 		// Set the viewport.
 		m_d3dContext->RSSetViewports(1, &(D3D11_VIEWPORT)(m_screenViewport));
 
+#elif TRIO_OPENGL
+		m_depthStencilBuffer.reset();
+
+		// Determine the render target size in pixels.
+		uint32_t backBufferWidth = std::max<uint32_t>(m_presentationParameters.GetBackBufferWidth(), 1);
+		uint32_t backBufferHeight = std::max<uint32_t>(m_presentationParameters.GetBackBufferHeight(), 1);
+
+		if (m_presentationParameters.GetDepthStencilFormat() != DepthFormat::None)
+		{
+			m_depthStencilBuffer.reset(new DepthStencilBuffer(this, backBufferWidth, backBufferHeight, m_presentationParameters.GetDepthStencilFormat()));
+		}
+		glViewport(0, 0, backBufferWidth, backBufferHeight);
+
 #endif
 	}
 
@@ -766,6 +801,9 @@ namespace Cuado
 		{
 			DX::ThrowIfFailed(hr);
 		}
+#elif TRIO_OPENGL
+		glFlush();
+		m_glContext->SwapBuffers();
 #endif
 	}
 

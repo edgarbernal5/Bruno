@@ -90,7 +90,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TRIOAPI_EXPORTS;TRIO_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TRIOAPI_EXPORTS;TRIO_OPENGL;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -100,6 +100,10 @@
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>echo F|xcopy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "$(SolutionDir)$(Configuration)"
+xcopy /Y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)$(Configuration)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -188,6 +192,7 @@
     <ClInclude Include="Graphics\IServiceBase.h" />
     <ClInclude Include="Graphics\IServiceProvider.h" />
     <ClInclude Include="Graphics\IVertexType.h" />
+    <ClInclude Include="Graphics\OpenGLContext.h" />
     <ClInclude Include="Graphics\PresentationParameters.h" />
     <ClInclude Include="Graphics\PrimitiveType.h" />
     <ClInclude Include="Graphics\RasterizerState.h" />
@@ -262,6 +267,7 @@
     <ClCompile Include="Graphics\GraphicsDeviceManager.cpp" />
     <ClCompile Include="Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Graphics\InputLayoutCache.cpp" />
+    <ClCompile Include="Graphics\OpenGLContext.cpp" />
     <ClCompile Include="Graphics\PresentationParameters.cpp" />
     <ClCompile Include="Graphics\RasterizerState.cpp" />
     <ClCompile Include="Graphics\RenderTarget2D.cpp" />

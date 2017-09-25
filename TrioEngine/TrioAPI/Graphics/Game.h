@@ -14,7 +14,8 @@ namespace Cuado
 	class TRIOAPI_DLL GraphicsDevice;
 	class TRIOAPI_DLL IGraphicsDeviceManager;
 
-	class TRIOAPI_DLL Game {
+	class TRIOAPI_DLL Game
+	{
 	public:
 		Game();
 		

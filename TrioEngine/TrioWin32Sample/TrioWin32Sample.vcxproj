@@ -95,7 +95,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>F:\Usuarios\Edgar\Documentos\Proyectos\CG\VagoEngine\TrioEngine\Debug;..\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>TrioFX.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

@@ -4,7 +4,7 @@
 #include "ResourceEnums.h"
 
 #if TRIO_OPENGL
-//#include "GL/glew.h"
+//#include <GL/glew.h>
 //#include <GL/gl.h>
 #include "GraphicsExtensions.h"
 #endif

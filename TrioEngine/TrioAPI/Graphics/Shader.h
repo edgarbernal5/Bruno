@@ -10,9 +10,9 @@
 #include "VertexElement.h"
 
 #if TRIO_OPENGL
-
-//#include "GL/glew.h"
-//#include "GL/wglew.h"
+//
+#include <GL/glew.h>
+//#include <GL/wglew.h>
 //
 //#include <GL/gl.h>
 //#include <GL/glu.h>
@@ -31,7 +31,7 @@ namespace Cuado
 		VertexElementUsage Usage;
 		int Index;
 		std::string Name;
-		GLint Location;
+		int Location;
 		Attribute() {}
 		Attribute(VertexElementUsage usage, int index, std::string name, int location) : Usage(usage), Index(index), Name(name), Location(location) {}
 	};
