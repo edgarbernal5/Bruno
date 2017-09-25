@@ -21,6 +21,11 @@
 #if TRIO_DIRECTX
 #pragma comment(lib, "TrioAPI.lib")
 #elif TRIO_OPENGL
+
+#ifndef GLEW_STATIC
+#define GLEW_STATIC
+#endif // !GLEW_STATIC
+
 //
 //
 //#include <GL/glew.h>
@@ -29,10 +34,10 @@
 //#include <GL/gl.h>
 //#include <GL/glu.h>
 
-#pragma comment(lib, "glew32.lib")
-//#pragma comment(lib, "glew32s.lib")
-//#pragma comment(lib, "opengl32.lib")
-
 #pragma comment(lib, "TrioAPIGL.lib")
+//#pragma comment(lib, "glew32.lib")
+#pragma comment(lib, "glew32s.lib")
+#pragma comment(lib, "opengl32.lib")
+
 #endif
 // TODO: reference additional headers your program requires here

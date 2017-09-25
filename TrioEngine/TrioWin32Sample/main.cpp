@@ -99,37 +99,6 @@ void DemoGame::Magic() {
 	m_pVertexBuffer = new VertexBuffer(GetGraphicsDevice(), VertexPositionColor::GetVertexDeclaration(), 8);
 	m_pVertexBuffer->SetData<VertexPositionColor>(vertexs, 8);
 	
-	/*m_pIndexBuffer = new IndexBuffer(GetGraphicsDevice(), IndexElementSize::SixteenBits, 6);
-	uint16_t indices[] = {
-		// front face
-		0, 1, 2,
-		1, 3, 2,
-	};
-	m_pIndexBuffer->SetData<uint16_t>(indices, 6);
-	*/
-
-	//Color whiteColor(1, 1, 1);
-	//Color blackColor(0, 0, 0);
-	//Color redColor(1, 0, 0);
-	//Color greenColor(0, 1, 0);
-	//Color blueColor(0, 0, 1);
-	//Color yellowColor(1, 0, 1);
-	//Color cyanColor(0, 1, 1);
-	//Color magentaColor(0, 0.5f, 1);
-
-	//VertexPositionColor vertexs[] =
-	//{
-	//	{ Vector3(-1.0f, +1.0f, 0.5f), redColor },
-	//	{ Vector3(+1.0f, +1.0f, 0.5f), blueColor },
-	//	{ Vector3(-1.0f, -1.0f, 0.5f), greenColor },
-	//	{ Vector3(+1.0f, -1.0f, 0.5f), redColor }
-	//};
-	
-
-	//int sizeVPC = sizeof(VertexPosition);
-
-	//m_pVertexBuffer = new VertexBuffer(GetGraphicsDevice(), VertexPosition::GetVertexDeclaration(), 4);
-	//m_pVertexBuffer->SetData<VertexPosition>(vertexs, 4);
 }
 
 void DemoGame::Draw(DX::StepTimer const & timer)
@@ -139,6 +108,7 @@ void DemoGame::Draw(DX::StepTimer const & timer)
 	auto device = GetGraphicsDevice();
 	device->Clear(LightSteelBlue);
 
+	return;
 	device->SetIndexBuffer(m_pIndexBuffer);
 	device->SetVertexBuffer(m_pVertexBuffer);	
 

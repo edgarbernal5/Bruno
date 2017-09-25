@@ -137,9 +137,9 @@ namespace Cuado
 		m_DepthStencilState(nullptr)
 	{
 		CreateDeviceResources();
+
 		m_graphicsCapabilities.Initialize(this);
 		CreateWindowSizeDependentResources();
-
 
 		DepthStencilState::InitStates();
 		RasterizerState::InitStates();
@@ -342,6 +342,13 @@ namespace Cuado
 		{
 			m_d3dContext->ClearDepthStencilView(m_depthStencilBuffer->GetDepthStencilView(), flags, depth, stencil);
 		}
+		
+	
+#elif TRIO_OPENGL
+		const float* colorFloat = reinterpret_cast<const float*>(&color);
+		glClearColor(colorFloat[0], colorFloat[1], colorFloat[2], colorFloat[3]);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 #endif
 	}
 

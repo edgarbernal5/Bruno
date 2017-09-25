@@ -50,7 +50,11 @@ namespace Cuado
 		// Register class
 		WNDCLASSEX wcex;
 		wcex.cbSize = sizeof(WNDCLASSEX);
+#if TRIO_OPENGL
+		wcex.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+#else
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
+#endif
 		wcex.lpfnWndProc = WndProc;
 		wcex.cbClsExtra = 0;
 		wcex.cbWndExtra = 0;
@@ -66,14 +70,36 @@ namespace Cuado
 
 		// Compute window rectangle dimensions based on requested client area dimensions.
 		RECT rc = { 0, 0, DefaultClientWidth, DefaultClientHeight };
-		AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+		DWORD		dwExStyle;
+		DWORD		dwStyle;
+
+		if (false)												// Are We Still In Fullscreen Mode?
+		{
+			dwExStyle = WS_EX_APPWINDOW;								// Window Extended Style
+			dwStyle = WS_POPUP;										// Windows Style
+			ShowCursor(FALSE);										// Hide Mouse Pointer
+		}
+		else
+		{
+			dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;			// Window Extended Style
+			dwStyle = WS_OVERLAPPEDWINDOW;							// Windows Style
+		}
+		//AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+		AdjustWindowRectEx(&rc, dwStyle, FALSE, dwExStyle);
 		int width = rc.right - rc.left;
 		int height = rc.bottom - rc.top;
 
 		std::wstring m_MainWndCaption(L"Game");
 
-		m_hWnd = CreateWindowEx(0, L"TrioEngine", m_MainWndCaption.c_str(), WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, m_hInstance,
+		m_hWnd = CreateWindowEx(dwExStyle, L"TrioEngine",
+			m_MainWndCaption.c_str(), 
+			dwStyle |							// Defined Window Style
+			WS_CLIPSIBLINGS |					// Required Window Style
+			WS_CLIPCHILDREN,					// Required Window Style
+			CW_USEDEFAULT, CW_USEDEFAULT, 
+			rc.right - rc.left, rc.bottom - rc.top, 
+			nullptr, nullptr,
+			m_hInstance,
 			nullptr);
 		
 		if (!m_hWnd)
@@ -87,9 +113,10 @@ namespace Cuado
 		m_clientWidth = rc.right - rc.left;
 		m_clientHeight = rc.bottom - rc.top;
 
+#if TRIO_DIRECTX
 		ShowWindow(m_hWnd, SW_SHOW);
 		UpdateWindow(m_hWnd);
-
+#endif
 		return true;
 	}
 

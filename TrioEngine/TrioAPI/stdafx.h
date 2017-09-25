@@ -17,7 +17,9 @@
 //#define NOHELP
 #pragma warning(pop)
 
+//#ifdef TRIO_DIRECTX
 #include <windows.h>
+//#endif
 
 #ifndef _WIN32_WINNT_WIN10
 #define _WIN32_WINNT_WIN10 0x0A00
@@ -53,7 +55,11 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #elif TRIO_OPENGL
 
+#ifndef GLEW_STATIC
+define GLEW_STATIC
+#endif // !GLEW_STATIC
 // Include GLEW
+
 #include <GL/glew.h>
 #include <GL/wglew.h>
 
@@ -118,6 +124,7 @@ namespace DX
 }
 
 #elif TRIO_OPENGL
+
 
 
 //#pragma comment(lib, "glew32.lib")

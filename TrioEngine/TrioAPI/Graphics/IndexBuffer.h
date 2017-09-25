@@ -4,8 +4,9 @@
 #include "ResourceEnums.h"
 
 #if TRIO_OPENGL
-//#include <GL/glew.h>
+#include <GL/glew.h>
 //#include <GL/gl.h>
+
 #include "GraphicsExtensions.h"
 #endif
 
@@ -184,6 +185,13 @@ namespace Cuado
 		if (m_pBuffer == 0)
 		{
 			first = false;
+			//GLenum error = glewInit(); // Enable GLEW
+			//if (error != GLEW_OK) // If GLEW fails
+			//{
+			//	/* Problem: glewInit failed, something is seriously wrong. */
+			//	fprintf(stderr, "Error: %s\n", glewGetErrorString(error));
+			//	return;
+			//}
 			glGenBuffers(1, &m_pBuffer);
 			CHECK_GL_ERROR(glGenBuffers);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pBuffer);

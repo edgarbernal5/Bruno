@@ -5,7 +5,7 @@
 namespace Cuado
 {
 	
-	OpenGLContext::OpenGLContext()
+	OpenGLContext::OpenGLContext() : m_hwnd(0), m_hdc(0)
 	{
 		
 	}
@@ -19,6 +19,7 @@ namespace Cuado
 
 	bool OpenGLContext::CreateContext(HWND hwnd)
 	{
+
 		m_hwnd = hwnd; // Set the HWND for our window
 
 		m_hdc = GetDC(m_hwnd); // Get the device context for our window
@@ -35,21 +36,39 @@ namespace Cuado
 		pfd.cStencilBits = 8;
 		pfd.iLayerType = PFD_MAIN_PLANE;
 
+		//PIXELFORMATDESCRIPTOR pfd;
+		//memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
+		//pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+		//pfd.nVersion = 1;
+		//pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
+		//pfd.iPixelType = PFD_TYPE_RGBA;
+		//pfd.cColorBits = 32;
+		//pfd.cDepthBits = 32;
+		//pfd.iLayerType = PFD_MAIN_PLANE;
+
 		int pixelFormat = ChoosePixelFormat(m_hdc, &pfd);
-		DescribePixelFormat(m_hdc, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
+		if (!pixelFormat) {
+			return false;
+		}
+		//DescribePixelFormat(m_hdc, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
 
 		int result;
 		result = SetPixelFormat(m_hdc, pixelFormat, &pfd);
 
-		HGLRC tempContext = wglCreateContext(m_hdc);
-		result = wglMakeCurrent(m_hdc, tempContext);
-
-
-		GLenum error = glewInit(); // Enable GLEW
-		if (error != GLEW_OK) // If GLEW fails
-		{
+		if (!result) {
 			return false;
 		}
+		HGLRC tempContext = wglCreateContext(m_hdc);
+		result = wglMakeCurrent(m_hdc, tempContext);
+		if (!result) {
+			return false;
+		}
+
+		ShowWindow(m_hwnd, SW_SHOW);						// Show The Window
+															//SetForegroundWindow(m_hwnd);						// Slightly Higher Priority
+															//SetFocus(m_hwnd);
+
+		fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
 		int attribs[] =
 		{
@@ -71,6 +90,17 @@ namespace Cuado
 			m_hrc = tempContext;
 		}
 
+		glewExperimental = GL_TRUE;
+		GLenum error = glewInit(); // Enable GLEW
+		if (error != GLEW_OK) // If GLEW fails
+		{
+			/* Problem: glewInit failed, something is seriously wrong. */
+			fprintf(stderr, "Error: %s\n", glewGetErrorString(error));
+			auto strError = glewGetErrorString(error);
+
+			return false;
+		}
+		CHECK_GL_ERROR_MSG(CreateContext, NULL);
 		//Checking GL version
 		const GLubyte *GLVersionString = glGetString(GL_VERSION);
 
@@ -81,6 +111,7 @@ namespace Cuado
 
 		if (!m_hrc) return false;
 
+		//wglDeleteContext(tempContext);
 		//if (wglSwapIntervalEXT != nullptr) {
 		//	wglSwapIntervalEXT(0);
 		//}
