@@ -73,6 +73,8 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir);..\Dependencies\include;$(IncludePath)</IncludePath>
     <LibraryPath>..\Dependencies\lib\32;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(Configuration)_$(ProjectName)</OutDir>
+    <IntDir>$(Configuration)_$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
