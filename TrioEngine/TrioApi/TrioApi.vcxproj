@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{E940DAD6-94B4-4718-BCE3-D92F16725235}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>TrioApi</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(SolutionDir)Dependencies\DevIL\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;TRIOAPI_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;TRIOAPI_EXPORTS;_WINDOWS;_USRDLL;TRIO_WINDOWS;TRIO_DIRECTX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DevIL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;TRIOAPI_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;TRIOAPI_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;TRIOAPI_EXPORTS;_WINDOWS;_USRDLL;TRIO_WINDOWS;TRIO_DIRECTX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;TRIOAPI_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="DataTypes\Array.h" />
+    <ClInclude Include="Event.h" />
+    <ClInclude Include="FX\AssertFX.h" />
+    <ClInclude Include="FX\CodeWriter.h" />
+    <ClInclude Include="FX\GLSLGenerator.h" />
+    <ClInclude Include="FX\HLSLGenerator.h" />
+    <ClInclude Include="FX\HLSLParser.h" />
+    <ClInclude Include="FX\HLSLPreprocessor.h" />
+    <ClInclude Include="FX\HLSLTokenizer.h" />
+    <ClInclude Include="FX\HLSLTree.h" />
+    <ClInclude Include="FX\Log.h" />
+    <ClInclude Include="FX\StringHelpers.h" />
+    <ClInclude Include="FX\StringPool.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GameHost.h" />
+    <ClInclude Include="GameServiceContainer.h" />
+    <ClInclude Include="GameWindow.h" />
+    <ClInclude Include="Graphics\BindFlags.h" />
+    <ClInclude Include="Graphics\Blend.h" />
+    <ClInclude Include="Graphics\BlendFunction.h" />
+    <ClInclude Include="Graphics\BlendState.h" />
+    <ClInclude Include="Graphics\ClearOptions.h" />
+    <ClInclude Include="Graphics\ColorWriteChannels.h" />
+    <ClInclude Include="Graphics\CompareFunction.h" />
+    <ClInclude Include="Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Graphics\ConstantBufferCollection.h" />
+    <ClInclude Include="Graphics\ConstantBufferField.h" />
+    <ClInclude Include="Graphics\CpuAccessFlags.h" />
+    <ClInclude Include="Graphics\CullMode.h" />
+    <ClInclude Include="Graphics\DepthFormat.h" />
+    <ClInclude Include="Graphics\DepthStencilBuffer.h" />
+    <ClInclude Include="Graphics\DepthStencilState.h" />
+    <ClInclude Include="Graphics\DepthStencilViewDimension.h" />
+    <ClInclude Include="Graphics\DepthStencilViewFlags.h" />
+    <ClInclude Include="Graphics\DepthWriteMask.h" />
+    <ClInclude Include="Graphics\DisplayMode.h" />
+    <ClInclude Include="Graphics\Effect.h" />
+    <ClInclude Include="Graphics\EffectCompiler.h" />
+    <ClInclude Include="Graphics\EffectParameter.h" />
+    <ClInclude Include="Graphics\EffectParameterCollection.h" />
+    <ClInclude Include="Graphics\EffectPass.h" />
+    <ClInclude Include="Graphics\EffectTechnique.h" />
+    <ClInclude Include="Graphics\EffectTechniqueCollection.h" />
+    <ClInclude Include="Graphics\FillMode.h" />
+    <ClInclude Include="Graphics\FormatHelper.h" />
+    <ClInclude Include="Graphics\GraphicsAdapter.h" />
+    <ClInclude Include="Graphics\GraphicsCapabilities.h" />
+    <ClInclude Include="Graphics\GraphicsDevice.h" />
+    <ClInclude Include="Graphics\GraphicsDeviceInformation.h" />
+    <ClInclude Include="Graphics\GraphicsDeviceManager.h" />
+    <ClInclude Include="Graphics\IGraphicsDeviceManager.h" />
+    <ClInclude Include="Graphics\IGraphicsDeviceService.h" />
+    <ClInclude Include="Graphics\IndexBuffer.h" />
+    <ClInclude Include="Graphics\IndexElementSize.h" />
+    <ClInclude Include="Graphics\InputLayoutCache.h" />
+    <ClInclude Include="Graphics\IServiceBase.h" />
+    <ClInclude Include="Graphics\MapMode.h" />
+    <ClInclude Include="Graphics\PresentationParameters.h" />
+    <ClInclude Include="Graphics\PresentInterval.h" />
+    <ClInclude Include="Graphics\PrimitiveType.h" />
+    <ClInclude Include="Graphics\RasterizerState.h" />
+    <ClInclude Include="Graphics\RenderTargetUsage.h" />
+    <ClInclude Include="Graphics\ResourceOptionFlags.h" />
+    <ClInclude Include="Graphics\ResourceUsage.h" />
+    <ClInclude Include="Graphics\SamplerState.h" />
+    <ClInclude Include="Graphics\SamplerStateCollection.h" />
+    <ClInclude Include="Graphics\SetDataOptions.h" />
+    <ClInclude Include="Graphics\Shader.h" />
+    <ClInclude Include="Graphics\ShaderLanguageTarget.h" />
+    <ClInclude Include="Graphics\ShaderStage.h" />
+    <ClInclude Include="Graphics\StencilOperation.h" />
+    <ClInclude Include="Graphics\SurfaceFormat.h" />
+    <ClInclude Include="Graphics\SurfaceType.h" />
+    <ClInclude Include="Graphics\Texture.h" />
+    <ClInclude Include="Graphics\Texture2D.h" />
+    <ClInclude Include="Graphics\TextureAddressMode.h" />
+    <ClInclude Include="Graphics\TextureCollection.h" />
+    <ClInclude Include="Graphics\TextureFilter.h" />
+    <ClInclude Include="Graphics\VertexBuffer.h" />
+    <ClInclude Include="Graphics\VertexBufferBinding.h" />
+    <ClInclude Include="Graphics\VertexDeclaration.h" />
+    <ClInclude Include="Graphics\VertexDeclarationHelper.h" />
+    <ClInclude Include="Graphics\VertexElement.h" />
+    <ClInclude Include="Graphics\VertexElementFormat.h" />
+    <ClInclude Include="Graphics\VertexElementUsage.h" />
+    <ClInclude Include="Graphics\VertexPosition.h" />
+    <ClInclude Include="Graphics\VertexPositionColor.h" />
+    <ClInclude Include="Graphics\VertexPositionColorTexture.h" />
+    <ClInclude Include="Graphics\VertexPositionNormalColorTexture.h" />
+    <ClInclude Include="Graphics\VertexPositionNormalTexture.h" />
+    <ClInclude Include="Graphics\VertexPositionTexture.h" />
+    <ClInclude Include="IServiceProvider.h" />
+    <ClInclude Include="Math\MathVector.h" />
+    <ClInclude Include="Math\Rectangle.h" />
+    <ClInclude Include="Memory\Allocator.h" />
+    <ClInclude Include="PlatformDirectives.h" />
+    <ClInclude Include="Screen.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="StepTimer.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="TrioApi.h" />
+    <ClInclude Include="TrioApiDecl.h" />
+    <ClInclude Include="Utils\Hash.h" />
+    <ClInclude Include="Utils\TextureLoader.h" />
+    <ClInclude Include="WindowsGameHost.h" />
+    <ClInclude Include="WindowsGameWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="FX\CodeWriter.cpp" />
+    <ClCompile Include="FX\GLSLGenerator.cpp" />
+    <ClCompile Include="FX\HLSLGenerator.cpp" />
+    <ClCompile Include="FX\HLSLParser.cpp" />
+    <ClCompile Include="FX\HLSLPreprocessor.cpp" />
+    <ClCompile Include="FX\HLSLTokenizer.cpp" />
+    <ClCompile Include="FX\HLSLTree.cpp" />
+    <ClCompile Include="FX\Log.cpp" />
+    <ClCompile Include="FX\StringHelpers.cpp" />
+    <ClCompile Include="FX\StringPool.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameHost.cpp" />
+    <ClCompile Include="GameServiceContainer.cpp" />
+    <ClCompile Include="Graphics\BlendState.cpp" />
+    <ClCompile Include="Graphics\ConstantBuffer.cpp" />
+    <ClCompile Include="Graphics\ConstantBufferCollection.cpp" />
+    <ClCompile Include="Graphics\DepthStencilBuffer.cpp" />
+    <ClCompile Include="Graphics\DepthStencilState.cpp" />
+    <ClCompile Include="Graphics\Effect.cpp" />
+    <ClCompile Include="Graphics\EffectCompiler.cpp" />
+    <ClCompile Include="Graphics\EffectParameter.cpp" />
+    <ClCompile Include="Graphics\EffectParameterCollection.cpp" />
+    <ClCompile Include="Graphics\EffectPass.cpp" />
+    <ClCompile Include="Graphics\EffectTechnique.cpp" />
+    <ClCompile Include="Graphics\EffectTechniqueCollection.cpp" />
+    <ClCompile Include="Graphics\FormatHelper.cpp" />
+    <ClCompile Include="Graphics\GraphicsAdapter.cpp" />
+    <ClCompile Include="Graphics\GraphicsCapabilities.cpp" />
+    <ClCompile Include="Graphics\GraphicsDevice.cpp" />
+    <ClCompile Include="Graphics\GraphicsDeviceInformation.cpp" />
+    <ClCompile Include="Graphics\GraphicsDeviceManager.cpp" />
+    <ClCompile Include="Graphics\IndexBuffer.cpp" />
+    <ClCompile Include="Graphics\InputLayoutCache.cpp" />
+    <ClCompile Include="Graphics\PresentationParameters.cpp" />
+    <ClCompile Include="Graphics\RasterizerState.cpp" />
+    <ClCompile Include="Graphics\SamplerState.cpp" />
+    <ClCompile Include="Graphics\SamplerStateCollection.cpp" />
+    <ClCompile Include="Graphics\Shader.cpp" />
+    <ClCompile Include="Graphics\Texture.cpp" />
+    <ClCompile Include="Graphics\Texture2D.cpp" />
+    <ClCompile Include="Graphics\TextureCollection.cpp" />
+    <ClCompile Include="Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="Graphics\VertexBufferBinding.cpp" />
+    <ClCompile Include="Graphics\VertexDeclaration.cpp" />
+    <ClCompile Include="Graphics\VertexDeclarationHelper.cpp" />
+    <ClCompile Include="Graphics\VertexElement.cpp" />
+    <ClCompile Include="Graphics\VertexPositionColor.cpp" />
+    <ClCompile Include="Graphics\VertexPositionColorTexture.cpp" />
+    <ClCompile Include="Graphics\VertexPositionNormalColorTexture.cpp" />
+    <ClCompile Include="Graphics\VertexPositionNormalTexture.cpp" />
+    <ClCompile Include="Graphics\VertexPositionTexture.cpp" />
+    <ClCompile Include="Math\MathVector.cpp" />
+    <ClCompile Include="Screen.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TrioApi.cpp" />
+    <ClCompile Include="Utils\Hash.cpp" />
+    <ClCompile Include="Utils\TextureLoader.cpp" />
+    <ClCompile Include="WindowsGameHost.cpp" />
+    <ClCompile Include="WindowsGameWindow.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
