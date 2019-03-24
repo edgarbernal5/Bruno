@@ -428,7 +428,7 @@ namespace TrioFX
 		return false;
 	}
 
-	void HLSLTree::PopulateEffectCollections(HLSLTree* root, std::vector<HLSLTechnique11*> &techniques, std::vector<HLSLBuffer*> &buffers, std::vector<HLSLStruct*> &structures)
+	void HLSLTree::PopulateEffectCollections(HLSLTree* root, std::vector<HLSLTechnique11*> &techniques, std::vector<HLSLBuffer*> &buffers, std::vector<HLSLStruct*> &structures, std::vector<TrioFX::HLSLDeclaration*> &textures, std::vector<TrioFX::HLSLDeclaration*> &samplers)
 	{
 		HLSLStatement* statement = m_root->statement;
 		while (statement != nullptr)
@@ -450,6 +450,19 @@ namespace TrioFX
 				HLSLStruct* structure = static_cast<HLSLStruct*>(statement);
 
 				structures.push_back(structure);
+			}
+			else if (statement->nodeType == HLSLNodeType_Declaration)
+			{
+				HLSLDeclaration* declaration = static_cast<HLSLDeclaration*>(statement);
+
+				if (declaration->type.baseType == HLSLBaseType_SamplerState)
+				{
+					samplers.push_back(declaration);
+				}
+				else if (declaration->type.baseType == HLSLBaseType_Texture2D)
+				{
+					textures.push_back(declaration);
+				}
 			}
 
 			statement = statement->nextStatement;

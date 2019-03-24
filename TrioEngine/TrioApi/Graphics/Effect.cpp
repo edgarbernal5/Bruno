@@ -87,8 +87,10 @@ namespace Vago
 		std::vector<TrioFX::HLSLTechnique11*> techniques;
 		std::vector<TrioFX::HLSLBuffer*> buffers;
 		std::vector<TrioFX::HLSLStruct*> structures;
+		std::vector<TrioFX::HLSLDeclaration*> textures;
+		std::vector<TrioFX::HLSLDeclaration*> samplers;
 
-		ID3DBlob* blob = EffectCompiler::CompileShader(filename, "PS", "ps_5_0", nullptr, false);
+		//ID3DBlob* blob = EffectCompiler::CompileShader(filename, "PS", "ps_5_0", nullptr, false);
 
 		TrioMem::Allocator allocator;
 		TrioFX::HLSLParser parser(&allocator, filename.c_str(), inputFileContent.data(), inputFileContent.size());
@@ -98,7 +100,7 @@ namespace Vago
 			return;
 		}
 
-		tree.PopulateEffectCollections(&tree, techniques, buffers, structures);
+		tree.PopulateEffectCollections(&tree, techniques, buffers, structures, textures, samplers);
 
 		ClearData();
 

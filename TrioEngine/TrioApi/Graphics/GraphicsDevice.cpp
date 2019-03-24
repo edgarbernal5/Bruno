@@ -67,6 +67,11 @@ namespace Vago
 		CreateDeviceResources();
 		CreateWindowSizeDependentResources();
 
+		DepthStencilState::InitStates();
+		RasterizerState::InitStates();
+		BlendState::InitStates();
+		SamplerState::InitStates();
+
 		m_pTextureCollection = new TextureCollection(ShaderStage::Pixel);
 		m_pSamplerCollection = new SamplerStateCollection(ShaderStage::Pixel);
 
@@ -84,11 +89,6 @@ namespace Vago
 			m_aVertexStrides[i] = 0;
 		}
 #endif
-
-		DepthStencilState::InitStates();
-		RasterizerState::InitStates();
-		BlendState::InitStates();
-		SamplerState::InitStates();
 	}
 
 	GraphicsDevice::~GraphicsDevice()

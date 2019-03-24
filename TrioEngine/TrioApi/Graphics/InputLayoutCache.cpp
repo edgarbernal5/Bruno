@@ -29,7 +29,7 @@ namespace Vago
 			const std::vector<D3D11_INPUT_ELEMENT_DESC>& inputs = vertexDecl->GetD3D11InputElements();
 
 			DX::ThrowIfFailed(
-				m_pDevice->GetD3DDevice()->CreateInputLayout(&inputs[0], inputs.size(), &m_vByteCode[0], m_vByteCode.size(), &inputLayout)
+				m_pDevice->GetD3DDevice()->CreateInputLayout(inputs.data(), inputs.size(), m_vByteCode.data(), m_vByteCode.size(), &inputLayout)
 			);
 
 			m_mCache[vertexDecl] = inputLayout;

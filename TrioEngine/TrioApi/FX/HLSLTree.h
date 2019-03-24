@@ -983,7 +983,7 @@ namespace TrioFX
 		HLSLBuffer * FindBuffer(const char * name);
 		HLSLTechnique11 * FindFirstTechnique11();
 
-		void PopulateEffectCollections(HLSLTree* root, std::vector<HLSLTechnique11*> &techniques, std::vector<HLSLBuffer*> &buffers, std::vector<HLSLStruct*> &structures);
+		void PopulateEffectCollections(HLSLTree* root, std::vector<HLSLTechnique11*> &techniques, std::vector<HLSLBuffer*> &buffers, std::vector<HLSLStruct*> &structures, std::vector<TrioFX::HLSLDeclaration*> &textures, std::vector<TrioFX::HLSLDeclaration*> &samplers);
 
 		bool GetExpressionValue(HLSLExpression * expression, int & value);
 		int GetExpressionValue(HLSLExpression * expression, float values[4]);
