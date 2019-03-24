@@ -18,8 +18,7 @@ namespace TrioFX
 		bool GetContainsString(const char* string) const;
 
 	private:
-
-		TrioDataTypes::Array<const char *> stringArray;
+		TrioData::Array<const char *> stringArray;
 
 	};
 

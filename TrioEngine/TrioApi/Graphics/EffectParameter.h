@@ -29,16 +29,25 @@ namespace Vago
 
 		//bool operator <
 	private:
-#ifdef TRIO_DIRECTX
-		//Obsoleto
-		//union InternalParameter
-		//{
+		struct STexture {
+			Texture* m_pTexture;
+		};
+		struct SConstantBuffer {
+			ConstantBuffer* m_pConstantBuffer;
+			uint32_t m_uiOffset;
+			// Tamaño en bytes;
+			uint32_t m_uiSize;
+		};
+
+		union InternalDataPointer
+		{
+			STexture m_Texture;
+			SConstantBuffer m_ConstantBuffer;
 		//	ID3DX11EffectMatrixVariable* m_Matrix;
 		//	ID3DX11EffectShaderResourceVariable* m_ShaderResource;
 		//	ID3DX11EffectScalarVariable* m_Scalar;
 		//	ID3DX11EffectVectorVariable* m_Vector;
-		//};
-#endif
+		};
 
 		/*union InternalValue
 		{
@@ -55,14 +64,11 @@ namespace Vago
 		//InternalParameter m_internalParameter;
 
 #endif
-		ConstantBuffer* m_constantBuffer;
-
+		InternalDataPointer m_uInternalParameter;
+		
 		std::string m_csName;
 		std::string m_csSemantic;
 
 		Effect *m_pEffect;
-		uint32_t m_uiOffset;
-		// Tamaño en bytes;
-		uint32_t m_uiSize;
 	};
 }

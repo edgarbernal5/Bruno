@@ -260,6 +260,135 @@ namespace Vago
 
 		size_t totalBufferFields = 0;
 		std::vector<EffectParameter*> parameters;
+		
+		TrioData::Array<TrioFX::HLSLParser::Variable>& globalVars = parser.GetGlobalVariables();
+		for (size_t i = 0; i < globalVars.GetSize(); i++)
+		{
+			TrioFX::HLSLDeclaration* field = (TrioFX::HLSLDeclaration*)globalVars[i].statement;
+			if (field != nullptr)
+			{
+				uint32_t offset = bufferSize;
+				uint32_t fieldSize = 0;
+				std::string paramterName = field->name;
+				std::string baseTypeName = "";
+
+				switch (field->type.baseType)
+				{
+				case TrioFX::HLSLBaseType_Int:
+					fieldSize = 1 * 4;
+					baseTypeName = "Int";
+					break;
+				case TrioFX::HLSLBaseType_Float:
+					fieldSize = 1 * 4;
+					baseTypeName = "Float";
+					break;
+
+				case TrioFX::HLSLBaseType_Int2:
+					fieldSize = 2 * 4;
+					baseTypeName = "Int2";
+					break;
+				case TrioFX::HLSLBaseType_Float2:
+					baseTypeName = "Float2";
+					fieldSize = 2 * 4;
+					break;
+
+				case TrioFX::HLSLBaseType_Int3:
+					baseTypeName = "Int3";
+					fieldSize = 3 * 4;
+					break;
+				case TrioFX::HLSLBaseType_Float3:
+					baseTypeName = "Float3";
+					fieldSize = 3 * 4;
+					break;
+
+				case TrioFX::HLSLBaseType_Int4:
+					baseTypeName = "Int4";
+					fieldSize = 4 * 4;
+					break;
+				case TrioFX::HLSLBaseType_Float4:
+					baseTypeName = "Float4";
+					fieldSize = 4 * 4;
+					break;
+
+				case TrioFX::HLSLBaseType_Float2x2:
+					baseTypeName = "Float2x2";
+					fieldSize = 2 * 2 * 4;
+					break;
+
+				case TrioFX::HLSLBaseType_Float3x3:
+					baseTypeName = "Float3x3";
+					fieldSize = 3 * 3 * 4;
+					break;
+
+				case TrioFX::HLSLBaseType_Float4x4:
+					baseTypeName = "Float4x4";
+					fieldSize = 4 * 4 * 4;
+					break;
+
+				case TrioFX::HLSLBaseType_Float4x3:
+					baseTypeName = "Float4x3";
+					fieldSize = 4 * 3 * 4;
+					break;
+
+				case TrioFX::HLSLBaseType_Float4x2:
+					baseTypeName = "Float4x2";
+					fieldSize = 4 * 2 * 4;
+					break;
+
+				case TrioFX::HLSLBaseType_Half:
+					baseTypeName = "Half";
+					fieldSize = 1 * 2;
+					break;
+
+				case TrioFX::HLSLBaseType_Half2:
+					baseTypeName = "Half2";
+					fieldSize = 2 * 2;
+					break;
+
+				case TrioFX::HLSLBaseType_Half3:
+					baseTypeName = "Half3";
+					fieldSize = 3 * 2;
+					break;
+
+				case TrioFX::HLSLBaseType_Half4:
+					baseTypeName = "Half4";
+					fieldSize = 4 * 2;
+					break;
+
+				case TrioFX::HLSLBaseType_Half2x2:
+					baseTypeName = "Half4x4";
+					fieldSize = 2 * 2 * 2;
+					break;
+
+				case TrioFX::HLSLBaseType_Half4x4:
+					baseTypeName = "Half4x4";
+					fieldSize = 4 * 4 * 2;
+					break;
+
+				case TrioFX::HLSLBaseType_Half4x3:
+					baseTypeName = "Half4x3";
+					fieldSize = 4 * 3 * 2;
+					break;
+
+				case TrioFX::HLSLBaseType_Half4x2:
+					baseTypeName = "Half4x2";
+					fieldSize = 4 * 2 * 2;
+					break;
+
+				case TrioFX::HLSLBaseType_Half3x3:
+					baseTypeName = "Half3x3";
+					fieldSize = 3 * 3 * 2;
+					break;
+				}
+				bufferSize += fieldSize;
+
+				ConstantBufferField cbf(paramterName, offset, fieldSize, baseTypeName);
+				constantFields.push_back(cbf);
+
+				//ConstantBuffer* nConstantBuffer = new ConstantBuffer(m_pDevice, buffer->name, bufferSize, constantFields);
+			}
+		}
+
 		for (size_t i = 0; i < buffers.size(); i++)
 		{
 			TrioFX::HLSLBuffer* buffer = buffers[i];
@@ -401,6 +530,7 @@ namespace Vago
 			}
 			totalBufferFields += constantFields.size();
 		}
+
 		m_Parameters = EffectParameterCollection(parameters);
 	}
 

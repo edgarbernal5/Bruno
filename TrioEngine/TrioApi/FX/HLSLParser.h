@@ -23,7 +23,19 @@ namespace TrioFX
 
 		bool Parse(HLSLTree* tree);
 
+		struct Variable
+		{
+			const char*     name;
+			HLSLType        type;
+			HLSLStatement*  statement;
+			Variable() : name(nullptr), statement(nullptr) {
+
+			}
+		};
+
+		TrioData::Array<Variable>& GetGlobalVariables() { return m_variables; }
 	private:
+
 
 		bool Accept(int token);
 		bool Expect(int token);
@@ -96,8 +108,8 @@ namespace TrioFX
 		void BeginScope();
 		void EndScope();
 
-		void DeclareVariable(const char* name, const HLSLType& type);
-		void CheckAndDeclareVariable(const char* name, const HLSLType& type);
+		Variable& DeclareVariable(const char* name, const HLSLType& type);
+		Variable& CheckAndDeclareVariable(const char* name, const HLSLType& type);
 
 		/** Returned pointer is only valid until Declare or Begin/EndScope is called. */
 		const HLSLType* FindVariable(const char* name, bool& global) const;
@@ -120,16 +132,10 @@ namespace TrioFX
 
 	private:
 
-		struct Variable
-		{
-			const char*     name;
-			HLSLType        type;
-		};
-
 		HLSLTokenizer             m_tokenizer;
 		std::vector<HLSLStruct*>       m_userTypes;
 		//std::vector<Variable>          m_variables;
-		TrioDataTypes::Array<Variable>          m_variables;
+		TrioData::Array<Variable>          m_variables;
 		std::vector<HLSLFunction*>     m_functions;
 
 		int                       m_numGlobals;

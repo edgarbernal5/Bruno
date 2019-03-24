@@ -1507,7 +1507,8 @@ namespace TrioFX
 					}
 				}
 
-				DeclareVariable(globalName, declaration->type);
+				Variable& var = DeclareVariable(globalName, declaration->type);
+				var.statement = declaration;
 
 				if (!ParseDeclarationAssignment(declaration))
 				{
@@ -1548,7 +1549,6 @@ namespace TrioFX
 
 		if (Accept('{'))
 		{
-			BeginScope();
 			if (!ParseBlock(firstStatement, returnType))
 			{
 				return false;
@@ -1793,7 +1793,8 @@ namespace TrioFX
 			declaration->type = type;
 			declaration->name = name;
 
-			DeclareVariable(declaration->name, declaration->type);
+			Variable& var = DeclareVariable(declaration->name, declaration->type);
+			var.statement = declaration;
 
 			// Handle option assignment of the declared variables(s).
 			if (!ParseDeclarationAssignment(declaration)) {
@@ -2569,7 +2570,8 @@ namespace TrioFX
 				return false;
 			}
 
-			DeclareVariable(argument->name, argument->type);
+			Variable& var = DeclareVariable(argument->name, argument->type);
+			//var.statement = argument;
 
 			// Optional semantic.
 			if (Accept(':') && !ExpectIdentifier(argument->semantic))
@@ -3754,24 +3756,24 @@ namespace TrioFX
 	}
 
 
-	void HLSLParser::CheckAndDeclareVariable(const char* name, const HLSLType& type) {
+	HLSLParser::Variable& HLSLParser::CheckAndDeclareVariable(const char* name, const HLSLType& type)
+	{
 		bool bFound = false;
 
-		for (size_t i = 0; i < m_variables.GetSize(); i++)
+		int i = m_variables.GetSize() - 1;
+		while (m_variables[i].name != nullptr)
 		{
 			if (strcmp(m_variables[i].name, name) == 0)
 			{
-				bFound = true;
-				break;
+				return m_variables[i];
 			}
+			--i;
 		}
 
-		if (!bFound) {
-			DeclareVariable(name, type);
-		}
+		return DeclareVariable(name, type);
 	}
 
-	void HLSLParser::DeclareVariable(const char* name, const HLSLType& type)
+	HLSLParser::Variable& HLSLParser::DeclareVariable(const char* name, const HLSLType& type)
 	{
 		if (m_variables.GetSize() == m_numGlobals)
 		{
@@ -3782,6 +3784,8 @@ namespace TrioFX
 		Variable& variable = m_variables.PushBackNew();
 		variable.name = name;
 		variable.type = type;
+
+		return variable;
 	}
 
 	static bool AreTypesEqual(HLSLTree* tree, const HLSLType& lhs, const HLSLType& rhs)

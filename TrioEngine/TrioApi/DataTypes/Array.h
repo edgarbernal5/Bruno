@@ -3,9 +3,8 @@
 #include "../FX/AssertFX.h"
 #include "../Memory/Allocator.h"
 
-namespace TrioDataTypes
+namespace TrioData
 {
-
 	template <typename T>
 	void ConstructRange(T * buffer, int new_size, int old_size) {
 		for (int i = old_size; i < new_size; i++) {
