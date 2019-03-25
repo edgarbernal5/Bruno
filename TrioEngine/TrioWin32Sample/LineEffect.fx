@@ -10,6 +10,7 @@ SamplerState linear_sampler : register(s0);
 cbuffer cbPerObject
 {
 	float4x4 gWorldViewProj;
+	float4x4 gWorldView;
 };
 
 struct VertexIn

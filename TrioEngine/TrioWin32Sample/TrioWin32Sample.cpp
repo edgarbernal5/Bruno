@@ -30,7 +30,8 @@ namespace TrioWin32
 	}
 
 	void DemoGame::Magic() {
-		m_pEffect = new Effect(GetGraphicsDevice(), "LineEffect.fx");
+		m_pEffect = new Effect(GetGraphicsDevice());
+		m_pEffect->CompileEffectFromFile("LineEffect.fx");
 
 		m_pIndexBuffer = new IndexBuffer(GetGraphicsDevice(), IndexElementSize::ThirtyTwoBits, 36, ResourceUsage::Immutable);
 

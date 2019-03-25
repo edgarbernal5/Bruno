@@ -508,14 +508,36 @@ namespace TrioFX
 		if (type.baseType >= HLSLBaseType_FirstNumeric &&
 			type.baseType <= HLSLBaseType_LastNumeric)
 		{
-			if (type.baseType == HLSLBaseType_Float || type.baseType == HLSLBaseType_Half) return 1;
-			if (type.baseType == HLSLBaseType_Float2 || type.baseType == HLSLBaseType_Half2) return 2;
-			if (type.baseType == HLSLBaseType_Float3 || type.baseType == HLSLBaseType_Half3) return 3;
-			if (type.baseType == HLSLBaseType_Float4 || type.baseType == HLSLBaseType_Half4) return 4;
+			if (type.baseType == HLSLBaseType_Float || type.baseType == HLSLBaseType_Half || type.baseType == HLSLBaseType_Int || type.baseType == HLSLBaseType_Uint) return 1;
+			if (type.baseType == HLSLBaseType_Float2 || type.baseType == HLSLBaseType_Half2 || type.baseType == HLSLBaseType_Int2 || type.baseType == HLSLBaseType_Uint2) return 2;
+			if (type.baseType == HLSLBaseType_Float3 || type.baseType == HLSLBaseType_Half3 || type.baseType == HLSLBaseType_Int3 || type.baseType == HLSLBaseType_Uint3) return 3;
+			if (type.baseType == HLSLBaseType_Float4 || type.baseType == HLSLBaseType_Half4 || type.baseType == HLSLBaseType_Int4 || type.baseType == HLSLBaseType_Uint4) return 4;
 
 		}
 		return 0;
 	}
+
+	//int GetDimensionSizeInBytes(const HLSLType & type)
+	//{
+	//	if (type.baseType >= HLSLBaseType_FirstNumeric &&
+	//		type.baseType <= HLSLBaseType_LastNumeric)
+	//	{
+	//		if (type.baseType == HLSLBaseType_Float || type.baseType == HLSLBaseType_Float2 || type.baseType == HLSLBaseType_Float3 || type.baseType == HLSLBaseType_Float4 ||
+	//			type.baseType == HLSLBaseType_Float2x2 || type.baseType == HLSLBaseType_Float3x3 || type.baseType == HLSLBaseType_Float4x4 || type.baseType == HLSLBaseType_Float4x2 ||
+	//			type.baseType == HLSLBaseType_Float4x3)
+	//			return 4;
+
+	//		if (type.baseType == HLSLBaseType_Int || type.baseType == HLSLBaseType_Int2 || type.baseType == HLSLBaseType_Int3 || type.baseType == HLSLBaseType_Int4 ||
+	//			type.baseType == HLSLBaseType_Uint || type.baseType == HLSLBaseType_Uint2 || type.baseType == HLSLBaseType_Uint3 || type.baseType == HLSLBaseType_Uint4)
+	//			return 4;
+
+	//		if (type.baseType == HLSLBaseType_Half || type.baseType == HLSLBaseType_Half2 || type.baseType == HLSLBaseType_Half3 || type.baseType == HLSLBaseType_Half4 ||
+	//			type.baseType == HLSLBaseType_Half2x2 || type.baseType == HLSLBaseType_Half3x3 || type.baseType == HLSLBaseType_Half4x4 || type.baseType == HLSLBaseType_Half4x2 ||
+	//			type.baseType == HLSLBaseType_Half4x3)
+	//			return 2;
+	//	}
+	//	return 0;
+	//}
 
 	// Returns dimension, 0 if invalid.
 	int HLSLTree::GetExpressionValue(HLSLExpression * expression, float values[4])
@@ -815,10 +837,11 @@ namespace TrioFX
 		}
 	}
 
-	/*void HLSLTreeVisitor::VisitBufferField(HLSLBufferField * node)
-	{
-	VisitType(node->type);
-	}*/
+	//void HLSLTreeVisitor::VisitBufferField(HLSLBufferField * node)
+	//{
+	//	MarkVisitNode(node);
+	//	VisitType(node->type);
+	//}
 
 	void HLSLTreeVisitor::VisitFunction(HLSLFunction * node)
 	{

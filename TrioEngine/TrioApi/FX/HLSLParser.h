@@ -28,6 +28,7 @@ namespace TrioFX
 			const char*     name;
 			HLSLType        type;
 			HLSLStatement*  statement;
+			
 			Variable() : name(nullptr), statement(nullptr) {
 
 			}
@@ -74,7 +75,7 @@ namespace TrioFX
 		bool ParseStatement(HLSLStatement*& statement, const HLSLType& returnType);
 		bool ParseDeclaration(HLSLDeclaration*& declaration);
 		bool ParseFieldDeclaration(HLSLStructField*& field);
-		//bool ParseBufferFieldDeclaration(HLSLBufferField*& field);
+		//bool ParseBufferFieldDeclaration(HLSLBufferField*& declaration);
 		bool ParseExpression(HLSLExpression*& expression);
 		bool ParseBinaryExpression(int priority, HLSLExpression*& expression);
 		bool ParseTerminalExpression(HLSLExpression*& expression, bool& needsEndParen);
@@ -129,6 +130,8 @@ namespace TrioFX
 
 		const char* GetFileName();
 		int GetLineNumber() const;
+
+		void CalculateBufferOffsets(HLSLBuffer* buffer);
 
 	private:
 

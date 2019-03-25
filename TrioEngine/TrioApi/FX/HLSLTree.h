@@ -17,7 +17,7 @@ namespace TrioFX
 		HLSLNodeType_Struct,
 		HLSLNodeType_StructField,
 		HLSLNodeType_Buffer,
-		HLSLNodeType_BufferField,
+		//HLSLNodeType_BufferField,
 		HLSLNodeType_Function,
 		HLSLNodeType_Argument,
 		HLSLNodeType_ExpressionStatement,
@@ -145,8 +145,8 @@ namespace TrioFX
 
 	inline bool IsMatrixType(HLSLBaseType baseType)
 	{
-		return baseType == HLSLBaseType_Float3x3 || baseType == HLSLBaseType_Float4x4 || baseType == HLSLBaseType_Float4x3 || baseType == HLSLBaseType_Float4x2 ||
-			baseType == HLSLBaseType_Half3x3 || baseType == HLSLBaseType_Half4x4 || baseType == HLSLBaseType_Half4x3 || baseType == HLSLBaseType_Half4x2;
+		return baseType == HLSLBaseType_Float2x2 || baseType == HLSLBaseType_Float3x3 || baseType == HLSLBaseType_Float4x4 || baseType == HLSLBaseType_Float4x3 || baseType == HLSLBaseType_Float4x2 ||
+			baseType == HLSLBaseType_Half2x2 || baseType == HLSLBaseType_Half3x3 || baseType == HLSLBaseType_Half4x4 || baseType == HLSLBaseType_Half4x3 || baseType == HLSLBaseType_Half4x2;
 	}
 
 	inline bool IsScalarType(HLSLBaseType baseType)
@@ -418,12 +418,16 @@ namespace TrioFX
 			assignment = nullptr;
 			templateName = nullptr;
 			buffer = nullptr;
+			sizeInBytes = 0;
+			offsetInBytes = 0;
 		}
 		const char*         name;
 		HLSLType            type;
 		const char*         registerName;       // @@ Store register index?
 		const char*         semantic;
-		
+		int					sizeInBytes;
+		int					offsetInBytes;
+
 		HLSLType            templateType;
 		const char*         templateName;
 		
@@ -479,18 +483,34 @@ namespace TrioFX
 	};
 
 	/** Field declaration inside of a cbuffer or tbuffer */ // @@ Isn't this just a regular declaration?
-	/*struct HLSLBufferField : public HLSLNode
-	{
-	static const HLSLNodeType s_type = HLSLNodeType_BufferField;
-	HLSLBufferField()
-	{
-	name            = nullptr;
-	nextField       = nullptr;
-	}
-	const char*         name;
-	HLSLType            type;
-	HLSLBufferField*    nextField;      // Next field in the cbuffer.
-	};*/
+	//struct TRIOAPI_DECL HLSLBufferField : public HLSLNode
+	//{
+	//	static const HLSLNodeType s_type = HLSLNodeType_BufferField;
+
+	//	HLSLBufferField()
+	//	{
+	//		name = nullptr;
+	//		registerName = nullptr;
+	//		semantic = nullptr;
+	//		nextField = nullptr;
+	//		//assignment = nullptr;
+	//		templateName = nullptr;
+	//		buffer = nullptr;
+	//		sizeInBytes = 0;
+	//	}
+	//	const char*         name;
+	//	HLSLType            type;
+	//	const char*         registerName;       // @@ Store register index?
+	//	const char*         semantic;
+	//	int					sizeInBytes;
+
+	//	HLSLType            templateType;
+	//	const char*         templateName;
+
+	//	HLSLBufferField*    nextField;    // If multiple variables declared on a line.
+	//	//HLSLExpression*     assignment;
+	//	HLSLBuffer*         buffer;
+	//};
 
 	/** Function declaration */
 	struct TRIOAPI_DECL HLSLFunction : public HLSLStatement

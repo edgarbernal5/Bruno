@@ -26,15 +26,14 @@ namespace Vago
 	{
 	public:
 		Effect(GraphicsDevice* device);
-		Effect(GraphicsDevice* device, std::vector<uint8_t> compiledBytes);
-		Effect(GraphicsDevice* device, std::string filename, ShaderLanguageTarget target = ShaderLanguageTarget::HLSL);
+		Effect(GraphicsDevice* device, std::vector<uint8_t> &compiledBytes);
 		~Effect();
 
 		inline EffectParameterCollection& GetParameters() { return m_Parameters; }
 		inline EffectTechniqueCollection& GetTechniques() { return m_Techniques; }
 		inline ConstantBufferCollection& GetConstantBuffers() { return m_ConstantBuffers; }
 
-		void CompileEffect(std::string filename, ShaderLanguageTarget target = ShaderLanguageTarget::HLSL);
+		void CompileEffectFromFile(std::string filename, ShaderLanguageTarget target = ShaderLanguageTarget::HLSL);
 
 		friend class EffectPass;
 	private:

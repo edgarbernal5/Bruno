@@ -19,18 +19,9 @@ namespace Vago
 
 	}
 
-	Effect::Effect(GraphicsDevice* device, std::vector<uint8_t> compiledBytes)
+	Effect::Effect(GraphicsDevice* device, std::vector<uint8_t> &compiledBytes)
 	{
 
-	}
-
-	Effect::Effect(GraphicsDevice* device, std::string filename, ShaderLanguageTarget target) :
-		m_pDevice(device)
-#ifdef TRIO_DIRECTX
-
-#endif
-	{
-		CompileEffect(filename, target);
 	}
 
 
@@ -74,7 +65,7 @@ namespace Vago
 		m_Parameters.clear();
 	}
 
-	void Effect::CompileEffect(std::string filename, ShaderLanguageTarget target)
+	void Effect::CompileEffectFromFile(std::string filename, ShaderLanguageTarget target)
 	{
 		std::string inputFileContent;
 
@@ -267,7 +258,15 @@ namespace Vago
 			TrioFX::HLSLDeclaration* field = (TrioFX::HLSLDeclaration*)globalVars[i].statement;
 			if (field != nullptr)
 			{
-				uint32_t offset = bufferSize;
+				if (field->buffer != nullptr)
+				{
+					
+				}
+				else
+				{
+
+				}
+				/*uint32_t offset = bufferSize;
 				uint32_t fieldSize = 0;
 				std::string paramterName = field->name;
 				std::string baseTypeName = "";
@@ -383,7 +382,7 @@ namespace Vago
 				bufferSize += fieldSize;
 
 				ConstantBufferField cbf(paramterName, offset, fieldSize, baseTypeName);
-				constantFields.push_back(cbf);
+				constantFields.push_back(cbf);*/
 
 				//ConstantBuffer* nConstantBuffer = new ConstantBuffer(m_pDevice, buffer->name, bufferSize, constantFields);
 			}
