@@ -671,7 +671,7 @@ namespace TrioFX
 		{ "sampler2DMS",        NumericType_NaN,        1, 0, 0, -1 },      // HLSLBaseType_Sampler2DMS
 		{ "sampler2DArray",     NumericType_NaN,        1, 0, 0, -1 },      // HLSLBaseType_Sampler2DArray
 		{ "SamplerState",     NumericType_NaN,        1, 0, 0, -1 },      // HLSLBaseType_SamplerState
-		//{ "Texture2D", NumericType_NaN, 1, 0, 0, -1 },      // HLSLBaseType_Texture
+		{ "Texture2D", NumericType_NaN, 1, 0, 0, -1 },      // HLSLBaseType_Texture
 		{ "user defined",       NumericType_NaN,        1, 0, 0, -1 },      // HLSLBaseType_UserDefined
 		{ "expression",         NumericType_NaN,        1, 0, 0, -1 }       // HLSLBaseType_Expression
 	};
@@ -1504,6 +1504,7 @@ namespace TrioFX
 				declaration->name = globalName;
 				declaration->type = type;
 				declaration->sizeInBytes = GetTypeSizeInBytes(type);
+				declaration->typeName = GetTypeName(type);
 
 				//@@Edgar
 				//if (typeNameTemplate != nullptr)
@@ -1825,6 +1826,7 @@ namespace TrioFX
 			declaration->type = type;
 			declaration->name = name;
 			declaration->sizeInBytes = GetTypeSizeInBytes(type);
+			declaration->typeName = GetTypeName(type);
 
 			Variable& var = DeclareVariable(declaration->name, declaration->type);
 			var.statement = declaration;

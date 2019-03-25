@@ -420,6 +420,7 @@ namespace TrioFX
 			buffer = nullptr;
 			sizeInBytes = 0;
 			offsetInBytes = 0;
+			typeName = nullptr;
 		}
 		const char*         name;
 		HLSLType            type;
@@ -430,7 +431,8 @@ namespace TrioFX
 
 		HLSLType            templateType;
 		const char*         templateName;
-		
+		const char*         typeName;
+
 		HLSLDeclaration*    nextDeclaration;    // If multiple variables declared on a line.
 		HLSLExpression*     assignment;
 		HLSLBuffer*         buffer;

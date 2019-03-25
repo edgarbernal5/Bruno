@@ -6,7 +6,7 @@ namespace Vago
 #if OPENGL
 	GLuint ConstantBuffer::m_indexTest = 0;
 #endif
-	ConstantBuffer::ConstantBuffer(GraphicsDevice* device, std::string name, uint32_t sizeInBytes, std::vector<ConstantBufferField> bufferFields) :
+	ConstantBuffer::ConstantBuffer(GraphicsDevice* device, std::string name, uint32_t sizeInBytes, std::vector<ConstantBufferField>& bufferFields) :
 		m_pDevice(device),
 #ifdef TRIO_DIRECTX
 		m_pBuffer(nullptr),
@@ -16,11 +16,24 @@ namespace Vago
 #endif
 		m_uiSizeInBytes(sizeInBytes),
 		
-		m_vBufferFields(bufferFields)
+		m_vBufferFields(bufferFields),
+		m_csName(name)
 	{
-		m_csName = name;
 
 		m_uiBufferBytes = new uint8_t[sizeInBytes];
+	}
+
+	ConstantBuffer::ConstantBuffer(GraphicsDevice* device, std::string name) :
+		m_pDevice(device),
+#ifdef TRIO_DIRECTX
+		m_pBuffer(nullptr),
+#elif OPENGL
+		m_buffer(0),
+		m_uniformBindingIndex(0),
+#endif
+		m_csName(name)
+	{
+
 	}
 
 	ConstantBuffer::~ConstantBuffer()

@@ -6,16 +6,21 @@
 #include "..\Math\MathVector.h"
 #include <string>
 
+#include "TextureAddressMode.h"
+#include "TextureFilter.h"
+
 namespace Vago
 {
 	class Texture;
 	class Effect;
 	class ConstantBuffer;
+	class SamplerState;
 	
 	class TRIOAPI_DECL EffectParameter
 	{
 	public:
 		EffectParameter(ConstantBufferField fieldDesc, ConstantBuffer* constantBuffer, Effect* effect);
+		EffectParameter(ConstantBufferField fieldDesc, Effect* effect);
 		~EffectParameter();
 
 		void SetValue(float value);
@@ -32,6 +37,10 @@ namespace Vago
 		struct STexture {
 			Texture* m_pTexture;
 		};
+		struct SSamplerState {
+			SamplerState* m_pSamplerState;
+
+		};
 		struct SConstantBuffer {
 			ConstantBuffer* m_pConstantBuffer;
 			uint32_t m_uiOffset;
@@ -43,6 +52,8 @@ namespace Vago
 		{
 			STexture m_Texture;
 			SConstantBuffer m_ConstantBuffer;
+			SSamplerState m_SamplerState;
+
 		//	ID3DX11EffectMatrixVariable* m_Matrix;
 		//	ID3DX11EffectShaderResourceVariable* m_ShaderResource;
 		//	ID3DX11EffectScalarVariable* m_Scalar;

@@ -17,7 +17,8 @@ namespace Vago
 	class TRIOAPI_DECL ConstantBuffer
 	{
 	public:
-		ConstantBuffer(GraphicsDevice* device, std::string name, uint32_t sizeInBytes, std::vector<ConstantBufferField> bufferFields);
+		ConstantBuffer(GraphicsDevice* device, std::string name, uint32_t sizeInBytes, std::vector<ConstantBufferField>& bufferFields);
+		ConstantBuffer(GraphicsDevice* device, std::string name);
 		~ConstantBuffer();
 
 		template <typename T>
@@ -30,7 +31,7 @@ namespace Vago
 #elif TRIO_OPENGL
 		void Apply(ShaderProgram* program);
 #endif
-		inline size_t GetFieldsCount() { return m_vBufferFields.size(); }
+		inline std::vector<ConstantBufferField>& GetFieldsDesc() { return m_vBufferFields; }
 
 		friend class Effect;
 		friend class EffectParameter;

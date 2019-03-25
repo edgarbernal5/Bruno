@@ -38,6 +38,7 @@ Texture2D gDiffuseMap : register(t0);
 SamplerState linear_sampler : register(s0);
 cbuffer cbPerObject {
     float4x4 gWorldViewProj;
+    float4x4 gWorldView;
 };
 struct VertexIn {
     float3 PosL : SV_POSITION;
