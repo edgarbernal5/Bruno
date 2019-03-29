@@ -275,43 +275,57 @@ namespace Vago
 
 		ConstantBuffer* orphanConstantBuffer = nullptr;
 		TrioData::Array<TrioFX::HLSLParser::Variable>& globalVars = parser.GetGlobalVariables();
+		uint32_t bufferSize = 0;
 		for (size_t i = 0; i < globalVars.GetSize(); i++)
 		{
 			TrioFX::HLSLDeclaration* field = (TrioFX::HLSLDeclaration*)globalVars[i].statement;
-			if (field != nullptr)
+			if (field != nullptr && field->buffer != nullptr)
 			{
-				if (field->buffer != nullptr)
-				{
-					ConstantBuffer* constantBuffer = nullptr;
+				ConstantBuffer* constantBuffer = nullptr;
 					
-					for (size_t j = 0; j < m_ConstantBuffers.size(); j++)
-					{
-						if (m_ConstantBuffers[j]->m_csName == field->buffer->name) {
-							constantBuffer = m_ConstantBuffers[j];
-							break;
-						}
+				for (size_t j = 0; j < m_ConstantBuffers.size(); j++)
+				{
+					if (m_ConstantBuffers[j]->m_csName == field->buffer->name) {
+						constantBuffer = m_ConstantBuffers[j];
+						break;
 					}
+				}
 
-					for (size_t j = 0; j < constantBuffer->GetFieldsDesc().size(); j++)
+				for (size_t j = 0; j < constantBuffer->GetFieldsDesc().size(); j++)
+				{
+					if (constantBuffer->GetFieldsDesc()[j].Name == field->name)
 					{
-						if (constantBuffer->GetFieldsDesc()[j].Name == field->name)
-						{
-							parameters.push_back(new EffectParameter(constantBuffer->GetFieldsDesc()[j], constantBuffer, this));
-							break;
-						}
-					}					
+						parameters.push_back(new EffectParameter(constantBuffer->GetFieldsDesc()[j], constantBuffer, this));
+						break;
+					}
+				}					
+			}
+			else
+			{
+				if (field->type.baseType >= TrioFX::HLSLBaseType_FirstNumeric && field->type.baseType <= TrioFX::HLSLBaseType_LastNumeric) {
+					if (orphanConstantBuffer == nullptr) {
+						orphanConstantBuffer = new ConstantBuffer(m_pDevice, "{Orphanage}");
+					}
+					ConstantBufferField cbf(field->name, bufferSize, field->sizeInBytes, field->typeName);
+					orphanConstantBuffer->GetFieldsDesc().push_back(cbf);
+
+					parameters.push_back(new EffectParameter(cbf, orphanConstantBuffer, this));
+
+					bufferSize += field->sizeInBytes;
 				}
 				else
 				{
-					if (field->type.baseType >= TrioFX::HLSLBaseType_FirstNumeric && field->type.baseType <= TrioFX::HLSLBaseType_LastNumeric) {
-						if (orphanConstantBuffer == nullptr) {
-							orphanConstantBuffer = new ConstantBuffer(m_pDevice, "{Orphans}");
-						}
+					if (field->type.baseType == TrioFX::HLSLBaseType_Texture2D)
+					{
+						EffectParameter::STexture sTexture;
+						sTexture.m_pTexture = nullptr;
+						sTexture.textureSlot = 0;
 
-						orphanConstantBuffer->GetFieldsDesc().push_back(ConstantBufferField(field->name, field->offsetInBytes, field->sizeInBytes, field->typeName));
+						parameters.push_back(new EffectParameter(sTexture, field->name, this));
 					}
 				}
 			}
+			
 		}
 
 		m_Parameters = EffectParameterCollection(parameters);

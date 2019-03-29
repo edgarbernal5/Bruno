@@ -6,13 +6,19 @@
 namespace Vago
 {
 	EffectParameter::EffectParameter(ConstantBufferField fieldDesc, ConstantBuffer* constantBuffer, Effect* effect) :
-		m_pEffect(effect)
+		m_pEffect(effect),
+		m_csName(fieldDesc.Name)
 	{
-		m_csName = fieldDesc.Name;
-
 		m_uInternalParameter.m_ConstantBuffer.m_pConstantBuffer = constantBuffer;
 		m_uInternalParameter.m_ConstantBuffer.m_uiOffset = fieldDesc.Offset;
 		m_uInternalParameter.m_ConstantBuffer.m_uiSize = fieldDesc.SizeInBytes;
+	}
+
+	EffectParameter::EffectParameter(STexture textureDesc, std::string parameterName, Effect* effect) :
+		m_pEffect(effect),
+		m_csName(parameterName)
+	{
+
 	}
 
 	EffectParameter::~EffectParameter()

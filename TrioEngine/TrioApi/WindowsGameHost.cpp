@@ -45,11 +45,6 @@ namespace Vago
 		return m_pGame;
 	}
 
-	HWND WindowsGameHost::GetHandle()
-	{
-		return NULL;
-	}
-
 	GameWindow* WindowsGameHost::GetWindow()
 	{
 		return m_pWindow;

@@ -18,24 +18,10 @@ namespace Vago
 	
 	class TRIOAPI_DECL EffectParameter
 	{
-	public:
-		EffectParameter(ConstantBufferField fieldDesc, ConstantBuffer* constantBuffer, Effect* effect);
-		EffectParameter(ConstantBufferField fieldDesc, Effect* effect);
-		~EffectParameter();
-
-		void SetValue(float value);
-		void SetValue(Texture* value);
-		void SetValue(Matrix value);
-		void SetValue(Vector2 value);
-		void SetValue(Vector3 value);
-		void SetValue(Vector4 value);
-
-		inline std::string& GetName() { return m_csName; }
-
-		//bool operator <
 	private:
 		struct STexture {
 			Texture* m_pTexture;
+			int textureSlot;
 		};
 		struct SSamplerState {
 			SamplerState* m_pSamplerState;
@@ -47,6 +33,24 @@ namespace Vago
 			// Tamaño en bytes;
 			uint32_t m_uiSize;
 		};
+
+	public:
+		EffectParameter(ConstantBufferField fieldDesc, ConstantBuffer* constantBuffer, Effect* effect);
+		EffectParameter(STexture textureDesc, std::string parameterName, Effect* effect);
+		~EffectParameter();
+
+		void SetValue(float value);
+		void SetValue(Texture* value);
+		void SetValue(Matrix value);
+		void SetValue(Vector2 value);
+		void SetValue(Vector3 value);
+		void SetValue(Vector4 value);
+
+		inline std::string& GetName() { return m_csName; }
+
+		friend class Effect;
+		//bool operator <
+	private:
 
 		union InternalDataPointer
 		{

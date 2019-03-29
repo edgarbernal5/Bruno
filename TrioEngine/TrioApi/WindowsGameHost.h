@@ -14,7 +14,6 @@ namespace Vago
 
 		void Exit();
 		inline Game* GetGame();
-		HWND GetHandle();
 		GameWindow* GetWindow();
 		
 		void Run();

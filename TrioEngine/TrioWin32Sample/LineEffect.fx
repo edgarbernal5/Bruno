@@ -6,6 +6,8 @@
 
 Texture2D gDiffuseMap : register(t0);
 SamplerState linear_sampler : register(s0);
+float4 sunColor;
+float4 moonColor;
 
 cbuffer cbPerObject
 {
