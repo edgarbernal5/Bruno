@@ -26,9 +26,9 @@ namespace Vago
 		if (bytes.size() > 0)
 		{
 			m_codeBytes.resize(bytes.size());
-			memcpy(&m_codeBytes[0], &bytes[0], bytes.size() * sizeof(uint8_t));
+			memcpy(m_codeBytes.data(), bytes.data(), bytes.size() * sizeof(uint8_t));
 
-			m_iHashKey = ComputeHash(&m_codeBytes[0], m_codeBytes.size());
+			m_iHashKey = ComputeHash(m_codeBytes.data(), m_codeBytes.size());
 		}
 
 #if TRIO_DIRECTX
@@ -49,7 +49,7 @@ namespace Vago
 		if (bytes.size() > 0)
 		{
 			m_codeBytes.resize(bytes.size());
-			memcpy(&m_codeBytes[0], &bytes[0], bytes.size() * sizeof(uint8_t));
+			memcpy(m_codeBytes.data(), bytes.data(), bytes.size() * sizeof(uint8_t));
 		}
 	}
 #endif
@@ -168,13 +168,13 @@ namespace Vago
 		switch (m_eStage)
 		{
 		case ShaderStage::Vertex:
-			m_pDevice->GetD3DDevice()->CreateVertexShader(&m_codeBytes[0], m_codeBytes.size(), nullptr, &m_uShaderPtr.m_pVertexShader);
+			m_pDevice->GetD3DDevice()->CreateVertexShader(m_codeBytes.data(), m_codeBytes.size(), nullptr, &m_uShaderPtr.m_pVertexShader);
 
 			m_pInputLayoutCache = new InputLayoutCache(m_pDevice, this->m_codeBytes);
 
 			break;
 		case ShaderStage::Pixel:
-			m_pDevice->GetD3DDevice()->CreatePixelShader(&m_codeBytes[0], m_codeBytes.size(), nullptr, &m_uShaderPtr.m_pPixelShader);
+			m_pDevice->GetD3DDevice()->CreatePixelShader(m_codeBytes.data(), m_codeBytes.size(), nullptr, &m_uShaderPtr.m_pPixelShader);
 
 			break;
 		case ShaderStage::Geometry:

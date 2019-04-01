@@ -14,7 +14,6 @@ namespace Vago
 	class TRIOAPI_DECL EffectPass
 	{
 	public:
-		EffectPass();
 		EffectPass(TrioFX::HLSLPass11* pass, TrioFX::HLSLTree* tree, GraphicsDevice* device, Effect* effect);
 		EffectPass(const char* name, Shader* vertexShader, Shader* pixelShader, GraphicsDevice* device, Effect* effect);
 

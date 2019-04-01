@@ -144,7 +144,7 @@ namespace TrioWin32
 
 		viewProj = view * proj;
 
-		m_pEffect->GetParameters()[0]->SetValue(viewProj);
+		m_pEffect->GetParameters()["gWorldViewProj"]->SetValue(viewProj);
 		m_pEffect->GetTechniques()[0]->GetPasses()[0]->Apply();
 
 		device->DrawIndexedPrimitives(PrimitiveType::TriangleList, 0, 0, 8, 0, 12);

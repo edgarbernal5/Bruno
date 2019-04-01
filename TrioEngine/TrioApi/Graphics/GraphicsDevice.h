@@ -60,6 +60,7 @@ namespace Vago
 		inline GraphicsCapabilities GetGraphicsCapabilities() { return m_graphicsCapabilities; }
 		inline PresentationParameters& GetPresentationParameters() { return m_presentationParameters; }
 		inline TextureCollection* GetTextures() { return m_pTextureCollection; }
+		inline TextureCollection* GetVertexTextures() { return m_pTextureCollection; }
 		
 		void Present();
 		void Reset(PresentationParameters presentationParameters);
@@ -81,6 +82,8 @@ namespace Vago
 		friend class EffectPass;
 	private:
 		GraphicsCapabilities						m_graphicsCapabilities;
+		TextureCollection*							m_pVertexTextureCollection;
+
 		TextureCollection*							m_pTextureCollection;
 		SamplerStateCollection*						m_pSamplerCollection;
 		PresentationParameters						m_presentationParameters;

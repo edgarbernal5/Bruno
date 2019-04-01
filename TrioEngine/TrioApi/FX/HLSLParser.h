@@ -131,9 +131,15 @@ namespace TrioFX
 		const char* GetFileName();
 		int GetLineNumber() const;
 
-		void CalculateBufferOffsets(HLSLBuffer* buffer);
-
+		void CalculateBufferAlignment(HLSLBuffer* buffer);
+		void CalculateGlobalVariableOffsets();
+		void CalculateDeclarationAlignment(HLSLDeclaration* declaration, int &offset);
 	private:
+		static const uint32_t c_ScalarSize = sizeof(uint32_t);
+
+		// packing rule constants
+		static const uint32_t c_ScalarsPerRegister = 4;
+		static const uint32_t c_RegisterSize = c_ScalarsPerRegister * c_ScalarSize; // must be a power of 2!!    
 
 		HLSLTokenizer             m_tokenizer;
 		std::vector<HLSLStruct*>       m_userTypes;
@@ -142,10 +148,6 @@ namespace TrioFX
 		std::vector<HLSLFunction*>     m_functions;
 
 		int                       m_numGlobals;
-
-		//vector<HLSLTechnique*>    m_techniques;
-		//vector<HLSLTechnique11*>  m_techniques11;
-
 
 		HLSLTree*                 m_tree;
 

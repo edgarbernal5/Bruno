@@ -24,6 +24,7 @@ namespace Vago
 		inline InputLayoutCache* GetInputLayouts() { return m_pInputLayoutCache; }
 #endif
 		friend class Effect;
+		friend class EffectLoader;
 		friend class EffectPass;
 		friend class GraphicsDevice;
 		friend class ShaderProgramCache;
@@ -41,7 +42,8 @@ namespace Vago
 		std::vector<uint8_t>	 m_codeBytes;
 
 		GraphicsDevice*			m_pDevice;
-		std::vector<size_t>		m_vBufferIndexes;
+		std::vector<std::pair<size_t, size_t>>		m_vBufferIndexes;
+		std::vector<std::pair<size_t, size_t>>		m_vSamplerIndexes;
 
 #if TRIO_DIRECTX
 		InputLayoutCache*		m_pInputLayoutCache;

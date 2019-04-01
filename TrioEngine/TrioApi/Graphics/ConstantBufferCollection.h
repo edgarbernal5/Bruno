@@ -39,7 +39,7 @@ namespace Vago
 
 		friend class GraphicsDevice;
 	private:
-		ConstantBuffer** m_pArrayBuffers;
+		ConstantBuffer* m_pArrayBuffers[16];
 		ShaderStage m_eStage;
 
 		int m_iValid;

@@ -41,6 +41,9 @@ namespace Vago
 
 	GraphicsDevice::GraphicsDevice(GraphicsAdapter* adapter, PresentationParameters parameters) :
 		m_pCurrentDepthStencilBuffer(nullptr),
+
+		m_pVertexTextureCollection(nullptr),
+
 		m_pTextureCollection(nullptr),
 		m_pSamplerCollection(nullptr),
 		m_pAdapter(adapter),
@@ -71,6 +74,8 @@ namespace Vago
 		RasterizerState::InitStates();
 		BlendState::InitStates();
 		SamplerState::InitStates();
+
+		m_pVertexTextureCollection = new TextureCollection(ShaderStage::Vertex);
 
 		m_pTextureCollection = new TextureCollection(ShaderStage::Pixel);
 		m_pSamplerCollection = new SamplerStateCollection(ShaderStage::Pixel);

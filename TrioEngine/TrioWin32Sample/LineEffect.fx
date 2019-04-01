@@ -6,8 +6,31 @@
 
 Texture2D gDiffuseMap : register(t0);
 SamplerState linear_sampler : register(s0);
-float4 sunColor;
-float4 moonColor;
+float3 sunColor;
+float3 moonColor;
+float3 eddColor;
+float4 seddColor;
+float floatante;
+
+cbuffer cbShadow
+{
+    float4 AmbientColor;
+    float4 LightColor ;
+    float3 LightPosition ;
+    float LightRadius;
+    float3 CameraPosition;
+    float2 ShadowMapSize ;
+};
+
+cbuffer cbLights
+{
+     float3    myLightDirection;
+     float3    myLightColour;
+     float3    myCameraPosition;
+     float2    myHalfPixel;
+     float4x4  myInverseViewProjection;
+     float     myPadding;
+};
 
 cbuffer cbPerObject
 {

@@ -253,6 +253,7 @@
     <ClInclude Include="Graphics\DisplayMode.h" />
     <ClInclude Include="Graphics\Effect.h" />
     <ClInclude Include="Graphics\EffectCompiler.h" />
+    <ClInclude Include="Graphics\EffectLoader.h" />
     <ClInclude Include="Graphics\EffectParameter.h" />
     <ClInclude Include="Graphics\EffectParameterCollection.h" />
     <ClInclude Include="Graphics\EffectPass.h" />
@@ -344,6 +345,7 @@
     <ClCompile Include="Graphics\DepthStencilState.cpp" />
     <ClCompile Include="Graphics\Effect.cpp" />
     <ClCompile Include="Graphics\EffectCompiler.cpp" />
+    <ClCompile Include="Graphics\EffectLoader.cpp" />
     <ClCompile Include="Graphics\EffectParameter.cpp" />
     <ClCompile Include="Graphics\EffectParameterCollection.cpp" />
     <ClCompile Include="Graphics\EffectPass.cpp" />

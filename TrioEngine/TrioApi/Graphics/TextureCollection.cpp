@@ -25,7 +25,6 @@ namespace Vago
 	void TextureCollection::CreateArray()
 	{
 		m_iN = 16;
-		m_pTextures = new Texture*[m_iN];
 		for (int i = 0; i < m_iN; i++)
 		{
 			m_pTextures[i] = nullptr;

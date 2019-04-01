@@ -21,6 +21,10 @@ namespace Vago
 		ConstantBuffer(GraphicsDevice* device, std::string name);
 		~ConstantBuffer();
 
+		inline uint8_t* GetRawData() {
+			return m_uiBufferBytes;
+		}
+
 		template <typename T>
 		void SetData(const T& data, int offsetInBytes);
 
@@ -34,6 +38,7 @@ namespace Vago
 		inline std::vector<ConstantBufferField>& GetFieldsDesc() { return m_vBufferFields; }
 
 		friend class Effect;
+		friend class EffectLoader;
 		friend class EffectParameter;
 		friend class EffectPass;
 		friend class GraphicsDevice;
@@ -71,7 +76,6 @@ namespace Vago
 	template <typename T>
 	void ConstantBuffer::SetData(const T& data, int offsetInBytes)
 	{
-
 #if TRIO_DIRECTX
 		if (m_pBuffer == nullptr)
 		{

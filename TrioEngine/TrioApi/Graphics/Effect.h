@@ -36,6 +36,8 @@ namespace Vago
 		void CompileEffectFromFile(std::string filename, ShaderLanguageTarget target = ShaderLanguageTarget::HLSL);
 
 		friend class EffectPass;
+		friend class EffectLoader;
+		
 	private:
 
 		GraphicsDevice*			m_pDevice;
@@ -47,13 +49,6 @@ namespace Vago
 
 		void ClearData();
 
-		class HLSLFunctionVisitor : public TrioFX::HLSLTreeVisitor
-		{
-		public:
-			HLSLFunctionVisitor();
-			void VisitIdentifierExpression(TrioFX::HLSLIdentifierExpression * node);
-
-			std::set<const char*> m_sParameterVisited;
-		};
+		
 	};
 }

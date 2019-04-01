@@ -65,7 +65,9 @@ namespace Vago
 		m_bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		m_bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		m_bufferDesc.MiscFlags = 0;
-		m_bufferDesc.ByteWidth = static_cast<uint32_t>(m_uiSizeInBytes + (16 - (m_uiSizeInBytes % 16)));
+		m_bufferDesc.ByteWidth = static_cast<uint32_t>(m_uiSizeInBytes + (16 - (m_uiSizeInBytes % 16))); //multiplo de 16 bytes, que es el tamaño del registro ( c_RegisterSize = c_ScalarsPerRegister * c_ScalarSize )
+		//_declspec(align(16))
+		//https://docs.microsoft.com/es-es/windows/desktop/direct3dhlsl/dx-graphics-hlsl-packing-rules
 		//m_bufferDesc.ByteWidth = m_sizeInBytes;
 
 		DX::ThrowIfFailed(m_pDevice->GetD3DDevice()->CreateBuffer(&m_bufferDesc, nullptr, &m_pBuffer));

@@ -8,7 +8,6 @@ namespace Vago
 	ConstantBufferCollection::ConstantBufferCollection() : m_iCount(0)
 	{
 		m_iValid = 0;
-		m_pArrayBuffers = new ConstantBuffer*[16];
 		for (size_t i = 0; i < 16; i++)
 		{
 			m_pArrayBuffers[i] = nullptr;
@@ -20,7 +19,6 @@ namespace Vago
 		m_eStage(stage)
 	{
 		m_iValid = 0;
-		m_pArrayBuffers = new ConstantBuffer*[16];
 		for (size_t i = 0; i < 16; i++)
 		{
 			m_pArrayBuffers[i] = nullptr;
@@ -30,10 +28,7 @@ namespace Vago
 	void ConstantBufferCollection::clear()
 	{
 		m_iValid = 0;
-		if (m_pArrayBuffers == nullptr)
-		{
-			m_pArrayBuffers = new ConstantBuffer*[16];
-		}
+		
 		for (size_t i = 0; i < 16; i++)
 		{
 			m_pArrayBuffers[i] = nullptr;

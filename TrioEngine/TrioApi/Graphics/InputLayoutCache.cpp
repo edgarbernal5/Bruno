@@ -16,7 +16,12 @@ namespace Vago
 
 	InputLayoutCache::~InputLayoutCache()
 	{
+		for (std::pair<VertexDeclaration*, ID3D11InputLayout*> inputLayout : m_mCache)
+		{
+			ReleaseCOM(inputLayout.second);
+		}
 
+		m_mCache.clear();
 	}
 
 	ID3D11InputLayout* InputLayoutCache::Get(VertexDeclaration* vertexDecl)

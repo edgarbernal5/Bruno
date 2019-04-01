@@ -25,6 +25,7 @@ namespace Vago
 		};
 		struct SSamplerState {
 			SamplerState* m_pSamplerState;
+			int samplerSlot;
 
 		};
 		struct SConstantBuffer {
@@ -37,6 +38,7 @@ namespace Vago
 	public:
 		EffectParameter(ConstantBufferField fieldDesc, ConstantBuffer* constantBuffer, Effect* effect);
 		EffectParameter(STexture textureDesc, std::string parameterName, Effect* effect);
+		EffectParameter(SSamplerState samplerState, std::string parameterName, Effect* effect);
 		~EffectParameter();
 
 		void SetValue(float value);
@@ -49,6 +51,7 @@ namespace Vago
 		inline std::string& GetName() { return m_csName; }
 
 		friend class Effect;
+		friend class EffectLoader;
 		//bool operator <
 	private:
 
@@ -57,20 +60,9 @@ namespace Vago
 			STexture m_Texture;
 			SConstantBuffer m_ConstantBuffer;
 			SSamplerState m_SamplerState;
-
-		//	ID3DX11EffectMatrixVariable* m_Matrix;
-		//	ID3DX11EffectShaderResourceVariable* m_ShaderResource;
-		//	ID3DX11EffectScalarVariable* m_Scalar;
-		//	ID3DX11EffectVectorVariable* m_Vector;
 		};
 
-		/*union InternalValue
-		{
-		Matrix m_matrix4x4;
-		Float3x3 m_matrix3x3;
-		};
-		*/
-
+		void* m_pData;
 
 #ifdef TRIO_DIRECTX
 		//ID3DX11EffectVariable* m_Variable;

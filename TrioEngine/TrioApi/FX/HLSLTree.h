@@ -477,10 +477,12 @@ namespace TrioFX
 		{
 			name = nullptr;
 			registerName = nullptr;
+			sizeInBytes = 0;
 			field = nullptr;
 		}
 		const char*         name;
 		const char*         registerName;
+		uint32_t			sizeInBytes;
 		HLSLDeclaration*    field;
 	};
 

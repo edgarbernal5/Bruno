@@ -35,7 +35,7 @@ namespace Vago
 		GLenum		m_glTargets[16];
 #endif
 
-		Texture**	m_pTextures;
+		Texture*	m_pTextures[16];
 		//array<Texture *, 16> m_pTextures;
 
 		int			m_iDirty;
@@ -44,10 +44,10 @@ namespace Vago
 
 		void CreateArray();
 
-		BaseType & GetAt(int iIndex) const
-		{
-			assert( iIndex >= 0 && iIndex < 16 ); 
-			return m_pTextures[iIndex];
-		}
+		//BaseType & GetAt(int iIndex)
+		//{
+		//	assert( iIndex >= 0 && iIndex < 16 ); 
+		//	return m_pTextures[iIndex];
+		//}
 	};
 }

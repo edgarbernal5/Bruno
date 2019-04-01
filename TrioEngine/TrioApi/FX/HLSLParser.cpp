@@ -1406,7 +1406,7 @@ namespace TrioFX
 				}
 			}
 
-			CalculateBufferOffsets(buffer);
+			CalculateBufferAlignment(buffer);
 
 			statement = buffer;
 		}
@@ -1826,6 +1826,7 @@ namespace TrioFX
 			declaration->type = type;
 			declaration->name = name;
 			declaration->sizeInBytes = GetTypeSizeInBytes(type);
+			
 			declaration->typeName = GetTypeName(type);
 
 			Variable& var = DeclareVariable(declaration->name, declaration->type);
@@ -3457,8 +3458,9 @@ namespace TrioFX
 				lastStatement = statement;
 				while (lastStatement->nextStatement) lastStatement = lastStatement->nextStatement;
 			}
-
 		}
+
+		CalculateGlobalVariableOffsets();
 		return true;
 	}
 
@@ -4137,24 +4139,58 @@ namespace TrioFX
 
 	}
 
-	void HLSLParser::CalculateBufferOffsets(HLSLBuffer* buffer)
+	void HLSLParser::CalculateBufferAlignment(HLSLBuffer* buffer)
 	{
 		HLSLDeclaration* field = buffer->field;
 		int offset = 0;
+
 		while (field != nullptr)
 		{
-			field->offsetInBytes = offset;
-			offset += field->sizeInBytes;
-
+			CalculateDeclarationAlignment(field, offset);
+			
 			HLSLDeclaration* nextSameLineDecl = field->nextDeclaration;
 			while (nextSameLineDecl != nullptr)
 			{
-				nextSameLineDecl->offsetInBytes = offset;
-				offset += nextSameLineDecl->sizeInBytes;
+				CalculateDeclarationAlignment(nextSameLineDecl, offset);
 
 				nextSameLineDecl = nextSameLineDecl->nextDeclaration;
 			}
 			field = (HLSLDeclaration*)field->nextStatement;
+		}
+
+		buffer->sizeInBytes = offset + (c_RegisterSize - (offset % c_RegisterSize));
+	}
+
+	void HLSLParser::CalculateDeclarationAlignment(HLSLDeclaration* declaration, int &offset)
+	{
+		uint32_t padding = (-offset & (c_RegisterSize - 1));
+
+		uint32_t aligned = (offset + (c_RegisterSize - 1)) & -c_RegisterSize;
+
+		if (aligned == 0 || padding == declaration->sizeInBytes)
+		{
+			declaration->offsetInBytes = offset;
+			offset += declaration->sizeInBytes;
+		}
+		else //if (offset + field->sizeInBytes > aligned)
+		{
+			declaration->offsetInBytes = aligned;
+			offset = aligned + declaration->sizeInBytes;
+		}
+	}
+
+	void HLSLParser::CalculateGlobalVariableOffsets()
+	{
+		int offset = 0;
+		for (size_t i = 0; i < m_variables.GetSize(); i++)
+		{
+			Variable& var = m_variables[i];
+			HLSLDeclaration* declaration = (HLSLDeclaration*)var.statement;
+
+			if (declaration->buffer == nullptr && declaration->type.baseType >= TrioFX::HLSLBaseType_FirstNumeric && declaration->type.baseType <= TrioFX::HLSLBaseType_LastNumeric)
+			{
+				CalculateDeclarationAlignment(declaration, offset);
+			}
 		}
 	}
 }

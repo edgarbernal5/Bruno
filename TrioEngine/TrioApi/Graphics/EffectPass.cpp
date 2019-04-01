@@ -9,11 +9,8 @@
 
 namespace Vago
 {
-	EffectPass::EffectPass() //:m_Effect(nullptr), m_Device(nullptr), m_vertexShader(nullptr), m_pixelShader(nullptr), m_AssignVS(false), m_AssignPS(false)
-	{
-	}
-
-	EffectPass::EffectPass(TrioFX::HLSLPass11* pass, TrioFX::HLSLTree* tree, GraphicsDevice* device, Effect* effect)
+	EffectPass::EffectPass(TrioFX::HLSLPass11* pass, TrioFX::HLSLTree* tree, GraphicsDevice* device, Effect* effect) :
+		m_pVertexShader(nullptr), m_pPixelShader(nullptr), m_pEffect(effect), m_pDevice(device)
 	{
 	}
 
@@ -26,22 +23,24 @@ namespace Vago
 	void EffectPass::Apply()
 	{
 #if defined(TRIO_OPENGL) || defined(TRIO_DIRECTX)
-		if (m_pVertexShader != nullptr)
+		if (m_pVertexShader)
 		{
 			m_pDevice->SetVertexShader(m_pVertexShader);
 			for (size_t i = 0; i < m_pVertexShader->m_vBufferIndexes.size(); i++)
 			{
-				ConstantBuffer* constBuffer = m_pEffect->m_ConstantBuffers[m_pVertexShader->m_vBufferIndexes[i]];
+				auto pair = m_pVertexShader->m_vBufferIndexes[i];
+				ConstantBuffer* constBuffer = m_pEffect->m_ConstantBuffers[pair.first];
 				m_pDevice->SetConstantBuffer(ShaderStage::Vertex, i, constBuffer);
 			}
 		}
 
-		if (m_pPixelShader != nullptr)
+		if (m_pPixelShader)
 		{
 			m_pDevice->SetPixelShader(m_pPixelShader);
 			for (size_t i = 0; i < m_pPixelShader->m_vBufferIndexes.size(); i++)
 			{
-				ConstantBuffer* constBuffer = m_pEffect->m_ConstantBuffers[m_pPixelShader->m_vBufferIndexes[i]];
+				auto pair = m_pPixelShader->m_vBufferIndexes[i];
+				ConstantBuffer* constBuffer = m_pEffect->m_ConstantBuffers[pair.first];
 				m_pDevice->SetConstantBuffer(ShaderStage::Pixel, i, constBuffer);
 			}
 		}
