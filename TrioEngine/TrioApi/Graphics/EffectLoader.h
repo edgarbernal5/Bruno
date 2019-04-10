@@ -24,16 +24,8 @@ namespace Vago
 		~EffectLoader();
 
 		bool LoadEffect(std::string filename);
+
 	private:
 		Effect& m_Effect;
-
-		class HLSLFunctionVisitor : public TrioFX::HLSLTreeVisitor
-		{
-		public:
-			HLSLFunctionVisitor();
-			void VisitIdentifierExpression(TrioFX::HLSLIdentifierExpression * node);
-
-			std::set<const char*> m_sParameterVisited;
-		};
 	};
 }

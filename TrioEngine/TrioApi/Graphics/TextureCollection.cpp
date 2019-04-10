@@ -29,7 +29,7 @@ namespace Vago
 		{
 			m_pTextures[i] = nullptr;
 		}
-		m_iDirty = INT_MAX;
+		m_iDirty = 0; //INT_MAX;
 	}
 	
 	void TextureCollection::SetTexture(int index, Texture* tex)
@@ -57,7 +57,17 @@ namespace Vago
 #ifdef TRIO_DIRECTX
 			if (texture == nullptr)
 			{
-				//device->m_d3dContext->PSSetShaderResources(i, 1, nullptr);
+				switch (m_eStage)
+				{
+				case ShaderStage::Vertex:
+					device->GetD3DDeviceContext()->VSSetShaderResources(i, 1, nullptr);
+					break;
+				case ShaderStage::Pixel:
+					device->GetD3DDeviceContext()->PSSetShaderResources(i, 1, nullptr);
+					break;
+				case ShaderStage::Geometry:
+					break;
+				}
 			}
 			else
 			{

@@ -5,6 +5,7 @@
 #include "StringPool.h"
 #include <vector>
 #include <map>
+#include <set>
 
 namespace TrioFX
 {
@@ -1093,6 +1094,15 @@ namespace TrioFX
 		HLSLBuffer * FindGlobalStructWithParameterName(HLSLRoot* root, const char * parameterName);
 	private:
 		
+	};
+
+	class TRIOAPI_DECL HLSLFunctionVisitor : public TrioFX::HLSLTreeVisitor
+	{
+	public:
+		HLSLFunctionVisitor();
+		void VisitIdentifierExpression(TrioFX::HLSLIdentifierExpression * node);
+
+		std::set<const char*> m_sParameterVisited;
 	};
 
 

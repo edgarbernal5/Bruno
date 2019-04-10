@@ -21,7 +21,7 @@ namespace Vago
 	struct DepthStencilState;
 	class GraphicsAdapter;
 	class IndexBuffer;
-	class TRIOAPI_DECL RasterizerState;
+	class RasterizerState;
 	struct SamplerState;
 	class SamplerStateCollection;
 	class Shader;

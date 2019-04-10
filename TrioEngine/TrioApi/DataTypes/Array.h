@@ -29,56 +29,60 @@ namespace TrioData
 	template <typename T>
 	class Array {
 	public:
-		Array(TrioMem::Allocator * allocator) : allocator(allocator), buffer(nullptr), size(0), capacity(0) {}
+		Array(TrioMem::Allocator * allocator) : 
+			m_pAllocator(allocator),
+			m_pBuffer(nullptr), 
+			m_iSize(0), 
+			m_iCapacity(0) {}
 
 		void PushBack(const T & val)
 		{
-			ASSERT(&val < buffer || &val >= buffer + size);
+			ASSERT(&val < m_pBuffer || &val >= m_pBuffer + m_iSize);
 
-			int old_size = size;
-			int new_size = size + 1;
+			int old_size = m_iSize;
+			int new_size = m_iSize + 1;
 
 			SetSize(new_size);
 
-			ConstructRange(buffer, new_size, old_size, val);
+			ConstructRange(m_pBuffer, new_size, old_size, val);
 		}
 
 		T & PushBackNew()
 		{
-			int old_size = size;
-			int new_size = size + 1;
+			int old_size = m_iSize;
+			int new_size = m_iSize + 1;
 
 			SetSize(new_size);
 
-			ConstructRange(buffer, new_size, old_size);
+			ConstructRange(m_pBuffer, new_size, old_size);
 
-			return buffer[old_size];
+			return m_pBuffer[old_size];
 		}
 		
 		void Resize(int new_size)
 		{
-			int old_size = size;
+			int old_size = m_iSize;
 
-			DestroyRange(buffer, new_size, old_size);
+			DestroyRange(m_pBuffer, new_size, old_size);
 
 			SetSize(new_size);
 
-			ConstructRange(buffer, new_size, old_size);
+			ConstructRange(m_pBuffer, new_size, old_size);
 		}
 
-		int GetSize() const { return size; }
-		const T & operator[](int i) const { ASSERT(i < size); return buffer[i]; }
-		T & operator[](int i) { ASSERT(i < size); return buffer[i]; }
+		int GetSize() const { return m_iSize; }
+		const T & operator[](int i) const { ASSERT(i < m_iSize); return m_pBuffer[i]; }
+		T & operator[](int i) { ASSERT(i < m_iSize); return m_pBuffer[i]; }
 
 	private:
 
 		// Change array size.
 		void SetSize(int new_size) {
-			size = new_size;
+			m_iSize = new_size;
 
-			if (new_size > capacity) {
+			if (new_size > m_iCapacity) {
 				int new_buffer_size;
-				if (capacity == 0) {
+				if (m_iCapacity == 0) {
 					// first allocation is exact
 					new_buffer_size = new_size;
 				}
@@ -94,31 +98,31 @@ namespace TrioData
 		// Change array capacity.
 		void SetCapacity(int new_capacity)
 		{
-			ASSERT(new_capacity >= size);
+			ASSERT(new_capacity >= m_iSize);
 
 			if (new_capacity == 0)
 			{
 				// free the buffer.
-				if (buffer != NULL)
+				if (m_pBuffer != nullptr)
 				{
-					allocator->Delete<T>(buffer);
-					buffer = NULL;
+					m_pAllocator->Delete<T>(m_pBuffer);
+					m_pBuffer = nullptr;
 				}
 			}
 			else
 			{
 				// realloc the buffer
-				buffer = allocator->Realloc<T>(buffer, new_capacity);
+				m_pBuffer = m_pAllocator->Realloc<T>(m_pBuffer, new_capacity);
 			}
 
-			capacity = new_capacity;
+			m_iCapacity = new_capacity;
 		}
 
 
 	private:
-		TrioMem::Allocator * allocator; // @@ Do we really have to keep a pointer to this?
-		T * buffer;
-		int size;
-		int capacity;
+		TrioMem::Allocator * m_pAllocator; // @@ Do we really have to keep a pointer to this?
+		T * m_pBuffer;
+		int m_iSize;
+		int m_iCapacity;
 	};
 }

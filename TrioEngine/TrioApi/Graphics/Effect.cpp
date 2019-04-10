@@ -26,7 +26,6 @@ namespace Vago
 
 	}
 
-
 	Effect::~Effect()
 	{
 		ClearData();

@@ -5,12 +5,7 @@
 
 namespace Vago
 {
-	EffectTechnique::EffectTechnique()
-	{
-
-	}
-
-	EffectTechnique::EffectTechnique(TrioFX::HLSLTechnique11* technique, TrioFX::HLSLTree* tree, GraphicsDevice* device, Effect* effect)
+	EffectTechnique::EffectTechnique(TrioFX::HLSLTechnique11* technique, TrioFX::HLSLTree& tree, std::vector<TrioFX::HLSLBuffer*> &buffers, std::vector<TrioFX::HLSLDeclaration*> &samplers, GraphicsDevice* device, Effect* effect)
 	{
 		m_csName = technique->name;
 
@@ -18,8 +13,7 @@ namespace Vago
 		TrioFX::HLSLPass11* ppass = technique->passes;
 		for (int i = 0; i < technique->numPasses; i++)
 		{
-			EffectPass* pass = new EffectPass(ppass, tree, device, effect);
-			m_vPasses[i] = pass;
+			m_vPasses[i] = new EffectPass(ppass, tree, buffers, samplers, device, effect);
 
 			ppass = ppass->nextPass;
 		}

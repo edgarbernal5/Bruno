@@ -48,7 +48,7 @@ namespace Vago
 		void SetValue(Vector3 value);
 		void SetValue(Vector4 value);
 
-		inline std::string& GetName() { return m_csName; }
+		inline const char* GetName() { return m_csName.c_str(); }
 
 		friend class Effect;
 		friend class EffectLoader;
