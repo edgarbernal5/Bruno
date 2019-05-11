@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 
-namespace Vago
+namespace TrioEngine
 {
 	class EffectParameter;
 

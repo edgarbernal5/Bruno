@@ -9,7 +9,7 @@
 
 #include "EffectLoader.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	Effect::Effect(GraphicsDevice* device) :
 		m_pDevice(device)

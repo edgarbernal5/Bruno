@@ -2,7 +2,7 @@
 
 #include "TrioApiDecl.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class VertexBuffer;
 
@@ -11,9 +11,15 @@ namespace Vago
 		VertexBuffer* Buffer;
 		uint32_t Offset, Stride;
 
-		VertexBufferBinding() : Buffer(nullptr) {}
+		VertexBufferBinding() : Buffer(nullptr), Offset(0), Stride(0) {}
 		VertexBufferBinding(VertexBuffer* buffer, uint32_t offset, uint32_t stride) : Buffer(buffer), Offset(offset), Stride(stride)
 		{
+		}
+		VertexBufferBinding(const VertexBufferBinding& rhs)
+		{
+			Buffer = rhs.Buffer;
+			Offset = rhs.Offset;
+			Stride = rhs.Stride;
 		}
 	};
 
@@ -34,7 +40,7 @@ namespace Vago
 		inline size_t size();
 
 	private:
-		BaseType* m_pArray;
+		BaseType m_pArray[32];
 		size_t m_iN;
 		size_t m_iCapacity;
 	};

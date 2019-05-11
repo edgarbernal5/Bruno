@@ -6,7 +6,7 @@
 #include "SurfaceFormat.h"
 #include "DisplayMode.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class TRIOAPI_DECL GraphicsAdapter
 	{

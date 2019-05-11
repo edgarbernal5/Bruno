@@ -2,7 +2,7 @@
 
 #include "TrioApiDecl.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	// Defines how "GraphicsDevice.Present updates the game window.
 	enum class PresentInterval

@@ -6,7 +6,7 @@
 #include "DepthStencilViewFlags.h"
 #include "DepthStencilViewDimension.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsDevice;
 

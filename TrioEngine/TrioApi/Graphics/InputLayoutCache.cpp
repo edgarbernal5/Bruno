@@ -4,7 +4,7 @@
 #include "VertexDeclaration.h"
 #include "GraphicsDevice.h"
 
-namespace Vago
+namespace TrioEngine
 {
 #ifdef TRIO_DIRECTX
 	InputLayoutCache::InputLayoutCache(GraphicsDevice* device, std::vector<uint8_t>& byteCode) :
@@ -27,6 +27,7 @@ namespace Vago
 	ID3D11InputLayout* InputLayoutCache::Get(VertexDeclaration* vertexDecl)
 	{
 		auto it = m_mCache.find(vertexDecl);
+
 		if (it == m_mCache.end())
 		{
 			ID3D11InputLayout* inputLayout = nullptr;

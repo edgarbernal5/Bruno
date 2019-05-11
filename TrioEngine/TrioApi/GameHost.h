@@ -3,7 +3,7 @@
 #include "Event.h"
 #include "GameWindow.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class Game;
 

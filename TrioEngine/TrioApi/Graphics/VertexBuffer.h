@@ -10,7 +10,7 @@
 #include "SetDataOptions.h"
 #include "VertexBufferBinding.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class VertexDeclaration;
 

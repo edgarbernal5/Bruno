@@ -3,7 +3,7 @@
 
 #include "WindowsGameWindow.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	WindowsGameHost::WindowsGameHost(Game* game) :
 		m_pGame(game),

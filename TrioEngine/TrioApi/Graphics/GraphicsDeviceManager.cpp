@@ -6,7 +6,7 @@
 #include "GraphicsDevice.h"
 #include "Screen.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	int GraphicsDeviceInformationComparer::SurfaceFormatBitDepth(SurfaceFormat format)
 	{

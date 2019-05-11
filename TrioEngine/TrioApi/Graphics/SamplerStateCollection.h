@@ -4,7 +4,7 @@
 
 #include "ShaderStage.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	struct SamplerState;
 	class GraphicsDevice;

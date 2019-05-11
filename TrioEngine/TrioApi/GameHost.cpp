@@ -4,7 +4,7 @@
 #include "Game.h"
 #include "WindowsGameHost.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	GameHost* GameHost::Create(Game* game)
 	{

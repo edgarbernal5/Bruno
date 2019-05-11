@@ -5,7 +5,7 @@
 #include "SurfaceType.h"
 #include "SurfaceFormat.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsDevice;
 

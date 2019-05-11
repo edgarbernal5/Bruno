@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "HLSLParser.h"
 
-#include "StringHelpers.h"
+#include "../Utils/StringUtility.h"
 #include "AssertFX.h"
 
 #include "HLSLTree.h"
@@ -1192,7 +1192,7 @@ namespace TrioFX
 
 	bool HLSLParser::Accept(const char* token)
 	{
-		if (m_tokenizer.GetToken() == HLSLToken_Identifier && String_Equal(token, m_tokenizer.GetIdentifier()))
+		if (m_tokenizer.GetToken() == HLSLToken_Identifier && TrioUtils::StringUtility::Equal(token, m_tokenizer.GetIdentifier()))
 		{
 			m_tokenizer.Next();
 			return true;
@@ -3109,7 +3109,7 @@ namespace TrioFX
 		// Case insensitive comparison.
 		for (int i = 0; i < count; i++)
 		{
-			if (String_EqualNoCase(name, validStates[i].name))
+			if (TrioUtils::StringUtility::EqualNoCase(name, validStates[i].name))
 			{
 				return &validStates[i];
 			}
@@ -3126,7 +3126,7 @@ namespace TrioFX
 			const EffectStateValue & value = state->values[i];
 			if (value.name == nullptr) break;
 
-			if (String_EqualNoCase(name, value.name))
+			if (TrioUtils::StringUtility::EqualNoCase(name, value.name))
 			{
 				return &value;
 			}
@@ -3169,7 +3169,7 @@ namespace TrioFX
 				const char * ident = m_tokenizer.GetIdentifier();
 				const EffectStateValue * stateValue = colorMaskValues;
 				while (stateValue->name != nullptr) {
-					if (String_EqualNoCase(stateValue->name, ident)) {
+					if (TrioUtils::StringUtility::EqualNoCase(stateValue->name, ident)) {
 						mask |= stateValue->value;
 						break;
 					}
@@ -3935,7 +3935,7 @@ namespace TrioFX
 		{
 			// Intrinsic names are not in the string pool (since they are compile time
 			// constants, so we need full string compare).
-			if (String_Equal(name, _intrinsic[i].function.name))
+			if (TrioUtils::StringUtility::Equal(name, _intrinsic[i].function.name))
 			{
 				return true;
 			}
@@ -3977,7 +3977,7 @@ namespace TrioFX
 		for (int i = 0; i < _numIntrinsics; ++i)
 		{
 			const HLSLFunction* function = &_intrinsic[i].function;
-			if (String_Equal(function->name, name))
+			if (TrioUtils::StringUtility::Equal(function->name, name))
 			{
 				nameMatches = true;
 

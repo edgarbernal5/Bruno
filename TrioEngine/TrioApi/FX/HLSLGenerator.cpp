@@ -4,10 +4,11 @@
 #include "HLSLParser.h"
 #include "HLSLTree.h"
 
-#include "StringHelpers.h"
+#include "../Utils/StringUtility.h"
 #include "AssertFX.h"
 
 #pragma warning (disable : 4996)
+
 namespace TrioFX
 {
 
@@ -119,24 +120,24 @@ namespace TrioFX
 		{
 			if (output)
 			{
-				if (String_Equal("POSITION", semantic))   return "SV_Position";
+				if (TrioUtils::StringUtility::Equal("POSITION", semantic))   return "SV_Position";
 			}
 		}
 		else if (target == HLSLGenerator::Target_PixelShader)
 		{
 			if (output)
 			{
-				if (String_Equal("DEPTH", semantic))      return "SV_Depth";
-				if (String_Equal("COLOR", semantic))      return "SV_Target";
-				if (String_Equal("COLOR0", semantic))     return "SV_Target0";
-				if (String_Equal("COLOR1", semantic))     return "SV_Target1";
-				if (String_Equal("COLOR2", semantic))     return "SV_Target2";
-				if (String_Equal("COLOR3", semantic))     return "SV_Target3";
+				if (TrioUtils::StringUtility::Equal("DEPTH", semantic))      return "SV_Depth";
+				if (TrioUtils::StringUtility::Equal("COLOR", semantic))      return "SV_Target";
+				if (TrioUtils::StringUtility::Equal("COLOR0", semantic))     return "SV_Target0";
+				if (TrioUtils::StringUtility::Equal("COLOR1", semantic))     return "SV_Target1";
+				if (TrioUtils::StringUtility::Equal("COLOR2", semantic))     return "SV_Target2";
+				if (TrioUtils::StringUtility::Equal("COLOR3", semantic))     return "SV_Target3";
 			}
 			else
 			{
-				if (String_Equal("VPOS", semantic))       return "SV_Position";
-				if (String_Equal("VFACE", semantic))      return "SV_IsFrontFace";    // bool   @@ Should we do type replacement too?
+				if (TrioUtils::StringUtility::Equal("VPOS", semantic))       return "SV_Position";
+				if (TrioUtils::StringUtility::Equal("VFACE", semantic))      return "SV_IsFrontFace";    // bool   @@ Should we do type replacement too?
 			}
 		}
 		return nullptr;
@@ -224,8 +225,8 @@ namespace TrioFX
 					while (field) {
 						if (field->semantic) {
 							field->hidden = false;
-							if (target == Target_PixelShader && !output && String_EqualNoCase(field->semantic, "POSITION")) {
-								ASSERT(String_EqualNoCase(field->sv_semantic, "SV_Position"));
+							if (target == Target_PixelShader && !output && TrioUtils::StringUtility::EqualNoCase(field->semantic, "POSITION")) {
+								ASSERT(TrioUtils::StringUtility::EqualNoCase(field->sv_semantic, "SV_Position"));
 								field->hidden = true;
 							}
 
@@ -524,7 +525,7 @@ namespace TrioFX
 			{
 				// Don't use printf directly so that we don't use the system locale.
 				char buffer[64];
-				String_FormatFloat(buffer, sizeof(buffer), literalExpression->fValue);
+				TrioUtils::StringUtility::FormatFloat(buffer, sizeof(buffer), literalExpression->fValue);
 				m_writer.Write("%s", buffer);
 			}
 			break;
@@ -634,79 +635,79 @@ namespace TrioFX
 			const char* name = functionCall->function->name;
 			if (!m_legacy)
 			{
-				if (String_Equal(name, "tex2D"))
+				if (TrioUtils::StringUtility::Equal(name, "tex2D"))
 				{
 					name = m_tex2DFunction;
 				}
-				else if (String_Equal(name, "tex2Dproj"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex2Dproj"))
 				{
 					name = m_tex2DProjFunction;
 				}
-				else if (String_Equal(name, "tex2Dlod"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex2Dlod"))
 				{
 					name = m_tex2DLodFunction;
 				}
-				else if (String_Equal(name, "tex2Dbias"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex2Dbias"))
 				{
 					name = m_tex2DBiasFunction;
 				}
-				else if (String_Equal(name, "tex2Dgrad"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex2Dgrad"))
 				{
 					name = m_tex2DGradFunction;
 				}
-				else if (String_Equal(name, "tex2Dgather"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex2Dgather"))
 				{
 					name = m_tex2DGatherFunction;
 				}
-				else if (String_Equal(name, "tex2Dsize"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex2Dsize"))
 				{
 					name = m_tex2DSizeFunction;
 				}
-				else if (String_Equal(name, "tex2Dfetch"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex2Dfetch"))
 				{
 					name = m_tex2DFetchFunction;
 				}
-				else if (String_Equal(name, "tex2Dcmp"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex2Dcmp"))
 				{
 					name = m_tex2DCmpFunction;
 				}
-				else if (String_Equal(name, "tex2DMSfetch"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex2DMSfetch"))
 				{
 					name = m_tex2DMSFetchFunction;
 				}
-				else if (String_Equal(name, "tex2DMSsize"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex2DMSsize"))
 				{
 					name = m_tex2DMSSizeFunction;
 				}
-				else if (String_Equal(name, "tex3D"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex3D"))
 				{
 					name = m_tex3DFunction;
 				}
-				else if (String_Equal(name, "tex3Dlod"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex3Dlod"))
 				{
 					name = m_tex3DLodFunction;
 				}
-				else if (String_Equal(name, "tex3Dbias"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex3Dbias"))
 				{
 					name = m_tex3DBiasFunction;
 				}
-				else if (String_Equal(name, "tex3Dsize"))
+				else if (TrioUtils::StringUtility::Equal(name, "tex3Dsize"))
 				{
 					name = m_tex3DSizeFunction;
 				}
-				else if (String_Equal(name, "texCUBE"))
+				else if (TrioUtils::StringUtility::Equal(name, "texCUBE"))
 				{
 					name = m_texCubeFunction;
 				}
-				else if (String_Equal(name, "texCUBElod"))
+				else if (TrioUtils::StringUtility::Equal(name, "texCUBElod"))
 				{
 					name = m_texCubeLodFunction;
 				}
-				else if (String_Equal(name, "texCUBEbias"))
+				else if (TrioUtils::StringUtility::Equal(name, "texCUBEbias"))
 				{
 					name = m_texCubeBiasFunction;
 				}
-				else if (String_Equal(name, "texCUBEsize"))
+				else if (TrioUtils::StringUtility::Equal(name, "texCUBEsize"))
 				{
 					name = m_texCubeSizeFunction;
 				}
@@ -1191,7 +1192,7 @@ namespace TrioFX
 	bool HLSLGenerator::ChooseUniqueName(const char* base, char* dst, int dstLength) const
 	{
 		// IC: Try without suffix first.
-		String_Printf(dst, dstLength, "%s", base);
+		TrioUtils::StringUtility::Printf(dst, dstLength, "%s", base);
 		if (!m_tree->GetContainsString(base))
 		{
 			return true;
@@ -1199,7 +1200,7 @@ namespace TrioFX
 
 		for (int i = 1; i < 1024; ++i)
 		{
-			String_Printf(dst, dstLength, "%s%d", base, i);
+			TrioUtils::StringUtility::Printf(dst, dstLength, "%s%d", base, i);
 			if (!m_tree->GetContainsString(dst))
 			{
 				return true;

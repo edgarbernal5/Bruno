@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "CodeWriter.h"
 
-
 #include "AssertFX.h"
-#include "StringHelpers.h"
+#include "../Utils/StringUtility.h"
 
 #include <stdarg.h>
 
@@ -42,7 +41,7 @@ namespace TrioFX
 			if (outputLine || outputFile)
 			{
 				char buffer[256];
-				String_Printf(buffer, sizeof(buffer), "#line %d", lineNumber);
+				TrioUtils::StringUtility::Printf(buffer, sizeof(buffer), "#line %d", lineNumber);
 				m_buffer += buffer;
 				if (outputFile && m_writeFileNames)
 				{
@@ -81,7 +80,7 @@ namespace TrioFX
 		va_start(args, format);
 
 		char buffer[_maxLineLength];
-		String_PrintfArgList(buffer, sizeof(buffer), format, args);
+		TrioUtils::StringUtility::PrintfArgList(buffer, sizeof(buffer), format, args);
 
 		m_buffer += buffer;
 
@@ -95,7 +94,7 @@ namespace TrioFX
 
 		char buffer[_maxLineLength];
 
-		int result = String_PrintfArgList(buffer, sizeof(buffer), format, args);
+		int result = TrioUtils::StringUtility::PrintfArgList(buffer, sizeof(buffer), format, args);
 		ASSERT(result != -1);
 
 		for (int i = 0; i < indent * m_spacesPerIndent; ++i)
@@ -117,7 +116,7 @@ namespace TrioFX
 		BeginLine(indent, fileName, lineNumber);
 
 		char buffer[_maxLineLength];
-		int result = String_PrintfArgList(buffer, sizeof(buffer), format, args);
+		int result = TrioUtils::StringUtility::PrintfArgList(buffer, sizeof(buffer), format, args);
 		ASSERT(result != -1);
 
 		m_buffer += buffer;

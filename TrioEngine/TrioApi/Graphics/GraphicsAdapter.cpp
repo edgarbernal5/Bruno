@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GraphicsAdapter.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	std::vector<GraphicsAdapter*> GraphicsAdapter::m_vAdapters;
 

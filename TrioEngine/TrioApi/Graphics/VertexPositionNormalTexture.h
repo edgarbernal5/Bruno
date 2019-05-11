@@ -5,7 +5,7 @@
 #include "../Math/MathVector.h"
 #include "VertexElement.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	// Vertex struct holding position, normal vector, and texture mapping information.
 	struct TRIOAPI_DECL VertexPositionNormalTexture

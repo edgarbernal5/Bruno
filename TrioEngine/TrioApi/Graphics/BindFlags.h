@@ -2,7 +2,7 @@
 
 #include "TrioApiDecl.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	enum class BindFlags : uint32_t
 	{

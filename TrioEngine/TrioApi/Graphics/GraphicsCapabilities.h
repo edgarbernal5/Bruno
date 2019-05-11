@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsDevice;
 

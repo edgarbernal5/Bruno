@@ -3,9 +3,11 @@
 
 #include "GraphicsDevice.h"
 
-namespace Vago
+namespace TrioEngine
 {
-	ConstantBufferCollection::ConstantBufferCollection() : m_iCount(0)
+	ConstantBufferCollection::ConstantBufferCollection() : 
+		m_iCount(0),
+		m_eStage(ShaderStage::Vertex)
 	{
 		m_iValid = 0;
 		for (size_t i = 0; i < 16; i++)

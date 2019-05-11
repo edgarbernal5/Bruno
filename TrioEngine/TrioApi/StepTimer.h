@@ -8,7 +8,7 @@
 #include <exception>
 #include <stdint.h>
 
-namespace Vago
+namespace TrioEngine
 {
 	// Helper class for animation and simulation timing.
 	class StepTimer

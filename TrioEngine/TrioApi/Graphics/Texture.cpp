@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Texture.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	Texture::Texture()
 	{

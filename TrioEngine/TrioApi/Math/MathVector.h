@@ -27,7 +27,7 @@
 #endif //  TRIO_DIRECTX
 
 
-namespace Vago
+namespace TrioEngine
 {
 	struct Vector2;
 	struct Vector4;
@@ -4430,17 +4430,17 @@ namespace Vago
 namespace std
 {
 
-	template<> struct less<Vago::Vector2>
+	template<> struct less<TrioEngine::Vector2>
 	{
-		bool operator()(const Vago::Vector2& V1, const Vago::Vector2& V2) const
+		bool operator()(const TrioEngine::Vector2& V1, const TrioEngine::Vector2& V2) const
 		{
 			return ((V1.x < V2.x) || ((V1.x == V2.x) && (V1.y < V2.y)));
 		}
 	};
 
-	template<> struct less<Vago::Vector3>
+	template<> struct less<TrioEngine::Vector3>
 	{
-		bool operator()(const Vago::Vector3& V1, const Vago::Vector3& V2) const
+		bool operator()(const TrioEngine::Vector3& V1, const TrioEngine::Vector3& V2) const
 		{
 			return ((V1.x < V2.x)
 				|| ((V1.x == V2.x) && (V1.y < V2.y))
@@ -4448,9 +4448,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<Vago::Vector4>
+	template<> struct less<TrioEngine::Vector4>
 	{
-		bool operator()(const Vago::Vector4& V1, const Vago::Vector4& V2) const
+		bool operator()(const TrioEngine::Vector4& V1, const TrioEngine::Vector4& V2) const
 		{
 			return ((V1.x < V2.x)
 				|| ((V1.x == V2.x) && (V1.y < V2.y))
@@ -4459,9 +4459,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<Vago::Matrix>
+	template<> struct less<TrioEngine::Matrix>
 	{
-		bool operator()(const Vago::Matrix& M1, const Vago::Matrix& M2) const
+		bool operator()(const TrioEngine::Matrix& M1, const TrioEngine::Matrix& M2) const
 		{
 			if (M1._11 != M2._11) return M1._11 < M2._11;
 			if (M1._12 != M2._12) return M1._12 < M2._12;
@@ -4484,9 +4484,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<Vago::Plane>
+	template<> struct less<TrioEngine::Plane>
 	{
-		bool operator()(const Vago::Plane& P1, const Vago::Plane& P2) const
+		bool operator()(const TrioEngine::Plane& P1, const TrioEngine::Plane& P2) const
 		{
 			return ((P1.x < P2.x)
 				|| ((P1.x == P2.x) && (P1.y < P2.y))
@@ -4495,9 +4495,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<Vago::Quaternion>
+	template<> struct less<TrioEngine::Quaternion>
 	{
-		bool operator()(const Vago::Quaternion& Q1, const Vago::Quaternion& Q2) const
+		bool operator()(const TrioEngine::Quaternion& Q1, const TrioEngine::Quaternion& Q2) const
 		{
 			return ((Q1.x < Q2.x)
 				|| ((Q1.x == Q2.x) && (Q1.y < Q2.y))
@@ -4506,9 +4506,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<Vago::Color>
+	template<> struct less<TrioEngine::Color>
 	{
-		bool operator()(const Vago::Color& C1, const Vago::Color& C2) const
+		bool operator()(const TrioEngine::Color& C1, const TrioEngine::Color& C2) const
 		{
 			return ((C1.x < C2.x)
 				|| ((C1.x == C2.x) && (C1.y < C2.y))
@@ -4517,9 +4517,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<Vago::Ray>
+	template<> struct less<TrioEngine::Ray>
 	{
-		bool operator()(const Vago::Ray& R1, const Vago::Ray& R2) const
+		bool operator()(const TrioEngine::Ray& R1, const TrioEngine::Ray& R2) const
 		{
 			if (R1.position.x != R2.position.x) return R1.position.x < R2.position.x;
 			if (R1.position.y != R2.position.y) return R1.position.y < R2.position.y;
@@ -4533,9 +4533,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<Vago::Viewport>
+	template<> struct less<TrioEngine::Viewport>
 	{
-		bool operator()(const Vago::Viewport& vp1, const Vago::Viewport& vp2) const
+		bool operator()(const TrioEngine::Viewport& vp1, const TrioEngine::Viewport& vp2) const
 		{
 			if (vp1.x != vp2.x) return (vp1.x < vp2.x);
 			if (vp1.y != vp2.y) return (vp1.y < vp2.y);

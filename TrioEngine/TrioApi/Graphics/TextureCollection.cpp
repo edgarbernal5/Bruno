@@ -4,7 +4,7 @@
 #include "GraphicsDevice.h"
 #include "Texture.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	TextureCollection::TextureCollection(ShaderStage stage) :
 		m_eStage(stage)

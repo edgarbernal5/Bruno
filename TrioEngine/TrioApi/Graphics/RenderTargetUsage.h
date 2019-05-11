@@ -2,7 +2,7 @@
 
 #include "TrioApiDecl.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	// Defines if the previous content in a render target is preserved when it set on the graphics device.
 	enum class RenderTargetUsage

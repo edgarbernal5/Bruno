@@ -4,7 +4,7 @@
 
 #include "IServiceBase.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class TRIOAPI_DECL IGraphicsDeviceManager : public IServiceBase
 	{

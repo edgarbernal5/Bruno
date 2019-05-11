@@ -3,7 +3,7 @@
 
 #include "VertexDeclarationHelper.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	VertexDeclaration* VertexPositionNormalTexture::g_pVertexDeclaration = nullptr;
 

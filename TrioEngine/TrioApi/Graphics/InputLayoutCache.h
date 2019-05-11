@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 
-namespace Vago
+namespace TrioEngine
 {
 #ifdef TRIO_DIRECTX
 	class GraphicsDevice;

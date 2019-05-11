@@ -4,7 +4,7 @@
 #include "GraphicsDevice.h"
 #include "VertexDeclaration.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	VertexBuffer::VertexBuffer() :
 		

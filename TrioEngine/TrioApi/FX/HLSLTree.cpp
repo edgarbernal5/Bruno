@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "HLSLTree.h"
 
-#include "StringHelpers.h"
+#include "../Utils/StringUtility.h"
 
 #include "AssertFX.h"
 
@@ -90,7 +90,7 @@ namespace TrioFX
 			if (statement->nodeType == HLSLNodeType_Function)
 			{
 				HLSLFunction * function = (HLSLFunction *)statement;
-				if (String_Equal(name, function->name))
+				if (TrioUtils::StringUtility::Equal(name, function->name))
 				{
 					return function;
 				}
@@ -110,7 +110,7 @@ namespace TrioFX
 			if (statement->nodeType == HLSLNodeType_Declaration)
 			{
 				HLSLDeclaration * declaration = (HLSLDeclaration *)statement;
-				if (String_Equal(name, declaration->name))
+				if (TrioUtils::StringUtility::Equal(name, declaration->name))
 				{
 					if (buffer_out) *buffer_out = nullptr;
 					return declaration;
@@ -124,7 +124,7 @@ namespace TrioFX
 				while (field != nullptr)
 				{
 					ASSERT(field->nodeType == HLSLNodeType_Declaration);
-					if (String_Equal(name, field->name))
+					if (TrioUtils::StringUtility::Equal(name, field->name))
 					{
 						if (buffer_out) *buffer_out = buffer;
 						return field;
@@ -148,7 +148,7 @@ namespace TrioFX
 			if (statement->nodeType == HLSLNodeType_Struct)
 			{
 				HLSLStruct * declaration = (HLSLStruct *)statement;
-				if (String_Equal(name, declaration->name))
+				if (TrioUtils::StringUtility::Equal(name, declaration->name))
 				{
 					return declaration;
 				}
@@ -168,7 +168,7 @@ namespace TrioFX
 			if (statement->nodeType == HLSLNodeType_Technique)
 			{
 				HLSLTechnique * technique = (HLSLTechnique *)statement;
-				if (String_Equal(name, technique->name))
+				if (TrioUtils::StringUtility::Equal(name, technique->name))
 				{
 					return technique;
 				}
@@ -188,7 +188,7 @@ namespace TrioFX
 			if (statement->nodeType == HLSLNodeType_Technique11)
 			{
 				HLSLTechnique11 * technique = (HLSLTechnique11 *)statement;
-				if (String_Equal(name, technique->name))
+				if (TrioUtils::StringUtility::Equal(name, technique->name))
 				{
 					return technique;
 				}
@@ -246,7 +246,7 @@ namespace TrioFX
 			if (statement->nodeType == HLSLNodeType_Pipeline)
 			{
 				HLSLPipeline * pipeline = (HLSLPipeline *)statement;
-				if (String_Equal(name, pipeline->name))
+				if (TrioUtils::StringUtility::Equal(name, pipeline->name))
 				{
 					return pipeline;
 				}
@@ -266,7 +266,7 @@ namespace TrioFX
 			if (statement->nodeType == HLSLNodeType_Buffer)
 			{
 				HLSLBuffer * buffer = (HLSLBuffer *)statement;
-				if (String_Equal(name, buffer->name))
+				if (TrioUtils::StringUtility::Equal(name, buffer->name))
 				{
 					return buffer;
 				}
@@ -488,7 +488,7 @@ namespace TrioFX
 
 			virtual void VisitFunctionCall(HLSLFunctionCall * node)
 			{
-				result = result || String_Equal(name, node->function->name);
+				result = result || TrioUtils::StringUtility::Equal(name, node->function->name);
 
 				HLSLTreeVisitor::VisitFunctionCall(node);
 			}
@@ -1103,7 +1103,7 @@ namespace TrioFX
 			if (statement->nodeType == HLSLNodeType_Struct)
 			{
 				HLSLStruct * declaration = (HLSLStruct *)statement;
-				if (String_Equal(name, declaration->name))
+				if (TrioUtils::StringUtility::Equal(name, declaration->name))
 				{
 					return declaration;
 				}
@@ -1126,7 +1126,7 @@ namespace TrioFX
 				HLSLDeclaration * field = declaration->field;
 				while (field != nullptr)
 				{
-					if (String_Equal(parameterName, field->name))
+					if (TrioUtils::StringUtility::Equal(parameterName, field->name))
 					{
 						return declaration;
 					}
@@ -1446,7 +1446,7 @@ namespace TrioFX
 					{
 						HLSLDeclaration* nextDeclaration = declaration->nextDeclaration;
 
-						if (declaration->semantic != nullptr && String_EqualNoCase(declaration->semantic, "PER_INSTANCED_ITEM"))
+						if (declaration->semantic != nullptr && TrioUtils::StringUtility::EqualNoCase(declaration->semantic, "PER_INSTANCED_ITEM"))
 						{
 							ASSERT(instanceDataDeclaration == nullptr);
 							instanceDataDeclaration = declaration;
@@ -1455,7 +1455,7 @@ namespace TrioFX
 						{
 							// Select group based on type and semantic.
 							HLSLDeclaration ** first, ** last;
-							if (declaration->semantic == nullptr || String_EqualNoCase(declaration->semantic, "PER_ITEM") || String_EqualNoCase(declaration->semantic, "PER_MATERIAL"))
+							if (declaration->semantic == nullptr || TrioUtils::StringUtility::EqualNoCase(declaration->semantic, "PER_ITEM") || TrioUtils::StringUtility::EqualNoCase(declaration->semantic, "PER_MATERIAL"))
 							{
 								if (IsSamplerType(declaration->type))
 								{

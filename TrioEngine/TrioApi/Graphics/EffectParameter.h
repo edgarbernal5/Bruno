@@ -9,7 +9,7 @@
 #include "TextureAddressMode.h"
 #include "TextureFilter.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class Texture;
 	class Effect;

@@ -2,7 +2,7 @@
 #include "TextureLoader.h"
 
 
-namespace Vago
+namespace TrioEngine
 {
 	TextureLoader::TextureLoader() : 
 		m_uiImgId(0)
@@ -52,26 +52,26 @@ namespace Vago
 		int localBpp = 0;
 		switch (targetFormat)
 		{
-		case Vago::SurfaceFormat::ColorSRgb:
-		case Vago::SurfaceFormat::Color:
+		case TrioEngine::SurfaceFormat::ColorSRgb:
+		case TrioEngine::SurfaceFormat::Color:
 			targetToIl = IL_RGBA;
 			localBpp = 4;
 			break;
-		case Vago::SurfaceFormat::Bgr32:
-		case Vago::SurfaceFormat::Bgr32SRgb:
-		case Vago::SurfaceFormat::Bgr565:
+		case TrioEngine::SurfaceFormat::Bgr32:
+		case TrioEngine::SurfaceFormat::Bgr32SRgb:
+		case TrioEngine::SurfaceFormat::Bgr565:
 			targetToIl = IL_BGR;
 			localBpp = 3;
 			break;
-		case Vago::SurfaceFormat::Bgra32:
-		case Vago::SurfaceFormat::Bgra4444:
-		case Vago::SurfaceFormat::Bgra32SRgb:
-		case Vago::SurfaceFormat::Bgra5551:
+		case TrioEngine::SurfaceFormat::Bgra32:
+		case TrioEngine::SurfaceFormat::Bgra4444:
+		case TrioEngine::SurfaceFormat::Bgra32SRgb:
+		case TrioEngine::SurfaceFormat::Bgra5551:
 			targetToIl = IL_BGRA;
 			localBpp = 4;
 			break;
 
-		case Vago::SurfaceFormat::Alpha8:
+		case TrioEngine::SurfaceFormat::Alpha8:
 			targetToIl = IL_ALPHA;
 			localBpp = 1;
 			break;

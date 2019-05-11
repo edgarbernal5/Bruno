@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 
-namespace Vago
+namespace TrioEngine
 {
 	class IServiceBase;
 

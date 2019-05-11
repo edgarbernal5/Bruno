@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "EffectCompiler.h"
 
-namespace Vago
+namespace TrioEngine
 {
 
 #if TRIO_DIRECTX

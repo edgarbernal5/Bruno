@@ -9,7 +9,7 @@
 
 #include <sstream>
 
-namespace Vago
+namespace TrioEngine
 {
 	class VertexDeclaration;
 

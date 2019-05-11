@@ -4,7 +4,7 @@
 #include "Shader.h"
 #include "GraphicsDevice.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	//Usar glVertexAttribPointer
 

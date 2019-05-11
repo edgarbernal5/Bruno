@@ -2,7 +2,7 @@
 #include "DepthStencilState.h"
 
 
-namespace Vago
+namespace TrioEngine
 {
 	DepthStencilState * DepthStencilState::Default = nullptr;
 	DepthStencilState * DepthStencilState::DepthRead = nullptr;

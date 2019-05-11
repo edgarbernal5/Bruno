@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Hash.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	int ComputeHash(const char * data, int size)
 	{

@@ -2,7 +2,7 @@
 
 #include "TrioApiDecl.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	enum class ShaderStage
 	{

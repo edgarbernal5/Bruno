@@ -7,7 +7,7 @@
 #include "RenderTargetUsage.h"
 #include "SurfaceFormat.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	struct TRIOAPI_DECL PresentationParameters
 	{

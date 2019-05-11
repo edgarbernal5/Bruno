@@ -3,7 +3,7 @@
 
 #include "ConstantBuffer.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	EffectParameter::EffectParameter(ConstantBufferField fieldDesc, ConstantBuffer* constantBuffer, Effect* effect) :
 		m_pEffect(effect),

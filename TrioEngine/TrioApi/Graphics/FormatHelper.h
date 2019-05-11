@@ -7,7 +7,7 @@
 #include "SurfaceFormat.h"
 #include "VertexElementFormat.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	DXGI_FORMAT ToFormat(SurfaceFormat format);
 	DXGI_FORMAT ToFormat(DepthFormat format);

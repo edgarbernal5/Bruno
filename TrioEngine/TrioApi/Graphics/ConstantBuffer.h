@@ -12,7 +12,7 @@
 
 #include <string>
 
-namespace Vago
+namespace TrioEngine
 {
 	class TRIOAPI_DECL ConstantBuffer
 	{

@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace Vago
+namespace TrioEngine
 {
 	int ComputeHash(const char * data, int size);
 	int ComputeHash(uint8_t * data, int size);

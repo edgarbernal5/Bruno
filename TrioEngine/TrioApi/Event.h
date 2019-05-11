@@ -8,7 +8,7 @@
 #include <mutex>
 #include <future>
 
-namespace Vago
+namespace TrioEngine
 {
 	template <typename... Args>
 	class EventHandler

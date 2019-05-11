@@ -17,7 +17,7 @@
 
 #include "..\FX\HLSLTree.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsDevice;
 	class Shader;

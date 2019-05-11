@@ -4,7 +4,7 @@
 //#include "VertexDeclaration.h"
 #include "VertexDeclarationHelper.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	VertexDeclaration* VertexPositionColorTexture::g_pVertexDeclaration = nullptr;
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "StringPool.h"
 
-#include "StringHelpers.h"
+#include "../Utils/StringUtility.h"
 
 namespace TrioFX
 {
@@ -20,7 +20,7 @@ namespace TrioFX
 	const char* StringPool::AddString(const char* string)
 	{
 		for (int i = 0; i < stringArray.GetSize(); i++) {
-			if (String_Equal(stringArray[i], string)) return stringArray[i];
+			if (TrioUtils::StringUtility::Equal(stringArray[i], string)) return stringArray[i];
 		}
 #if _MSC_VER
 		const char * dup = _strdup(string);
@@ -69,7 +69,7 @@ namespace TrioFX
 		va_end(tmp);
 
 		for (int i = 0; i < stringArray.GetSize(); i++) {
-			if (String_Equal(stringArray[i], string)) {
+			if (TrioUtils::StringUtility::Equal(stringArray[i], string)) {
 				delete[] string;
 				return stringArray[i];
 			}
@@ -91,7 +91,7 @@ namespace TrioFX
 	bool StringPool::GetContainsString(const char* string) const
 	{
 		for (int i = 0; i < stringArray.GetSize(); i++) {
-			if (String_Equal(stringArray[i], string)) return true;
+			if (TrioUtils::StringUtility::Equal(stringArray[i], string)) return true;
 		}
 		return false;
 	}

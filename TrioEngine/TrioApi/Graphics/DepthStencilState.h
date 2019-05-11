@@ -6,7 +6,7 @@
 #include "DepthWriteMask.h"
 #include "StencilOperation.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsDevice;
 

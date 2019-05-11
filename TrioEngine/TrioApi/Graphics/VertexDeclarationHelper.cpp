@@ -4,7 +4,7 @@
 #include "VertexDeclaration.h"
 #include "VertexElement.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	std::map<std::string, VertexDeclaration*> VertexDeclarationHelper::g_declarationByClass;
 

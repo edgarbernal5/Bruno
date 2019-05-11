@@ -5,7 +5,7 @@
 #include "Graphics\IGraphicsDeviceService.h"
 #include "Graphics\GraphicsDevice.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	Game::Game() :
 		m_bDoneFirstUpdate(false),

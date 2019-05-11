@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace Vago
+namespace TrioEngine
 {
 	class IServiceBase;
 

@@ -2,7 +2,7 @@
 
 #include "MathVector.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	//------------------------------------------------------------------------------
 	// 2D rectangle
@@ -203,9 +203,9 @@ namespace Vago
 // Support for SimpleMath and Standard C++ Library containers
 namespace std
 {
-	template<> struct less<Vago::Rectangle>
+	template<> struct less<TrioEngine::Rectangle>
 	{
-		bool operator()(const Vago::Rectangle& r1, const Vago::Rectangle& r2) const
+		bool operator()(const TrioEngine::Rectangle& r1, const TrioEngine::Rectangle& r2) const
 		{
 			return ((r1.x < r2.x)
 				|| ((r1.x == r2.x) && (r1.y < r2.y))

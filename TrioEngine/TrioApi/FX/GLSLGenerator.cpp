@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GLSLGenerator.h"
 
-#include "StringHelpers.h"
+#include "../Utils/StringUtility.h"
 #include "Log.h"
 #include "AssertFX.h"
 
@@ -527,7 +527,7 @@ namespace TrioFX
 			{
 				// Don't use printf directly so that we don't use the system locale.
 				char buffer[64];
-				String_FormatFloat(buffer, sizeof(buffer), literalExpression->fValue);
+				TrioUtils::StringUtility::FormatFloat(buffer, sizeof(buffer), literalExpression->fValue);
 				m_writer.Write("%s", buffer);
 			}
 				break;
@@ -781,7 +781,7 @@ namespace TrioFX
 			bool handled = false;
 			const char* functionName = functionCall->function->name;
 
-			if (String_Equal(functionName, "mul"))
+			if (TrioUtils::StringUtility::Equal(functionName, "mul"))
 			{
 				HLSLExpression* argument[2];
 				if (GetFunctionArguments(functionCall, argument, 2) != 2)
@@ -815,7 +815,7 @@ namespace TrioFX
 
 				handled = true;
 			}
-			else if (String_Equal(functionName, "saturate"))
+			else if (TrioUtils::StringUtility::Equal(functionName, "saturate"))
 			{
 				HLSLExpression* argument[1];
 				if (GetFunctionArguments(functionCall, argument, 1) != 1)
@@ -867,78 +867,78 @@ namespace TrioFX
 	{
 
 		// Remap intrinstic functions.
-		if (String_Equal(name, "tex2D"))
+		if (TrioUtils::StringUtility::Equal(name, "tex2D"))
 		{
 			name = m_versionLegacy ? "texture2D" : "texture";
 		}
-		else if (String_Equal(name, "tex2Dproj"))
+		else if (TrioUtils::StringUtility::Equal(name, "tex2Dproj"))
 		{
 			name = m_versionLegacy ? "texture2DProj" : "textureProj";
 		}
-		else if (String_Equal(name, "texCUBE"))
+		else if (TrioUtils::StringUtility::Equal(name, "texCUBE"))
 		{
 			name = m_versionLegacy ? "textureCube" : "texture";
 		}
-		else if (String_Equal(name, "tex3D"))
+		else if (TrioUtils::StringUtility::Equal(name, "tex3D"))
 		{
 			name = m_versionLegacy ? "texture3D" : "texture";
 		}
-		else if (String_Equal(name, "clip"))
+		else if (TrioUtils::StringUtility::Equal(name, "clip"))
 		{
 			name = m_clipFunction;
 		}
-		else if (String_Equal(name, "tex2Dlod"))
+		else if (TrioUtils::StringUtility::Equal(name, "tex2Dlod"))
 		{
 			name = m_tex2DlodFunction;
 		}
-		else if (String_Equal(name, "tex2Dbias"))
+		else if (TrioUtils::StringUtility::Equal(name, "tex2Dbias"))
 		{
 			name = m_tex2DbiasFunction;
 		}
-		else if (String_Equal(name, "tex2Dgrad"))
+		else if (TrioUtils::StringUtility::Equal(name, "tex2Dgrad"))
 		{
 			name = m_tex2DgradFunction;
 		}
-		else if (String_Equal(name, "tex2DArray"))
+		else if (TrioUtils::StringUtility::Equal(name, "tex2DArray"))
 		{
 			name = "texture";
 		}
-		else if (String_Equal(name, "texCUBEbias"))
+		else if (TrioUtils::StringUtility::Equal(name, "texCUBEbias"))
 		{
 			name = m_texCUBEbiasFunction;
 		}
-		else if (String_Equal(name, "texCUBElod"))
+		else if (TrioUtils::StringUtility::Equal(name, "texCUBElod"))
 		{
 			name = m_texCUBElodFunction;
 		}
-		else if (String_Equal(name, "atan2"))
+		else if (TrioUtils::StringUtility::Equal(name, "atan2"))
 		{
 			name = "atan";
 		}
-		else if (String_Equal(name, "sincos"))
+		else if (TrioUtils::StringUtility::Equal(name, "sincos"))
 		{
 			name = m_sinCosFunction;
 		}
-		else if (String_Equal(name, "fmod"))
+		else if (TrioUtils::StringUtility::Equal(name, "fmod"))
 		{
 			// mod is not the same as fmod if the parameter is negative!
 			// The equivalent of fmod(x, y) is x - y * floor(x/y)
 			// We use the mod version for performance.
 			name = "mod";
 		}
-		else if (String_Equal(name, "lerp"))
+		else if (TrioUtils::StringUtility::Equal(name, "lerp"))
 		{
 			name = "mix";
 		}
-		else if (String_Equal(name, "frac"))
+		else if (TrioUtils::StringUtility::Equal(name, "frac"))
 		{
 			name = "fract";
 		}
-		else if (String_Equal(name, "ddx"))
+		else if (TrioUtils::StringUtility::Equal(name, "ddx"))
 		{
 			name = "dFdx";
 		}
-		else if (String_Equal(name, "ddy"))
+		else if (TrioUtils::StringUtility::Equal(name, "ddy"))
 		{
 			name = "dFdy";
 		}
@@ -1064,7 +1064,7 @@ namespace TrioFX
 				HLSLFunction* function = static_cast<HLSLFunction*>(statement);
 
 				// Check if this is our entry point.
-				bool entryPoint = String_Equal(function->name, m_entryName);
+				bool entryPoint = TrioUtils::StringUtility::Equal(function->name, m_entryName);
 
 				// Use an alternate name for the function which is supposed to be entry point
 				// so that we can supply our own function which will be the actual entry point.
@@ -1530,7 +1530,7 @@ namespace TrioFX
 			if (statement->nodeType == HLSLNodeType_Function)
 			{
 				HLSLFunction* function = static_cast<HLSLFunction*>(statement);
-				if (String_Equal(function->name, name))
+				if (TrioUtils::StringUtility::Equal(function->name, name))
 				{
 					return function;
 				}
@@ -1548,7 +1548,7 @@ namespace TrioFX
 			if (statement->nodeType == HLSLNodeType_Struct)
 			{
 				HLSLStruct* structDeclaration = static_cast<HLSLStruct*>(statement);
-				if (String_Equal(structDeclaration->name, name))
+				if (TrioUtils::StringUtility::Equal(structDeclaration->name, name))
 				{
 					return structDeclaration;
 				}
@@ -1603,7 +1603,7 @@ namespace TrioFX
 
 					m_writer.Write("%s ", qualifier);
 					char attribName[64];
-					String_Printf(attribName, 64, "%s%s", prefix, field->semantic);
+					TrioUtils::StringUtility::Printf(attribName, 64, "%s%s", prefix, field->semantic);
 					OutputDeclaration(field->type, attribName);
 					m_writer.EndLine(";");
 				}
@@ -1617,7 +1617,7 @@ namespace TrioFX
 
 			m_writer.Write("%s ", qualifier);
 			char attribName[64];
-			String_Printf(attribName, 64, "%s%s", prefix, semantic);
+			TrioUtils::StringUtility::Printf(attribName, 64, "%s%s", prefix, semantic);
 			OutputDeclaration(type, attribName);
 			m_writer.EndLine(";");
 		}
@@ -1647,7 +1647,7 @@ namespace TrioFX
 		const char* builtInSemantic = GetBuiltInSemantic(semantic, AttributeModifier_Out, &outputIndex);
 		if (builtInSemantic != nullptr)
 		{
-			if (String_Equal(builtInSemantic, "gl_Position"))
+			if (TrioUtils::StringUtility::Equal(builtInSemantic, "gl_Position"))
 			{
 				if (m_options.flags & Flag_FlipPositionOutput)
 				{
@@ -1668,7 +1668,7 @@ namespace TrioFX
 
 				m_outputPosition = true;
 			}
-			else if (String_Equal(builtInSemantic, "gl_FragDepth"))
+			else if (TrioUtils::StringUtility::Equal(builtInSemantic, "gl_FragDepth"))
 			{
 				// If the value goes outside of the 0 to 1 range, the
 				// fragment will be rejected unlike in D3D, so clamp it.
@@ -1790,7 +1790,7 @@ namespace TrioFX
 			while (field != nullptr)
 			{
 				char fieldResultName[1024];
-				String_Printf(fieldResultName, sizeof(fieldResultName), "%s.%s", resultName, field->name);
+				TrioUtils::StringUtility::Printf(fieldResultName, sizeof(fieldResultName), "%s.%s", resultName, field->name);
 				OutputSetOutAttribute(field->semantic, fieldResultName);
 				field = field->nextField;
 			}
@@ -1900,7 +1900,7 @@ namespace TrioFX
 	{
 		for (int i = 0; i < s_numReservedWords; ++i)
 		{
-			if (String_Equal(s_reservedWord[i], name))
+			if (TrioUtils::StringUtility::Equal(s_reservedWord[i], name))
 			{
 				return m_reservedWord[i];
 			}
@@ -1912,7 +1912,7 @@ namespace TrioFX
 	{
 		for (int i = 0; i < 1024; ++i)
 		{
-			String_Printf(dst, dstLength, "%s%d", base, i);
+			TrioUtils::StringUtility::Printf(dst, dstLength, "%s%d", base, i);
 			if (!m_tree->GetContainsString(dst))
 			{
 				return true;
@@ -1926,22 +1926,22 @@ namespace TrioFX
 		if (outputIndex)
 			*outputIndex = -1;
 
-		if (m_target == Target_VertexShader && modifier == AttributeModifier_Out && String_Equal(semantic, "POSITION"))
+		if (m_target == Target_VertexShader && modifier == AttributeModifier_Out && TrioUtils::StringUtility::Equal(semantic, "POSITION"))
 			return "gl_Position";
 
-		if (m_target == Target_VertexShader && modifier == AttributeModifier_Out && String_Equal(semantic, "SV_Position"))
+		if (m_target == Target_VertexShader && modifier == AttributeModifier_Out && TrioUtils::StringUtility::Equal(semantic, "SV_Position"))
 			return "gl_Position";
 
-		if (m_target == Target_VertexShader && modifier == AttributeModifier_Out && String_Equal(semantic, "PSIZE"))
+		if (m_target == Target_VertexShader && modifier == AttributeModifier_Out && TrioUtils::StringUtility::Equal(semantic, "PSIZE"))
 			return "gl_PointSize";
 
-		if (m_target == Target_VertexShader && modifier == AttributeModifier_In && String_Equal(semantic, "SV_InstanceID"))
+		if (m_target == Target_VertexShader && modifier == AttributeModifier_In && TrioUtils::StringUtility::Equal(semantic, "SV_InstanceID"))
 			return "gl_InstanceID";
 
-		if (m_target == Target_FragmentShader && modifier == AttributeModifier_Out && String_Equal(semantic, "SV_Depth"))
+		if (m_target == Target_FragmentShader && modifier == AttributeModifier_Out && TrioUtils::StringUtility::Equal(semantic, "SV_Depth"))
 			return "gl_FragDepth";
 
-		if (m_target == Target_FragmentShader && modifier == AttributeModifier_In && String_Equal(semantic, "SV_Position"))
+		if (m_target == Target_FragmentShader && modifier == AttributeModifier_In && TrioUtils::StringUtility::Equal(semantic, "SV_Position"))
 			return "gl_FragCoord";
 
 		if (m_target == Target_FragmentShader && modifier == AttributeModifier_Out)

@@ -12,7 +12,7 @@
 
 #include "..\Math\MathVector.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class ConstantBuffer;
 	class ConstantBufferCollection;

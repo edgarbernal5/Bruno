@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsDevice;
 
@@ -185,8 +185,8 @@ namespace Vago
 #ifdef TRIO_DIRECTX
 		switch (m_eUsage)
 		{
-		case Vago::ResourceUsage::Dynamic:
-		case Vago::ResourceUsage::Default:
+		case TrioEngine::ResourceUsage::Dynamic:
+		case TrioEngine::ResourceUsage::Default:
 			if (m_pTexture == nullptr)
 			{
 				CreateTexture(nullptr);
@@ -206,7 +206,7 @@ namespace Vago
 			m_pDevice->GetD3DDeviceContext()->UpdateSubresource(m_pTexture, level, &region, data + startIndex, GetPitch(w), 0);
 
 			break;
-		case Vago::ResourceUsage::Immutable:
+		case TrioEngine::ResourceUsage::Immutable:
 
 			if (m_pTexture == nullptr)
 			{
@@ -231,7 +231,7 @@ namespace Vago
 				m_pDevice->GetD3DDeviceContext()->UpdateSubresource(m_pTexture, level, &region, data + startIndex, GetPitch(w), 0);
 			}
 			break;
-		case Vago::ResourceUsage::Staging:
+		case TrioEngine::ResourceUsage::Staging:
 			break;
 		default:
 			break;

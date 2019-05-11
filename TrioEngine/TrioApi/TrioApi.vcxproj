@@ -102,7 +102,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(SolutionDir)Dependencies\DevIL\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(SolutionDir)Dependencies\DevIL\include;$(SolutionDir)Dependencies\Assimp\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <LinkIncremental>true</LinkIncremental>
@@ -142,8 +142,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DevIL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimpd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DevIL\lib;$(SolutionDir)Dependencies\Assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -226,7 +226,6 @@
     <ClInclude Include="FX\HLSLTokenizer.h" />
     <ClInclude Include="FX\HLSLTree.h" />
     <ClInclude Include="FX\Log.h" />
-    <ClInclude Include="FX\StringHelpers.h" />
     <ClInclude Include="FX\StringPool.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameHost.h" />
@@ -273,6 +272,9 @@
     <ClInclude Include="Graphics\InputLayoutCache.h" />
     <ClInclude Include="Graphics\IServiceBase.h" />
     <ClInclude Include="Graphics\MapMode.h" />
+    <ClInclude Include="Graphics\Mesh.h" />
+    <ClInclude Include="Graphics\Model.h" />
+    <ClInclude Include="Graphics\ModelMaterial.h" />
     <ClInclude Include="Graphics\PresentationParameters.h" />
     <ClInclude Include="Graphics\PresentInterval.h" />
     <ClInclude Include="Graphics\PrimitiveType.h" />
@@ -319,6 +321,7 @@
     <ClInclude Include="TrioApi.h" />
     <ClInclude Include="TrioApiDecl.h" />
     <ClInclude Include="Utils\Hash.h" />
+    <ClInclude Include="Utils\StringUtility.h" />
     <ClInclude Include="Utils\TextureLoader.h" />
     <ClInclude Include="WindowsGameHost.h" />
     <ClInclude Include="WindowsGameWindow.h" />
@@ -333,7 +336,6 @@
     <ClCompile Include="FX\HLSLTokenizer.cpp" />
     <ClCompile Include="FX\HLSLTree.cpp" />
     <ClCompile Include="FX\Log.cpp" />
-    <ClCompile Include="FX\StringHelpers.cpp" />
     <ClCompile Include="FX\StringPool.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameHost.cpp" />
@@ -359,6 +361,9 @@
     <ClCompile Include="Graphics\GraphicsDeviceManager.cpp" />
     <ClCompile Include="Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Graphics\InputLayoutCache.cpp" />
+    <ClCompile Include="Graphics\Mesh.cpp" />
+    <ClCompile Include="Graphics\Model.cpp" />
+    <ClCompile Include="Graphics\ModelMaterial.cpp" />
     <ClCompile Include="Graphics\PresentationParameters.cpp" />
     <ClCompile Include="Graphics\RasterizerState.cpp" />
     <ClCompile Include="Graphics\SamplerState.cpp" />
@@ -389,6 +394,7 @@
     </ClCompile>
     <ClCompile Include="TrioApi.cpp" />
     <ClCompile Include="Utils\Hash.cpp" />
+    <ClCompile Include="Utils\StringUtility.cpp" />
     <ClCompile Include="Utils\TextureLoader.cpp" />
     <ClCompile Include="WindowsGameHost.cpp" />
     <ClCompile Include="WindowsGameWindow.cpp" />

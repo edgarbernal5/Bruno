@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PresentationParameters.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	PresentationParameters::PresentationParameters()
 	{

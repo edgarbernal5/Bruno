@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace Vago
+namespace TrioEngine
 {
 	class TRIOAPI_DECL TextureLoader
 	{

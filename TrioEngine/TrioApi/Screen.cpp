@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Screen.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	std::vector<Screen> Screen::g_vScreens;
 	bool Screen::g_bMultiMonitorSupport;

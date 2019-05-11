@@ -2,7 +2,7 @@
 
 #include "GameHost.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class WindowsGameWindow;
 

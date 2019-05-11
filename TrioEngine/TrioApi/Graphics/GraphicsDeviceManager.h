@@ -10,7 +10,7 @@
 #include "DepthFormat.h"
 #include "DisplayMode.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class Game;
 	class GraphicsAdapter;

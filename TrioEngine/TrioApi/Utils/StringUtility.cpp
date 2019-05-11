@@ -1,6 +1,5 @@
 #include "stdafx.h"
-#include "StringHelpers.h"
-
+#include "StringUtility.h"
 
 #include <cctype>
 #include <cstdarg>
@@ -13,9 +12,9 @@
 
 #pragma warning(disable : 4996)
 
-namespace TrioFX
+namespace TrioUtils
 {
-	int String_PrintfArgList(char* buffer, int bufferSize, const char* format, va_list args)
+	int StringUtility::PrintfArgList(char* buffer, int bufferSize, const char* format, va_list args)
 	{
 		va_list tmp;
 		va_copy(tmp, args);
@@ -32,18 +31,18 @@ namespace TrioFX
 		return n;
 	}
 
-	int String_Printf(char* buffer, int bufferSize, const char* format, ...)
+	int StringUtility::Printf(char* buffer, int bufferSize, const char* format, ...)
 	{
 		va_list args;
 		va_start(args, format);
 
-		int count = String_PrintfArgList(buffer, bufferSize, format, args);
+		int count = StringUtility::PrintfArgList(buffer, bufferSize, format, args);
 
 		va_end(args);
 		return count;
 	}
 
-	bool String_Equal(const char* first, const char* second)
+	bool StringUtility::Equal(const char* first, const char* second)
 	{
 		if (first == second) return true;
 		if (first == nullptr || second == nullptr) return false;
@@ -51,7 +50,7 @@ namespace TrioFX
 		return std::strcmp(first, second) == 0;
 	}
 
-	bool String_EqualNoCase(const char* first, const char* second)
+	bool StringUtility::EqualNoCase(const char* first, const char* second)
 	{
 		if (first == second) return true;
 		if (first == nullptr || second == nullptr) return false;
@@ -63,12 +62,12 @@ namespace TrioFX
 #endif
 	}
 
-	double String_ToDouble(const char* buffer, char** end)
+	double StringUtility::ToDouble(const char* buffer, char** end)
 	{
 		return std::strtod(buffer, end);
 	}
 
-	int String_ToInteger(const char* buffer, char** end)
+	int StringUtility::ToInteger(const char* buffer, char** end)
 	{
 		/*long value = std::strtol(buffer, end, 0);
 
@@ -86,8 +85,13 @@ namespace TrioFX
 		return strtol(buffer, end, 10);
 	}
 
-	int String_FormatFloat(char* buffer, int bufferSize, float value)
+	int StringUtility::FormatFloat(char* buffer, int bufferSize, float value)
 	{
-		return String_Printf(buffer, bufferSize, "%f", value);
+		return StringUtility::Printf(buffer, bufferSize, "%f", value);
+	}
+
+	void StringUtility::ToWideString(const std::string& source, std::wstring& dest)
+	{
+		dest.assign(source.begin(), source.end());
 	}
 }

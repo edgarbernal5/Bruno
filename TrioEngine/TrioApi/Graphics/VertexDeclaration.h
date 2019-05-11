@@ -9,7 +9,7 @@
 #include <vector>
 #include <map>
 
-namespace Vago
+namespace TrioEngine
 {
 	//class VertexElement;
 	class GraphicsDevice;

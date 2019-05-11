@@ -4,7 +4,7 @@
 
 #include "PresentationParameters.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsAdapter;
 	class GraphicsDeviceManager;

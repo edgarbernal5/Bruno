@@ -2,7 +2,7 @@
 #include "FormatHelper.h"
 
 
-namespace Vago
+namespace TrioEngine
 {
 	//TO-DO: Faltan formatos...
 	DXGI_FORMAT ToFormat(SurfaceFormat format)

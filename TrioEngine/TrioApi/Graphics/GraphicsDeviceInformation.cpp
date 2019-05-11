@@ -4,7 +4,7 @@
 //#include "GraphicsDeviceManager.h"
 //#include "GraphicsAdapter.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	
 }

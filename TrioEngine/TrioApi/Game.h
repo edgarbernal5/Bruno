@@ -6,7 +6,7 @@
 #include "GameServiceContainer.h"
 #include "StepTimer.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class GameHost;
 	class GraphicsDevice;

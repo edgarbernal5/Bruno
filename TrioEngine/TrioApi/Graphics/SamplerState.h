@@ -6,7 +6,7 @@
 #include "TextureFilter.h"
 #include "Math\MathVector.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	struct TRIOAPI_DECL SamplerState
 	{

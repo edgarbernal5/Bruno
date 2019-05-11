@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "HLSLTokenizer.h"
 
-#include "StringHelpers.h"
+#include "../Utils/StringUtility.h"
 #include "Log.h"
 
 #include <ctype.h>
@@ -373,7 +373,7 @@ namespace TrioFX
 		}
 
 		char* fEnd = nullptr;
-		double fValue = String_ToDouble(m_buffer, &fEnd);
+		double fValue = TrioUtils::StringUtility::ToDouble(m_buffer, &fEnd);
 
 		if (fEnd == m_buffer)
 		{
@@ -381,7 +381,7 @@ namespace TrioFX
 		}
 
 		char*  iEnd = nullptr;
-		int    iValue = String_ToInteger(m_buffer, &iEnd);
+		int    iValue = TrioUtils::StringUtility::ToInteger(m_buffer, &iEnd);
 
 		// If the character after the number is an f then the f is treated as part
 		// of the number (to handle 1.0f syntax).
@@ -427,7 +427,7 @@ namespace TrioFX
 			}
 
 			char* iEnd = nullptr;
-			int lineNumber = String_ToInteger(m_buffer, &iEnd);
+			int lineNumber = TrioUtils::StringUtility::ToInteger(m_buffer, &iEnd);
 
 			if (!isspace(*iEnd))
 			{

@@ -55,6 +55,12 @@
     <Filter Include="Source Files\DataTypes">
       <UniqueIdentifier>{c59f9007-6163-4bfc-9c95-767911ca096e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\Models">
+      <UniqueIdentifier>{49dbb1a5-9d60-4ec0-9cbf-4181f8f3028f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Models">
+      <UniqueIdentifier>{91061eb2-f245-46be-9cdd-50422585cf09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -276,9 +282,6 @@
     <ClInclude Include="FX\Log.h">
       <Filter>Header Files\FX</Filter>
     </ClInclude>
-    <ClInclude Include="FX\StringHelpers.h">
-      <Filter>Header Files\FX</Filter>
-    </ClInclude>
     <ClInclude Include="FX\StringPool.h">
       <Filter>Header Files\FX</Filter>
     </ClInclude>
@@ -377,6 +380,18 @@
     </ClInclude>
     <ClInclude Include="Graphics\EffectLoader.h">
       <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Model.h">
+      <Filter>Header Files\Graphics\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Mesh.h">
+      <Filter>Header Files\Graphics\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\ModelMaterial.h">
+      <Filter>Header Files\Graphics\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\StringUtility.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -497,9 +512,6 @@
     <ClCompile Include="FX\Log.cpp">
       <Filter>Source Files\FX</Filter>
     </ClCompile>
-    <ClCompile Include="FX\StringHelpers.cpp">
-      <Filter>Source Files\FX</Filter>
-    </ClCompile>
     <ClCompile Include="FX\StringPool.cpp">
       <Filter>Source Files\FX</Filter>
     </ClCompile>
@@ -562,6 +574,18 @@
     </ClCompile>
     <ClCompile Include="Graphics\EffectLoader.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Model.cpp">
+      <Filter>Source Files\Graphics\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Mesh.cpp">
+      <Filter>Source Files\Graphics\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\ModelMaterial.cpp">
+      <Filter>Source Files\Graphics\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\StringUtility.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@
 #include "TextureCollection.h"
 #include "VertexBuffer.h"
 
-namespace Vago
+namespace TrioEngine
 {
 #if defined(_DEBUG) && defined(TRIO_DIRECTX)
 	// Check for SDK Layer support.

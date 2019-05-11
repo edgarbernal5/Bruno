@@ -4,7 +4,7 @@
 #include "GraphicsDevice.h"
 #include "FormatHelper.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	DepthStencilBuffer::DepthStencilBuffer() :
 #ifdef TRIO_DIRECTX

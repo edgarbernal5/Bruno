@@ -7,7 +7,7 @@
 #include "..\FX\HLSLGenerator.h"
 #include <vector>
 
-namespace Vago
+namespace TrioEngine
 {
 	class TRIOAPI_DECL  EffectCompiler
 	{

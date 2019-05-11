@@ -5,7 +5,7 @@
 #include "..\FX\HLSLParser.h"
 #include <string>
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsDevice;
 	class Effect;

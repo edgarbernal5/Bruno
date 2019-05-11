@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace Vago
+namespace TrioEngine
 {
 	struct TRIOAPI_DECL ConstantBufferField
 	{

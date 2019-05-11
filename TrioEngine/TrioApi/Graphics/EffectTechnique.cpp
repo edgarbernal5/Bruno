@@ -3,7 +3,7 @@
 
 #include "EffectPass.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	EffectTechnique::EffectTechnique(TrioFX::HLSLTechnique11* technique, TrioFX::HLSLTree& tree, std::vector<TrioFX::HLSLBuffer*> &buffers, std::vector<TrioFX::HLSLDeclaration*> &samplers, GraphicsDevice* device, Effect* effect)
 	{

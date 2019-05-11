@@ -10,7 +10,7 @@
 
 #include <queue>
 
-namespace Vago
+namespace TrioEngine
 {
 	EffectLoader::EffectLoader(Effect* effect) :
 		m_Effect(*effect)

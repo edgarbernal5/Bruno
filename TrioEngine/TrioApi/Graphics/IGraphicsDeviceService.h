@@ -5,7 +5,7 @@
 #include "IServiceBase.h"
 #include "Event.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsDevice;
 

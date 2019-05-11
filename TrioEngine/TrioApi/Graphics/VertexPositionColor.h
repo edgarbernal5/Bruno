@@ -5,7 +5,7 @@
 #include "../Math/MathVector.h"
 #include "VertexElement.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class VertexDeclaration;
 

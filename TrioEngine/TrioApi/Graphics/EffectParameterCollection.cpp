@@ -3,7 +3,7 @@
 
 #include "EffectParameter.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	EffectParameterCollection::EffectParameterCollection(std::vector<EffectParameter*> parameters) :
 		m_vArray(parameters)

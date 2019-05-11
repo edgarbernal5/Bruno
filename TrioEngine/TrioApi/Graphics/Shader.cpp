@@ -6,7 +6,7 @@
 
 #include "..\Utils\Hash.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	Shader::Shader(GraphicsDevice* device, ShaderStage stage, const std::vector<uint8_t>& bytes) :
 #if TRIO_DIRECTX

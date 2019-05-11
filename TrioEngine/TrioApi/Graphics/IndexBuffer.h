@@ -10,7 +10,7 @@
 #include "ResourceOptionFlags.h"
 #include "SetDataOptions.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsDevice;
 

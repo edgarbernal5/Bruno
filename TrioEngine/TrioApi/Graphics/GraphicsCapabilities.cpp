@@ -3,7 +3,7 @@
 
 #include "GraphicsDevice.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	GraphicsCapabilities::GraphicsCapabilities()
 	{

@@ -17,7 +17,7 @@
 
 #include "Math/MathVector.h"
 
-using namespace Vago;
+using namespace TrioEngine;
 
 namespace TrioWin32
 {

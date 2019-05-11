@@ -4,7 +4,7 @@
 #include "SamplerState.h"
 #include "GraphicsDevice.h"
 
-namespace Vago
+namespace TrioEngine
 {
 	SamplerStateCollection::SamplerStateCollection(ShaderStage stage) :
 		m_eStage(stage)

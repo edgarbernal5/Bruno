@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Log.h"
-#include "StringHelpers.h"
+#include "../Utils/StringUtility.h"
 
 #include <iostream>
 
@@ -12,7 +12,7 @@ namespace TrioFX
 		va_start(args, format);
 
 		char buffer[1024];
-		int count = String_Printf(buffer, sizeof(buffer), format, args);
+		int count = TrioUtils::StringUtility::Printf(buffer, sizeof(buffer), format, args);
 
 		va_end(args);
 

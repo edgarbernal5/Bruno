@@ -5,7 +5,7 @@
 #include "ShaderStage.h"
 #include <vector>
 
-namespace Vago
+namespace TrioEngine
 {
 	class GraphicsDevice;
 #if TRIO_DIRECTX

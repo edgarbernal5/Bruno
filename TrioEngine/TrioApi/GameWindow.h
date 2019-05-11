@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace Vago
+namespace TrioEngine
 {
 	class GameWindow
 	{
