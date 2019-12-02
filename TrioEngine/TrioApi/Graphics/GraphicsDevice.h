@@ -40,10 +40,10 @@ namespace TrioEngine
 		void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount);
 		void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount);
 
-		GraphicsAdapter*           GetAdapter() const { return m_pAdapter; }
+		GraphicsAdapter*           GetAdapter() const { return m_adapter; }
 
 #ifdef TRIO_DIRECTX
-		UINT                    GetBackBufferCount() const { return m_uiBackBufferCount; }
+		UINT                    GetBackBufferCount() const { return m_backBufferCount; }
 		ID3D11RenderTargetView*	GetBackBufferRenderTargetView() const { return m_d3dRenderTargetView.Get(); }
 		ID3D11Device*           GetD3DDevice() const { return m_d3dDevice.Get(); }
 		ID3D11Device1*          GetD3DDevice1() const { return m_d3dDevice1.Get(); }
@@ -54,13 +54,13 @@ namespace TrioEngine
 		IDXGISwapChain1*        GetSwapChain1() const { return m_swapChain1.Get(); }
 		//ID3D11DepthStencilView* GetDepthStencilView() const					{ return m_depthStencilBuffer->m_d3dDepthStencilView.Get(); }
 
-		D3D11_VIEWPORT          GetScreenViewport() const { return m_stScreenViewport; }
+		D3D11_VIEWPORT          GetScreenViewport() const { return m_screenViewport; }
 #endif
 
 		inline GraphicsCapabilities GetGraphicsCapabilities() { return m_graphicsCapabilities; }
 		inline PresentationParameters& GetPresentationParameters() { return m_presentationParameters; }
-		inline TextureCollection* GetTextures() { return m_pTextureCollection; }
-		inline TextureCollection* GetVertexTextures() { return m_pTextureCollection; }
+		inline TextureCollection* GetTextures() { return m_textureCollection; }
+		inline TextureCollection* GetVertexTextures() { return m_textureCollection; }
 		
 		void Present();
 		void Reset(PresentationParameters presentationParameters);
@@ -82,42 +82,42 @@ namespace TrioEngine
 		friend class EffectPass;
 	private:
 		GraphicsCapabilities						m_graphicsCapabilities;
-		TextureCollection*							m_pVertexTextureCollection;
+		TextureCollection*							m_vertexTextureCollection;
 
-		TextureCollection*							m_pTextureCollection;
-		SamplerStateCollection*						m_pSamplerCollection;
+		TextureCollection*							m_textureCollection;
+		SamplerStateCollection*						m_samplerCollection;
 		PresentationParameters						m_presentationParameters;
-		GraphicsAdapter*							m_pAdapter;
+		GraphicsAdapter*							m_adapter;
 
 		std::unique_ptr<DepthStencilBuffer> m_depthStencilBuffer;
-		DepthStencilBuffer* m_pCurrentDepthStencilBuffer;
+		DepthStencilBuffer* m_currentDepthStencilBuffer;
 
-		IndexBuffer* m_pIndexBuffer;
-		bool m_bIndexBufferDirty;
+		IndexBuffer* m_indexBuffer;
+		bool m_indexBufferDirty;
 
-		VertexBuffer* m_pVertexBuffer;
-		bool m_bVertexBufferDirty;
-		VertexBufferBindings m_vVertexBindings;
+		VertexBuffer* m_vertexBuffer;
+		bool m_vertexBufferDirty;
+		VertexBufferBindings m_vertexBindings;
 
-		Shader* m_pVertexShader;
-		bool m_bVertexShaderDirty;
+		Shader* m_vertexShader;
+		bool m_vertexShaderDirty;
 
-		Shader* m_pPixelShader;
-		bool m_bPixelShaderDirty;
+		Shader* m_pixelShader;
+		bool m_pixelShaderDirty;
 
-		DepthStencilState* m_pDepthStencilState;
-		bool m_bDepthStencilStateDirty;
+		DepthStencilState* m_depthStencilState;
+		bool m_depthStencilStateDirty;
 
-		BlendState* m_pBlendState;
-		bool m_bBlendStateDirty;
+		BlendState* m_blendState;
+		bool m_blendStateDirty;
 
-		RasterizerState* m_pRasterizerState;
-		bool m_bRasterizerStateDirty;
+		RasterizerState* m_rasterizerState;
+		bool m_rasterizerStateDirty;
 		
-		ConstantBufferCollection* m_pVertexConstantBuffers;
-		ConstantBufferCollection* m_pPixelConstantBuffers;
+		ConstantBufferCollection* m_vertexConstantBuffers;
+		ConstantBufferCollection* m_pixelConstantBuffers;
 
-		UINT                                            m_uiBackBufferCount;
+		uint32_t                                            m_backBufferCount;
 #ifdef TRIO_DIRECTX
 		Microsoft::WRL::ComPtr<ID3D11Device>				m_d3dDevice;
 		Microsoft::WRL::ComPtr<ID3D11Device1>				m_d3dDevice1;
@@ -129,17 +129,17 @@ namespace TrioEngine
 
 		// Direct3D rendering objects. Required for 3D.
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_d3dRenderTargetView;
-		D3D11_VIEWPORT                                  m_stScreenViewport;
+		D3D11_VIEWPORT                                  m_screenViewport;
 
-		std::vector<ID3D11RenderTargetView *>			m_vCurrentRenderTargets;
+		std::vector<ID3D11RenderTargetView *>			m_currentRenderTargets;
 
 		D3D_FEATURE_LEVEL                               m_d3dMinFeatureLevel;
 		D3D_FEATURE_LEVEL                               m_d3dFeatureLevel;
 
 		static const int MaxVertexBuffers = 16;
-		ID3D11Buffer*	m_aVertexBuffers[MaxVertexBuffers];
-		uint32_t		m_aVertexOffsets[MaxVertexBuffers];
-		uint32_t		m_aVertexStrides[MaxVertexBuffers];
+		ID3D11Buffer*	m_vertexBuffers[MaxVertexBuffers];
+		uint32_t		m_vertexOffsets[MaxVertexBuffers];
+		uint32_t		m_vertexStrides[MaxVertexBuffers];
 
 #endif
 		void ApplyState(bool applyShaders);

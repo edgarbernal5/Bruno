@@ -19,15 +19,15 @@ namespace TrioEngine
 
 		void Apply();
 
-		inline const char* GetName() { return m_csName.c_str(); }
+		inline const char* GetName() { return m_name.c_str(); }
 	private:
 
-		Effect* m_pEffect;
-		Shader* m_pVertexShader;
-		Shader* m_pPixelShader;
+		Effect* m_effect;
+		Shader* m_vertexShader;
+		Shader* m_pixelShader;
 
-		GraphicsDevice* m_pDevice;
+		GraphicsDevice* m_device;
 
-		std::string m_csName;
+		std::string m_name;
 	};
 }

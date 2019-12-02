@@ -7,14 +7,14 @@
 namespace TrioEngine
 {
 	WindowsGameWindow::WindowsGameWindow(WindowsGameHost* host) : 
-		m_pHost(host),
-		m_bFullScreen(false),
-		m_iPrevClientWidth(0),
-		m_iPrevClientHeight(0),
-		m_bInDeviceTransition(false),
-		m_bInSizeMove(false),
-		m_bInSuspend(false),
-		m_bMinimized(false)
+		m_host(host),
+		m_fullScreen(false),
+		m_prevClientWidth(0),
+		m_prevClientHeight(0),
+		m_inDeviceTransition(false),
+		m_inSizeMove(false),
+		m_inSuspend(false),
+		m_minimized(false)
 	{
 
 	}
@@ -25,11 +25,11 @@ namespace TrioEngine
 
 	void WindowsGameWindow::BeginScreenDeviceChange(bool willBeFullScreen)
 	{
-		m_bInDeviceTransition = true;
+		m_inDeviceTransition = true;
 
 		auto rect = GetClientBounds();
-		m_iPrevClientWidth = rect.width;
-		m_iPrevClientHeight = rect.height;
+		m_prevClientWidth = rect.width;
+		m_prevClientHeight = rect.height;
 	}
 	
 	bool WindowsGameWindow::LoadWindow()
@@ -61,32 +61,32 @@ namespace TrioEngine
 
 		std::wstring m_MainWndCaption(L"Game");
 
-		m_pHwnd = CreateWindowEx(0, L"TrioEngine", m_MainWndCaption.c_str(), WS_OVERLAPPEDWINDOW,
+		m_hwnd = CreateWindowEx(0, L"TrioEngine", m_MainWndCaption.c_str(), WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
 			nullptr);
 
-		if (!m_pHwnd)
+		if (!m_hwnd)
 		{
 			//MessageBox(0, L"CreateWindow Failed.", 0, 0);
 			return false;
 		}
-		SetWindowLongPtr(m_pHwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+		SetWindowLongPtr(m_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
-		ShowWindow(m_pHwnd, SW_SHOW);
-		UpdateWindow(m_pHwnd);
+		ShowWindow(m_hwnd, SW_SHOW);
+		UpdateWindow(m_hwnd);
 
 		return true;
 	}
 
 	void WindowsGameWindow::EndScreenDeviceChange(std::string screenDeviceName, int clientWidth, int clientHeight)
 	{
-		m_bInDeviceTransition = false;
+		m_inDeviceTransition = false;
 	}
 
 	inline Rectangle WindowsGameWindow::GetClientBounds()
 	{
 		RECT rcWindowClient;
-		GetClientRect(m_pHwnd, &rcWindowClient);
+		GetClientRect(m_hwnd, &rcWindowClient);
 
 		Rectangle rect;
 		rect.x = rcWindowClient.left;
@@ -98,7 +98,7 @@ namespace TrioEngine
 
 	HWND WindowsGameWindow::GetHandle()
 	{
-		return m_pHwnd;
+		return m_hwnd;
 	}
 
 	const char* WindowsGameWindow::GetScreenDeviceName()
@@ -107,15 +107,15 @@ namespace TrioEngine
 		target.cbSize = sizeof(MONITORINFOEXW);
 
 		//create a monitor info struct to store the data to
-		HMONITOR Hmon = MonitorFromWindow(m_pHwnd, MONITOR_DEFAULTTOPRIMARY);
+		HMONITOR Hmon = MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTOPRIMARY);
 		//create a handle to the main monitor
 		//(should start at top left of screen with (0,0) as apposed to other monitors i believe)
 		//if i could gather aditional info on what monitors are available that might be           useful
 		GetMonitorInfoW(Hmon, &target);
 
-		WideCharToMultiByte(CP_ACP, 0, target.szDevice, -1, &m_csScreenDeviceName[0], _countof(target.szDevice), NULL, FALSE);
+		WideCharToMultiByte(CP_ACP, 0, target.szDevice, -1, &m_screenDeviceName[0], _countof(target.szDevice), NULL, FALSE);
 
-		return m_csScreenDeviceName.c_str();
+		return m_screenDeviceName.c_str();
 	}
 
 	LRESULT CALLBACK WindowsGameWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -136,28 +136,28 @@ namespace TrioEngine
 		case WM_SIZE:
 			if (wParam == SIZE_MINIMIZED)
 			{
-				if (!window->m_bMinimized)
+				if (!window->m_minimized)
 				{
-					window->m_bMinimized = true;
-					if (!window->m_bInSuspend)
+					window->m_minimized = true;
+					if (!window->m_inSuspend)
 					{
 						std::cout << "OnSuspending" << std::endl;
 						window->Suspend();
 					}
-					window->m_bInSuspend = true;
+					window->m_inSuspend = true;
 				}
 			}
-			else if (window->m_bMinimized)
+			else if (window->m_minimized)
 			{
-				window->m_bMinimized = false;
-				if (window->m_bInSuspend)
+				window->m_minimized = false;
+				if (window->m_inSuspend)
 				{
 					std::cout << "OnResuming" << std::endl;
 					window->Resume();
 				}
-				window->m_bInSuspend = false;
+				window->m_inSuspend = false;
 			}
-			else if (!window->m_bInSizeMove)
+			else if (!window->m_inSizeMove)
 			{
 				std::cout << "ClientSizeChanged" << std::endl;
 				window->ClientSizeChanged();
@@ -165,14 +165,14 @@ namespace TrioEngine
 			break;
 
 		case WM_ENTERSIZEMOVE:
-			window->m_bInSizeMove = true;
+			window->m_inSizeMove = true;
 
 			window->BeginScreenDeviceChange(false);
 			break;
 
 		case WM_EXITSIZEMOVE:
 		{
-			window->m_bInSizeMove = false;
+			window->m_inSizeMove = false;
 
 			RECT rc;
 			GetClientRect(hWnd, &rc);
@@ -181,7 +181,7 @@ namespace TrioEngine
 			int clientWidth = rc.right - rc.left;
 			int clientHeight = rc.bottom - rc.top;
 
-			if (window->m_iPrevClientWidth != clientWidth || window->m_iPrevClientHeight != clientHeight)
+			if (window->m_prevClientWidth != clientWidth || window->m_prevClientHeight != clientHeight)
 			{
 
 				std::cout << "ClientSizeChanged" << std::endl;
@@ -218,24 +218,24 @@ namespace TrioEngine
 			switch (wParam)
 			{
 			case PBT_APMQUERYSUSPEND:
-				if (!window->m_bInSuspend)
+				if (!window->m_inSuspend)
 				{
 					std::cout << "OnSuspending" << std::endl;
 					window->Suspend();
 				}
 
-				window->m_bInSuspend = true;
+				window->m_inSuspend = true;
 				return true;
 
 			case PBT_APMRESUMESUSPEND:
-				if (!window->m_bMinimized)
+				if (!window->m_minimized)
 				{
-					if (window->m_bInSuspend)
+					if (window->m_inSuspend)
 					{
 						std::cout << "OnResuming" << std::endl;
 						window->Resume();
 					}
-					window->m_bInSuspend = false;
+					window->m_inSuspend = false;
 				}
 				return true;
 			}

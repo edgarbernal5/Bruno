@@ -14,18 +14,18 @@ namespace TrioEngine
 
 	void PresentationParameters::Clear()
 	{
-		m_eBackBufferFormat = SurfaceFormat::Color;
-		m_eDepthStencilFormat = DepthFormat::Depth24Stencil8;
+		m_backBufferFormat = SurfaceFormat::Color;
+		m_depthStencilFormat = DepthFormat::Depth24Stencil8;
 
 		//m_BackBufferHeight = GraphicsDeviceManager::DefaultBackBufferHeight;
 		//m_BackBufferWidth = GraphicsDeviceManager::DefaultBackBufferWidth;
 
-		m_pDeviceWindowHandle = nullptr;
-		m_bFullScreen = false;
+		m_deviceWindowHandle = nullptr;
+		m_fullScreen = false;
 
-		m_iMultiSampleCount = 0;
+		m_multiSampleCount = 0;
 
-		m_ePresentInternal = PresentInterval::Default;
-		m_eUsage = RenderTargetUsage::DiscardContents;
+		m_presentInternal = PresentInterval::Default;
+		m_usage = RenderTargetUsage::DiscardContents;
 	}
 }

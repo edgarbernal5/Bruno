@@ -8,45 +8,45 @@
 namespace TrioEngine
 {
 	Game::Game() :
-		m_bDoneFirstUpdate(false),
-		m_bDoneFirstDraw(false),
-		m_bInRun(false),
+		m_doneFirstUpdate(false),
+		m_doneFirstDraw(false),
+		m_inRun(false),
 
-		m_pGraphicsDevice(nullptr),
-		m_pHost(nullptr),
-		m_pGraphicsDeviceManager(nullptr)
+		m_graphicsDevice(nullptr),
+		m_host(nullptr),
+		m_graphicsDeviceManager(nullptr)
 	{
 		CommonConstructor();
 	}
 
 	Game::~Game()
 	{
-		if (m_pGraphicsDeviceManager)
+		if (m_graphicsDeviceManager)
 		{
-			delete m_pGraphicsDeviceManager;
-			m_pGraphicsDeviceManager = nullptr;
+			delete m_graphicsDeviceManager;
+			m_graphicsDeviceManager = nullptr;
 		}
 	}
 
 	void Game::CommonConstructor()
 	{
-		m_pHost = GameHost::Create(this);
+		m_host = GameHost::Create(this);
 
-		m_pHost->Idle += ([=]()
+		m_host->Idle += ([=]()
 		{
 			Tick();
 		});
 
-		m_pHost->Activated += [=]()
+		m_host->Activated += [=]()
 		{
 
 		};
-		m_pHost->Deactivated += [=]()
+		m_host->Deactivated += [=]()
 		{
 
 		};
 
-		m_pHost->Resume += [=]()
+		m_host->Resume += [=]()
 		{
 
 			m_timer.ResetElapsedTime();
@@ -55,26 +55,25 @@ namespace TrioEngine
 
 	void Game::DrawFrame()
 	{
-		if (m_bDoneFirstUpdate && m_pGraphicsDeviceManager && m_pGraphicsDeviceManager->BeginDraw())
+		if (m_doneFirstUpdate && m_graphicsDeviceManager && m_graphicsDeviceManager->BeginDraw())
 		{
 			Draw(m_timer);
 			EndDraw();
-			m_bDoneFirstDraw = true;
+			m_doneFirstDraw = true;
 		}
 	}
 
 	void Game::EndDraw()
 	{
-		if (m_pGraphicsDeviceManager)
+		if (m_graphicsDeviceManager)
 		{
-			m_pGraphicsDeviceManager->EndDraw();
+			m_graphicsDeviceManager->EndDraw();
 		}
 	}
 
 	void Game::Initialize()
 	{
 	}
-
 
 	void Game::Run()
 	{
@@ -83,37 +82,37 @@ namespace TrioEngine
 
 	void Game::RunGame(bool useBlockingRun)
 	{
-		m_pGraphicsDeviceManager = dynamic_cast<IGraphicsDeviceManager*>(m_services.GetService(typeid(IGraphicsDeviceManager).name()));
-		if (m_pGraphicsDeviceManager != nullptr)
+		m_graphicsDeviceManager = dynamic_cast<IGraphicsDeviceManager*>(m_services.GetService(typeid(IGraphicsDeviceManager).name()));
+		if (m_graphicsDeviceManager != nullptr)
 		{
-			m_pGraphicsDeviceManager->CreateDevice();
+			m_graphicsDeviceManager->CreateDevice();
 		}
 
 		IGraphicsDeviceService* service = dynamic_cast<IGraphicsDeviceService*>(m_services.GetService(typeid(IGraphicsDeviceService).name()));
 		if (service != nullptr)
 		{
-			m_pGraphicsDevice = service->GetGraphicsDevice();
+			m_graphicsDevice = service->GetGraphicsDevice();
 		}
 		Initialize();
-		m_bInRun = true;
+		m_inRun = true;
 		Update(m_timer);
-		m_bDoneFirstUpdate = true;
+		m_doneFirstUpdate = true;
 
 		if (useBlockingRun)
 		{
-			if (m_pHost != nullptr)
+			if (m_host != nullptr)
 			{
-				m_pHost->Run();
+				m_host->Run();
 			}
 			//EndRun()
 		}
 		else
 		{
-			m_pHost->StartGameLoop();
+			m_host->StartGameLoop();
 			return;
 		}
 
-		m_bInRun = false;
+		m_inRun = false;
 	}
 
 	void Game::Tick()

@@ -7,7 +7,7 @@
 namespace TrioEngine
 {
 	SamplerStateCollection::SamplerStateCollection(ShaderStage stage) :
-		m_eStage(stage)
+		m_stage(stage)
 	{
 		CreateArray();
 		Clear();
@@ -20,40 +20,40 @@ namespace TrioEngine
 
 	void SamplerStateCollection::CreateArray()
 	{
-		m_N = 16;
-		m_pSamplers = new SamplerState*[m_N];
-		m_Dirty = INT_MAX;
+		m_n = 16;
+		m_samplers = new SamplerState*[m_n];
+		m_dirty = INT_MAX;
 	}
 
 	void SamplerStateCollection::Clear()
 	{
-		for (int i = 0; i < m_N; i++)
+		for (int i = 0; i < m_n; i++)
 		{
 			//m_Samplers[i] = nullptr;
-			m_pSamplers[i] = SamplerState::LinearWrap;
+			m_samplers[i] = SamplerState::LinearWrap;
 		}
-		m_Dirty = INT_MAX;
+		m_dirty = INT_MAX;
 	}
 
 	void SamplerStateCollection::BindAllSamplers(GraphicsDevice* device)
 	{
-		if (m_Dirty == 0)
+		if (m_dirty == 0)
 			return;
 
 		//TO-DO: tomar en cuenta los samplers de vertex shader
-		for (int i = 0; i < m_N; i++)
+		for (int i = 0; i < m_n; i++)
 		{
 			int mask = 1 << i;
-			if ((m_Dirty & mask) == 0)
+			if ((m_dirty & mask) == 0)
 				continue;
 
-			SamplerState* sampler = m_pSamplers[i];
+			SamplerState* sampler = m_samplers[i];
 #ifdef TRIO_DIRECTX
 			ID3D11SamplerState *state = nullptr;
 			if (sampler != nullptr)
 				state = sampler->GetState(device);
 
-			switch (m_eStage)
+			switch (m_stage)
 			{
 			case ShaderStage::Vertex:
 				device->GetD3DDeviceContext()->VSSetSamplers(i, 1, &state);
@@ -66,17 +66,17 @@ namespace TrioEngine
 			}
 #endif
 
-			m_Dirty &= ~mask;
-			if (m_Dirty == 0)
+			m_dirty &= ~mask;
+			if (m_dirty == 0)
 				break;
 		}
 
-		m_Dirty = 0;
+		m_dirty = 0;
 	}
 
 	void SamplerStateCollection::SetSampler(int index, SamplerState * tex)
 	{
-		m_pSamplers[index] = tex;
-		m_Dirty |= 1 << index;
+		m_samplers[index] = tex;
+		m_dirty |= 1 << index;
 	}
 }

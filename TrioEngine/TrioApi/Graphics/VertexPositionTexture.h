@@ -42,6 +42,6 @@ namespace TrioEngine
 		Vector3 m_position;
 		Vector2 m_textureCoordinate;
 
-		static VertexDeclaration* g_pVertexDeclaration;
+		static VertexDeclaration* g_vertexDeclaration;
 	};
 }

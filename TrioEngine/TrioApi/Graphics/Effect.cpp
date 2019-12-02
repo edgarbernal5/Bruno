@@ -12,7 +12,7 @@
 namespace TrioEngine
 {
 	Effect::Effect(GraphicsDevice* device) :
-		m_pDevice(device)
+		m_device(device)
 
 #ifdef TRIO_DIRECTX
 #elif TRIO_OPENGL
@@ -33,8 +33,8 @@ namespace TrioEngine
 
 	void Effect::ClearData()
 	{
-		auto it = m_mShadersByName.begin();
-		while (it != m_mShadersByName.end())
+		auto it = m_shadersByName.begin();
+		while (it != m_shadersByName.end())
 		{
 			Shader* shader = it->second;
 			if (shader != nullptr) delete shader;
@@ -42,28 +42,28 @@ namespace TrioEngine
 			++it;
 		}
 
-		for (size_t i = 0; i < m_Techniques.size(); i++)
+		for (size_t i = 0; i < m_techniques.size(); i++)
 		{
-			EffectTechnique* technique = m_Techniques[i];
+			EffectTechnique* technique = m_techniques[i];
 			if (technique != nullptr) delete technique;
 		}
 
-		for (size_t i = 0; i < m_ConstantBuffers.size(); i++)
+		for (size_t i = 0; i < m_constantBuffers.size(); i++)
 		{
-			ConstantBuffer* buffer = m_ConstantBuffers[i];
+			ConstantBuffer* buffer = m_constantBuffers[i];
 			if (buffer != nullptr) delete buffer;
 		}
 
-		for (size_t i = 0; i < m_Parameters.size(); i++)
+		for (size_t i = 0; i < m_parameters.size(); i++)
 		{
-			EffectParameter* parameter = m_Parameters[i];
+			EffectParameter* parameter = m_parameters[i];
 			if (parameter != nullptr) delete parameter;
 		}
 
-		m_mShadersByName.clear();
-		m_Techniques.clear();
-		m_ConstantBuffers.clear();
-		m_Parameters.clear();
+		m_shadersByName.clear();
+		m_techniques.clear();
+		m_constantBuffers.clear();
+		m_parameters.clear();
 	}
 
 	void Effect::CompileEffectFromFile(std::string filename, ShaderLanguageTarget target)

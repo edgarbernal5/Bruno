@@ -13,7 +13,7 @@
 namespace TrioEngine
 {
 	EffectLoader::EffectLoader(Effect* effect) :
-		m_Effect(*effect)
+		m_effect(*effect)
 	{
 
 	}
@@ -42,7 +42,7 @@ namespace TrioEngine
 		{
 			return false;
 		}
-		m_Effect.ClearData();
+		m_effect.ClearData();
 
 		std::vector<TrioFX::HLSLTechnique11*> techniques;
 		std::vector<TrioFX::HLSLBuffer*> buffers;
@@ -56,9 +56,9 @@ namespace TrioEngine
 		{
 			TrioFX::HLSLTechnique11* tech11 = techniques[i];
 
-			EffectTechnique* technique = new EffectTechnique(tech11, tree, buffers, samplers, m_Effect.m_pDevice, &m_Effect);
+			EffectTechnique* technique = new EffectTechnique(tech11, tree, buffers, samplers, m_effect.m_device, &m_effect);
 
-			m_Effect.m_Techniques.push_back(technique);
+			m_effect.m_techniques.push_back(technique);
 		}
 
 		for (size_t i = 0; i < buffers.size(); i++)
@@ -75,11 +75,11 @@ namespace TrioEngine
 				field = (TrioFX::HLSLDeclaration*)field->nextStatement;
 			}
 
-			ConstantBuffer* nConstantBuffer = new ConstantBuffer(m_Effect.m_pDevice, buffer->name, buffer->sizeInBytes, constantFields);
+			ConstantBuffer* nConstantBuffer = new ConstantBuffer(m_effect.m_device, buffer->name, buffer->sizeInBytes, constantFields);
 #if TRIO_OPENGL
 			nConstantBuffer->m_uniformBindingIndex = i;
 #endif
-			m_Effect.m_ConstantBuffers.push_back(nConstantBuffer);
+			m_effect.m_constantBuffers.push_back(nConstantBuffer);
 		}
 
 		std::vector<EffectParameter*> parameters;
@@ -96,10 +96,10 @@ namespace TrioEngine
 			{
 				ConstantBuffer* constantBuffer = nullptr;
 
-				for (size_t j = 0; j < m_Effect.m_ConstantBuffers.size(); j++)
+				for (size_t j = 0; j < m_effect.m_constantBuffers.size(); j++)
 				{
-					if (m_Effect.m_ConstantBuffers[j]->m_csName == field->buffer->name) {
-						constantBuffer = m_Effect.m_ConstantBuffers[j];
+					if (m_effect.m_constantBuffers[j]->m_name == field->buffer->name) {
+						constantBuffer = m_effect.m_constantBuffers[j];
 						break;
 					}
 				}
@@ -108,7 +108,7 @@ namespace TrioEngine
 				{
 					if (constantBuffer->GetFieldsDesc()[j].Name == field->name)
 					{
-						lazyAppend.push(new EffectParameter(constantBuffer->GetFieldsDesc()[j], constantBuffer, &m_Effect));
+						lazyAppend.push(new EffectParameter(constantBuffer->GetFieldsDesc()[j], constantBuffer, &m_effect));
 						break;
 					}
 				}
@@ -119,19 +119,19 @@ namespace TrioEngine
 				{
 					if (orphanConstantBuffer == nullptr)
 					{
-						orphanConstantBuffer = new ConstantBuffer(m_Effect.m_pDevice, "{Orphanage}");
+						orphanConstantBuffer = new ConstantBuffer(m_effect.m_device, "{Orphanage}");
 					}
 					ConstantBufferField cbf(field->name, field->offsetInBytes, field->sizeInBytes, field->typeName);
 					orphanConstantBuffer->GetFieldsDesc().push_back(cbf);
 
-					parameters.push_back(new EffectParameter(cbf, orphanConstantBuffer, &m_Effect));
+					parameters.push_back(new EffectParameter(cbf, orphanConstantBuffer, &m_effect));
 				}
 				else
 				{
 					if (field->type.baseType == TrioFX::HLSLBaseType_Texture2D)
 					{
 						EffectParameter::STexture sTexture;
-						sTexture.m_pTexture = nullptr;
+						sTexture.m_texture = nullptr;
 						sTexture.textureSlot = lazyAppend2.size();
 
 						if (field->registerName != nullptr)
@@ -142,12 +142,12 @@ namespace TrioEngine
 								sTexture.textureSlot = std::stoi(registerName.substr(1, registerName.size() - 1));
 							}
 						}
-						lazyAppend2.push(new EffectParameter(sTexture, field->name, &m_Effect));
+						lazyAppend2.push(new EffectParameter(sTexture, field->name, &m_effect));
 					}
 					else if (field->type.baseType == TrioFX::HLSLBaseType_SamplerState)
 					{
 						EffectParameter::SSamplerState sSamplerState;
-						sSamplerState.m_pSamplerState = nullptr;
+						sSamplerState.m_samplerState = nullptr;
 						sSamplerState.samplerSlot = lazyAppend2.size();
 
 						if (field->registerName != nullptr)
@@ -159,14 +159,14 @@ namespace TrioEngine
 							}
 						}
 
-						lazyAppend2.push(new EffectParameter(sSamplerState, field->name, &m_Effect));
+						lazyAppend2.push(new EffectParameter(sSamplerState, field->name, &m_effect));
 					}
 				}
 			}
 		}
 		if (orphanConstantBuffer)
 		{
-			m_Effect.m_ConstantBuffers.push_back(orphanConstantBuffer);
+			m_effect.m_constantBuffers.push_back(orphanConstantBuffer);
 		}
 
 		while (!lazyAppend2.empty())
@@ -181,7 +181,7 @@ namespace TrioEngine
 			parameters.push_back(q);
 		}
 
-		m_Effect.m_Parameters = EffectParameterCollection(parameters);
+		m_effect.m_parameters = EffectParameterCollection(parameters);
 		return true;
 	}
 }

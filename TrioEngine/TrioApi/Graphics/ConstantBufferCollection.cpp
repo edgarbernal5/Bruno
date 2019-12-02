@@ -6,44 +6,44 @@
 namespace TrioEngine
 {
 	ConstantBufferCollection::ConstantBufferCollection() : 
-		m_iCount(0),
-		m_eStage(ShaderStage::Vertex)
+		m_count(0),
+		m_stage(ShaderStage::Vertex)
 	{
-		m_iValid = 0;
+		m_valid = 0;
 		for (size_t i = 0; i < 16; i++)
 		{
-			m_pArrayBuffers[i] = nullptr;
+			m_arrayBuffers[i] = nullptr;
 		}
 	}
 
 	ConstantBufferCollection::ConstantBufferCollection(ShaderStage stage) : 
-		m_iCount(0), 
-		m_eStage(stage)
+		m_count(0), 
+		m_stage(stage)
 	{
-		m_iValid = 0;
+		m_valid = 0;
 		for (size_t i = 0; i < 16; i++)
 		{
-			m_pArrayBuffers[i] = nullptr;
+			m_arrayBuffers[i] = nullptr;
 		}
 	}
 
 	void ConstantBufferCollection::clear()
 	{
-		m_iValid = 0;
+		m_valid = 0;
 		
 		for (size_t i = 0; i < 16; i++)
 		{
-			m_pArrayBuffers[i] = nullptr;
+			m_arrayBuffers[i] = nullptr;
 		}
-		m_iCount = 0;
+		m_count = 0;
 	}
 
 	void ConstantBufferCollection::push_back(ConstantBuffer* item)
 	{
-		if (m_iCount < 15)
+		if (m_count < 15)
 		{
-			m_pArrayBuffers[m_iCount] = item;
-			m_iCount++;
+			m_arrayBuffers[m_count] = item;
+			m_count++;
 		}
 
 	}
@@ -52,19 +52,19 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 	void ConstantBufferCollection::SetConstantBuffers(GraphicsDevice* device)
 	{
-		if (m_iValid == 0)
+		if (m_valid == 0)
 		{
 			return;
 		}
 
-		int valid = m_iValid;
+		int valid = m_valid;
 		for (int i = 0; i < 16; i++)
 		{
-			ConstantBuffer* item = m_pArrayBuffers[i];
+			ConstantBuffer* item = m_arrayBuffers[i];
 
 			if (item != nullptr)
 			{
-				item->Apply(m_eStage, i);
+				item->Apply(m_stage, i);
 			}
 
 			valid &= ~(1 << i);
@@ -105,6 +105,6 @@ namespace TrioEngine
 
 	size_t ConstantBufferCollection::size()
 	{
-		return m_iCount;
+		return m_count;
 	}
 }

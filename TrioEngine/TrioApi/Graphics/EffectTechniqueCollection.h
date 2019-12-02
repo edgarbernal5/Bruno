@@ -33,7 +33,7 @@ namespace TrioEngine
 		inline size_t size();
 
 	private:
-		std::map<std::string, BaseType> m_mData;
-		std::vector<BaseType> m_vArray;
+		std::map<std::string, BaseType> m_data;
+		std::vector<BaseType> m_array;
 	};
 }

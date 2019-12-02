@@ -12,7 +12,7 @@ namespace TrioEngine
 	RasterizerState::RasterizerState()
 #ifdef TRIO_DIRECTX
 		:
-		m_pState(nullptr)
+		m_state(nullptr)
 #endif
 	{
 		CullMode = CullMode::CullCounterClockwiseFace;
@@ -32,7 +32,7 @@ namespace TrioEngine
 	void RasterizerState::ApplyState(GraphicsDevice* device)
 	{
 #ifdef TRIO_DIRECTX
-		if (m_pState == nullptr)
+		if (m_state == nullptr)
         {
 			D3D11_RASTERIZER_DESC desc;
 			ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
@@ -66,11 +66,11 @@ namespace TrioEngine
 
 			desc.DepthBiasClamp = DepthBiasClamp;
 			DX::ThrowIfFailed(
-				device->GetD3DDevice()->CreateRasterizerState(&desc, &m_pState)
+				device->GetD3DDevice()->CreateRasterizerState(&desc, &m_state)
 			);
 		}
 
-		device->GetD3DDeviceContext()->RSSetState(m_pState);
+		device->GetD3DDeviceContext()->RSSetState(m_state);
 #elif TRIO_OPENGL
 		// When rendering offscreen the faces change order.
 		//bool offscreen = device.IsRenderTargetBound;

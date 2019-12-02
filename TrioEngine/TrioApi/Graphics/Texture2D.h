@@ -21,8 +21,8 @@ namespace TrioEngine
 
 		~Texture2D();
 
-		inline int GetWidth() { return m_iWidth; }
-		inline int GetHeight() { return m_iHeight; }
+		inline int GetWidth() { return m_width; }
+		inline int GetHeight() { return m_height; }
 
 		template <class T>
 		void GetData(T* data, int length);
@@ -30,7 +30,7 @@ namespace TrioEngine
 		template <class T>
 		void GetData(int level, Rectangle* rect, T* data, int length, int startIndex, int elementCount);
 
-		ResourceUsage GetUsage() { return m_eUsage; }
+		ResourceUsage GetUsage() { return m_usage; }
 
 		template <class T>
 		void SetData(T* data, int length);
@@ -41,22 +41,22 @@ namespace TrioEngine
 		template <class T>
 		void SetData(int level, Rectangle* rect, T* data, int length, int startIndex, int elementCount);
 
-		void SetUsage(ResourceUsage usage) { m_eUsage = usage; }
+		void SetUsage(ResourceUsage usage) { m_usage = usage; }
 
 		//friend class SpriteBatch;
 	protected:
 		Texture2D(GraphicsDevice* graphicsDevice, int width, int height, uint32_t mipmap, SurfaceFormat format, SurfaceType type, uint32_t multiSamples, uint32_t msQuality, bool shared);
 
-		int m_iWidth;
-		int m_iHeight;
+		int m_width;
+		int m_height;
 
-		uint32_t m_uArraySize;
-		uint32_t m_uMultiSamples;
-		uint32_t m_uMsQuality;
+		uint32_t m_arraySize;
+		uint32_t m_multiSamples;
+		uint32_t m_msQuality;
 
-		ResourceUsage m_eUsage;
-		SurfaceType m_eSurfaceType;
-		bool m_bShared;
+		ResourceUsage m_usage;
+		SurfaceType m_surfaceType;
+		bool m_shared;
 
 		void CommonConstructor(int width, int height, uint32_t mipmap, SurfaceType type, uint32_t multiSamples, uint32_t msQuality, bool shared, uint32_t uArraySize);
 
@@ -65,7 +65,7 @@ namespace TrioEngine
 #endif
 	private:
 #ifdef TRIO_DIRECTX
-		D3D11_TEXTURE2D_DESC m_Tex2DDesc;
+		D3D11_TEXTURE2D_DESC m_tex2DDesc;
 #endif
 
 	};
@@ -94,15 +94,15 @@ namespace TrioEngine
 		{
 			x = 0;
 			y = 0;
-			w = std::max<int>(m_iWidth >> level, 1);
-			h = std::max<int>(m_iHeight >> level, 1);
+			w = std::max<int>(m_width >> level, 1);
+			h = std::max<int>(m_height >> level, 1);
 
 			//TO-DO: modificar h y w con formatos Dxt1, etc.
 			// Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-			if (m_eFormat == SurfaceFormat::Dxt1 ||
-				m_eFormat == SurfaceFormat::Dxt1a ||
-				m_eFormat == SurfaceFormat::Dxt3 ||
-				m_eFormat == SurfaceFormat::Dxt5)
+			if (m_format == SurfaceFormat::Dxt1 ||
+				m_format == SurfaceFormat::Dxt1a ||
+				m_format == SurfaceFormat::Dxt3 ||
+				m_format == SurfaceFormat::Dxt5)
 			{
 				w = (w + 3) & ~3;
 				h = (h + 3) & ~3;
@@ -112,22 +112,22 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Usage = (D3D11_USAGE)ResourceUsage::Staging;
-		desc.Width = m_iWidth;
-		desc.Height = m_iHeight;
+		desc.Width = m_width;
+		desc.Height = m_height;
 		desc.MipLevels = 1;
 		desc.ArraySize = 1;
-		desc.Format = ToFormat(m_eFormat);
+		desc.Format = ToFormat(m_format);
 		desc.BindFlags = (UINT)BindFlags::None;
 		desc.CPUAccessFlags = (UINT)CpuAccessFlags::Read;
 		desc.MiscFlags = (UINT)ResourceOptionFlags::None;
 
-		desc.SampleDesc.Count = m_uMultiSamples;
-		desc.SampleDesc.Quality = m_uMsQuality;
+		desc.SampleDesc.Count = m_multiSamples;
+		desc.SampleDesc.Quality = m_msQuality;
 
 		//TO-DO: hacer un pool de texturas staging.
 		ID3D11Texture2D *stagingTex = nullptr;
 		DX::ThrowIfFailed(
-			m_pDevice->GetD3DDevice()->CreateTexture2D(&desc, nullptr, &stagingTex)
+			m_device->GetD3DDevice()->CreateTexture2D(&desc, nullptr, &stagingTex)
 		);
 
 		D3D11_BOX region;
@@ -139,17 +139,17 @@ namespace TrioEngine
 		region.left = x;
 		region.right = x + w;
 
-		m_pDevice->GetD3DDeviceContext()->CopySubresourceRegion(stagingTex, 0, 0, 0, 0, m_pTexture, level, &region);
+		m_device->GetD3DDeviceContext()->CopySubresourceRegion(stagingTex, 0, 0, 0, 0, m_texture, level, &region);
 
 		D3D11_MAPPED_SUBRESOURCE mapsource;
-		m_pDevice->GetD3DDeviceContext()->Map(stagingTex, 0, (D3D11_MAP)MapMode::Read, 0, &mapsource);
+		m_device->GetD3DDeviceContext()->Map(stagingTex, 0, (D3D11_MAP)MapMode::Read, 0, &mapsource);
 
 		T *pData = reinterpret_cast<T*>(mapsource.pData);
 		memcpy(data + startIndex, pData + startIndex, sizeof(T) * elementCount);
 
-		m_pDevice->GetD3DDeviceContext()->Unmap(stagingTex, 0);
+		m_device->GetD3DDeviceContext()->Unmap(stagingTex, 0);
 
-		ReleaseCOM(stagingTex);
+		RELEASE_COM(stagingTex);
 #endif
 	}
 
@@ -168,26 +168,26 @@ namespace TrioEngine
 		{
 			x = 0;
 			y = 0;
-			w = std::max<int>(m_iWidth >> level, 1);
-			h = std::max<int>(m_iHeight >> level, 1);
+			w = std::max<int>(m_width >> level, 1);
+			h = std::max<int>(m_height >> level, 1);
 
 			//TO-DO: modificar h y w con formatos Dxt1, etc.
 			// Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-			if (m_eFormat == SurfaceFormat::Dxt1 ||
-				m_eFormat == SurfaceFormat::Dxt1a ||
-				m_eFormat == SurfaceFormat::Dxt3 ||
-				m_eFormat == SurfaceFormat::Dxt5)
+			if (m_format == SurfaceFormat::Dxt1 ||
+				m_format == SurfaceFormat::Dxt1a ||
+				m_format == SurfaceFormat::Dxt3 ||
+				m_format == SurfaceFormat::Dxt5)
 			{
 				w = (w + 3) & ~3;
 				h = (h + 3) & ~3;
 			}
 		}
 #ifdef TRIO_DIRECTX
-		switch (m_eUsage)
+		switch (m_usage)
 		{
 		case TrioEngine::ResourceUsage::Dynamic:
 		case TrioEngine::ResourceUsage::Default:
-			if (m_pTexture == nullptr)
+			if (m_texture == nullptr)
 			{
 				CreateTexture(nullptr);
 			}
@@ -203,12 +203,12 @@ namespace TrioEngine
 			region.right = x + w;
 
 			//TO-DO: Revisar esto bien.
-			m_pDevice->GetD3DDeviceContext()->UpdateSubresource(m_pTexture, level, &region, data + startIndex, GetPitch(w), 0);
+			m_device->GetD3DDeviceContext()->UpdateSubresource(m_texture, level, &region, data + startIndex, GetPitch(w), 0);
 
 			break;
 		case TrioEngine::ResourceUsage::Immutable:
 
-			if (m_pTexture == nullptr)
+			if (m_texture == nullptr)
 			{
 				D3D11_SUBRESOURCE_DATA iinitData = { 0 };
 				iinitData.pSysMem = data;
@@ -228,7 +228,7 @@ namespace TrioEngine
 				region.right = x + w;
 
 				//TO-DO: Revisar esto bien.
-				m_pDevice->GetD3DDeviceContext()->UpdateSubresource(m_pTexture, level, &region, data + startIndex, GetPitch(w), 0);
+				m_device->GetD3DDeviceContext()->UpdateSubresource(m_texture, level, &region, data + startIndex, GetPitch(w), 0);
 			}
 			break;
 		case TrioEngine::ResourceUsage::Staging:

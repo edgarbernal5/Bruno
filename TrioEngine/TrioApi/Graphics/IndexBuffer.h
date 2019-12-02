@@ -28,8 +28,8 @@ namespace TrioEngine
 		template <typename T>
 		void GetData(T* data, int length);
 
-		inline int GetIndexCount() { return m_iIndexCount; }
-		inline IndexElementSize GetElementSize() { return m_eElementSize; }
+		inline int GetIndexCount() { return m_indexCount; }
+		inline IndexElementSize GetElementSize() { return m_elementSize; }
 
 		template <typename T>
 		void SetData(const T* data, int length);
@@ -44,15 +44,15 @@ namespace TrioEngine
 
 	private:
 
-		GraphicsDevice*				m_pDevice;
-		int							m_iIndexCount;
-		IndexElementSize			m_eElementSize;
-		ResourceUsage				m_eUsage;
+		GraphicsDevice*				m_device;
+		int							m_indexCount;
+		IndexElementSize			m_elementSize;
+		ResourceUsage				m_usage;
 
 #ifdef TRIO_DIRECTX
-		ID3D11Buffer*				m_pBuffer;
+		ID3D11Buffer*				m_buffer;
 #elif TRIO_OPENGL
-		GLuint						m_pBuffer;
+		GLuint						m_buffer;
 #endif
 
 #ifdef TRIO_DIRECTX
@@ -70,10 +70,10 @@ namespace TrioEngine
 		//	return;
 
 #ifdef TRIO_DIRECTX
-		uint32_t elementSizeInBytes = m_eElementSize == IndexElementSize::SixteenBits ? 2 : 4;
+		uint32_t elementSizeInBytes = m_elementSize == IndexElementSize::SixteenBits ? 2 : 4;
 
 		D3D11_BUFFER_DESC stagingDesc;
-		m_pBuffer->GetDesc(&stagingDesc);
+		m_buffer->GetDesc(&stagingDesc);
 
 		stagingDesc.BindFlags = (uint32_t)BindFlags::None;
 		stagingDesc.CPUAccessFlags = (uint32_t)(CpuAccessFlags::Read | CpuAccessFlags::Write);
@@ -82,24 +82,24 @@ namespace TrioEngine
 
 		ID3D11Buffer* stagingBuffer = nullptr;
 		DX::ThrowIfFailed(
-			m_pDevice->GetD3DDevice()->CreateBuffer(&stagingDesc, nullptr, &stagingBuffer)
+			m_device->GetD3DDevice()->CreateBuffer(&stagingDesc, nullptr, &stagingBuffer)
 		);
 
-		m_pDevice->GetD3DDeviceContext()->CopyResource(stagingBuffer, m_pBuffer);
+		m_device->GetD3DDeviceContext()->CopyResource(stagingBuffer, m_buffer);
 
 		D3D11_MAPPED_SUBRESOURCE box;
-		m_pDevice->GetD3DDeviceContext()->Map(stagingBuffer, 0, (D3D11_MAP)MapMode::Read, 0, &box);
+		m_device->GetD3DDeviceContext()->Map(stagingBuffer, 0, (D3D11_MAP)MapMode::Read, 0, &box);
 
 		T* pData = reinterpret_cast<T*>(box.pData) + (offsetInBytes / sizeof(T));
 		memcpy(data + startIndex, pData, elementSizeInBytes * elementCount);
 
-		m_pDevice->GetD3DDeviceContext()->Unmap(stagingBuffer, 0);
+		m_device->GetD3DDeviceContext()->Unmap(stagingBuffer, 0);
 
-		ReleaseCOM(stagingBuffer);
+		RELEASE_COM(stagingBuffer);
 #elif TRIO_OPENGL
 		uint32_t elementSizeInBytes = m_eElementSize == IndexElementSize::SixteenBits ? 2 : 4;
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_buffer);
 
 		uint8_t* dataInBytes = (uint8_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
 		dataInBytes += offsetInBytes;
@@ -121,13 +121,13 @@ namespace TrioEngine
 	template <typename T>
 	void IndexBuffer::SetData(int offsetInBytes, const T* data, int length, int startIndex, int elementCount, SetDataOptions options)
 	{
-		int elementSizeInBytes = m_eElementSize == IndexElementSize::SixteenBits ? 2 : 4;
+		int elementSizeInBytes = m_elementSize == IndexElementSize::SixteenBits ? 2 : 4;
 
 #ifdef TRIO_DIRECTX
-		switch (m_eUsage)
+		switch (m_usage)
 		{
 		case ResourceUsage::Immutable:
-			if (m_pBuffer == nullptr)
+			if (m_buffer == nullptr)
 			{
 				D3D11_SUBRESOURCE_DATA iinitData = { 0 };
 				iinitData.pSysMem = data;
@@ -144,11 +144,11 @@ namespace TrioEngine
 				region.left = offsetInBytes;
 				region.right = offsetInBytes + (elementCount * elementSizeInBytes);
 
-				m_pDevice->GetD3DDeviceContext()->UpdateSubresource(m_pBuffer, 0, &region, (data + startIndex), elementSizeInBytes, 0);
+				m_device->GetD3DDeviceContext()->UpdateSubresource(m_buffer, 0, &region, (data + startIndex), elementSizeInBytes, 0);
 			}
 			break;
 		case ResourceUsage::Dynamic:
-			if (m_pBuffer == nullptr)
+			if (m_buffer == nullptr)
 			{
 				CreateBuffer(nullptr);
 			}
@@ -159,7 +159,7 @@ namespace TrioEngine
 
 				D3D11_MAPPED_SUBRESOURCE resource;
 
-				m_pDevice->GetD3DDeviceContext()->Map(m_pBuffer, 0, (D3D11_MAP)mode, 0, &resource);
+				m_device->GetD3DDeviceContext()->Map(m_buffer, 0, (D3D11_MAP)mode, 0, &resource);
 
 				T* pDataResource = (T*)((uint8_t*)(resource.pData) + offsetInBytes);
 
@@ -167,12 +167,12 @@ namespace TrioEngine
 
 				memcpy(pDataResource, pData, elementSizeInBytes * elementCount);
 
-				m_pDevice->GetD3DDeviceContext()->Unmap(m_pBuffer, 0);
+				m_device->GetD3DDeviceContext()->Unmap(m_buffer, 0);
 			}
 
 			break;
 		case ResourceUsage::Default:
-			if (m_pBuffer == nullptr)
+			if (m_buffer == nullptr)
 			{
 				D3D11_SUBRESOURCE_DATA vinitData = { 0 };
 				vinitData.pSysMem = data;
@@ -187,18 +187,18 @@ namespace TrioEngine
 		bool first = true;
 		uint32_t sizeInBytes = elementCount * elementSizeInBytes;
 		uint32_t bufferSize = m_iIndexCount * elementSizeInBytes;
-		if (m_pBuffer == 0)
+		if (m_buffer == 0)
 		{
 			first = false;
-			glGenBuffers(1, &m_pBuffer);
+			glGenBuffers(1, &m_buffer);
 			GraphicsExtensions::checkGLError("Indexbuffer glGenBuffers");
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pBuffer);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_buffer);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferSize, nullptr, (m_eUsage == ResourceUsage::Dynamic ? GL_STREAM_DRAW : GL_STATIC_DRAW));
-			GraphicsExtensions::checkGLError("Indexbuffer glBufferData m_pBuffer == 0");
+			GraphicsExtensions::checkGLError("Indexbuffer glBufferData m_buffer == 0");
 		}
 
 		if (first) {
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pBuffer);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_buffer);
 			GraphicsExtensions::checkGLError("Indexbuffer first=true");
 		}
 		if (options == SetDataOptions::Discard)
@@ -212,7 +212,7 @@ namespace TrioEngine
 		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offsetInBytes, sizeInBytes, dataPTR);
 		std::stringstream ss;
 		ss << "elementSizeInBytes " << elementSizeInBytes << endl;
-		ss << "m_pBuffer " << m_pBuffer << endl;
+		ss << "m_buffer " << m_buffer << endl;
 		ss << "offsetInBytes " << offsetInBytes << endl;
 		ss << "bufferSize " << bufferSize << endl;
 		ss << "sizeInBytes " << sizeInBytes << endl;

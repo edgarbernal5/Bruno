@@ -5,7 +5,7 @@
 namespace TrioEngine
 {
 	TextureLoader::TextureLoader() : 
-		m_uiImgId(0)
+		m_imgId(0)
 	{
 		ilInit();
 		iluInit();
@@ -13,20 +13,20 @@ namespace TrioEngine
 
 	TextureLoader::~TextureLoader()
 	{
-		for (size_t i = 0; i < m_vBuffers.size(); i++)
+		for (size_t i = 0; i < m_buffers.size(); i++)
 		{
-			delete[] m_vBuffers[i];
+			delete[] m_buffers[i];
 		}
-		m_vBuffers.clear();
+		m_buffers.clear();
 	}
 
 	TextureLoader::ImageInfo TextureLoader::GetTextureFromFile(std::string csFilename, TextureLoaderType targetType, SurfaceFormat targetFormat)
 	{
 		// Generate the main image name to use.
-		ilGenImages(1, &m_uiImgId);
+		ilGenImages(1, &m_imgId);
 
 		// Bind this image name.
-		ilBindImage(m_uiImgId);
+		ilBindImage(m_imgId);
 
 		wchar_t bufferFilename[256];
 		int nChars = MultiByteToWideChar(CP_ACP, 0, csFilename.c_str(), -1, NULL, 0);
@@ -88,13 +88,13 @@ namespace TrioEngine
 		}
 
 		imageInfo.Data = buffer;
-		m_vBuffers.push_back(buffer);
+		m_buffers.push_back(buffer);
 
 		ilCopyPixels(0, 0, 0, ilInfo.Width, ilInfo.Height, ilInfo.Depth, targetToIl, (ILenum)targetType, buffer);
 
 		imageInfo.SizeOfData = bufferSize;
 
-		ilDeleteImages(1, &m_uiImgId);
+		ilDeleteImages(1, &m_imgId);
 
 		return imageInfo;
 	}

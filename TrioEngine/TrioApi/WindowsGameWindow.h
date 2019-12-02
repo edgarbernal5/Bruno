@@ -26,17 +26,17 @@ namespace TrioEngine
 		const char* GetScreenDeviceName();
 
 	private:
-		WindowsGameHost* m_pHost;
-		HWND m_pHwnd;
+		WindowsGameHost* m_host;
+		HWND m_hwnd;
 
-		std::string m_csScreenDeviceName;
-		int m_iPrevClientWidth;
-		int m_iPrevClientHeight;
-		bool m_bFullScreen;
-		bool m_bInDeviceTransition;
-		bool m_bInSizeMove;
-		bool m_bInSuspend;
-		bool m_bMinimized;
+		std::string m_screenDeviceName;
+		int m_prevClientWidth;
+		int m_prevClientHeight;
+		bool m_fullScreen;
+		bool m_inDeviceTransition;
+		bool m_inSizeMove;
+		bool m_inSuspend;
+		bool m_minimized;
 
 		// Windows procedure
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

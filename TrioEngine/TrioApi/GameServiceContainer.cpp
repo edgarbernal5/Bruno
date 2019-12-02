@@ -14,18 +14,18 @@ namespace TrioEngine
 
 	void GameServiceContainer::AddService(std::string typeName, void* object)
 	{
-		auto it = m_mServices.find(typeName);
-		if (it != m_mServices.end())
+		auto it = m_services.find(typeName);
+		if (it != m_services.end())
 		{
 			throw std::exception();
 		}
-		m_mServices[typeName] = object;
+		m_services[typeName] = object;
 	}
 
 	IServiceBase* GameServiceContainer::GetService(std::string csTypeName)
 	{
-		auto it = m_mServices.find(csTypeName);
-		if (it != m_mServices.end())
+		auto it = m_services.find(csTypeName);
+		if (it != m_services.end())
 		{
 			return (IServiceBase*)it->second;
 		}
@@ -34,11 +34,11 @@ namespace TrioEngine
 
 	void GameServiceContainer::RemoveService(std::string csTypeName)
 	{
-		auto it = m_mServices.find(csTypeName);
-		if (it == m_mServices.end())
+		auto it = m_services.find(csTypeName);
+		if (it == m_services.end())
 		{
 			throw std::exception();
 		}
-		m_mServices.erase(csTypeName);
+		m_services.erase(csTypeName);
 	}
 }

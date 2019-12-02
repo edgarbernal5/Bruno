@@ -40,32 +40,32 @@ namespace TrioEngine
 #endif
 
 	GraphicsDevice::GraphicsDevice(GraphicsAdapter* adapter, PresentationParameters parameters) :
-		m_pCurrentDepthStencilBuffer(nullptr),
+		m_currentDepthStencilBuffer(nullptr),
 
-		m_pVertexTextureCollection(nullptr),
+		m_vertexTextureCollection(nullptr),
 
-		m_pTextureCollection(nullptr),
-		m_pSamplerCollection(nullptr),
-		m_pAdapter(adapter),
+		m_textureCollection(nullptr),
+		m_samplerCollection(nullptr),
+		m_adapter(adapter),
 		m_presentationParameters(parameters),
-		m_uiBackBufferCount(2),
-		m_pVertexShader(nullptr),
-		m_bVertexShaderDirty(false),
+		m_backBufferCount(2),
+		m_vertexShader(nullptr),
+		m_vertexShaderDirty(false),
 
-		m_pVertexConstantBuffers(nullptr),
-		m_pPixelConstantBuffers(nullptr),
+		m_vertexConstantBuffers(nullptr),
+		m_pixelConstantBuffers(nullptr),
 
-		m_pPixelShader(nullptr),
-		m_bPixelShaderDirty(false),
+		m_pixelShader(nullptr),
+		m_pixelShaderDirty(false),
 
-		m_bRasterizerStateDirty(false),
-		m_pRasterizerState(nullptr),
+		m_rasterizerStateDirty(false),
+		m_rasterizerState(nullptr),
 
-		m_bBlendStateDirty(false),
-		m_pBlendState(nullptr),
+		m_blendStateDirty(false),
+		m_blendState(nullptr),
 
-		m_bDepthStencilStateDirty(false),
-		m_pDepthStencilState(nullptr)
+		m_depthStencilStateDirty(false),
+		m_depthStencilState(nullptr)
 	{
 		CreateDeviceResources();
 		CreateWindowSizeDependentResources();
@@ -75,23 +75,23 @@ namespace TrioEngine
 		BlendState::InitStates();
 		SamplerState::InitStates();
 
-		m_pVertexTextureCollection = new TextureCollection(ShaderStage::Vertex);
+		m_vertexTextureCollection = new TextureCollection(ShaderStage::Vertex);
 
-		m_pTextureCollection = new TextureCollection(ShaderStage::Pixel);
-		m_pSamplerCollection = new SamplerStateCollection(ShaderStage::Pixel);
+		m_textureCollection = new TextureCollection(ShaderStage::Pixel);
+		m_samplerCollection = new SamplerStateCollection(ShaderStage::Pixel);
 
-		m_pVertexConstantBuffers = new ConstantBufferCollection(ShaderStage::Vertex);
-		m_pPixelConstantBuffers = new ConstantBufferCollection(ShaderStage::Pixel);
+		m_vertexConstantBuffers = new ConstantBufferCollection(ShaderStage::Vertex);
+		m_pixelConstantBuffers = new ConstantBufferCollection(ShaderStage::Pixel);
 
-		m_bIndexBufferDirty = true;
-		m_bVertexBufferDirty = true;
+		m_indexBufferDirty = true;
+		m_vertexBufferDirty = true;
 
 #ifdef TRIO_DIRECTX
 		for (size_t i = 0; i < MaxVertexBuffers; i++)
 		{
-			m_aVertexBuffers[i] = nullptr;
-			m_aVertexOffsets[i] = 0;
-			m_aVertexStrides[i] = 0;
+			m_vertexBuffers[i] = nullptr;
+			m_vertexOffsets[i] = 0;
+			m_vertexStrides[i] = 0;
 		}
 #endif
 	}
@@ -102,20 +102,20 @@ namespace TrioEngine
 
 	void GraphicsDevice::ApplyState(bool applyShaders)
 	{
-		if (m_bBlendStateDirty)
+		if (m_blendStateDirty)
 		{
-			m_pBlendState->ApplyState(this);
-			m_bBlendStateDirty = false;
+			m_blendState->ApplyState(this);
+			m_blendStateDirty = false;
 		}
-		if (m_bDepthStencilStateDirty)
+		if (m_depthStencilStateDirty)
 		{
-			m_pDepthStencilState->ApplyState(this);
-			m_bDepthStencilStateDirty = false;
+			m_depthStencilState->ApplyState(this);
+			m_depthStencilStateDirty = false;
 		}
-		if (m_bRasterizerStateDirty)
+		if (m_rasterizerStateDirty)
 		{
-			m_pRasterizerState->ApplyState(this);
-			m_bRasterizerStateDirty = false;
+			m_rasterizerState->ApplyState(this);
+			m_rasterizerStateDirty = false;
 		}
 
 		if (!applyShaders)
@@ -123,12 +123,12 @@ namespace TrioEngine
 			return;
 		}
 
-		if (m_bIndexBufferDirty)
+		if (m_indexBufferDirty)
 		{
-			if (m_pIndexBuffer)
+			if (m_indexBuffer)
 			{
 #ifdef TRIO_DIRECTX
-				m_d3dContext->IASetIndexBuffer(m_pIndexBuffer->m_pBuffer, ToFormat(m_pIndexBuffer->m_eElementSize), 0);
+				m_d3dContext->IASetIndexBuffer(m_indexBuffer->m_buffer, ToFormat(m_indexBuffer->m_elementSize), 0);
 #elif TRIO_OPENGL
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer->m_Buffer);
 				GraphicsExtensions::checkGLError("Apply State GL_ELEMENT_ARRAY_BUFFER");
@@ -142,15 +142,15 @@ namespace TrioEngine
 				//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 #endif
 			}
-			m_bIndexBufferDirty = false;
+			m_indexBufferDirty = false;
 		}
 
-		if (m_bVertexBufferDirty)
+		if (m_vertexBufferDirty)
 		{
-			if (m_vVertexBindings.size() > 0)
+			if (m_vertexBindings.size() > 0)
 			{
 #ifdef TRIO_DIRECTX
-				m_d3dContext->IASetVertexBuffers(0, m_vVertexBindings.size(), &m_aVertexBuffers[0], m_aVertexStrides, m_aVertexOffsets);
+				m_d3dContext->IASetVertexBuffers(0, m_vertexBindings.size(), &m_vertexBuffers[0], m_vertexStrides, m_vertexOffsets);
 #endif
 			}
 			else
@@ -161,12 +161,12 @@ namespace TrioEngine
 			}
 		}
 
-		if (m_bVertexShaderDirty)
+		if (m_vertexShaderDirty)
 		{
 #ifdef TRIO_DIRECTX
-			if (m_pVertexShader != nullptr)
+			if (m_vertexShader != nullptr)
 			{
-				m_d3dContext->VSSetShader(m_pVertexShader->m_uShaderPtr.m_pVertexShader, nullptr, 0);
+				m_d3dContext->VSSetShader(m_vertexShader->m_shaderPtr.m_vertexShader, nullptr, 0);
 			}
 			else
 			{
@@ -175,49 +175,49 @@ namespace TrioEngine
 #endif
 		}
 
-		if (m_bVertexShaderDirty || m_bVertexBufferDirty)
+		if (m_vertexShaderDirty || m_vertexBufferDirty)
 		{
 #ifdef TRIO_DIRECTX
-			ID3D11InputLayout* layout = m_pVertexShader->GetInputLayouts()->Get(m_vVertexBindings[0].Buffer->m_pVertexDeclaration);
+			ID3D11InputLayout* layout = m_vertexShader->GetInputLayouts()->Get(m_vertexBindings[0].Buffer->m_vertexDeclaration);
 			m_d3dContext->IASetInputLayout(layout);
 #elif TRIO_OPENGL
 
 #endif
-			m_bVertexShaderDirty = false;
-			m_bVertexBufferDirty = false;
+			m_vertexShaderDirty = false;
+			m_vertexBufferDirty = false;
 		}
 
-		if (m_bPixelShaderDirty)
+		if (m_pixelShaderDirty)
 		{
 #ifdef TRIO_DIRECTX
-			if (m_pPixelShader)
+			if (m_pixelShader)
 			{
-				m_d3dContext->PSSetShader(m_pPixelShader->m_uShaderPtr.m_pPixelShader, nullptr, 0);
+				m_d3dContext->PSSetShader(m_pixelShader->m_shaderPtr.m_pixelShader, nullptr, 0);
 			}
 			else
 			{
 				m_d3dContext->PSSetShader(nullptr, nullptr, 0);
 			}
 #endif
-			m_bPixelShaderDirty = false;
+			m_pixelShaderDirty = false;
 		}
 
 #ifdef TRIO_DIRECTX
-		m_pVertexConstantBuffers->SetConstantBuffers(this);
-		m_pPixelConstantBuffers->SetConstantBuffers(this);
+		m_vertexConstantBuffers->SetConstantBuffers(this);
+		m_pixelConstantBuffers->SetConstantBuffers(this);
 #endif
 	}
 
 	bool GraphicsDevice::AreSameVertexBindings(VertexBufferBindings &bindings)
 	{
-		if (bindings.size() != m_vVertexBindings.size())
+		if (bindings.size() != m_vertexBindings.size())
 			return false;
 
 		for (int i = 0; i < bindings.size(); i++)
 		{
-			if (bindings[i].Buffer != m_vVertexBindings[i].Buffer ||
-				bindings[i].Offset != m_vVertexBindings[i].Offset ||
-				bindings[i].Stride != m_vVertexBindings[i].Stride)
+			if (bindings[i].Buffer != m_vertexBindings[i].Buffer ||
+				bindings[i].Offset != m_vertexBindings[i].Offset ||
+				bindings[i].Stride != m_vertexBindings[i].Stride)
 			{
 				return false;
 			}
@@ -236,7 +236,7 @@ namespace TrioEngine
 				options = options | ClearOptions::Stencil;
 		}
 
-		Clear(options, color, m_stScreenViewport.MaxDepth, 0);
+		Clear(options, color, m_screenViewport.MaxDepth, 0);
 	}
 
 	void GraphicsDevice::Clear(ClearOptions options, Color &color, float depth, uint8_t stencil)
@@ -245,9 +245,9 @@ namespace TrioEngine
 		if ((options & ClearOptions::Target) == ClearOptions::Target)
 		{
 			const float* colorFloat = reinterpret_cast<const float*>(&color);
-			for (int i = 0; i < m_vCurrentRenderTargets.size() && m_vCurrentRenderTargets[i] != nullptr; i++)
+			for (int i = 0; i < m_currentRenderTargets.size() && m_currentRenderTargets[i] != nullptr; i++)
 			{
-				m_d3dContext->ClearRenderTargetView(m_vCurrentRenderTargets[i], colorFloat);
+				m_d3dContext->ClearRenderTargetView(m_currentRenderTargets[i], colorFloat);
 			}
 		}
 		uint32_t flags = 0;
@@ -292,7 +292,7 @@ namespace TrioEngine
 			D3D_FEATURE_LEVEL_9_1,
 		};
 
-		IDXGIAdapter1* adapter = m_pAdapter->GetD3DAdapter();
+		IDXGIAdapter1* adapter = m_adapter->GetD3DAdapter();
 
 		D3D_FEATURE_LEVEL d3dFeatureLevel = D3D_FEATURE_LEVEL_11_0;
 		// Create the Direct3D 11 API device object and a corresponding context.
@@ -419,7 +419,7 @@ namespace TrioEngine
 		// Clear the previous window size specific context.
 		ID3D11RenderTargetView* nullViews[] = { nullptr };
 		m_d3dContext->OMSetRenderTargets(_countof(nullViews), nullViews, nullptr);
-		m_vCurrentRenderTargets = std::vector<ID3D11RenderTargetView*>(4, nullptr);
+		m_currentRenderTargets = std::vector<ID3D11RenderTargetView*>(4, nullptr);
 
 		m_depthStencilBuffer.reset();
 		m_d3dRenderTargetView.Reset();
@@ -433,7 +433,7 @@ namespace TrioEngine
 		{
 			// If the swap chain already exists, resize it.
 			HRESULT hr = m_swapChain->ResizeBuffers(
-				m_uiBackBufferCount,
+				m_backBufferCount,
 				backBufferWidth,
 				backBufferHeight,
 				ToFormat(m_presentationParameters.GetBackBufferFormat()),
@@ -482,7 +482,7 @@ namespace TrioEngine
 				swapChainDesc.Height = backBufferHeight;
 				swapChainDesc.Format = ToFormat(m_presentationParameters.GetBackBufferFormat());
 				swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-				swapChainDesc.BufferCount = m_uiBackBufferCount;
+				swapChainDesc.BufferCount = m_backBufferCount;
 				swapChainDesc.SampleDesc.Count = 1;
 				swapChainDesc.SampleDesc.Quality = 0;
 				swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
@@ -513,7 +513,7 @@ namespace TrioEngine
 				swapChainDesc.SampleDesc.Count = 1;
 				swapChainDesc.SampleDesc.Quality = 0;
 				swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-				swapChainDesc.BufferCount = m_uiBackBufferCount;
+				swapChainDesc.BufferCount = m_backBufferCount;
 				swapChainDesc.OutputWindow = m_presentationParameters.GetHostHWND();
 				swapChainDesc.Windowed = TRUE;
 				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -544,11 +544,11 @@ namespace TrioEngine
 			m_depthStencilBuffer.reset(new DepthStencilBuffer(this, backBufferWidth, backBufferHeight, m_presentationParameters.GetDepthStencilFormat()));
 		}
 
-		m_vCurrentRenderTargets[0] = m_d3dRenderTargetView.Get();
-		m_d3dContext->OMSetRenderTargets(1, &m_vCurrentRenderTargets[0], m_depthStencilBuffer->m_depthStencilView.Get());
+		m_currentRenderTargets[0] = m_d3dRenderTargetView.Get();
+		m_d3dContext->OMSetRenderTargets(1, &m_currentRenderTargets[0], m_depthStencilBuffer->m_depthStencilView.Get());
 
 		// Set the 3D rendering viewport to target the entire window.
-		m_stScreenViewport = CD3D11_VIEWPORT(
+		m_screenViewport = CD3D11_VIEWPORT(
 			0.0f,
 			0.0f,
 			static_cast<float>(backBufferWidth),
@@ -556,7 +556,7 @@ namespace TrioEngine
 		);
 
 		// Set the viewport.
-		m_d3dContext->RSSetViewports(1, &m_stScreenViewport);
+		m_d3dContext->RSSetViewports(1, &m_screenViewport);
 
 #endif
 	}
@@ -568,8 +568,8 @@ namespace TrioEngine
 
 		m_d3dContext->IASetPrimitiveTopology(FormatToPrimitive(primitiveType));
 		
-		m_pTextureCollection->BindAllTextures(this);
-		m_pSamplerCollection->BindAllSamplers(this);
+		m_textureCollection->BindAllTextures(this);
+		m_samplerCollection->BindAllSamplers(this);
 
 		int indexCount = GetElementCountArray(primitiveType, primitiveCount);
 		m_d3dContext->DrawIndexed(indexCount, startIndex, baseVertex);
@@ -591,11 +591,11 @@ namespace TrioEngine
 
 	void GraphicsDevice::Reset(PresentationParameters presentationParameters, GraphicsAdapter* graphicsAdapter)
 	{
-		if (m_pAdapter != graphicsAdapter)
+		if (m_adapter != graphicsAdapter)
 		{
 			//TO-DO:
 		}
-		m_pAdapter = graphicsAdapter;
+		m_adapter = graphicsAdapter;
 		m_presentationParameters = presentationParameters;
 		CreateWindowSizeDependentResources();
 	}
@@ -672,11 +672,11 @@ namespace TrioEngine
 
 	void GraphicsDevice::SetBlendState(BlendState* state)
 	{
-		if (m_pBlendState == state)
+		if (m_blendState == state)
 			return;
 
-		m_pBlendState = state;
-		m_bBlendStateDirty = true;
+		m_blendState = state;
+		m_blendStateDirty = true;
 	}
 
 	void GraphicsDevice::SetConstantBuffer(ShaderStage stage, int slot, ConstantBuffer* buffer)
@@ -684,10 +684,10 @@ namespace TrioEngine
 		switch (stage)
 		{
 		case ShaderStage::Vertex:
-			(*m_pVertexConstantBuffers)[slot] = buffer;
+			(*m_vertexConstantBuffers)[slot] = buffer;
 			break;
 		case ShaderStage::Pixel:
-			(*m_pPixelConstantBuffers)[slot] = buffer;
+			(*m_pixelConstantBuffers)[slot] = buffer;
 			break;
 		case ShaderStage::Geometry:
 			break;
@@ -700,59 +700,59 @@ namespace TrioEngine
 
 	void GraphicsDevice::SetDepthStencilState(DepthStencilState* state)
 	{
-		if (m_pDepthStencilState == state)
+		if (m_depthStencilState == state)
 			return;
 
-		m_pDepthStencilState = state;
-		m_bDepthStencilStateDirty = true;
+		m_depthStencilState = state;
+		m_depthStencilStateDirty = true;
 	}
 
 	void GraphicsDevice::SetIndexBuffer(IndexBuffer* indexBuffer)
 	{
-		if (m_pIndexBuffer == indexBuffer)
+		if (m_indexBuffer == indexBuffer)
 			return;
 
-		m_pIndexBuffer = indexBuffer;
-		m_bIndexBufferDirty = true;
+		m_indexBuffer = indexBuffer;
+		m_indexBufferDirty = true;
 	}
 
 	void GraphicsDevice::SetRasterizerState(RasterizerState* state)
 	{
-		if (m_pRasterizerState == state)
+		if (m_rasterizerState == state)
 			return;
 
-		m_pRasterizerState = state;
-		m_bRasterizerStateDirty = true;
+		m_rasterizerState = state;
+		m_rasterizerStateDirty = true;
 	}
 
 	void GraphicsDevice::SetSamplerState(int index, SamplerState* state)
 	{
-		m_pSamplerCollection->SetSampler(index, state);
+		m_samplerCollection->SetSampler(index, state);
 	}
 
 	void GraphicsDevice::SetVertexBuffer(VertexBuffer* buffer)
 	{
-		if (m_vVertexBindings.size() == 1 && m_vVertexBindings[0].Buffer == buffer ||
-			m_vVertexBindings.size() == 0 && buffer == nullptr)
+		if (m_vertexBindings.size() == 1 && m_vertexBindings[0].Buffer == buffer ||
+			m_vertexBindings.size() == 0 && buffer == nullptr)
 			return;
 
-		m_bVertexBufferDirty = true;
+		m_vertexBufferDirty = true;
 
 		if (buffer == nullptr)
 		{
-			m_vVertexBindings.clear();
+			m_vertexBindings.clear();
 			return;
 		}
 		//TODO:
-		m_vVertexBindings.clear();
-		m_vVertexBindings[0].Buffer = buffer;
-		m_vVertexBindings[0].Offset = 0;
-		m_vVertexBindings[0].Stride = buffer->GetVertexDeclaration()->GetVertexStride();
+		m_vertexBindings.clear();
+		m_vertexBindings[0].Buffer = buffer;
+		m_vertexBindings[0].Offset = 0;
+		m_vertexBindings[0].Stride = buffer->GetVertexDeclaration()->GetVertexStride();
 
 #ifdef TRIO_DIRECTX
-		m_aVertexBuffers[0] = buffer->m_pBuffer;
-		m_aVertexOffsets[0] = 0;
-		m_aVertexStrides[0] = m_vVertexBindings[0].Stride;
+		m_vertexBuffers[0] = buffer->m_buffer;
+		m_vertexOffsets[0] = 0;
+		m_vertexStrides[0] = m_vertexBindings[0].Stride;
 #endif
 	}
 
@@ -761,33 +761,33 @@ namespace TrioEngine
 		if (AreSameVertexBindings(bindings))
 			return;
 
-		m_vVertexBindings = bindings;
+		m_vertexBindings = bindings;
 #ifdef TRIO_DIRECTX
-		for (int i = 0; i < m_vVertexBindings.size(); i++)
+		for (int i = 0; i < m_vertexBindings.size(); i++)
 		{
-			m_aVertexBuffers[i] = m_vVertexBindings[i].Buffer->m_pBuffer;
-			m_aVertexOffsets[i] = m_vVertexBindings[i].Offset;
-			m_aVertexStrides[i] = m_vVertexBindings[i].Stride;
+			m_vertexBuffers[i] = m_vertexBindings[i].Buffer->m_buffer;
+			m_vertexOffsets[i] = m_vertexBindings[i].Offset;
+			m_vertexStrides[i] = m_vertexBindings[i].Stride;
 		}
 #endif
-		m_bVertexBufferDirty = true;
+		m_vertexBufferDirty = true;
 	}
 
 	void GraphicsDevice::SetPixelShader(Shader* shader)
 	{
-		if (m_pPixelShader == shader)
+		if (m_pixelShader == shader)
 			return;
 
-		m_pPixelShader = shader;
-		m_bPixelShaderDirty = true;
+		m_pixelShader = shader;
+		m_pixelShaderDirty = true;
 	}
 
 	void GraphicsDevice::SetVertexShader(Shader* shader)
 	{
-		if (m_pVertexShader == shader)
+		if (m_vertexShader == shader)
 			return;
 
-		m_pVertexShader = shader;
-		m_bVertexShaderDirty = true;
+		m_vertexShader = shader;
+		m_vertexShaderDirty = true;
 	}
 }

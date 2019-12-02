@@ -3,7 +3,7 @@
 
 namespace TrioEngine
 {
-	std::vector<GraphicsAdapter*> GraphicsAdapter::m_vAdapters;
+	std::vector<GraphicsAdapter*> GraphicsAdapter::g_Adapters;
 
 	GraphicsAdapter::GraphicsAdapter()
 	{
@@ -11,15 +11,15 @@ namespace TrioEngine
 
 #ifdef TRIO_DIRECTX
 	GraphicsAdapter::GraphicsAdapter(IDXGIAdapter1* adapter, uint32_t adapterIndex) :
-		m_pAdapter(adapter)
+		m_adapter(adapter)
 	{
-		m_bIsDefaultAdapter = (adapterIndex == 0);
-		m_pAdapter->GetDesc1(&m_stAdapter_desc);
+		m_isDefaultAdapter = (adapterIndex == 0);
+		m_adapter->GetDesc1(&m_adapter_desc);
 
 		char bufferDesc[128];
-		WideCharToMultiByte(CP_ACP, 0, m_stAdapter_desc.Description, -1, bufferDesc, _countof(bufferDesc), NULL, FALSE);
+		WideCharToMultiByte(CP_ACP, 0, m_adapter_desc.Description, -1, bufferDesc, _countof(bufferDesc), NULL, FALSE);
 
-		m_csDeviceName = bufferDesc;
+		m_deviceName = bufferDesc;
 		DXGI_FORMAT DXIGFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		Microsoft::WRL::ComPtr<IDXGIOutput> pOutput;
@@ -63,20 +63,20 @@ namespace TrioEngine
 
 	std::vector<GraphicsAdapter*>& GraphicsAdapter::GetAdapters()
 	{
-		if (m_vAdapters.size() == 0)
+		if (g_Adapters.size() == 0)
 		{
 			PopulateAdapters();
 		}
-		return m_vAdapters;
+		return g_Adapters;
 	}
 
 	GraphicsAdapter* GraphicsAdapter::GetDefaultAdapter()
 	{
-		if (m_vAdapters.size() == 0)
+		if (g_Adapters.size() == 0)
 		{
 			PopulateAdapters();
 		}
-		return m_vAdapters[0];
+		return g_Adapters[0];
 	}
 
 	DisplayMode GraphicsAdapter::GetCurrentDisplayMode()
@@ -100,7 +100,7 @@ namespace TrioEngine
 
 		Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
 
-		m_vAdapters.clear();
+		g_Adapters.clear();
 
 		int idx = 0;
 		for (uint32_t adapterIndex = 0; dxgiFactory->EnumAdapters1(adapterIndex, &adapter) != DXGI_ERROR_NOT_FOUND; ++adapterIndex)
@@ -120,7 +120,7 @@ namespace TrioEngine
 			//OutputDebugStringW(buff);
 #endif
 
-			m_vAdapters.push_back(new GraphicsAdapter(adapter.Detach(), idx));
+			g_Adapters.push_back(new GraphicsAdapter(adapter.Detach(), idx));
 			++idx;
 		}
 

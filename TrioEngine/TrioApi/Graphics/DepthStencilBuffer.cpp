@@ -14,14 +14,14 @@ namespace TrioEngine
 #elif TRIO_OPENGL
 		: m_glDepthBuffer(0),
 #endif
-		m_pDevice(nullptr)
+		m_device(nullptr)
 	{
 
 
 	}
 
 	DepthStencilBuffer::DepthStencilBuffer(GraphicsDevice* device, int width, int height, DepthFormat format) :
-		m_eDepthFormat(format),
+		m_depthFormat(format),
 
 #ifdef TRIO_DIRECTX
 		m_shaderResourceView(nullptr),
@@ -29,7 +29,7 @@ namespace TrioEngine
 		m_glDepthBuffer(0),
 		m_glStencilBuffer(0),
 #endif
-		m_pDevice(device) {
+		m_device(device) {
 
 #ifdef TRIO_DIRECTX
 

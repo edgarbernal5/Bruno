@@ -41,6 +41,6 @@ namespace TrioEngine
 	private:
 		Vector3 m_position;
 
-		static VertexDeclaration* g_pVertexDeclaration;
+		static VertexDeclaration* g_vertexDeclaration;
 	};
 }

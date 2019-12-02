@@ -7,6 +7,7 @@
 namespace TrioEngine
 {
 	class Mesh;
+	class ModelMaterial;
 	
 	class TRIOAPI_DECL Model
 	{
@@ -20,10 +21,17 @@ namespace TrioEngine
 		Model(const std::string& filename, ModelLoadParams loadParams = ModelLoadParams());
 		~Model();
 
+		const std::vector<ModelMaterial*>& GetMaterials() const;
 		const std::vector<Mesh*>& GetMeshes() const;
 	private:
 
+		std::vector<ModelMaterial*> m_materials;
+		std::vector<Mesh*> m_meshes;
 
-		std::vector<Mesh*> m_vMeshes;
+		/*std::vector<AnimationClip*> mAnimations;
+		std::map<std::string, AnimationClip*> mAnimationsByName;
+		std::vector<Bone*> mBones;
+		std::map<std::string, UINT> mBoneIndexMapping;
+		SceneNode* mRootNode;*/
 	};
 }

@@ -21,7 +21,7 @@ namespace TrioEngine
 		void RemoveService(std::string csTypeName);
 
 	private:
-		std::map<std::string, void*> m_mServices;
+		std::map<std::string, void*> m_services;
 	};
 
 }

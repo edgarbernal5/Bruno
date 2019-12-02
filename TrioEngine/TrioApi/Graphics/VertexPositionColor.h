@@ -47,6 +47,6 @@ namespace TrioEngine
 		Vector3 m_position;
 		Vector4 m_color;
 
-		static VertexDeclaration* g_pVertexDeclaration;
+		static VertexDeclaration* g_vertexDeclaration;
 	};
 }

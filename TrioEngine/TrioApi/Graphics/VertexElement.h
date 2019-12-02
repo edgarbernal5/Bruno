@@ -24,21 +24,21 @@ namespace TrioEngine
 		friend class VertexDeclaration;
 		friend class VertexDeclarationHelper;
 
-		inline int GetOffset() { return m_iOffset; }
-		inline VertexElementFormat GetVertexElementFormat() { return m_eFormat; }
-		inline VertexElementUsage GetVertexElementUsage() { return m_eUsage; }
+		inline int GetOffset() { return m_offset; }
+		inline VertexElementFormat GetVertexElementFormat() { return m_format; }
+		inline VertexElementUsage GetVertexElementUsage() { return m_usage; }
 		inline int GetUsageIndex() { return m_iUsageIndex; }
 
-		inline void SetOffset(int offset) { m_iOffset = offset; }
-		inline void SetVertexElementFormat(VertexElementFormat format) { m_eFormat = format; }
-		inline void SetVertexElementUsage(VertexElementUsage usage) { m_eUsage = usage; }
+		inline void SetOffset(int offset) { m_offset = offset; }
+		inline void SetVertexElementFormat(VertexElementFormat format) { m_format = format; }
+		inline void SetVertexElementUsage(VertexElementUsage usage) { m_usage = usage; }
 		inline void SetUsageIndex(int usageIndex) { m_iUsageIndex = usageIndex; }
 
 		bool operator ==(const VertexElement& other) const
 		{
-			return m_iOffset == other.m_iOffset &&
-				m_eFormat == other.m_eFormat &&
-				m_eUsage == other.m_eUsage &&
+			return m_offset == other.m_offset &&
+				m_format == other.m_format &&
+				m_usage == other.m_usage &&
 				m_iUsageIndex == other.m_iUsageIndex;
 		}
 
@@ -48,9 +48,9 @@ namespace TrioEngine
 		}
 
 	private:
-		int m_iOffset;
-		VertexElementFormat m_eFormat;
-		VertexElementUsage m_eUsage;
+		int m_offset;
+		VertexElementFormat m_format;
+		VertexElementUsage m_usage;
 		int m_iUsageIndex;
 
 #ifdef TRIO_DIRECTX
@@ -61,7 +61,7 @@ namespace TrioEngine
 		std::string GetSignature()
 		{
 			std::stringstream ss;
-			ss << "(Offset " << m_iOffset << ", Format " << (int)m_eFormat << ", Usage " << (int)m_eUsage << ", UsageIndex " << m_iUsageIndex << ")";
+			ss << "(Offset " << m_offset << ", Format " << (int)m_format << ", Usage " << (int)m_usage << ", UsageIndex " << m_iUsageIndex << ")";
 
 			return ss.str();
 		}

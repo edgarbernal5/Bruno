@@ -13,13 +13,13 @@ namespace TrioEngine
 
 	Texture::Texture(GraphicsDevice* device, SurfaceFormat format) :
 #ifdef TRIO_DIRECTX
-		m_pShaderResourceView(nullptr),
-		m_pTexture(nullptr),
+		m_shaderResourceView(nullptr),
+		m_texture(nullptr),
 #elif TRIO_OPENGL
 		m_glTexture(-1),
 #endif
-		m_pDevice(device),
-		m_eFormat(format)
+		m_device(device),
+		m_format(format)
 	{
 
 	}
@@ -27,7 +27,7 @@ namespace TrioEngine
 	int Texture::GetPitch(int width)
 	{
 		int pitch = 0;
-		switch (m_eFormat)
+		switch (m_format)
 		{
 		case SurfaceFormat::Dxt1:
 		case SurfaceFormat::Dxt1SRgb:
@@ -42,11 +42,11 @@ namespace TrioEngine
 		case SurfaceFormat::RgbPvrtc4Bpp:
 		case SurfaceFormat::RgbaPvrtc4Bpp:
 			//Debug.Assert(MathHelper.IsPowerOfTwo(width), "This format must be power of two!");
-			pitch = ((width + 3) / 4) * GetTypeSize(m_eFormat);
+			pitch = ((width + 3) / 4) * GetTypeSize(m_format);
 			break;
 
 		default:
-			pitch = width * GetTypeSize(m_eFormat);
+			pitch = width * GetTypeSize(m_format);
 			break;
 		};
 

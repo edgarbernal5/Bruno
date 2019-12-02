@@ -40,9 +40,9 @@ namespace TrioEngine
 		inline size_t size();
 
 	private:
-		BaseType m_pArray[32];
-		size_t m_iN;
-		size_t m_iCapacity;
+		BaseType m_array[32];
+		size_t m_n;
+		size_t m_capacity;
 	};
 
 }

@@ -41,20 +41,20 @@ namespace TrioEngine
 	const int GraphicsDeviceManager::DefaultBackBufferWidth = 800;
 
 	GraphicsDeviceManager::GraphicsDeviceManager(Game* game) :
-	m_pGame(game),
-		m_bInDeviceTransition(false),
-		m_pDevice(nullptr),
-		m_bIsFullScreen(false),
-		m_bUseResizedBackBuffer(false),
-		m_bSynchronizeWithVerticalRetrace(true),
-		m_bAllowMultiSampling(false),
-		m_bBeginDrawOk(false)
+	m_game(game),
+		m_inDeviceTransition(false),
+		m_device(nullptr),
+		m_isFullScreen(false),
+		m_useResizedBackBuffer(false),
+		m_synchronizeWithVerticalRetrace(true),
+		m_allowMultiSampling(false),
+		m_beginDrawOk(false)
 	{
-		m_iBackBufferWidth = DefaultBackBufferWidth;
-		m_iBackBufferHeight = DefaultBackBufferHeight;
+		m_backBufferWidth = DefaultBackBufferWidth;
+		m_backBufferHeight = DefaultBackBufferHeight;
 
-		m_iBackBufferFormat = SurfaceFormat::Color;
-		m_eDepthStencilFormat = DepthFormat::Depth24Stencil8;
+		m_backBufferFormat = SurfaceFormat::Color;
+		m_depthStencilFormat = DepthFormat::Depth24Stencil8;
 
 		if (game->GetServices().GetService(typeid(IGraphicsDeviceManager).name()) != nullptr)
 		{
@@ -72,23 +72,23 @@ namespace TrioEngine
 
 	GraphicsDeviceManager::~GraphicsDeviceManager()
 	{
-		if (m_pGame)
+		if (m_game)
 		{
-			if (dynamic_cast<IGraphicsDeviceService*>(m_pGame->GetServices().GetService(typeid(IGraphicsDeviceService).name())) == this)
+			if (dynamic_cast<IGraphicsDeviceService*>(m_game->GetServices().GetService(typeid(IGraphicsDeviceService).name())) == this)
 			{
-				m_pGame->GetServices().RemoveService(typeid(IGraphicsDeviceService).name());
+				m_game->GetServices().RemoveService(typeid(IGraphicsDeviceService).name());
 			}
 		}
-		if (m_pDevice)
+		if (m_device)
 		{
-			delete m_pDevice;
-			m_pDevice = nullptr;
+			delete m_device;
+			m_device = nullptr;
 		}
 	}
 
 	void GraphicsDeviceManager::AddDevices(bool anySuitableDevice, std::vector<GraphicsDeviceInformation>& foundDevices)
 	{
-		HWND handle = m_pGame->GetWindow()->GetHandle();
+		HWND handle = m_game->GetWindow()->GetHandle();
 		for (auto &adapter : GraphicsAdapter::GetAdapters())
 		{
 			//TO-DO: dar soporte a multiples ventanas (monitores).
@@ -97,12 +97,12 @@ namespace TrioEngine
 				GraphicsDeviceInformation gdi;
 
 				gdi.Adapter = adapter;
-				gdi.Parameters.SetIsFullScreen(m_bIsFullScreen);
+				gdi.Parameters.SetIsFullScreen(m_isFullScreen);
 				gdi.Parameters.SetHostHWND(handle);
-				gdi.Parameters.SetPresentInterval(m_bSynchronizeWithVerticalRetrace ? PresentInterval::One : PresentInterval::Immediate);
+				gdi.Parameters.SetPresentInterval(m_synchronizeWithVerticalRetrace ? PresentInterval::One : PresentInterval::Immediate);
 
 				AddDevices(gdi.Adapter, gdi.Adapter->GetCurrentDisplayMode(), gdi, foundDevices);
-				if (m_bIsFullScreen)
+				if (m_isFullScreen)
 				{
 					for (auto &mode : adapter->GetSupportedDisplayModes())
 					{
@@ -118,23 +118,23 @@ namespace TrioEngine
 
 	void GraphicsDeviceManager::AddDevices(GraphicsAdapter* adapter, const DisplayMode& mode, GraphicsDeviceInformation baseDeviceInfo, std::vector<GraphicsDeviceInformation>& foundDevices)
 	{
-		SurfaceFormat format = this->m_iBackBufferFormat;
-		DepthFormat depthFormat = this->m_eDepthStencilFormat;
+		SurfaceFormat format = this->m_backBufferFormat;
+		DepthFormat depthFormat = this->m_depthStencilFormat;
 
-		if (m_bIsFullScreen)
+		if (m_isFullScreen)
 		{
 			baseDeviceInfo.Parameters.setBackBufferHeight(mode.Height);
 			baseDeviceInfo.Parameters.setBackBufferWidth(mode.Width);
 		}
-		else if (m_bUseResizedBackBuffer)
+		else if (m_useResizedBackBuffer)
 		{
-			baseDeviceInfo.Parameters.setBackBufferHeight(m_iResizedBackBufferHeight);
-			baseDeviceInfo.Parameters.setBackBufferWidth(m_iResizedBackBufferWidth);
+			baseDeviceInfo.Parameters.setBackBufferHeight(m_resizedBackBufferHeight);
+			baseDeviceInfo.Parameters.setBackBufferWidth(m_resizedBackBufferWidth);
 		}
 		else
 		{
-			baseDeviceInfo.Parameters.setBackBufferHeight(m_iBackBufferHeight);
-			baseDeviceInfo.Parameters.setBackBufferWidth(m_iBackBufferWidth);
+			baseDeviceInfo.Parameters.setBackBufferHeight(m_backBufferHeight);
+			baseDeviceInfo.Parameters.setBackBufferWidth(m_backBufferWidth);
 		}
 
 		baseDeviceInfo.Parameters.setSurfaceFormat(format);
@@ -158,7 +158,7 @@ namespace TrioEngine
 
 	void GraphicsDeviceManager::ApplyChanges()
 	{
-		if (m_pDevice == nullptr || m_bIsDeviceDirty)
+		if (m_device == nullptr || m_isDeviceDirty)
 		{
 			ChangeDevice(false);
 		}
@@ -166,28 +166,28 @@ namespace TrioEngine
 
 	bool GraphicsDeviceManager::BeginDraw()
 	{
-		m_bBeginDrawOk = true;
+		m_beginDrawOk = true;
 		return true;
 	}
 
 	void GraphicsDeviceManager::ChangeDevice(bool forceCreate)
 	{
-		m_bInDeviceTransition = true;
+		m_inDeviceTransition = true;
 
-		const char* screenDeviceName = m_pGame->GetWindow()->GetScreenDeviceName();
-		int width = m_pGame->GetWindow()->GetClientBounds().width;
-		int height = m_pGame->GetWindow()->GetClientBounds().height;
+		const char* screenDeviceName = m_game->GetWindow()->GetScreenDeviceName();
+		int width = m_game->GetWindow()->GetClientBounds().width;
+		int height = m_game->GetWindow()->GetClientBounds().height;
 
 		GraphicsDeviceInformation graphicsDeviceInformation = FindBestDevice(forceCreate);
 
 		bool beginScreenDevice = false;
 		bool flagCreateDevice = true;
 
-		m_pGame->GetWindow()->BeginScreenDeviceChange(graphicsDeviceInformation.Parameters.GetIsFullScreen());
+		m_game->GetWindow()->BeginScreenDeviceChange(graphicsDeviceInformation.Parameters.GetIsFullScreen());
 		beginScreenDevice = true;
-		if (!forceCreate && (m_pDevice != nullptr))
+		if (!forceCreate && (m_device != nullptr))
 		{
-			m_pDevice->Reset(graphicsDeviceInformation.Parameters, graphicsDeviceInformation.Adapter);
+			m_device->Reset(graphicsDeviceInformation.Parameters, graphicsDeviceInformation.Adapter);
 			flagCreateDevice = false;
 		}
 
@@ -196,8 +196,8 @@ namespace TrioEngine
 			CreateDevice(graphicsDeviceInformation);
 		}
 
-		PresentationParameters& presentationParameters = m_pDevice->GetPresentationParameters();
-		screenDeviceName = m_pDevice->GetAdapter()->GetDeviceName();
+		PresentationParameters& presentationParameters = m_device->GetPresentationParameters();
+		screenDeviceName = m_device->GetAdapter()->GetDeviceName();
 
 		if (presentationParameters.GetBackBufferWidth() != 0)
 		{
@@ -210,11 +210,11 @@ namespace TrioEngine
 
 		if (beginScreenDevice)
 		{
-			m_pGame->GetWindow()->EndScreenDeviceChange(screenDeviceName, width, height);
+			m_game->GetWindow()->EndScreenDeviceChange(screenDeviceName, width, height);
 		}
 
-		m_bIsDeviceDirty = false;
-		m_bInDeviceTransition = false;
+		m_isDeviceDirty = false;
+		m_inDeviceTransition = false;
 	}
 
 	void GraphicsDeviceManager::CreateDevice()
@@ -224,14 +224,14 @@ namespace TrioEngine
 
 	void GraphicsDeviceManager::CreateDevice(GraphicsDeviceInformation newInfo)
 	{
-		if (m_pDevice != nullptr)
+		if (m_device != nullptr)
 		{
-			delete m_pDevice;
-			m_pDevice = nullptr;
+			delete m_device;
+			m_device = nullptr;
 		}
 
-		m_pDevice = new GraphicsDevice(newInfo.Adapter, newInfo.Parameters);
-		m_pDevice->DeviceLost += ([=]()
+		m_device = new GraphicsDevice(newInfo.Adapter, newInfo.Parameters);
+		m_device->DeviceLost += ([=]()
 		{
 
 		});
@@ -241,9 +241,9 @@ namespace TrioEngine
 
 	void GraphicsDeviceManager::EndDraw()
 	{
-		if (m_bBeginDrawOk && m_pDevice)
+		if (m_beginDrawOk && m_device)
 		{
-			m_pDevice->Present();
+			m_device->Present();
 		}
 	}
 
@@ -252,9 +252,9 @@ namespace TrioEngine
 		std::vector<GraphicsDeviceInformation> foundDevices;
 
 		AddDevices(anySuitableDevice, foundDevices);
-		if ((foundDevices.size() == 0) && m_bAllowMultiSampling)
+		if ((foundDevices.size() == 0) && m_allowMultiSampling)
 		{
-			m_bAllowMultiSampling = false;
+			m_allowMultiSampling = false;
 			AddDevices(anySuitableDevice, foundDevices);
 		}
 		if (foundDevices.size() == 0)
@@ -267,7 +267,7 @@ namespace TrioEngine
 
 	GraphicsDevice* GraphicsDeviceManager::GetGraphicsDevice()
 	{
-		return m_pDevice;
+		return m_device;
 	}
 
 	bool GraphicsDeviceManager::IsWindowOnAdapter(HWND windowHandle, GraphicsAdapter* adapter)
@@ -291,57 +291,57 @@ namespace TrioEngine
 
 	void GraphicsDeviceManager::SetAllowMultiSampling(bool valor)
 	{
-		m_bAllowMultiSampling = valor;
-		m_bIsDeviceDirty = true;
+		m_allowMultiSampling = valor;
+		m_isDeviceDirty = true;
 	}
 
 	void GraphicsDeviceManager::SetBackBufferFormat(SurfaceFormat format)
 	{
-		m_iBackBufferFormat = format;
-		m_bIsDeviceDirty = true;
+		m_backBufferFormat = format;
+		m_isDeviceDirty = true;
 	}
 
 	void GraphicsDeviceManager::SetPreferredBackBufferHeight(int height)
 	{
-		m_iBackBufferHeight = height;
-		m_bUseResizedBackBuffer = false;
+		m_backBufferHeight = height;
+		m_useResizedBackBuffer = false;
 
-		m_bIsDeviceDirty = true;
+		m_isDeviceDirty = true;
 	}
 
 	void GraphicsDeviceManager::SetPreferredBackBufferWidth(int width)
 	{
-		m_iBackBufferWidth = width;
-		m_bUseResizedBackBuffer = false;
+		m_backBufferWidth = width;
+		m_useResizedBackBuffer = false;
 
-		m_bIsDeviceDirty = true;
+		m_isDeviceDirty = true;
 	}
 
 	void GraphicsDeviceManager::SetDepthStencilFormat(DepthFormat format)
 	{
-		m_eDepthStencilFormat = format;
-		m_bIsDeviceDirty = true;
+		m_depthStencilFormat = format;
+		m_isDeviceDirty = true;
 	}
 
 	void GraphicsDeviceManager::SetIsFullScreen(bool fullscreen)
 	{
-		m_bIsFullScreen = fullscreen;
-		m_bIsDeviceDirty = true;
+		m_isFullScreen = fullscreen;
+		m_isDeviceDirty = true;
 	}
 
 	void GraphicsDeviceManager::SetSynchronizeWithVerticalRetrace(bool sync)
 	{
-		m_bSynchronizeWithVerticalRetrace = sync;
-		m_bIsDeviceDirty = true;
+		m_synchronizeWithVerticalRetrace = sync;
+		m_isDeviceDirty = true;
 	}
 
 	void GraphicsDeviceManager::WindowClientSizeChanged()
 	{
-		if (!m_bInDeviceTransition && (m_pGame->GetWindow()->GetClientBounds().height != 0) || (m_pGame->GetWindow()->GetClientBounds().height != 0))
+		if (!m_inDeviceTransition && (m_game->GetWindow()->GetClientBounds().height != 0) || (m_game->GetWindow()->GetClientBounds().height != 0))
 		{
-			m_iResizedBackBufferHeight = m_pGame->GetWindow()->GetClientBounds().height;
-			m_iResizedBackBufferWidth = m_pGame->GetWindow()->GetClientBounds().width;
-			m_bUseResizedBackBuffer = true;
+			m_resizedBackBufferHeight = m_game->GetWindow()->GetClientBounds().height;
+			m_resizedBackBufferWidth = m_game->GetWindow()->GetClientBounds().width;
+			m_useResizedBackBuffer = true;
 			ChangeDevice(false);
 		}
 	}

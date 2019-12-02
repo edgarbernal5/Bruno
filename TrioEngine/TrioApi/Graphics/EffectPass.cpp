@@ -11,7 +11,7 @@
 namespace TrioEngine
 {
 	EffectPass::EffectPass(TrioFX::HLSLPass11* pass11, TrioFX::HLSLTree& tree, std::vector<TrioFX::HLSLBuffer*> &buffers, std::vector<TrioFX::HLSLDeclaration*> &samplers, GraphicsDevice* device, Effect* effect) :
-		m_pVertexShader(nullptr), m_pPixelShader(nullptr), m_pEffect(effect), m_pDevice(device)
+		m_vertexShader(nullptr), m_pixelShader(nullptr), m_effect(effect), m_device(device)
 	{
 		TrioFX::HLSLPassShader* passShader = pass11->shader;
 
@@ -34,8 +34,8 @@ namespace TrioEngine
 				std::vector<std::pair<size_t, size_t>> buffersUsedIndexes;
 				std::vector<std::pair<size_t, size_t>> samplersUsedIndexes;
 
-				auto itm = m_pEffect->m_mShadersByName.find(passShader->options->functionCallName);
-				if (itm == m_pEffect->m_mShadersByName.end())
+				auto itm = m_effect->m_shadersByName.find(passShader->options->functionCallName);
+				if (itm == m_effect->m_shadersByName.end())
 				{
 					TrioFX::HLSLFunctionVisitor visitor;
 					TrioFX::HLSLFunction* functionDef = tree.FindFunction(passShader->options->functionCallName);
@@ -136,9 +136,9 @@ namespace TrioEngine
 					vector<uint8_t> pData(intermediario.begin(), intermediario.end());
 
 #endif
-					shader = new Shader(m_pDevice, stage, pData);
-					shader->m_vBufferIndexes = buffersUsedIndexes;
-					shader->m_vSamplerIndexes = samplersUsedIndexes;
+					shader = new Shader(m_device, stage, pData);
+					shader->m_bufferIndexes = buffersUsedIndexes;
+					shader->m_samplerIndexes = samplersUsedIndexes;
 
 #if TRIO_OPENGL
 					if (stage == ShaderStage::Vertex)
@@ -174,7 +174,7 @@ namespace TrioEngine
 					}
 #endif
 
-					m_pEffect->m_mShadersByName[passShader->options->functionCallName] = shader;
+					m_effect->m_shadersByName[passShader->options->functionCallName] = shader;
 				}
 				else
 				{
@@ -199,12 +199,12 @@ namespace TrioEngine
 			}
 		}
 
-		m_pVertexShader = vertexShader;
-		m_pPixelShader = pixelShader;
+		m_vertexShader = vertexShader;
+		m_pixelShader = pixelShader;
 	}
 
 	EffectPass::EffectPass(const char* name, Shader* vertexShader, Shader* pixelShader, GraphicsDevice* device, Effect* effect) :
-		m_pVertexShader(vertexShader), m_pPixelShader(pixelShader), m_pEffect(effect), m_pDevice(device), m_csName(name)
+		m_vertexShader(vertexShader), m_pixelShader(pixelShader), m_effect(effect), m_device(device), m_name(name)
 	{
 
 	}
@@ -212,25 +212,25 @@ namespace TrioEngine
 	void EffectPass::Apply()
 	{
 #if defined(TRIO_OPENGL) || defined(TRIO_DIRECTX)
-		if (m_pVertexShader)
+		if (m_vertexShader)
 		{
-			m_pDevice->SetVertexShader(m_pVertexShader);
-			for (size_t i = 0; i < m_pVertexShader->m_vBufferIndexes.size(); i++)
+			m_device->SetVertexShader(m_vertexShader);
+			for (size_t i = 0; i < m_vertexShader->m_bufferIndexes.size(); i++)
 			{
-				auto pair = m_pVertexShader->m_vBufferIndexes[i];
-				ConstantBuffer* constBuffer = m_pEffect->m_ConstantBuffers[pair.first];
-				m_pDevice->SetConstantBuffer(ShaderStage::Vertex, i, constBuffer);
+				auto pair = m_vertexShader->m_bufferIndexes[i];
+				ConstantBuffer* constBuffer = m_effect->m_constantBuffers[pair.first];
+				m_device->SetConstantBuffer(ShaderStage::Vertex, i, constBuffer);
 			}
 		}
 
-		if (m_pPixelShader)
+		if (m_pixelShader)
 		{
-			m_pDevice->SetPixelShader(m_pPixelShader);
-			for (size_t i = 0; i < m_pPixelShader->m_vBufferIndexes.size(); i++)
+			m_device->SetPixelShader(m_pixelShader);
+			for (size_t i = 0; i < m_pixelShader->m_bufferIndexes.size(); i++)
 			{
-				auto pair = m_pPixelShader->m_vBufferIndexes[i];
-				ConstantBuffer* constBuffer = m_pEffect->m_ConstantBuffers[pair.first];
-				m_pDevice->SetConstantBuffer(ShaderStage::Pixel, i, constBuffer);
+				auto pair = m_pixelShader->m_bufferIndexes[i];
+				ConstantBuffer* constBuffer = m_effect->m_constantBuffers[pair.first];
+				m_device->SetConstantBuffer(ShaderStage::Pixel, i, constBuffer);
 			}
 		}
 #endif

@@ -18,29 +18,29 @@ namespace TrioEngine
 		~GraphicsAdapter();
 
 #ifdef TRIO_DIRECTX
-		IDXGIAdapter1* GetD3DAdapter() { return m_pAdapter; }
+		IDXGIAdapter1* GetD3DAdapter() { return m_adapter; }
 #endif
-		inline const char* GetDeviceName() { return m_csDeviceName.c_str(); }
+		inline const char* GetDeviceName() { return m_deviceName.c_str(); }
 		DisplayMode GetCurrentDisplayMode();
 
 		const std::vector<DisplayMode>& GetSupportedDisplayModes() { return m_modes; }
 
-		inline bool GetIsDefaultAdapter() { return m_bIsDefaultAdapter; }
+		inline bool GetIsDefaultAdapter() { return m_isDefaultAdapter; }
 		static GraphicsAdapter* GetDefaultAdapter();
 		static std::vector<GraphicsAdapter*>& GetAdapters();
 
 	private:
-		std::string			m_csDeviceName;
-		bool				m_bIsDefaultAdapter;
+		std::string			m_deviceName;
+		bool				m_isDefaultAdapter;
 #ifdef TRIO_DIRECTX
-		IDXGIAdapter1*		m_pAdapter;
+		IDXGIAdapter1*		m_adapter;
 
-		DXGI_ADAPTER_DESC1	m_stAdapter_desc;
+		DXGI_ADAPTER_DESC1	m_adapter_desc;
 #endif
 		std::vector<DisplayMode> m_modes;
 		DisplayMode			m_currentDisplayMode;
 
-		static std::vector<GraphicsAdapter*> m_vAdapters;
+		static std::vector<GraphicsAdapter*> g_Adapters;
 		static void PopulateAdapters();
 	};
 

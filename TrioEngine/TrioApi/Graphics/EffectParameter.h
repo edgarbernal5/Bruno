@@ -20,19 +20,19 @@ namespace TrioEngine
 	{
 	private:
 		struct STexture {
-			Texture* m_pTexture;
+			Texture* m_texture;
 			int textureSlot;
 		};
 		struct SSamplerState {
-			SamplerState* m_pSamplerState;
+			SamplerState* m_samplerState;
 			int samplerSlot;
 
 		};
 		struct SConstantBuffer {
-			ConstantBuffer* m_pConstantBuffer;
-			uint32_t m_uiOffset;
+			ConstantBuffer* m_constantBuffer;
+			uint32_t m_offset;
 			// Tamaño en bytes;
-			uint32_t m_uiSize;
+			uint32_t m_size;
 		};
 
 	public:
@@ -48,7 +48,7 @@ namespace TrioEngine
 		void SetValue(Vector3 value);
 		void SetValue(Vector4 value);
 
-		inline const char* GetName() { return m_csName.c_str(); }
+		inline const char* GetName() { return m_name.c_str(); }
 
 		friend class Effect;
 		friend class EffectLoader;
@@ -57,12 +57,12 @@ namespace TrioEngine
 
 		union InternalDataPointer
 		{
-			STexture m_Texture;
-			SConstantBuffer m_ConstantBuffer;
-			SSamplerState m_SamplerState;
+			STexture m_texture;
+			SConstantBuffer m_constantBuffer;
+			SSamplerState m_samplerState;
 		};
 
-		void* m_pData;
+		void* m_data;
 
 #ifdef TRIO_DIRECTX
 		//ID3DX11EffectVariable* m_Variable;
@@ -71,11 +71,11 @@ namespace TrioEngine
 		//InternalParameter m_internalParameter;
 
 #endif
-		InternalDataPointer m_uInternalParameter;
+		InternalDataPointer m_internalParameter;
 		
-		std::string m_csName;
-		std::string m_csSemantic;
+		std::string m_name;
+		std::string m_semantic;
 
-		Effect *m_pEffect;
+		Effect *m_effect;
 	};
 }

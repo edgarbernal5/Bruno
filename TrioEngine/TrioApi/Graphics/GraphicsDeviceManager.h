@@ -49,22 +49,22 @@ namespace TrioEngine
 		void SetPreferredBackBufferHeight(int height);
 		void SetSynchronizeWithVerticalRetrace(bool sync);
 
-		inline bool GetIsFullScreen() { return m_bIsFullScreen; }
+		inline bool GetIsFullScreen() { return m_isFullScreen; }
 
-		inline SurfaceFormat GetPreferredBackBufferFormat() { return m_iBackBufferFormat; }
-		inline int GetPreferredBackBufferWidth() { return m_iBackBufferWidth; }
+		inline SurfaceFormat GetPreferredBackBufferFormat() { return m_backBufferFormat; }
+		inline int GetPreferredBackBufferWidth() { return m_backBufferWidth; }
 
-		inline int GetPreferredBackBufferHeight() { return m_iBackBufferHeight; }
+		inline int GetPreferredBackBufferHeight() { return m_backBufferHeight; }
 
 		static const int DefaultBackBufferHeight;
 		static const int DefaultBackBufferWidth;
 	private:
-		Game* m_pGame;
-		GraphicsDevice* m_pDevice;
+		Game* m_game;
+		GraphicsDevice* m_device;
 
-		SurfaceFormat m_iBackBufferFormat;
-		DepthFormat m_eDepthStencilFormat;
-		bool m_bInDeviceTransition;
+		SurfaceFormat m_backBufferFormat;
+		DepthFormat m_depthStencilFormat;
+		bool m_inDeviceTransition;
 
 		void AddDevices(bool anySuitableDevice, std::vector<GraphicsDeviceInformation>& foundDevices);
 		void AddDevices(GraphicsAdapter* adapter, const DisplayMode& mode, GraphicsDeviceInformation baseDeviceInfo, std::vector<GraphicsDeviceInformation>& foundDevices);
@@ -75,19 +75,19 @@ namespace TrioEngine
 		bool IsWindowOnAdapter(HWND windowHandle, GraphicsAdapter* adapter);
 		void WindowClientSizeChanged();
 
-		int m_iResizedBackBufferWidth;
-		int m_iResizedBackBufferHeight;
-		int m_iBackBufferWidth;
-		int m_iBackBufferHeight;
+		int m_resizedBackBufferWidth;
+		int m_resizedBackBufferHeight;
+		int m_backBufferWidth;
+		int m_backBufferHeight;
 
-		bool m_bBeginDrawOk;
+		bool m_beginDrawOk;
 
-		bool m_bIsFullScreen;
-		bool m_bUseResizedBackBuffer;
-		bool m_bIsDeviceDirty;
+		bool m_isFullScreen;
+		bool m_useResizedBackBuffer;
+		bool m_isDeviceDirty;
 
-		bool m_bAllowMultiSampling;
-		bool m_bSynchronizeWithVerticalRetrace;
+		bool m_allowMultiSampling;
+		bool m_synchronizeWithVerticalRetrace;
 
 	protected:
 		virtual void RankDevices(std::vector<GraphicsDeviceInformation>& foundDevices);

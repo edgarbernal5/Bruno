@@ -28,14 +28,17 @@ namespace TrioEngine
 			TextureTypeEnd
 		};
 
+		inline const char* GetName() { return m_name.c_str(); }
+		const std::map<TextureType, std::vector<std::wstring>*>& GetTextures() const;
+
 		friend class Model;
 	private:
 		ModelMaterial(aiMaterial* material);
 
-		static std::map<ModelMaterial::TextureType, uint32_t> g_mTextureTypeMappings;
+		static std::map<ModelMaterial::TextureType, uint32_t> g_textureTypeMappings;
 		static void InitializeTextureTypeMappings();
 
-		std::string m_csName;
-		std::map<TextureType, std::vector<std::wstring>*> m_mTextures;
+		std::string m_name;
+		std::map<TextureType, std::vector<std::wstring>*> m_textures;
 	};
 }

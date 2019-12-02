@@ -25,7 +25,7 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 		ID3D11DepthStencilView* GetDepthStencilView() { return m_depthStencilView.Get(); }
 #endif
-		inline DepthFormat GetDepthFormat() { return m_eDepthFormat; }
+		inline DepthFormat GetDepthFormat() { return m_depthFormat; }
 
 		friend class GraphicsDevice;
 	protected:
@@ -38,7 +38,7 @@ namespace TrioEngine
 		GLuint								m_glStencilBuffer;
 #endif
 
-		DepthFormat							m_eDepthFormat;
-		GraphicsDevice*						m_pDevice;
+		DepthFormat							m_depthFormat;
+		GraphicsDevice*						m_device;
 	};
 }

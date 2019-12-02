@@ -26,6 +26,6 @@ namespace TrioEngine
 		bool LoadEffect(std::string filename);
 
 	private:
-		Effect& m_Effect;
+		Effect& m_effect;
 	};
 }

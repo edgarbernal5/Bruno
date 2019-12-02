@@ -61,7 +61,7 @@ namespace TrioEngine
 
 		void CalculateHashKey();
 
-		inline int GetVertexStride()	{ return m_iVertexStride; }
+		inline int GetVertexStride()	{ return m_vertexStride; }
 		inline int GetHashKey()			{ return m_iHashKey; }
 
 		friend class GraphicsDevice;
@@ -73,9 +73,9 @@ namespace TrioEngine
 #endif
 		VertexDeclaration(VertexElement const* pElements, int size);
 
-		int m_iVertexStride;
-		std::vector<D3D11_INPUT_ELEMENT_DESC> m_vD3D11Elements;
-		std::vector<VertexElement> m_vElements;
+		int m_vertexStride;
+		std::vector<D3D11_INPUT_ELEMENT_DESC> m_d3d11Elements;
+		std::vector<VertexElement> m_elements;
 		int m_iHashKey;
 
 #ifdef TRIO_DIRECTX

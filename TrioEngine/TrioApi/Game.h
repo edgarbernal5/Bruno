@@ -18,9 +18,9 @@ namespace TrioEngine
 		Game();
 		virtual ~Game();
 
-		inline GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice; }
+		inline GraphicsDevice* GetGraphicsDevice() { return m_graphicsDevice; }
 		inline GameServiceContainer& GetServices() { return m_services; }
-		inline GameWindow* GetWindow() { return m_pHost->GetWindow(); }
+		inline GameWindow* GetWindow() { return m_host->GetWindow(); }
 
 		void Run();
 		void RunGame(bool useBlockingRun);
@@ -28,14 +28,14 @@ namespace TrioEngine
 		virtual void Update(StepTimer const& timer);
 
 	private:
-		GameHost*				m_pHost;
-		GraphicsDevice*			m_pGraphicsDevice;
-		IGraphicsDeviceManager* m_pGraphicsDeviceManager;
+		GameHost*				m_host;
+		GraphicsDevice*			m_graphicsDevice;
+		IGraphicsDeviceManager* m_graphicsDeviceManager;
 		GameServiceContainer	m_services;
 
-		bool m_bDoneFirstUpdate;
-		bool m_bDoneFirstDraw;
-		bool m_bInRun;
+		bool m_doneFirstUpdate;
+		bool m_doneFirstDraw;
+		bool m_inRun;
 
 		StepTimer m_timer;
 

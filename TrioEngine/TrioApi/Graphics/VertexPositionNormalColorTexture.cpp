@@ -5,7 +5,7 @@
 
 namespace TrioEngine
 {
-	VertexDeclaration* VertexPositionNormalColorTexture::g_pVertexDeclaration = nullptr;
+	VertexDeclaration* VertexPositionNormalColorTexture::g_vertexDeclaration = nullptr;
 
 	//--------------------------------------------------------------------------------------
 	// Vertex struct holding position, normal vector, color, and texture mapping information.
@@ -28,16 +28,16 @@ namespace TrioEngine
 
 	VertexDeclaration* VertexPositionNormalColorTexture::GetVertexDeclaration()
 	{
-		if (g_pVertexDeclaration == nullptr)
+		if (g_vertexDeclaration == nullptr)
 		{
 #ifdef TRIO_DIRECTX
-			g_pVertexDeclaration = VertexDeclarationHelper::GetVertexDeclaration(InputElementCount, InputElementsD3D11, InputElements);
+			g_vertexDeclaration = VertexDeclarationHelper::GetVertexDeclaration(InputElementCount, InputElementsD3D11, InputElements);
 #else
 			g_pVertexDeclaration = VertexDeclarationHelper::GetVertexDeclaration(InputElementCount, InputElements);
 #endif
-			VertexDeclarationHelper::AddVertexDeclaration(typeid(VertexPositionNormalColorTexture).name(), g_pVertexDeclaration);
+			VertexDeclarationHelper::AddVertexDeclaration(typeid(VertexPositionNormalColorTexture).name(), g_vertexDeclaration);
 		}
 
-		return g_pVertexDeclaration;
+		return g_vertexDeclaration;
 	}
 }

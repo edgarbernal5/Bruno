@@ -6,11 +6,11 @@
 namespace TrioEngine
 {
 	EffectTechniqueCollection::EffectTechniqueCollection(std::vector<EffectTechnique*> parameters) :
-		m_vArray(parameters)
+		m_array(parameters)
 	{
-		for (size_t i = 0; i < m_vArray.size(); i++)
+		for (size_t i = 0; i < m_array.size(); i++)
 		{
-			m_mData[m_vArray[i]->GetName()] = m_vArray[i];
+			m_data[m_array[i]->GetName()] = m_array[i];
 		}
 	}
 
@@ -24,8 +24,8 @@ namespace TrioEngine
 
 	void EffectTechniqueCollection::clear()
 	{
-		m_mData.clear();
-		m_vArray.clear();
+		m_data.clear();
+		m_array.clear();
 	}
 
 	void EffectTechniqueCollection::push_back(EffectTechnique* technique)
@@ -33,37 +33,37 @@ namespace TrioEngine
 		if (technique == nullptr)
 			return;
 
-		m_vArray.push_back(technique);
-		m_mData[technique->GetName()] = technique;
+		m_array.push_back(technique);
+		m_data[technique->GetName()] = technique;
 	}
 
 	EffectTechniqueCollection::BaseType & EffectTechniqueCollection::operator[](std::string nName)
 	{
-		auto it = m_mData.find(nName);
-		if (it == m_mData.end()) {
-			m_mData[nName] = nullptr;
+		auto it = m_data.find(nName);
+		if (it == m_data.end()) {
+			m_data[nName] = nullptr;
 		}
 
-		return m_mData[nName];
+		return m_data[nName];
 	}
 
 	const EffectTechniqueCollection::BaseType & EffectTechniqueCollection::operator[](std::string nName) const
 	{
-		return m_mData.at(nName);
+		return m_data.at(nName);
 	}
 
 	EffectTechniqueCollection::BaseType & EffectTechniqueCollection::operator[](int nIndex)
 	{
-		return m_vArray[nIndex];
+		return m_array[nIndex];
 	}
 
 	const EffectTechniqueCollection::BaseType & EffectTechniqueCollection::operator[](int nIndex) const
 	{
-		return m_vArray[nIndex];
+		return m_array[nIndex];
 	}
 
 	size_t EffectTechniqueCollection::size()
 	{
-		return m_vArray.size();
+		return m_array.size();
 	}
 }

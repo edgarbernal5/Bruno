@@ -8,9 +8,9 @@ namespace TrioEngine
 	}
 
 	VertexElement::VertexElement(int offset, VertexElementFormat elementFormat, VertexElementUsage elementUsage, int usageIndex) :
-		m_iOffset(offset),
-		m_eFormat(elementFormat),
-		m_eUsage(elementUsage),
+		m_offset(offset),
+		m_format(elementFormat),
+		m_usage(elementUsage),
 		m_iUsageIndex(usageIndex)
 	{
 	}
@@ -22,81 +22,81 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 	void VertexElement::GetVertexElementFromD3D11(D3D11_INPUT_ELEMENT_DESC desc)
 	{
-		m_eUsage = VertexElementUsage::Position;
+		m_usage = VertexElementUsage::Position;
 
 		if (strcmp("SV_Position", desc.SemanticName) == 0 || strcmp("POSITION", desc.SemanticName) == 0)
-			m_eUsage = VertexElementUsage::Position;
+			m_usage = VertexElementUsage::Position;
 		else if (strcmp("COLOR", desc.SemanticName) == 0)
-			m_eUsage = VertexElementUsage::Color;
+			m_usage = VertexElementUsage::Color;
 		else if (strcmp("TEXCOORD", desc.SemanticName) == 0)
-			m_eUsage = VertexElementUsage::TextureCoordinate;
+			m_usage = VertexElementUsage::TextureCoordinate;
 		else if (strcmp("NORMAL", desc.SemanticName) == 0)
-			m_eUsage = VertexElementUsage::Normal;
+			m_usage = VertexElementUsage::Normal;
 		else if (strcmp("BINORMAL", desc.SemanticName) == 0)
-			m_eUsage = VertexElementUsage::Binormal;
+			m_usage = VertexElementUsage::Binormal;
 		else if (strcmp("TANGENT", desc.SemanticName) == 0)
-			m_eUsage = VertexElementUsage::Tangent;
+			m_usage = VertexElementUsage::Tangent;
 		else if (strcmp("BLENDINDICES", desc.SemanticName) == 0)
-			m_eUsage = VertexElementUsage::BlendIndices;
+			m_usage = VertexElementUsage::BlendIndices;
 		else if (strcmp("BLENDWEIGHT", desc.SemanticName) == 0)
-			m_eUsage = VertexElementUsage::BlendWeight;
+			m_usage = VertexElementUsage::BlendWeight;
 		else if (strcmp("DEPTH", desc.SemanticName) == 0)
-			m_eUsage = VertexElementUsage::Depth;
+			m_usage = VertexElementUsage::Depth;
 		else if (strcmp("PSIZE", desc.SemanticName) == 0)
-			m_eUsage = VertexElementUsage::PointSize;
+			m_usage = VertexElementUsage::PointSize;
 
 		m_iUsageIndex = desc.SemanticIndex;
 
 		switch (desc.Format)
 		{
 		case DXGI_FORMAT_R32_FLOAT:
-			m_eFormat = VertexElementFormat::Single;
+			m_format = VertexElementFormat::Single;
 			break;
 		case DXGI_FORMAT_R32G32_FLOAT:
-			m_eFormat = VertexElementFormat::Vector2;
+			m_format = VertexElementFormat::Vector2;
 			break;
 		case DXGI_FORMAT_R32G32B32_FLOAT:
-			m_eFormat = VertexElementFormat::Vector3;
+			m_format = VertexElementFormat::Vector3;
 			break;
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
-			m_eFormat = VertexElementFormat::Vector4;
+			m_format = VertexElementFormat::Vector4;
 			break;
 		case DXGI_FORMAT_R8G8B8A8_UNORM:
-			m_eFormat = VertexElementFormat::Color;
+			m_format = VertexElementFormat::Color;
 			break;
 		case DXGI_FORMAT_R8G8B8A8_UINT:
-			m_eFormat = VertexElementFormat::Byte4;
+			m_format = VertexElementFormat::Byte4;
 			break;
 		case DXGI_FORMAT_R16G16_SINT:
-			m_eFormat = VertexElementFormat::Short2;
+			m_format = VertexElementFormat::Short2;
 			break;
 		case DXGI_FORMAT_R16G16B16A16_SINT:
-			m_eFormat = VertexElementFormat::Short4;
+			m_format = VertexElementFormat::Short4;
 			break;
 		case DXGI_FORMAT_R16G16_SNORM:
-			m_eFormat = VertexElementFormat::NormalizedShort2;
+			m_format = VertexElementFormat::NormalizedShort2;
 			break;
 		case DXGI_FORMAT_R16G16B16A16_SNORM:
-			m_eFormat = VertexElementFormat::NormalizedShort4;
+			m_format = VertexElementFormat::NormalizedShort4;
 			break;
 		case DXGI_FORMAT_R16G16_FLOAT:
-			m_eFormat = VertexElementFormat::HalfVector2;
+			m_format = VertexElementFormat::HalfVector2;
 			break;
 		case DXGI_FORMAT_R16G16B16A16_FLOAT:
-			m_eFormat = VertexElementFormat::HalfVector4;
+			m_format = VertexElementFormat::HalfVector4;
 			break;
 		default:
-			m_eFormat = VertexElementFormat::Color;
+			m_format = VertexElementFormat::Color;
 			break;
 		}
-		m_iOffset = desc.AlignedByteOffset;
+		m_offset = desc.AlignedByteOffset;
 	}
 
 	D3D11_INPUT_ELEMENT_DESC VertexElement::GetD3D11InputElement()
 	{
 		D3D11_INPUT_ELEMENT_DESC element;
 
-		switch (m_eUsage)
+		switch (m_usage)
 		{
 		case VertexElementUsage::Position:
 			element.SemanticName = "POSITION";
@@ -134,7 +134,7 @@ namespace TrioEngine
 
 		element.SemanticIndex = m_iUsageIndex;
 
-		switch (m_eFormat)
+		switch (m_format)
 		{
 		case VertexElementFormat::Single:
 			element.Format = DXGI_FORMAT_R32_FLOAT;
@@ -177,7 +177,7 @@ namespace TrioEngine
 		}
 
 		element.InputSlot = 0;
-		element.AlignedByteOffset = m_iOffset;
+		element.AlignedByteOffset = m_offset;
 
 		// Note that instancing is only supported in 
 		// feature level 9.3 and above.

@@ -504,6 +504,7 @@ namespace TrioEngine
 
 		static Matrix CreateLookAt(const Vector3& position, const Vector3& target, const Vector3& up);
 		static Matrix CreateWorld(const Vector3& position, const Vector3& forward, const Vector3& up);
+		static Matrix CreateTRS(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
 
 		static Matrix CreateFromQuaternion(const Quaternion& quat);
 
@@ -3317,6 +3318,21 @@ namespace TrioEngine
 		R._41 = position.x; R._42 = position.y; R._43 = position.z;
 		R._44 = 1.f;
 		return R;
+	}
+
+	inline Matrix Matrix::CreateTRS(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
+	{
+		using namespace DirectX;
+		DirectX::XMVECTOR quatv = XMLoadFloat4(&rotation);
+
+		DirectX::XMMATRIX MT = XMMatrixTranslation(position.x, position.y, position.z);
+		DirectX::XMMATRIX MR = XMMatrixRotationQuaternion(quatv);
+
+		DirectX::XMMATRIX MS = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+
+		Matrix result;
+		XMStoreFloat4x4(&result, XMMatrixMultiply(MT, XMMatrixMultiply(MT, MS)));
+		return result;
 	}
 
 	inline Matrix Matrix::CreateFromQuaternion(const Quaternion& rotation)

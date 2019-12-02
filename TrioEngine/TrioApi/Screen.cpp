@@ -3,22 +3,22 @@
 
 namespace TrioEngine
 {
-	std::vector<Screen> Screen::g_vScreens;
-	bool Screen::g_bMultiMonitorSupport;
+	std::vector<Screen> Screen::g_screens;
+	bool Screen::g_multiMonitorSupport;
 
 	Screen::Screen() : 
-		m_pMonitor(nullptr), m_bPrimary(false)
+		Monitor(nullptr), m_primary(false)
 	{
 
 	}
 
 	Screen::Screen(HMONITOR pMonitor, HDC pHdc) :
-		m_pMonitor(pMonitor), m_bPrimary(false)
+		Monitor(pMonitor), m_primary(false)
 	{
-		if (!g_bMultiMonitorSupport || pMonitor == (HMONITOR)(-1163005939))
+		if (!g_multiMonitorSupport || pMonitor == (HMONITOR)(-1163005939))
 		{
-			m_bPrimary = true;
-			m_csDeviceName = "DISPLAY";
+			m_primary = true;
+			m_deviceName = "DISPLAY";
 		}
 		else
 		{
@@ -26,38 +26,38 @@ namespace TrioEngine
 			target.cbSize = sizeof(MONITORINFOEXW);
 
 			GetMonitorInfoW(pMonitor, &target);
-			WideCharToMultiByte(CP_ACP, 0, target.szDevice, -1, &m_csDeviceName[0], _countof(target.szDevice), NULL, FALSE);
+			WideCharToMultiByte(CP_ACP, 0, target.szDevice, -1, &m_deviceName[0], _countof(target.szDevice), NULL, FALSE);
 
-			m_bPrimary = ((target.dwFlags & MONITORINFOF_PRIMARY) != 0);
+			m_primary = ((target.dwFlags & MONITORINFOF_PRIMARY) != 0);
 		}
 	}
 
 	std::vector<Screen>& Screen::GetScreens()
 	{
-		if (g_vScreens.size() == 0)
+		if (g_screens.size() == 0)
 		{
-			g_bMultiMonitorSupport = GetSystemMetrics(SM_CMONITORS) != 0;
+			g_multiMonitorSupport = GetSystemMetrics(SM_CMONITORS) != 0;
 
-			if (g_bMultiMonitorSupport)
+			if (g_multiMonitorSupport)
 			{
 				MonitorEnumCallback monitorCallback;
 				EnumDisplayMonitors(NULL, NULL, MonitorEnumCallback::MonitorEnumProc, reinterpret_cast<LPARAM>(&monitorCallback));
 
-				if (monitorCallback.m_vScreens.size() > 0)
+				if (monitorCallback.m_screens.size() > 0)
 				{
-					g_vScreens = monitorCallback.m_vScreens;
+					g_screens = monitorCallback.m_screens;
 				}
 				else
 				{
-					g_vScreens.push_back(Screen((HMONITOR)(-1163005939), 0));
+					g_screens.push_back(Screen((HMONITOR)(-1163005939), 0));
 				}
 			}
 			else
 			{
-				g_vScreens.push_back(Screen((HMONITOR)(-1163005939), 0));
+				g_screens.push_back(Screen((HMONITOR)(-1163005939), 0));
 			}
 		}
-		return g_vScreens;
+		return g_screens;
 	}
 
 	BOOL CALLBACK Screen::MonitorEnumCallback::MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
@@ -68,7 +68,7 @@ namespace TrioEngine
 
 	bool Screen::MonitorEnumCallback::callback(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor)
 	{
-		m_vScreens.push_back(Screen(hMonitor, hdcMonitor));
+		m_screens.push_back(Screen(hMonitor, hdcMonitor));
 		return true;
 	}
 }

@@ -24,13 +24,13 @@ namespace TrioEngine
 
 		const BaseType & operator[](int nIndex) const
 		{
-			return m_pArrayBuffers[nIndex];
+			return m_arrayBuffers[nIndex];
 		}
 
 		BaseType & operator[](int nIndex)
 		{
-			m_iValid |= 1 << nIndex;
-			return m_pArrayBuffers[nIndex];
+			m_valid |= 1 << nIndex;
+			return m_arrayBuffers[nIndex];
 		}
 
 		void clear();
@@ -39,11 +39,11 @@ namespace TrioEngine
 
 		friend class GraphicsDevice;
 	private:
-		ConstantBuffer* m_pArrayBuffers[16];
-		ShaderStage m_eStage;
+		ConstantBuffer* m_arrayBuffers[16];
+		ShaderStage m_stage;
 
-		int m_iValid;
-		int m_iCount;
+		int m_valid;
+		int m_count;
 
 #ifdef TRIO_DIRECTX
 		void SetConstantBuffers(GraphicsDevice* device);

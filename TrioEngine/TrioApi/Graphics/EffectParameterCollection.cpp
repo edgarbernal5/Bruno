@@ -6,11 +6,11 @@
 namespace TrioEngine
 {
 	EffectParameterCollection::EffectParameterCollection(std::vector<EffectParameter*> parameters) :
-		m_vArray(parameters)
+		m_array(parameters)
 	{
-		for (size_t i = 0; i < m_vArray.size(); i++)
+		for (size_t i = 0; i < m_array.size(); i++)
 		{
-			m_mData[m_vArray[i]->GetName()] = m_vArray[i];
+			m_data[m_array[i]->GetName()] = m_array[i];
 		}
 	}
 
@@ -24,38 +24,38 @@ namespace TrioEngine
 
 	void EffectParameterCollection::clear()
 	{
-		m_mData.clear();
-		m_vArray.clear();
+		m_data.clear();
+		m_array.clear();
 	}
 
 	EffectParameterCollection::BaseType & EffectParameterCollection::operator[](std::string nName)
 	{
-		auto it = m_mData.find(nName);
-		if (it == m_mData.end()) {
-			m_mData[nName] = nullptr;
+		auto it = m_data.find(nName);
+		if (it == m_data.end()) {
+			m_data[nName] = nullptr;
 		}
 
-		return m_mData[nName];
+		return m_data[nName];
 	}
 
 	const EffectParameterCollection::BaseType & EffectParameterCollection::operator[](std::string nName) const
 	{
-		return m_mData.at(nName);
+		return m_data.at(nName);
 	}
 
 	EffectParameterCollection::BaseType & EffectParameterCollection::operator[](int nIndex)
 	{
-		return m_vArray[nIndex];
+		return m_array[nIndex];
 	}
 
 	const EffectParameterCollection::BaseType & EffectParameterCollection::operator[](int nIndex) const
 	{
-		return m_vArray[nIndex];
+		return m_array[nIndex];
 	}
 
 	size_t EffectParameterCollection::size()
 	{
-		return m_vArray.size();
+		return m_array.size();
 	}
 
 	void EffectParameterCollection::push_back(EffectParameter* parameter)
@@ -63,7 +63,7 @@ namespace TrioEngine
 		if (parameter == nullptr)
 			return;
 
-		m_vArray.push_back(parameter);
-		m_mData[parameter->GetName()] = parameter;
+		m_array.push_back(parameter);
+		m_data[parameter->GetName()] = parameter;
 	}
 }

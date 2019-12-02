@@ -18,7 +18,7 @@ namespace TrioEngine
 
 #ifdef TRIO_DIRECTX
 		:
-	m_pState(nullptr)
+	m_state(nullptr)
 #endif
 	{
 		Filter = TextureFilter::Linear;
@@ -41,7 +41,7 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 	ID3D11SamplerState* SamplerState::GetState(GraphicsDevice* device)
 	{
-		if (m_pState == nullptr)
+		if (m_state == nullptr)
 		{
 			D3D11_SAMPLER_DESC desc;
 
@@ -59,10 +59,10 @@ namespace TrioEngine
 			desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 			memcpy(desc.BorderColor, &BorderColor.x, 4 * sizeof(float));
 
-			DX::ThrowIfFailed(device->GetD3DDevice()->CreateSamplerState(&desc, &m_pState));
+			DX::ThrowIfFailed(device->GetD3DDevice()->CreateSamplerState(&desc, &m_state));
 		}
 
-		return m_pState;
+		return m_state;
 	}
 
 	D3D11_TEXTURE_ADDRESS_MODE SamplerState::GetAddressMode(TextureAddressMode mode)

@@ -33,7 +33,7 @@ namespace TrioEngine
 		friend class GraphicsDevice;
 	private:
 #ifdef TRIO_DIRECTX
-		ID3D11RasterizerState * m_pState;
+		ID3D11RasterizerState * m_state;
 #endif
 
 		void ApplyState(GraphicsDevice * device);

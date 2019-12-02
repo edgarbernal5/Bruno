@@ -8,37 +8,37 @@ namespace TrioEngine
 {
 #ifdef TRIO_DIRECTX
 	InputLayoutCache::InputLayoutCache(GraphicsDevice* device, std::vector<uint8_t>& byteCode) :
-		m_pDevice(device),
-		m_vByteCode(byteCode)
+		m_device(device),
+		m_byteCode(byteCode)
 	{
 
 	}
 
 	InputLayoutCache::~InputLayoutCache()
 	{
-		for (std::pair<VertexDeclaration*, ID3D11InputLayout*> inputLayout : m_mCache)
+		for (std::pair<VertexDeclaration*, ID3D11InputLayout*> inputLayout : m_cache)
 		{
-			ReleaseCOM(inputLayout.second);
+			RELEASE_COM(inputLayout.second);
 		}
 
-		m_mCache.clear();
+		m_cache.clear();
 	}
 
 	ID3D11InputLayout* InputLayoutCache::Get(VertexDeclaration* vertexDecl)
 	{
-		auto it = m_mCache.find(vertexDecl);
+		auto it = m_cache.find(vertexDecl);
 
-		if (it == m_mCache.end())
+		if (it == m_cache.end())
 		{
 			ID3D11InputLayout* inputLayout = nullptr;
 
 			const std::vector<D3D11_INPUT_ELEMENT_DESC>& inputs = vertexDecl->GetD3D11InputElements();
 
 			DX::ThrowIfFailed(
-				m_pDevice->GetD3DDevice()->CreateInputLayout(inputs.data(), inputs.size(), m_vByteCode.data(), m_vByteCode.size(), &inputLayout)
+				m_device->GetD3DDevice()->CreateInputLayout(inputs.data(), inputs.size(), m_byteCode.data(), m_byteCode.size(), &inputLayout)
 			);
 
-			m_mCache[vertexDecl] = inputLayout;
+			m_cache[vertexDecl] = inputLayout;
 			return inputLayout;
 		}
 		return it->second;

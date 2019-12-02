@@ -6,47 +6,47 @@ namespace TrioEngine
 
 	VertexBufferBindings::VertexBufferBindings() :
 		
-		m_iN(0),
-		m_iCapacity(0)
+		m_n(0),
+		m_capacity(0)
 	{
-		m_iCapacity = 32;
-		for (size_t i = 0; i < m_iCapacity; i++)
+		m_capacity = 32;
+		for (size_t i = 0; i < m_capacity; i++)
 		{
-			m_pArray[i] = VertexBufferBinding();
+			m_array[i] = VertexBufferBinding();
 		}
 	}
 
 	VertexBufferBindings::~VertexBufferBindings()
 	{
-		for (size_t i = 0; i < m_iCapacity; i++)
+		for (size_t i = 0; i < m_capacity; i++)
 		{
-			m_pArray[i] = VertexBufferBinding();
+			m_array[i] = VertexBufferBinding();
 		}
-		m_iN = 0;
-		m_iCapacity = 0;
+		m_n = 0;
+		m_capacity = 0;
 	}
 
 	void VertexBufferBindings::clear()
 	{
-		m_iN = 0;
+		m_n = 0;
 	}
 
 	VertexBufferBindings::BaseType & VertexBufferBindings::operator[](int iIndex)
 	{
-		if (iIndex >= m_iN) {
-			m_iN = iIndex + 1;
+		if (iIndex >= m_n) {
+			m_n = iIndex + 1;
 		}
-		return m_pArray[iIndex];
+		return m_array[iIndex];
 	}
 
 	const VertexBufferBindings::BaseType & VertexBufferBindings::operator[](int iIndex) const
 	{
-		return m_pArray[iIndex];
+		return m_array[iIndex];
 	}
 
 	size_t VertexBufferBindings::size()
 	{
-		return m_iN;
+		return m_n;
 	}
 
 

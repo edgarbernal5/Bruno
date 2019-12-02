@@ -51,7 +51,7 @@ namespace TrioEngine
 		friend class GraphicsDevice;
 	private:
 #ifdef TRIO_DIRECTX
-		ID3D11DepthStencilState*		m_pState;
+		ID3D11DepthStencilState*		m_state;
 #endif
 
 		void ApplyState(GraphicsDevice * device);

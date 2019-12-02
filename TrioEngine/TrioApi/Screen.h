@@ -8,7 +8,7 @@ namespace TrioEngine
 {
 	struct Screen
 	{
-		HMONITOR m_pMonitor;
+		HMONITOR Monitor;
 		//HDC m_pHdc;
 
 		Screen();
@@ -16,16 +16,16 @@ namespace TrioEngine
 		
 		struct MonitorEnumCallback
 		{
-			std::vector<Screen> m_vScreens;
+			std::vector<Screen> m_screens;
 			bool callback(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor);
 			static BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 		};
 		static std::vector<Screen>& GetScreens();
 	private:
-		bool m_bPrimary;
-		std::string m_csDeviceName;
+		bool m_primary;
+		std::string m_deviceName;
 
-		static std::vector<Screen> g_vScreens;
-		static bool g_bMultiMonitorSupport;
+		static std::vector<Screen> g_screens;
+		static bool g_multiMonitorSupport;
 	};
 }

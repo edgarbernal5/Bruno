@@ -6,29 +6,29 @@
 namespace TrioEngine
 {
 	WindowsGameHost::WindowsGameHost(Game* game) :
-		m_pGame(game),
-		m_bExitRequested(false)
+		m_game(game),
+		m_exitRequested(false)
 	{
-		m_pWindow = new WindowsGameWindow(this);
+		m_window = new WindowsGameWindow(this);
 
-		m_pWindow->Activated += ([=]() {
+		m_window->Activated += ([=]() {
 			Activated();
 		});
 
-		m_pWindow->Deactivated += ([=]() {
+		m_window->Deactivated += ([=]() {
 			Deactivated();
 		});
 
-		m_pWindow->Resume += ([=]() {
+		m_window->Resume += ([=]() {
 			Resume();
 		});
 
-		m_pWindow->Suspend += ([=]() {
+		m_window->Suspend += ([=]() {
 			Suspend();
 		});
 
 		//Load windows after hooked up all windows events.
-		m_pWindow->LoadWindow();
+		m_window->LoadWindow();
 	}
 
 	WindowsGameHost::~WindowsGameHost()
@@ -37,17 +37,17 @@ namespace TrioEngine
 
 	void WindowsGameHost::Exit()
 	{
-		m_bExitRequested = true;
+		m_exitRequested = true;
 	}
 
 	inline Game* WindowsGameHost::GetGame()
 	{
-		return m_pGame;
+		return m_game;
 	}
 
 	GameWindow* WindowsGameHost::GetWindow()
 	{
-		return m_pWindow;
+		return m_window;
 	}
 
 	void WindowsGameHost::Run()
@@ -65,7 +65,7 @@ namespace TrioEngine
 			// Otherwise, do animation/game stuff.
 			else
 			{
-				if (m_bExitRequested)
+				if (m_exitRequested)
 				{
 
 				}

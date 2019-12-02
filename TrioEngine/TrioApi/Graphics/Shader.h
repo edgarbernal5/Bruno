@@ -18,10 +18,10 @@ namespace TrioEngine
 		Shader(GraphicsDevice* device, ShaderStage stage, const std::vector<uint8_t>& bytes);
 		~Shader();
 
-		inline int GetHashKey() { return m_iHashKey; }
+		inline int GetHashKey() { return m_hashKey; }
 
 #if TRIO_DIRECTX
-		inline InputLayoutCache* GetInputLayouts() { return m_pInputLayoutCache; }
+		inline InputLayoutCache* GetInputLayouts() { return m_inputLayoutCache; }
 #endif
 		friend class Effect;
 		friend class EffectLoader;
@@ -35,27 +35,27 @@ namespace TrioEngine
 		Shader(GraphicsDevice* device, ShaderStage stage, ID3D11VertexShader* shader, const std::vector<uint8_t>& bytes, int hashKey);
 		Shader(GraphicsDevice* device, ShaderStage stage, ID3D11PixelShader* shader);
 #endif
-		ShaderStage			m_eStage;
-		int					m_iHashKey;
+		ShaderStage			m_stage;
+		int					m_hashKey;
 
 		//m_codeBytes representa el shaderBytecode.
 		std::vector<uint8_t>	 m_codeBytes;
 
-		GraphicsDevice*			m_pDevice;
-		std::vector<std::pair<size_t, size_t>>		m_vBufferIndexes;
-		std::vector<std::pair<size_t, size_t>>		m_vSamplerIndexes;
+		GraphicsDevice*			m_device;
+		std::vector<std::pair<size_t, size_t>>		m_bufferIndexes;
+		std::vector<std::pair<size_t, size_t>>		m_samplerIndexes;
 
 #if TRIO_DIRECTX
-		InputLayoutCache*		m_pInputLayoutCache;
+		InputLayoutCache*		m_inputLayoutCache;
 
 		union InternalShader
 		{
-			ID3D11VertexShader* m_pVertexShader;
-			ID3D11PixelShader* m_pPixelShader;
-			ID3D11GeometryShader* m_pGeometryShader;
+			ID3D11VertexShader* m_vertexShader;
+			ID3D11PixelShader* m_pixelShader;
+			ID3D11GeometryShader* m_geometryShader;
 		};
 
-		InternalShader		m_uShaderPtr;
+		InternalShader		m_shaderPtr;
 
 		void CreateShader();
 

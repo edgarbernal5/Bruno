@@ -29,29 +29,28 @@ namespace TrioEngine
 
 	Texture2D::Texture2D(GraphicsDevice* graphicsDevice, int width, int height, uint32_t mipmap, SurfaceFormat format, SurfaceType type, uint32_t multiSamples, uint32_t msQuality, bool shared) :
 		Texture(graphicsDevice, format),
-		m_iWidth(width),
-		m_iHeight(height),
-		m_eSurfaceType(type),
-		m_bShared(shared)
+		m_width(width),
+		m_height(height),
+		m_surfaceType(type),
+		m_shared(shared)
 	{
 		CommonConstructor(width, height, mipmap, type, multiSamples, msQuality, shared, 1);
-
 	}
 
 	void Texture2D::CommonConstructor(int width, int height, uint32_t mipmap, SurfaceType type, uint32_t multiSamples, uint32_t msQuality, bool shared, uint32_t uArraySize)
 	{
-		m_iWidth = width;
-		m_iHeight = height;
-		m_eSurfaceType = type;
-		m_bShared = shared;
+		m_width = width;
+		m_height = height;
+		m_surfaceType = type;
+		m_shared = shared;
 
-		m_uLevelCount = mipmap;
-		m_uMultiSamples = multiSamples;
-		m_uMsQuality = msQuality;
+		m_levelCount = mipmap;
+		m_multiSamples = multiSamples;
+		m_msQuality = msQuality;
 
-		m_uArraySize = uArraySize;
+		m_arraySize = uArraySize;
 
-		m_eUsage = ResourceUsage::Default;
+		m_usage = ResourceUsage::Default;
 
 		if (type == SurfaceType::SwapChainRenderTarget)
 			return;
@@ -94,42 +93,42 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 	void Texture2D::CreateTexture(D3D11_SUBRESOURCE_DATA * subdata)
 	{
-		m_Tex2DDesc = { 0 };
-		m_Tex2DDesc.Width = m_iWidth;
-		m_Tex2DDesc.Height = m_iHeight;
-		m_Tex2DDesc.MipLevels = m_uLevelCount;
-		m_Tex2DDesc.ArraySize = m_uArraySize;
-		m_Tex2DDesc.Format = ToFormat(m_eFormat);
-		m_Tex2DDesc.BindFlags = (UINT)BindFlags::ShaderResource;
-		m_Tex2DDesc.CPUAccessFlags = (UINT)CpuAccessFlags::None;
-		m_Tex2DDesc.SampleDesc.Count = m_uMultiSamples;
-		m_Tex2DDesc.SampleDesc.Quality = m_uMsQuality;
-		m_Tex2DDesc.Usage = (D3D11_USAGE)m_eUsage;
-		m_Tex2DDesc.MiscFlags = (UINT)ResourceOptionFlags::None;
+		m_tex2DDesc = { 0 };
+		m_tex2DDesc.Width = m_width;
+		m_tex2DDesc.Height = m_height;
+		m_tex2DDesc.MipLevels = m_levelCount;
+		m_tex2DDesc.ArraySize = m_arraySize;
+		m_tex2DDesc.Format = ToFormat(m_format);
+		m_tex2DDesc.BindFlags = (UINT)BindFlags::ShaderResource;
+		m_tex2DDesc.CPUAccessFlags = (UINT)CpuAccessFlags::None;
+		m_tex2DDesc.SampleDesc.Count = m_multiSamples;
+		m_tex2DDesc.SampleDesc.Quality = m_msQuality;
+		m_tex2DDesc.Usage = (D3D11_USAGE)m_usage;
+		m_tex2DDesc.MiscFlags = (UINT)ResourceOptionFlags::None;
 
-		if (m_eSurfaceType == SurfaceType::RenderTarget)
+		if (m_surfaceType == SurfaceType::RenderTarget)
 		{
-			m_Tex2DDesc.BindFlags |= (uint32_t)BindFlags::RenderTarget;
+			m_tex2DDesc.BindFlags |= (uint32_t)BindFlags::RenderTarget;
 
 			//if(createUAV)
 			//	m_Tex2DDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
 
 			//Se debería preguntar por la generación automática??
-			if (m_uLevelCount > 1)
-				m_Tex2DDesc.MiscFlags |= (uint32_t)ResourceOptionFlags::GenerateMipMaps;
+			if (m_levelCount > 1)
+				m_tex2DDesc.MiscFlags |= (uint32_t)ResourceOptionFlags::GenerateMipMaps;
 		}
 
-		if (m_bShared)
+		if (m_shared)
 		{
-			m_Tex2DDesc.MiscFlags |= (uint32_t)ResourceOptionFlags::Shared;
+			m_tex2DDesc.MiscFlags |= (uint32_t)ResourceOptionFlags::Shared;
 		}
 
 		ID3D11Texture2D *localTexture = nullptr;
-		DX::ThrowIfFailed(m_pDevice->GetD3DDevice()->CreateTexture2D(&m_Tex2DDesc, subdata, &localTexture));
+		DX::ThrowIfFailed(m_device->GetD3DDevice()->CreateTexture2D(&m_tex2DDesc, subdata, &localTexture));
 
-		m_pTexture = localTexture;
+		m_texture = localTexture;
 
-		DX::ThrowIfFailed(m_pDevice->GetD3DDevice()->CreateShaderResourceView(m_pTexture, nullptr, &m_pShaderResourceView));
+		DX::ThrowIfFailed(m_device->GetD3DDevice()->CreateShaderResourceView(m_texture, nullptr, &m_shaderResourceView));
 	}
 #endif
 

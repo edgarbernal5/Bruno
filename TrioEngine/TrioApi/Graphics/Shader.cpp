@@ -10,25 +10,25 @@ namespace TrioEngine
 {
 	Shader::Shader(GraphicsDevice* device, ShaderStage stage, const std::vector<uint8_t>& bytes) :
 #if TRIO_DIRECTX
-		m_pInputLayoutCache(nullptr),
+		m_inputLayoutCache(nullptr),
 #elif TRIO_OPENGL
 		m_shaderHandle(-1),
 #endif
-		m_pDevice(device),
-		m_eStage(stage)
+		m_device(device),
+		m_stage(stage)
 	{
 #if TRIO_DIRECTX
-		m_uShaderPtr.m_pGeometryShader = nullptr;
+		m_shaderPtr.m_geometryShader = nullptr;
 #elif TRIO_OPENGL
 		m_glslCode = string(bytes.begin(), bytes.end());
 #endif
-		m_iHashKey = 0;
+		m_hashKey = 0;
 		if (bytes.size() > 0)
 		{
 			m_codeBytes.resize(bytes.size());
 			memcpy(m_codeBytes.data(), bytes.data(), bytes.size() * sizeof(uint8_t));
 
-			m_iHashKey = ComputeHash(m_codeBytes.data(), m_codeBytes.size());
+			m_hashKey = ComputeHash(m_codeBytes.data(), m_codeBytes.size());
 		}
 
 #if TRIO_DIRECTX
@@ -38,13 +38,13 @@ namespace TrioEngine
 
 #if TRIO_DIRECTX
 	Shader::Shader(GraphicsDevice* device, ShaderStage stage, ID3D11VertexShader* shader, const std::vector<uint8_t>& bytes, int hashKey) :
-		m_pDevice(device),
-		m_eStage(stage),
-		m_pInputLayoutCache(nullptr)
+		m_device(device),
+		m_stage(stage),
+		m_inputLayoutCache(nullptr)
 	{
-		m_uShaderPtr.m_pVertexShader = shader;
+		m_shaderPtr.m_vertexShader = shader;
 
-		m_iHashKey = hashKey;
+		m_hashKey = hashKey;
 
 		if (bytes.size() > 0)
 		{
@@ -56,13 +56,13 @@ namespace TrioEngine
 
 #if TRIO_DIRECTX
 	Shader::Shader(GraphicsDevice* device, ShaderStage stage, ID3D11PixelShader* shader) :
-		m_pDevice(device),
-		m_eStage(stage),
-		m_pInputLayoutCache(nullptr)
+		m_device(device),
+		m_stage(stage),
+		m_inputLayoutCache(nullptr)
 	{
-		m_uShaderPtr.m_pPixelShader = shader;
+		m_shaderPtr.m_pixelShader = shader;
 
-		m_iHashKey = 0;
+		m_hashKey = 0;
 
 
 	}
@@ -165,16 +165,16 @@ namespace TrioEngine
 	{
 		//m_codeBytes representa el shaderBytecode
 
-		switch (m_eStage)
+		switch (m_stage)
 		{
 		case ShaderStage::Vertex:
-			m_pDevice->GetD3DDevice()->CreateVertexShader(m_codeBytes.data(), m_codeBytes.size(), nullptr, &m_uShaderPtr.m_pVertexShader);
+			m_device->GetD3DDevice()->CreateVertexShader(m_codeBytes.data(), m_codeBytes.size(), nullptr, &m_shaderPtr.m_vertexShader);
 
-			m_pInputLayoutCache = new InputLayoutCache(m_pDevice, this->m_codeBytes);
+			m_inputLayoutCache = new InputLayoutCache(m_device, this->m_codeBytes);
 
 			break;
 		case ShaderStage::Pixel:
-			m_pDevice->GetD3DDevice()->CreatePixelShader(m_codeBytes.data(), m_codeBytes.size(), nullptr, &m_uShaderPtr.m_pPixelShader);
+			m_device->GetD3DDevice()->CreatePixelShader(m_codeBytes.data(), m_codeBytes.size(), nullptr, &m_shaderPtr.m_pixelShader);
 
 			break;
 		case ShaderStage::Geometry:

@@ -5,7 +5,7 @@
 
 namespace TrioEngine
 {
-	VertexDeclaration* VertexPositionColor::g_pVertexDeclaration = nullptr;
+	VertexDeclaration* VertexPositionColor::g_vertexDeclaration = nullptr;
 
 	//--------------------------------------------------------------------------------------
 	// Vertex struct holding position and color information.
@@ -25,16 +25,16 @@ namespace TrioEngine
 
 	VertexDeclaration* VertexPositionColor::GetVertexDeclaration()
 	{
-		if (g_pVertexDeclaration == nullptr)
+		if (g_vertexDeclaration == nullptr)
 		{
 #ifdef TRIO_DIRECTX
-			g_pVertexDeclaration = VertexDeclarationHelper::GetVertexDeclaration(InputElementCount, InputElementsD3D11, InputElements);
+			g_vertexDeclaration = VertexDeclarationHelper::GetVertexDeclaration(InputElementCount, InputElementsD3D11, InputElements);
 #else
 			g_pVertexDeclaration = VertexDeclarationHelper::GetVertexDeclaration(InputElementCount, InputElements);
 #endif
-			VertexDeclarationHelper::AddVertexDeclaration(typeid(VertexPositionColor).name(), g_pVertexDeclaration);
+			VertexDeclarationHelper::AddVertexDeclaration(typeid(VertexPositionColor).name(), g_vertexDeclaration);
 		}
 
-		return g_pVertexDeclaration;
+		return g_vertexDeclaration;
 	}
 }

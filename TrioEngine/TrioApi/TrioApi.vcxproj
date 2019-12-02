@@ -215,6 +215,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Component.h" />
     <ClInclude Include="DataTypes\Array.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="FX\AssertFX.h" />
@@ -229,6 +230,7 @@
     <ClInclude Include="FX\StringPool.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameHost.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameServiceContainer.h" />
     <ClInclude Include="GameWindow.h" />
     <ClInclude Include="Graphics\BindFlags.h" />
@@ -284,6 +286,7 @@
     <ClInclude Include="Graphics\ResourceUsage.h" />
     <ClInclude Include="Graphics\SamplerState.h" />
     <ClInclude Include="Graphics\SamplerStateCollection.h" />
+    <ClInclude Include="Graphics\SceneNode.h" />
     <ClInclude Include="Graphics\SetDataOptions.h" />
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Graphics\ShaderLanguageTarget.h" />
@@ -313,11 +316,14 @@
     <ClInclude Include="Math\MathVector.h" />
     <ClInclude Include="Math\Rectangle.h" />
     <ClInclude Include="Memory\Allocator.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="PlatformDirectives.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StepTimer.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="TrioApi.h" />
     <ClInclude Include="TrioApiDecl.h" />
     <ClInclude Include="Utils\Hash.h" />
@@ -327,6 +333,7 @@
     <ClInclude Include="WindowsGameWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Component.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="FX\CodeWriter.cpp" />
     <ClCompile Include="FX\GLSLGenerator.cpp" />
@@ -339,6 +346,7 @@
     <ClCompile Include="FX\StringPool.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameHost.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameServiceContainer.cpp" />
     <ClCompile Include="Graphics\BlendState.cpp" />
     <ClCompile Include="Graphics\ConstantBuffer.cpp" />
@@ -368,6 +376,7 @@
     <ClCompile Include="Graphics\RasterizerState.cpp" />
     <ClCompile Include="Graphics\SamplerState.cpp" />
     <ClCompile Include="Graphics\SamplerStateCollection.cpp" />
+    <ClCompile Include="Graphics\SceneNode.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="Graphics\Texture2D.cpp" />
@@ -383,6 +392,8 @@
     <ClCompile Include="Graphics\VertexPositionNormalTexture.cpp" />
     <ClCompile Include="Graphics\VertexPositionTexture.cpp" />
     <ClCompile Include="Math\MathVector.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -392,6 +403,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TrioApi.cpp" />
     <ClCompile Include="Utils\Hash.cpp" />
     <ClCompile Include="Utils\StringUtility.cpp" />

@@ -66,7 +66,7 @@ namespace TrioEngine
 
 		ImageInfo GetTextureFromFile(std::string csFilename, TextureLoaderType targetType = TextureLoaderType::UnsignedByte, SurfaceFormat targetFormat = SurfaceFormat::Color);
 	private:
-		ILuint m_uiImgId;
-		std::vector<uint8_t*> m_vBuffers;
+		ILuint m_imgId;
+		std::vector<uint8_t*> m_buffers;
 	};
 }

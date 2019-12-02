@@ -15,7 +15,7 @@
 #include "EffectTechniqueCollection.h"
 #include "ConstantBufferCollection.h"
 
-#include "..\FX\HLSLTree.h"
+#include "FX\HLSLTree.h"
 
 namespace TrioEngine
 {
@@ -29,9 +29,9 @@ namespace TrioEngine
 		Effect(GraphicsDevice* device, std::vector<uint8_t> &compiledBytes);
 		~Effect();
 
-		inline EffectParameterCollection& GetParameters() { return m_Parameters; }
-		inline EffectTechniqueCollection& GetTechniques() { return m_Techniques; }
-		inline ConstantBufferCollection& GetConstantBuffers() { return m_ConstantBuffers; }
+		inline EffectParameterCollection& GetParameters() { return m_parameters; }
+		inline EffectTechniqueCollection& GetTechniques() { return m_techniques; }
+		inline ConstantBufferCollection& GetConstantBuffers() { return m_constantBuffers; }
 
 		void CompileEffectFromFile(std::string filename, ShaderLanguageTarget target = ShaderLanguageTarget::HLSL);
 
@@ -40,12 +40,12 @@ namespace TrioEngine
 		
 	private:
 
-		GraphicsDevice*			m_pDevice;
-		std::map<std::string, Shader*>	m_mShadersByName;
+		GraphicsDevice*			m_device;
+		std::map<std::string, Shader*>	m_shadersByName;
 
-		EffectParameterCollection	m_Parameters;
-		EffectTechniqueCollection	m_Techniques;
-		ConstantBufferCollection	m_ConstantBuffers;
+		EffectParameterCollection	m_parameters;
+		EffectTechniqueCollection	m_techniques;
+		ConstantBufferCollection	m_constantBuffers;
 
 		void ClearData();
 

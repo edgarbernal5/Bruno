@@ -29,8 +29,8 @@ namespace TrioEngine
 		template <typename T>
 		void GetData(T* data, int length);
 
-		inline int GetVertexCount() { return m_iVertexCount; }
-		inline VertexDeclaration* GetVertexDeclaration() { return m_pVertexDeclaration; }
+		inline int GetVertexCount() { return m_vertexCount; }
+		inline VertexDeclaration* GetVertexDeclaration() { return m_vertexDeclaration; }
 
 		template <class T>
 		void SetData(const T* data, int length);
@@ -41,20 +41,20 @@ namespace TrioEngine
 		friend class GraphicsDevice;
 	private:
 #ifdef TRIO_DIRECTX
-		ID3D11Buffer* m_pBuffer;
+		ID3D11Buffer* m_buffer;
 		//ID3D11InputLayout* m_InputLayout;
 
 		void CreateBuffer(D3D11_SUBRESOURCE_DATA* subdata);
 #elif OPENGL
 		GLuint m_pBuffer;
 #endif
-		GraphicsDevice * m_pDevice;
+		GraphicsDevice * m_device;
 
-		VertexDeclaration *m_pVertexDeclaration;
-		ResourceUsage m_eUsage;
-		VertexBufferBinding m_vBinding;
+		VertexDeclaration *m_vertexDeclaration;
+		ResourceUsage m_usage;
+		VertexBufferBinding m_binding;
 
-		int m_iVertexCount;
+		int m_vertexCount;
 
 		friend class GraphicsDevice;
 	protected:
@@ -71,9 +71,9 @@ namespace TrioEngine
 		//return;
 
 #ifdef TRIO_DIRECTX
-		uint32_t elementSizeInBytes = m_pVertexDeclaration->GetVertexStride();
+		uint32_t elementSizeInBytes = m_vertexDeclaration->GetVertexStride();
 		D3D11_BUFFER_DESC stagingDesc;
-		m_pBuffer->GetDesc(&stagingDesc);
+		m_buffer->GetDesc(&stagingDesc);
 
 		stagingDesc.BindFlags = (uint32_t)BindFlags::None;
 		stagingDesc.CPUAccessFlags = (uint32_t)(CpuAccessFlags::Read | CpuAccessFlags::Write);
@@ -81,19 +81,19 @@ namespace TrioEngine
 		stagingDesc.MiscFlags = (uint32_t)ResourceOptionFlags::None;
 
 		ID3D11Buffer* stagingBuffer = nullptr;
-		DX::ThrowIfFailed(m_pDevice->GetD3DDevice()->CreateBuffer(&stagingDesc, nullptr, &stagingBuffer));
+		DX::ThrowIfFailed(m_device->GetD3DDevice()->CreateBuffer(&stagingDesc, nullptr, &stagingBuffer));
 
-		m_pDevice->GetD3DDeviceContext()->CopyResource(stagingBuffer, m_pBuffer);
+		m_device->GetD3DDeviceContext()->CopyResource(stagingBuffer, m_buffer);
 
 		D3D11_MAPPED_SUBRESOURCE box;
-		m_pDevice->GetD3DDeviceContext()->Map(stagingBuffer, 0, (D3D11_MAP)MapMode::Read, 0, &box);
+		m_device->GetD3DDeviceContext()->Map(stagingBuffer, 0, (D3D11_MAP)MapMode::Read, 0, &box);
 
 		T *pData = reinterpret_cast<T*>(box.pData) + (offsetInBytes / sizeof(T));
 		memcpy(data + startIndex, pData, elementSizeInBytes * elementCount);
 
-		m_pDevice->GetD3DDeviceContext()->Unmap(stagingBuffer, 0);
+		m_device->GetD3DDeviceContext()->Unmap(stagingBuffer, 0);
 
-		ReleaseCOM(stagingBuffer);
+		RELEASE_COM(stagingBuffer);
 #elif TRIO_OPENGL
 		uint32_t elementSizeInBytes = m_pVertexDeclaration->GetVertexStride();
 
@@ -127,14 +127,14 @@ namespace TrioEngine
 		}
 		//TO-DO: tomar en cuenta vertexStride menores a m_pVertexDeclaration->GetVertexStride().
 
-		if (m_vBinding.Buffer == nullptr)
-			m_vBinding = VertexBufferBinding(this, 0, m_pVertexDeclaration->GetVertexStride());
+		if (m_binding.Buffer == nullptr)
+			m_binding = VertexBufferBinding(this, 0, m_vertexDeclaration->GetVertexStride());
 
 #ifdef TRIO_DIRECTX
-		switch (m_eUsage)
+		switch (m_usage)
 		{
 		case ResourceUsage::Immutable:
-			if (m_pBuffer == nullptr)
+			if (m_buffer == nullptr)
 			{
 				D3D11_SUBRESOURCE_DATA vinitData = { 0 };
 				vinitData.pSysMem = data;
@@ -155,11 +155,11 @@ namespace TrioEngine
 				region.left = offsetInBytes;
 				region.right = offsetInBytes + (elementCount * elementSizeInBytes);
 
-				m_pDevice->GetD3DDeviceContext()->UpdateSubresource(m_pBuffer, 0, &region, (data + startIndex), elementSizeInBytes, 0);
+				m_device->GetD3DDeviceContext()->UpdateSubresource(m_buffer, 0, &region, (data + startIndex), elementSizeInBytes, 0);
 			}
 			break;
 		case ResourceUsage::Dynamic:
-			if (m_pBuffer == nullptr)
+			if (m_buffer == nullptr)
 			{
 				D3D11_SUBRESOURCE_DATA vinitData = { 0 };
 				vinitData.pSysMem = data;
@@ -174,7 +174,7 @@ namespace TrioEngine
 
 				D3D11_MAPPED_SUBRESOURCE resource;
 
-				m_pDevice->GetD3DDeviceContext()->Map(m_pBuffer, 0, (D3D11_MAP)mode, 0, &resource);
+				m_device->GetD3DDeviceContext()->Map(m_buffer, 0, (D3D11_MAP)mode, 0, &resource);
 
 				T* pDataResource = (T*)((uint8_t*)(resource.pData) + offsetInBytes);
 
@@ -182,11 +182,11 @@ namespace TrioEngine
 
 				memcpy(pDataResource, pData, elementSizeInBytes * elementCount);
 
-				m_pDevice->GetD3DDeviceContext()->Unmap(m_pBuffer, 0);
+				m_device->GetD3DDeviceContext()->Unmap(m_buffer, 0);
 			}
 			break;
 		case ResourceUsage::Default:
-			if (m_pBuffer == nullptr)
+			if (m_buffer == nullptr)
 			{
 				D3D11_SUBRESOURCE_DATA vinitData = { 0 };
 				vinitData.pSysMem = data;

@@ -6,38 +6,38 @@
 namespace TrioEngine
 {
 	EffectParameter::EffectParameter(ConstantBufferField fieldDesc, ConstantBuffer* constantBuffer, Effect* effect) :
-		m_pEffect(effect),
-		m_csName(fieldDesc.Name),
+		m_effect(effect),
+		m_name(fieldDesc.Name),
 
-		m_pData(nullptr)
+		m_data(nullptr)
 	{
-		m_uInternalParameter.m_ConstantBuffer.m_pConstantBuffer = constantBuffer;
-		m_uInternalParameter.m_ConstantBuffer.m_uiOffset = fieldDesc.Offset;
-		m_uInternalParameter.m_ConstantBuffer.m_uiSize = fieldDesc.SizeInBytes;
+		m_internalParameter.m_constantBuffer.m_constantBuffer = constantBuffer;
+		m_internalParameter.m_constantBuffer.m_offset = fieldDesc.Offset;
+		m_internalParameter.m_constantBuffer.m_size = fieldDesc.SizeInBytes;
 
-		m_pData = constantBuffer->GetRawData();
+		m_data = constantBuffer->GetRawData();
 	}
 
 	EffectParameter::EffectParameter(STexture textureDesc, std::string parameterName, Effect* effect) :
-		m_pEffect(effect),
-		m_csName(parameterName),
+		m_effect(effect),
+		m_name(parameterName),
 
-		m_pData(nullptr)
+		m_data(nullptr)
 	{
-		m_uInternalParameter.m_Texture = textureDesc;
+		m_internalParameter.m_texture = textureDesc;
 
-		m_pData = &m_uInternalParameter.m_Texture.m_pTexture;
+		m_data = &m_internalParameter.m_texture.m_texture;
 	}
 
 	EffectParameter::EffectParameter(SSamplerState samplerState, std::string parameterName, Effect* effect) :
-		m_pEffect(effect),
-		m_csName(parameterName),
+		m_effect(effect),
+		m_name(parameterName),
 
-		m_pData(nullptr)
+		m_data(nullptr)
 	{
-		m_uInternalParameter.m_SamplerState = samplerState;
+		m_internalParameter.m_samplerState = samplerState;
 
-		m_pData = &m_uInternalParameter.m_SamplerState.m_pSamplerState;
+		m_data = &m_internalParameter.m_samplerState.m_samplerState;
 	}
 
 	EffectParameter::~EffectParameter()
@@ -60,8 +60,8 @@ namespace TrioEngine
 		Matrix transposed = value;
 		transposed = transposed.Transpose();
 
-		m_uInternalParameter.m_ConstantBuffer.m_pConstantBuffer->SetInternalData(
-			(uint8_t*)&transposed.m[0][0], sizeof(value), m_uInternalParameter.m_ConstantBuffer.m_uiOffset
+		m_internalParameter.m_constantBuffer.m_constantBuffer->SetInternalData(
+			(uint8_t*)&transposed.m[0][0], sizeof(value), m_internalParameter.m_constantBuffer.m_offset
 		);
 	}
 

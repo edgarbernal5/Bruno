@@ -15,18 +15,18 @@ namespace TrioEngine
 		Texture();
 		virtual ~Texture();
 
-		inline SurfaceFormat GetFormat() { return m_eFormat; }
-		inline uint32_t GetLevelCount() { return m_uLevelCount; }
+		inline SurfaceFormat GetFormat() { return m_format; }
+		inline uint32_t GetLevelCount() { return m_levelCount; }
 		
 		friend class TextureCollection;
 	protected:
 		Texture(GraphicsDevice* device, SurfaceFormat format);
 
 #ifdef TRIO_DIRECTX
-		ID3D11ShaderResourceView*	m_pShaderResourceView;
-		ID3D11Resource*				m_pTexture;
+		ID3D11ShaderResourceView*	m_shaderResourceView;
+		ID3D11Resource*				m_texture;
 
-		ID3D11ShaderResourceView*	GetShaderResourceView() { return m_pShaderResourceView; }
+		ID3D11ShaderResourceView*	GetShaderResourceView() { return m_shaderResourceView; }
 #elif TRIO_OPENGL
 		GLenum 						m_glFormat;
 		GLint 						m_glInternalFormat;
@@ -36,13 +36,13 @@ namespace TrioEngine
 #endif
 		int							GetPitch(int width);
 
-		GraphicsDevice*				m_pDevice;
-		SurfaceFormat				m_eFormat;
+		GraphicsDevice*				m_device;
+		SurfaceFormat				m_format;
 
-		uint32_t					m_uLevelCount;
-		uint32_t					m_ArraySize;
+		uint32_t					m_levelCount;
+		uint32_t					m_arraySize;
 
-		bool						m_bCreateUAV;
+		bool						m_createUAV;
 	};
 
 }

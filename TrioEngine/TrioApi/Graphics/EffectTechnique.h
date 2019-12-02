@@ -18,14 +18,14 @@ namespace TrioEngine
 		EffectTechnique(TrioFX::HLSLTechnique11* technique, TrioFX::HLSLTree& tree, std::vector<TrioFX::HLSLBuffer*> &buffers, std::vector<TrioFX::HLSLDeclaration*> &samplers, GraphicsDevice* device, Effect *effect);
 		~EffectTechnique();
 
-		inline const char* GetName() { return m_csName.c_str(); }
+		inline const char* GetName() { return m_name.c_str(); }
 
 		//const
 		std::vector<EffectPass*>& GetPasses();
 		friend class Effect;
 	private:
 
-		std::vector<EffectPass*> m_vPasses;
-		std::string m_csName;
+		std::vector<EffectPass*> m_passes;
+		std::string m_name;
 	};
 }

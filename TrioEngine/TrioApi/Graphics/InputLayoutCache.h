@@ -20,11 +20,11 @@ namespace TrioEngine
 
 		ID3D11InputLayout* Get(VertexDeclaration* vertexDecl);
 	private:
-		std::map<VertexDeclaration*, ID3D11InputLayout*> m_mCache;
+		std::map<VertexDeclaration*, ID3D11InputLayout*> m_cache;
 		
-		GraphicsDevice* m_pDevice;
+		GraphicsDevice* m_device;
 
-		std::vector<uint8_t>& m_vByteCode;
+		std::vector<uint8_t>& m_byteCode;
 	};
 #endif
 }

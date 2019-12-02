@@ -21,9 +21,9 @@ namespace TrioEngine
 		void StartGameLoop();
 
 	private:
-		bool m_bExitRequested;
+		bool m_exitRequested;
 
-		Game* m_pGame;
-		WindowsGameWindow* m_pWindow;
+		Game* m_game;
+		WindowsGameWindow* m_window;
 	};
 }

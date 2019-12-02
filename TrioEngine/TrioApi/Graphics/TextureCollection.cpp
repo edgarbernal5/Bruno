@@ -7,7 +7,7 @@
 namespace TrioEngine
 {
 	TextureCollection::TextureCollection(ShaderStage stage) :
-		m_eStage(stage)
+		m_stage(stage)
 	{
 		CreateArray();
 #ifdef TRIO_OPENGL
@@ -24,12 +24,12 @@ namespace TrioEngine
 
 	void TextureCollection::CreateArray()
 	{
-		m_iN = 16;
-		for (int i = 0; i < m_iN; i++)
+		m_n = 16;
+		for (int i = 0; i < m_n; i++)
 		{
-			m_pTextures[i] = nullptr;
+			m_textures[i] = nullptr;
 		}
-		m_iDirty = 0; //INT_MAX;
+		m_dirty = 0; //INT_MAX;
 	}
 	
 	void TextureCollection::SetTexture(int index, Texture* tex)
@@ -37,27 +37,27 @@ namespace TrioEngine
 		//if (m_pTextures[index] == tex && m_pTextures[index] != nullptr)
 		//	return;
 
-		m_pTextures[index] = tex;
-		m_iDirty |= 1 << index;
+		m_textures[index] = tex;
+		m_dirty |= 1 << index;
 	}
 	
 	void TextureCollection::BindAllTextures(GraphicsDevice* device)
 	{
-		if (m_iDirty == 0)
+		if (m_dirty == 0)
 			return;
 
 		//TO-DO: tomar en cuenta las texturas de vertex shader
-		for (int i = 0; i < m_iN; i++)
+		for (int i = 0; i < m_n; i++)
         {
 			int mask = 1 << i;
-			if ((m_iDirty & mask) == 0)
+			if ((m_dirty & mask) == 0)
 				continue;
 			
-			Texture* texture = m_pTextures[i];
+			Texture* texture = m_textures[i];
 #ifdef TRIO_DIRECTX
 			if (texture == nullptr)
 			{
-				switch (m_eStage)
+				switch (m_stage)
 				{
 				case ShaderStage::Vertex:
 					device->GetD3DDeviceContext()->VSSetShaderResources(i, 1, nullptr);
@@ -72,7 +72,7 @@ namespace TrioEngine
 			else
 			{
 				ID3D11ShaderResourceView* view = texture->GetShaderResourceView();
-				switch (m_eStage)
+				switch (m_stage)
 				{
 				case ShaderStage::Vertex:
 					device->GetD3DDeviceContext()->VSSetShaderResources(i, 1, &view);
@@ -101,10 +101,10 @@ namespace TrioEngine
 			}
 #endif
 			
-			m_iDirty &= ~mask;
-			if (m_iDirty == 0)
+			m_dirty &= ~mask;
+			if (m_dirty == 0)
 				break;
 		}
-		m_iDirty = 0;
+		m_dirty = 0;
 	}
 }

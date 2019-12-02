@@ -8,31 +8,31 @@ namespace TrioEngine
 	IndexBuffer::IndexBuffer() :
 		
 #ifdef TRIO_DIRECTX
-		m_pBuffer(nullptr),
+		m_buffer(nullptr),
 #elif TRIO_OPENGL
 		m_pBuffer(0),
 #endif
-		m_pDevice(nullptr)
+		m_device(nullptr)
 	{
 	
 	}
 
 	IndexBuffer::IndexBuffer(GraphicsDevice *device, IndexElementSize elementSize, int indexCount, ResourceUsage usage) :
-		m_pDevice(device),
-		m_pBuffer(0),
-		m_iIndexCount(indexCount),
-		m_eElementSize(elementSize),
-		m_eUsage(usage)
+		m_device(device),
+		m_buffer(0),
+		m_indexCount(indexCount),
+		m_elementSize(elementSize),
+		m_usage(usage)
 	{
 
 	}
 
 	IndexBuffer::IndexBuffer(GraphicsDevice *device, IndexElementSize elementSize, int indexCount) :
-		m_pDevice(device),
-		m_pBuffer(0),
-		m_iIndexCount(indexCount),
-		m_eElementSize(elementSize),
-		m_eUsage(ResourceUsage::Immutable)
+		m_device(device),
+		m_buffer(0),
+		m_indexCount(indexCount),
+		m_elementSize(elementSize),
+		m_usage(ResourceUsage::Immutable)
 	{
 
 	}
@@ -48,7 +48,7 @@ namespace TrioEngine
 		ResourceUsage usage = ResourceUsage::Default;
 		//ResourceUsage usage = m_eUsage;
 
-		uint64_t sizeInBytes = uint64_t(m_iIndexCount) * (m_eElementSize == IndexElementSize::SixteenBits ? 2u : 4u);
+		uint64_t sizeInBytes = uint64_t(m_indexCount) * (m_elementSize == IndexElementSize::SixteenBits ? 2u : 4u);
 
 		if (sizeInBytes > uint64_t(D3D11_REQ_RESOURCE_SIZE_IN_MEGABYTES_EXPRESSION_A_TERM * 1024u * 1024u))
 			throw std::exception("Buffer too large for DirectX 11");
@@ -57,7 +57,7 @@ namespace TrioEngine
 		ibd.BindFlags = (uint32_t)BindFlags::IndexBuffer;
 		ibd.CPUAccessFlags = 0;
 
-		if (m_eUsage == ResourceUsage::Dynamic)
+		if (m_usage == ResourceUsage::Dynamic)
 		{
 			ibd.CPUAccessFlags = (uint32_t)CpuAccessFlags::Write;
 			usage = ResourceUsage::Dynamic;
@@ -69,7 +69,7 @@ namespace TrioEngine
 		ibd.StructureByteStride = 0;
 
 		DX::ThrowIfFailed(
-			m_pDevice->GetD3DDevice()->CreateBuffer(&ibd, subdata, &m_pBuffer)
+			m_device->GetD3DDevice()->CreateBuffer(&ibd, subdata, &m_buffer)
 		);
 	}
 #endif

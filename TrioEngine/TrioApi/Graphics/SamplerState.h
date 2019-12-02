@@ -41,7 +41,7 @@ namespace TrioEngine
 		friend class SamplerStateCollection;
 	private:
 #ifdef TRIO_DIRECTX
-		ID3D11SamplerState * m_pState;
+		ID3D11SamplerState * m_state;
 
 		ID3D11SamplerState * GetState(GraphicsDevice * device);
 

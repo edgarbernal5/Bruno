@@ -7,40 +7,40 @@ namespace TrioEngine
 	GLuint ConstantBuffer::m_indexTest = 0;
 #endif
 	ConstantBuffer::ConstantBuffer(GraphicsDevice* device, std::string name, uint32_t sizeInBytes, std::vector<ConstantBufferField>& bufferFields) :
-		m_pDevice(device),
+		m_device(device),
 #ifdef TRIO_DIRECTX
-		m_pBuffer(nullptr),
+		m_buffer(nullptr),
 #elif OPENGL
 		m_buffer(0),
 		m_uniformBindingIndex(0),
 #endif
-		m_uiSizeInBytes(sizeInBytes),
+		m_sizeInBytes(sizeInBytes),
 		
-		m_vBufferFields(bufferFields),
-		m_csName(name)
+		m_bufferFields(bufferFields),
+		m_name(name)
 	{
 
-		m_uiBufferBytes = new uint8_t[sizeInBytes];
+		m_bufferBytes = new uint8_t[sizeInBytes];
 	}
 
 	ConstantBuffer::ConstantBuffer(GraphicsDevice* device, std::string name) :
-		m_pDevice(device),
+		m_device(device),
 #ifdef TRIO_DIRECTX
-		m_pBuffer(nullptr),
+		m_buffer(nullptr),
 #elif OPENGL
 		m_buffer(0),
 		m_uniformBindingIndex(0),
 #endif
-		m_csName(name)
+		m_name(name)
 	{
 
 	}
 
 	ConstantBuffer::~ConstantBuffer()
 	{
-		if (m_uiBufferBytes != nullptr){
-			delete m_uiBufferBytes;
-			m_uiBufferBytes = nullptr;
+		if (m_bufferBytes != nullptr){
+			delete m_bufferBytes;
+			m_bufferBytes = nullptr;
 		}
 	}
 
@@ -65,12 +65,12 @@ namespace TrioEngine
 		m_bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		m_bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		m_bufferDesc.MiscFlags = 0;
-		m_bufferDesc.ByteWidth = static_cast<uint32_t>(m_uiSizeInBytes + (16 - (m_uiSizeInBytes % 16))); //multiplo de 16 bytes, que es el tamaño del registro ( c_RegisterSize = c_ScalarsPerRegister * c_ScalarSize )
+		m_bufferDesc.ByteWidth = static_cast<uint32_t>(m_sizeInBytes + (16 - (m_sizeInBytes % 16))); //multiplo de 16 bytes, que es el tamaño del registro ( c_RegisterSize = c_ScalarsPerRegister * c_ScalarSize )
 		//_declspec(align(16))
 		//https://docs.microsoft.com/es-es/windows/desktop/direct3dhlsl/dx-graphics-hlsl-packing-rules
 		//m_bufferDesc.ByteWidth = m_sizeInBytes;
 
-		DX::ThrowIfFailed(m_pDevice->GetD3DDevice()->CreateBuffer(&m_bufferDesc, nullptr, &m_pBuffer));
+		DX::ThrowIfFailed(m_device->GetD3DDevice()->CreateBuffer(&m_bufferDesc, nullptr, &m_buffer));
 #elif TRIO_OPENGL
 		////m_sizeInBytes = static_cast<uint32_t>(m_sizeInBytes+ (m_sizeInBytes % 16));
 		//glGenBuffers(1, &m_buffer);
@@ -84,45 +84,45 @@ namespace TrioEngine
 	void ConstantBuffer::SetData()
 	{
 #if TRIO_DIRECTX
-		if (m_pBuffer == nullptr)
+		if (m_buffer == nullptr)
 		{
 			Initialize();
 		}
 		//Mejorar esto.
-		uint32_t elementSizeInBytes = m_uiSizeInBytes;
+		uint32_t elementSizeInBytes = m_sizeInBytes;
 		D3D11_MAPPED_SUBRESOURCE resource;
 
-		m_pDevice->GetD3DDeviceContext()->Map(m_pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+		m_device->GetD3DDeviceContext()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 
 		uint8_t* pDataResource = (uint8_t*)(resource.pData);
 
-		memcpy(pDataResource, m_uiBufferBytes, elementSizeInBytes);
+		memcpy(pDataResource, m_bufferBytes, elementSizeInBytes);
 
-		m_pDevice->GetD3DDeviceContext()->Unmap(m_pBuffer, 0);
+		m_device->GetD3DDeviceContext()->Unmap(m_buffer, 0);
 #endif
 	}
 
 #if TRIO_DIRECTX
 	void ConstantBuffer::Apply(ShaderStage stage, int slot)
 	{
-		if (m_pBuffer == nullptr)
+		if (m_buffer == nullptr)
 		{
 			Initialize();
 		}
 
-		if (m_bDirty)
+		if (m_dirty)
 		{
 			SetData();
-			m_bDirty = false;
+			m_dirty = false;
 		}
 
 		switch (stage)
 		{
 		case ShaderStage::Vertex:
-			m_pDevice->GetD3DDeviceContext()->VSSetConstantBuffers(slot, 1, &m_pBuffer);
+			m_device->GetD3DDeviceContext()->VSSetConstantBuffers(slot, 1, &m_buffer);
 			break;
 		case ShaderStage::Pixel:
-			m_pDevice->GetD3DDeviceContext()->PSSetConstantBuffers(slot, 1, &m_pBuffer);
+			m_device->GetD3DDeviceContext()->PSSetConstantBuffers(slot, 1, &m_buffer);
 			break;
 		case ShaderStage::Geometry:
 			break;
@@ -192,8 +192,8 @@ namespace TrioEngine
 
 	void ConstantBuffer::SetInternalData(uint8_t* data, uint32_t sizeInBytes, int offsetInBytes)
 	{
-		memcpy(m_uiBufferBytes + offsetInBytes, data, sizeInBytes);
-		m_bDirty = true;
+		memcpy(m_bufferBytes + offsetInBytes, data, sizeInBytes);
+		m_dirty = true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

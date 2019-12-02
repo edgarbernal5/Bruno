@@ -9,29 +9,29 @@ namespace TrioEngine
 	//Usar glVertexAttribPointer
 
 	VertexDeclaration::VertexDeclaration() :
-		m_iVertexStride(0)
+		m_vertexStride(0)
 	{
 
 	}
 
 	VertexDeclaration::VertexDeclaration(int vertexStride, std::vector<VertexElement>& elements) :
-		m_iVertexStride(vertexStride),
-		m_vElements(elements)
+		m_vertexStride(vertexStride),
+		m_elements(elements)
 	{
 		m_iHashKey = 0;
 		CalculateHashKey();
 	}
 
 	VertexDeclaration::VertexDeclaration(std::vector<VertexElement>& elements) :
-		m_vElements(elements)
+		m_elements(elements)
 	{
 		m_iHashKey = 0;
 		CalculateHashKey();
 	}
 #ifdef TRIO_DIRECTX
 	VertexDeclaration::VertexDeclaration(D3D11_INPUT_ELEMENT_DESC const* dxElements, VertexElement const* pElements, int size) :
-		m_vElements(pElements, pElements + size),
-		m_vD3D11Elements(dxElements, dxElements + size)
+		m_elements(pElements, pElements + size),
+		m_d3d11Elements(dxElements, dxElements + size)
 	{
 		m_iHashKey = 0;
 		CalculateHashKey();
@@ -39,7 +39,7 @@ namespace TrioEngine
 #endif
 
 	VertexDeclaration::VertexDeclaration(VertexElement const* pElements, int size) :
-		m_vElements(pElements, pElements + size)
+		m_elements(pElements, pElements + size)
 	{
 
 		m_iHashKey = 0;
@@ -53,13 +53,13 @@ namespace TrioEngine
 	void VertexDeclaration::CalculateHashKey()
 	{
 		std::string signature = "";
-		m_iVertexStride = 0;
+		m_vertexStride = 0;
 		
-		for (int i = 0; i < m_vElements.size(); i++)
+		for (int i = 0; i < m_elements.size(); i++)
 		{
-			m_iVertexStride += GetTypeSize(m_vElements[i].m_eFormat);
+			m_vertexStride += GetTypeSize(m_elements[i].m_format);
 
-			signature += m_vElements[i].GetSignature();
+			signature += m_elements[i].GetSignature();
 		}
 
 		m_iHashKey = ComputeHash(signature.data(), signature.size());
@@ -69,15 +69,15 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 	const std::vector<D3D11_INPUT_ELEMENT_DESC> & VertexDeclaration::GetD3D11InputElements()
 	{
-		if (m_vD3D11Elements.size() == 0)
+		if (m_d3d11Elements.size() == 0)
 		{
-			m_vD3D11Elements.reserve(m_vElements.size());
-			for (int i = 0; i < m_vElements.size(); i++)
+			m_d3d11Elements.reserve(m_elements.size());
+			for (int i = 0; i < m_elements.size(); i++)
 			{
-				m_vD3D11Elements[i] = m_vElements[i].GetD3D11InputElement();
+				m_d3d11Elements[i] = m_elements[i].GetD3D11InputElement();
 			}
 		}
-		return m_vD3D11Elements;
+		return m_d3d11Elements;
 	}
 
 #elif TRIO_OPENGL

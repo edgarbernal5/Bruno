@@ -22,7 +22,7 @@ namespace TrioEngine
 		~ConstantBuffer();
 
 		inline uint8_t* GetRawData() {
-			return m_uiBufferBytes;
+			return m_bufferBytes;
 		}
 
 		template <typename T>
@@ -35,7 +35,7 @@ namespace TrioEngine
 #elif TRIO_OPENGL
 		void Apply(ShaderProgram* program);
 #endif
-		inline std::vector<ConstantBufferField>& GetFieldsDesc() { return m_vBufferFields; }
+		inline std::vector<ConstantBufferField>& GetFieldsDesc() { return m_bufferFields; }
 
 		friend class Effect;
 		friend class EffectLoader;
@@ -47,16 +47,16 @@ namespace TrioEngine
 	private:
 		void Initialize();
 
-		std::vector<ConstantBufferField> m_vBufferFields;
-		GraphicsDevice* m_pDevice;
-		std::string m_csName;
-		uint32_t m_uiSizeInBytes;
+		std::vector<ConstantBufferField> m_bufferFields;
+		GraphicsDevice* m_device;
+		std::string m_name;
+		uint32_t m_sizeInBytes;
 
-		uint8_t* m_uiBufferBytes;
+		uint8_t* m_bufferBytes;
 
-		bool m_bDirty;
+		bool m_dirty;
 #ifdef TRIO_DIRECTX
-		ID3D11Buffer* m_pBuffer;
+		ID3D11Buffer* m_buffer;
 		D3D11_BUFFER_DESC m_bufferDesc;
 
 #elif TRIO_OPENGL
@@ -77,7 +77,7 @@ namespace TrioEngine
 	void ConstantBuffer::SetData(const T& data, int offsetInBytes)
 	{
 #if TRIO_DIRECTX
-		if (m_pBuffer == nullptr)
+		if (m_buffer == nullptr)
 		{
 			Initialize();
 		}
@@ -85,13 +85,13 @@ namespace TrioEngine
 		uint32_t elementSizeInBytes = sizeof(T);
 		D3D11_MAPPED_SUBRESOURCE resource;
 
-		m_pDevice->GetD3DDeviceContext()->Map(m_pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+		m_device->GetD3DDeviceContext()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 
 		T* pDataResource = (T*)((uint8_t*)(resource.pData) + offsetInBytes);
 		
 		memcpy(pDataResource, &data, elementSizeInBytes);
 
-		m_pDevice->GetD3DDeviceContext()->Unmap(m_pBuffer, 0);
+		m_device->GetD3DDeviceContext()->Unmap(m_buffer, 0);
 #elif TRIO_OPENGL
 		//if (m_buffer == 0)
 		//{

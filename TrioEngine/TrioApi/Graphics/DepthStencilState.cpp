@@ -11,7 +11,7 @@ namespace TrioEngine
 	DepthStencilState::DepthStencilState()
 #ifdef TRIO_DIRECTX
 		:
-		m_pState(nullptr)
+		m_state(nullptr)
 #endif
 	{
 		DepthBufferEnable = true;
@@ -40,7 +40,7 @@ namespace TrioEngine
 	{
 
 #ifdef TRIO_DIRECTX
-		if (m_pState == nullptr)
+		if (m_state == nullptr)
         {
 			D3D11_DEPTH_STENCIL_DESC desc;
 			desc.DepthEnable = DepthBufferEnable;
@@ -75,10 +75,10 @@ namespace TrioEngine
 			desc.FrontFace.StencilFailOp = GetStencilOp(StencilFail);
 			desc.FrontFace.StencilPassOp = GetStencilOp(StencilPass);
 
-			DX::ThrowIfFailed(device->GetD3DDevice()->CreateDepthStencilState(&desc, &m_pState));
+			DX::ThrowIfFailed(device->GetD3DDevice()->CreateDepthStencilState(&desc, &m_state));
 		}
 
-		device->GetD3DDeviceContext()->OMSetDepthStencilState(m_pState, ReferenceStencil);
+		device->GetD3DDeviceContext()->OMSetDepthStencilState(m_state, ReferenceStencil);
 #elif OPENGL
 		if (DepthBufferEnable)
 			glEnable(GL_DEPTH_TEST);

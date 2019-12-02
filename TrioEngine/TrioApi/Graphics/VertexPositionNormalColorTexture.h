@@ -53,6 +53,6 @@ namespace TrioEngine
 		Vector4 m_color;
 		Vector2 m_textureCoordinate;
 
-		static VertexDeclaration* g_pVertexDeclaration;
+		static VertexDeclaration* g_vertexDeclaration;
 	};
 }

@@ -22,25 +22,25 @@ namespace TrioEngine
 
 		const BaseType & operator[](int iIndex) const
 		{
-			return m_pTextures[iIndex];
+			return m_textures[iIndex];
 		}
 
 		BaseType & operator[](int iIndex)
 		{
-			m_iDirty |= 1 << iIndex;
-			return m_pTextures[iIndex];
+			m_dirty |= 1 << iIndex;
+			return m_textures[iIndex];
 		}
 	private:
 #ifdef TRIO_OPENGL
 		GLenum		m_glTargets[16];
 #endif
 
-		Texture*	m_pTextures[16];
+		Texture*	m_textures[16];
 		//array<Texture *, 16> m_pTextures;
 
-		int			m_iDirty;
-		int			m_iN;
-		ShaderStage m_eStage;
+		int			m_dirty;
+		int			m_n;
+		ShaderStage m_stage;
 
 		void CreateArray();
 

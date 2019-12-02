@@ -101,5 +101,7 @@ namespace DX
 		}
 	}
 
-#define ReleaseCOM(com) if(com) { com->Release(); com = nullptr; }
 }
+
+#define DELETE_OBJECT(OBJ) if(OBJ) { delete OBJ; OBJ = nullptr; }
+#define RELEASE_COM(COM) if(COM) { COM->Release(); COM = nullptr; }

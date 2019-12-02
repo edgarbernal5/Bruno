@@ -50,6 +50,6 @@ namespace TrioEngine
 		Vector3 m_normal;
 		Vector2 m_textureCoordinate;
 
-		static VertexDeclaration* g_pVertexDeclaration;
+		static VertexDeclaration* g_vertexDeclaration;
 	};
 }
