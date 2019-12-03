@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "CodeWriter.h"
 #include "HLSLTree.h"
@@ -13,7 +13,7 @@ namespace TrioFX
 	struct HLSLFunction;
 	struct HLSLStruct;
 
-	class TRIOAPI_DECL HLSLGenerator
+	class TRIO_API_EXPORT HLSLGenerator
 	{
 	public:
 		enum Target

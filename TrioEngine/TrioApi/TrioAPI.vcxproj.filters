@@ -72,9 +72,6 @@
     <ClInclude Include="TrioApi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TrioApiDecl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Event.h">
       <Filter>Header Files\System</Filter>
     </ClInclude>
@@ -409,6 +406,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrioApiRequisites.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

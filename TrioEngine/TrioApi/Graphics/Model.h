@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include <string>
 
@@ -9,7 +9,7 @@ namespace TrioEngine
 	class Mesh;
 	class ModelMaterial;
 	
-	class TRIOAPI_DECL Model
+	class TRIO_API_EXPORT Model
 	{
 	public:
 		struct ModelLoadParams

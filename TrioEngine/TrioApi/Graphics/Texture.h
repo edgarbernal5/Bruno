@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "SurfaceType.h"
 #include "SurfaceFormat.h"
@@ -9,7 +9,7 @@ namespace TrioEngine
 {
 	class GraphicsDevice;
 
-	class TRIOAPI_DECL Texture
+	class TRIO_API_EXPORT Texture
 	{
 	public:
 		Texture();

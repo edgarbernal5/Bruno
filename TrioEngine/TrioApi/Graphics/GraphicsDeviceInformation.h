@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "PresentationParameters.h"
 
@@ -9,7 +9,7 @@ namespace TrioEngine
 	class GraphicsAdapter;
 	class GraphicsDeviceManager;
 
-	struct TRIOAPI_DECL GraphicsDeviceInformation
+	struct TRIO_API_EXPORT GraphicsDeviceInformation
 	{
 		GraphicsAdapter* Adapter;
 		PresentationParameters Parameters;

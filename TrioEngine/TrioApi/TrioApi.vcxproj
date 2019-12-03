@@ -325,7 +325,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TrioApi.h" />
-    <ClInclude Include="TrioApiDecl.h" />
+    <ClInclude Include="TrioApiRequisites.h" />
     <ClInclude Include="Utils\Hash.h" />
     <ClInclude Include="Utils\StringUtility.h" />
     <ClInclude Include="Utils\TextureLoader.h" />

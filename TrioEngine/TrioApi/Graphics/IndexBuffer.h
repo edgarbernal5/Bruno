@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "BindFlags.h"
 #include "CpuAccessFlags.h"
@@ -14,7 +14,7 @@ namespace TrioEngine
 {
 	class GraphicsDevice;
 
-	class TRIOAPI_DECL IndexBuffer
+	class TRIO_API_EXPORT IndexBuffer
 	{
 	public:
 		IndexBuffer();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 #include "Texture.h"
 
 #include "../Math/Rectangle.h"
@@ -12,7 +12,7 @@ namespace TrioEngine
 {
 	class GraphicsDevice;
 
-	class TRIOAPI_DECL Texture2D : public Texture
+	class TRIO_API_EXPORT Texture2D : public Texture
 	{
 	public:
 		Texture2D(GraphicsDevice* graphicsDevice, int width, int height);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "GraphicsDeviceInformation.h"
 #include "IGraphicsDeviceManager.h"
@@ -28,7 +28,7 @@ namespace TrioEngine
 		int RankFormat(SurfaceFormat format);
 	};
 
-	class TRIOAPI_DECL GraphicsDeviceManager : public IGraphicsDeviceManager, public IGraphicsDeviceService
+	class TRIO_API_EXPORT GraphicsDeviceManager : public IGraphicsDeviceManager, public IGraphicsDeviceService
 	{
 	public:
 		GraphicsDeviceManager(Game* game);

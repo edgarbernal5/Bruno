@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "StringPool.h"
 #include <vector>
@@ -11,7 +11,7 @@ namespace TrioFX
 {
 	class Allocator;
 
-	enum TRIOAPI_DECL HLSLNodeType
+	enum TRIO_API_EXPORT HLSLNodeType
 	{
 		HLSLNodeType_Root,
 		HLSLNodeType_Declaration,
@@ -55,7 +55,7 @@ namespace TrioFX
 		HLSLNodeType_CompilerShader,
 	};
 
-	enum TRIOAPI_DECL HLSLTypeDimension
+	enum TRIO_API_EXPORT HLSLTypeDimension
 	{
 		HLSLTypeDimension_None,
 		HLSLTypeDimension_Scalar,
@@ -69,7 +69,7 @@ namespace TrioFX
 		HLSLTypeDimension_Matrix4x2
 	};
 
-	enum TRIOAPI_DECL HLSLBaseType
+	enum TRIO_API_EXPORT HLSLBaseType
 	{
 		HLSLBaseType_Unknown,
 		HLSLBaseType_Void,
@@ -178,7 +178,7 @@ namespace TrioFX
 			baseType == HLSLBaseType_Uint4;
 	}
 
-	enum TRIOAPI_DECL HLSLBinaryOp
+	enum TRIO_API_EXPORT HLSLBinaryOp
 	{
 		HLSLBinaryOp_And,
 		HLSLBinaryOp_Or,
@@ -235,7 +235,7 @@ namespace TrioFX
 			op == HLSLBinaryOp_DivAssign;
 	}
 
-	enum TRIOAPI_DECL HLSLUnaryOp
+	enum TRIO_API_EXPORT HLSLUnaryOp
 	{
 		HLSLUnaryOp_Negative,       // -x
 		HLSLUnaryOp_Positive,       // +x
@@ -247,7 +247,7 @@ namespace TrioFX
 		HLSLUnaryOp_BitNot,         // ~x
 	};
 
-	enum TRIOAPI_DECL HLSLArgumentModifier
+	enum TRIO_API_EXPORT HLSLArgumentModifier
 	{
 		HLSLArgumentModifier_None,
 		HLSLArgumentModifier_In,
@@ -257,7 +257,7 @@ namespace TrioFX
 		HLSLArgumentModifier_Const,
 	};
 
-	enum TRIOAPI_DECL HLSLTypeFlags
+	enum TRIO_API_EXPORT HLSLTypeFlags
 	{
 		HLSLTypeFlag_None = 0,
 		HLSLTypeFlag_Const = 0x01,
@@ -282,7 +282,7 @@ namespace TrioFX
 		HLSLTypeFlag_NoPromote = 0x200000,
 	};
 
-	enum TRIOAPI_DECL HLSLAttributeType
+	enum TRIO_API_EXPORT HLSLAttributeType
 	{
 		HLSLAttributeType_Unknown,
 		HLSLAttributeType_Unroll,
@@ -291,7 +291,7 @@ namespace TrioFX
 		HLSLAttributeType_NoFastMath,
 	};
 
-	enum TRIOAPI_DECL HLSLAddressSpace
+	enum TRIO_API_EXPORT HLSLAddressSpace
 	{
 		HLSLAddressSpace_Undefined,
 		HLSLAddressSpace_Constant,
@@ -366,21 +366,21 @@ namespace TrioFX
 	}
 
 	/** Base class for all nodes in the HLSL AST */
-	struct TRIOAPI_DECL HLSLNode
+	struct TRIO_API_EXPORT HLSLNode
 	{
 		HLSLNodeType        nodeType;
 		const char*         fileName;
 		int                 line;
 	};
 
-	struct TRIOAPI_DECL HLSLRoot : public HLSLNode
+	struct TRIO_API_EXPORT HLSLRoot : public HLSLNode
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Root;
 		HLSLRoot()          { statement = nullptr; }
 		HLSLStatement*      statement;          // First statement.
 	};
 
-	struct TRIOAPI_DECL HLSLStatement : public HLSLNode
+	struct TRIO_API_EXPORT HLSLStatement : public HLSLNode
 	{
 		HLSLStatement()
 		{
@@ -393,7 +393,7 @@ namespace TrioFX
 		mutable bool        hidden;
 	};
 
-	struct TRIOAPI_DECL HLSLAttribute : public HLSLNode
+	struct TRIO_API_EXPORT HLSLAttribute : public HLSLNode
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Attribute;
 		HLSLAttribute()
@@ -407,7 +407,7 @@ namespace TrioFX
 		HLSLAttribute*      nextAttribute;
 	};
 
-	struct TRIOAPI_DECL HLSLDeclaration : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLDeclaration : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Declaration;
 		HLSLDeclaration()
@@ -439,7 +439,7 @@ namespace TrioFX
 		HLSLBuffer*         buffer;
 	};
 
-	struct TRIOAPI_DECL HLSLStruct : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLStruct : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Struct;
 		HLSLStruct()
@@ -451,7 +451,7 @@ namespace TrioFX
 		HLSLStructField*    field;              // First field in the structure.
 	};
 
-	struct TRIOAPI_DECL HLSLStructField : public HLSLNode
+	struct TRIO_API_EXPORT HLSLStructField : public HLSLNode
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_StructField;
 		HLSLStructField()
@@ -471,7 +471,7 @@ namespace TrioFX
 	};
 
 	/** A cbuffer or tbuffer declaration. */
-	struct TRIOAPI_DECL HLSLBuffer : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLBuffer : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Buffer;
 		HLSLBuffer()
@@ -488,7 +488,7 @@ namespace TrioFX
 	};
 
 	/** Field declaration inside of a cbuffer or tbuffer */ // @@ Isn't this just a regular declaration?
-	//struct TRIOAPI_DECL HLSLBufferField : public HLSLNode
+	//struct TRIO_API_EXPORT HLSLBufferField : public HLSLNode
 	//{
 	//	static const HLSLNodeType s_type = HLSLNodeType_BufferField;
 
@@ -518,7 +518,7 @@ namespace TrioFX
 	//};
 
 	/** Function declaration */
-	struct TRIOAPI_DECL HLSLFunction : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLFunction : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Function;
 		HLSLFunction()
@@ -544,7 +544,7 @@ namespace TrioFX
 	};
 
 	/** Declaration of an argument to a function. */
-	struct TRIOAPI_DECL HLSLArgument : public HLSLNode
+	struct TRIO_API_EXPORT HLSLArgument : public HLSLNode
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Argument;
 		HLSLArgument()
@@ -568,7 +568,7 @@ namespace TrioFX
 	};
 
 	/** A expression which forms a complete statement. */
-	struct TRIOAPI_DECL HLSLExpressionStatement : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLExpressionStatement : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_ExpressionStatement;
 		HLSLExpressionStatement()
@@ -578,7 +578,7 @@ namespace TrioFX
 		HLSLExpression*     expression;
 	};
 
-	struct TRIOAPI_DECL HLSLReturnStatement : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLReturnStatement : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_ReturnStatement;
 		HLSLReturnStatement()
@@ -588,22 +588,22 @@ namespace TrioFX
 		HLSLExpression*     expression;
 	};
 
-	struct TRIOAPI_DECL HLSLDiscardStatement : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLDiscardStatement : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_DiscardStatement;
 	};
 
-	struct TRIOAPI_DECL HLSLBreakStatement : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLBreakStatement : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_BreakStatement;
 	};
 
-	struct TRIOAPI_DECL HLSLContinueStatement : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLContinueStatement : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_ContinueStatement;
 	};
 
-	struct TRIOAPI_DECL HLSLIfStatement : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLIfStatement : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_IfStatement;
 		HLSLIfStatement()
@@ -619,7 +619,7 @@ namespace TrioFX
 		bool                isStatic;
 	};
 
-	struct TRIOAPI_DECL HLSLForStatement : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLForStatement : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_ForStatement;
 		HLSLForStatement()
@@ -635,7 +635,7 @@ namespace TrioFX
 		HLSLStatement*      statement;
 	};
 
-	struct TRIOAPI_DECL HLSLBlockStatement : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLBlockStatement : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_BlockStatement;
 		HLSLBlockStatement()
@@ -647,7 +647,7 @@ namespace TrioFX
 
 
 	/** Base type for all types of expressions. */
-	struct TRIOAPI_DECL HLSLExpression : public HLSLNode
+	struct TRIO_API_EXPORT HLSLExpression : public HLSLNode
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Expression;
 		HLSLExpression()
@@ -658,7 +658,7 @@ namespace TrioFX
 		HLSLExpression*     nextExpression; // Used when the expression is part of a list, like in a function call.
 	};
 
-	struct TRIOAPI_DECL HLSLUnaryExpression : public HLSLExpression
+	struct TRIO_API_EXPORT HLSLUnaryExpression : public HLSLExpression
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_UnaryExpression;
 		HLSLUnaryExpression()
@@ -669,7 +669,7 @@ namespace TrioFX
 		HLSLExpression*     expression;
 	};
 
-	struct TRIOAPI_DECL HLSLBinaryExpression : public HLSLExpression
+	struct TRIO_API_EXPORT HLSLBinaryExpression : public HLSLExpression
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_BinaryExpression;
 		HLSLBinaryExpression()
@@ -683,7 +683,7 @@ namespace TrioFX
 	};
 
 	/** ? : construct */
-	struct TRIOAPI_DECL HLSLConditionalExpression : public HLSLExpression
+	struct TRIO_API_EXPORT HLSLConditionalExpression : public HLSLExpression
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_ConditionalExpression;
 		HLSLConditionalExpression()
@@ -697,7 +697,7 @@ namespace TrioFX
 		HLSLExpression*     falseExpression;
 	};
 
-	struct TRIOAPI_DECL HLSLCastingExpression : public HLSLExpression
+	struct TRIO_API_EXPORT HLSLCastingExpression : public HLSLExpression
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_CastingExpression;
 		HLSLCastingExpression()
@@ -709,7 +709,7 @@ namespace TrioFX
 	};
 
 	/** Float, integer, boolean, etc. literal constant. */
-	struct TRIOAPI_DECL HLSLLiteralExpression : public HLSLExpression
+	struct TRIO_API_EXPORT HLSLLiteralExpression : public HLSLExpression
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_LiteralExpression;
 		HLSLBaseType        type;   // Note, not all types can be literals.
@@ -722,7 +722,7 @@ namespace TrioFX
 	};
 
 	/** An identifier, typically a variable name or structure field name. */
-	struct TRIOAPI_DECL HLSLIdentifierExpression : public HLSLExpression
+	struct TRIO_API_EXPORT HLSLIdentifierExpression : public HLSLExpression
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_IdentifierExpression;
 		HLSLIdentifierExpression()
@@ -735,7 +735,7 @@ namespace TrioFX
 	};
 
 	/** float2(1, 2) */
-	struct TRIOAPI_DECL HLSLConstructorExpression : public HLSLExpression
+	struct TRIO_API_EXPORT HLSLConstructorExpression : public HLSLExpression
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_ConstructorExpression;
 		HLSLConstructorExpression()
@@ -747,7 +747,7 @@ namespace TrioFX
 	};
 
 	/** object.member **/
-	struct TRIOAPI_DECL HLSLMemberAccess : public HLSLExpression
+	struct TRIO_API_EXPORT HLSLMemberAccess : public HLSLExpression
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_MemberAccess;
 		HLSLMemberAccess()
@@ -762,7 +762,7 @@ namespace TrioFX
 	};
 
 	/** array[index] **/
-	struct TRIOAPI_DECL HLSLArrayAccess : public HLSLExpression
+	struct TRIO_API_EXPORT HLSLArrayAccess : public HLSLExpression
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_ArrayAccess;
 		HLSLArrayAccess()
@@ -774,7 +774,7 @@ namespace TrioFX
 		HLSLExpression*     index;
 	};
 
-	struct TRIOAPI_DECL HLSLFunctionCall : public HLSLExpression
+	struct TRIO_API_EXPORT HLSLFunctionCall : public HLSLExpression
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_FunctionCall;
 		HLSLFunctionCall()
@@ -788,7 +788,7 @@ namespace TrioFX
 		HLSLExpression*     argument;
 	};
 
-	struct TRIOAPI_DECL HLSLFunctionAccess : public HLSLFunctionCall
+	struct TRIO_API_EXPORT HLSLFunctionAccess : public HLSLFunctionCall
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_FunctionAccess;
 		HLSLFunctionAccess()
@@ -802,7 +802,7 @@ namespace TrioFX
 		//bool                swizzle;
 	};
 
-	struct TRIOAPI_DECL HLSLStateAssignment : public HLSLNode
+	struct TRIO_API_EXPORT HLSLStateAssignment : public HLSLNode
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_StateAssignment;
 		HLSLStateAssignment()
@@ -822,7 +822,7 @@ namespace TrioFX
 		HLSLStateAssignment*    nextStateAssignment;
 	};
 
-	struct TRIOAPI_DECL HLSLSamplerState : public HLSLExpression // @@ Does this need to be an expression? Does it have a type? I guess type is useful.
+	struct TRIO_API_EXPORT HLSLSamplerState : public HLSLExpression // @@ Does this need to be an expression? Does it have a type? I guess type is useful.
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_SamplerState;
 		HLSLSamplerState()
@@ -835,7 +835,7 @@ namespace TrioFX
 		HLSLStateAssignment*    stateAssignments;
 	};
 
-	struct TRIOAPI_DECL HLSLPass : public HLSLNode
+	struct TRIO_API_EXPORT HLSLPass : public HLSLNode
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Pass;
 		HLSLPass()
@@ -852,7 +852,7 @@ namespace TrioFX
 		HLSLPass*               nextPass;
 	};
 
-	struct TRIOAPI_DECL HLSLPassShader : public HLSLNode
+	struct TRIO_API_EXPORT HLSLPassShader : public HLSLNode
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_PassShader;
 		HLSLPassShader()
@@ -867,7 +867,7 @@ namespace TrioFX
 		HLSLPassShader*               nextShader;
 	};
 
-	struct TRIOAPI_DECL HLSLPass11 : public HLSLNode
+	struct TRIO_API_EXPORT HLSLPass11 : public HLSLNode
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Pass11;
 		HLSLPass11()
@@ -888,7 +888,7 @@ namespace TrioFX
 		HLSLPass11*               nextPass;
 	};
 
-	struct TRIOAPI_DECL HLSLTechnique : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLTechnique : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Technique;
 		HLSLTechnique()
@@ -903,7 +903,7 @@ namespace TrioFX
 		HLSLPass*           passes;
 	};
 
-	struct TRIOAPI_DECL HLSLTechnique11 : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLTechnique11 : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Technique11;
 		HLSLTechnique11()
@@ -918,7 +918,7 @@ namespace TrioFX
 		HLSLPass11*           passes;
 	};
 
-	struct TRIOAPI_DECL HLSLCompilerShader : public HLSLNode
+	struct TRIO_API_EXPORT HLSLCompilerShader : public HLSLNode
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_CompilerShader;
 		HLSLCompilerShader()
@@ -932,7 +932,7 @@ namespace TrioFX
 		const char*   functionCallName;
 	};
 
-	struct TRIOAPI_DECL HLSLPipeline : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLPipeline : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Pipeline;
 		HLSLPipeline()
@@ -947,7 +947,7 @@ namespace TrioFX
 		HLSLStateAssignment*    stateAssignments;
 	};
 
-	struct TRIOAPI_DECL HLSLStage : public HLSLStatement
+	struct TRIO_API_EXPORT HLSLStage : public HLSLStatement
 	{
 		static const HLSLNodeType s_type = HLSLNodeType_Stage;
 		HLSLStage()
@@ -968,7 +968,7 @@ namespace TrioFX
 	/**
 	* Abstract syntax tree for parsed HLSL code.
 	*/
-	class TRIOAPI_DECL HLSLTree
+	class TRIO_API_EXPORT HLSLTree
 	{
 
 	public:
@@ -1041,7 +1041,7 @@ namespace TrioFX
 
 
 
-	class TRIOAPI_DECL HLSLTreeVisitor
+	class TRIO_API_EXPORT HLSLTreeVisitor
 	{
 	public:
 		virtual void VisitType(HLSLType & type);
@@ -1096,7 +1096,7 @@ namespace TrioFX
 		
 	};
 
-	class TRIOAPI_DECL HLSLFunctionVisitor : public TrioFX::HLSLTreeVisitor
+	class TRIO_API_EXPORT HLSLFunctionVisitor : public TrioFX::HLSLTreeVisitor
 	{
 	public:
 		HLSLFunctionVisitor();

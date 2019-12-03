@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "ShaderLanguageTarget.h"
 #include <map>
@@ -22,7 +22,7 @@ namespace TrioEngine
 	class GraphicsDevice;
 	class Shader;
 
-	class TRIOAPI_DECL Effect
+	class TRIO_API_EXPORT Effect
 	{
 	public:
 		Effect(GraphicsDevice* device);

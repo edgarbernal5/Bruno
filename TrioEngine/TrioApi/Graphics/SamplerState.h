@@ -8,7 +8,7 @@
 
 namespace TrioEngine
 {
-	struct TRIOAPI_DECL SamplerState
+	struct TRIO_API_EXPORT SamplerState
 	{
 	public:
 		SamplerState();

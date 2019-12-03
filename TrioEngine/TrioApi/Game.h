@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "GameHost.h"
 #include "GameServiceContainer.h"
@@ -12,7 +12,7 @@ namespace TrioEngine
 	class GraphicsDevice;
 	class IGraphicsDeviceManager;
 
-	class TRIOAPI_DECL Game
+	class TRIO_API_EXPORT Game
 	{
 	public:
 		Game();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "DepthFormat.h"
 #include "PresentInterval.h"
@@ -9,7 +9,7 @@
 
 namespace TrioEngine
 {
-	struct TRIOAPI_DECL PresentationParameters
+	struct TRIO_API_EXPORT PresentationParameters
 	{
 		PresentationParameters();
 		~PresentationParameters();

@@ -9,7 +9,7 @@ namespace TrioEngine
 	struct SamplerState;
 	class GraphicsDevice;
 
-	class TRIOAPI_DECL SamplerStateCollection
+	class TRIO_API_EXPORT SamplerStateCollection
 	{
 	public:
 		SamplerStateCollection(ShaderStage stage);

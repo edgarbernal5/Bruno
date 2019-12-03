@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "CodeWriter.h"
 #include "HLSLTree.h"
@@ -8,7 +8,7 @@
 namespace TrioFX
 {
 
-	class TRIOAPI_DECL GLSLGenerator
+	class TRIO_API_EXPORT GLSLGenerator
 	{
 
 	public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "BindFlags.h"
 #include "ResourceUsage.h"
@@ -14,7 +14,7 @@ namespace TrioEngine
 {
 	class VertexDeclaration;
 
-	class TRIOAPI_DECL VertexBuffer
+	class TRIO_API_EXPORT VertexBuffer
 	{
 	public:
 		VertexBuffer();
@@ -239,7 +239,7 @@ namespace TrioEngine
 		SetData<T>(0, data, length, 0, length, 0, SetDataOptions::None);
 	}
 
-	class TRIOAPI_DECL DynamicVertexBuffer : public VertexBuffer
+	class TRIO_API_EXPORT DynamicVertexBuffer : public VertexBuffer
 	{
 	public:
 		DynamicVertexBuffer(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount);

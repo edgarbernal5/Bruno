@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "CullMode.h"
 #include "FillMode.h"
@@ -9,7 +9,7 @@ namespace TrioEngine
 {
 	class GraphicsDevice;
 
-	class TRIOAPI_DECL RasterizerState
+	class TRIO_API_EXPORT RasterizerState
 	{
 	public:
 		RasterizerState();

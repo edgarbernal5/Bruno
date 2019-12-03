@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "CompareFunction.h"
 #include "DepthWriteMask.h"
@@ -10,7 +10,7 @@ namespace TrioEngine
 {
 	class GraphicsDevice;
 
-	struct TRIOAPI_DECL DepthStencilState
+	struct TRIO_API_EXPORT DepthStencilState
 	{
 	public:
 		DepthStencilState();

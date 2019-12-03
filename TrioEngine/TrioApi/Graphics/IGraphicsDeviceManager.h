@@ -1,12 +1,12 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "IServiceBase.h"
 
 namespace TrioEngine
 {
-	class TRIOAPI_DECL IGraphicsDeviceManager : public IServiceBase
+	class TRIO_API_EXPORT IGraphicsDeviceManager : public IServiceBase
 	{
 	public:
 		virtual ~IGraphicsDeviceManager() {}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "../Math/MathVector.h"
 #include <string>
@@ -12,7 +12,7 @@ namespace TrioEngine
 	class Model;
 	class ModelMaterial;
 	
-	class TRIOAPI_DECL Mesh
+	class TRIO_API_EXPORT Mesh
 	{
 	public:
 		

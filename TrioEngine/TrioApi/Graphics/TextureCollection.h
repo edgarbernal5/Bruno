@@ -9,7 +9,7 @@ namespace TrioEngine
 	class Texture;
 	class GraphicsDevice;
 
-	class TRIOAPI_DECL TextureCollection
+	class TRIO_API_EXPORT TextureCollection
 	{
 	public:
 		typedef Texture* BaseType;

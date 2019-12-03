@@ -1,10 +1,10 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 namespace TrioEngine
 {
-	class TRIOAPI_DECL IServiceBase
+	class TRIO_API_EXPORT IServiceBase
 	{
 	public:
 		virtual ~IServiceBase() {}

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 #include "SurfaceFormat.h"
 
 namespace TrioEngine
 {
-	struct TRIOAPI_DECL DisplayMode
+	struct TRIO_API_EXPORT DisplayMode
 	{
 		int Width, Height;
 		SurfaceFormat Format;

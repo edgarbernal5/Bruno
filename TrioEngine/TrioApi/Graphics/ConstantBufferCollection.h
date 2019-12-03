@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "ConstantBuffer.h"
 
@@ -14,7 +14,7 @@ namespace TrioEngine
 {
 	class GraphicsDevice;
 
-	class TRIOAPI_DECL ConstantBufferCollection
+	class TRIO_API_EXPORT ConstantBufferCollection
 	{
 	public:
 		ConstantBufferCollection();

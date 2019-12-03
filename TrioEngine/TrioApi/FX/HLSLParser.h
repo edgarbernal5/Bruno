@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "HLSLTokenizer.h"
 #include "HLSLTree.h"
@@ -14,7 +14,7 @@ namespace TrioFX
 {
 	struct EffectState;
 
-	class TRIOAPI_DECL HLSLParser
+	class TRIO_API_EXPORT HLSLParser
 	{
 
 	public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "IServiceBase.h"
 #include "Event.h"
@@ -9,7 +9,7 @@ namespace TrioEngine
 {
 	class GraphicsDevice;
 
-	class TRIOAPI_DECL IGraphicsDeviceService
+	class TRIO_API_EXPORT IGraphicsDeviceService
 	{
 	public:
 		virtual GraphicsDevice* GetGraphicsDevice() = 0;

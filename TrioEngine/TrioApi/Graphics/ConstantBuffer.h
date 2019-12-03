@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "ConstantBufferField.h"
 #include "GraphicsDevice.h"
@@ -14,7 +14,7 @@
 
 namespace TrioEngine
 {
-	class TRIOAPI_DECL ConstantBuffer
+	class TRIO_API_EXPORT ConstantBuffer
 	{
 	public:
 		ConstantBuffer(GraphicsDevice* device, std::string name, uint32_t sizeInBytes, std::vector<ConstantBufferField>& bufferFields);

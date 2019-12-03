@@ -1,13 +1,13 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include <string>
 #include <vector>
 
 namespace TrioEngine
 {
-	class TRIOAPI_DECL TextureLoader
+	class TRIO_API_EXPORT TextureLoader
 	{
 	public:
 		TextureLoader();

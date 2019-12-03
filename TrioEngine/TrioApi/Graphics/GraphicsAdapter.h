@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include <vector>
 #include "SurfaceFormat.h"
@@ -8,7 +8,7 @@
 
 namespace TrioEngine
 {
-	class TRIOAPI_DECL GraphicsAdapter
+	class TRIO_API_EXPORT GraphicsAdapter
 	{
 	public:
 		GraphicsAdapter();

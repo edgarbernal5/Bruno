@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include <string>
 
@@ -12,7 +12,7 @@
 
 namespace TrioFX
 {
-	class TRIOAPI_DECL CodeWriter
+	class TRIO_API_EXPORT CodeWriter
 	{
 
 	public:

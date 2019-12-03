@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include <string>
 
@@ -8,7 +8,7 @@ namespace TrioEngine
 {
 	class IServiceBase;
 
-	class TRIOAPI_DECL IServiceProvider
+	class TRIO_API_EXPORT IServiceProvider
 	{
 	public:
 		virtual IServiceBase* GetService(std::string csTypeName) = 0;

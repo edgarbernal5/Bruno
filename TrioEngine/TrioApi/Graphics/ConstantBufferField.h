@@ -1,12 +1,12 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include <string>
 
 namespace TrioEngine
 {
-	struct TRIOAPI_DECL ConstantBufferField
+	struct TRIO_API_EXPORT ConstantBufferField
 	{
 		std::string Name;
 		uint32_t Offset;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include <string>
 
@@ -8,7 +8,7 @@ struct aiMaterial;
 
 namespace TrioEngine
 {	
-	class TRIOAPI_DECL ModelMaterial
+	class TRIO_API_EXPORT ModelMaterial
 	{
 	public:
 		ModelMaterial();

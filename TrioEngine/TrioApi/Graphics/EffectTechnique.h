@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "..\FX\HLSLParser.h"
 #include <vector>
@@ -11,7 +11,7 @@ namespace TrioEngine
 	class GraphicsDevice;
 	class Effect;
 	
-	class TRIOAPI_DECL EffectTechnique
+	class TRIO_API_EXPORT EffectTechnique
 	{
 	public:
 		EffectTechnique(std::vector<EffectPass*>& passes, const char* name);

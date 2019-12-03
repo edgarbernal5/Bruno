@@ -1,8 +1,8 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 namespace TrioFX
 {
-	void TRIOAPI_DECL Log_Error(const char* format, ...);
+	void TRIO_API_EXPORT Log_Error(const char* format, ...);
 }

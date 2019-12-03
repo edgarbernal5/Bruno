@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "ShaderStage.h"
 #include <vector>
@@ -12,7 +12,7 @@ namespace TrioEngine
 	class InputLayoutCache;
 #endif
 
-	class TRIOAPI_DECL Shader
+	class TRIO_API_EXPORT Shader
 	{
 	public:
 		Shader(GraphicsDevice* device, ShaderStage stage, const std::vector<uint8_t>& bytes);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "DepthFormat.h"
 #include "DepthStencilViewFlags.h"
@@ -10,7 +10,7 @@ namespace TrioEngine
 {
 	class GraphicsDevice;
 
-	class TRIOAPI_DECL DepthStencilBuffer
+	class TRIO_API_EXPORT DepthStencilBuffer
 	{
 	public:
 		DepthStencilBuffer();

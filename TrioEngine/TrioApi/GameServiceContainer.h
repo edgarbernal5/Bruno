@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "IServiceProvider.h"
 #include <string>
@@ -10,7 +10,7 @@ namespace TrioEngine
 {
 	class IServiceBase;
 
-	class TRIOAPI_DECL GameServiceContainer : public IServiceProvider
+	class TRIO_API_EXPORT GameServiceContainer : public IServiceProvider
 	{
 	public:
 		GameServiceContainer();

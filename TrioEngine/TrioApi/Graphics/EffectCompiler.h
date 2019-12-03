@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "ShaderStage.h"
 #include "..\FX\GLSLGenerator.h"
@@ -9,7 +9,7 @@
 
 namespace TrioEngine
 {
-	class TRIOAPI_DECL  EffectCompiler
+	class TRIO_API_EXPORT  EffectCompiler
 	{
 	public:
 #if TRIO_DIRECTX

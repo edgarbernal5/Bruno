@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "ClearOptions.h"
 #include "Event.h"
@@ -28,7 +28,7 @@ namespace TrioEngine
 	class TextureCollection;
 	class VertexBuffer;
 	
-	class TRIOAPI_DECL GraphicsDevice
+	class TRIO_API_EXPORT GraphicsDevice
 	{
 	public:
 		GraphicsDevice(GraphicsAdapter* adapter, PresentationParameters parameters);

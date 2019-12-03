@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "../Math/MathVector.h"
 #include "VertexElement.h"
@@ -10,7 +10,7 @@ namespace TrioEngine
 	class VertexDeclaration;
 
 	// Vertex struct holding position and color information.
-	struct TRIOAPI_DECL VertexPositionColor
+	struct TRIO_API_EXPORT VertexPositionColor
 	{
 		VertexPositionColor() = default;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "../Math/MathVector.h"
 #include "VertexElement.h"
@@ -8,7 +8,7 @@
 namespace TrioEngine
 {
 	// Vertex struct holding position, normal vector, color, and texture mapping information.
-	struct TRIOAPI_DECL VertexPositionNormalColorTexture
+	struct TRIO_API_EXPORT VertexPositionNormalColorTexture
 	{
 		VertexPositionNormalColorTexture() = default;
 

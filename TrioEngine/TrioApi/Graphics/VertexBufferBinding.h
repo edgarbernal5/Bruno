@@ -1,12 +1,12 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 namespace TrioEngine
 {
 	class VertexBuffer;
 
-	struct TRIOAPI_DECL VertexBufferBinding
+	struct TRIO_API_EXPORT VertexBufferBinding
 	{
 		VertexBuffer* Buffer;
 		uint32_t Offset, Stride;
@@ -23,7 +23,7 @@ namespace TrioEngine
 		}
 	};
 
-	struct TRIOAPI_DECL VertexBufferBindings
+	struct TRIO_API_EXPORT VertexBufferBindings
 	{
 	public:
 		VertexBufferBindings();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "ShaderLanguageTarget.h"
 #include <map>
@@ -17,7 +17,7 @@ namespace TrioEngine
 {
 	class Effect;
 
-	class TRIOAPI_DECL EffectLoader
+	class TRIO_API_EXPORT EffectLoader
 	{
 	public:
 		EffectLoader(Effect* effect);

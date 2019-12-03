@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include <vector>
 #include <string>
@@ -12,7 +12,7 @@ namespace TrioEngine
 	class GraphicsDevice;
 	class VertexDeclaration;
 
-	class TRIOAPI_DECL InputLayoutCache
+	class TRIO_API_EXPORT InputLayoutCache
 	{
 	public:
 		InputLayoutCache(GraphicsDevice* device, std::vector<uint8_t>& byteCode);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include <string>
 #include <vector>
@@ -10,7 +10,7 @@ namespace TrioEngine
 {
 	class VertexDeclaration;
 
-	class TRIOAPI_DECL VertexDeclarationHelper 
+	class TRIO_API_EXPORT VertexDeclarationHelper 
 	{
 	public:
 #ifdef TRIO_DIRECTX

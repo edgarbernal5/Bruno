@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "ConstantBufferField.h"
 #include "..\Math\MathVector.h"
@@ -16,7 +16,7 @@ namespace TrioEngine
 	class ConstantBuffer;
 	class SamplerState;
 	
-	class TRIOAPI_DECL EffectParameter
+	class TRIO_API_EXPORT EffectParameter
 	{
 	private:
 		struct STexture {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "..\FX\HLSLParser.h"
 #include <string>
@@ -11,7 +11,7 @@ namespace TrioEngine
 	class Effect;
 	class Shader;
 	
-	class TRIOAPI_DECL EffectPass
+	class TRIO_API_EXPORT EffectPass
 	{
 	public:
 		EffectPass(TrioFX::HLSLPass11* pass11, TrioFX::HLSLTree& tree, std::vector<TrioFX::HLSLBuffer*> &buffers, std::vector<TrioFX::HLSLDeclaration*> &samplers, GraphicsDevice* device, Effect* effect);

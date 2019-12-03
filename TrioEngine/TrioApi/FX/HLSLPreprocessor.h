@@ -1,14 +1,14 @@
 #pragma once
 
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include <string>
 
 namespace TrioFX
 {
 
-	class TRIOAPI_DECL HLSLPreprocessor
+	class TRIO_API_EXPORT HLSLPreprocessor
 	{
 	public:
 		HLSLPreprocessor(const char* buffer, size_t length);

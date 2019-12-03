@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TrioApiDecl.h"
+#include "TrioApiRequisites.h"
 
 #include "FormatHelper.h"
 #include "VertexElement.h"
@@ -50,7 +50,7 @@ namespace TrioEngine
 	};
 #endif
 
-	class TRIOAPI_DECL VertexDeclaration
+	class TRIO_API_EXPORT VertexDeclaration
 	{
 	public:
 		VertexDeclaration();
