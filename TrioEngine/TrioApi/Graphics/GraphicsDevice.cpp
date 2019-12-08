@@ -236,7 +236,7 @@ namespace TrioEngine
 				options = options | ClearOptions::Stencil;
 		}
 
-		Clear(options, color, m_screenViewport.MaxDepth, 0);
+		Clear(options, color, m_viewport.maxDepth, 0);
 	}
 
 	void GraphicsDevice::Clear(ClearOptions options, Color &color, float depth, uint8_t stencil)
@@ -548,7 +548,7 @@ namespace TrioEngine
 		m_d3dContext->OMSetRenderTargets(1, &m_currentRenderTargets[0], m_depthStencilBuffer->m_depthStencilView.Get());
 
 		// Set the 3D rendering viewport to target the entire window.
-		m_screenViewport = CD3D11_VIEWPORT(
+		m_viewport = CD3D11_VIEWPORT(
 			0.0f,
 			0.0f,
 			static_cast<float>(backBufferWidth),
@@ -556,7 +556,7 @@ namespace TrioEngine
 		);
 
 		// Set the viewport.
-		m_d3dContext->RSSetViewports(1, &m_screenViewport);
+		m_d3dContext->RSSetViewports(1, m_viewport.Get11());
 
 #endif
 	}
@@ -789,5 +789,13 @@ namespace TrioEngine
 
 		m_vertexShader = shader;
 		m_vertexShaderDirty = true;
+	}
+
+	void GraphicsDevice::SetViewport(Viewport viewport)
+	{
+		m_viewport = viewport;
+#ifdef TRIO_DIRECTX
+		m_d3dContext->RSSetViewports(1, m_viewport.Get11());
+#endif
 	}
 }

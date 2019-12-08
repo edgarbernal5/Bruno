@@ -32,11 +32,11 @@ namespace TrioEngine
 		inline PresentInterval GetPresentInterval() const { return m_presentInternal; }
 
 		inline void SetHostHWND(HWND host) { m_deviceWindowHandle = host; }
-		inline void setSurfaceFormat(SurfaceFormat format) { m_backBufferFormat = format; }
-		inline void setBackBufferWidth(int width) { m_backBufferWidth = width; }
-		inline void setBackBufferHeight(int height) { m_backBufferHeight = height; }
-		inline void setDepthStencilFormat(DepthFormat format) { m_depthStencilFormat = format; }
-		inline void SetIsFullScreen(bool isfull) { m_fullScreen = isfull; }
+		inline void SetSurfaceFormat(SurfaceFormat format) { m_backBufferFormat = format; }
+		inline void SetBackBufferWidth(int width) { m_backBufferWidth = width; }
+		inline void SetBackBufferHeight(int height) { m_backBufferHeight = height; }
+		inline void SetDepthStencilFormat(DepthFormat format) { m_depthStencilFormat = format; }
+		inline void SetIsFullScreen(bool isfullScreen) { m_fullScreen = isfullScreen; }
 		inline void SetPresentInterval(PresentInterval interval) { m_presentInternal = interval; }
 		inline void SetRenderTargetUsage(RenderTargetUsage usage) { m_usage = usage; }
 

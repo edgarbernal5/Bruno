@@ -12,3 +12,7 @@
 #define TRIO_API_EXPORT
 
 #endif
+namespace TrioEngine
+{
+	class Game;
+}

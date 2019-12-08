@@ -145,6 +145,9 @@
       <AdditionalDependencies>assimpd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DevIL\lib;$(SolutionDir)Dependencies\Assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>echo F|xcopy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "$(SolutionDir)TrioWpfEditor\bin\$(Configuration)\$(PlatformName)\$(TargetName)$(TargetExt)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>

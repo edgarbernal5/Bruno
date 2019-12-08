@@ -123,22 +123,22 @@ namespace TrioEngine
 
 		if (m_isFullScreen)
 		{
-			baseDeviceInfo.Parameters.setBackBufferHeight(mode.Height);
-			baseDeviceInfo.Parameters.setBackBufferWidth(mode.Width);
+			baseDeviceInfo.Parameters.SetBackBufferHeight(mode.Height);
+			baseDeviceInfo.Parameters.SetBackBufferWidth(mode.Width);
 		}
 		else if (m_useResizedBackBuffer)
 		{
-			baseDeviceInfo.Parameters.setBackBufferHeight(m_resizedBackBufferHeight);
-			baseDeviceInfo.Parameters.setBackBufferWidth(m_resizedBackBufferWidth);
+			baseDeviceInfo.Parameters.SetBackBufferHeight(m_resizedBackBufferHeight);
+			baseDeviceInfo.Parameters.SetBackBufferWidth(m_resizedBackBufferWidth);
 		}
 		else
 		{
-			baseDeviceInfo.Parameters.setBackBufferHeight(m_backBufferHeight);
-			baseDeviceInfo.Parameters.setBackBufferWidth(m_backBufferWidth);
+			baseDeviceInfo.Parameters.SetBackBufferHeight(m_backBufferHeight);
+			baseDeviceInfo.Parameters.SetBackBufferWidth(m_backBufferWidth);
 		}
 
-		baseDeviceInfo.Parameters.setSurfaceFormat(format);
-		baseDeviceInfo.Parameters.setDepthStencilFormat(depthFormat);
+		baseDeviceInfo.Parameters.SetSurfaceFormat(format);
+		baseDeviceInfo.Parameters.SetDepthStencilFormat(depthFormat);
 
 		bool found = false;
 		for (size_t i = 0; i < foundDevices.size(); i++)

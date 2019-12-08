@@ -53,14 +53,13 @@ namespace TrioEngine
 		IDXGISwapChain*         GetSwapChain() const { return m_swapChain.Get(); }
 		IDXGISwapChain1*        GetSwapChain1() const { return m_swapChain1.Get(); }
 		//ID3D11DepthStencilView* GetDepthStencilView() const					{ return m_depthStencilBuffer->m_d3dDepthStencilView.Get(); }
-
-		D3D11_VIEWPORT          GetScreenViewport() const { return m_screenViewport; }
 #endif
 
 		inline GraphicsCapabilities GetGraphicsCapabilities() { return m_graphicsCapabilities; }
 		inline PresentationParameters& GetPresentationParameters() { return m_presentationParameters; }
 		inline TextureCollection* GetTextures() { return m_textureCollection; }
 		inline TextureCollection* GetVertexTextures() { return m_textureCollection; }
+		inline Viewport GetViewport() { return m_viewport; }
 		
 		void Present();
 		void Reset(PresentationParameters presentationParameters);
@@ -74,6 +73,7 @@ namespace TrioEngine
 		void SetVertexBuffer(VertexBuffer *buffer);
 		void SetVertexBuffer(VertexBufferBindings &bindings);
 		void SetVertexShader(Shader* shader);
+		void SetViewport(Viewport viewport);
 		void SetPixelShader(Shader* shader);
 
 		Event<> DeviceLost;
@@ -117,6 +117,8 @@ namespace TrioEngine
 		ConstantBufferCollection* m_vertexConstantBuffers;
 		ConstantBufferCollection* m_pixelConstantBuffers;
 
+		Viewport				m_viewport;
+
 		uint32_t                                            m_backBufferCount;
 #ifdef TRIO_DIRECTX
 		Microsoft::WRL::ComPtr<ID3D11Device>				m_d3dDevice;
@@ -129,8 +131,7 @@ namespace TrioEngine
 
 		// Direct3D rendering objects. Required for 3D.
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_d3dRenderTargetView;
-		D3D11_VIEWPORT                                  m_screenViewport;
-
+		
 		std::vector<ID3D11RenderTargetView *>			m_currentRenderTargets;
 
 		D3D_FEATURE_LEVEL                               m_d3dMinFeatureLevel;
@@ -140,8 +141,8 @@ namespace TrioEngine
 		ID3D11Buffer*	m_vertexBuffers[MaxVertexBuffers];
 		uint32_t		m_vertexOffsets[MaxVertexBuffers];
 		uint32_t		m_vertexStrides[MaxVertexBuffers];
-
 #endif
+
 		void ApplyState(bool applyShaders);
 		bool AreSameVertexBindings(VertexBufferBindings &bindings);
 		void CreateDeviceResources();
