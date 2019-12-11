@@ -440,7 +440,7 @@ namespace TrioEngine
 		Matrix& operator/= (const Matrix& M);
 		// Element-wise divide
 
-	// Unary operators
+		// Unary operators
 		Matrix operator+ () const { return *this; }
 		Matrix operator- () const;
 

@@ -76,9 +76,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Delivery\GraphicsDeviceService.cs" />
-    <Compile Include="HostUtils\HwndMouseEventArgs.cs" />
-    <Compile Include="HostUtils\HwndMouseState.cs" />
-    <Compile Include="HostUtils\NativeMethods.cs" />
+    <Compile Include="Delivery\Host\HwndMouseEventArgs.cs" />
+    <Compile Include="Delivery\Host\HwndMouseState.cs" />
+    <Compile Include="Delivery\Host\NativeMethods.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

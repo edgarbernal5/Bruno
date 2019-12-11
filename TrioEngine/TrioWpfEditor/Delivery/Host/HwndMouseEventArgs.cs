@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace TrioWpfEditor.HostUtils
+namespace TrioWpfEditor.Delivery.Host
 {
     /// <summary>
     /// Event arguments used for mouse events in the GraphicsDeviceHost.

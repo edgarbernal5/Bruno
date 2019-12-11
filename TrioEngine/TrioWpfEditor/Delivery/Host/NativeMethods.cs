@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace TrioWpfEditor.HostUtils
+namespace TrioWpfEditor.Delivery.Host
 {
     /// <summary>
     /// An internal set of functionality used for interopping with native Win32 APIs.

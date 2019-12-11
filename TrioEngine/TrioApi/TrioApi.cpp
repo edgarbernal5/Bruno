@@ -91,3 +91,148 @@ void GraphicsDevice_SetViewport(GraphicsDevice* device, Viewport viewport)
 {
 	device->SetViewport(viewport);
 }
+
+/*
+Vector3
+*/
+void Vector3_Clamp(Vector3 *pVector1, Vector3 *pMin, Vector3 *pMax)
+{
+	pVector1->Clamp(*pMin, *pMax);
+}
+
+void Vector3_Cross(Vector3 *pVector1, Vector3 *pVector2)
+{
+	pVector1->Cross(*pVector2);
+}
+
+float Vector3_Distance(Vector3 *pVector1, Vector3 *pVector2)
+{
+	return Vector3::Distance(*pVector1, *pVector2);
+}
+
+float Vector3_DistanceSquared(Vector3 *pVector1, Vector3 *pVector2)
+{
+	return Vector3::DistanceSquared(*pVector1, *pVector2);
+}
+
+float Vector3_Dot(Vector3 *pVector1, Vector3 *pVector2)
+{
+	return pVector1->Dot(*pVector2);
+}
+
+void Vector3_MultiplyDivision(Vector3 *pVector, float scalar)
+{
+	*pVector /= scalar;
+}
+
+void Vector3_MultiplyTwoVectors(Vector3 *pVector1, Vector3 *pVector2)
+{
+	*pVector1 *= *pVector2;
+}
+
+void Vector3_MultiplyScalar(Vector3 *pVector, float scalar)
+{
+	*pVector *= scalar;
+}
+
+void Vector3_Normalize(Vector3 *pVector)
+{
+	pVector->Normalize();
+}
+
+void Vector3_SubTwoVectors(Vector3 *pVector1, Vector3 *pVector2)
+{
+	*pVector1 -= *pVector2;
+}
+
+void Vector3_SumTwoVectors(Vector3 *pVector1, Vector3 *pVector2)
+{
+	*pVector1 += *pVector2;
+}
+
+void Vector3_UnaryNegation(Vector3 *pVector)
+{
+	*pVector = -*pVector;
+}
+
+/*
+Matrix
+*/
+void Matrix_CreateLookAt(Matrix *pMatrix1, Vector3* eye, Vector3* target, Vector3* up)
+{
+	pMatrix1->CreateLookAt(*eye, *target, *up);
+}
+
+void Matrix_CreatePerspectiveFieldOfView(Matrix *pMatrix1, float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) 
+{
+	*pMatrix1 = Matrix::CreatePerspectiveFieldOfView(fieldOfView, aspectRatio, nearPlaneDistance, farPlaneDistance);
+}
+
+void Matrix_CreateRotationX(Matrix *pMatrix1, float radians)
+{
+	*pMatrix1 = Matrix::CreateRotationX(radians);
+}
+
+void Matrix_CreateRotationY(Matrix *pMatrix1, float radians)
+{
+	*pMatrix1 = Matrix::CreateRotationY(radians);
+}
+
+void Matrix_CreateRotationZ(Matrix *pMatrix1, float radians)
+{
+	*pMatrix1 = Matrix::CreateRotationZ(radians);
+}
+
+void Matrix_CreateScale(Matrix *pMatrix1, Vector3* scale)
+{
+	*pMatrix1 = Matrix::CreateScale(*scale);
+}
+
+void Matrix_CreateTranslation(Matrix *pMatrix1, Vector3* translation)
+{
+	*pMatrix1 = Matrix::CreateTranslation(*translation);
+}
+
+void Matrix_Division(Matrix *pMatrix1, Matrix *pMatrix2)
+{
+	*pMatrix1 /= *pMatrix2;
+}
+
+void Matrix_Invert(Matrix *pMatrix)
+{
+	pMatrix->Invert();
+}
+
+void Matrix_Multiply(Matrix *pMatrix1, Matrix *pMatrix2)
+{
+	*pMatrix1 *= *pMatrix2;
+}
+
+void Matrix_MultiplyScalar(Matrix *pMatrix1, float scalar)
+{
+	*pMatrix1 /= scalar;
+}
+
+void Matrix_Sub(Matrix *pMatrix1, Matrix *pMatrix2)
+{
+	*pMatrix1 -= *pMatrix2;
+}
+void Matrix_Sum(Matrix *pMatrix1, Matrix *pMatrix2)
+{
+	*pMatrix1 += *pMatrix2;
+}
+
+void Matrix_Transpose(Matrix *pMatrix)
+{
+	pMatrix->Transpose();
+}
+
+void Matrix_CreateTRS(Matrix *pMatrix1, Vector3* position, Quaternion* rotation, Vector3* scale)
+{
+	*pMatrix1 = Matrix::CreateTRS(*position, *rotation, *scale);
+}
+
+void Matrix_CreateWorld(Matrix *pMatrix1, Vector3* position, Vector3* forward, Vector3* up)
+{
+	*pMatrix1 = Matrix::CreateWorld(*position, *forward, *up);
+}
