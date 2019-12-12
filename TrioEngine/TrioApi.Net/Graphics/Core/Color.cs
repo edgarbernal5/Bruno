@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using TrioApi.Net.Graphics.Utilities;
 using TrioApi.Net.Math;
 
 namespace TrioApi.Net.Graphics.Core

@@ -19,7 +19,6 @@ namespace TrioEngine
 	public:
 		VertexBuffer();
 		VertexBuffer(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount, ResourceUsage usage);
-		
 		VertexBuffer(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount);
 		virtual ~VertexBuffer();
 

@@ -54,6 +54,9 @@ namespace TrioEngine
 		IDXGISwapChain1*        GetSwapChain1() const { return m_swapChain1.Get(); }
 		//ID3D11DepthStencilView* GetDepthStencilView() const					{ return m_depthStencilBuffer->m_d3dDepthStencilView.Get(); }
 #endif
+		inline BlendState* GetBlendState() { return m_blendState; }
+		inline DepthStencilState* GetDepthStencilState() { return m_depthStencilState; }
+		inline RasterizerState* GetRasterizerState() { return m_rasterizerState; }
 
 		inline GraphicsCapabilities GetGraphicsCapabilities() { return m_graphicsCapabilities; }
 		inline PresentationParameters& GetPresentationParameters() { return m_presentationParameters; }

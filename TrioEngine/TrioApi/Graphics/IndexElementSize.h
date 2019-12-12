@@ -4,7 +4,7 @@
 
 namespace TrioEngine
 {
-	enum class IndexElementSize
+	enum class IndexElementSize : int
 	{
 		SixteenBits,
 		ThirtyTwoBits

@@ -169,6 +169,58 @@ namespace TrioApi.Net.Math
             Z = sameValue;
         }
 
+        public static float Distance(Vector3 value1, Vector3 value2)
+        {
+            return Internal_Distance(ref value1, ref value2);
+        }
+
+        public static float DistanceSquared(Vector3 value1, Vector3 value2)
+        {
+            return Internal_DistanceSquared(ref value1, ref value2);
+        }
+
+        public static Vector3 Normalize(Vector3 vector)
+        {
+            Internal_Normalize(ref vector);
+            return vector;
+        }
+
+        public static Vector3 operator -(Vector3 vectorIn)
+        {
+            Internal_UnaryNegation(ref vectorIn);
+            return vectorIn;
+        }
+
+        public static Vector3 operator +(Vector3 vector1, Vector3 vector2)
+        {
+            Internal_SumTwoVectors(ref vector1, ref vector2);
+            return vector1;
+        }
+
+        public static Vector3 operator *(Vector3 vector1, float scaleFactor)
+        {
+            Internal_MultiplyScalar(ref vector1, scaleFactor);
+            return vector1;
+        }
+
+        public static Vector3 operator *(float scaleFactor, Vector3 vector1)
+        {
+            Internal_MultiplyScalar(ref vector1, scaleFactor);
+            return vector1;
+        }
+
+        public static Vector3 operator *(Vector3 vector1, Vector3 vector2)
+        {
+            Internal_MultiplyTwoVectors(ref vector1, ref vector2);
+            return vector1;
+        }
+
+        public static Vector3 operator /(Vector3 vector, float divider)
+        {
+            Internal_MultiplyDivision(ref vector, divider);
+            return vector;
+        }
+
         /// <summary>Tests vectors for equality.</summary>
         /// <param name="value1">Source vector.</param>
         /// <param name="value2">Source vector.</param>
@@ -208,24 +260,6 @@ namespace TrioApi.Net.Math
         public override int GetHashCode()
         {
             return this.X.GetHashCode() + this.Y.GetHashCode() + this.Z.GetHashCode();
-        }
-
-        public static Vector3 Normalize(Vector3 vector)
-        {
-            Internal_Normalize(ref vector);
-            return vector;
-        }
-
-        public static Vector3 operator -(Vector3 vectorIn)
-        {
-            Internal_UnaryNegation(ref vectorIn);
-            return vectorIn;
-        }
-
-        public static Vector3 operator +(Vector3 vector1, Vector3 vector2)
-        {
-            Internal_SumTwoVectors(ref vector1, ref vector2);
-            return vector1;
         }
     }
 }

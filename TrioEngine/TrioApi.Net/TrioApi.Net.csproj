@@ -60,8 +60,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\Core\BlendState.cs" />
     <Compile Include="Graphics\Core\Color.cs" />
-    <Compile Include="Graphics\Core\PackUtils.cs" />
+    <Compile Include="Graphics\Core\DepthStencilState.cs" />
+    <Compile Include="Graphics\Core\IndexBuffer.cs" />
+    <Compile Include="Graphics\Core\IndexElementSize.cs" />
+    <Compile Include="Graphics\Core\IVertexType.cs" />
+    <Compile Include="Graphics\Core\RasterizerState.cs" />
+    <Compile Include="Graphics\Core\ResourceUsage.cs" />
+    <Compile Include="Graphics\Core\SetDataOptions.cs" />
+    <Compile Include="Graphics\Core\VertexBuffer.cs" />
+    <Compile Include="Graphics\Core\VertexDeclaration.cs" />
+    <Compile Include="Graphics\Core\VertexElement.cs" />
+    <Compile Include="Graphics\Core\VertexElementFormat.cs" />
+    <Compile Include="Graphics\Core\VertexElementUsage.cs" />
+    <Compile Include="Graphics\Core\VertexPosition.cs" />
+    <Compile Include="Graphics\Core\VertexPositionColor.cs" />
+    <Compile Include="Graphics\Utilities\PackUtils.cs" />
     <Compile Include="Graphics\DepthFormat.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
@@ -71,6 +86,7 @@
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\Viewport.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="ImportConfiguration.cs" />
     <Compile Include="Math\Matrix.cs" />
     <Compile Include="Math\Quaternion.cs" />

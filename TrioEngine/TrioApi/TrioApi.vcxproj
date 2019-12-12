@@ -389,6 +389,7 @@
     <ClCompile Include="Graphics\VertexDeclaration.cpp" />
     <ClCompile Include="Graphics\VertexDeclarationHelper.cpp" />
     <ClCompile Include="Graphics\VertexElement.cpp" />
+    <ClCompile Include="Graphics\VertexPosition.cpp" />
     <ClCompile Include="Graphics\VertexPositionColor.cpp" />
     <ClCompile Include="Graphics\VertexPositionColorTexture.cpp" />
     <ClCompile Include="Graphics\VertexPositionNormalColorTexture.cpp" />

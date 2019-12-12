@@ -9,6 +9,14 @@ namespace TrioWpfEditor.Delivery
         private static readonly GraphicsDeviceService singletonInstance = new GraphicsDeviceService();
         private static int referenceCount;
 
+        public static GraphicsDeviceService Service
+        {
+            get
+            {
+                return singletonInstance;
+            }
+        }
+
         public GraphicsDevice GraphicsDevice
         {
             get { return graphicsDevice; }

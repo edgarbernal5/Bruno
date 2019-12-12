@@ -11,23 +11,8 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 	VertexDeclaration* VertexDeclarationHelper::GetVertexDeclaration(const int inputElementCount, const D3D11_INPUT_ELEMENT_DESC *d3dInputElements, const VertexElement *inputElements)
 	{
-		/*std::vector<VertexElement> elements;
-		int offset = 0;
-		for (int i = 0; i < inputElementCount; i++)
-		{
-			VertexElement item;
-			D3D11_INPUT_ELEMENT_DESC temp(inputElements[i]);
-			temp.AlignedByteOffset = offset;
-
-			item.GetVertexElementFromD3D11(temp);
-
-			elements.push_back(item);
-
-			offset += GetTypeSize(temp.Format);
-		}*/
-
 		return new VertexDeclaration(d3dInputElements, inputElements, inputElementCount);
-}
+	}
 #elif TRIO_OPENGL
 	VertexDeclaration* VertexDeclarationHelper::GetVertexDeclaration(const int inputElementCount, const VertexElement *inputElements)
 	{

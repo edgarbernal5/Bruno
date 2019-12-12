@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using TrioApi.Net.Graphics.Core;
 
 namespace TrioApi.Net.Graphics
 {
@@ -21,25 +22,81 @@ namespace TrioApi.Net.Graphics
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Clear", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Clear(IntPtr device, uint packedColor);
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_GetBlendState", CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr Internal_GetBlendState(IntPtr device);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_GetDepthStencilState", CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr Internal_GetDepthStencilState(IntPtr device);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_GetRasterizerState", CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr Internal_GetRasterizerState(IntPtr device);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_GetViewport", CallingConvention = CallingConvention.StdCall)]
+        private static extern Viewport Internal_GetViewport(IntPtr device);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetBlendState", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetBlendState(IntPtr device, IntPtr blendState);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetDepthStencilState", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetDepthStencilState(IntPtr device, IntPtr depthStencilState);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetRasterizerState", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetRasterizerState(IntPtr device, IntPtr rasterizerState);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetViewport", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetViewport(IntPtr device, Viewport viewport);
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Present", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Present(IntPtr device);
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Reset", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Reset(IntPtr device, PresentationParameters parameters);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetViewport", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_SetViewport(IntPtr device, Viewport viewport);
-
         bool disposed = false;
 
         internal IntPtr m_nativePtr;
+
+        public BlendState BlendState
+        {
+            get
+            {
+                return new BlendState(Internal_GetBlendState(m_nativePtr));
+            }
+            set
+            {
+                Internal_SetBlendState(m_nativePtr, value.m_nativePtr);
+            }
+        }
+
+        public DepthStencilState DepthStencilState
+        {
+            get
+            {
+                return new DepthStencilState(Internal_GetDepthStencilState(m_nativePtr));
+            }
+            set
+            {
+                Internal_SetDepthStencilState(m_nativePtr, value.m_nativePtr);
+            }
+        }
+
+        public RasterizerState RasterizerState
+        {
+            get
+            {
+                return new RasterizerState(Internal_GetRasterizerState(m_nativePtr));
+            }
+            set
+            {
+                Internal_SetRasterizerState(m_nativePtr, value.m_nativePtr);
+            }
+        }
 
         public Viewport Viewport
         {
             get
             {
-                Viewport x=default(Viewport);
-                return x;
+                return Internal_GetViewport(m_nativePtr);
             }
             set
             {
@@ -50,6 +107,10 @@ namespace TrioApi.Net.Graphics
         public GraphicsDevice(GraphicsAdapter adapter, PresentationParameters parameters)
         {
             m_nativePtr = Internal_ctor(adapter.m_nativePtr, parameters);
+
+            DepthStencilState = DepthStencilState.Default;
+            RasterizerState = RasterizerState.CullCounterClockwise;
+            BlendState = BlendState.Opaque;
         }
 
         public void Present()

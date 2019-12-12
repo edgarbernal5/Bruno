@@ -6,6 +6,65 @@
 #include "TrioApi.h"
 #include "Game.h"
 #include "Graphics/GraphicsAdapter.h"
+#include "Graphics/IndexBuffer.h"
+#include "Graphics/VertexBuffer.h"
+
+#include "Graphics/BlendState.h"
+#include "Graphics/DepthStencilState.h"
+#include "Graphics/RasterizerState.h"
+
+#include "Graphics/VertexPosition.h"
+#include "Graphics/VertexPositionColor.h"
+#include "Graphics/VertexPositionNormalTexture.h"
+
+/*
+BlendState
+*/
+BlendState* BlendState_Ctor()
+{
+	return new BlendState();
+}
+
+BlendState* BlendState_Additive()
+{
+	return BlendState::Additive;
+}
+
+BlendState* BlendState_AlphaBlend()
+{
+	return BlendState::AlphaBlend;
+}
+
+BlendState* BlendState_NonPremultiplied()
+{
+	return BlendState::NonPremultiplied;
+}
+
+BlendState* BlendState_Opaque()
+{
+	return BlendState::Opaque;
+}
+
+/*
+DepthStencilState
+*/
+DepthStencilState* DepthStencilState_Ctor()
+{
+	return new DepthStencilState();
+}
+
+DepthStencilState* DepthStencilState_Default()
+{
+	return DepthStencilState::Default;
+}
+DepthStencilState* DepthStencilState_DepthRead()
+{
+	return DepthStencilState::DepthRead;
+}
+DepthStencilState* DepthStencilState_None()
+{
+	return DepthStencilState::None;
+}
 
 /*
 Game
@@ -77,6 +136,26 @@ void GraphicsDevice_Clear(GraphicsDevice* device, uint32_t packedColor)
 	device->Clear(color);
 }
 
+BlendState* GraphicsDevice_GetBlendState(GraphicsDevice* device)
+{
+	return device->GetBlendState();
+}
+
+DepthStencilState* GraphicsDevice_GetDepthStencilState(GraphicsDevice* device)
+{
+	return device->GetDepthStencilState();
+}
+
+RasterizerState* GraphicsDevice_GetRasterizerState(GraphicsDevice* device)
+{
+	return device->GetRasterizerState();
+}
+
+Viewport GraphicsDevice_GetViewport(GraphicsDevice* device)
+{
+	return device->GetViewport();
+}
+
 void GraphicsDevice_Present(GraphicsDevice* device)
 {
 	device->Present();
@@ -87,9 +166,142 @@ void GraphicsDevice_Reset(GraphicsDevice* device, PresentationParameters paramet
 	device->Reset(parameters);
 }
 
+void GraphicsDevice_SetBlendState(GraphicsDevice* device, BlendState* state)
+{
+	device->SetBlendState(state);
+}
+
+void GraphicsDevice_SetDepthStencilState(GraphicsDevice* device, DepthStencilState* state)
+{
+	device->SetDepthStencilState(state);
+}
+
+void GraphicsDevice_SetRasterizerState(GraphicsDevice* device, RasterizerState* state)
+{
+	device->SetRasterizerState(state);
+}
+
 void GraphicsDevice_SetViewport(GraphicsDevice* device, Viewport viewport)
 {
 	device->SetViewport(viewport);
+}
+
+/*
+IndexBuffer
+*/
+IndexBuffer* IndexBuffer_Ctor(GraphicsDevice* device, int elementSize, int indexCount, int usage)
+{
+	return new IndexBuffer(device, (IndexElementSize)elementSize, indexCount, (ResourceUsage)usage);
+}
+
+void IndexBuffer_SetData(IndexBuffer* buffer, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes)
+{
+	buffer->SetData<uint8_t>(0, data, sizeArrayBytes, 0, elementCount, SetDataOptions::None);
+}
+
+/*
+Matrix
+*/
+void Matrix_CreateLookAt(Matrix *pMatrix1, Vector3* eye, Vector3* target, Vector3* up)
+{
+	*pMatrix1 = Matrix::CreateLookAt(*eye, *target, *up);
+}
+
+void Matrix_CreatePerspectiveFieldOfView(Matrix *pMatrix1, float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
+{
+	*pMatrix1 = Matrix::CreatePerspectiveFieldOfView(fieldOfView, aspectRatio, nearPlaneDistance, farPlaneDistance);
+}
+
+void Matrix_CreateRotationX(Matrix *pMatrix1, float radians)
+{
+	*pMatrix1 = Matrix::CreateRotationX(radians);
+}
+
+void Matrix_CreateRotationY(Matrix *pMatrix1, float radians)
+{
+	*pMatrix1 = Matrix::CreateRotationY(radians);
+}
+
+void Matrix_CreateRotationZ(Matrix *pMatrix1, float radians)
+{
+	*pMatrix1 = Matrix::CreateRotationZ(radians);
+}
+
+void Matrix_CreateScale(Matrix *pMatrix1, Vector3* scale)
+{
+	*pMatrix1 = Matrix::CreateScale(*scale);
+}
+
+void Matrix_CreateTranslation(Matrix *pMatrix1, Vector3* translation)
+{
+	*pMatrix1 = Matrix::CreateTranslation(*translation);
+}
+
+void Matrix_Division(Matrix *pMatrix1, Matrix *pMatrix2)
+{
+	*pMatrix1 /= *pMatrix2;
+}
+
+void Matrix_Invert(Matrix *pMatrix)
+{
+	*pMatrix = pMatrix->Invert();
+}
+
+void Matrix_Multiply(Matrix *pMatrix1, Matrix *pMatrix2)
+{
+	*pMatrix1 *= *pMatrix2;
+}
+
+void Matrix_MultiplyScalar(Matrix *pMatrix1, float scalar)
+{
+	*pMatrix1 /= scalar;
+}
+
+void Matrix_Sub(Matrix *pMatrix1, Matrix *pMatrix2)
+{
+	*pMatrix1 -= *pMatrix2;
+}
+void Matrix_Sum(Matrix *pMatrix1, Matrix *pMatrix2)
+{
+	*pMatrix1 += *pMatrix2;
+}
+
+void Matrix_Transpose(Matrix *pMatrix)
+{
+	pMatrix->Transpose();
+}
+
+void Matrix_CreateTRS(Matrix *pMatrix1, Vector3* position, Quaternion* rotation, Vector3* scale)
+{
+	*pMatrix1 = Matrix::CreateTRS(*position, *rotation, *scale);
+}
+
+void Matrix_CreateWorld(Matrix *pMatrix1, Vector3* position, Vector3* forward, Vector3* up)
+{
+	*pMatrix1 = Matrix::CreateWorld(*position, *forward, *up);
+}
+
+/*
+RasterizerState
+*/
+RasterizerState* RasterizerState_Ctor()
+{
+	return new RasterizerState();
+}
+
+RasterizerState* RasterizerState_CullClockwise()
+{
+	return RasterizerState::CullClockwise;
+}
+
+RasterizerState* RasterizerState_CullCounterClockwise()
+{
+	return RasterizerState::CullCounterClockwise;
+}
+
+RasterizerState* RasterizerState_CullNone()
+{
+	return RasterizerState::CullNone;
 }
 
 /*
@@ -156,83 +368,49 @@ void Vector3_UnaryNegation(Vector3 *pVector)
 }
 
 /*
-Matrix
+VertexBuffer
 */
-void Matrix_CreateLookAt(Matrix *pMatrix1, Vector3* eye, Vector3* target, Vector3* up)
+VertexBuffer* VertexBuffer_Ctor(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount, int usage)
 {
-	pMatrix1->CreateLookAt(*eye, *target, *up);
+	return new VertexBuffer(device, vertexDeclaration, vertexCount, (ResourceUsage)usage);
 }
 
-void Matrix_CreatePerspectiveFieldOfView(Matrix *pMatrix1, float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) 
+VertexBuffer* VertexBuffer_Ctor2(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount)
 {
-	*pMatrix1 = Matrix::CreatePerspectiveFieldOfView(fieldOfView, aspectRatio, nearPlaneDistance, farPlaneDistance);
+	return new VertexBuffer(device, vertexDeclaration, vertexCount);
 }
 
-void Matrix_CreateRotationX(Matrix *pMatrix1, float radians)
+void VertexBuffer_SetData(VertexBuffer* buffer, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes)
 {
-	*pMatrix1 = Matrix::CreateRotationX(radians);
+	buffer->SetData<uint8_t>(data, sizeArrayBytes);
 }
 
-void Matrix_CreateRotationY(Matrix *pMatrix1, float radians)
+/*
+VertexDeclaration
+*/
+VertexDeclaration* VertexDeclaration_Ctor(int vertexStride, VertexElement* elements, int sizeElements)
 {
-	*pMatrix1 = Matrix::CreateRotationY(radians);
+	auto vertices = std::vector<VertexElement>(elements, elements + sizeElements);
+	return new VertexDeclaration(vertexStride, vertices);
 }
 
-void Matrix_CreateRotationZ(Matrix *pMatrix1, float radians)
+VertexDeclaration* VertexDeclaration_Ctor2(VertexElement* elements, int sizeElements)
 {
-	*pMatrix1 = Matrix::CreateRotationZ(radians);
+	auto vertices = std::vector<VertexElement>(elements, elements + sizeElements);
+	return new VertexDeclaration(vertices);
 }
 
-void Matrix_CreateScale(Matrix *pMatrix1, Vector3* scale)
+VertexDeclaration* VertexDeclaration_GetP()
 {
-	*pMatrix1 = Matrix::CreateScale(*scale);
+	return VertexPosition::GetVertexDeclaration();
 }
 
-void Matrix_CreateTranslation(Matrix *pMatrix1, Vector3* translation)
+VertexDeclaration* VertexDeclaration_GetPC()
 {
-	*pMatrix1 = Matrix::CreateTranslation(*translation);
+	return VertexPositionColor::GetVertexDeclaration();
 }
 
-void Matrix_Division(Matrix *pMatrix1, Matrix *pMatrix2)
+VertexDeclaration* VertexDeclaration_GetPNT()
 {
-	*pMatrix1 /= *pMatrix2;
-}
-
-void Matrix_Invert(Matrix *pMatrix)
-{
-	pMatrix->Invert();
-}
-
-void Matrix_Multiply(Matrix *pMatrix1, Matrix *pMatrix2)
-{
-	*pMatrix1 *= *pMatrix2;
-}
-
-void Matrix_MultiplyScalar(Matrix *pMatrix1, float scalar)
-{
-	*pMatrix1 /= scalar;
-}
-
-void Matrix_Sub(Matrix *pMatrix1, Matrix *pMatrix2)
-{
-	*pMatrix1 -= *pMatrix2;
-}
-void Matrix_Sum(Matrix *pMatrix1, Matrix *pMatrix2)
-{
-	*pMatrix1 += *pMatrix2;
-}
-
-void Matrix_Transpose(Matrix *pMatrix)
-{
-	pMatrix->Transpose();
-}
-
-void Matrix_CreateTRS(Matrix *pMatrix1, Vector3* position, Quaternion* rotation, Vector3* scale)
-{
-	*pMatrix1 = Matrix::CreateTRS(*position, *rotation, *scale);
-}
-
-void Matrix_CreateWorld(Matrix *pMatrix1, Vector3* position, Vector3* forward, Vector3* up)
-{
-	*pMatrix1 = Matrix::CreateWorld(*position, *forward, *up);
+	return VertexPositionNormalTexture::GetVertexDeclaration();
 }

@@ -1,5 +1,5 @@
 ﻿
-namespace TrioApi.Net.Graphics.Core
+namespace TrioApi.Net.Graphics.Utilities
 {
     internal static class PackUtils
     {

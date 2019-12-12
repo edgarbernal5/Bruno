@@ -4,7 +4,7 @@
 
 namespace TrioEngine
 {
-	enum class SetDataOptions
+	enum class SetDataOptions : int
 	{
 		None,
 		Discard = 1,
