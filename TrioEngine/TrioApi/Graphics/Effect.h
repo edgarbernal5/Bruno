@@ -39,7 +39,6 @@ namespace TrioEngine
 		friend class EffectLoader;
 		
 	private:
-
 		GraphicsDevice*			m_device;
 		std::map<std::string, Shader*>	m_shadersByName;
 
@@ -48,7 +47,5 @@ namespace TrioEngine
 		ConstantBufferCollection	m_constantBuffers;
 
 		void ClearData();
-
-		
 	};
 }

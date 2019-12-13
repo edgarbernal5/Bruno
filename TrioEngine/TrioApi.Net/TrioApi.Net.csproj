@@ -60,9 +60,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Containers\INamedItem.cs" />
+    <Compile Include="Containers\NamedList.cs" />
     <Compile Include="Graphics\Core\BlendState.cs" />
     <Compile Include="Graphics\Core\Color.cs" />
     <Compile Include="Graphics\Core\DepthStencilState.cs" />
+    <Compile Include="Graphics\Core\Effect.cs" />
+    <Compile Include="Graphics\Core\EffectParameter.cs" />
+    <Compile Include="Graphics\Core\EffectParameterCollection.cs" />
+    <Compile Include="Graphics\Core\EffectPass.cs" />
+    <Compile Include="Graphics\Core\EffectPassCollection.cs" />
+    <Compile Include="Graphics\Core\EffectTechnique.cs" />
+    <Compile Include="Graphics\Core\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Core\IndexBuffer.cs" />
     <Compile Include="Graphics\Core\IndexElementSize.cs" />
     <Compile Include="Graphics\Core\IVertexType.cs" />

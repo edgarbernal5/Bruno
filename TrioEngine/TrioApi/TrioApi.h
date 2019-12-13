@@ -22,6 +22,36 @@ extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall DepthStencilState_DepthR
 extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall DepthStencilState_None();
 
 /*
+Effect
+*/
+extern "C" TRIO_API_EXPORT Effect* __stdcall Effect_Ctor(GraphicsDevice* device);
+extern "C" TRIO_API_EXPORT void __stdcall Effect_CompileEffectFromFile(Effect* effect, char* filename);
+extern "C" TRIO_API_EXPORT void __stdcall Effect_GetParameters(Effect* effect, EffectParameter*** parameters, int *size);
+extern "C" TRIO_API_EXPORT void __stdcall Effect_GetTechniques(Effect* effect, EffectTechnique*** techniques, int *size);
+
+/*
+EffectParameter
+*/
+extern "C" TRIO_API_EXPORT char* __stdcall EffectParameter_GetName(EffectParameter* parameter);
+extern "C" TRIO_API_EXPORT void __stdcall EffectParameter_SetValueScalar(EffectParameter* parameter, float scalar);
+extern "C" TRIO_API_EXPORT void __stdcall EffectParameter_SetValueMatrix(EffectParameter* parameter, Matrix* matrix);
+extern "C" TRIO_API_EXPORT void __stdcall EffectParameter_SetValueVector2(EffectParameter* parameter, Vector2* vector);
+extern "C" TRIO_API_EXPORT void __stdcall EffectParameter_SetValueVector3(EffectParameter* parameter, Vector3* vector);
+extern "C" TRIO_API_EXPORT void __stdcall EffectParameter_SetValueVector4(EffectParameter* parameter, Vector4* vector);
+extern "C" TRIO_API_EXPORT void __stdcall EffectParameter_SetValueColor(EffectParameter* parameter, uint32_t packedColor);
+
+/*
+EffectPass
+*/
+extern "C" TRIO_API_EXPORT char* __stdcall EffectPass_GetName(EffectPass* pass);
+
+/*
+EffectTechnique
+*/
+extern "C" TRIO_API_EXPORT void __stdcall EffectTechnique_GetPasses(EffectTechnique* technique, EffectPass*** passes, int *size);
+extern "C" TRIO_API_EXPORT char* __stdcall EffectTechnique_GetName(EffectTechnique* technique);
+
+/*
 Game
 */
 extern "C" TRIO_API_EXPORT Game* __stdcall Game_Ctor();
@@ -37,7 +67,6 @@ extern "C" TRIO_API_EXPORT void __stdcall GraphicsAdapter_GetAdapters(GraphicsAd
 GraphicsDevice
 */
 extern "C" TRIO_API_EXPORT GraphicsDevice* __stdcall GraphicsDevice_Ctor(GraphicsAdapter* adapter, PresentationParameters parameters);
-extern "C" TRIO_API_EXPORT GraphicsDevice* __stdcall GraphicsDevice_Ctor2(GraphicsAdapter* adapter, int height, int width, int surfaceFormat, int depthFormat, bool isfullScreen, HWND handle);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Dtor(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Clear(GraphicsDevice* device, uint32_t color);
 extern "C" TRIO_API_EXPORT BlendState* __stdcall GraphicsDevice_GetBlendState(GraphicsDevice* device);

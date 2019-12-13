@@ -14,6 +14,7 @@ namespace TrioEngine
 		m_vertexShader(nullptr), m_pixelShader(nullptr), m_effect(effect), m_device(device)
 	{
 		TrioFX::HLSLPassShader* passShader = pass11->shader;
+		m_name = pass11->name;
 
 		std::vector<bool> buffersUsed(buffers.size(), false);
 		std::vector<bool> samplersUsed(samplers.size(), false);

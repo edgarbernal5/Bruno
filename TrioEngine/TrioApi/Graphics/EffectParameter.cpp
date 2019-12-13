@@ -44,6 +44,10 @@ namespace TrioEngine
 	{
 	}
 
+	void EffectParameter::SetValue(Color& value)
+	{
+
+	}
 
 	void EffectParameter::SetValue(float value)
 	{
@@ -55,7 +59,7 @@ namespace TrioEngine
 
 	}
 
-	void EffectParameter::SetValue(Matrix value)
+	void EffectParameter::SetValue(Matrix& value)
 	{
 		Matrix transposed = value;
 		transposed = transposed.Transpose();

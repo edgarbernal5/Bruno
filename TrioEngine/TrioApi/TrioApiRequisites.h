@@ -15,4 +15,8 @@
 namespace TrioEngine
 {
 	class Game;
+	class Effect;
+	class EffectTechnique;
+	class EffectParameter;
+	class EffectPass;
 }

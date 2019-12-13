@@ -41,9 +41,10 @@ namespace TrioEngine
 		EffectParameter(SSamplerState samplerState, std::string parameterName, Effect* effect);
 		~EffectParameter();
 
+		void SetValue(Color& value);
 		void SetValue(float value);
 		void SetValue(Texture* value);
-		void SetValue(Matrix value);
+		void SetValue(Matrix& value);
 		void SetValue(Vector2 value);
 		void SetValue(Vector3 value);
 		void SetValue(Vector4 value);

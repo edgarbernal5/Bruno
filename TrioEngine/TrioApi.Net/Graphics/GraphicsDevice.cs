@@ -13,9 +13,6 @@ namespace TrioApi.Net.Graphics
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_ctor(IntPtr adapter, PresentationParameters parameters);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Ctor2", CallingConvention = CallingConvention.StdCall)]
-        private static extern IntPtr Internal_ctor2(IntPtr adapter, int height, int width, int surfaceFormat, int depthFormat, bool isfullScreen, IntPtr handle);
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Dtor", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_dtor(IntPtr device);
 

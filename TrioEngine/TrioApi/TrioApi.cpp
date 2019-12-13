@@ -13,6 +13,11 @@
 #include "Graphics/DepthStencilState.h"
 #include "Graphics/RasterizerState.h"
 
+#include "Graphics/Effect.h"
+#include "Graphics/EffectTechnique.h"
+#include "Graphics/EffectPass.h"
+#include "Graphics/EffectParameter.h"
+
 #include "Graphics/VertexPosition.h"
 #include "Graphics/VertexPositionColor.h"
 #include "Graphics/VertexPositionNormalTexture.h"
@@ -67,6 +72,157 @@ DepthStencilState* DepthStencilState_None()
 }
 
 /*
+Effect
+*/
+Effect* Effect_Ctor(GraphicsDevice* device)
+{
+	return new Effect(device);
+}
+
+void Effect_CompileEffectFromFile(Effect* effect, char* filename)
+{
+	effect->CompileEffectFromFile(filename);
+}
+
+void Effect_GetParameters(Effect* effect, EffectParameter*** parameters, int *size)
+{
+	auto list = effect->GetParameters();
+	auto n = list.size();
+
+	*size = n;
+	if (n > 0)
+	{
+		EffectParameter** newArray = (EffectParameter**)CoTaskMemAlloc(sizeof(EffectParameter*) * n);
+		for (size_t i = 0; i < n; i++)
+		{
+			newArray[i] = list[i];
+		}
+		*parameters = newArray;
+	}
+}
+
+void Effect_GetTechniques(Effect* effect, EffectTechnique*** techniques, int *size)
+{
+	auto list = effect->GetTechniques();
+	auto n = list.size();
+
+	*size = n;
+	if (n > 0)
+	{
+		EffectTechnique** newArray = (EffectTechnique**)CoTaskMemAlloc(sizeof(EffectTechnique*) * n);
+		for (size_t i = 0; i < n; i++)
+		{
+			newArray[i] = list[i];
+		}
+		*techniques = newArray;
+	}
+}
+
+/*
+EffectParameter
+*/
+char* EffectParameter_GetName(EffectParameter* parameter)
+{
+	const char *szSampleString = parameter->GetName();
+
+	ULONG ulSize = strlen(szSampleString) + sizeof(char);
+	char* pszReturn = NULL;
+
+	pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
+	// Copy the contents of szSampleString
+	// to the memory pointed to by pszReturn.
+	strcpy_s(pszReturn, ulSize, szSampleString);
+	// Return pszReturn.
+
+	return pszReturn;
+}
+void EffectParameter_SetValueScalar(EffectParameter* parameter, float scalar)
+{
+	parameter->SetValue(scalar);
+}
+
+void EffectParameter_SetValueMatrix(EffectParameter* parameter, Matrix* matrix)
+{
+	parameter->SetValue(*matrix);
+}
+
+void EffectParameter_SetValueVector2(EffectParameter* parameter, Vector2* vector)
+{
+	parameter->SetValue(*vector);
+}
+
+void EffectParameter_SetValueVector3(EffectParameter* parameter, Vector3* vector)
+{
+	parameter->SetValue(*vector);
+}
+
+void EffectParameter_SetValueVector4(EffectParameter* parameter, Vector4* vector)
+{
+	parameter->SetValue(*vector);
+}
+
+void EffectParameter_SetValueColor(EffectParameter* parameter, uint32_t packedColor)
+{
+	Color color(packedColor);
+	parameter->SetValue(color);
+}
+
+/*
+EffectPass
+*/
+char* EffectPass_GetName(EffectPass* pass)
+{
+	const char *szSampleString = pass->GetName();
+
+	ULONG ulSize = strlen(szSampleString) + sizeof(char);
+	char* pszReturn = NULL;
+
+	pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
+	// Copy the contents of szSampleString
+	// to the memory pointed to by pszReturn.
+	strcpy_s(pszReturn, ulSize, szSampleString);
+	// Return pszReturn.
+
+	return pszReturn;
+}
+
+/*
+EffectTechnique
+*/
+void EffectTechnique_GetPasses(EffectTechnique* technique, EffectPass*** passes, int *size)
+{
+	auto list = technique->GetPasses();
+	auto n = list.size();
+
+	*size = n;
+	if (n > 0)
+	{
+		EffectPass** newArray = (EffectPass**)CoTaskMemAlloc(sizeof(EffectPass*) * n);
+		for (size_t i = 0; i < n; i++)
+		{
+			newArray[i] = list[i];
+		}
+		*passes = newArray;
+	}
+}
+
+char* EffectTechnique_GetName(EffectTechnique* technique)
+{
+	const char *szSampleString = technique->GetName();
+
+	ULONG ulSize = strlen(szSampleString) + sizeof(char);
+	char* pszReturn = NULL;
+
+	pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
+	// Copy the contents of szSampleString
+	// to the memory pointed to by pszReturn.
+	strcpy_s(pszReturn, ulSize, szSampleString);
+	// Return pszReturn.
+
+	return pszReturn;
+}
+
+/*
 Game
 */
 Game* Game_Ctor()
@@ -89,7 +245,6 @@ GraphicsAdapter
 */
 void GraphicsAdapter_GetAdapters(GraphicsAdapter*** adapters, int *size)
 {
-	*size = 0;
 	auto list = GraphicsAdapter::GetAdapters();
 	auto n = list.size();
 
@@ -110,18 +265,6 @@ GraphicsDevice
 */
 GraphicsDevice* GraphicsDevice_Ctor(GraphicsAdapter* adapter, PresentationParameters parameters)
 {
-	return new GraphicsDevice(adapter, parameters);
-}
-
-GraphicsDevice* GraphicsDevice_Ctor2(GraphicsAdapter* adapter, int height, int width, int surfaceFormat, int depthFormat, bool isfullScreen, HWND handle)
-{
-	PresentationParameters parameters;
-	parameters.SetBackBufferHeight(height);
-	parameters.SetBackBufferWidth(width);
-	parameters.SetDepthStencilFormat((DepthFormat)depthFormat);
-	parameters.SetHostHWND(handle);
-	parameters.SetIsFullScreen(isfullScreen);
-	parameters.SetSurfaceFormat((SurfaceFormat)surfaceFormat);
 	return new GraphicsDevice(adapter, parameters);
 }
 
