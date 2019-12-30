@@ -22,43 +22,44 @@ namespace TrioEngine
 		m_transform.reset();
 	}
 
-	void GameObject::BindComponent(const std::shared_ptr<Component>& com)
+	void GameObject::BindComponent(const std::shared_ptr<Component>& component)
 	{
-		com->m_object = this;
+		auto object = Scene::ActiveScene()->GetGameObject(this);
+		component->m_ownerObject = object;
 	}
 
 	std::shared_ptr<GameObject> GameObject::Create(const std::string& name)
 	{
-		std::shared_ptr<GameObject> obj = std::shared_ptr<GameObject>(new GameObject(name));
+		std::shared_ptr<GameObject> object = std::shared_ptr<GameObject>(new GameObject(name));
 
-		//Scene::Instance()->AddGameObject(obj);
-		obj->m_transform = obj->AddComponent<Transform>();
+		Scene::ActiveScene()->AddGameObject(object);
+		object->m_transform = object->AddComponent<Transform>();
 
-		return obj;
+		return object;
 	}
 
-	void GameObject::Destroy(std::shared_ptr<GameObject>& obj)
+	void GameObject::Destroy(std::shared_ptr<GameObject>& object)
 	{
-		Scene::Instance()->RemoveGameObject(obj);
-		obj.reset();
+		Scene::ActiveScene()->RemoveGameObject(object);
+		object.reset();
 	}
 
 	void GameObject::OnTransformDirty()
 	{
 		for (int i = 0; i < m_addedComponents.size(); ++i)
 		{
-			auto& com = m_addedComponents[i];
-			com->OnTransformDirty();
+			auto& component = m_addedComponents[i];
+			component->OnTransformDirty();
 		}
 
 		for (int i = 0; i < m_components.size(); ++i)
 		{
-			auto& com = m_components[i];
-			com->OnTransformDirty();
+			auto& component = m_components[i];
+			component->OnTransformDirty();
 		}
 	}
 
-	void GameObject::SetActive(bool active)
+	void GameObject::SetActiveSelf(bool active)
 	{
 		m_isActiveSelf = active;
 	}

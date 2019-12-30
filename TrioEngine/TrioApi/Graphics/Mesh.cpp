@@ -86,4 +86,20 @@ namespace TrioEngine
 			}
 		}
 	}
+
+	Mesh::~Mesh()
+	{
+		for (std::vector<Vector3>* textureCoordinates : m_textureCoordinates)
+		{
+			delete textureCoordinates;
+		}
+
+		for (std::vector<Vector4>* vertexColors : m_vertexColors)
+		{
+			delete vertexColors;
+		}
+
+		//mVertexBuffer.ReleaseBuffer();
+		//mIndexBuffer.ReleaseBuffer();
+	}
 }

@@ -28,14 +28,14 @@ namespace TrioEngine
 		{
 			aiTextureType mappedTextureType = (aiTextureType)g_textureTypeMappings[textureType];
 
-			UINT textureCount = material->GetTextureCount(mappedTextureType);
+			uint32_t textureCount = material->GetTextureCount(mappedTextureType);
 			if (textureCount > 0)
 			{
 				std::vector<std::wstring>* textures = new std::vector<std::wstring>();
 				m_textures.insert(std::pair<TextureType, std::vector<std::wstring>*>(textureType, textures));
 
 				textures->reserve(textureCount);
-				for (UINT textureIndex = 0; textureIndex < textureCount; textureIndex++)
+				for (uint32_t textureIndex = 0; textureIndex < textureCount; textureIndex++)
 				{
 					aiString path;
 					if (material->GetTexture(mappedTextureType, textureIndex, &path) == AI_SUCCESS)

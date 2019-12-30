@@ -14,33 +14,6 @@
 
 namespace TrioUtils
 {
-	int StringUtility::PrintfArgList(char* buffer, int bufferSize, const char* format, va_list args)
-	{
-		va_list tmp;
-		va_copy(tmp, args);
-
-#if _MSC_VER >= 1400
-		int n = vsnprintf_s(buffer, bufferSize, _TRUNCATE, format, tmp);
-#else
-		int n = vsnprintf(buffer, bufferSize, format, tmp);
-#endif
-
-		va_end(tmp);
-
-		if (n < 0 || n > bufferSize) return -1;
-		return n;
-	}
-
-	int StringUtility::Printf(char* buffer, int bufferSize, const char* format, ...)
-	{
-		va_list args;
-		va_start(args, format);
-
-		int count = StringUtility::PrintfArgList(buffer, bufferSize, format, args);
-
-		va_end(args);
-		return count;
-	}
 
 	bool StringUtility::Equal(const char* first, const char* second)
 	{
@@ -60,6 +33,33 @@ namespace TrioUtils
 #else
 		return strcasecmp(first, second) == 0;
 #endif
+	}
+
+	int StringUtility::Printf(char* buffer, int bufferSize, const char* format, ...)
+	{
+		va_list args;
+		va_start(args, format);
+
+		int count = StringUtility::PrintfArgList(buffer, bufferSize, format, args);
+
+		va_end(args);
+		return count;
+	}
+	int StringUtility::PrintfArgList(char* buffer, int bufferSize, const char* format, va_list args)
+	{
+		va_list tmp;
+		va_copy(tmp, args);
+
+#if _MSC_VER >= 1400
+		int n = vsnprintf_s(buffer, bufferSize, _TRUNCATE, format, tmp);
+#else
+		int n = vsnprintf(buffer, bufferSize, format, tmp);
+#endif
+
+		va_end(tmp);
+
+		if (n < 0 || n > bufferSize) return -1;
+		return n;
 	}
 
 	double StringUtility::ToDouble(const char* buffer, char** end)

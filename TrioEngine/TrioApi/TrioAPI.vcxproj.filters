@@ -61,6 +61,54 @@
     <Filter Include="Source Files\Graphics\Models">
       <UniqueIdentifier>{91061eb2-f245-46be-9cdd-50422585cf09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Content">
+      <UniqueIdentifier>{43bce298-36d4-4c57-844f-a956a54a4ae5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Content\Pipeline">
+      <UniqueIdentifier>{04cee6ef-60c7-4881-ac9d-9b9e216559bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Content">
+      <UniqueIdentifier>{3bb27c2d-26ed-4b8b-805b-ecdf4de9d380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Content\Pipeline">
+      <UniqueIdentifier>{d4c59644-3a32-41e8-b715-68decdc5459c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Content\Pipeline\Tasks">
+      <UniqueIdentifier>{855e5c73-56db-4b25-98ee-9de548224e9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\IO">
+      <UniqueIdentifier>{898ef40e-da90-4d44-b169-3407d0fadc33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IO">
+      <UniqueIdentifier>{94707957-4827-4d5f-9c78-9979f22bd938}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Content\Pipeline\Importers">
+      <UniqueIdentifier>{43c7ef90-4a30-4a47-8134-b83551bb0dbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Content\Pipeline\Tasks">
+      <UniqueIdentifier>{ba086b70-21d7-4da2-9aa1-1b5218ef85a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Content\Pipeline\Importers">
+      <UniqueIdentifier>{ea1e451e-b88e-41a1-b504-62f1179df75f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Content\Pipeline\Processors">
+      <UniqueIdentifier>{4a0f695f-6c1c-4cad-bb05-cd2d32a8a9d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Content\Pipeline\Processors">
+      <UniqueIdentifier>{ee606ee6-ed57-4673-b470-f8cecead68e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Content\Pipeline\Graphics">
+      <UniqueIdentifier>{cbdbcba9-d256-45c7-bea3-8b935d7f6614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Content\Pipeline\Graphics">
+      <UniqueIdentifier>{06b53517-b413-4b2a-ae3e-dec93c90c23c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Content\Pipeline\Serialization">
+      <UniqueIdentifier>{10ff4ebb-8a57-4a6b-991a-faf7bac42e3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Content\Pipeline\Serialization">
+      <UniqueIdentifier>{3711a9fe-d2e7-4285-9a19-39bce02cb46b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -411,6 +459,186 @@
     <ClInclude Include="TrioApiRequisites.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Content\Pipeline\Tasks\BuildCoordinator.h">
+      <Filter>Header Files\Content\Pipeline\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\ContentIdentity.h">
+      <Filter>Header Files\Content\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\ContentItem.h">
+      <Filter>Header Files\Content\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Tasks\BuildItem.h">
+      <Filter>Header Files\Content\Pipeline\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\File.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\Path.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Importers\ImporterManager.h">
+      <Filter>Header Files\Content\Pipeline\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Importers\IContentImporter.h">
+      <Filter>Header Files\Content\Pipeline\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Processors\ProcessorManager.h">
+      <Filter>Header Files\Content\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Processors\IContentProcessor.h">
+      <Filter>Header Files\Content\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\OpaqueData.h">
+      <Filter>Header Files\Content\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Importers\EffectImporter.h">
+      <Filter>Header Files\Content\Pipeline\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Importers\ModelImporter.h">
+      <Filter>Header Files\Content\Pipeline\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Importers\TextureImporter.h">
+      <Filter>Header Files\Content\Pipeline\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\EffectContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\TextureContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\MipmapChain.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\BitmapContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\PixelBitmapContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\Texture2DContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\GeometryContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\MeshContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\NodeContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\MaterialContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\VertexChannel.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\VertexChannelNames.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\VertexChannelCollection.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\VertexContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\VertexBufferContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\VertexDeclarationContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\BitCopier.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\IndirectPositionCollection.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\VectorConverter.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Tasks\BuildRequest.h">
+      <Filter>Header Files\Content\Pipeline\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Tasks\BuildItemCollection.h">
+      <Filter>Header Files\Content\Pipeline\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Processors\ContentProcessorContext.h">
+      <Filter>Header Files\Content\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Processors\BasicContentProcessorContext.h">
+      <Filter>Header Files\Content\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\ContentTypeWriter.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\Stream.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\MemoryStream.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\FileStream.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\ContentCompiler.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\ContentTypeWriterFactory.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\EffectWriter.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\ExternalReferenceWriter.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\IndexCollectionWriter.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\MaterialWriter.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\ModelWriter.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\Texture2DWriter.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\VertexBufferWriter.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\ContentWriter.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\BinaryWriter.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\CompiledEffectContent.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Graphics\IndexCollection.h">
+      <Filter>Header Files\Content\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\BinaryReader.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\ContentReader.h">
+      <Filter>Header Files\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\ContentManager.h">
+      <Filter>Header Files\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\ContentTypeReader.h">
+      <Filter>Header Files\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\ExternalReferenceReader.h">
+      <Filter>Header Files\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\ContentTypeReaderManager.h">
+      <Filter>Header Files\Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -625,6 +853,141 @@
     </ClCompile>
     <ClCompile Include="Graphics\VertexPosition.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\File.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\Path.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Importers\ImporterManager.cpp">
+      <Filter>Source Files\Content\Pipeline\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Processors\ProcessorManager.cpp">
+      <Filter>Source Files\Content\Pipeline\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Importers\EffectImporter.cpp">
+      <Filter>Source Files\Content\Pipeline\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Importers\ModelImporter.cpp">
+      <Filter>Source Files\Content\Pipeline\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Importers\TextureImporter.cpp">
+      <Filter>Source Files\Content\Pipeline\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\EffectContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\ContentItem.cpp">
+      <Filter>Source Files\Content\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\TextureContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\BitmapContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\Texture2DContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\GeometryContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\MeshContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\NodeContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\MaterialContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\VertexChannel.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\VertexChannelNames.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\VertexChannelCollection.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\VertexContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\VertexBufferContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\VertexDeclarationContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\IndirectPositionCollection.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\VectorConverter.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Tasks\BuildCoordinator.cpp">
+      <Filter>Source Files\Content\Pipeline\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Tasks\BuildRequest.cpp">
+      <Filter>Source Files\Content\Pipeline\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Tasks\BuildItemCollection.cpp">
+      <Filter>Source Files\Content\Pipeline\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Processors\BasicContentProcessorContext.cpp">
+      <Filter>Source Files\Content\Pipeline\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\MemoryStream.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\FileStream.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Serialization\ContentCompiler.cpp">
+      <Filter>Source Files\Content\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Serialization\ContentTypeWriterFactory.cpp">
+      <Filter>Source Files\Content\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Serialization\EffectWriter.cpp">
+      <Filter>Source Files\Content\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Serialization\ContentWriter.cpp">
+      <Filter>Source Files\Content\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\BinaryWriter.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Graphics\CompiledEffectContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Serialization\ExternalReferenceWriter.cpp">
+      <Filter>Source Files\Content\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Serialization\IndexCollectionWriter.cpp">
+      <Filter>Source Files\Content\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Serialization\ModelWriter.cpp">
+      <Filter>Source Files\Content\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Serialization\Texture2DWriter.cpp">
+      <Filter>Source Files\Content\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\BinaryReader.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\ContentReader.cpp">
+      <Filter>Source Files\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\ExternalReferenceReader.cpp">
+      <Filter>Source Files\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\ContentManager.cpp">
+      <Filter>Source Files\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\ContentTypeReaderManager.cpp">
+      <Filter>Source Files\Content</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

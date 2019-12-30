@@ -17,8 +17,8 @@ namespace TrioEngine
 	class TRIO_API_EXPORT ConstantBuffer
 	{
 	public:
-		ConstantBuffer(GraphicsDevice* device, std::string name, uint32_t sizeInBytes, std::vector<ConstantBufferField>& bufferFields);
-		ConstantBuffer(GraphicsDevice* device, std::string name);
+		ConstantBuffer(GraphicsDevice* device, const std::string& name, uint32_t sizeInBytes, std::vector<ConstantBufferField>& bufferFields);
+		ConstantBuffer(GraphicsDevice* device, const std::string& name);
 		~ConstantBuffer();
 
 		inline uint8_t* GetRawData() {

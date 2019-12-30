@@ -13,23 +13,24 @@ namespace TrioEngine
 	class Scene : public Object
 	{
 	public:
-		static Scene* Instance();
 		Scene();
 		virtual ~Scene();
 		
+		std::shared_ptr<GameObject> GetGameObject(const GameObject* object);
 		void Update();
-		std::shared_ptr<GameObject> GetGameObject(const GameObject* obj);
 
-	private:
+		static Scene* ActiveScene();
+
 		friend class GameObject;
-		void AddGameObject(const std::shared_ptr<GameObject>& obj);
-		void RemoveGameObject(const std::shared_ptr<GameObject>& obj);
-
 	private:
-		static Scene* m_instance;
+		static Scene* g_activeScene;
 
+		void AddGameObject(const std::shared_ptr<GameObject>& object);
+		void RemoveGameObject(const std::shared_ptr<GameObject>& object);
+
+		std::vector<Scene*> m_scenes;
 		std::map<int, std::shared_ptr<GameObject>> m_objects;
-		std::vector<std::shared_ptr<GameObject>> m_added_objects;
-		std::vector<std::shared_ptr<GameObject>> m_removed_objects;
+		std::vector<std::shared_ptr<GameObject>> m_addedObjects;
+		std::vector<std::shared_ptr<GameObject>> m_removedObjects;
 	};
 }

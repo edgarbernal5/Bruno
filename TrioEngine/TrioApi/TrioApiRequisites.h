@@ -19,4 +19,14 @@ namespace TrioEngine
 	class EffectTechnique;
 	class EffectParameter;
 	class EffectPass;
+	class Scene;
+	class Transform;
+	class GameObject;
+	class Component;
+	class Object;
+
+	//class ContentManager;
+	//class ContentReader;
+
+	class TextureContent;
 }

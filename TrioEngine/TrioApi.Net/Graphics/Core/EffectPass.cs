@@ -12,7 +12,7 @@ namespace TrioApi.Net.Graphics.Core
     {
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "EffectPass_GetName", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        private static extern string Internal_GetName(IntPtr technique);
+        private static extern string Internal_GetName(IntPtr pass);
 
         public string Name { get; private set; }
 

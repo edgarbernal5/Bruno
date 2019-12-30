@@ -16,7 +16,7 @@ namespace TrioEngine
 		m_isDefaultAdapter = (adapterIndex == 0);
 		m_adapter->GetDesc1(&m_adapter_desc);
 
-		char bufferDesc[128];
+		char bufferDesc[128]; //TODO:
 		WideCharToMultiByte(CP_ACP, 0, m_adapter_desc.Description, -1, bufferDesc, _countof(bufferDesc), NULL, FALSE);
 
 		m_deviceName = bufferDesc;

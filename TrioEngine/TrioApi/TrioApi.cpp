@@ -22,6 +22,10 @@
 #include "Graphics/VertexPositionColor.h"
 #include "Graphics/VertexPositionNormalTexture.h"
 
+#include "Scene.h"
+#include "Transform.h"
+#include "GameObject.h"
+
 /*
 BlendState
 */
@@ -51,6 +55,14 @@ BlendState* BlendState_Opaque()
 }
 
 /*
+Component
+*/
+bool Component_GetEnabled(Component* component)
+{
+	return component->GetEnabled();
+}
+
+/*
 DepthStencilState
 */
 DepthStencilState* DepthStencilState_Ctor()
@@ -62,10 +74,12 @@ DepthStencilState* DepthStencilState_Default()
 {
 	return DepthStencilState::Default;
 }
+
 DepthStencilState* DepthStencilState_DepthRead()
 {
 	return DepthStencilState::DepthRead;
 }
+
 DepthStencilState* DepthStencilState_None()
 {
 	return DepthStencilState::None;
@@ -238,6 +252,40 @@ void Game_Run(Game* game)
 void Game_Tick(Game* game)
 {
 	game->Tick();
+}
+
+
+/*
+GameObject
+*/
+GameObject* GameObject_Create(char* name)
+{
+	return GameObject::Create(name).get();
+}
+
+void GameObject_Destroy(GameObject *gameObject)
+{
+	//GameObject::Destroy(std::make_shared<GameObject>(gameObject));
+}
+
+Transform* GameObject_GetTransform(GameObject* gameObject)
+{
+	return gameObject->GetTransform().get();
+}
+
+bool GameObject_IsActiveInTree(GameObject* gameObject)
+{
+	return gameObject->IsActiveInTree();
+}
+
+bool GameObject_IsActiveSelf(GameObject* gameObject)
+{
+	return gameObject->IsActiveSelf();
+}
+
+void GameObject_SetActiveSelf(GameObject* gameObject, bool active)
+{
+	gameObject->SetActiveSelf(active);
 }
 
 /*
@@ -425,6 +473,35 @@ void Matrix_CreateWorld(Matrix *pMatrix1, Vector3* position, Vector3* forward, V
 }
 
 /*
+Object
+*/
+int Object_GetId(Object* object)
+{
+	return object->GetId();
+}
+
+char* Object_GetName(Object* object)
+{
+	const char *szSampleString = object->GetName().c_str();
+
+	ULONG ulSize = strlen(szSampleString) + sizeof(char);
+	char* pszReturn = NULL;
+
+	pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
+	// Copy the contents of szSampleString
+	// to the memory pointed to by pszReturn.
+	strcpy_s(pszReturn, ulSize, szSampleString);
+	// Return pszReturn.
+
+	return pszReturn;
+}
+
+void Object_SetName(Object* object, char* name)
+{
+	object->SetName(name);
+}
+
+/*
 RasterizerState
 */
 RasterizerState* RasterizerState_Ctor()
@@ -445,6 +522,92 @@ RasterizerState* RasterizerState_CullCounterClockwise()
 RasterizerState* RasterizerState_CullNone()
 {
 	return RasterizerState::CullNone;
+}
+
+/*
+Scene
+*/
+Scene* Scene_Ctor()
+{
+	return new Scene();
+}
+
+Scene* Scene_GetActiveScene()
+{
+	return Scene::ActiveScene();
+}
+
+/*
+Transform
+*/
+Transform* Transform_GetParent(Transform* transform)
+{
+	return transform->GetParent().get();
+}
+
+void Transform_GetPosition(Transform* transform, Vector3 *position)
+{
+	*position = transform->GetPosition();
+}
+
+void Transform_GetRotation(Transform* transform, Quaternion *rotation)
+{
+	*rotation = transform->GetRotation();
+}
+
+void Transform_GetScale(Transform* transform, Vector3 *scale)
+{
+	*scale = transform->GetScale();
+}
+
+void Transform_SetPosition(Transform* transform, Vector3 *position)
+{
+	transform->SetPosition(*position);
+}
+
+void Transform_SetRotation(Transform* transform, Quaternion *rotation)
+{
+	transform->SetRotation(*rotation);
+}
+
+void Transform_SetScale(Transform* transform, Vector3 *scale)
+{
+	transform->SetScale(*scale);
+}
+
+void Transform_GetLocalPosition(Transform* transform, Vector3 *position)
+{
+	*position = transform->GetLocalPosition();
+}
+
+void Transform_GetLocalRotation(Transform* transform, Quaternion *rotation)
+{
+	*rotation = transform->GetRotation();
+}
+
+void Transform_GetLocalScale(Transform* transform, Vector3 *scale)
+{
+	*scale = transform->GetLocalScale();
+}
+
+void Transform_SetLocalPosition(Transform* transform, Vector3 *position)
+{
+	transform->SetLocalPosition(*position);
+}
+
+void Transform_SetLocalRotation(Transform* transform, Quaternion *rotation)
+{
+	transform->SetLocalRotation(*rotation);
+}
+
+void Transform_SetLocalScale(Transform* transform, Vector3 *scale)
+{
+	transform->SetLocalScale(*scale);
+}
+
+void Transform_SetParent(Transform* transform, Transform* parent)
+{
+	transform->SetParent(std::shared_ptr<Transform>(parent));
 }
 
 /*

@@ -14,9 +14,14 @@ namespace TrioEngine
 	public:
 		virtual ~GameObject();
 
-		template <class T, typename ...ARGUMENTS> std::shared_ptr<T> AddComponent(ARGUMENTS... args);
-		template <class T> std::shared_ptr<T> GetComponent() const;
-		template <class T> std::vector<std::shared_ptr<T>> GetComponentsInChildren() const;
+		template <class T, typename ...ARGUMENTS> 
+		std::shared_ptr<T> AddComponent(ARGUMENTS... args);
+		
+		template <class T> 
+		std::shared_ptr<T> GetComponent() const;
+
+		template <class T> 
+		std::vector<std::shared_ptr<T>> GetComponentsInChildren() const;
 
 		int GetLayer() const
 		{
@@ -38,17 +43,17 @@ namespace TrioEngine
 			return m_isActiveSelf;
 		}
 
-		void SetActive(bool active);
+		void SetActiveSelf(bool active);
 		void SetLayer(int layer);
 		void Update();
 
 		static std::shared_ptr<GameObject> Create(const std::string& name);
-		static void Destroy(std::shared_ptr<GameObject>& obj);
+		static void Destroy(std::shared_ptr<GameObject>& object);
 
 		friend class Transform;
 	private:
 		GameObject(const std::string& name);
-		void BindComponent(const std::shared_ptr<Component>& com);
+		void BindComponent(const std::shared_ptr<Component>& component);
 		void OnTransformDirty();
 
 		std::vector<std::shared_ptr<Component>> m_components;
@@ -64,19 +69,19 @@ namespace TrioEngine
 	template <class T, typename ...ARGUMENTS>
 	std::shared_ptr<T> GameObject::AddComponent(ARGUMENTS... args)
 	{
-		std::shared_ptr<T> pComponent = std::make_shared<T>(args...);
+		std::shared_ptr<T> component = std::make_shared<T>(args...);
 
-		auto bIsTransform = std::dynamic_pointer_cast<Transform>(pComponent);
-		if (m_transform && bIsTransform)
+		auto isTransform = std::dynamic_pointer_cast<Transform>(component);
+		if (m_transform && isTransform)
 		{
 			return std::shared_ptr<T>();
 		}
 
-		m_addedComponents.push_back(pComponent);
+		m_addedComponents.push_back(component);
 
-		//this->BindComponent(pComponent);
+		BindComponent(component);
 
-		return pComponent;
+		return component;
 	}
 
 	template <class T>
@@ -84,21 +89,21 @@ namespace TrioEngine
 	{
 		for (int i = 0; i < m_addedComponents.size(); ++i)
 		{
-			auto& com = m_addedComponents[i];
-			auto t = std::dynamic_pointer_cast<T>(com);
-			if (t)
+			auto& component = m_addedComponents[i];
+			auto castedComponent = std::dynamic_pointer_cast<T>(component);
+			if (castedComponent)
 			{
-				return t;
+				return castedComponent;
 			}
 		}
 
 		for (int i = 0; i < m_components.size(); ++i)
 		{
-			auto& com = m_components[i];
-			auto t = std::dynamic_pointer_cast<T>(com);
-			if (t)
+			auto& component = m_components[i];
+			auto castedComponent = std::dynamic_pointer_cast<T>(component);
+			if (castedComponent)
 			{
-				return t;
+				return castedComponent;
 			}
 		}
 
@@ -112,21 +117,21 @@ namespace TrioEngine
 
 		for (int i = 0; i < m_addedComponents.size(); ++i)
 		{
-			auto& com = m_addedComponents[i];
-			auto t = std::dynamic_pointer_cast<T>(com);
-			if (t)
+			auto& component = m_addedComponents[i];
+			auto castedComponent = std::dynamic_pointer_cast<T>(component);
+			if (castedComponent)
 			{
-				components.push_back(t);
+				components.push_back(castedComponent);
 			}
 		}
 
 		for (int i = 0; i < m_components.size(); ++i)
 		{
-			auto& com = m_components[i];
-			auto t = std::dynamic_pointer_cast<T>(com);
-			if (t)
+			auto& component = m_components[i];
+			auto castedComponent = std::dynamic_pointer_cast<T>(component);
+			if (castedComponent)
 			{
-				components.push_back(t);
+				components.push_back(castedComponent);
 			}
 		}
 
@@ -134,10 +139,10 @@ namespace TrioEngine
 		for (int i = 0; i < childCount; ++i)
 		{
 			auto child = this->GetTransform()->GetChild(i);
-			std::vector<std::shared_ptr<T>> childComs = child->GetGameObject()->GetComponentsInChildren<T>();
-			for (int j = 0; j < childComs.size(); ++j)
+			std::vector<std::shared_ptr<T>> childComponents = child->GetGameObject()->GetComponentsInChildren<T>();
+			for (int j = 0; j < childComponents.size(); ++j)
 			{
-				components.push_back(childComs[j]);
+				components.push_back(childComponents[j]);
 			}
 		}
 

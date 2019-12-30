@@ -6,7 +6,7 @@ namespace TrioEngine
 #if OPENGL
 	GLuint ConstantBuffer::m_indexTest = 0;
 #endif
-	ConstantBuffer::ConstantBuffer(GraphicsDevice* device, std::string name, uint32_t sizeInBytes, std::vector<ConstantBufferField>& bufferFields) :
+	ConstantBuffer::ConstantBuffer(GraphicsDevice* device, const std::string& name, uint32_t sizeInBytes, std::vector<ConstantBufferField>& bufferFields) :
 		m_device(device),
 #ifdef TRIO_DIRECTX
 		m_buffer(nullptr),
@@ -23,7 +23,7 @@ namespace TrioEngine
 		m_bufferBytes = new uint8_t[sizeInBytes];
 	}
 
-	ConstantBuffer::ConstantBuffer(GraphicsDevice* device, std::string name) :
+	ConstantBuffer::ConstantBuffer(GraphicsDevice* device, const std::string& name) :
 		m_device(device),
 #ifdef TRIO_DIRECTX
 		m_buffer(nullptr),

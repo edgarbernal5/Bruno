@@ -14,24 +14,21 @@ namespace TrioEngine
 	public:
 		Component();
 		virtual ~Component();
-		//std::shared_ptr<GameObject> GetGameObject() const { return m_object.lock(); }
 
-		GameObject* GetGameObject() const
-		{
-			return m_object;
-		}
+		bool GetEnabled() { return m_enabled; }
+		std::shared_ptr<GameObject> GetGameObject() const { return m_ownerObject.lock(); }
 		const std::shared_ptr<Transform>& GetTransform() const;
 
+		void SetEnabled(bool enabled) { m_enabled = enabled; }
+
+		friend class GameObject;
 	protected:
 		virtual void Update() { }
-		virtual void LateUpdate() { }
 		virtual void OnTransformDirty() { }
-
+		
 	private:
-		friend class GameObject;
+		bool m_enabled;
 
-	private:
-		//std::weak_ptr<GameObject> m_object;
-		GameObject* m_object;
+		std::weak_ptr<GameObject> m_ownerObject;
 	};
 }

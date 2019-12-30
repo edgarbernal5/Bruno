@@ -58,7 +58,7 @@ namespace TrioEngine
 		void SetLocalRotation(const Quaternion& rotation);
 		void SetLocalScale(const Vector3& scale);
 		
-		void SetPosition(const Vector3& pos);
+		void SetPosition(const Vector3& position);
 		void SetRotation(const Quaternion& rotation);
 		void SetScale(const Vector3& scale);
 		
@@ -84,8 +84,8 @@ namespace TrioEngine
 		Quaternion m_rotation;
 		Vector3 m_scale;
 		
-		Matrix m_local_to_world;
-		Matrix m_world_to_local;
+		Matrix m_localToWorld;
+		Matrix m_worldToLocal;
 
 		bool m_dirty;
 	};

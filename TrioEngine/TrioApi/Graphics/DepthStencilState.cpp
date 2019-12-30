@@ -36,7 +36,7 @@ namespace TrioEngine
 	{
 	}
 
-	void DepthStencilState::ApplyState(GraphicsDevice * device)
+	void DepthStencilState::ApplyState(GraphicsDevice* device)
 	{
 
 #ifdef TRIO_DIRECTX

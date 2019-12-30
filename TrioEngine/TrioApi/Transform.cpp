@@ -6,8 +6,8 @@
 namespace TrioEngine
 {
 	Transform::Transform() :
-		m_localPosition(0, 0, 0),
-		m_localScale(1, 1, 1),
+		m_localPosition(0.0f, 0.0f, 0.0f),
+		m_localScale(1.0f, 1.0f, 1.0f),
 		m_position(m_localPosition),
 		m_rotation(m_localRotation),
 		m_scale(m_localScale),
@@ -27,14 +27,14 @@ namespace TrioEngine
 		Quaternion rotation = GetRotation();
 		Vector3 scale = GetScale();
 
-		auto old_parent = m_parent.lock();
-		if (old_parent)
+		auto oldParent = m_parent.lock();
+		if (oldParent)
 		{
-			for (int i = 0; i < old_parent->GetChildCount(); ++i)
+			for (int i = 0; i < oldParent->GetChildCount(); ++i)
 			{
-				if (old_parent->GetChild(i).get() == this)
+				if (oldParent->GetChild(i).get() == this)
 				{
-					old_parent->m_children.erase(old_parent->m_children.begin() + i);
+					oldParent->m_children.erase(oldParent->m_children.begin() + i);
 					break;
 				}
 			}
@@ -54,14 +54,14 @@ namespace TrioEngine
 
 	std::shared_ptr<Transform> Transform::GetRoot() const
 	{
-		auto parent = this->GetParent();
+		auto parent = GetParent();
 		if (parent)
 		{
 			return parent->GetRoot();
 		}
 		else
 		{
-			return this->GetGameObject()->GetTransform();
+			return GetGameObject()->GetTransform();
 		}
 	}
 
@@ -69,132 +69,120 @@ namespace TrioEngine
 	{
 		m_localPosition = position;
 
-		this->MarkDirty();
+		MarkDirty();
 	}
 
 	void Transform::SetLocalRotation(const Quaternion& rotation)
 	{
 		m_localRotation = rotation;
 
-		this->MarkDirty();
+		MarkDirty();
 	}
 
 	void Transform::SetLocalScale(const Vector3& scale)
 	{
 		m_localScale = scale;
 
-		this->MarkDirty();
+		MarkDirty();
 	}
 
 	const Vector3& Transform::GetPosition()
 	{
-		this->UpdateMatrix();
+		UpdateMatrix();
 
 		return m_position;
 	}
 
-	void Transform::SetPosition(const Vector3& pos)
+	void Transform::SetPosition(const Vector3& position)
 	{
-		Vector3 local_position;
+		Vector3 localPosition = position;
 
 		auto parent = m_parent.lock();
 		if (parent)
 		{
-			//local_position = parent->GetWorldToLocalMatrix().MultiplyPoint3x4(pos);
-		}
-		else
-		{
-			local_position = pos;
+			localPosition = Vector3::Transform(position, parent->GetWorldToLocalMatrix());
 		}
 
-		this->SetLocalPosition(local_position);
+		SetLocalPosition(localPosition);
 	}
 
 	const Quaternion& Transform::GetRotation()
 	{
-		this->UpdateMatrix();
+		UpdateMatrix();
 
 		return m_rotation;
 	}
 
 	void Transform::SetRotation(const Quaternion& rotation)
 	{
-		Quaternion local_rotation;
+		Quaternion localRotation = rotation;
 
 		auto parent = m_parent.lock();
 		if (parent)
 		{
-			//local_rotation = Quaternion::Inverse(parent->GetRotation()) * rotation;
-		}
-		else
-		{
-			local_rotation = rotation;
+			Quaternion invRotation;
+			rotation.Inverse(invRotation);
+
+			localRotation = invRotation * rotation;
 		}
 
-		this->SetLocalRotation(local_rotation);
+		SetLocalRotation(localRotation);
 	}
 
 	const Vector3& Transform::GetScale()
 	{
-		this->UpdateMatrix();
+		UpdateMatrix();
 
 		return m_scale;
 	}
 
 	void Transform::SetScale(const Vector3& scale)
 	{
-		Vector3 local_scale;
+		Vector3 localScale = scale;
 
 		auto parent = m_parent.lock();
 		if (parent)
 		{
-			const auto& parent_scale = parent->GetScale();
-			local_scale = Vector3(scale.x / parent_scale.x, scale.y / parent_scale.y, scale.z / parent_scale.z);
-		}
-		else
-		{
-			local_scale = scale;
+			const auto& parentScale = parent->GetScale();
+			localScale = Vector3(scale.x / parentScale.x, scale.y / parentScale.y, scale.z / parentScale.z);
 		}
 
-		this->SetLocalScale(local_scale);
+		SetLocalScale(localScale);
 	}
 
 	const Matrix& Transform::GetLocalToWorldMatrix()
 	{
-		this->UpdateMatrix();
+		UpdateMatrix();
 
-		return m_local_to_world;
+		return m_localToWorld;
 	}
 
 	const Matrix& Transform::GetWorldToLocalMatrix()
 	{
-		this->UpdateMatrix();
+		UpdateMatrix();
 
-		return m_world_to_local;
+		return m_worldToLocal;
 	}
 
 	Vector3 Transform::GetRight()
 	{
-		this->UpdateMatrix();
+		UpdateMatrix();
 
-		return m_local_to_world.Left();
-		//return m_local_to_world.MultiplyDirection(Vector3(1, 0, 0));
+		return m_localToWorld.Right();
 	}
 
 	Vector3 Transform::GetUp()
 	{
-		this->UpdateMatrix();
+		UpdateMatrix();
 
-		return m_local_to_world.Up();
-		//return m_local_to_world.MultiplyDirection(Vector3(0, 1, 0));
+		return m_localToWorld.Up();
 	}
 
 	Vector3 Transform::GetForward()
 	{
-		this->UpdateMatrix();
+		UpdateMatrix();
 
-		return m_local_to_world.Forward();
-		//return m_local_to_world. * Vector3(0, 0, 1);
+		return m_localToWorld.Forward();
 	}
 
 	void Transform::MarkDirty()
@@ -202,9 +190,9 @@ namespace TrioEngine
 		m_dirty = true;
 		GetGameObject()->OnTransformDirty();
 
-		for (auto& i : m_children)
+		for (auto& child : m_children)
 		{
-			i->MarkDirty();
+			child->MarkDirty();
 		}
 	}
 
@@ -217,16 +205,21 @@ namespace TrioEngine
 			auto parent = m_parent.lock();
 			if (parent)
 			{
-
+				m_localToWorld = parent->GetLocalToWorldMatrix() * Matrix::CreateTRS(m_localPosition, m_localRotation, m_localScale);
+				m_position = Vector3::Transform(m_localPosition, parent->GetLocalToWorldMatrix());
+				m_rotation = parent->GetRotation() * m_localRotation;
+				const auto& parentScale = parent->GetScale();
+				m_scale = Vector3(parentScale.x * m_localScale.x, parentScale.y * m_localScale.y, parentScale.z * m_localScale.z);
 			}
 			else
 			{
+				m_localToWorld = Matrix::CreateTRS(m_localPosition, m_localRotation, m_localScale);
 				m_position = m_localPosition;
 				m_rotation = m_localRotation;
 				m_scale = m_localScale;
-
-				//m_world_to_local = Matrix::CreateWorld
 			}
+
+			m_localToWorld.Invert(m_worldToLocal);
 		}
 	}
 }

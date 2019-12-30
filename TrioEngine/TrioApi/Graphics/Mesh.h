@@ -15,7 +15,8 @@ namespace TrioEngine
 	class TRIO_API_EXPORT Mesh
 	{
 	public:
-		
+		~Mesh();
+
 		friend class Model;
 	private:
 		Mesh(Model& model, aiMesh& mesh);
