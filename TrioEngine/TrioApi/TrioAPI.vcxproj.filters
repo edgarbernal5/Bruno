@@ -639,6 +639,18 @@
     <ClInclude Include="Content\ContentTypeReaderManager.h">
       <Filter>Header Files\Content</Filter>
     </ClInclude>
+    <ClInclude Include="Content\Pipeline\Processors\TextureProcessor.h">
+      <Filter>Header Files\Content\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Processors\EffectProcessor.h">
+      <Filter>Header Files\Content\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Tasks\BuildCoordinatorSettings.h">
+      <Filter>Header Files\Content\Pipeline\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Tasks\TimestampCache.h">
+      <Filter>Header Files\Content\Pipeline\Tasks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -988,6 +1000,12 @@
     </ClCompile>
     <ClCompile Include="Content\ContentTypeReaderManager.cpp">
       <Filter>Source Files\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Processors\TextureProcessor.cpp">
+      <Filter>Source Files\Content\Pipeline\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Processors\EffectProcessor.cpp">
+      <Filter>Source Files\Content\Pipeline\Processors</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

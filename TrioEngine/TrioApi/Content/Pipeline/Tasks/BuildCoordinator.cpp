@@ -16,8 +16,9 @@
 
 namespace TrioEngine
 {
-	BuildCoordinator::BuildCoordinator() :
-		m_importerManager(nullptr), m_processorManager(nullptr), m_BuildItems(nullptr), m_BuildItemsChanged(false)
+	BuildCoordinator::BuildCoordinator(BuildCoordinatorSettings settings) :
+		m_importerManager(nullptr), m_processorManager(nullptr), m_BuildItems(nullptr), m_BuildItemsChanged(false),
+		m_Settings(settings)
 	{
 		m_Settings.InitializePaths();
 
@@ -31,7 +32,26 @@ namespace TrioEngine
 
 	BuildCoordinator::~BuildCoordinator()
 	{
-
+		if (m_importerManager != nullptr)
+		{
+			delete m_importerManager;
+			m_importerManager = nullptr;
+		}
+		if (m_processorManager != nullptr)
+		{
+			delete m_processorManager;
+			m_processorManager = nullptr;
+		}
+		if (m_ContentCompiler != nullptr)
+		{
+			delete m_ContentCompiler;
+			m_ContentCompiler = nullptr;
+		}
+		if (m_BuildItems != nullptr)
+		{
+			delete m_BuildItems;
+			m_BuildItems = nullptr;
+		}
 	}
 
 	void BuildCoordinator::RunTheBuild()
@@ -138,14 +158,16 @@ namespace TrioEngine
 		RequestBuild(request);
 	}
 
-
 	BuildItem* BuildCoordinator::RequestBuild(BuildRequest* request)
 	{
 		request->m_SourceFileName = GetRelativePath(request->m_SourceFileName);
 		if (request->m_ImporterName.size() == 0)
 		{
 			//Adivinar el importador por medio de la extension del archivo.
-			request->m_ImporterName = m_importerManager->GetImporterNameByExtension(TrioIO::Path::GetFileExtension(request->m_SourceFileName));
+			request->m_ImporterName = m_importerManager->GetImporterNameByExtension
+			(
+				TrioIO::Path::GetFileExtension(request->m_SourceFileName)
+			);
 		}
 
 		//TO-DO: verificar el "hashcode" de BuildRequest.
@@ -178,7 +200,9 @@ namespace TrioEngine
 
 		std::vector<std::string>::iterator its = find(m_RebuiltFiles.begin(), m_RebuiltFiles.end(), item->OutputFilename);
 		if (its != m_RebuiltFiles.end())
+		{
 			m_RebuiltFiles.erase(its);
+		}
 		//timestampCache.remove
 		TrioIO::File::Delete(absolutePath);
 
@@ -223,7 +247,7 @@ namespace TrioEngine
 			request->m_AssetName = TrioIO::Path::Combine(TrioIO::Path::GetDirectoryFromFilePath(request->m_SourceFileName), TrioIO::Path::GetFilenameWithoutExtension(request->m_SourceFileName));
 		}
 
-		std::string relativePath = GetRelativePath(TrioIO::Path::Combine(intermediateDirectory, request->m_AssetName) + ".cuab");
+		std::string relativePath = GetRelativePath(TrioIO::Path::Combine(intermediateDirectory, request->m_AssetName) + ".trio");
 
 		BuildItem* item = m_BuildItems->FindItem(relativePath);
 

@@ -3,9 +3,8 @@
 
 namespace TrioEngine
 {
-
 #if TRIO_DIRECTX
-	ID3DBlob* EffectCompiler::CompileShader(std::string path, std::string entryFunctionName, std::string profile, const D3D_SHADER_MACRO* defines, bool forceOptimization)
+	ID3DBlob* EffectCompiler::CompileShader(std::string path, const char* entryFunctionName, const char* profile, const D3D_SHADER_MACRO* defines, bool forceOptimization)
 	{
 		UINT flags = D3DCOMPILE_WARNINGS_ARE_ERRORS;
 #ifdef _DEBUG
@@ -22,8 +21,8 @@ namespace TrioEngine
 		//TO-DO: tomar en cuenta las clases y funciones de Microsoft
 		//D3DX11CompileEffectFromFile
 
-		HRESULT hr = D3DCompileFromFile(pathWS.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryFunctionName.c_str(),
-			profile.c_str(), flags, 0, &compiledShader, &errorMessages);
+		HRESULT hr = D3DCompileFromFile(pathWS.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryFunctionName,
+			profile, flags, 0, &compiledShader, &errorMessages);
 
 		if (FAILED(hr))
 		{
@@ -34,15 +33,15 @@ namespace TrioEngine
 			}
 
 			if (compiledShader)
+			{
 				compiledShader->Release();
-
+			}
 			return nullptr;
 		}
 		return compiledShader;
 	}
 
-
-	ID3D11VertexShader* EffectCompiler::CompileVSFromFile(ID3D11Device* device, std::string path, std::string functionName, std::string profile, const D3D_SHADER_MACRO* defines, ID3DBlob** byteCode, bool forceOptimization)
+	ID3D11VertexShader* EffectCompiler::CompileVSFromFile(ID3D11Device* device, std::string path, const char* functionName, const char* profile, const D3D_SHADER_MACRO* defines, ID3DBlob** byteCode, bool forceOptimization)
 	{
 		ID3DBlob* compiledShader = CompileShader(path, functionName, profile, defines, forceOptimization);
 		ID3D11VertexShader* shader = nullptr;
@@ -57,8 +56,8 @@ namespace TrioEngine
 
 	ID3D11PixelShader* EffectCompiler::CompilePSFromFile(ID3D11Device* device,
 		std::string path,
-		std::string functionName,
-		std::string profile,
+		const char* functionName,
+		const char* profile,
 		const D3D_SHADER_MACRO* defines,
 		bool forceOptimization)
 	{
@@ -66,7 +65,6 @@ namespace TrioEngine
 		ID3D11PixelShader* shader = nullptr;
 		device->CreatePixelShader(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
 			nullptr, &shader);
-
 
 		return shader;
 	}

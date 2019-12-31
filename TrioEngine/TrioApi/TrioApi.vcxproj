@@ -254,8 +254,10 @@
     <ClInclude Include="Content\Pipeline\OpaqueData.h" />
     <ClInclude Include="Content\Pipeline\Processors\BasicContentProcessorContext.h" />
     <ClInclude Include="Content\Pipeline\Processors\ContentProcessorContext.h" />
+    <ClInclude Include="Content\Pipeline\Processors\EffectProcessor.h" />
     <ClInclude Include="Content\Pipeline\Processors\IContentProcessor.h" />
     <ClInclude Include="Content\Pipeline\Processors\ProcessorManager.h" />
+    <ClInclude Include="Content\Pipeline\Processors\TextureProcessor.h" />
     <ClInclude Include="Content\Pipeline\Serialization\ContentCompiler.h" />
     <ClInclude Include="Content\Pipeline\Serialization\ContentTypeWriter.h" />
     <ClInclude Include="Content\Pipeline\Serialization\ContentTypeWriterFactory.h" />
@@ -268,9 +270,11 @@
     <ClInclude Include="Content\Pipeline\Serialization\Texture2DWriter.h" />
     <ClInclude Include="Content\Pipeline\Serialization\VertexBufferWriter.h" />
     <ClInclude Include="Content\Pipeline\Tasks\BuildCoordinator.h" />
+    <ClInclude Include="Content\Pipeline\Tasks\BuildCoordinatorSettings.h" />
     <ClInclude Include="Content\Pipeline\Tasks\BuildItem.h" />
     <ClInclude Include="Content\Pipeline\Tasks\BuildItemCollection.h" />
     <ClInclude Include="Content\Pipeline\Tasks\BuildRequest.h" />
+    <ClInclude Include="Content\Pipeline\Tasks\TimestampCache.h" />
     <ClInclude Include="DataTypes\Array.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="FX\AssertFX.h" />
@@ -424,7 +428,9 @@
     <ClCompile Include="Content\Pipeline\Importers\ModelImporter.cpp" />
     <ClCompile Include="Content\Pipeline\Importers\TextureImporter.cpp" />
     <ClCompile Include="Content\Pipeline\Processors\BasicContentProcessorContext.cpp" />
+    <ClCompile Include="Content\Pipeline\Processors\EffectProcessor.cpp" />
     <ClCompile Include="Content\Pipeline\Processors\ProcessorManager.cpp" />
+    <ClCompile Include="Content\Pipeline\Processors\TextureProcessor.cpp" />
     <ClCompile Include="Content\Pipeline\Serialization\ContentCompiler.cpp" />
     <ClCompile Include="Content\Pipeline\Serialization\ContentTypeWriterFactory.cpp" />
     <ClCompile Include="Content\Pipeline\Serialization\ContentWriter.cpp" />

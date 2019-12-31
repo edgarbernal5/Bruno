@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TrioApi.Net.Content.Tasks;
 using TrioApi.Net.Game;
 using TrioApi.Net.Graphics.Core;
 using TrioWpfEditor.Delivery;
@@ -69,6 +70,13 @@ namespace TrioWpfEditor
             GameObject gameObject = GameObject.Create("GO1");
             string name = gameObject.Name;
             int id = gameObject.Id;
+
+            BuildCoordinatorSettings settings = new BuildCoordinatorSettings();
+            //settings.IntermediateDirectory = "";
+            //settings.OutputDirectory = "";
+            //settings.RootDirectory = "";
+
+            BuildCoordinator buildCoordinator = new BuildCoordinator(settings);
         }
     }
 }

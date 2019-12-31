@@ -26,6 +26,31 @@
 #include "Transform.h"
 #include "GameObject.h"
 
+#include "Content/Pipeline/Tasks/BuildCoordinator.h"
+
+/*
+DepthStencilState
+*/
+DepthStencilState* DepthStencilState_Ctor()
+{
+	return new DepthStencilState();
+}
+
+DepthStencilState* DepthStencilState_Default()
+{
+	return DepthStencilState::Default;
+}
+
+DepthStencilState* DepthStencilState_DepthRead()
+{
+	return DepthStencilState::DepthRead;
+}
+
+DepthStencilState* DepthStencilState_None()
+{
+	return DepthStencilState::None;
+}
+
 /*
 BlendState
 */
@@ -55,34 +80,41 @@ BlendState* BlendState_Opaque()
 }
 
 /*
+BuildCoordinator
+*/
+
+BuildCoordinator* BuildCoordinator_Ctor(const char* intermediateDirectory, const char* outputDirectory, const char* rootDirectory)
+{
+	BuildCoordinatorSettings settings;
+
+	if (intermediateDirectory)
+	settings.IntermediateDirectory = intermediateDirectory;
+	
+	if (outputDirectory)
+	settings.OutputDirectory = outputDirectory;
+
+	if (rootDirectory)
+	settings.RootDirectory = rootDirectory;
+
+	return new BuildCoordinator(settings);
+}
+
+void BuildCoordinator_RequestBuild(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues)
+{
+	coordinator->RequestBuild(sourceFilename, assetName, importerName, processorName, nullptr);
+}
+
+void BuildCoordinator_RunTheBuild(BuildCoordinator* coordinator)
+{
+	coordinator->RunTheBuild();
+}
+
+/*
 Component
 */
 bool Component_GetEnabled(Component* component)
 {
 	return component->GetEnabled();
-}
-
-/*
-DepthStencilState
-*/
-DepthStencilState* DepthStencilState_Ctor()
-{
-	return new DepthStencilState();
-}
-
-DepthStencilState* DepthStencilState_Default()
-{
-	return DepthStencilState::Default;
-}
-
-DepthStencilState* DepthStencilState_DepthRead()
-{
-	return DepthStencilState::DepthRead;
-}
-
-DepthStencilState* DepthStencilState_None()
-{
-	return DepthStencilState::None;
 }
 
 /*
@@ -93,7 +125,7 @@ Effect* Effect_Ctor(GraphicsDevice* device)
 	return new Effect(device);
 }
 
-void Effect_CompileEffectFromFile(Effect* effect, char* filename)
+void Effect_CompileEffectFromFile(Effect* effect, const char* filename)
 {
 	effect->CompileEffectFromFile(filename);
 }
@@ -258,7 +290,7 @@ void Game_Tick(Game* game)
 /*
 GameObject
 */
-GameObject* GameObject_Create(char* name)
+GameObject* GameObject_Create(const char* name)
 {
 	return GameObject::Create(name).get();
 }
@@ -496,7 +528,7 @@ char* Object_GetName(Object* object)
 	return pszReturn;
 }
 
-void Object_SetName(Object* object, char* name)
+void Object_SetName(Object* object, const char* name)
 {
 	object->SetName(name);
 }

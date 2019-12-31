@@ -33,8 +33,10 @@ namespace TrioIO
 			return(tmp + p2);
 		}
 		else
+		{
 			if (p2[0] == '\\')
 				return (tmp + p2.substr(1, p2.size()));
+		}
 		return(p1 + p2);
 	}
 	

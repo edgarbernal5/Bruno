@@ -2,7 +2,17 @@
 
 #include "TrioApiRequisites.h"
 
+#include "Content/Pipeline/Tasks/BuildCoordinatorSettings.h"
+
 using namespace TrioEngine;
+
+/*
+DepthStencilState
+*/
+extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall DepthStencilState_Ctor();
+extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall DepthStencilState_Default();
+extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall DepthStencilState_DepthRead();
+extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall DepthStencilState_None();
 
 /*
 BlendState
@@ -14,23 +24,22 @@ extern "C" TRIO_API_EXPORT BlendState* __stdcall BlendState_NonPremultiplied();
 extern "C" TRIO_API_EXPORT BlendState* __stdcall BlendState_Opaque();
 
 /*
+BuildCoordinator
+*/
+extern "C" TRIO_API_EXPORT BuildCoordinator* __stdcall BuildCoordinator_Ctor(const char* intermediateDirectory, const char* outputDirectory, const char* rootDirectory);
+extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_RequestBuild(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues);
+extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_RunTheBuild(BuildCoordinator* coordinator);
+
+/*
 Component
 */
 extern "C" TRIO_API_EXPORT bool __stdcall Component_GetEnabled(Component* component);
 
 /*
-DepthStencilState
-*/
-extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall DepthStencilState_Ctor();
-extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall DepthStencilState_Default();
-extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall DepthStencilState_DepthRead();
-extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall DepthStencilState_None();
-
-/*
 Effect
 */
 extern "C" TRIO_API_EXPORT Effect* __stdcall Effect_Ctor(GraphicsDevice* device);
-extern "C" TRIO_API_EXPORT void __stdcall Effect_CompileEffectFromFile(Effect* effect, char* filename);
+extern "C" TRIO_API_EXPORT void __stdcall Effect_CompileEffectFromFile(Effect* effect, const char* filename);
 extern "C" TRIO_API_EXPORT void __stdcall Effect_GetParameters(Effect* effect, EffectParameter*** parameters, int *size);
 extern "C" TRIO_API_EXPORT void __stdcall Effect_GetTechniques(Effect* effect, EffectTechnique*** techniques, int *size);
 
@@ -66,7 +75,7 @@ extern "C" TRIO_API_EXPORT void __stdcall Game_Tick(Game* game);
 /*
 GameObject
 */
-extern "C" TRIO_API_EXPORT GameObject* __stdcall GameObject_Create(char* name);
+extern "C" TRIO_API_EXPORT GameObject* __stdcall GameObject_Create(const char* name);
 extern "C" TRIO_API_EXPORT void __stdcall GameObject_Destroy(GameObject *gameObject);
 extern "C" TRIO_API_EXPORT Transform* __stdcall GameObject_GetTransform(GameObject* gameObject);
 extern "C" TRIO_API_EXPORT bool __stdcall GameObject_IsActiveInTree(GameObject* gameObject);
@@ -126,7 +135,7 @@ Object
 */
 extern "C" TRIO_API_EXPORT int __stdcall Object_GetId(Object* object);
 extern "C" TRIO_API_EXPORT char* __stdcall Object_GetName(Object* object);
-extern "C" TRIO_API_EXPORT void __stdcall Object_SetName(Object* object, char* name);
+extern "C" TRIO_API_EXPORT void __stdcall Object_SetName(Object* object, const char* name);
 
 /*
 RasterizerState

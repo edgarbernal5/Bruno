@@ -62,6 +62,8 @@
   <ItemGroup>
     <Compile Include="Containers\INamedItem.cs" />
     <Compile Include="Containers\NamedList.cs" />
+    <Compile Include="Content\Tasks\BuildCoordinator.cs" />
+    <Compile Include="Content\Tasks\BuildCoordinatorSettings.cs" />
     <Compile Include="Game\GameObject.cs" />
     <Compile Include="Game\Object.cs" />
     <Compile Include="Game\Transform.cs" />

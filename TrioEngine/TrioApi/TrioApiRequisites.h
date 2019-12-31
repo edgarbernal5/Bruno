@@ -28,5 +28,6 @@ namespace TrioEngine
 	//class ContentManager;
 	//class ContentReader;
 
+	class BuildCoordinator;
 	class TextureContent;
 }
