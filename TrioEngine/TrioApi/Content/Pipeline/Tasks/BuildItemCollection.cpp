@@ -2,6 +2,7 @@
 #include "BuildItemCollection.h"
 
 #include "BuildItem.h"
+#include "IO/File.h"
 
 namespace TrioEngine
 {
@@ -15,7 +16,10 @@ namespace TrioEngine
 
 	void BuildItemCollection::Load(std::string filename)
 	{
+		if (TrioIO::File::Exist(filename))
+		{
 
+		}
 	}
 
 	BuildItem* BuildItemCollection::FindItem(std::string outputFilename)
@@ -43,7 +47,7 @@ namespace TrioEngine
 		m_Items.clear();
 		m_RequestTable.clear();
 		m_OutputFilenameTable.clear();
-		m_OutputFilenameTable.clear();
+		m_WantedItems.clear();
 	}
 
 	void BuildItemCollection::WantItem(BuildItem* item)

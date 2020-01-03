@@ -9,6 +9,8 @@
 #include "VertexDeclaration.h"
 #include "SetDataOptions.h"
 #include "VertexBufferBinding.h"
+#include "CpuAccessFlags.h"
+#include "ResourceOptionFlags.h"
 
 namespace TrioEngine
 {

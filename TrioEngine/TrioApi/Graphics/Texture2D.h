@@ -5,6 +5,10 @@
 
 #include "../Math/Rectangle.h"
 #include "ResourceUsage.h"
+#include "CpuAccessFlags.h"
+#include "MapMode.h"
+#include "BindFlags.h"
+#include "ResourceOptionFlags.h"
 
 #include <string>
 

@@ -14,7 +14,11 @@ namespace TrioEngine
 
 		BuildCoordinatorSettings()
 		{
-			RootDirectory = "";
+		}
+
+		std::string GetCacheFilename()
+		{
+			return IntermediateDirectory + "Content-Pipeline.xml";
 		}
 
 		void InitializePaths()

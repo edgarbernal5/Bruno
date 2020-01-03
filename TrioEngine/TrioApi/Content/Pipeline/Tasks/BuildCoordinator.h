@@ -5,6 +5,7 @@
 #include "Content/Pipeline/OpaqueData.h"
 
 #include "BuildCoordinatorSettings.h"
+#include "Content/Pipeline/Tasks/TimestampCache.h"
 
 namespace TrioEngine
 {
@@ -19,7 +20,7 @@ namespace TrioEngine
 	class TRIO_API_EXPORT BuildCoordinator
 	{
 	public:
-		BuildCoordinator(BuildCoordinatorSettings settings);
+		BuildCoordinator(BuildCoordinatorSettings settings, TimestampCache* timestampCache);
 		~BuildCoordinator();
 
 		std::string GetAbsolutePath(std::string path);
@@ -60,5 +61,6 @@ namespace TrioEngine
 
 		BuildCoordinatorSettings m_Settings;
 		BuildItemCollection *m_BuildItems;
+		TimestampCache m_timestampCache;
 	};
 }

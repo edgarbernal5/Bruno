@@ -2,6 +2,7 @@
 
 #include "TrioApiRequisites.h"
 
+#include "VertexChannel.h"
 namespace TrioEngine
 {
 	class VertexChannel;

@@ -16,7 +16,7 @@
 
 namespace TrioEngine
 {
-	BuildCoordinator::BuildCoordinator(BuildCoordinatorSettings settings) :
+	BuildCoordinator::BuildCoordinator(BuildCoordinatorSettings settings, TimestampCache* timestampCache) :
 		m_importerManager(nullptr), m_processorManager(nullptr), m_BuildItems(nullptr), m_BuildItemsChanged(false),
 		m_Settings(settings)
 	{
@@ -28,6 +28,11 @@ namespace TrioEngine
 		m_ContentCompiler = new ContentCompiler();
 
 		m_BuildItems = new BuildItemCollection();
+
+		if (timestampCache)
+		{
+			m_timestampCache = *timestampCache;
+		}
 	}
 
 	BuildCoordinator::~BuildCoordinator()
@@ -77,6 +82,15 @@ namespace TrioEngine
 
 	ContentItem* BuildCoordinator::BuildAsset(BuildItem* item)
 	{
+		if (item->m_IsBuilt)
+		{
+			return nullptr;
+		}
+
+		m_BuildItemsChanged = true;
+		item->m_Dependencies.clear();
+		item->m_ExtraOutputFiles.clear();
+
 		ContentItem* input = ImportAsset(item);
 
 		ContentItem* output = input;
@@ -108,8 +122,9 @@ namespace TrioEngine
 		std::string absolutePath = GetAbsolutePath(item->m_BuildRequest->m_SourceFileName);
 		std::string& importerName = item->m_BuildRequest->m_ImporterName;
 
+		item->m_SourceTimestamp = m_timestampCache.GetTimestamp(absolutePath);
+		
 		IContentImporter* instance = m_importerManager->GetByImporterName(importerName);
-
 		ContentItem* input = instance->Import(absolutePath);
 
 		if (input != nullptr)
@@ -120,13 +135,12 @@ namespace TrioEngine
 		return input;
 	}
 
-
 	void BuildCoordinator::SerializeAsset(BuildItem* item, ContentItem* assetObject)
 	{
 		//__typeof(assetObject);
 		TrioIO::Path::CreateFolder(TrioIO::Path::GetDirectoryFromFilePath(GetAbsolutePath(item->OutputFilename)));
 		std::string absolutePath = GetAbsolutePath(item->OutputFilename);
-		//timestampCache.Remove(absolutePath);
+		m_timestampCache.Remove(absolutePath);
 
 		TrioIO::FileStream* fileStream = new TrioIO::FileStream(absolutePath, TrioIO::FileAccess::Write);
 		{
@@ -237,7 +251,7 @@ namespace TrioEngine
 	{
 		std::string intermediateDirectory = m_Settings.OutputDirectory;
 
-		if (request->m_AssetName == "")
+		if (request->m_AssetName.size() == 0)
 		{
 			if (!TrioIO::Path::IsPathRooted(request->m_SourceFileName))
 			{

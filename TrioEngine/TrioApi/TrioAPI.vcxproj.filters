@@ -1007,5 +1007,8 @@
     <ClCompile Include="Content\Pipeline\Processors\EffectProcessor.cpp">
       <Filter>Source Files\Content\Pipeline\Processors</Filter>
     </ClCompile>
+    <ClCompile Include="Content\Pipeline\Tasks\TimestampCache.cpp">
+      <Filter>Source Files\Content\Pipeline\Tasks</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

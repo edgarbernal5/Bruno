@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 namespace TrioEngine
 {
@@ -13,7 +14,8 @@ namespace TrioEngine
 	class TRIO_API_EXPORT BuildItem
 	{
 	public:
-		BuildItem() : m_IsBuilt(false), m_IsWanted(false), m_BuildRequest(nullptr)
+		BuildItem() : 
+			m_IsBuilt(false), m_IsWanted(false), m_BuildRequest(nullptr)
 		{
 
 		}
@@ -24,12 +26,12 @@ namespace TrioEngine
 	private:
 		BuildRequest* m_BuildRequest;
 
-		std::map<std::string, time_t> m_Dependencies;
+		std::map<std::string, std::chrono::system_clock::time_point> m_Dependencies;
 		std::vector<std::string> m_ExtraOutputFiles;
 		bool m_IsBuilt;
 		bool m_IsWanted;
 		std::string OutputFilename;
-		time_t m_SourceTime;
+		std::filesystem::file_time_type m_SourceTimestamp;
 
 		std::vector<std::string> m_Requests;
 	};

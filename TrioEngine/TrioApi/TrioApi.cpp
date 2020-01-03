@@ -82,7 +82,6 @@ BlendState* BlendState_Opaque()
 /*
 BuildCoordinator
 */
-
 BuildCoordinator* BuildCoordinator_Ctor(const char* intermediateDirectory, const char* outputDirectory, const char* rootDirectory)
 {
 	BuildCoordinatorSettings settings;
@@ -96,7 +95,7 @@ BuildCoordinator* BuildCoordinator_Ctor(const char* intermediateDirectory, const
 	if (rootDirectory)
 	settings.RootDirectory = rootDirectory;
 
-	return new BuildCoordinator(settings);
+	return new BuildCoordinator(settings, nullptr);
 }
 
 void BuildCoordinator_RequestBuild(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues)
