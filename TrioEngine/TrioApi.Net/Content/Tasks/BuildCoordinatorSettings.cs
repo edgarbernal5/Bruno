@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace TrioApi.Net.Content.Tasks
+namespace TrioWpfFramework.Net.Content.Tasks
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct BuildCoordinatorSettings

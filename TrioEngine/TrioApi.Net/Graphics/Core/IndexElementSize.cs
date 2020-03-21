@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioApi.Net.Graphics.Core
+namespace TrioWpfFramework.Net.Graphics.Core
 {
     /// <summary>Defines the size of an element of an index buffer.</summary>
 	public enum IndexElementSize

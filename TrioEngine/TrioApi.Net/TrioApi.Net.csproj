@@ -60,8 +60,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Containers\FixedSizeNamedList.cs" />
     <Compile Include="Containers\INamedItem.cs" />
-    <Compile Include="Containers\NamedList.cs" />
     <Compile Include="Content\Tasks\BuildCoordinator.cs" />
     <Compile Include="Content\Tasks\BuildCoordinatorSettings.cs" />
     <Compile Include="Game\GameObject.cs" />
@@ -103,6 +103,8 @@
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="ImportConfiguration.cs" />
+    <Compile Include="Linq\LinqHelper.cs" />
+    <Compile Include="Linq\TreeHelper.cs" />
     <Compile Include="Maths\Matrix.cs" />
     <Compile Include="Maths\Quaternion.cs" />
     <Compile Include="Maths\Vector2.cs" />

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using TrioApi.Net.Containers;
+using TrioWpfFramework.Net.Containers;
 
-namespace TrioApi.Net.Graphics.Core
+namespace TrioWpfFramework.Net.Graphics.Core
 {
     public class EffectPass : INamedItem
     {

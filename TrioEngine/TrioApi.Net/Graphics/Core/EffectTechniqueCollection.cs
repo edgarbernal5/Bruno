@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TrioApi.Net.Containers;
+using TrioWpfFramework.Net.Containers;
 
-namespace TrioApi.Net.Graphics.Core
+namespace TrioWpfFramework.Net.Graphics.Core
 {
-    public class EffectTechniqueCollection : NamedList<EffectTechnique>
+    public class EffectTechniqueCollection : FixedSizeNamedList<EffectTechnique>
     {
         public EffectTechniqueCollection(EffectTechnique[] techniques) : base(techniques)
         {

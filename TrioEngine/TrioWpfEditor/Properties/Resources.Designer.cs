@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TrioWpfEditor.Properties
+namespace TrioWpfFramework.Properties
 {
 
 

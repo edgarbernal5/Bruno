@@ -4,10 +4,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using TrioApi.Net.Containers;
-using TrioApi.Net.Maths;
+using TrioWpfFramework.Net.Containers;
+using TrioWpfFramework.Net.Maths;
 
-namespace TrioApi.Net.Graphics.Core
+namespace TrioWpfFramework.Net.Graphics.Core
 {
     public class EffectParameter : INamedItem
     {

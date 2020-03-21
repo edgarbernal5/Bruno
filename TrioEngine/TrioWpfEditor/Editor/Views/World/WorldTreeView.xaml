@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="TrioWpfEditor.Delivery.Views.World.WorldTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controls="clr-namespace:TrioWpfFramework.Controls;assembly=TrioWpfFramework"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <controls:TreeViewEx x:Name="treeView" BorderThickness="0"
+                       ItemsSource="{Binding Outline.RootItems}"
+                       SelectedItems="{Binding Outline.SelectedItems, Mode=OneWay}"/>
+
+    </Grid>
+</UserControl>

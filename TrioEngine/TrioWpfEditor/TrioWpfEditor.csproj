@@ -56,6 +56,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -75,11 +76,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Delivery\GraphicsDeviceService.cs" />
-    <Compile Include="Delivery\Host\HwndMouseEventArgs.cs" />
-    <Compile Include="Delivery\Host\HwndMouseState.cs" />
-    <Compile Include="Delivery\Host\NativeMethods.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="Editor\EditorDockStrategy.cs" />
+    <Compile Include="Editor\EditorException.cs" />
+    <Compile Include="Editor\EditorPlugin.cs" />
+    <Compile Include="Editor\EditorPluginCollection.cs" />
+    <Compile Include="Editor\Models\Document.cs" />
+    <Compile Include="Editor\Services\IEditorService.cs" />
+    <Compile Include="Editor\ViewModels\EditorDockTabItemViewModel.cs" />
+    <Compile Include="Editor\ViewModels\EditorDockTabPaneViewModel.cs" />
+    <Compile Include="Editor\ViewModels\EditorViewModel.cs" />
+    <Compile Include="Editor\ViewModels\WorldTree\WorldTree.cs" />
+    <Compile Include="Editor\ViewModels\WorldTree\WorldTreeItem.cs" />
+    <Compile Include="Editor\ViewModels\WorldTree\WorldTreeViewModel.cs" />
+    <Compile Include="Editor\Views\World\WorldTreeView.xaml.cs">
+      <DependentUpon>WorldTreeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\GraphicsDeviceService.cs" />
+    <Compile Include="Editor\Views\Controls\Host\HwndMouseEventArgs.cs" />
+    <Compile Include="Editor\Views\Controls\Host\HwndMouseState.cs" />
+    <Compile Include="ServiceLocation\ServiceContainer.cs" />
+    <Page Include="Editor\Views\World\WorldTreeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\EditorWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -87,11 +107,27 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Delivery\Host\GraphicsDeviceHost.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="Editor\Views\Controls\Host\GraphicsDeviceHost.cs" />
+    <Compile Include="Editor\EditorWindow.xaml.cs">
+      <DependentUpon>EditorWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Themes\Flat\Colors\Dark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Flat\Colors\Default.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Flat\Colors\Gray.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Flat\Colors\Light.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -124,6 +160,15 @@
       <Project>{eb11a614-a4a3-47b3-b276-64bf6129351f}</Project>
       <Name>TrioApi.Net</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TrioWpfFramework\TrioWpfFramework.csproj">
+      <Project>{4944fb02-b8ed-417e-9630-ac4c90982f88}</Project>
+      <Name>TrioWpfFramework</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Editor\Interop\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Windows\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

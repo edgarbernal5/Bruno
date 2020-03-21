@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioApi.Net.Graphics
+namespace TrioWpfFramework.Net.Graphics
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Viewport

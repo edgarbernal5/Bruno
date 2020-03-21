@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioApi.Net
+namespace TrioWpfFramework.Net
 {
     internal static class Helpers
     {

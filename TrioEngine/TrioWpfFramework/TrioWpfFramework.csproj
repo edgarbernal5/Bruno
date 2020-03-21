@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4944FB02-B8ED-417E-9630-AC4C90982F88}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TrioWpfFramework</RootNamespace>
+    <AssemblyName>TrioWpfFramework</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\TreeViewEx\IndentationMarginConverter.cs" />
+    <Compile Include="Controls\TreeViewEx\TreeViewEx.cs" />
+    <Compile Include="Controls\TreeViewEx\TreeViewItemEx.cs" />
+    <Compile Include="Editor\Commands\CommandGroup.cs" />
+    <Compile Include="Editor\Commands\CommandItemCollection.cs" />
+    <Compile Include="Editor\Commands\CommandSeparator.cs" />
+    <Compile Include="Editor\Commands\ICommandItem.cs" />
+    <Compile Include="Linq\LinqHelper.cs" />
+    <Compile Include="Editor\Commands\Menu\MenuItemViewModel.cs" />
+    <Compile Include="Editor\Commands\Menu\MenuItemViewModelCollection.cs" />
+    <Compile Include="Editor\Commands\Menu\MenuManager.cs" />
+    <Compile Include="Editor\Commands\Menu\MenuSeparatorViewModel.cs" />
+    <Compile Include="Editor\Commands\Toolbars\ToolBarItemViewModel.cs" />
+    <Compile Include="Editor\Commands\Toolbars\ToolBarItemViewModelCollection.cs" />
+    <Compile Include="Editor\Commands\Toolbars\ToolBarManager.cs" />
+    <Compile Include="Editor\Commands\Toolbars\ToolBarSeparatorViewModel.cs" />
+    <Compile Include="Editor\Commands\Toolbars\ToolBarViewModel.cs" />
+    <Compile Include="Editor\Commands\Toolbars\ToolBarViewModelCollection.cs" />
+    <Compile Include="Linq\TreeHelper.cs" />
+    <Compile Include="Editor\Commands\DelegateCommand.cs" />
+    <Compile Include="Editor\ExitCode.cs" />
+    <Compile Include="Editor\Commands\IDelegateCommand.cs" />
+    <Compile Include="Editor\ObservableObject.cs" />
+    <Compile Include="Editor\ValidatableObservableObject.cs" />
+    <Compile Include="Mathematics\Numeric.cs" />
+    <Compile Include="ObjectHelper.cs" />
+    <Compile Include="Windows\Boxed.cs" />
+    <Compile Include="Windows\Categories.cs" />
+    <Compile Include="Controls\Icon\Icon.cs" />
+    <Compile Include="Controls\Icon\MultiColorGlyph.cs" />
+    <Compile Include="Controls\ImageEffect.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Windows\Collections\ChildCollection.cs" />
+    <Compile Include="Windows\Collections\CollectionExtensions.cs" />
+    <Compile Include="Windows\Collections\INamedItem.cs" />
+    <Compile Include="Windows\Collections\MergeableNode.cs" />
+    <Compile Include="Windows\Collections\MergeableNodeCollection.cs" />
+    <Compile Include="Windows\Collections\MergeAlgorithm.cs" />
+    <Compile Include="Windows\Collections\MergeOperation.cs" />
+    <Compile Include="Windows\Collections\MergePoint.cs" />
+    <Compile Include="Windows\Collections\NamedItemCollection.cs" />
+    <Compile Include="Windows\Converters\InvertBooleanConverter.cs" />
+    <Compile Include="Windows\Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Windows\Converters\ToUpperConverter.cs" />
+    <Compile Include="Windows\Docking\AutoHide\AutoHideBar.cs" />
+    <Compile Include="Windows\Docking\AutoHide\AutoHideGroup.cs" />
+    <Compile Include="Windows\Docking\AutoHide\AutoHideOverlay.cs" />
+    <Compile Include="Windows\Docking\AutoHide\AutoHidePane.cs" />
+    <Compile Include="Windows\Docking\AutoHide\AutoHideState.cs" />
+    <Compile Include="Windows\Docking\AutoHide\AutoHideTab.cs" />
+    <Compile Include="Windows\Docking\Controls\DockControl.cs" />
+    <Compile Include="Windows\Docking\DockAnchorPane\DockAnchorPane.cs" />
+    <Compile Include="Windows\Docking\DockCommands.cs" />
+    <Compile Include="Windows\Docking\DockException.cs" />
+    <Compile Include="Windows\Docking\DockHelper.cs" />
+    <Compile Include="Windows\Docking\DockIndicators\BorderIndicators.cs" />
+    <Compile Include="Windows\Docking\DockIndicators\DockIndicator.cs" />
+    <Compile Include="Windows\Docking\DockIndicators\DockIndicatorOverlay.cs" />
+    <Compile Include="Windows\Docking\DockIndicators\PaneIndicators.cs" />
+    <Compile Include="Windows\Docking\DockOverlay\DockOverlay.cs" />
+    <Compile Include="Windows\Docking\DockPosition.cs" />
+    <Compile Include="Windows\Docking\DockSplitPane\DockSplitPane.cs" />
+    <Compile Include="Windows\Docking\DockState.cs" />
+    <Compile Include="Windows\Docking\DockStrategy.cs" />
+    <Compile Include="Windows\Docking\DockTabItem\DockTabItem.cs" />
+    <Compile Include="Windows\Docking\DockTabPane\DockPaneMenu.cs" />
+    <Compile Include="Windows\Docking\DockTabPane\DockTabPane.cs" />
+    <Compile Include="Windows\Docking\DockTabPane\DockTabPanel.cs" />
+    <Compile Include="Windows\Docking\DragManager\DockTabItemProxy.cs" />
+    <Compile Include="Windows\Docking\DragManager\DragManager.cs" />
+    <Compile Include="Windows\Docking\FloatWindow\FloatWindow.cs" />
+    <Compile Include="Windows\Docking\IDockElement.cs" />
+    <Compile Include="Windows\Docking\IDockTabItem.cs" />
+    <Compile Include="Windows\Docking\ViewModels\DockAnchorPaneViewModel.cs" />
+    <Compile Include="Windows\Docking\ViewModels\DockElementCollection.cs" />
+    <Compile Include="Windows\Docking\ViewModels\DockElementViewModel.cs" />
+    <Compile Include="Windows\Docking\ViewModels\DockPaneCollection.cs" />
+    <Compile Include="Windows\Docking\ViewModels\DockPaneViewModel.cs" />
+    <Compile Include="Windows\Docking\ViewModels\DockSplitPaneViewModel.cs" />
+    <Compile Include="Windows\Docking\ViewModels\DockTabItemCollection.cs" />
+    <Compile Include="Windows\Docking\ViewModels\DockTabItemViewModel.cs" />
+    <Compile Include="Windows\Docking\ViewModels\DockTabPaneCollection.cs" />
+    <Compile Include="Windows\Docking\ViewModels\DockTabPaneViewModel.cs" />
+    <Compile Include="Windows\Docking\ViewModels\FloatWindowCollection.cs" />
+    <Compile Include="Windows\Docking\ViewModels\FloatWindowViewModel.cs" />
+    <Compile Include="Windows\Docking\ViewModels\IDockAnchorPane.cs" />
+    <Compile Include="Windows\Docking\ViewModels\IDockContainer.cs" />
+    <Compile Include="Windows\Docking\ViewModels\IDockControl.cs" />
+    <Compile Include="Windows\Docking\ViewModels\IDockPane.cs" />
+    <Compile Include="Windows\Docking\ViewModels\IDockSplitPane.cs" />
+    <Compile Include="Windows\Docking\ViewModels\IDockTabPane.cs" />
+    <Compile Include="Windows\Docking\ViewModels\IFloatWindow.cs" />
+    <Compile Include="Windows\ErrorsContainer.cs" />
+    <Compile Include="Windows\Interop\GetWindowLongIndex.cs" />
+    <Compile Include="Windows\Interop\LoadCursorNames.cs" />
+    <Compile Include="Windows\Interop\NativeMethods.cs" />
+    <Compile Include="Windows\Interop\POINT.cs" />
+    <Compile Include="Windows\Interop\SetWindowPosFlags.cs" />
+    <Compile Include="Windows\Interop\ShowWindowStyles.cs" />
+    <Compile Include="Windows\Interop\TRACKMOUSEEVENT.cs" />
+    <Compile Include="Windows\Interop\Win32.cs" />
+    <Compile Include="Windows\Interop\WindowMessages.cs" />
+    <Compile Include="Windows\Interop\WindowStyles.cs" />
+    <Compile Include="Windows\Interop\WindowStylesEx.cs" />
+    <Compile Include="Windows\Interop\WNDCLASS.cs" />
+    <Compile Include="Windows\ScreenConduction\IActivatable.cs" />
+    <Compile Include="Windows\ScreenConduction\IDisplayName.cs" />
+    <Compile Include="Windows\ScreenConduction\IGuardClose.cs" />
+    <Compile Include="Windows\ScreenConduction\IScreen.cs" />
+    <Compile Include="Windows\ScreenConduction\IScreenConductor.cs" />
+    <Compile Include="Windows\ScreenConduction\Screen.cs" />
+    <Compile Include="Windows\WpfWindowsExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Controls\TreeViewEx\Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Flat\Colors\Dark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Flat\Colors\Default.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Flat\Colors\Gray.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Flat\Colors\Light.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

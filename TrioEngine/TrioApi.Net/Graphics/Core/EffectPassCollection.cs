@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TrioApi.Net.Containers;
+using TrioWpfFramework.Net.Containers;
 
-namespace TrioApi.Net.Graphics.Core
+namespace TrioWpfFramework.Net.Graphics.Core
 {
-    public class EffectPassCollection : NamedList<EffectPass>
+    public class EffectPassCollection : FixedSizeNamedList<EffectPass>
     {
         public EffectPassCollection(EffectPass[] passes) : base(passes)
         {

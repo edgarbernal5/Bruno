@@ -4,9 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using TrioApi.Net.Maths;
+using TrioWpfFramework.Net.Maths;
 
-namespace TrioApi.Net.Game
+namespace TrioWpfFramework.Net.Game
 {
     public class Transform
     {

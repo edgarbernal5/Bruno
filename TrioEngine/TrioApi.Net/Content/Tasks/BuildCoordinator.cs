@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioApi.Net.Content.Tasks
+namespace TrioWpfFramework.Net.Content.Tasks
 {
     public class BuildCoordinator : IDisposable
     {
@@ -15,7 +15,7 @@ namespace TrioApi.Net.Content.Tasks
             [MarshalAs(UnmanagedType.LPStr)] string outputDirectory,
             [MarshalAs(UnmanagedType.LPStr)] string rootDirectory);
 
-        bool disposed = false;
+        bool m_disposed = false;
 
         internal IntPtr m_nativePtr;
 
@@ -28,9 +28,9 @@ namespace TrioApi.Net.Content.Tasks
         {
             if (disposing)
             {
-                if (!disposed)
+                if (!m_disposed)
                 {
-                    disposed = true;
+                    m_disposed = true;
                     //Internal_dtor(m_nativePtr);
                 }
             }

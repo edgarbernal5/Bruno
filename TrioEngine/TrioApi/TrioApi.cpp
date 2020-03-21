@@ -87,13 +87,19 @@ BuildCoordinator* BuildCoordinator_Ctor(const char* intermediateDirectory, const
 	BuildCoordinatorSettings settings;
 
 	if (intermediateDirectory)
-	settings.IntermediateDirectory = intermediateDirectory;
+	{
+		settings.IntermediateDirectory = intermediateDirectory;
+	}
 	
 	if (outputDirectory)
-	settings.OutputDirectory = outputDirectory;
+	{
+		settings.OutputDirectory = outputDirectory;
+	}
 
 	if (rootDirectory)
-	settings.RootDirectory = rootDirectory;
+	{
+		settings.RootDirectory = rootDirectory;
+	}
 
 	return new BuildCoordinator(settings, nullptr);
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioApi.Net
+namespace TrioWpfFramework.Net
 {
     internal static class ImportConfiguration
     {

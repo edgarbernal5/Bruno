@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TrioApi.Net.Containers;
+using TrioWpfFramework.Net.Containers;
 
-namespace TrioApi.Net.Graphics.Core
+namespace TrioWpfFramework.Net.Graphics.Core
 {
-    public class EffectParameterCollection : NamedList<EffectParameter>
+    public class EffectParameterCollection : FixedSizeNamedList<EffectParameter>
     {
         public EffectParameterCollection(EffectParameter[] parameters) : base(parameters)
         {
