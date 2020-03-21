@@ -142,7 +142,6 @@
     <Compile Include="Windows\ErrorsContainer.cs" />
     <Compile Include="Windows\Interop\GetWindowLongIndex.cs" />
     <Compile Include="Windows\Interop\LoadCursorNames.cs" />
-    <Compile Include="Windows\Interop\NativeMethods.cs" />
     <Compile Include="Windows\Interop\POINT.cs" />
     <Compile Include="Windows\Interop\SetWindowPosFlags.cs" />
     <Compile Include="Windows\Interop\ShowWindowStyles.cs" />
