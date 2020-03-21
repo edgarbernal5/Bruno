@@ -7,7 +7,7 @@ using TrioWpfFramework.Windows.Docking;
 using TrioWpfFramework.Windows.Docking.ViewModels;
 using TrioWpfFramework.Windows.ScreenConduction;
 
-namespace TrioWpfFramework.Editor
+namespace TrioWpfEditor.Editor
 {
     internal class EditorDockStrategy : DockStrategy
     {

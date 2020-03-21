@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.ServiceLocation
+namespace TrioWpfEditor.ServiceLocation
 {
     public class ServiceContainer : IDisposable
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Editor
+namespace TrioWpfEditor.Editor
 {
     public class EditorPluginCollection : Collection<EditorPlugin>
     {

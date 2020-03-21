@@ -4,7 +4,7 @@ using TrioWpfFramework.Editor.Services;
 using TrioWpfFramework.Windows.Docking;
 using static System.FormattableString;
 
-namespace TrioWpfFramework.Editor
+namespace TrioWpfEditor.Editor
 {
     public abstract class EditorPlugin
     {

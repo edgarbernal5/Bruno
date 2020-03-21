@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Input;
 using TrioWpfFramework.Net.Linq;
 using TrioWpfFramework.Editor.Services;
-using TrioWpfFramework.ServiceLocation;
+using TrioWpfEditor.ServiceLocation;
 using TrioWpfFramework.Windows.Docking;
 using TrioWpfFramework.Windows.Docking.Controls;
 using TrioWpfFramework.Windows.Docking.ViewModels;
