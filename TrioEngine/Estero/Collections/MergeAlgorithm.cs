@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Containers
+namespace Estero.Collections
 {
     /// <summary>
     /// Merges a collection of <see cref="MergeableNode{T}"/>s to another collection of 

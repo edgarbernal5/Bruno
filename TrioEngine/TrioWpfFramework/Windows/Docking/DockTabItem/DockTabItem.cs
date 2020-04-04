@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Estero.Linq;
+using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -6,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using TrioWpfFramework.Linq;
 using TrioWpfFramework.Windows.Docking.Controls;
 
 namespace TrioWpfFramework.Windows.Docking

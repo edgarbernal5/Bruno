@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Estero.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using TrioWpfFramework.Net.Containers;
 
 namespace TrioWpfFramework.Net.Graphics.Core
 {

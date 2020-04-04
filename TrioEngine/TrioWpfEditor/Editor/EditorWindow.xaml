@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:TrioWpfEditor.Views.Controls"
         mc:Ignorable="d"
         Title="Trio Engine" Height="749.508" Width="956.393">
-    <DockPanel>
+
+    <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_Archivo">
                 <MenuItem Header="_Nuevo proyecto" />

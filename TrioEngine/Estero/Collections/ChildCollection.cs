@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Containers
+namespace Estero.Collections
 {
     /// <summary>
     /// Represents a collection of children.

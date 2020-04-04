@@ -94,7 +94,6 @@
     <Compile Include="Editor\GraphicsDeviceService.cs" />
     <Compile Include="Editor\Views\Controls\Host\HwndMouseEventArgs.cs" />
     <Compile Include="Editor\Views\Controls\Host\HwndMouseState.cs" />
-    <Compile Include="ServiceLocation\ServiceContainer.cs" />
     <Page Include="Editor\Views\World\WorldTreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -168,6 +167,7 @@
   <ItemGroup>
     <Folder Include="Editor\Interop\" />
     <Folder Include="Helpers\" />
+    <Folder Include="Resources\" />
     <Folder Include="Windows\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

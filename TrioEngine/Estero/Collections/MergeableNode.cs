@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Estero.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TrioWpfFramework.Net.Linq;
 
-namespace TrioWpfFramework.Net.Containers
+namespace Estero.Collections
 {
     /// <summary>
     /// Describes a node in a tree, which can be merged with another tree.

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Linq
+namespace Estero.Linq
 {
     /// <summary>
     /// Provides new extension methods for LINQ.
@@ -23,8 +23,6 @@ namespace TrioWpfFramework.Linq
                 action(element);
             }
         }
-
-
 
         /// <summary>
         /// Returns an <see cref="IEnumerable{T}"/> that returns a single element.

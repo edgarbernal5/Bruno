@@ -8,7 +8,6 @@ using System.Windows;
 using System.Windows.Input;
 using TrioWpfFramework.Net.Linq;
 using TrioWpfFramework.Editor.Services;
-using TrioWpfEditor.ServiceLocation;
 using TrioWpfFramework.Windows.Docking;
 using TrioWpfFramework.Windows.Docking.Controls;
 using TrioWpfFramework.Windows.Docking.ViewModels;
@@ -16,6 +15,7 @@ using TrioWpfFramework.Windows.ScreenConduction;
 using static System.FormattableString;
 using TrioWpfFramework.Editor;
 using TrioWpfFramework.Editor.Commands;
+using TrioWpfFramework.ServiceLocation;
 
 namespace TrioWpfEditor.Editor.ViewModels
 {

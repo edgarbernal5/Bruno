@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TrioWpfEditor.Editor.ViewModels;
-using TrioWpfEditor.ServiceLocation;
+using TrioWpfFramework.ServiceLocation;
 using TrioWpfFramework.Windows.Docking.ViewModels;
 using TrioWpfFramework.Windows.ScreenConduction;
 

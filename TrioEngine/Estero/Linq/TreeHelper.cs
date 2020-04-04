@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Linq
+namespace Estero.Linq
 {
     /// <summary>
     /// Provides new extension methods for traversing trees using LINQ.

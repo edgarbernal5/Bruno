@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Estero.Collections;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -7,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using TrioWpfFramework.Net.Containers;
 using TrioWpfFramework.Editor.Commands;
 using TrioWpfFramework.Editor.Commands.Toolbars;
 using TrioWpfFramework.Windows;

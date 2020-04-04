@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Estero.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -12,7 +13,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Threading;
-using TrioWpfFramework.Net.Linq;
 using TrioWpfFramework.Windows.Interop;
 
 namespace TrioWpfFramework.Windows

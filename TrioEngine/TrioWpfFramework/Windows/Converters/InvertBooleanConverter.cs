@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
-using TrioWpfFramework.Helpers;
+using Estero;
 
 namespace TrioWpfFramework.Windows
 {

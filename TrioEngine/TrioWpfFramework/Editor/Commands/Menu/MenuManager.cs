@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using TrioWpfFramework.Net.Containers;
 using TrioWpfFramework.Editor.Commands;
 using TrioWpfFramework.Editor.Commands.Menu;
 using TrioWpfFramework.Windows;
+using Estero.Collections;
 
 namespace TrioWpfFramework.Editor
 {

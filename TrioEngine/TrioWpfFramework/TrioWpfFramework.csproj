@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommonServiceLocator, Version=2.0.5.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.2.0.5\lib\net46\CommonServiceLocator.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -54,7 +57,6 @@
     <Compile Include="Editor\Commands\CommandItemCollection.cs" />
     <Compile Include="Editor\Commands\CommandSeparator.cs" />
     <Compile Include="Editor\Commands\ICommandItem.cs" />
-    <Compile Include="Linq\LinqHelper.cs" />
     <Compile Include="Editor\Commands\Menu\MenuItemViewModel.cs" />
     <Compile Include="Editor\Commands\Menu\MenuItemViewModelCollection.cs" />
     <Compile Include="Editor\Commands\Menu\MenuManager.cs" />
@@ -65,29 +67,27 @@
     <Compile Include="Editor\Commands\Toolbars\ToolBarSeparatorViewModel.cs" />
     <Compile Include="Editor\Commands\Toolbars\ToolBarViewModel.cs" />
     <Compile Include="Editor\Commands\Toolbars\ToolBarViewModelCollection.cs" />
-    <Compile Include="Linq\TreeHelper.cs" />
     <Compile Include="Editor\Commands\DelegateCommand.cs" />
     <Compile Include="Editor\ExitCode.cs" />
     <Compile Include="Editor\Commands\IDelegateCommand.cs" />
     <Compile Include="Editor\ObservableObject.cs" />
     <Compile Include="Editor\ValidatableObservableObject.cs" />
     <Compile Include="Mathematics\Numeric.cs" />
-    <Compile Include="ObjectHelper.cs" />
+    <Compile Include="ServiceLocation\CreationPolicy.cs" />
+    <Compile Include="ServiceLocation\DisposalPolicy.cs" />
+    <Compile Include="ServiceLocation\ServiceContainer.cs" />
+    <Compile Include="ServiceLocation\ServiceContainer_IServiceLocator.cs" />
+    <Compile Include="ServiceLocation\ServiceContainer_IServiceProvider.cs" />
+    <Compile Include="ServiceLocation\ServiceContainer_Overloads.cs" />
+    <Compile Include="ServiceLocation\ServiceEntry.cs" />
+    <Compile Include="ServiceLocation\ServiceFactory.cs" />
+    <Compile Include="ServiceLocation\ServiceRegistration.cs" />
     <Compile Include="Windows\Boxed.cs" />
     <Compile Include="Windows\Categories.cs" />
     <Compile Include="Controls\Icon\Icon.cs" />
     <Compile Include="Controls\Icon\MultiColorGlyph.cs" />
     <Compile Include="Controls\ImageEffect.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Windows\Collections\ChildCollection.cs" />
-    <Compile Include="Windows\Collections\CollectionExtensions.cs" />
-    <Compile Include="Windows\Collections\INamedItem.cs" />
-    <Compile Include="Windows\Collections\MergeableNode.cs" />
-    <Compile Include="Windows\Collections\MergeableNodeCollection.cs" />
-    <Compile Include="Windows\Collections\MergeAlgorithm.cs" />
-    <Compile Include="Windows\Collections\MergeOperation.cs" />
-    <Compile Include="Windows\Collections\MergePoint.cs" />
-    <Compile Include="Windows\Collections\NamedItemCollection.cs" />
     <Compile Include="Windows\Converters\InvertBooleanConverter.cs" />
     <Compile Include="Windows\Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Windows\Converters\ToUpperConverter.cs" />
@@ -181,6 +181,14 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Estero\Estero.csproj">
+      <Project>{cc7dc8bc-3d51-4ae2-a2c4-1410a65252dc}</Project>
+      <Name>Estero</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

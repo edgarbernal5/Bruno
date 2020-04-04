@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Containers
+namespace Estero.Collections
 {
     public class NamedItemCollection<T> : KeyedCollection<string, T> where T : INamedItem
     {
