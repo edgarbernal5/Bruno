@@ -1,5 +1,4 @@
-﻿using CommonServiceLocator;
-using Estero.Collections;
+﻿using Estero.Collections;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Estero;
+using Microsoft.Practices.ServiceLocation;
 
 namespace TrioWpfFramework.ServiceLocation
 {

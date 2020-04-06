@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using TrioWpfFramework.Delivery.ViewModels.Core;
 using TrioWpfFramework.Windows.Docking.ViewModels;
 
 using static System.FormattableString;

@@ -58,6 +58,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -76,41 +77,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Editor\EditorDockStrategy.cs" />
-    <Compile Include="Editor\EditorException.cs" />
-    <Compile Include="Editor\EditorPlugin.cs" />
-    <Compile Include="Editor\EditorPluginCollection.cs" />
-    <Compile Include="Editor\Models\Document.cs" />
-    <Compile Include="Editor\Services\IEditorService.cs" />
-    <Compile Include="Editor\ViewModels\EditorDockTabItemViewModel.cs" />
-    <Compile Include="Editor\ViewModels\EditorDockTabPaneViewModel.cs" />
-    <Compile Include="Editor\ViewModels\EditorViewModel.cs" />
-    <Compile Include="Editor\ViewModels\WorldTree\WorldTree.cs" />
-    <Compile Include="Editor\ViewModels\WorldTree\WorldTreeItem.cs" />
-    <Compile Include="Editor\ViewModels\WorldTree\WorldTreeViewModel.cs" />
-    <Compile Include="Editor\Views\World\WorldTreeView.xaml.cs">
-      <DependentUpon>WorldTreeView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Editor\GraphicsDeviceService.cs" />
     <Compile Include="Editor\Views\Controls\Host\HwndMouseEventArgs.cs" />
     <Compile Include="Editor\Views\Controls\Host\HwndMouseState.cs" />
-    <Page Include="Editor\Views\World\WorldTreeView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Editor\EditorWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Editor\Views\Controls\Host\GraphicsDeviceHost.cs" />
-    <Compile Include="Editor\EditorWindow.xaml.cs">
-      <DependentUpon>EditorWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Page Include="Themes\Flat\Colors\Dark.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -166,6 +140,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Editor\Interop\" />
+    <Folder Include="Editor\Models\" />
+    <Folder Include="Editor\Services\" />
+    <Folder Include="Editor\ViewModels\" />
+    <Folder Include="Editor\Views\World\" />
     <Folder Include="Helpers\" />
     <Folder Include="Resources\" />
     <Folder Include="Windows\" />
