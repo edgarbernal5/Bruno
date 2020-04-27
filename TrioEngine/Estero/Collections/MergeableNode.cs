@@ -177,7 +177,6 @@ namespace Estero.Collections
         /// </summary>
         /// <param name="content">The content. (Can be <see langword="null"/>.)</param>
         /// <param name="children">The children. (Can be <see langword="null"/>.)</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public MergeableNode(T content, params MergeableNode<T>[] children)
           : this(content)
         {
@@ -196,7 +195,6 @@ namespace Estero.Collections
         /// <param name="content">The content. (Can be <see langword="null"/>.)</param>
         /// <param name="mergePoint">The merge point.</param>
         /// <param name="children">The children. (Can be <see langword="null"/>.)</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public MergeableNode(T content, MergePoint mergePoint, params MergeableNode<T>[] children)
           : this(content, new[] { mergePoint })
         {
@@ -216,7 +214,6 @@ namespace Estero.Collections
         /// <param name="mergePoint0">The first merge point.</param>
         /// <param name="mergePoint1">The second merge point.</param>
         /// <param name="children">The children. (Can be <see langword="null"/>.)</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public MergeableNode(T content, MergePoint mergePoint0, MergePoint mergePoint1, params MergeableNode<T>[] children)
           : this(content, new[] { mergePoint0, mergePoint1 })
         {
@@ -237,7 +234,6 @@ namespace Estero.Collections
         /// <param name="mergePoint1">The second merge point.</param>
         /// <param name="mergePoint2">The third merge point.</param>
         /// <param name="children">The children. (Can be <see langword="null"/>.)</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public MergeableNode(T content, MergePoint mergePoint0, MergePoint mergePoint1, MergePoint mergePoint2, params MergeableNode<T>[] children)
           : this(content, new[] { mergePoint0, mergePoint1, mergePoint2 })
         {
@@ -256,7 +252,6 @@ namespace Estero.Collections
         /// <param name="content">The content. (Can be <see langword="null"/>.)</param>
         /// <param name="mergePoints">The merge points.</param>
         /// <param name="children">The children. (Can be <see langword="null"/>.)</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public MergeableNode(T content, MergePoint[] mergePoints, params MergeableNode<T>[] children)
           : this(content, mergePoints)
         {

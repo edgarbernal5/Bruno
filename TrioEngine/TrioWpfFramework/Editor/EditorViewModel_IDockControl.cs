@@ -1,22 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
 using TrioWpfFramework.Windows.Docking;
-using TrioWpfFramework.Windows.Docking.Controls;
-using TrioWpfFramework.Windows.Docking.ViewModels;
-using static System.FormattableString;
-using TrioWpfFramework.Windows.Framework;
 
 namespace TrioWpfFramework.Editor
 {
     partial class EditorViewModel
     {
-        //--------------------------------------------------------------
-        #region Properties & Events
-        //--------------------------------------------------------------
-
         /// <inheritdoc/>
         public DockStrategy DockStrategy
         {
@@ -137,13 +127,7 @@ namespace TrioWpfFramework.Editor
 
         /// <inheritdoc/>
         public event EventHandler<EventArgs> ActiveDockTabItemChanged;
-        #endregion
 
-
-
-        //--------------------------------------------------------------
-        #region Methods
-        //--------------------------------------------------------------
 
         private void OnFloatWindowsChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {
@@ -228,9 +212,6 @@ namespace TrioWpfFramework.Editor
             ActiveDockTabItemChanged?.Invoke(this, eventArgs);
         }
 
-
-        #region ----- DockSerializer -----
-
         /// <summary>
         /// Loads the docking layout.
         /// </summary>
@@ -287,8 +268,5 @@ namespace TrioWpfFramework.Editor
         //        DockStrategy.End();
         //    }
         //}
-        #endregion
-
-        #endregion
     }
 }

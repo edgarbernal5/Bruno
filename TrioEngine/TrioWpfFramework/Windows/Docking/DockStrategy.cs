@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using TrioWpfFramework.Windows.Docking.ViewModels;
 
 using static System.FormattableString;
 
@@ -320,7 +319,6 @@ namespace TrioWpfFramework.Windows.Docking
         }
 
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private static void RemoveObsoleteDockPanes(IDockContainer rootContainer)
         {
             Debug.Assert(rootContainer != null);
@@ -367,7 +365,6 @@ namespace TrioWpfFramework.Windows.Docking
         }
 
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private static IDockPane FindObsoleteDockPane(IDockPane dockPane)
         {
             if (dockPane == null)
@@ -430,8 +427,6 @@ namespace TrioWpfFramework.Windows.Docking
             UpdateProperties(DockControl.AutoHideBottom, DockState.AutoHide);
         }
 
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void UpdateProperties(IDockPane dockPane, DockState dockState)
         {
             Debug.Assert(dockPane != null);
@@ -782,8 +777,6 @@ namespace TrioWpfFramework.Windows.Docking
             dockTabPane.SelectedItem = dockTabItem;
         }
 
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void FindLastActive(IDockPane dockPane, DockState dockState, ref IDockTabPane lastActivePane, ref IDockTabItem lastActiveItem)
         {
             Debug.Assert(dockPane != null);

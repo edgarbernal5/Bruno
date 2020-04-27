@@ -11,20 +11,37 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using TrioWpfFramework.Mathematics;
 using TrioWpfFramework.Windows.Interop;
 
 namespace TrioWpfFramework.Windows
 {
     public static class WpfWindowsExtensions
     {
+        public static bool AreEqual(Point value1, Point value2)
+        {
+            return Numeric.AreEqual(value1.X, value2.X)
+                   && Numeric.AreEqual(value1.Y, value2.Y);
+        }
+
         public static DependencyObject GetVisualRoot(this DependencyObject dependencyObject)
         {
             if (dependencyObject == null)
                 throw new ArgumentNullException(nameof(dependencyObject));
 
             return TreeHelper.GetRoot(dependencyObject, VisualTreeHelper.GetParent);
+        }
+
+        public static IEnumerable<DependencyObject> GetVisualDescendants(this DependencyObject dependencyObject, bool depthFirst)
+        {
+            if (dependencyObject == null)
+                throw new ArgumentNullException(nameof(dependencyObject));
+
+            return TreeHelper.GetDescendants(dependencyObject, GetVisualChildren, depthFirst);
         }
 
         public static IEnumerable<DependencyObject> GetVisualDescendants(this DependencyObject dependencyObject)
@@ -454,5 +471,462 @@ namespace TrioWpfFramework.Windows
 
             return false;
         }
+
+        /// <summary>
+        /// Identifies the <see cref="P:DigitalRune.Windows.WindowsHelper.SelectOnMouseDown"/>
+        /// attached dependency property.
+        /// </summary>
+        /// 
+        /// <AttachedPropertyComments>
+        /// <summary>
+        /// Gets or sets a value indicating whether the <strong>Selector.IsSelected</strong>
+        /// attached property should be set when a mouse button is pressed over the element.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> to set the <strong>Selector.IsSelected</strong> attached property
+        /// whenever a mouse button is pressed over the element; otherwise, <see langword="false"/>.
+        /// The default value is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// This attached dependency property can be set on any <see cref="UIElement"/>. Typically
+        /// it is set on <see cref="ListBoxItem"/>s. If the property is set to
+        /// <see langword="true"/>, then the <strong>Selector.IsSelected</strong> attached property
+        /// will be set whenever a mouse button is pressed down over the element. This is usually
+        /// needed when a <see cref="ListBoxItem"/> contains an interactive element, like a
+        /// <see cref="TextBox"/> because the contained element handles the mouse and the list box
+        /// item is not automatically selected. Setting the
+        /// <see cref="P:DigitalRune.Windows.WindowsHelper.SelectOnMouseDown"/> attached property
+        /// makes sure that the list box item is properly selected.
+        /// </remarks>
+        /// </AttachedPropertyComments>
+        public static readonly DependencyProperty SelectOnMouseDownProperty = DependencyProperty.RegisterAttached(
+          "SelectOnMouseDown", typeof(bool), typeof(WpfWindowsExtensions),
+          new PropertyMetadata(Boxed.BooleanFalse, OnSelectOnMouseDownChanged));
+
+
+        /// <summary>
+        /// Gets the value of the <see cref="P:DigitalRune.Windows.WindowsHelper.SelectOnMouseDown"/>
+        /// attached property from a given <see cref="DependencyObject"/> object.
+        /// </summary>
+        /// <param name="obj">The object from which to read the property value.</param>
+        /// <returns>
+        /// The value of the <see cref="P:DigitalRune.Windows.WindowsHelper.SelectOnMouseDown"/>
+        /// attached property.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="obj"/> is <see langword="null"/>.
+        /// </exception>
+        public static bool GetSelectOnMouseDown(DependencyObject obj)
+        {
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
+
+            return (bool)obj.GetValue(SelectOnMouseDownProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="P:DigitalRune.Windows.WindowsHelper.SelectOnMouseDown"/>
+        /// attached property to a given <see cref="DependencyObject"/> object.
+        /// </summary>
+        /// <param name="obj">The object on which to set the property value.</param>
+        /// <param name="value">The property value to set.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="obj"/> is <see langword="null"/>.
+        /// </exception>
+        public static void SetSelectOnMouseDown(DependencyObject obj, bool value)
+        {
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
+
+            obj.SetValue(SelectOnMouseDownProperty, Boxed.Get(value));
+        }
+
+
+        private static void OnSelectOnMouseDownChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            var element = dependencyObject as UIElement;
+            if (element == null)
+                return;
+
+            if ((bool)eventArgs.NewValue)
+            {
+                element.PreviewMouseDown += OnPreviewMouseDown;
+            }
+            else
+            {
+                element.PreviewMouseDown -= OnPreviewMouseDown;
+            }
+        }
+
+
+        private static void OnPreviewMouseDown(object sender, MouseButtonEventArgs eventArgs)
+        {
+            var element = sender as UIElement;
+            if (element == null)
+                return;
+
+            Selector.SetIsSelected(element, true);
+        }
+
+        /// <summary>
+        /// Gets the visual parent of the <see cref="DependencyObject"/>.
+        /// </summary>
+        /// <param name="dependencyObject">
+        /// The <see cref="DependencyObject"/> to get the visual parent for.
+        /// </param>
+        /// <returns>
+        /// The visual parent of the <see cref="DependencyObject"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="dependencyObject"/> is <see langword="null"/>.
+        /// </exception>
+        public static DependencyObject GetVisualParent(this DependencyObject dependencyObject)
+        {
+            if (dependencyObject == null)
+                throw new ArgumentNullException(nameof(dependencyObject));
+
+            return VisualTreeHelper.GetParent(dependencyObject);
+        }
+
+
+        /// <summary>
+        /// Identifies the <see cref="P:DigitalRune.Windows.WindowsHelper.ShowIcon"/> attached
+        /// dependency property.
+        /// </summary>
+        /// <AttachedPropertyComments>
+        /// <summary>
+        /// Gets or sets a value indicating whether the window icon is visible in the caption bar.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the window icon is visible; otherwise,
+        /// <see langword="false"/>. The default value is <see langword="true"/>.
+        /// </value>
+        /// </AttachedPropertyComments>
+        public static readonly DependencyProperty ShowIconProperty = DependencyProperty.RegisterAttached(
+            "ShowIcon",
+            typeof(bool),
+            typeof(WpfWindowsExtensions),
+            new PropertyMetadata(Boxed.BooleanTrue, OnShowIconChanged));
+
+        /// <summary>
+        /// Gets the value of the <see cref="P:DigitalRune.Windows.WindowsHelper.ShowIcon"/>
+        /// attached property from a given <see cref="Window"/> object.
+        /// </summary>
+        /// <param name="window">The object from which to read the property value.</param>
+        /// <returns>
+        /// The value of the <see cref="P:DigitalRune.Windows.WindowsHelper.ShowIcon"/> attached
+        /// property.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="window"/> is <see langword="null"/>.
+        /// </exception>
+        public static bool GetShowIcon(DependencyObject window)
+        {
+            if (window == null)
+                throw new ArgumentNullException(nameof(window));
+
+            return (bool)window.GetValue(ShowIconProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="P:DigitalRune.Windows.WindowsHelper.ShowIcon"/>
+        /// attached property to a given <see cref="Window"/> object.
+        /// </summary>
+        /// <param name="window">The object on which to set the property value.</param>
+        /// <param name="value">The property value to set.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="window"/> is <see langword="null"/>.
+        /// </exception>
+        public static void SetShowIcon(DependencyObject window, bool value)
+        {
+            if (window == null)
+                throw new ArgumentNullException(nameof(window));
+
+            window.SetValue(ShowIconProperty, Boxed.Get(value));
+        }
+
+
+        /// <summary>
+        /// Identifies the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMinimize"/> attached
+        /// dependency property.
+        /// </summary>
+        /// <AttachedPropertyComments>
+        /// <summary>
+        /// Gets or sets a value indicating whether the window has a minimize button.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the window has a minimize button; otherwise,
+        /// <see langword="false"/>. The default value is <see langword="true"/>.
+        /// </value>
+        /// </AttachedPropertyComments>
+        public static readonly DependencyProperty CanMinimizeProperty = DependencyProperty.RegisterAttached(
+            "CanMinimize",
+            typeof(bool),
+            typeof(WpfWindowsExtensions),
+            new PropertyMetadata(Boxed.BooleanTrue, OnCanMinimizeChanged));
+
+        /// <summary>
+        /// Gets the value of the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMinimize"/>
+        /// attached property from a given <see cref="Window"/> object.
+        /// </summary>
+        /// <param name="window">The object from which to read the property value.</param>
+        /// <returns>
+        /// The value of the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMinimize"/> attached
+        /// property.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="window"/> is <see langword="null"/>.
+        /// </exception>
+        public static bool GetCanMinimize(DependencyObject window)
+        {
+            if (window == null)
+                throw new ArgumentNullException(nameof(window));
+
+            return (bool)window.GetValue(CanMinimizeProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMinimize"/>
+        /// attached property to a given <see cref="Window"/> object.
+        /// </summary>
+        /// <param name="window">The object on which to set the property value.</param>
+        /// <param name="value">The property value to set.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="window"/> is <see langword="null"/>.
+        /// </exception>
+        public static void SetCanMinimize(DependencyObject window, bool value)
+        {
+            if (window == null)
+                throw new ArgumentNullException(nameof(window));
+
+            window.SetValue(CanMinimizeProperty, Boxed.Get(value));
+        }
+
+
+        /// <summary>
+        /// Identifies the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMaximize"/> attached
+        /// dependency property.
+        /// </summary>
+        /// <AttachedPropertyComments>
+        /// <summary>
+        /// Gets or sets a value indicating whether the window has a maximize button.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the window has a maximize button; otherwise,
+        /// <see langword="false"/>. The default value is <see langword="true"/>.
+        /// </value>
+        /// </AttachedPropertyComments>
+        public static readonly DependencyProperty CanMaximizeProperty = DependencyProperty.RegisterAttached(
+          "CanMaximize",
+          typeof(bool),
+          typeof(WpfWindowsExtensions),
+          new PropertyMetadata(Boxed.BooleanTrue, OnCanMaximizeChanged));
+
+        /// <summary>
+        /// Gets the value of the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMaximize"/>
+        /// attached property from a given <see cref="Window"/> object.
+        /// </summary>
+        /// <param name="window">The object from which to read the property value.</param>
+        /// <returns>
+        /// The value of the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMaximize"/> attached
+        /// property.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="window"/> is <see langword="null"/>.
+        /// </exception>
+        public static bool GetCanMaximize(DependencyObject window)
+        {
+            if (window == null)
+                throw new ArgumentNullException(nameof(window));
+
+            return (bool)window.GetValue(CanMaximizeProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMaximize"/>
+        /// attached property to a given <see cref="Window"/> object.
+        /// </summary>
+        /// <param name="window">The object on which to set the property value.</param>
+        /// <param name="value">The property value to set.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="window"/> is <see langword="null"/>.
+        /// </exception>
+        public static void SetCanMaximize(DependencyObject window, bool value)
+        {
+            if (window == null)
+                throw new ArgumentNullException(nameof(window));
+
+            window.SetValue(CanMaximizeProperty, Boxed.Get(value));
+        }
+
+
+        /// <summary>
+        /// Called when the <see cref="P:DigitalRune.Windows.WindowsHelper.ShowIcon"/> property
+        /// changed.
+        /// </summary>
+        /// <param name="dependencyObject">The dependency object.</param>
+        /// <param name="eventArgs">
+        /// The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.
+        /// </param>
+        private static void OnShowIconChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            bool newValue = (bool)eventArgs.NewValue;
+            var window = dependencyObject as Window;
+            if (window == null)
+                return;
+
+            if (window.IsLoaded)
+            {
+                if (newValue)
+                    ShowWindowIcon(window);
+                else
+                    HideWindowIcon(window);
+            }
+            else
+            {
+                EventHandler handler = null;
+                handler = (s, e) =>
+                {
+                    window.SourceInitialized -= handler;
+
+                    if (newValue)
+                        ShowWindowIcon(window);
+                    else
+                        HideWindowIcon(window);
+                };
+                window.SourceInitialized += handler;
+            }
+        }
+
+
+        /// <summary>
+        /// Called when the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMinimize"/> property
+        /// changed.
+        /// </summary>
+        /// <param name="dependencyObject">The dependency object.</param>
+        /// <param name="eventArgs">
+        /// The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.
+        /// </param>
+        private static void OnCanMinimizeChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            bool newValue = (bool)eventArgs.NewValue;
+            var window = dependencyObject as Window;
+            if (window == null)
+                return;
+
+            if (window.IsLoaded)
+            {
+                if (newValue)
+                    ShowMinimizeBox(window);
+                else
+                    HideMinimizeBox(window);
+            }
+            else
+            {
+                EventHandler handler = null;
+                handler = (s, e) =>
+                {
+                    window.SourceInitialized -= handler;
+
+                    if (newValue)
+                        ShowMinimizeBox(window);
+                    else
+                        HideMinimizeBox(window);
+                };
+                window.SourceInitialized += handler;
+            }
+        }
+
+
+        /// <summary>
+        /// Called when the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMaximize"/> property
+        /// changed.
+        /// </summary>
+        /// <param name="dependencyObject">The dependency object.</param>
+        /// <param name="eventArgs">
+        /// The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.
+        /// </param>
+        private static void OnCanMaximizeChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            bool newValue = (bool)eventArgs.NewValue;
+            var window = dependencyObject as Window;
+            if (window == null)
+                return;
+
+            if (window.IsLoaded)
+            {
+                if (newValue)
+                    ShowMaximizeBox(window);
+                else
+                    HideMaximizeBox(window);
+            }
+            else
+            {
+                EventHandler handler = null;
+                handler = (s, e) =>
+                {
+                    window.SourceInitialized -= handler;
+
+                    if (newValue)
+                        ShowMaximizeBox(window);
+                    else
+                        HideMaximizeBox(window);
+                };
+                window.SourceInitialized += handler;
+            }
+        }
+
+
+        private static void ShowWindowIcon(Window window)
+        {
+            // Not implemented.
+        }
+
+
+        private static void HideWindowIcon(Window window)
+        {
+            IntPtr hwnd = new WindowInteropHelper(window).Handle;
+            int value = Win32.GetWindowLong(hwnd, GetWindowLongIndex.GWL_EXSTYLE);
+            Win32.SetWindowLong(hwnd, GetWindowLongIndex.GWL_EXSTYLE, (int)(value | WindowStylesEx.WS_EX_DLGMODALFRAME));
+
+            // Update the window's non-client area to reflect the changes.
+            //Win32.SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOSIZE | SetWindowPosFlags.SWP_NOZORDER | SetWindowPosFlags.SWP_FRAMECHANGED);
+
+            // Fix for dialog windows. See http://stackoverflow.com/questions/18580430/hide-the-icon-from-a-wpf-window.
+            Win32.SendMessage(hwnd, WindowMessages.WM_SETICON, new IntPtr(1), IntPtr.Zero);
+            Win32.SendMessage(hwnd, WindowMessages.WM_SETICON, IntPtr.Zero, IntPtr.Zero);
+        }
+        
+        private static void ShowMinimizeBox(Window window)
+        {
+            IntPtr hwnd = new WindowInteropHelper(window).Handle;
+            int value = Win32.GetWindowLong(hwnd, GetWindowLongIndex.GWL_STYLE);
+            Win32.SetWindowLong(hwnd, GetWindowLongIndex.GWL_STYLE, (int)(value | WindowStyles.WS_MINIMIZEBOX));
+        }
+
+
+       private static void HideMinimizeBox(Window window)
+        {
+            IntPtr hwnd = new WindowInteropHelper(window).Handle;
+            int value = Win32.GetWindowLong(hwnd, GetWindowLongIndex.GWL_STYLE);
+            Win32.SetWindowLong(hwnd, GetWindowLongIndex.GWL_STYLE, (int)(value & ~WindowStyles.WS_MINIMIZEBOX));
+        }
+
+
+        private static void ShowMaximizeBox(Window window)
+        {
+            IntPtr hwnd = new WindowInteropHelper(window).Handle;
+            int value = Win32.GetWindowLong(hwnd, GetWindowLongIndex.GWL_STYLE);
+            Win32.SetWindowLong(hwnd, GetWindowLongIndex.GWL_STYLE, (int)(value | WindowStyles.WS_MAXIMIZEBOX));
+        }
+
+
+        private static void HideMaximizeBox(Window window)
+        {
+            IntPtr hwnd = new WindowInteropHelper(window).Handle;
+            int value = Win32.GetWindowLong(hwnd, GetWindowLongIndex.GWL_STYLE);
+            Win32.SetWindowLong(hwnd, GetWindowLongIndex.GWL_STYLE, (int)(value & ~WindowStyles.WS_MAXIMIZEBOX));
+        }
+
     }
 }

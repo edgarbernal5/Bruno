@@ -11,8 +11,6 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using TrioWpfFramework.Mathematics;
-using TrioWpfFramework.Windows.Docking.Controls;
-using TrioWpfFramework.Windows.Docking.ViewModels;
 using TrioWpfFramework.Windows.Interop;
 
 namespace TrioWpfFramework.Windows.Docking
@@ -351,7 +349,6 @@ namespace TrioWpfFramework.Windows.Docking
         /// Move the dragged items from the current <see cref="DockTabPanel"/> into a
         /// <see cref="FloatWindow"/>.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         private void DragDockTabItemsIntoFloatWindow()
         {
             Debug.Assert(_floatWindow == null);
@@ -1261,7 +1258,6 @@ namespace TrioWpfFramework.Windows.Docking
         }
 
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private static FrameworkElement GetTargetPane(FrameworkElement element)
         {
             Debug.Assert(element != null);
@@ -1329,7 +1325,6 @@ namespace TrioWpfFramework.Windows.Docking
         }
 
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private static void ReplaceItemsWithProxies(IDockPane dockPane, List<IDockTabItem> items, IDockTabPane currentPane)
         {
             Debug.Assert(dockPane != null);
@@ -1388,7 +1383,6 @@ namespace TrioWpfFramework.Windows.Docking
         /// Removes the item proxies from the specified <see cref="IDockPane"/>.
         /// </summary>
         /// <param name="dockPane">The <see cref="IDockPane"/>.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private static void RemoveItemProxies(IDockPane dockPane)
         {
             Debug.Assert(dockPane != null);
@@ -1472,8 +1466,6 @@ namespace TrioWpfFramework.Windows.Docking
             RestoreItemsFromProxies(_dockStrategy.DockControl.AutoHideBottom);
         }
 
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private static void RestoreItemsFromProxies(IDockPane dockPane)
         {
             Debug.Assert(dockPane != null);

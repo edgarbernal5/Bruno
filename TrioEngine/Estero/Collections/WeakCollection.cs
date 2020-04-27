@@ -107,7 +107,6 @@ namespace Estero.Collections
             /// <exception cref="InvalidOperationException">
             /// The collection was modified after the enumerator was created.
             /// </exception>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
             public bool MoveNext()
             {
                 if (_version != _weakCollection._version)
@@ -144,7 +143,6 @@ namespace Estero.Collections
             /// <exception cref="InvalidOperationException">
             /// The <see cref="WeakCollection{T}"/> was modified after the enumerator was created.
             /// </exception>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
             public void Reset()
             {
                 if (_version != _weakCollection._version)
@@ -179,7 +177,6 @@ namespace Estero.Collections
         /// Gets the number of items contained in the <see cref="WeakCollection{T}"/>.
         /// </summary>
         /// <value>The number of items contained in the <see cref="WeakCollection{T}"/>.</value>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "item")]
         public int Count
         {
             get

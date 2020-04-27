@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using TrioWpfFramework.Windows.Docking;
-using TrioWpfFramework.Windows.Docking.ViewModels;
 using TrioWpfFramework.Windows.Framework;
 
 namespace TrioWpfFramework.Editor
@@ -206,8 +204,6 @@ namespace TrioWpfFramework.Editor
         }
 
 
-        /// <inheritdoc/>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
         protected override void OnClose(IDockTabItem dockTabItem)
         {
             base.OnClose(dockTabItem);

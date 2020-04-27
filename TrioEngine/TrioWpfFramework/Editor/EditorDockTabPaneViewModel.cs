@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using TrioWpfFramework.Windows.Docking;
-using TrioWpfFramework.Windows.Docking.ViewModels;
 using TrioWpfFramework.Windows.Framework;
 
 namespace TrioWpfFramework.Editor

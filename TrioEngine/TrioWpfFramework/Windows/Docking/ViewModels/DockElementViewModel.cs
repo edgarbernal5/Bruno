@@ -1,7 +1,7 @@
 ﻿
 using System.Windows;
 
-namespace TrioWpfFramework.Windows.Docking.ViewModels
+namespace TrioWpfFramework.Windows.Docking
 {
     public abstract class DockElementViewModel : ObservableObject, IDockElement
     {

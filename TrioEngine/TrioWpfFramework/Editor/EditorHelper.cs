@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
 using TrioWpfFramework.ServiceLocation;
+using static System.FormattableString;
 
 namespace TrioWpfFramework.Editor
 {
@@ -99,6 +101,41 @@ namespace TrioWpfFramework.Editor
             return text;
         }
 
+        /// <summary>
+        /// Throws a <seealso cref="ServiceNotFoundException"/> if the specified services is
+        /// <see langword="null"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the service.</typeparam>
+        /// <param name="service">The service.</param>
+        /// <returns>The service.</returns>
+        /// <exception cref="ServiceNotFoundException">
+        /// <paramref name="service"/> is <see langword="null"/>.
+        /// </exception>
+        public static T ThrowIfMissing<T>(this T service) where T : class
+        {
+            if (service == null)
+            {
+                var message = Invariant($"The service of type {typeof(T).Name} is missing.");
+                throw new ServiceNotFoundException(message);
+            }
+
+            return service;
+        }
+
+
+        /// <summary>
+        /// Logs a warning if the specified service is <see langword="null"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the service.</typeparam>
+        /// <param name="service">The service.</param>
+        /// <returns>The service.</returns>
+        public static T WarnIfMissing<T>(this T service) where T : class
+        {
+            //if (service == null)
+                //Logger.Warn(CultureInfo.InvariantCulture, "The service of type {0} is missing.", typeof(T).Name);
+
+            return service;
+        }
 
         /// <summary>
         /// Adds the specified resource dictionary to the application.

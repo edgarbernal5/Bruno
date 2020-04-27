@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using TrioWpfFramework.ServiceLocation;
-using TrioWpfFramework.Windows.Docking.ViewModels;
+using TrioWpfFramework.Windows.Docking;
 using TrioWpfFramework.Windows.Framework;
 
 namespace TrioWpfFramework.Editor
@@ -10,7 +10,7 @@ namespace TrioWpfFramework.Editor
     /// <summary>
     /// Represents the editor.
     /// </summary>
-    public interface IEditorService : IDockControl, IScreenConductor, IScreen, IActivatable, IGuardClose, IDisplayName
+    public interface IEditorService : IDockControl, IConductor, IScreen, IActivatable, IGuardClose, IDisplayName
     {
         /// <summary>
         /// Gets or sets the name of the application.
@@ -118,7 +118,6 @@ namespace TrioWpfFramework.Editor
         /// e.g. the editor contains unsaved documents, the user may prevent the application from
         /// closing.
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Exit")]
         void Exit(int exitCode = (int)Editor.ExitCode.ERROR_SUCCESS);
 
 
@@ -156,7 +155,6 @@ namespace TrioWpfFramework.Editor
         /// the editor to rebuilt menus and toolbars.
         /// </para>
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         ICollection<MergeableNodeCollection<ICommandItem>> MenuNodeCollections { get; }
 
 
@@ -184,7 +182,6 @@ namespace TrioWpfFramework.Editor
         /// the editor to rebuilt menus and toolbars.
         /// </para>
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         ICollection<MergeableNodeCollection<ICommandItem>> ToolBarNodeCollections { get; }
 
 
@@ -205,7 +202,6 @@ namespace TrioWpfFramework.Editor
         /// defines the point where the command item should be inserted in the context menu.
         /// </para>
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         ICollection<MergeableNodeCollection<ICommandItem>> DockContextMenuNodeCollections { get; }
 
 

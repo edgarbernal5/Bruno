@@ -1,11 +1,7 @@
-﻿using Microsoft.Windows.Themes;
+﻿
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -13,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using TrioWpfFramework.Windows;
+using Microsoft.Windows.Themes;
 
 namespace TrioWpfFramework.Controls
 {
@@ -84,17 +81,7 @@ namespace TrioWpfFramework.Controls
         //   Perhaps this is a WPF problem...
 
 
-        //--------------------------------------------------------------
-        #region Constants
-        //--------------------------------------------------------------
-
         internal const string PART_DropDownButton = nameof(PART_DropDownButton);
-        #endregion
-
-
-        //--------------------------------------------------------------
-        #region Fields
-        //--------------------------------------------------------------
 
         private ToggleButton _toggleButton;
 
@@ -102,12 +89,7 @@ namespace TrioWpfFramework.Controls
         private ContextMenu _contextMenu;
         private DependencyObject _contextMenuRoot;
         private Popup _popup;
-        #endregion
 
-
-        //--------------------------------------------------------------
-        #region Properties & Events
-        //--------------------------------------------------------------
 
         /// <summary>
         /// Gets or sets the button that raises the <see cref="Command"/> and the
@@ -146,12 +128,6 @@ namespace TrioWpfFramework.Controls
         /// Occurs after the drop-down closed.
         /// </summary>
         public event EventHandler<EventArgs> DropDownClosed;
-        #endregion
-
-
-        //--------------------------------------------------------------
-        #region Dependency Properties & Routed Events
-        //--------------------------------------------------------------
 
         /// <summary>
         /// Identifies the <see cref="DropDown"/> dependency property.
@@ -285,12 +261,7 @@ namespace TrioWpfFramework.Controls
             add { AddHandler(ClickEvent, value); }
             remove { RemoveHandler(ClickEvent, value); }
         }
-        #endregion
 
-
-        //--------------------------------------------------------------
-        #region Creation & Cleanup
-        //--------------------------------------------------------------
 
         /// <summary>
         /// Initializes static members of the <see cref="DropDownButton"/> class.
@@ -302,12 +273,6 @@ namespace TrioWpfFramework.Controls
             EventManager.RegisterClassHandler(typeof(DropDownButton), Mouse.LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCapture));
             EventManager.RegisterClassHandler(typeof(DropDownButton), Mouse.PreviewMouseDownOutsideCapturedElementEvent, new MouseButtonEventHandler(OnMouseDownOutsideCapturedElement));
         }
-        #endregion
-
-
-        //--------------------------------------------------------------
-        #region Methods
-        //--------------------------------------------------------------
 
         /// <summary>
         /// Raises the <see cref="DropDownOpened"/> event.
@@ -768,9 +733,6 @@ namespace TrioWpfFramework.Controls
             eventArgs.Handled = true;
         }
 
-
-        #region ----- Helper methods -----
-
         private static bool IsLogicalDescendant(DependencyObject ancestor, DependencyObject node)
         {
             Debug.Assert(ancestor != null);
@@ -785,9 +747,6 @@ namespace TrioWpfFramework.Controls
 
             return false;
         }
-        #endregion
-
-        #endregion
     }
 
 

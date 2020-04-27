@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
-namespace TrioWpfFramework.Windows.Docking.ViewModels
+namespace TrioWpfFramework.Windows.Docking
 {
     [ContentProperty(nameof(Items))]
     public class DockTabPaneViewModel : DockPaneViewModel, IDockTabPane

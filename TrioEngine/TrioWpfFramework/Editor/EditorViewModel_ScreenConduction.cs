@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using TrioWpfFramework.Windows.Docking;
-using TrioWpfFramework.Windows.Docking.Controls;
-using TrioWpfFramework.Windows.Docking.ViewModels;
 using static System.FormattableString;
-using TrioWpfFramework.ServiceLocation;
 using TrioWpfFramework.Windows.Framework;
 using Estero.Linq;
 
@@ -40,14 +34,14 @@ namespace TrioWpfFramework.Editor
         //--------------------------------------------------------------
 
         /// <inheritdoc/>
-        IEnumerable<object> IScreenConductor.Items
+        IEnumerable<object> IConductor.Items
         {
             get { return GetItems(false); }
         }
 
 
         /// <inheritdoc/>
-        IEnumerable<object> IScreenConductor.ActiveItems
+        IEnumerable<object> IConductor.ActiveItems
         {
             get { return GetItems(true); }
         }
@@ -79,7 +73,7 @@ namespace TrioWpfFramework.Editor
 
 
         /// <inheritdoc/>
-        Task<bool> IScreenConductor.ActivateItemAsync(object item)
+        Task<bool> IConductor.ActivateItemAsync(object item)
         {
             // Explicit interface implementation because this method is not really async.
 
@@ -170,9 +164,6 @@ namespace TrioWpfFramework.Editor
             }
         }
 
-
-        /// <inheritdoc/>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
         protected override void OnDeactivated(DeactivationEventArgs eventArgs)
         {
             if (eventArgs.Closed)

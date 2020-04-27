@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using TrioWpfFramework.Windows.Docking.Controls;
 
 namespace TrioWpfFramework.Windows.Docking
 {

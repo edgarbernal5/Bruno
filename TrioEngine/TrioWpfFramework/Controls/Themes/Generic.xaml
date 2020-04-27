@@ -1,0 +1,26 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/ButtonChrome/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/ColorGradientControl/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/ColorPicker/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/CommandTextBox/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/DropDownButton/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/ExplorerView/Themes/Generic.xaml" />
+        <!--<ResourceDictionary Source="/TrioWpfFramework;component/Controls/EditableTextBlock/Themes/Generic.xaml" />-->
+        <!--<ResourceDictionary Source="/TrioWpfFramework;component/Controls/FontChooser/Themes/Generic.xaml" />-->
+       
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/NumericUpDown/Themes/Generic.xaml" />
+        
+        <!--<ResourceDictionary Source="/TrioWpfFramework;component/Controls/PathTextBlock/Themes/Generic.xaml" />-->
+        <!--<ResourceDictionary Source="/TrioWpfFramework;component/Controls/ProgressRing/Themes/Generic.xaml" />-->
+        
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/PropertyGrid/Themes/Generic.xaml" />
+        
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/SplitButton/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/ToolBarEx/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/TreeViewEx/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/WatermarkedTextBox/Themes/Generic.xaml" />
+        
+        <!--<ResourceDictionary Source="/TrioWpfFramework;component/Controls/WindowChrome/Themes/Generic.xaml" />-->
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

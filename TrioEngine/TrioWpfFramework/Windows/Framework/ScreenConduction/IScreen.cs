@@ -3,6 +3,6 @@ namespace TrioWpfFramework.Windows.Framework
 {
     public interface IScreen
     {
-        IScreenConductor Conductor { get; set; }
+        IConductor Conductor { get; set; }
     }
 }

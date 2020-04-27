@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
-using TrioWpfFramework.Windows.Docking.Controls;
 using TrioWpfFramework.Windows.Interop;
 
 namespace TrioWpfFramework.Windows.Docking

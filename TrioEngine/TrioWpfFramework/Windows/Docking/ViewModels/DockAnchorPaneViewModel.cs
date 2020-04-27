@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
-namespace TrioWpfFramework.Windows.Docking.ViewModels
+namespace TrioWpfFramework.Windows.Docking
 {
     [ContentProperty(nameof(ChildPane))]
     public class DockAnchorPaneViewModel : DockPaneViewModel, IDockAnchorPane

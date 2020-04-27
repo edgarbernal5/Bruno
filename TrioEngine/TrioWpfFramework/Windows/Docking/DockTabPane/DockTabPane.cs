@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
-using TrioWpfFramework.Windows.Docking.Controls;
-using TrioWpfFramework.Windows.Docking.ViewModels;
 
 namespace TrioWpfFramework.Windows.Docking
 {
@@ -384,7 +378,6 @@ namespace TrioWpfFramework.Windows.Docking
         /// <param name="e">
         /// The <see cref="NotifyCollectionChangedEventArgs"/> instance containing the event data.
         /// </param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
             base.OnItemsChanged(e);
@@ -557,7 +550,6 @@ namespace TrioWpfFramework.Windows.Docking
         /// Invoked when the <see cref="UIElement.KeyDown"/> event is received.
         /// </summary>
         /// <param name="e">Information about the event.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Windows.Docking.ViewModels
+namespace TrioWpfFramework.Windows.Docking
 {
     public abstract class DockElementCollection<T> : ObservableCollection<T>
     {

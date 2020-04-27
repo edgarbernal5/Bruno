@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using TrioWpfFramework.Windows.Docking.Controls;
-using TrioWpfFramework.Windows.Docking.ViewModels;
 using TrioWpfFramework.Windows.Interop;
 
 namespace TrioWpfFramework.Windows.Docking
@@ -145,7 +143,6 @@ namespace TrioWpfFramework.Windows.Docking
         /// <param name="e">
         /// The <see cref="CancelEventArgs"/> instance containing the event data.
         /// </param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         protected override void OnClosing(CancelEventArgs e)
         {
             // Raise Closing event.

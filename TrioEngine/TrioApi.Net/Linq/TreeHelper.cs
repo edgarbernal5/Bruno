@@ -177,7 +177,6 @@ namespace TrioWpfFramework.Net.Linq
         /// <remarks>
         /// This method can be used to traverse a tree in depth-first order (preorder).
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static IEnumerable<T> GetSubtree<T>(T node, Func<T, IEnumerable<T>> getChildren) where T : class
         {
             return GetSubtree(node, getChildren, true);
@@ -218,7 +217,6 @@ namespace TrioWpfFramework.Net.Linq
         /// This method can be used to traverse a tree in either depth-first order (preorder) or in 
         /// breadth-first order (also known as level-order).
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static IEnumerable<T> GetSubtree<T>(T node, Func<T, IEnumerable<T>> getChildren, bool depthFirst) where T : class
         {
             if (node == null)

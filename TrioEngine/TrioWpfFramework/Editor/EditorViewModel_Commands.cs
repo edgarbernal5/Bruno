@@ -1,18 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using TrioWpfFramework.Windows.Docking;
-using TrioWpfFramework.Windows.Docking.Controls;
-using TrioWpfFramework.Windows.Docking.ViewModels;
-using static System.FormattableString;
-using TrioWpfFramework.ServiceLocation;
-using TrioWpfFramework.Windows.Framework;
-using Estero.Linq;
 using Estero.Collections;
 using System.Collections.ObjectModel;
 
@@ -20,22 +8,12 @@ namespace TrioWpfFramework.Editor
 {
     public partial class EditorViewModel
     {
-        //--------------------------------------------------------------
-        #region Fields
-        //--------------------------------------------------------------
-
         // Merge DockTabItem context menu nodes and create the menu items. (Note: The managers need
         // to be kept alive because they manage the visibility of the items but are weak event
         // listeners.)
         internal MenuManager MenuManager;       // Used in EditorWindow.
         internal ToolBarManager ToolBarManager; // Used in EditorWindow.
         private MenuManager _contextMenuManager;
-        #endregion
-
-
-        //--------------------------------------------------------------
-        #region Properties & Events
-        //--------------------------------------------------------------
 
         /// <inheritdoc/>
         public ICollection<MergeableNodeCollection<ICommandItem>> MenuNodeCollections { get; } = new Collection<MergeableNodeCollection<ICommandItem>>();
@@ -76,25 +54,13 @@ namespace TrioWpfFramework.Editor
 
         /// <inheritdoc/>
         public event EventHandler<EventArgs> UIInvalidated;
-        #endregion
-
-
-        //--------------------------------------------------------------
-        #region Creation and Cleanup
-        //--------------------------------------------------------------
-
+        
         private void InitializeCommandItems()
         {
             MenuManager = new MenuManager();
             ToolBarManager = new ToolBarManager();
             _contextMenuManager = new MenuManager();
         }
-        #endregion
-
-
-        //--------------------------------------------------------------
-        #region Methods
-        //--------------------------------------------------------------
 
         /// <inheritdoc/>
         public void InvalidateUI()
@@ -152,6 +118,5 @@ namespace TrioWpfFramework.Editor
         {
             UIInvalidated?.Invoke(this, eventArgs);
         }
-        #endregion
     }
 }

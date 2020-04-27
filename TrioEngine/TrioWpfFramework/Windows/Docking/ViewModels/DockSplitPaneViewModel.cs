@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
-namespace TrioWpfFramework.Windows.Docking.ViewModels
+namespace TrioWpfFramework.Windows.Docking
 {
 
     /// <summary>

@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using TrioWpfFramework.Windows.Docking;
-using TrioWpfFramework.Windows.Docking.Controls;
-using TrioWpfFramework.Windows.Docking.ViewModels;
 using static System.FormattableString;
 using TrioWpfFramework.ServiceLocation;
 using TrioWpfFramework.Windows.Framework;

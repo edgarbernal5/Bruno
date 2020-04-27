@@ -25,7 +25,7 @@ namespace TrioWpfFramework.Windows.Framework
         }
         private bool _isActive;
 
-        public IScreenConductor Conductor
+        public IConductor Conductor
         {
             get { return _conductor; }
             set
@@ -40,7 +40,7 @@ namespace TrioWpfFramework.Windows.Framework
                 RaisePropertyChanged();
             }
         }
-        private IScreenConductor _conductor;
+        private IConductor _conductor;
 
 
         /// <summary>

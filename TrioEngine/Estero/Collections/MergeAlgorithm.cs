@@ -98,7 +98,6 @@ namespace Estero.Collections
         /// <exception cref="MergeException">
         /// Merge operations failed. Could not find merge points.
         /// </exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
         private void Merge(MergeableNodeCollection<T> targetNodes, MergeableNode<T> node)
         {
             if (node == null)
@@ -282,7 +281,6 @@ namespace Estero.Collections
         /// to the children of <paramref name="existingNode"/>.
         /// </para>
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         protected virtual void OnMerge(MergeableNode<T> existingNode, MergeableNode<T> node)
         {
             // Process children.
@@ -319,7 +317,6 @@ namespace Estero.Collections
         /// inserts it into <paramref name="existingNodes"/> at <paramref name="index"/>.
         /// </para>
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         protected virtual void OnInsert(MergeableNodeCollection<T> existingNodes, MergeableNode<T> node, int index)
         {
             if (!CloneNodesOnMerge)

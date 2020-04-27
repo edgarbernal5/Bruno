@@ -1,0 +1,236 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:TrioWpfFramework.Controls"
+                    xmlns:docking="clr-namespace:TrioWpfFramework.Windows.Docking">
+    
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Colors/Default.xaml" />
+        <!--<ResourceDictionary Source="System/FocusVisual.xaml" /> included in other .xaml -->
+        <ResourceDictionary Source="System/Button.xaml" />
+        <ResourceDictionary Source="System/CheckBox.xaml" />
+        <ResourceDictionary Source="System/ComboBox.xaml" />
+        <ResourceDictionary Source="System/ContentControl.xaml" />
+        <ResourceDictionary Source="System/ContextMenu.xaml" />
+        <ResourceDictionary Source="System/DataGrid.xaml" />
+        <ResourceDictionary Source="System/Expander.xaml" />
+        <ResourceDictionary Source="System/GroupBox.xaml" />
+        <ResourceDictionary Source="System/Hyperlink.xaml" />
+        <ResourceDictionary Source="System/Label.xaml" />
+        <ResourceDictionary Source="System/ListBox.xaml" />
+        <ResourceDictionary Source="System/ListView.xaml" />
+        <!-- <ResourceDictionary Source="System/Menu.xaml" /> included in ToolBar.xaml -->
+        <ResourceDictionary Source="System/ProgressBar.xaml" />
+        <ResourceDictionary Source="System/RadioButton.xaml" />
+        <ResourceDictionary Source="System/ScrollBar.xaml" />
+        <ResourceDictionary Source="System/ScrollViewer.xaml" />
+        <ResourceDictionary Source="System/Separator.xaml" />
+        <ResourceDictionary Source="System/Slider.xaml" />
+        <ResourceDictionary Source="System/StatusBar.xaml" />
+        <ResourceDictionary Source="System/TabControl.xaml" />
+        <ResourceDictionary Source="System/TextBox.xaml" />
+        <ResourceDictionary Source="System/Thumb.xaml" />
+        <ResourceDictionary Source="System/ToolBar.xaml" />
+        <ResourceDictionary Source="System/ToolTip.xaml" />
+        <ResourceDictionary Source="System/TreeView.xaml" />
+        <ResourceDictionary Source="System/Window.xaml" />
+        <ResourceDictionary Source="Estero/Controls.xaml" />
+        <ResourceDictionary Source="Estero/ToolBarEx.xaml" />
+        <ResourceDictionary Source="Estero/TreeViewEx.xaml" />
+        <ResourceDictionary Source="Estero/Docking.xaml" />
+        <ResourceDictionary Source="Estero/Framework.xaml" />
+        <ResourceDictionary Source="Estero/PropertyGrid.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!--
+        The implicit styles for controls are defined here. The styles in the included
+        resource dictionaries are named. This has following advantages:
+        - The styles can be reused within the theme and in other themes.
+        - The implicit styles are defined in this dictionary, which means WPF does not have to look
+        into the merged dictionaries when looking for an implicit style.
+    -->
+
+    <!--  System/FocusVisual.xaml  -->
+    <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" BasedOn="{StaticResource Modern.FocusVisual}" />
+
+    <!--  System/Button.xaml  -->
+    <Style BasedOn="{StaticResource Modern.Button}" TargetType="{x:Type Button}" />
+    <Style BasedOn="{StaticResource Modern.RepeatButton}" TargetType="{x:Type RepeatButton}" />
+    <Style BasedOn="{StaticResource Modern.ToggleButton}" TargetType="{x:Type ToggleButton}" />
+
+    <!--  System/CheckBox.xaml  -->
+    <Style BasedOn="{StaticResource Modern.CheckBox}" TargetType="{x:Type CheckBox}" />
+
+    <!--  System/ComboBox.xaml  -->
+    <Style BasedOn="{StaticResource Modern.ComboBox}" TargetType="{x:Type ComboBox}" />
+    <Style BasedOn="{StaticResource Modern.ComboBoxItem}" TargetType="{x:Type ComboBoxItem}" />
+
+    <!--  System/ContentControl.xaml  -->
+    <Style BasedOn="{StaticResource Modern.ContentControl}" TargetType="{x:Type ContentControl}" />
+
+    <!--  System/ContextMenu.xaml  -->
+    <Style BasedOn="{StaticResource Modern.ContextMenu}" TargetType="{x:Type ContextMenu}" />
+
+    <!--  System/DataGrid.xaml  -->
+    <Style BasedOn="{StaticResource Modern.DataGrid}" TargetType="{x:Type DataGrid}" />
+
+    <!--  System/Expander.xaml  -->
+    <Style BasedOn="{StaticResource Modern.Expander}" TargetType="{x:Type Expander}" />
+
+    <!--  System/GroupBox.xaml  -->
+    <Style BasedOn="{StaticResource Modern.GroupBox}" TargetType="{x:Type GroupBox}" />
+
+    <!--  System/Hyperlink.xaml  -->
+    <Style BasedOn="{StaticResource Modern.Hyperlink}" TargetType="{x:Type Hyperlink}" />
+
+    <!--  System/Label.xaml  -->
+    <Style BasedOn="{StaticResource Modern.Label}" TargetType="{x:Type Label}" />
+
+    <!--  System/ListBox.xaml  -->
+    <Style BasedOn="{StaticResource Modern.ListBox}" TargetType="{x:Type ListBox}" />
+    <Style BasedOn="{StaticResource Modern.ListBoxItem}" TargetType="{x:Type ListBoxItem}" />
+
+    <!--  System/ListView.xaml  -->
+    <Style x:Key="{x:Static GridView.GridViewScrollViewerStyleKey}"
+           BasedOn="{StaticResource Modern.GridView.ScrollViewer}"
+           TargetType="{x:Type ScrollViewer}" />
+    <Style BasedOn="{StaticResource Modern.GridViewColumnHeader}" TargetType="{x:Type GridViewColumnHeader}" />
+    <Style x:Key="{x:Static GridView.GridViewItemContainerStyleKey}"
+           BasedOn="{StaticResource Modern.GridView.ListViewItem}"
+           TargetType="{x:Type ListViewItem}" />
+    <Style x:Key="{x:Static GridView.GridViewStyleKey}"
+           BasedOn="{StaticResource Modern.GridView.ListView}"
+           TargetType="{x:Type ListView}" />
+
+    <!--  System/Menu.xaml  -->
+    <Style BasedOn="{StaticResource Modern.Menu}" TargetType="{x:Type Menu}" />
+    <Style BasedOn="{StaticResource Modern.MenuItem}" TargetType="{x:Type MenuItem}" />
+    <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}"
+           BasedOn="{StaticResource Modern.Menu.Separator}"
+           TargetType="{x:Type Separator}" />
+
+    <!--  System/ProgressBar.xaml  -->
+    <Style BasedOn="{StaticResource Modern.ProgressBar}" TargetType="{x:Type ProgressBar}" />
+
+    <!--  System/RadioButton.xaml  -->
+    <Style BasedOn="{StaticResource Modern.RadioButton}" TargetType="{x:Type RadioButton}" />
+
+    <!--  System/ScrollBar.xaml  -->
+    <Style BasedOn="{StaticResource Modern.ScrollBar}" TargetType="{x:Type ScrollBar}" />
+
+    <!--  System/ScrollViewer.xaml  -->
+    <Style BasedOn="{StaticResource Modern.ScrollViewer}" TargetType="{x:Type ScrollViewer}" />
+
+    <!--  System/Separator.xaml  -->
+    <Style BasedOn="{StaticResource Modern.Separator}" TargetType="{x:Type Separator}" />
+
+    <!--  System/Slider.xaml  -->
+    <Style BasedOn="{StaticResource Modern.Slider}" TargetType="{x:Type Slider}" />
+
+    <!--  System/StatusBar.xaml  -->
+    <Style BasedOn="{StaticResource Modern.StatusBar}" TargetType="{x:Type StatusBar}" />
+    <Style BasedOn="{StaticResource Modern.StatusBarItem}" TargetType="{x:Type StatusBarItem}" />
+    <Style x:Key="{x:Static StatusBar.SeparatorStyleKey}"
+           BasedOn="{StaticResource Modern.StatusBar.Separator}"
+           TargetType="{x:Type Separator}" />
+
+    <!--  System/TabControl.xaml  -->
+    <Style BasedOn="{StaticResource Modern.TabControl}" TargetType="{x:Type TabControl}" />
+    <Style BasedOn="{StaticResource Modern.TabItem}" TargetType="{x:Type TabItem}" />
+
+    <!--  System/TextBox.xaml  -->
+    <Style BasedOn="{StaticResource Modern.TextBox}" TargetType="{x:Type TextBox}" />
+    <Style BasedOn="{StaticResource Modern.PasswordBox}" TargetType="{x:Type PasswordBox}" />
+    <Style BasedOn="{StaticResource Modern.RichTextBox}" TargetType="{x:Type RichTextBox}" />
+
+    <!--  System/Thumb.xaml  -->
+    <Style BasedOn="{StaticResource Modern.Thumb}" TargetType="{x:Type Thumb}" />
+
+    <!--  System/ToolBar.xaml  -->
+    <Style BasedOn="{StaticResource Modern.ToolTip}" TargetType="{x:Type ToolTip}" />
+
+    <!--  System/ToolTip.xaml  -->
+    <Style x:Key="{x:Type ToolBarTray}"
+           BasedOn="{StaticResource Modern.ToolBarTray}"
+           TargetType="{x:Type ToolBarTray}" />
+    <Style BasedOn="{StaticResource Modern.ToolBar}" TargetType="{x:Type ToolBar}" />
+    <Style x:Key="{x:Static ToolBar.ButtonStyleKey}"
+           BasedOn="{StaticResource Modern.ToolBar.Button}"
+           TargetType="{x:Type Button}" />
+    <Style x:Key="{x:Static ToolBar.ToggleButtonStyleKey}"
+           BasedOn="{StaticResource Modern.ToolBar.ToggleButton}"
+           TargetType="{x:Type ToggleButton}" />
+    <Style x:Key="{x:Static ToolBar.CheckBoxStyleKey}"
+           BasedOn="{StaticResource Modern.ToolBar.CheckBox}"
+           TargetType="{x:Type CheckBox}" />
+    <Style x:Key="{x:Static ToolBar.RadioButtonStyleKey}"
+           BasedOn="{StaticResource Modern.ToolBar.RadioButton}"
+           TargetType="{x:Type RadioButton}" />
+    <Style x:Key="{x:Static ToolBar.ComboBoxStyleKey}"
+           BasedOn="{StaticResource Modern.ToolBar.ComboBox}"
+           TargetType="{x:Type ComboBox}" />
+    <Style x:Key="{x:Static ToolBar.TextBoxStyleKey}"
+           BasedOn="{StaticResource Modern.ToolBar.TextBox}"
+           TargetType="{x:Type TextBox}" />
+    <Style x:Key="{x:Static ToolBar.MenuStyleKey}"
+           BasedOn="{StaticResource Modern.ToolBar.Menu}"
+           TargetType="{x:Type Menu}" />
+    <Style x:Key="{x:Static ToolBar.SeparatorStyleKey}"
+           BasedOn="{StaticResource Modern.ToolBar.Separator}"
+           TargetType="{x:Type Separator}" />
+
+    <!--  System/TreeView.xaml  -->
+    <Style BasedOn="{StaticResource Modern.TreeView}" TargetType="{x:Type TreeView}" />
+    <Style BasedOn="{StaticResource Modern.TreeViewItem}" TargetType="{x:Type TreeViewItem}" />
+
+    <!--  System/Window.xaml  -->
+    <Style BasedOn="{StaticResource Modern.ResizeGrip}" TargetType="{x:Type ResizeGrip}" />
+    <Style BasedOn="{StaticResource Modern.Window}" TargetType="{x:Type Window}" />
+
+    <!--  Estero/Controls.xaml  -->
+    <Style BasedOn="{StaticResource Modern.Icon}" TargetType="{x:Type controls:Icon}" />
+    <Style BasedOn="{StaticResource Modern.DropDownButton}" TargetType="{x:Type controls:DropDownButton}" />
+    <Style BasedOn="{StaticResource Modern.SplitButton}" TargetType="{x:Type controls:SplitButton}" />
+    <Style BasedOn="{StaticResource Modern.ColorDialog}" TargetType="{x:Type controls:ColorDialog}" />
+    <Style BasedOn="{StaticResource Modern.NumericUpDown}" TargetType="{x:Type controls:NumericUpDown}" />
+    <!--<Style BasedOn="{StaticResource Modern.TimeSpanUpDown}" TargetType="{x:Type controls:TimeSpanUpDown}" />-->
+    <Style BasedOn="{StaticResource Modern.WatermarkedTextBox}" TargetType="{x:Type controls:WatermarkedTextBox}" />
+    <!--<Style BasedOn="{StaticResource Modern.CommandTextBox}" TargetType="{x:Type controls:CommandTextBox}" />-->
+    <Style BasedOn="{StaticResource Modern.ExplorerViewMenu}" TargetType="{x:Type controls:ExplorerViewMenu}" />
+    <Style x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type controls:ExplorerView}, ResourceId=ExplorerViewStyle}"
+           BasedOn="{StaticResource Modern.ExplorerView}"
+           TargetType="{x:Type ListView}" />
+    <Style x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type controls:ExplorerView}, ResourceId=ExplorerViewItemContainerStyle}"
+           BasedOn="{StaticResource Modern.ExplorerViewItem}"
+           TargetType="{x:Type ListViewItem}" />
+    
+    <!--  Estero/ToolBarEx.xaml  -->
+    <Style BasedOn="{StaticResource Modern.ToolBarDropDownButton}" TargetType="{x:Type controls:ToolBarDropDownButton}" />
+    <Style BasedOn="{StaticResource Modern.ToolBarSplitButton}" TargetType="{x:Type controls:ToolBarSplitButton}" />
+    <Style BasedOn="{StaticResource Modern.ToolBarEx}" TargetType="{x:Type controls:ToolBarEx}" />
+
+    <!--  Estero/TreeViewEx.xaml  -->
+    <Style BasedOn="{StaticResource Modern.TreeViewEx}" TargetType="{x:Type controls:TreeViewEx}" />
+    <Style BasedOn="{StaticResource Modern.TreeViewItemEx}" TargetType="{x:Type controls:TreeViewItemEx}" />
+
+    <!--  Estero/Docking.xaml  -->
+    <Style BasedOn="{StaticResource Modern.DockControl}" TargetType="{x:Type docking:DockControl}" />
+    <Style BasedOn="{StaticResource Modern.AutoHideGroup}" TargetType="{x:Type docking:AutoHideGroup}" />
+    <Style BasedOn="{StaticResource Modern.AutoHideTab}" TargetType="{x:Type docking:AutoHideTab}" />
+    <Style BasedOn="{StaticResource Modern.AutoHidePane}" TargetType="{x:Type docking:AutoHidePane}" />
+    <Style BasedOn="{StaticResource Modern.DockAnchorPane}" TargetType="{x:Type docking:DockAnchorPane}" />
+    <Style BasedOn="{StaticResource Modern.DockTabPane}" TargetType="{x:Type docking:DockTabPane}" />
+    <Style BasedOn="{StaticResource Modern.DockTabItem}" TargetType="{x:Type docking:DockTabItem}" />
+    <Style BasedOn="{StaticResource Modern.DockPaneSplitter}" TargetType="{x:Type docking:DockPaneSplitter}" />
+    <Style BasedOn="{StaticResource Modern.DockIndicator}" TargetType="{x:Type docking:DockIndicator}" />
+    <Style BasedOn="{StaticResource Modern.BorderIndicators}" TargetType="{x:Type docking:BorderIndicators}" />
+    <Style BasedOn="{StaticResource Modern.PaneIndicators}" TargetType="{x:Type docking:PaneIndicators}" />
+
+    <!--  Estero/Framework.xaml  -->
+    <Style x:Key="{x:Static dr:AutoCompleteBehavior.AutoCompleteListBoxStyleKey}"
+           BasedOn="{StaticResource Modern.AutoCompleteBehavior.ListBox}"
+           TargetType="{x:Type ListBox}" />
+
+    <!--  Estero/PropertyGrid.xaml  -->
+    <Style BasedOn="{StaticResource Modern.PropertyGrid}" TargetType="{x:Type controls:PropertyGrid}" />
+
+</ResourceDictionary>

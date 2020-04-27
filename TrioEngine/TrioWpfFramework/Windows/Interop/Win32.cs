@@ -196,6 +196,73 @@ namespace TrioWpfFramework.Windows.Interop
         public static extern bool ShowWindow(IntPtr hWnd, ShowWindowStyles nCmdShow);
 
         /// <summary>
+        /// Dispatches incoming sent Window messages, checks the thread message queue for a posted
+        /// message, and retrieves the message (if any exist).
+        /// </summary>
+        /// <param name="message">The received message.</param>
+        /// <param name="hWnd">The handle of the window whose messages are to be examined.</param>
+        /// <param name="messageFilterMin">
+        /// Specifies the value of the first message in the range of messages to be examined.
+        /// </param>
+        /// <param name="messageFilterMax">
+        /// Specifies the value of the last message in the range of messages to be examined.
+        /// </param>
+        /// <param name="flags">
+        /// Specifies how messages are handled. (Default: 0. Look up other constants in MSDN
+        /// library.)
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if message is available; otherwise <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// Set both <paramref name="messageFilterMin"/> and <paramref name="messageFilterMax"/> to
+        /// 0 to return all available message (that is, no range filtering is performed).
+        /// </remarks>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool PeekMessage(out MSG message, IntPtr hWnd, uint messageFilterMin, uint messageFilterMax, uint flags);
+
+
+        /// <summary>
+        /// Places (posts) a message in the message queue associated with the thread that created
+        /// the specified window and returns without waiting for the thread to process the message.
+        /// </summary>
+        /// <param name="hWnd">
+        /// Handle to the window whose window procedure is to receive the message. Some values have
+        /// special meanings - see MSDN documentation.
+        /// </param>
+        /// <param name="Msg">Specifies the message to be posted.</param>
+        /// <param name="wParam">Specifies additional message-specific information.</param>
+        /// <param name="lParam">Specifies additional message-specific information.</param>
+        /// <returns>
+        /// If the function succeeds, the return value is <see langword="true"/>. If the function
+        /// fails, the return value is <see langword="false"/>. To get extended error information,
+        /// call <see cref="Marshal.GetLastWin32Error"/>.
+        /// </returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool PostMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+
+        /// <summary>
+        /// Sends the specified message to a window or windows. It calls the window procedure for
+        /// the specified window and does not return until the window procedure has processed the
+        /// message.
+        /// </summary>
+        /// <param name="hWnd">
+        /// Handle to the window whose window procedure is to receive the message. Some values have
+        /// special meanings - see MSDN documentation.
+        /// </param>
+        /// <param name="msg">Specifies the message to be sent.</param>
+        /// <param name="wParam">Specifies additional message-specific information.</param>
+        /// <param name="lParam">Specifies additional message-specific information.</param>
+        /// <returns>
+        /// The return value specifies the result of the message processing; it depends on the
+        /// message sent.
+        /// </returns>
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+        /// <summary>
         /// Returns a DWORD value by concatenation the specified values.
         /// </summary>
         /// <param name="low">The low-order word of the new value.</param>

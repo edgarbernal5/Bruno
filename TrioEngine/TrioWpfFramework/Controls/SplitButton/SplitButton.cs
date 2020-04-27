@@ -14,17 +14,8 @@ namespace TrioWpfFramework.Controls
     [TemplatePart(Name = PART_ActionButton, Type = typeof(Button))]
     public class SplitButton : DropDownButton
     {
-        //--------------------------------------------------------------
-        #region Constants
-        //--------------------------------------------------------------
-
         internal const string PART_ActionButton = nameof(PART_ActionButton);
-        #endregion
 
-
-        //--------------------------------------------------------------
-        #region Creation & Cleanup
-        //--------------------------------------------------------------
 
         /// <summary>
         /// Initializes static members of the <see cref="SplitButton"/> class.
@@ -33,12 +24,6 @@ namespace TrioWpfFramework.Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SplitButton), new FrameworkPropertyMetadata(typeof(SplitButton)));
         }
-        #endregion
-
-
-        //--------------------------------------------------------------
-        #region Methods
-        //--------------------------------------------------------------
 
         /// <summary>
         /// When overridden in a derived class, is invoked whenever application code or internal
@@ -52,7 +37,6 @@ namespace TrioWpfFramework.Controls
 
             Button = GetTemplateChild(PART_ActionButton) as Button;
         }
-        #endregion
     }
 
 

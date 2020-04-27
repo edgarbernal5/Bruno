@@ -231,7 +231,6 @@ namespace TrioWpfFramework.Editor
         /// that the listener does not handle. Regardless, the method should return
         /// <see langword="false"/> if it receives an event that it does not recognize or handle.
         /// </returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         bool IWeakEventListener.ReceiveWeakEvent(Type managerType, object sender, EventArgs eventArgs)
         {
             var propertyChangedEventArgs = eventArgs as PropertyChangedEventArgs;

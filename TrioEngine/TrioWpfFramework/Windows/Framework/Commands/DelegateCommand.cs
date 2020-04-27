@@ -130,7 +130,6 @@ namespace TrioWpfFramework.Windows.Framework
         /// Note that this will trigger the execution of <see cref="CanExecute"/> once for each
         /// invoker.
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")]
         public void RaiseCanExecuteChanged()
         {
             OnCanExecuteChanged();

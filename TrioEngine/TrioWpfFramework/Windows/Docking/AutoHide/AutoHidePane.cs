@@ -10,8 +10,6 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using TrioWpfFramework.Mathematics;
-using TrioWpfFramework.Windows.Docking.Controls;
-using TrioWpfFramework.Windows.Docking.ViewModels;
 using TrioWpfFramework.Windows.Interop;
 
 using static System.FormattableString;

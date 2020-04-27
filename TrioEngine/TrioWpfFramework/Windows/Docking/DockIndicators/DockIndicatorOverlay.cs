@@ -231,7 +231,6 @@ namespace TrioWpfFramework.Windows.Docking
         /// <summary>
         /// Identifies the <see cref="FadeOutAnimation"/> dependency property.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "FadeOut")]
         public static readonly DependencyProperty FadeOutAnimationProperty = DependencyProperty.Register(
             "FadeOutAnimation",
             typeof(Storyboard),
@@ -246,7 +245,6 @@ namespace TrioWpfFramework.Windows.Docking
         /// A <see cref="Storyboard"/> that is played when the <see cref="DockIndicatorOverlay"/> is
         /// closed. The default value is <see langword="null"/>.
         /// </value>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "FadeOut")]
         [Description("Gets or sets the animation that is played when the DockIndicatorOverlay disappears.")]
         //[Category(Categories.Default)]
         public Storyboard FadeOutAnimation
@@ -315,7 +313,6 @@ namespace TrioWpfFramework.Windows.Docking
         /// <param name="e">
         /// A <see cref="CancelEventArgs"/> that contains the event data.
         /// </param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
