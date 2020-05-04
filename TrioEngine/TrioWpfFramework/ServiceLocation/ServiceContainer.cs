@@ -399,7 +399,7 @@ namespace TrioWpfFramework.ServiceLocation
                 // Try to locate matching service entry in the current or a parent container.
                 ServiceRegistration registration = new ServiceRegistration(serviceType, key);
                 ServiceEntry entry;
-                ServiceContainer container;
+                ServiceContainer container = null;
 
                 if (_registry.TryGetValue(registration, out entry))
                 {
@@ -441,8 +441,8 @@ namespace TrioWpfFramework.ServiceLocation
                         {
                             if (entry.Instances == null)
                             {
-                                //var instance = entry.CreateInstance(container);
-                                //StoreInstance(entry, instance);
+                                var instance = entry.CreateInstance(container);
+                                StoreInstance(entry, instance);
                             }
                         }
                     }

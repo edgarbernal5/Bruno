@@ -233,10 +233,10 @@ namespace TrioWpfFramework.Editor
 
             // Register the base services.
             Services.Register(typeof(IEditorService), null, this);
-            //Services.Register(typeof(IMessageBus), null, new MessageBus());
+            Services.Register(typeof(IMessageBus), null, new MessageBus());
             Services.Register(typeof(IViewLocator), null, typeof(EditorViewLocator));
 
-            _resourceDictionary = new ResourceDictionary { Source = new Uri("pack://application:,,,/DigitalRune.Editor;component/Resources/DataTemplates.xaml", UriKind.RelativeOrAbsolute) };
+            _resourceDictionary = new ResourceDictionary { Source = new Uri("pack://application:,,,/TrioWpfFramework;component/Resources/DataTemplates.xaml", UriKind.RelativeOrAbsolute) };
             EditorHelper.RegisterResources(_resourceDictionary);
 
             // Register views.

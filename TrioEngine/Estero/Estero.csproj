@@ -51,6 +51,7 @@
     <Compile Include="Collections\MergeOperation.cs" />
     <Compile Include="Collections\MergePoint.cs" />
     <Compile Include="Collections\NamedItemCollection.cs" />
+    <Compile Include="Collections\Pair.cs" />
     <Compile Include="Collections\ReadOnlyWeakCollection.cs" />
     <Compile Include="Collections\WeakCollection.cs" />
     <Compile Include="Linq\LinqHelper.cs" />

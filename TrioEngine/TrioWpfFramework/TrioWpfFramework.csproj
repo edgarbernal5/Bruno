@@ -42,6 +42,28 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Reactive, Version=4.4.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.4.4.1\lib\net46\System.Reactive.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Core, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Core.4.4.1\lib\net46\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Interfaces.4.4.1\lib\net46\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Linq.4.4.1\lib\net46\System.Reactive.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xaml" />
@@ -131,6 +153,7 @@
       <DependentUpon>EditorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Editor\ExceptionHelper.cs" />
+    <Compile Include="Editor\FocusMessage.cs" />
     <Compile Include="Editor\Plugins\Documents\Document.cs" />
     <Compile Include="Editor\EditorDockStrategy.cs" />
     <Compile Include="Editor\EditorException.cs" />
@@ -167,8 +190,12 @@
     <Compile Include="Windows\Framework\Commands\IDelegateCommand.cs" />
     <Compile Include="Windows\BindablePropertyObserver.cs" />
     <Compile Include="Windows\Framework\Interactivity\DialogResultBehavior.cs" />
+    <Compile Include="Windows\Framework\Interactivity\EventToCommand.cs" />
     <Compile Include="Windows\Framework\Interactivity\InvalidateOnCommandParameterChangedBehavior.cs" />
     <Compile Include="Windows\Framework\IViewLocator.cs" />
+    <Compile Include="Windows\Framework\MessageBus\IMessageBus.cs" />
+    <Compile Include="Windows\Framework\MessageBus\MessageBus.cs" />
+    <Compile Include="Windows\Framework\MessageBus\WeakSubject.cs" />
     <Compile Include="Windows\Framework\ScreenConduction\IDialogResult.cs" />
     <Compile Include="Windows\Framework\TaskHelper.cs" />
     <Compile Include="Windows\Framework\WindowManager\WindowManager.cs" />

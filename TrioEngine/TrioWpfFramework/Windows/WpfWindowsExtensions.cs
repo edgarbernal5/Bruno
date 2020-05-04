@@ -837,6 +837,29 @@ namespace TrioWpfFramework.Windows
             }
         }
 
+        /// <summary>
+        /// Gets the visual subtree (the given <see cref="DependencyObject"/> and all of its
+        /// descendants) using either a depth- or a breadth-first search.
+        /// </summary>
+        /// <param name="dependencyObject">
+        /// The <see cref="DependencyObject"/> to get the visual descendants for.
+        /// </param>
+        /// <param name="depthFirst">
+        /// If set to <see langword="true"/> then a depth-first search for descendants will be made;
+        /// otherwise a breadth-first search will be made.
+        /// </param>
+        /// <returns>The visual descendants of the <see cref="DependencyObject"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="dependencyObject"/> is <see langword="null"/>.
+        /// </exception>
+        public static IEnumerable<DependencyObject> GetVisualSubtree(this DependencyObject dependencyObject, bool depthFirst)
+        {
+            if (dependencyObject == null)
+                throw new ArgumentNullException(nameof(dependencyObject));
+
+            return TreeHelper.GetSubtree(dependencyObject, GetVisualChildren, depthFirst);
+        }
+
 
         /// <summary>
         /// Called when the <see cref="P:DigitalRune.Windows.WindowsHelper.CanMaximize"/> property

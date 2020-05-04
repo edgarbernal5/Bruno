@@ -30,14 +30,12 @@ namespace TrioWpfFramework.Windows.Framework
             OnConfigure();
         }
 
-
         private void StartRuntime()
         {
             // ----- Silverlight-specific initialization.
             Application = Application.Current;
             Application.Startup += OnStartup;
             Application.Exit += OnExit;
-
 
             // ----- Application-specific initialization.
             OnConfigure();
@@ -55,9 +53,6 @@ namespace TrioWpfFramework.Windows.Framework
         {
         }
 
-
-
-
         /// <summary>
         /// Called when the application is started.
         /// </summary>
@@ -68,7 +63,6 @@ namespace TrioWpfFramework.Windows.Framework
         protected virtual void OnStartup(object sender, StartupEventArgs eventArgs)
         {
         }
-
 
         /// <summary>
         /// Called when an exception is thrown by an application but not handled.
@@ -81,7 +75,6 @@ namespace TrioWpfFramework.Windows.Framework
         protected virtual void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs eventArgs)
         {
         }
-
 
         /// <summary>
         /// Called just before the application shuts down (cannot be canceled).

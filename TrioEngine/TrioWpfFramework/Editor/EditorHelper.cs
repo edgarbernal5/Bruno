@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using TrioWpfFramework.ServiceLocation;
+using TrioWpfFramework.Windows.Framework;
 using static System.FormattableString;
 
 namespace TrioWpfFramework.Editor
@@ -99,6 +100,26 @@ namespace TrioWpfFramework.Editor
                 text = text.Remove(index, 1);
 
             return text;
+        }
+
+
+
+        /// <summary>
+        /// Focuses the specified editor.
+        /// </summary>
+        /// <param name="editor">The editor.</param>
+        /// <param name="dataContext">
+        /// The data context of the UI element which should receive the focus.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="dataContext"/> is <see langword="null"/>.
+        /// </exception>
+        public static void Focus(this IEditorService editor, object dataContext)
+        {
+            if (dataContext == null)
+                throw new ArgumentNullException(nameof(dataContext));
+
+            editor?.Services.GetInstance<IMessageBus>()?.Publish(new FocusMessage(dataContext));
         }
 
         /// <summary>
