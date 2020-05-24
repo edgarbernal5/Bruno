@@ -53,7 +53,7 @@ namespace TrioWpfFramework
             if (editorViewModel != null)
             {
                 _editorViewModel.Window = this;
-                //_editorViewModel.DockControl = DockControl;
+                _editorViewModel.DockControl = DockControl;
             }
         }
 
@@ -245,12 +245,12 @@ namespace TrioWpfFramework
             if (element == null)
             {
                 // Check float windows.
-                //foreach (var floatWindow in DockControl.FloatWindows)
-                //{
-                //    element = FindFocusableElement(floatWindow, dataContext);
-                //    if (element != null)
-                //        break;
-                //}
+                foreach (var floatWindow in DockControl.FloatWindows)
+                {
+                    element = FindFocusableElement(floatWindow, dataContext);
+                    if (element != null)
+                        break;
+                }
             }
 
             element?.Focus();
@@ -275,12 +275,12 @@ namespace TrioWpfFramework
                 && GetWindow(focusedElement) is FloatWindow)  // ...which is in a FloatWindow.
             {
                 var sourceElement = eventArgs.Source as DependencyObject;
-                //if (GetSelfOrVisualAncestor<DockControl>(sourceElement) == DockControl)
-                //{
-                //    // Routed command originated within the DockControl. These commands are
-                //    // local and must not be routed to FloatWindows.
-                //    return;
-                //}
+                if (GetSelfOrVisualAncestor<DockControl>(sourceElement) == DockControl)
+                {
+                    // Routed command originated within the DockControl. These commands are
+                    // local and must not be routed to FloatWindows.
+                    return;
+                }
 
                 var routedCommand = eventArgs.Command as RoutedCommand;
                 if (routedCommand != null)
@@ -300,12 +300,12 @@ namespace TrioWpfFramework
                 && GetWindow(focusedElement) != this)  // ...which is not in the main window.
             {
                 var sourceElement = eventArgs.Source as DependencyObject;
-                //if (GetSelfOrVisualAncestor<DockControl>(sourceElement) == DockControl)
-                //{
-                //    // Routed command originated within the DockControl. These commands are
-                //    // local and must not be routed to FloatWindows.
-                //    return;
-                //}
+                if (GetSelfOrVisualAncestor<DockControl>(sourceElement) == DockControl)
+                {
+                    // Routed command originated within the DockControl. These commands are
+                    // local and must not be routed to FloatWindows.
+                    return;
+                }
 
                 var routedCommand = eventArgs.Command as RoutedCommand;
                 if (routedCommand != null)

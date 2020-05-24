@@ -21,6 +21,6 @@
         <ResourceDictionary Source="/TrioWpfFramework;component/Controls/TreeViewEx/Themes/Generic.xaml" />
         <ResourceDictionary Source="/TrioWpfFramework;component/Controls/WatermarkedTextBox/Themes/Generic.xaml" />
         
-        <!--<ResourceDictionary Source="/TrioWpfFramework;component/Controls/WindowChrome/Themes/Generic.xaml" />-->
+        <ResourceDictionary Source="/TrioWpfFramework;component/Controls/WindowChrome/Themes/Generic.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

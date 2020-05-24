@@ -67,7 +67,7 @@ namespace TrioWpfFramework.Editor
         /// All required extensions must be added to this list before
         /// <see cref="EditorViewModel.Startup"/> is called.
         /// </remarks>
-        EditorPluginCollection Extensions { get; }
+        EditorPluginCollection Plugins { get; }
 
 
         /// <summary>

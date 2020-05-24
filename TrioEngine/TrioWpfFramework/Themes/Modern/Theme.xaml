@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:TrioWpfFramework.Controls"
+                    xmlns:eeframework="clr-namespace:TrioWpfFramework.Windows.Framework"
                     xmlns:docking="clr-namespace:TrioWpfFramework.Windows.Docking">
     
     <ResourceDictionary.MergedDictionaries>
@@ -39,6 +40,7 @@
         <ResourceDictionary Source="Estero/Docking.xaml" />
         <ResourceDictionary Source="Estero/Framework.xaml" />
         <ResourceDictionary Source="Estero/PropertyGrid.xaml" />
+        <ResourceDictionary Source="Estero/WindowChrome.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <!--
@@ -194,7 +196,7 @@
     <Style BasedOn="{StaticResource Modern.NumericUpDown}" TargetType="{x:Type controls:NumericUpDown}" />
     <!--<Style BasedOn="{StaticResource Modern.TimeSpanUpDown}" TargetType="{x:Type controls:TimeSpanUpDown}" />-->
     <Style BasedOn="{StaticResource Modern.WatermarkedTextBox}" TargetType="{x:Type controls:WatermarkedTextBox}" />
-    <!--<Style BasedOn="{StaticResource Modern.CommandTextBox}" TargetType="{x:Type controls:CommandTextBox}" />-->
+    <Style BasedOn="{StaticResource Modern.CommandTextBox}" TargetType="{x:Type controls:CommandTextBox}" />
     <Style BasedOn="{StaticResource Modern.ExplorerViewMenu}" TargetType="{x:Type controls:ExplorerViewMenu}" />
     <Style x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type controls:ExplorerView}, ResourceId=ExplorerViewStyle}"
            BasedOn="{StaticResource Modern.ExplorerView}"
@@ -226,7 +228,7 @@
     <Style BasedOn="{StaticResource Modern.PaneIndicators}" TargetType="{x:Type docking:PaneIndicators}" />
 
     <!--  Estero/Framework.xaml  -->
-    <Style x:Key="{x:Static dr:AutoCompleteBehavior.AutoCompleteListBoxStyleKey}"
+    <Style x:Key="{x:Static eeframework:AutoCompleteBehavior.AutoCompleteListBoxStyleKey}"
            BasedOn="{StaticResource Modern.AutoCompleteBehavior.ListBox}"
            TargetType="{x:Type ListBox}" />
 

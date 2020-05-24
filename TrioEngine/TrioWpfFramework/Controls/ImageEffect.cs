@@ -17,7 +17,7 @@ namespace TrioWpfFramework.Controls
     /// </summary>
     public class ImageEffect : ShaderEffect
     {
-        private static readonly PixelShader ImageEffectShader = new PixelShader { UriSource = MakePackUri("Resources/ImageEffect.ps") };
+        private static readonly PixelShader ImageEffectShader = new PixelShader { UriSource = MakePackUri("Controls/Resources/ImageEffect.ps") };
  
         /// <summary>
         /// Identifies the <see cref="Input"/> dependency property.
@@ -132,7 +132,7 @@ namespace TrioWpfFramework.Controls
             // Extract the short name.
             string assemblyShortName = assembly.ToString().Split(',')[0];
             string uriString = Invariant($"pack://application:,,,/{assemblyShortName};component/{relativeFile}");
-            return new Uri(uriString);
+            return new Uri(uriString, UriKind.RelativeOrAbsolute);
         }
     }
 }

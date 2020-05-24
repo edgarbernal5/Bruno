@@ -93,6 +93,11 @@
     <Compile Include="Controls\ColorPicker\ColorSpaceConverter.cs" />
     <Compile Include="Controls\CommandTextBox\CommandTextBox.cs" />
     <Compile Include="Controls\DropDownButton\DropDownButton.cs" />
+    <Compile Include="Controls\MultiFrameImage.cs" />
+    <Compile Include="Controls\WindowChrome\WindowCaptionButtons.cs" />
+    <Compile Include="Controls\WindowChrome\WindowCaptionIcon.cs" />
+    <Compile Include="Editor\Command Items\DelegateCommandItem.cs" />
+    <Compile Include="Editor\Command Items\RoutedCommandItem.cs" />
     <Compile Include="Editor\Error Handling\ExceptionControl.xaml.cs">
       <DependentUpon>ExceptionControl.xaml</DependentUpon>
     </Compile>
@@ -154,11 +159,16 @@
     </Compile>
     <Compile Include="Editor\ExceptionHelper.cs" />
     <Compile Include="Editor\FocusMessage.cs" />
+    <Compile Include="Editor\Plugins\Commands\CommandPlugin.cs" />
     <Compile Include="Editor\Plugins\Documents\Document.cs" />
     <Compile Include="Editor\EditorDockStrategy.cs" />
     <Compile Include="Editor\EditorException.cs" />
     <Compile Include="Editor\EditorPlugin.cs" />
     <Compile Include="Editor\EditorPluginCollection.cs" />
+    <Compile Include="Editor\Plugins\Themes\IThemeService.cs" />
+    <Compile Include="Editor\Plugins\Themes\ThemeCommandItem.cs" />
+    <Compile Include="Editor\Plugins\Themes\ThemePlugin.cs" />
+    <Compile Include="Editor\Plugins\Themes\ThemeMessage.cs" />
     <Compile Include="Editor\Plugins\WorldOutline\WorldOutline.cs" />
     <Compile Include="Editor\Plugins\WorldOutline\WorldOutlineItem.cs" />
     <Compile Include="Editor\Plugins\WorldOutline\WorldOutlineViewModel.cs" />
@@ -189,6 +199,7 @@
     <Compile Include="Editor\ExitCode.cs" />
     <Compile Include="Windows\Framework\Commands\IDelegateCommand.cs" />
     <Compile Include="Windows\BindablePropertyObserver.cs" />
+    <Compile Include="Windows\Framework\Interactivity\AutoCompleteBehavior.cs" />
     <Compile Include="Windows\Framework\Interactivity\DialogResultBehavior.cs" />
     <Compile Include="Windows\Framework\Interactivity\EventToCommand.cs" />
     <Compile Include="Windows\Framework\Interactivity\InvalidateOnCommandParameterChangedBehavior.cs" />
@@ -204,7 +215,11 @@
     <Compile Include="Windows\Interop\MSG.cs" />
     <Compile Include="Windows\ObservableObject.cs" />
     <Compile Include="Windows\PackedBitmapExtension.cs" />
+    <Compile Include="Windows\SafeLibraryHandle.cs" />
     <Compile Include="Windows\Themes\MultiColorGlyphs.cs" />
+    <Compile Include="Windows\Themes\Theme.cs" />
+    <Compile Include="Windows\Themes\ThemeChangedEventArgs.cs" />
+    <Compile Include="Windows\Themes\ThemeManager.cs" />
     <Compile Include="Windows\ValidatableObservableObject.cs" />
     <Compile Include="Mathematics\Numeric.cs" />
     <Compile Include="ServiceLocation\CreationPolicy.cs" />
@@ -331,6 +346,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\WatermarkedTextBox\Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\WindowChrome\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -538,6 +557,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\Modern\WindowChrome.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Windows\Docking\DockSplitPane\Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -553,8 +576,9 @@
     <Folder Include="Windows\Framework\DragAndDrop\" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Controls\Resources\ImageEffect.ps" />
     <None Include="packages.config" />
-    <None Include="Windows\Themes\Resources\Estero-Icons.ttf" />
+    <Resource Include="Windows\Themes\Resources\Estero-Icons.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Windows\Themes\Resources\Estero Icons.svg" />

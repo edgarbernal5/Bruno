@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static System.FormattableString;
@@ -15,7 +12,7 @@ using System.Collections.ObjectModel;
 namespace TrioWpfFramework.Editor
 {
     /// <summary>
-    /// Manages the editor (including main window, services, extensions, etc.).
+    /// Manages the editor (including main window, services, plugins, etc.).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -57,7 +54,6 @@ namespace TrioWpfFramework.Editor
             }
         }
 
-        /// <inheritdoc/>
         public string ApplicationName
         {
             get { return _applicationName; }
@@ -69,8 +65,6 @@ namespace TrioWpfFramework.Editor
         }
         private string _applicationName;
 
-
-        /// <inheritdoc/>
         public object ApplicationIcon
         {
             get { return _applicationIcon; }
@@ -78,8 +72,6 @@ namespace TrioWpfFramework.Editor
         }
         private object _applicationIcon;
 
-
-        /// <inheritdoc/>
         public string Subtitle
         {
             get { return _subtitle; }
@@ -118,7 +110,7 @@ namespace TrioWpfFramework.Editor
 
 
         /// <inheritdoc/>
-        public EditorPluginCollection Extensions { get; }
+        public EditorPluginCollection Plugins { get; }
 
 
         /// <summary>
@@ -130,7 +122,7 @@ namespace TrioWpfFramework.Editor
             get
             {
                 // Note: OrderByDescending is a stable sort.
-                return Extensions.OrderByDescending(e => e.Priority);
+                return Plugins.OrderByDescending(e => e.Priority);
             }
         }
 
@@ -180,7 +172,6 @@ namespace TrioWpfFramework.Editor
         public ICommand WindowActivationCommand { get; }
 
 
-        /// <inheritdoc/>
         public event EventHandler<EventArgs> WindowActivated;
 
 
@@ -206,7 +197,7 @@ namespace TrioWpfFramework.Editor
             _applicationName = EditorHelper.GetDefaultApplicationName();
             _subtitle = null;
 
-            Extensions = new EditorPluginCollection();
+            Plugins = new EditorPluginCollection();
 
             InitializeCommandItems();
 
@@ -243,7 +234,7 @@ namespace TrioWpfFramework.Editor
             Services.RegisterView(typeof(EditorViewModel), typeof(EditorWindow));
 
             // Initialize editor extensions.
-            Extensions.IsLocked = true;
+            Plugins.IsLocked = true;
             foreach (var extension in OrderedExtensions)
                 extension.Initialize(this);
 
@@ -278,7 +269,9 @@ namespace TrioWpfFramework.Editor
             {
                 extension.Startup();
                 if (IsShuttingDown)
+                {
                     return false;
+                }
             }
 
             InvalidateUI();
@@ -313,7 +306,7 @@ namespace TrioWpfFramework.Editor
             foreach (var extension in OrderedExtensions.Reverse())
                 extension.Uninitialize();
 
-            Extensions.IsLocked = false;
+            Plugins.IsLocked = false;
 
             //Settings.Default.Save();
 

@@ -5,8 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TrioWpfFramework.Editor;
+using TrioWpfFramework.Editor.Commands;
+using TrioWpfFramework.Editor.Themes;
 using TrioWpfFramework.ServiceLocation;
 using TrioWpfFramework.Windows;
 using TrioWpfFramework.Windows.Framework;
@@ -47,16 +50,16 @@ namespace TrioWpfEditor
             _editor = new EditorViewModel(_serviceContainer)
             {
                 ApplicationName = ApplicationName,
-                //ApplicationIcon = BitmapFrame.Create(new Uri("pack://application:,,,/DigitalRune.Editor;component/Resources/Raido.ico", UriKind.RelativeOrAbsolute))
+                ApplicationIcon = BitmapFrame.Create(new Uri("pack://application:,,,/TrioWpfEditor;component/Resources/Estero.ico", UriKind.RelativeOrAbsolute))
             };
             // Core extensions
-            //_editor.Extensions.Add(new CommandExtension());
+            _editor.Plugins.Add(new CommandPlugin());
             //_editor.Extensions.Add(new LayoutExtension());
             //_editor.Extensions.Add(new AboutExtension());
             //_editor.Extensions.Add(new OptionsExtension());
             //_editor.Extensions.Add(new PrintExtension());
             //_editor.Extensions.Add(new QuickLaunchExtension());
-            //_editor.Extensions.Add(new ThemeExtension());
+            _editor.Plugins.Add(new ThemePlugin());
             //_editor.Extensions.Add(new StatusExtension());
             //_editor.Extensions.Add(new SearchExtension());
 
@@ -174,62 +177,6 @@ namespace TrioWpfEditor
 
             // Set application's exit code.
             eventArgs.ApplicationExitCode = _editor.ExitCode;
-        }
-
-
-        /// <summary>
-        /// Called in the first application instance when another instance was started.
-        /// </summary>
-        /// <param name="args">The command line arguments.</param>
-        /// <returns>Not used.</returns>
-        private bool OnOtherInstanceStarted(string[] args)
-        {
-            //Logger.Info("Receiving command-line arguments from another application instance.");
-
-            if (_editor == null)
-            {
-                //Logger.Warn("Application is not ready to accept external command-line arguments. Request ignored. Command-line arguments: {0}", args);
-                return false;
-            }
-
-            // A second instance has been started.
-            // --> Handle command line arguments of second instance.
-            if (_editor.IsOpen)
-            {
-                HandleExternalCommandLineArgsAsync(args).Forget();
-            }
-            else
-            {
-                // Handle request when editor is loaded.
-                EventHandler<ActivationEventArgs> handler = null;
-                handler = (s, e) =>
-                {
-                    Debug.Assert(e.Opened, "This event handler should only be called when the editor is opened.");
-                    _editor.Activated -= handler;
-                    HandleExternalCommandLineArgsAsync(args).Forget();
-                };
-                _editor.Activated += handler;
-            }
-
-            return true;
-        }
-
-
-        private async Task HandleExternalCommandLineArgsAsync(string[] args)
-        {
-            //// Bring application to foreground:
-            //WpfWindowsExtensions.ActivateWindow(Application.MainWindow);
-
-            //// Ignore first argument (name of executable).
-            //args = args.Skip(1).ToArray();
-
-            //// Parse new command-line arguments.
-            //// The same arguments have already been parsed by the second instance. That means, 
-            //// we know that they are valid and do not contain "--help" or similar.
-            //var parseResult = _editor.CommandLineParser.Parse(args);
-
-            //// Let the document service open files specified on the command line.
-            //await _documentExtension.OpenFromCommandLineAsync(parseResult);
         }
 
 

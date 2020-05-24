@@ -29,7 +29,7 @@ namespace TrioWpfFramework.Editor
         /// <inheritdoc/>
         protected override IDockTabItem OnCreateDockTabItem(string dockId)
         {
-            return ((EditorViewModel)DockControl).Extensions
+            return ((EditorViewModel)DockControl).Plugins
                                                  .Select(ext => ext.GetViewModel(dockId))
                                                  .FirstOrDefault(ds => ds != null);
         }

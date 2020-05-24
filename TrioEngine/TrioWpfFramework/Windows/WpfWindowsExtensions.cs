@@ -899,6 +899,24 @@ namespace TrioWpfFramework.Windows
             }
         }
 
+        /// <summary>
+        /// Gets the <see cref="DependencyObject"/> and its visual ancestors.
+        /// </summary>
+        /// <param name="dependencyObject">
+        /// The <see cref="DependencyObject"/> to get the visual ancestors for.
+        /// </param>
+        /// <returns>The <see cref="DependencyObject"/> and its visual ancestors.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="dependencyObject"/> is <see langword="null"/>.
+        /// </exception>
+        public static IEnumerable<DependencyObject> GetSelfAndVisualAncestors(this DependencyObject dependencyObject)
+        {
+            if (dependencyObject == null)
+                throw new ArgumentNullException(nameof(dependencyObject));
+
+            return TreeHelper.GetSelfAndAncestors(dependencyObject, VisualTreeHelper.GetParent);
+        }
+
 
         private static void ShowWindowIcon(Window window)
         {

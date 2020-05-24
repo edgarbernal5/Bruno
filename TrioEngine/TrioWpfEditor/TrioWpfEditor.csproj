@@ -126,8 +126,10 @@
   <ItemGroup>
     <Folder Include="Editor\Views\World\" />
     <Folder Include="Helpers\" />
-    <Folder Include="Resources\" />
     <Folder Include="Windows\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Estero.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

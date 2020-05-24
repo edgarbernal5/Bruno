@@ -12,17 +12,19 @@
         MinHeight="200"
         CommandManager.PreviewCanExecute="OnPreviewCanExecute"
         CommandManager.PreviewExecuted="OnPreviewExecuted"
+        Icon="{Binding ApplicationIcon}"
+        Style="{DynamicResource Modern.WindowChrome}"
         UseLayoutRounding="True"
         d:DataContext="{x:Static editor:EditorViewModel.DesignInstance}"
         mc:Ignorable="d">
 
-    <!--<Window.Resources>
+    <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/TrioWpfFramework;component/Themes/Modern/WindowChrome.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </Window.Resources>-->
+    </Window.Resources>
 
     <Window.InputBindings>
         <!--
@@ -32,11 +34,11 @@
         <KeyBinding Command="Stop" Gesture="Esc" />
     </Window.InputBindings>
 
-    <i:Interaction.Triggers>
+    <!--<i:Interaction.Triggers>
         <i:EventTrigger EventName="Activated">
             <dr:EventToCommand Command="{Binding WindowActivationCommand}" />
         </i:EventTrigger>
-    </i:Interaction.Triggers>
+    </i:Interaction.Triggers>-->
 
     <DockPanel LastChildFill="True">
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace TrioWpfFramework.Windows.Interop
 {
@@ -261,6 +262,60 @@ namespace TrioWpfFramework.Windows.Interop
         /// </returns>
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+        /// <summary>
+        /// Loads a string resource from the executable file associated with a specified module,
+        /// copies the string into a buffer, and appends a terminating null character.
+        /// </summary>
+        /// <param name="hInstance">
+        /// A handle to an instance of the module whose executable file contains the string
+        /// resource. To get the handle to the application itself, call the GetModuleHandle function
+        /// with NULL.
+        /// </param>
+        /// <param name="uID">The identifier of the string to be loaded.</param>
+        /// <param name="lpBuffer">
+        /// The buffer is to receive the string. Must be of sufficient length to hold a pointer (8
+        /// bytes).
+        /// </param>
+        /// <param name="nBufferMax">
+        /// The size of the buffer, in characters. The string is truncated and null-terminated if it
+        /// is longer than the number of characters specified. If this parameter is 0, then lpBuffer
+        /// receives a read-only pointer to the resource itself.
+        /// </param>
+        /// <returns>
+        /// If the function succeeds, the return value is the number of characters copied into the
+        /// buffer, not including the terminating null character, or zero if the string resource
+        /// does not exist. To get extended error information, call GetLastError.
+        /// </returns>
+        [DllImport("user32", CharSet = CharSet.Unicode, ExactSpelling = true, EntryPoint = "LoadStringW", SetLastError = true)]
+        public static extern int LoadString(SafeLibraryHandle hInstance, uint uID, StringBuilder lpBuffer, int nBufferMax);
+
+
+        /// <summary>
+        /// Loads the specified module into the address space of the calling process. The specified
+        /// module may cause other modules to be loaded.
+        /// </summary>
+        /// <param name="lpFileName">The name of the module.</param>
+        /// <returns>
+        /// The handle to the module, or <see langword="null"/> if the function fails. To get
+        /// extended error information, call GetLastError.
+        /// </returns>
+        [DllImport("kernel32", CharSet = CharSet.Unicode, ExactSpelling = true, EntryPoint = "LoadLibraryW", SetLastError = true)]
+        public static extern SafeLibraryHandle LoadLibrary([MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
+
+        /// <summary>
+        /// Frees the loaded dynamic-link library (DLL) module and, if necessary, decrements its
+        /// reference count. When the reference count reaches zero, the module is unloaded from the
+        /// address space of the calling process and the handle is no longer valid.
+        /// </summary>
+        /// <param name="hModule">A handle to the loaded library module.</param>
+        /// <returns>
+        /// <see langword="true"/> if succeeds; otherwise, <see langword="false"/>. To get extended
+        /// error information, call the GetLastError function.
+        /// </returns>
+        [DllImport("kernel32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool FreeLibrary(IntPtr hModule);
 
         /// <summary>
         /// Returns a DWORD value by concatenation the specified values.

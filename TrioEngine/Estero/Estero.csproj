@@ -58,6 +58,10 @@
     <Compile Include="Linq\TreeHelper.cs" />
     <Compile Include="ObjectHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WeakEvents\InternalWeakDelegate.cs" />
+    <Compile Include="WeakEvents\WeakEvent.cs" />
+    <Compile Include="WeakEvents\WeakMulticastDelegate.cs" />
+    <Compile Include="WeakEvents\WeakMulticastDelegate{T}.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
