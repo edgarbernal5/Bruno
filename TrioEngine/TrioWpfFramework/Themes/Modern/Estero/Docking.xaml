@@ -419,22 +419,22 @@
                                 <ToggleButton x:Name="PART_WindowListButton"
                                               Style="{StaticResource Modern.DockTabPane.ToggleButton}"
                                               ToolTip="Show Window List">
-                                    <TextBlock FontFamily="pack://application:,,,/DigitalRune.Windows.Themes;component/Resources/#Estero Icons" FontSize="16">&#xE009;</TextBlock>
+                                    <TextBlock FontFamily="pack://application:,,,/TrioWpfFramework;component/Windows/Themes/Resources/#DigitalRune Icons" FontSize="16">&#xE009;</TextBlock>
                                 </ToggleButton>
                                 <Button x:Name="PART_AutoHideButton"
                                         Style="{StaticResource Modern.DockTabPane.Button}"
                                         ToolTip="Auto-Hide">
-                                    <TextBlock FontFamily="pack://application:,,,/DigitalRune.Windows.Themes;component/Resources/#Estero Icons" FontSize="16">&#xE00A;</TextBlock>
+                                    <TextBlock FontFamily="pack://application:,,,/TrioWpfFramework;component/Windows/Themes/Resources/#DigitalRune Icons" FontSize="16">&#xE00A;</TextBlock>
                                 </Button>
                                 <Button x:Name="PART_DockButton"
                                         Style="{StaticResource Modern.DockTabPane.Button}"
                                         ToolTip="Dock Window">
-                                    <TextBlock FontFamily="pack://application:,,,/DigitalRune.Windows.Themes;component/Resources/#Estero Icons" FontSize="16">&#xE00B;</TextBlock>
+                                    <TextBlock FontFamily="pack://application:,,,/TrioWpfFramework;component/Windows/Themes/Resources/#DigitalRune Icons" FontSize="16">&#xE00B;</TextBlock>
                                 </Button>
                                 <Button x:Name="PART_CloseButton"
                                         Style="{StaticResource Modern.DockTabPane.Button}"
                                         ToolTip="Close Window">
-                                    <TextBlock FontFamily="pack://application:,,,/DigitalRune.Windows.Themes;component/Resources/#Estero Icons" FontSize="16">&#xE00C;</TextBlock>
+                                    <TextBlock FontFamily="pack://application:,,,/TrioWpfFramework;component/Windows/Themes/Resources/#DigitalRune Icons" FontSize="16">&#xE00C;</TextBlock>
                                 </Button>
                             </StackPanel>
                         </Grid>

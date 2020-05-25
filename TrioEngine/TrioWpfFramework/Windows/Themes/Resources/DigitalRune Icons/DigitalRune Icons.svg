@@ -15,17 +15,17 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    viewBox="0 0 1000 1000"
-   sodipodi:docname="Estero Icons.svg"
+   sodipodi:docname="DigitalRune Icons.svg"
    inkscape:export-filename="X:\DigitalRune\Engine\Content\Fonts\DigitalRune Icons\RaidoColor32.png"
    inkscape:export-xdpi="2.8099999"
    inkscape:export-ydpi="2.8099999">
   <title
-     id="title4683">Estero Icons</title>
+     id="title4683">DigitalRune Icons</title>
   <defs
      id="defs5498">
     <font
        horiz-adv-x="1024"
-       id="Estero-Icons"
+       id="DigitalRune-Icons"
        inkscape:label="font 1"
        horiz-origin-x="0"
        horiz-origin-y="0"
@@ -35,7 +35,7 @@
       <font-face
          units-per-em="1024"
          id="font-face4689"
-         font-family="Estero Icons" />
+         font-family="DigitalRune Icons" />
       <missing-glyph
          d="M0,0h1000v1024h-1000z"
          id="missing-glyph4691" />
@@ -1407,7 +1407,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>Estero Icons</dc:title>
+        <dc:title>DigitalRune Icons</dc:title>
         <dc:creator>
           <cc:Agent>
             <dc:title>Martin Garstenauer</dc:title>

@@ -322,7 +322,7 @@
                                                      ToolTip="Categorized">
                                             <Image Width="16"
                                                    Height="16"
-                                                   Source="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 224 0 32 32}" />
+                                                   Source="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 224 0 32 32}" />
                                         </RadioButton>
                                         <RadioButton VerticalAlignment="Center"
                                                      IsChecked="{Binding IsCategorized, Converter={x:Static windows:InvertBooleanConverter.Instance}, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
@@ -330,7 +330,7 @@
                                                      ToolTip="Alphabetical">
                                             <Image Width="16"
                                                    Height="16"
-                                                   Source="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 256 0 32 32}" />
+                                                   Source="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 256 0 32 32}" />
                                         </RadioButton>
                                     </StackPanel>
                                 </Grid>
@@ -346,7 +346,7 @@
                                         <Image Width="16"
                                                Height="16"
                                                Margin="1,0"
-                                               Source="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 288 0 32 32}" />
+                                               Source="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 288 0 32 32}" />
                                     </local:CommandTextBox.ButtonContent>
                                 </local:CommandTextBox>
                             </Grid>

@@ -367,7 +367,7 @@
                                             ToolTip="Click button to pick a color from anywhere on the screen.">
                                         <controls:Icon Width="16"
                                                     Height="16"
-                                                    Source="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 320 0 32 32}" />
+                                                    Source="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 320 0 32 32}" />
                                     </Button>
                                 </Grid>
                                 <Grid Margin="13,0,0,0" ToolTip="Select the RGB color space (linear or sRGB). This setting affects which numeric values are displayed for red, green and blue.">

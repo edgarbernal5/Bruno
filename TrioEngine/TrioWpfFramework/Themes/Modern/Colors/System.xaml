@@ -307,7 +307,7 @@
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <!--  DigitalRune.Windows.Controls  -->
+    <!--  Estero.Windows.Controls  -->
     <SolidColorBrush x:Key="PropertyGroup.Background"
                      options:Freeze="True"
                      Color="{StaticResource Gray100}" />

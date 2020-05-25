@@ -203,6 +203,8 @@
     <Compile Include="Windows\Framework\Interactivity\DialogResultBehavior.cs" />
     <Compile Include="Windows\Framework\Interactivity\EventToCommand.cs" />
     <Compile Include="Windows\Framework\Interactivity\InvalidateOnCommandParameterChangedBehavior.cs" />
+    <Compile Include="Windows\Framework\Interactivity\StylizedBehaviors.cs" />
+    <Compile Include="Windows\Framework\Interactivity\TreeViewItemSelectionBehavior.cs" />
     <Compile Include="Windows\Framework\IViewLocator.cs" />
     <Compile Include="Windows\Framework\MessageBus\IMessageBus.cs" />
     <Compile Include="Windows\Framework\MessageBus\MessageBus.cs" />
@@ -576,12 +578,12 @@
     <Folder Include="Windows\Framework\DragAndDrop\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Windows\Themes\Resources\DigitalRune-Icons.ttf" />
     <Resource Include="Controls\Resources\ImageEffect.ps" />
     <None Include="packages.config" />
-    <Resource Include="Windows\Themes\Resources\Estero-Icons.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Windows\Themes\Resources\Estero Icons.svg" />
+    <Content Include="Controls\Resources\Icons.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Strings.resx">

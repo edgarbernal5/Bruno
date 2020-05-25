@@ -303,7 +303,7 @@
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <!--  DigitalRune.Windows.Controls  -->
+    <!--  Estero.Windows.Controls  -->
     <SolidColorBrush x:Key="PropertyGroup.Background"
                      options:Freeze="True"
                      Color="{StaticResource Gray015}" />
@@ -333,7 +333,7 @@
         </DrawingBrush.Drawing>
     </DrawingBrush>
 
-    <!--  DigitalRune.Windows.Docking  -->
+    <!--  Estero.Windows.Docking  -->
     <SolidColorBrush x:Key="DockIndicator.Background"
                      options:Freeze="True"
                      Color="{StaticResource Accent0}" />

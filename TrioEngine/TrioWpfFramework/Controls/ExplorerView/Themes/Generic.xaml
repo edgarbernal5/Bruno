@@ -4,13 +4,13 @@
                     xmlns:local="clr-namespace:TrioWpfFramework.Controls">
 
     <Style x:Key="{x:Type local:ExplorerViewMenu}" TargetType="{x:Type local:ExplorerViewMenu}">
-        <Setter Property="ImageSourceExtraLargeIcons" Value="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 0 0 32 32}" />
-        <Setter Property="ImageSourceLargeIcons" Value="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 32 0 32 32}" />
-        <Setter Property="ImageSourceMediumIcons" Value="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 64 0 32 32}" />
-        <Setter Property="ImageSourceSmallIcons" Value="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 96 0 32 32}" />
-        <Setter Property="ImageSourceList" Value="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 128 0 32 32}" />
-        <Setter Property="ImageSourceDetails" Value="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 160 0 32 32}" />
-        <Setter Property="ImageSourceTiles" Value="{windows:PackedBitmap /DigitalRune.Windows.Controls;component/Resources/Icons.png, 192 0 32 32}" />
+        <Setter Property="ImageSourceExtraLargeIcons" Value="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 0 0 32 32}" />
+        <Setter Property="ImageSourceLargeIcons" Value="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 32 0 32 32}" />
+        <Setter Property="ImageSourceMediumIcons" Value="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 64 0 32 32}" />
+        <Setter Property="ImageSourceSmallIcons" Value="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 96 0 32 32}" />
+        <Setter Property="ImageSourceList" Value="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 128 0 32 32}" />
+        <Setter Property="ImageSourceDetails" Value="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 160 0 32 32}" />
+        <Setter Property="ImageSourceTiles" Value="{windows:PackedBitmap /TrioWpfFramework;component/Controls/Resources/Icons.png, 192 0 32 32}" />
         <Setter Property="StringExtraLargeIcons" Value="Extra Large Icons" />
         <Setter Property="StringLargeIcons" Value="Large Icons" />
         <Setter Property="StringMediumIcons" Value="Medium Icons" />

@@ -9,7 +9,7 @@ namespace TrioWpfFramework.Windows.Themes
     /// </summary>
     public static class MultiColorGlyphs
     {
-        private static readonly FontFamily FontFamily = new FontFamily(new Uri("pack://application:,,,/"), "/TrioWpfFramework;component/Windows/Themes/Resources/#Estero Icons");
+        private static readonly FontFamily FontFamily = new FontFamily(new Uri("pack://application:,,,/"), "/TrioWpfFramework;component/Windows/Themes/Resources/#DigitalRune Icons");
 
         // Icon theme colors. (Defined in theme resource dictionaries.)
         private const string DarkGray = "Icon.DarkGray";

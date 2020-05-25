@@ -146,12 +146,12 @@
     <ControlTemplate x:Key="Modern.PropertyGrid.Expander.ToggleButton" TargetType="{x:Type ToggleButton}">
         <Grid Background="Transparent">
             <TextBlock x:Name="ExpandArrow"
-                       FontFamily="pack://application:,,,/DigitalRune.Windows.Themes;component/Resources/#DigitalRune Icons"
+                       FontFamily="pack://application:,,,/TrioWpfFramework;component/Windows/Themes/Resources/#DigitalRune Icons"
                        FontSize="16">
                 &#xE007;
             </TextBlock>
             <TextBlock x:Name="CollapseArrow"
-                       FontFamily="pack://application:,,,/DigitalRune.Windows.Themes;component/Resources/#DigitalRune Icons"
+                       FontFamily="pack://application:,,,/TrioWpfFramework;component/Windows/Themes/Resources/#DigitalRune Icons"
                        FontSize="16"
                        Visibility="Collapsed">
                 &#xE008;

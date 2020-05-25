@@ -135,7 +135,7 @@ namespace TrioWpfFramework.Editor
                     CultureInfo.InvariantCulture,
                     "mailto:{0}?Subject=Error Report: Exception in {1}&body={2}",
                     Email,
-                    (!string.IsNullOrEmpty(ApplicationName) ? ApplicationName : "DigitalRune Application"),
+                    (!string.IsNullOrEmpty(ApplicationName) ? ApplicationName : "Estero Application"),
                     "<The error message is in the clipboard. Please paste it (Ctrl + V) into the content of this e-mail.>");
 
                 // Start process with "mailto:...." as the command.

@@ -109,44 +109,44 @@ namespace TrioWpfFramework.Editor.Commands
                 new DelegateCommandItem("Exit", new DelegateCommand(() => Editor.Exit()))
                 {
                     Category = CommandCategories.File,
-                    Icon = MultiColorGlyphs.Exit,
+                    //Icon = MultiColorGlyphs.Exit,
                     Text = "E_xit",
                     ToolTip = "Close this application."
                 },
                 new RoutedCommandItem(ApplicationCommands.Undo)
                 {
                     Category = CommandCategories.Edit,
-                    Icon = MultiColorGlyphs.Undo,
+                    //Icon = MultiColorGlyphs.Undo,
                     ToolTip = "Undo the last operation.",
                 },
                 new RoutedCommandItem(ApplicationCommands.Redo)
                 {
                     Category = CommandCategories.Edit,
-                    Icon = MultiColorGlyphs.Redo,
+                    //Icon = MultiColorGlyphs.Redo,
                     ToolTip = "Perform the last undone operation.",
                 },
                 new RoutedCommandItem(ApplicationCommands.Cut)
                 {
                     Category = CommandCategories.Edit,
-                    Icon = MultiColorGlyphs.Cut,
+                    //Icon = MultiColorGlyphs.Cut,
                     ToolTip = "Remove selected item and copy it to the clipboard.",
                 },
                 new RoutedCommandItem(ApplicationCommands.Copy)
                 {
                     Category = CommandCategories.Edit,
-                    Icon = MultiColorGlyphs.Copy,
+                    //Icon = MultiColorGlyphs.Copy,
                     ToolTip = "Copy selected item to the clipboard.",
                 },
                 new RoutedCommandItem(ApplicationCommands.Paste)
                 {
                     Category = CommandCategories.Edit,
-                    Icon = MultiColorGlyphs.Paste,
+                    //Icon = MultiColorGlyphs.Paste,
                     ToolTip = "Paste the content of the clipboard into the active document.",
                 },
                 new RoutedCommandItem(ApplicationCommands.Delete)
                 {
                     Category = CommandCategories.Edit,
-                    Icon = MultiColorGlyphs.Delete,
+                    //Icon = MultiColorGlyphs.Delete,
                     ToolTip = "Delete the selected item.",
                 },
                 new RoutedCommandItem(ApplicationCommands.SelectAll)
@@ -246,30 +246,30 @@ namespace TrioWpfFramework.Editor.Commands
 
         private void AddToolBars()
         {
-            _toolBarNodes = new MergeableNodeCollection<ICommandItem>
-            {
-                new MergeableNode<ICommandItem>(new CommandGroup("StandardGroup", "Standard"),
-                    new MergeableNode<ICommandItem>(new CommandSeparator("FileSeparator")),
-                    new MergeableNode<ICommandItem>(new CommandSeparator("PrintSeparator")),
-                    new MergeableNode<ICommandItem>(CommandItems["Cut"]),
-                    new MergeableNode<ICommandItem>(CommandItems["Copy"]),
-                    new MergeableNode<ICommandItem>(CommandItems["Paste"]),
-                    new MergeableNode<ICommandItem>(CommandItems["Delete"]),
-                    new MergeableNode<ICommandItem>(new CommandSeparator("ClipboardSeparator")),
-                    new MergeableNode<ICommandItem>(CommandItems["Undo"]),
-                    new MergeableNode<ICommandItem>(CommandItems["Redo"]),
-                    new MergeableNode<ICommandItem>(new CommandSeparator("UndoSeparator"))),
-                new MergeableNode<ICommandItem>(new CommandGroup("ViewGroup", "View")),
-            };
-
-            Editor.ToolBarNodeCollections.Add(_toolBarNodes);
+            //_toolBarNodes = new MergeableNodeCollection<ICommandItem>
+            //{
+            //    new MergeableNode<ICommandItem>(new CommandGroup("StandardGroup", "Standard"),
+            //        new MergeableNode<ICommandItem>(new CommandSeparator("FileSeparator")),
+            //        new MergeableNode<ICommandItem>(new CommandSeparator("PrintSeparator")),
+            //        new MergeableNode<ICommandItem>(CommandItems["Cut"]),
+            //        new MergeableNode<ICommandItem>(CommandItems["Copy"]),
+            //        new MergeableNode<ICommandItem>(CommandItems["Paste"]),
+            //        new MergeableNode<ICommandItem>(CommandItems["Delete"]),
+            //        new MergeableNode<ICommandItem>(new CommandSeparator("ClipboardSeparator")),
+            //        new MergeableNode<ICommandItem>(CommandItems["Undo"]),
+            //        new MergeableNode<ICommandItem>(CommandItems["Redo"]),
+            //        new MergeableNode<ICommandItem>(new CommandSeparator("UndoSeparator"))),
+            //    new MergeableNode<ICommandItem>(new CommandGroup("ViewGroup", "View")),
+            //};
+            //
+            //Editor.ToolBarNodeCollections.Add(_toolBarNodes);
         }
 
 
         private void RemoveToolBars()
         {
-            Editor.ToolBarNodeCollections.Remove(_toolBarNodes);
-            _toolBarNodes = null;
+            //Editor.ToolBarNodeCollections.Remove(_toolBarNodes);
+            //_toolBarNodes = null;
         }
 
 
