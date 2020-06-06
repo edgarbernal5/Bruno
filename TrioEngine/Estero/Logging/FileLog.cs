@@ -13,11 +13,11 @@ namespace Estero.Logging
             m_targetFilename = Path.Combine(exePath, filename);
         }
 
-        public void Error(Exception exception)
+        public void Debug(string format, params object[] args)
         {
             using (StreamWriter writer = File.AppendText(m_targetFilename))
             {
-                LogMessage(CreateLogMessage(exception.ToString(), "ERROR"), writer);
+                LogMessage(CreateLogMessage(format, "DEBUG", args), writer);
             }
         }
 
@@ -26,6 +26,14 @@ namespace Estero.Logging
             using (StreamWriter writer = File.AppendText(m_targetFilename))
             {
                 LogMessage(CreateLogMessage(format, "INFO", args), writer);
+            }
+        }
+
+        public void Error(Exception exception)
+        {
+            using (StreamWriter writer = File.AppendText(m_targetFilename))
+            {
+                LogMessage(CreateLogMessage(exception.ToString(), "ERROR"), writer);
             }
         }
 

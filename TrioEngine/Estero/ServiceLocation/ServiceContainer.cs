@@ -9,51 +9,83 @@ namespace Estero.ServiceLocation
     /// <summary>
     /// A simple IoC container.
     /// </summary>
-    public class ServiceContainer
+    public class ServiceContainer : IDisposable
     {
         private static readonly Type delegateType = typeof(Delegate);
         private static readonly Type enumerableType = typeof(IEnumerable);
-        private readonly List<ContainerEntry> entries;
+        private readonly Dictionary<ContainerRegistration, ContainerEntry> _registrations;
 
-        /// <summary>
-        /// Whether to enable recursive property injection for all resolutions.
-        /// </summary>
+        public bool IsDisposed { get; private set; }
+
         public bool EnablePropertyInjection { get; set; }
 
         public ServiceContainer()
         {
-            entries = new List<ContainerEntry>();
+            _registrations = new Dictionary<ContainerRegistration, ContainerEntry>();
 
             RegisterInstance(typeof(ServiceContainer), null, this);
         }
 
+        public void Clear()
+        {
+            lock (_registrations)
+            {
+                foreach (var entry in _registrations.Values)
+                    DisposeInstances(entry);
+
+                _registrations.Clear();
+            }
+        }
+
         public void RegisterInstance(Type service, string key, object implementation)
         {
-            RegisterHandler(service, key, container => implementation);
+            RegisterHandler(service, key, container => implementation, DisposalPolicy.Manual);
         }
 
         public void RegisterPerRequest(Type service, string key, Type implementation)
         {
-            RegisterHandler(service, key, container => container.BuildInstance(implementation));
+            RegisterHandler(service, key, container => container.BuildInstance(implementation), DisposalPolicy.Automatic);
         }
 
         public void RegisterSingleton(Type service, string key, Type implementation)
         {
             object singleton = null;
-            RegisterHandler(service, key, container => singleton ?? (singleton = container.BuildInstance(implementation)));
+            RegisterHandler(service, key, container => singleton ?? (singleton = container.BuildInstance(implementation)), DisposalPolicy.Automatic);
         }
 
-        public void RegisterHandler(Type service, string key, Func<ServiceContainer, object> handler)
+        public void RegisterHandler(Type service, string key, Func<ServiceContainer, object> createInstance, DisposalPolicy disposalPolicy = DisposalPolicy.Manual)
         {
-            GetOrCreateEntry(service, key).Add(handler);
+            var registration = new ContainerRegistration(service, key);
+            var entry = new ContainerEntry(createInstance, disposalPolicy);
+            lock (_registrations)
+            {
+                _registrations[registration] = entry;
+            }
         }
 
         public void UnregisterHandler(Type service, string key)
         {
-            var entry = GetEntry(service, key);
-            if (entry != null)
+            var registration = new ContainerRegistration(service, key);
+            lock (_registrations)
             {
-                entries.Remove(entry);
+                if (_registrations.TryGetValue(registration, out ContainerEntry entry))
+                {
+                    DisposeInstances(entry);
+                    _registrations.Remove(registration);
+                }
+            }
+        }
+
+        public void UnregisterHandler(Type service)
+        {
+            lock (_registrations)
+            {
+                var entries = _registrations.Where(registry => registry.Key.Type == service).ToArray();
+                foreach (var entry in entries)
+                {
+                    DisposeInstances(entry.Value);
+                    _registrations.Remove(entry.Key);
+                }
             }
         }
 
@@ -67,13 +99,14 @@ namespace Estero.ServiceLocation
             var entry = GetEntry(service, key);
             if (entry != null)
             {
-                var instance = entry.Single()(this);
+                var instance = entry.CreateInstance(this);
 
                 if (EnablePropertyInjection && instance != null)
                 {
                     BuildUp(instance);
                 }
 
+                entry.InstanceCached = instance;
                 return instance;
             }
 
@@ -118,22 +151,29 @@ namespace Estero.ServiceLocation
             return GetEntry(service, key) != null;
         }
 
+        private IEnumerable<ContainerRegistration> GetRegistrations(Type service)
+        {
+            IEnumerable<ContainerRegistration> registrations;
+
+            lock (_registrations)
+            {
+                registrations = _registrations.Keys.Where(r => r.Type == service).ToArray();
+            }
+            return registrations;
+        }
+
         public IEnumerable<object> GetAllInstances(Type service, string key = null)
         {
-            var entries = GetEntry(service, key);
+            var registrations = GetRegistrations(service).Distinct();
 
-            if (entries == null)
+            var instances = new List<object>();
+            foreach (var registration in registrations)
             {
-                return new object[0];
-            }
-
-            var instances = entries.Select(e => e(this));
-
-            foreach (var instance in instances)
-            {
-                if (EnablePropertyInjection && instance != null)
+                if (registration.Key != null)  // Only named instances.
                 {
-                    BuildUp(instance);
+                    var instance = GetInstance(service, registration.Key);
+                    if (instance != null)
+                        instances.Add(instance);
                 }
             }
 
@@ -158,32 +198,15 @@ namespace Estero.ServiceLocation
             }
         }
 
-        private ContainerEntry GetOrCreateEntry(Type service, string key)
-        {
-            var entry = GetEntry(service, key);
-            if (entry == null)
-            {
-                entry = new ContainerEntry { Service = service, Key = key };
-                entries.Add(entry);
-            }
-
-            return entry;
-        }
-
         private ContainerEntry GetEntry(Type service, string key)
         {
-            if (service == null)
+            ContainerEntry entry;
+            var registration = new ContainerRegistration(service, key);
+            if (_registrations.TryGetValue(registration, out entry))
             {
-                return entries.FirstOrDefault(x => x.Key == key);
+                return entry;
             }
-
-            if (key == null)
-            {
-                return entries.FirstOrDefault(x => x.Service == service && x.Key == null)
-                       ?? entries.FirstOrDefault(x => x.Service == service);
-            }
-
-            return entries.FirstOrDefault(x => x.Service == service && x.Key == key);
+            return null;
         }
 
         protected object BuildInstance(Type type)
@@ -231,17 +254,41 @@ namespace Estero.ServiceLocation
                 .FirstOrDefault();
         }
 
-        private class ContainerEntry : List<Func<ServiceContainer, object>>
+        public void Dispose()
         {
-            public string Key;
-            public Type Service;
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        private class FactoryFactory<T>
+        protected virtual void Dispose(bool disposing)
         {
-            public Func<T> Create(ServiceContainer container)
+            if (!IsDisposed)
             {
-                return () => (T)container.GetInstance(typeof(T), null);
+                if (disposing)
+                {
+                    lock (_registrations)
+                    {
+                        foreach (var entry in _registrations.Values)
+                        {
+                            DisposeInstances(entry);
+                        }
+                        _registrations.Clear();
+                    }
+                }
+
+                IsDisposed = true;
+            }
+        }
+
+        private void DisposeInstances(ContainerEntry entry)
+        {
+            if (entry.DisposalPolicy != DisposalPolicy.Automatic)
+                return;
+
+            if (entry.InstanceCached is IDisposable)
+            {
+                var disposable = entry.InstanceCached as IDisposable;
+                disposable.Dispose();
             }
         }
     }

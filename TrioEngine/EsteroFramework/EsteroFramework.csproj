@@ -57,6 +57,8 @@
     <Compile Include="BootstrapperBase.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
     <Compile Include="Commands\IDelegateCommand.cs" />
+    <Compile Include="Editor\EditorUnit.cs" />
+    <Compile Include="Editor\EditorUnitCollection.cs" />
     <Compile Include="Editor\EditorException.cs" />
     <Compile Include="Editor\EditorHelper.cs" />
     <Compile Include="Editor\EditorViewLocator.cs" />
@@ -64,11 +66,12 @@
     <Compile Include="Editor\EditorWindow.xaml.cs">
       <DependentUpon>EditorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Editor\ExitCode.cs" />
     <Compile Include="Editor\IEditorService.cs" />
     <Compile Include="ScreenManagement\IActivate.cs" />
     <Compile Include="ScreenManagement\IDeactivate.cs" />
     <Compile Include="ScreenManagement\IGuardClose.cs" />
-    <Compile Include="IHaveDisplayName.cs" />
+    <Compile Include="ScreenManagement\IHaveDisplayName.cs" />
     <Compile Include="IViewLocator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -111,6 +114,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Editor\CoreUnits\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

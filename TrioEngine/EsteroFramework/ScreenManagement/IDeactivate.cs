@@ -8,7 +8,7 @@ namespace EsteroFramework
 {
     public interface IDeactivate
     {
-        event EventHandler<DeactivationEventArgs> AttemptingDeactivation;
+        event EventHandler<DeactivationEventArgs> Deactivating;
 
         void Deactivate(bool close);
 

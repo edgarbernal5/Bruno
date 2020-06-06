@@ -48,7 +48,7 @@ namespace EsteroFramework
 
 
         public event EventHandler<ActivationEventArgs> Activated;
-        public event EventHandler<DeactivationEventArgs> AttemptingDeactivation;
+        public event EventHandler<DeactivationEventArgs> Deactivating;
         public event EventHandler<DeactivationEventArgs> Deactivated;
 
         void IActivate.Activate()
@@ -78,7 +78,7 @@ namespace EsteroFramework
         {
             if (IsActive || IsInitialized && close)
             {
-                AttemptingDeactivation?.Invoke(this, new DeactivationEventArgs
+                Deactivating?.Invoke(this, new DeactivationEventArgs
                 {
                     WasClosed = close
                 });

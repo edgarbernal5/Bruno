@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Estero.Logging
 {
-    /// <summary>
-    /// A logger.
-    /// </summary>
+    //ConfigSectionHandler
+
     public interface ILog
     {
+        void Debug(string format, params object[] args);
         void Info(string format, params object[] args);
 
         void Warn(string format, params object[] args);

@@ -1,4 +1,5 @@
 ﻿
+using Estero.Logging;
 using Estero.ServiceLocation;
 using EsteroFramework;
 using EsteroFramework.Editor;
@@ -8,6 +9,8 @@ namespace TrioWpfEditor
 {
     public class Bootstrapper : BootstrapperBase
     {
+        private static readonly ILog Logger;
+
         private ServiceContainer _serviceContainer;
         private EditorViewModel _editor;
 
@@ -16,26 +19,44 @@ namespace TrioWpfEditor
             Initialize();
         }
 
+        static Bootstrapper()
+        {
+            LogManager.Targets = name => new CompositeLog(new ILog[] { new DebugLog() });
+            Logger = LogManager.GetLog();
+        }
+
         protected override void OnConfigure()
         {
-            _serviceContainer = new ServiceContainer();
+            Logger.Info("Configuring editor");
 
+            _serviceContainer = new ServiceContainer();
             _serviceContainer.RegisterPerRequest(typeof(IWindowManager), null, typeof(WindowManager));
 
             _editor = new EditorViewModel(_serviceContainer);
+
+            //Core units
+            //_editor.Units.Add(new );
 
             _editor.Configure();
         }
 
         protected override void OnStartup(object sender, StartupEventArgs eventArgs)
         {
+            Logger.Info("Configuring startup");
             _editor.Startup();
 
             var windowService = _serviceContainer.GetInstance<IWindowManager>();
             windowService.ShowWindow(_editor, null, false);
         }
+
+        protected override void OnExit(object sender, ExitEventArgs eventArgs)
+        {
+            Logger.Info("Exiting application");
+
+            _editor.Shutdown();
+            _serviceContainer.Dispose();
+        }
     }
-    
 
     //GraphicsDeviceService.Service.DeviceCreated += Service_DeviceCreated;
     //    private void Service_DeviceCreated(object sender, EventArgs e)
