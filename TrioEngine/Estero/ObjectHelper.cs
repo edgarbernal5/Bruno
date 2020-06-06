@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Estero
 {
@@ -25,7 +27,21 @@ namespace Estero
         }
 
 
+        public static string GetPropertyName<T>(Expression<Func<T>> expression)
+        {
+            if (expression == null)
+                throw new ArgumentNullException("expression");
 
+            var memberExpression = expression.Body as MemberExpression;
+            if (memberExpression == null)
+                throw new ArgumentException("The argument does not represent an expression accessing a field or property.", "expression");
+
+            var property = memberExpression.Member as PropertyInfo;
+            if (property == null)
+                throw new ArgumentException("The argument does not represent an expression accessing a property.", "expression");
+
+            return memberExpression.Member.Name;
+        }
 
         /// <summary>
         /// Safely disposes the object.

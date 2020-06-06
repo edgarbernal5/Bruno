@@ -1,15 +1,41 @@
-﻿using System;
+﻿using Estero;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace TrioWpfFramework.Windows
 {
+    [Serializable]
+    [DataContract(IsReference = true)]
     public abstract class ObservableObject : INotifyPropertyChanged
     {
+        [field: NonSerialized]
+        private bool _enableUIThreadMarshaling;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="PropertyChanged"/> event is
+        /// raised on the UI thread.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the <see cref="PropertyChanged"/> event is raised
+        /// asynchronously on the UI thread; otherwise, <see langword="false"/> if the
+        /// <see cref="PropertyChanged"/> event is raised synchronously on the current thread. The
+        /// default value is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// Changes of a view model that affect the view should be performed on the UI thread.
+        /// Therefore UI thread marshaling is usually not necessary and disabled by default.
+        /// </remarks>
+        protected bool EnableUIThreadMarshaling
+        {
+            get { return _enableUIThreadMarshaling; }
+            set { _enableUIThreadMarshaling = value; }
+        }
+
+        [field: NonSerialized]
         /// <summary>
         /// Raised when a property on this object has a new value.
         /// </summary>
@@ -37,17 +63,28 @@ namespace TrioWpfFramework.Windows
             var handler = PropertyChanged;
             if (handler != null)
             {
-                //if (EnableUIThreadMarshaling)
-                //{
-                //    // Ensure that the changed notifications are raised on the UI thread.
-                //    WindowsHelper.CheckBeginInvokeOnUI(() => handler(this, eventArgs));
-                //}
-                //else
-                //{
-                //    handler(this, eventArgs);
-                //}
-                handler(this, eventArgs);
+                if (EnableUIThreadMarshaling)
+                {
+                    // Ensure that the changed notifications are raised on the UI thread.
+                    WpfWindowsExtensions.CheckBeginInvokeOnUI(() => handler(this, eventArgs));
+                }
+                else
+                {
+                    handler(this, eventArgs);
+                }
             }
+        }
+
+        protected void RaisePropertyChanged<T>(Expression<Func<T>> expression)
+        {
+#if DEBUG
+            // (Only in DEBUG to avoid double check in RELEASE.)
+            if (expression == null)
+                throw new ArgumentNullException(nameof(expression), "expression cannot be null. Call RaisePropertyChanged() instead, if you want to indicate that all properties have changed.");
+#endif
+
+            string propertyName = ObjectHelper.GetPropertyName(expression);
+            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
 
         protected void RaisePropertyChanged([CallerMemberName] string propertyName = null)

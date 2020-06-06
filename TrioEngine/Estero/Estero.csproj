@@ -56,8 +56,12 @@
     <Compile Include="Collections\WeakCollection.cs" />
     <Compile Include="Linq\LinqHelper.cs" />
     <Compile Include="Linq\TreeHelper.cs" />
+    <Compile Include="Logging\DebugLog.cs" />
+    <Compile Include="Logging\FileLog.cs" />
+    <Compile Include="Logging\ILog.cs" />
     <Compile Include="ObjectHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceLocation\ServiceContainer.cs" />
     <Compile Include="WeakEvents\InternalWeakDelegate.cs" />
     <Compile Include="WeakEvents\WeakEvent.cs" />
     <Compile Include="WeakEvents\WeakMulticastDelegate.cs" />
