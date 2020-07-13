@@ -25,8 +25,9 @@ namespace Estero.Logging
 
         private string CreateLogMessage(string format, string category, params object[] args)
         {
-            return string.Format("[{0}] {1}",
-                DateTime.Now.ToString("o"), string.Format(format, args));
+            var className = LogManager.GetClassFullName(4);
+            return string.Format("[{0}] {1} {2}: {3}",
+                DateTime.Now.ToString("o"), category, className, string.Format(format, args));
         }
     }
 }

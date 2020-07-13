@@ -1,5 +1,7 @@
-﻿using Estero.ServiceLocation;
+﻿using Estero.Collections;
+using Estero.ServiceLocation;
 using System;
+using System.Collections.Generic;
 
 namespace EsteroFramework.Editor
 {
@@ -18,5 +20,9 @@ namespace EsteroFramework.Editor
         int ExitCode { get; }
 
         EditorWindow Window { get; }
+
+        MenuItemViewModelCollection Menu { get; }
+
+        List<TreeNodeCollection<ICommandItem>> MenuNodes { get; }
     }
 }

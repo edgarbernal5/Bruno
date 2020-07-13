@@ -1,4 +1,5 @@
-﻿using Estero.Logging;
+﻿using Estero.Collections;
+using Estero.Logging;
 using Estero.ServiceLocation;
 using System;
 using System.Collections.Generic;
@@ -53,15 +54,27 @@ namespace EsteroFramework.Editor
         }
         private EditorWindow _window;
 
+        public MenuItemViewModelCollection Menu
+        {
+            get => _menuManager.Menu;
+        }
+
+        public List<TreeNodeCollection<ICommandItem>> MenuNodes { get; }
+
+        private MenuManager _menuManager;
+
         public EditorViewModel(ServiceContainer serviceContainer)
         {
             Services = serviceContainer;
             Units = new EditorUnitCollection();
+            MenuNodes = new List<TreeNodeCollection<ICommandItem>>();
+            _menuManager = new MenuManager();
         }
 
         public void Configure()
         {
             Logger.Info("Configuring editor view model");
+
             DisplayName = "Estero Editor";
 
             Services.RegisterInstance(typeof(IEditorService), null, this);
@@ -82,6 +95,15 @@ namespace EsteroFramework.Editor
             {
                 unit.Startup();
             }
+
+            RecreateUI();
+        }
+
+        private void RecreateUI()
+        {
+            Logger.Debug("Recreating UI");
+
+            _menuManager.Update(MenuNodes);
         }
 
         public void Shutdown()

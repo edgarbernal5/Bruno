@@ -11,11 +11,15 @@ namespace EsteroFramework.Editor
 
         public IEditorService Editor { get; private set; }
 
+        public CommandItemCollection CommandItems { get; private set; }
+
         private bool _initialized;
 
         protected EditorUnit()
         {
             Logger.Debug("Creating {0}.", GetType().Name);
+
+            CommandItems = new CommandItemCollection();
         }
 
         public void Initialize(IEditorService editor)

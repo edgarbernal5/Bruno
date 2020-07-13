@@ -15,9 +15,9 @@ namespace Estero.Logging
 			return Targets(GetClassFullName());
 		}
 
-		private static string GetClassFullName()
+		internal static string GetClassFullName(int skipFrmes = 2)
 		{
-			int num = 2;
+			int num = skipFrmes;
 			MethodBase method;
 			string result;
 			while (true)

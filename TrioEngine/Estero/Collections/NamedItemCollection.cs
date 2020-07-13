@@ -10,17 +10,17 @@ namespace Estero.Collections
     public class NamedItemCollection<T> : KeyedCollection<string, T> where T : INamedItem
     {
         public NamedItemCollection()
-      : base(StringComparer.Ordinal)
+            : base(StringComparer.Ordinal)
         {
         }
 
         public NamedItemCollection(IEqualityComparer<string> comparer)
-      : base(comparer)
+            : base(comparer)
         {
         }
 
         public NamedItemCollection(IEqualityComparer<string> comparer, int dictionaryCreationThreshold)
-      : base(comparer, dictionaryCreationThreshold)
+            : base(comparer, dictionaryCreationThreshold)
         {
         }
 
@@ -42,7 +42,6 @@ namespace Estero.Collections
             {
                 Add(item);
             }
-
         }
 
         public void InsertRange(int index, IEnumerable<T> collection)

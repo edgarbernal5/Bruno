@@ -1,13 +1,15 @@
-﻿using EsteroWindows;
+﻿using Estero.Logging;
+using EsteroWindows;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace EsteroFramework
 {
-    public class Screen : PropertyChangedBase,
-        IHaveDisplayName, IActivate, IDeactivate, IGuardClose
+    public class Screen : PropertyChangedBase, IHaveDisplayName, IActivate, IDeactivate, IGuardClose
     {
+        private static readonly ILog Logger = LogManager.GetLog();
+
         public Screen()
         {
             _displayName = GetType().FullName;
@@ -46,7 +48,6 @@ namespace EsteroFramework
         }
         private bool _isInitialized;
 
-
         public event EventHandler<ActivationEventArgs> Activated;
         public event EventHandler<DeactivationEventArgs> Deactivating;
         public event EventHandler<DeactivationEventArgs> Deactivated;
@@ -61,11 +62,13 @@ namespace EsteroFramework
             if (!IsInitialized)
             {
                 //OnInitializeAsync(cancellationToken);
+                OnInitialize();
                 IsInitialized = initialized = true;
             }
 
-            //Log.Info("Activating {0}.", this);
+            Logger.Info("Activating {0}.", this);
             //await OnActivateAsync(cancellationToken);
+            OnActivate();
             IsActive = true;
 
             Activated?.Invoke(this, new ActivationEventArgs
@@ -76,13 +79,14 @@ namespace EsteroFramework
 
         void IDeactivate.Deactivate(bool close)
         {
-            if (IsActive || IsInitialized && close)
+            if (IsActive || (IsInitialized && close))
             {
                 Deactivating?.Invoke(this, new DeactivationEventArgs
                 {
                     WasClosed = close
                 });
 
+                Logger.Info("Deactivating {0}.", this);
                 OnDeactivate(close);
                 IsActive = false;
 
@@ -94,12 +98,20 @@ namespace EsteroFramework
                 if (close)
                 {
                     //Views.Clear();
-                    //Log.Info("Closed {0}.", this);
+                    Logger.Info("Closed {0}.", this);
                 }
             }
         }
 
         protected virtual void OnDeactivate(bool close)
+        {
+        }
+
+        protected virtual void OnInitialize()
+        {
+        }
+
+        protected virtual void OnActivate()
         {
         }
 

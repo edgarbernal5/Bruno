@@ -45,14 +45,10 @@
     <Compile Include="Collections\CollectionExtensions.cs" />
     <Compile Include="Collections\FixedSizeNamedList.cs" />
     <Compile Include="Collections\INamedItem.cs" />
-    <Compile Include="Collections\MergeableNode.cs" />
-    <Compile Include="Collections\MergeableNodeCollection.cs" />
-    <Compile Include="Collections\MergeAlgorithm.cs" />
-    <Compile Include="Collections\MergeOperation.cs" />
-    <Compile Include="Collections\MergePoint.cs" />
     <Compile Include="Collections\NamedItemCollection.cs" />
-    <Compile Include="Collections\Pair.cs" />
     <Compile Include="Collections\ReadOnlyWeakCollection.cs" />
+    <Compile Include="Collections\TreeMerger.cs" />
+    <Compile Include="Collections\TreeNode.cs" />
     <Compile Include="Collections\WeakCollection.cs" />
     <Compile Include="Linq\LinqHelper.cs" />
     <Compile Include="Linq\TreeHelper.cs" />

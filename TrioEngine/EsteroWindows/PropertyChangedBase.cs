@@ -24,13 +24,14 @@ namespace EsteroWindows
         {
             if (IsNotifying && PropertyChanged != null)
             {
+                var eventArgs = new PropertyChangedEventArgs(propertyName);
                 if (WindowsPlatform.PropertyChangeNotificationsOnUIThread)
                 {
-                    OnUIThread(() => OnPropertyChanged(new PropertyChangedEventArgs(propertyName)));
+                    WindowsPlatform.OnUIThread(() => OnPropertyChanged(eventArgs));
                 }
                 else
                 {
-                    OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+                    OnPropertyChanged(eventArgs);
                 }
             }
         }
@@ -41,14 +42,9 @@ namespace EsteroWindows
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        protected void OnPropertyChanged(PropertyChangedEventArgs e)
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(this, e);
-        }
-
-        protected virtual void OnUIThread(Action action)
-        {
-            WindowsPlatform.OnUIThread(action);
         }
 
         public virtual bool Set<T>(ref T oldValue, T newValue, [CallerMemberName] string propertyName = null)

@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace EsteroFramework.Editor
 {
-    public class EditorUnitCollection : Collection<EditorUnit>
+    public class MenuItemViewModelCollection : ObservableCollection<MenuItemViewModel>
     {
     }
 }

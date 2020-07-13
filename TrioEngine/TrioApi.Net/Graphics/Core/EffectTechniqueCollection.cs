@@ -9,7 +9,8 @@ namespace TrioWpfFramework.Net.Graphics.Core
 {
     public class EffectTechniqueCollection : FixedSizeNamedList<EffectTechnique>
     {
-        public EffectTechniqueCollection(EffectTechnique[] techniques) : base(techniques)
+        public EffectTechniqueCollection(EffectTechnique[] techniques) 
+            : base(techniques)
         {
 
         }

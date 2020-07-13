@@ -9,7 +9,8 @@ namespace TrioWpfFramework.Net.Graphics.Core
 {
     public class EffectParameterCollection : FixedSizeNamedList<EffectParameter>
     {
-        public EffectParameterCollection(EffectParameter[] parameters) : base(parameters)
+        public EffectParameterCollection(EffectParameter[] parameters) 
+            : base(parameters)
         {
 
         }

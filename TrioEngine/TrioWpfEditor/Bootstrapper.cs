@@ -3,6 +3,7 @@ using Estero.Logging;
 using Estero.ServiceLocation;
 using EsteroFramework;
 using EsteroFramework.Editor;
+using EsteroFramework.Editor.Menus;
 using System.Windows;
 
 namespace TrioWpfEditor
@@ -35,7 +36,7 @@ namespace TrioWpfEditor
             _editor = new EditorViewModel(_serviceContainer);
 
             //Core units
-            //_editor.Units.Add(new );
+            _editor.Units.Add(new MenuUnit());
 
             _editor.Configure();
         }

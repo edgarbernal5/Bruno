@@ -81,5 +81,11 @@
   <ItemGroup>
     <Folder Include="Themes\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EsteroWindows\EsteroWindows.csproj">
+      <Project>{CDD79FF0-CC5B-4034-9082-80708737DA56}</Project>
+      <Name>EsteroWindows</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

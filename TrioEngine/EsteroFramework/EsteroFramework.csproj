@@ -57,6 +57,15 @@
     <Compile Include="BootstrapperBase.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
     <Compile Include="Commands\IDelegateCommand.cs" />
+    <Compile Include="Editor\CommandsItems\CommandGroup.cs" />
+    <Compile Include="Editor\CommandsItems\CommandItem.cs" />
+    <Compile Include="Editor\CommandsItems\CommandItemCollection.cs" />
+    <Compile Include="Editor\CommandsItems\CommandSeparator.cs" />
+    <Compile Include="Editor\CommandsItems\ICommandItem.cs" />
+    <Compile Include="Editor\CommandsItems\Menu Items\MenuItemViewModel.cs" />
+    <Compile Include="Editor\CommandsItems\Menu Items\MenuItemViewModelCollection.cs" />
+    <Compile Include="Editor\CommandsItems\Menu Items\MenuSeparatorViewModel.cs" />
+    <Compile Include="Editor\CommandsItems\MenuManager.cs" />
     <Compile Include="Editor\EditorUnit.cs" />
     <Compile Include="Editor\EditorUnitCollection.cs" />
     <Compile Include="Editor\EditorException.cs" />
@@ -68,6 +77,7 @@
     </Compile>
     <Compile Include="Editor\ExitCode.cs" />
     <Compile Include="Editor\IEditorService.cs" />
+    <Compile Include="Editor\Units\Menus\MenuUnit.cs" />
     <Compile Include="ScreenManagement\IActivate.cs" />
     <Compile Include="ScreenManagement\IDeactivate.cs" />
     <Compile Include="ScreenManagement\IGuardClose.cs" />
@@ -115,8 +125,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Editor\CoreUnits\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
