@@ -6,7 +6,20 @@
         xmlns:local="clr-namespace:EsteroFramework.Editor"
         mc:Ignorable="d"
         Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+    <DockPanel LastChildFill="True">
+        <Grid Background="{Binding ElementName=Menu, Path=Background}" DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Menu Name="Menu"
+                  ItemsSource="{Binding Menu}"
+                  PreviewGotKeyboardFocus="OnPreviewMenuGotKeyboardFocus"
+                  UsesItemContainerTemplate="True" />
+            
+        </Grid>
+        <Grid>
+            
+        </Grid>
+    </DockPanel>
 </Window>

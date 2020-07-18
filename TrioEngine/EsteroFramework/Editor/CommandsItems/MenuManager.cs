@@ -1,9 +1,5 @@
 ﻿using Estero.Collections;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EsteroFramework.Editor
 {
@@ -46,11 +42,37 @@ namespace EsteroFramework.Editor
         {
             if (nodes == null || nodes.Count == 0)
                 return;
+
+            foreach (var node in nodes)
+            {
+                var content = node.Content;
+                if (content is CommandGroup || content is CommandSeparator)
+                    continue;
+
+                CommandItems.Add(content);
+
+                CollectCommandItems(node.Children);
+            }
         }
 
         private void CreateMenuItems(TreeNodeCollection<ICommandItem> nodes, MenuItemViewModelCollection menuItems)
         {
+            if (nodes == null || nodes.Count == 0)
+                return;
 
+
+            foreach (var node in nodes)
+            {
+                var menuItem = node.Content.CreateMenuItem();
+                menuItems.Add(menuItem);
+
+                if (node.Children != null && node.Children.Count > 0)
+                {
+                    menuItem.IsVisible = true;
+                    menuItem.Submenu = new MenuItemViewModelCollection();
+                    CreateMenuItems(node.Children, menuItem.Submenu);
+                }
+            }
         }
     }
 }
