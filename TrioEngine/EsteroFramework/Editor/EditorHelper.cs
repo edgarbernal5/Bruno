@@ -16,5 +16,14 @@ namespace EsteroFramework.Editor
 
             serviceContainer.RegisterPerRequest(typeof(FrameworkElement), viewModelType.FullName, view);
         }
+
+        public static void RegisterResources(ResourceDictionary resources)
+        {
+            Application.Current.Resources.MergedDictionaries.Add(resources);
+        }
+        public static void UnregisterResources(ResourceDictionary resources)
+        {
+            Application.Current.Resources.MergedDictionaries.Remove(resources);
+        }
     }
 }

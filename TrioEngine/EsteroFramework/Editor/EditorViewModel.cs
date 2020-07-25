@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace EsteroFramework.Editor
 {
@@ -62,6 +63,7 @@ namespace EsteroFramework.Editor
         public List<TreeNodeCollection<ICommandItem>> MenuNodes { get; }
 
         private MenuManager _menuManager;
+        private ResourceDictionary _resourceDictionary;
 
         public EditorViewModel(ServiceContainer serviceContainer)
         {
@@ -80,6 +82,9 @@ namespace EsteroFramework.Editor
             Services.RegisterInstance(typeof(IEditorService), null, this);
             Services.RegisterPerRequest(typeof(IViewLocator), null, typeof(EditorViewLocator));
             Services.RegisterView(typeof(EditorViewModel), typeof(EditorWindow));
+
+            _resourceDictionary = new ResourceDictionary { Source = new Uri("pack://application:,,,/EsteroFramework;component/Resources/EditorDataTemplates.xaml", UriKind.RelativeOrAbsolute) };
+            EditorHelper.RegisterResources(_resourceDictionary);
 
             foreach (var unit in OrderedUnits)
             {
@@ -119,6 +124,8 @@ namespace EsteroFramework.Editor
             {
                 unit.Uninitialize();
             }
+
+            EditorHelper.UnregisterResources(_resourceDictionary);
         }
 
         public void Exit(int exitCode = (int)Editor.ExitCode.ERROR_SUCCESS)
