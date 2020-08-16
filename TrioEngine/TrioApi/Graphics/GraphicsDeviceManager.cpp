@@ -137,7 +137,7 @@ namespace TrioEngine
 			baseDeviceInfo.Parameters.SetBackBufferWidth(m_backBufferWidth);
 		}
 
-		baseDeviceInfo.Parameters.SetSurfaceFormat(format);
+		baseDeviceInfo.Parameters.GetBackBufferFormat(format);
 		baseDeviceInfo.Parameters.SetDepthStencilFormat(depthFormat);
 
 		bool found = false;

@@ -103,9 +103,17 @@ namespace TrioEngine
 	{
 		switch (format)
 		{
+		case DepthFormat::None:
+			return DXGI_FORMAT_UNKNOWN;
+		
+		case DepthFormat::Depth16:
+			return DXGI_FORMAT_D16_UNORM;
+		
 		case DepthFormat::Depth32:
 			return DXGI_FORMAT_D32_FLOAT;
-		default:
+
+		case DepthFormat::Depth24:
+		case DepthFormat::Depth24Stencil8:
 			return DXGI_FORMAT_D24_UNORM_S8_UINT;
 		}
 	}

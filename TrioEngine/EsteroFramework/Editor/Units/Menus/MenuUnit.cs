@@ -21,7 +21,6 @@ namespace EsteroFramework.Editor.Menus
 
         }
 
-
         protected override void OnStartup()
         {
             AddCommands();

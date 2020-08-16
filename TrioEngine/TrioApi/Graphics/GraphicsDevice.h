@@ -10,6 +10,7 @@
 #include "ShaderStage.h"
 #include "VertexBufferBinding.h"
 
+#include "DeviceErrorStatus.h"
 #include "..\Math\MathVector.h"
 
 namespace TrioEngine
@@ -27,6 +28,7 @@ namespace TrioEngine
 	class Shader;
 	class TextureCollection;
 	class VertexBuffer;
+	class SwapChain;
 	
 	class TRIO_API_EXPORT GraphicsDevice
 	{
@@ -45,13 +47,10 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 		UINT                    GetBackBufferCount() const { return m_backBufferCount; }
 		ID3D11RenderTargetView*	GetBackBufferRenderTargetView() const { return m_d3dRenderTargetView.Get(); }
-		ID3D11Device*           GetD3DDevice() const { return m_d3dDevice.Get(); }
-		ID3D11Device1*          GetD3DDevice1() const { return m_d3dDevice1.Get(); }
-		ID3D11DeviceContext*    GetD3DDeviceContext() const { return m_d3dContext.Get(); }
-		ID3D11DeviceContext1*   GetD3DDeviceContext1() const { return m_d3dContext1.Get(); }
+		ID3D11Device1*          GetD3DDevice() const noexcept { return m_d3dDevice.Get(); }
+		ID3D11DeviceContext1*   GetD3DDeviceContext() const noexcept { return m_d3dContext.Get(); }
+		auto                    GetDXGIFactory() const noexcept { return m_dxgiFactory.Get(); }
 		D3D_FEATURE_LEVEL       GetDeviceFeatureLevel() const { return m_d3dFeatureLevel; }
-		IDXGISwapChain*         GetSwapChain() const { return m_swapChain.Get(); }
-		IDXGISwapChain1*        GetSwapChain1() const { return m_swapChain1.Get(); }
 		//ID3D11DepthStencilView* GetDepthStencilView() const					{ return m_depthStencilBuffer->m_d3dDepthStencilView.Get(); }
 #endif
 		inline BlendState* GetBlendState() { return m_blendState; }
@@ -84,6 +83,7 @@ namespace TrioEngine
 
 		friend class EffectPass;
 	private:
+		std::unique_ptr <SwapChain> m_swapChain;
 		GraphicsCapabilities						m_graphicsCapabilities;
 		TextureCollection*							m_vertexTextureCollection;
 
@@ -124,13 +124,12 @@ namespace TrioEngine
 
 		uint32_t                                            m_backBufferCount;
 #ifdef TRIO_DIRECTX
-		Microsoft::WRL::ComPtr<ID3D11Device>				m_d3dDevice;
-		Microsoft::WRL::ComPtr<ID3D11Device1>				m_d3dDevice1;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext>			m_d3dContext;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext1>		m_d3dContext1;
-		Microsoft::WRL::ComPtr<IDXGISwapChain>				m_swapChain;
-		Microsoft::WRL::ComPtr<IDXGISwapChain1>				m_swapChain1;
+		Microsoft::WRL::ComPtr<IDXGIFactory2>               m_dxgiFactory;
+		Microsoft::WRL::ComPtr<ID3D11Device1>               m_d3dDevice;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext1>        m_d3dContext;
 		Microsoft::WRL::ComPtr<ID3DUserDefinedAnnotation>	m_d3dAnnotation;
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D>         m_renderTarget;
 
 		// Direct3D rendering objects. Required for 3D.
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_d3dRenderTargetView;
@@ -149,6 +148,9 @@ namespace TrioEngine
 		void ApplyState(bool applyShaders);
 		bool AreSameVertexBindings(VertexBufferBindings &bindings);
 		void CreateDeviceResources();
+#if TRIO_DIRECTX
+		void CreateFactory();
+#endif
 		void CreateWindowSizeDependentResources();
 		void HandleDeviceLost();
 		void SetConstantBuffer(ShaderStage stage, int slot, ConstantBuffer* buffer);

@@ -38,7 +38,9 @@
 #include <wrl/client.h>
 
 #ifdef TRIO_DIRECTX
+
 #include <d3d11_1.h>
+#include <dxgi1_6.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 
@@ -99,6 +101,14 @@ namespace DX
 		if (FAILED(hr))
 		{
 			throw com_exception(hr);
+		}
+	}
+
+	inline void ThrowIfFailed(TrioEngine::DeviceErrorStatus status)
+	{
+		if (FAILED(status))
+		{
+			throw com_exception((HRESULT)status);
 		}
 	}
 

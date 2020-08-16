@@ -651,6 +651,15 @@
     <ClInclude Include="Content\Pipeline\Tasks\TimestampCache.h">
       <Filter>Header Files\Content\Pipeline\Tasks</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\SwapChain.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\SwapChainFlags.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DeviceErrorStatus.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1009,6 +1018,9 @@
     </ClCompile>
     <ClCompile Include="Content\Pipeline\Tasks\TimestampCache.cpp">
       <Filter>Source Files\Content\Pipeline\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\SwapChain.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

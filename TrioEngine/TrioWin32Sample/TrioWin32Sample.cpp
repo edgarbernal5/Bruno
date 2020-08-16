@@ -21,6 +21,7 @@ namespace TrioWin32
 	{
 		mRadius = 5.0f;
 		GraphicsDeviceManager* graphicsManager = new GraphicsDeviceManager(this);
+		graphicsManager->SetDepthStencilFormat(DepthFormat::Depth32);
 	}
 
 	void DemoGame::Initialize()
@@ -163,8 +164,6 @@ namespace TrioWin32
 		m_position = Vector3(x, y, z);
 	}
 }
-
-
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,

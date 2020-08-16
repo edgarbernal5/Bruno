@@ -311,6 +311,7 @@
     <ClInclude Include="Graphics\DepthStencilViewDimension.h" />
     <ClInclude Include="Graphics\DepthStencilViewFlags.h" />
     <ClInclude Include="Graphics\DepthWriteMask.h" />
+    <ClInclude Include="Graphics\DeviceErrorStatus.h" />
     <ClInclude Include="Graphics\DisplayMode.h" />
     <ClInclude Include="Graphics\Effect.h" />
     <ClInclude Include="Graphics\EffectCompiler.h" />
@@ -354,6 +355,8 @@
     <ClInclude Include="Graphics\StencilOperation.h" />
     <ClInclude Include="Graphics\SurfaceFormat.h" />
     <ClInclude Include="Graphics\SurfaceType.h" />
+    <ClInclude Include="Graphics\SwapChain.h" />
+    <ClInclude Include="Graphics\SwapChainFlags.h" />
     <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="Graphics\Texture2D.h" />
     <ClInclude Include="Graphics\TextureAddressMode.h" />
@@ -488,6 +491,7 @@
     <ClCompile Include="Graphics\SamplerStateCollection.cpp" />
     <ClCompile Include="Graphics\SceneNode.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
+    <ClCompile Include="Graphics\SwapChain.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="Graphics\Texture2D.cpp" />
     <ClCompile Include="Graphics\TextureCollection.cpp" />

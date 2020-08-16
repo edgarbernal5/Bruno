@@ -15,32 +15,24 @@ namespace TrioEngine
 		~PresentationParameters();
 
 		inline SurfaceFormat GetBackBufferFormat() const { return m_backBufferFormat; }
-
+		inline int GetBackBufferWidth() const { return m_backBufferWidth; }
+		inline int GetBackBufferHeight() const { return m_backBufferHeight; }
+		inline DepthFormat GetDepthStencilFormat() const { return m_depthStencilFormat; }
+		inline HWND GetHostHWND() const { return m_deviceWindowHandle; }
+		inline bool GetIsFullScreen() const { return m_fullScreen; }
+		inline int GetMultiSampleCount() { return m_multiSampleCount; }
+		inline PresentInterval GetPresentInterval() const { return m_presentInternal; }
 		inline RenderTargetUsage GetRenderTargetUsage() const { return m_usage; }
 
-		inline int GetBackBufferWidth() const { return m_backBufferWidth; }
-
-		inline int GetBackBufferHeight() const { return m_backBufferHeight; }
-
-		inline DepthFormat GetDepthStencilFormat() const { return m_depthStencilFormat; }
-
-		inline bool GetIsFullScreen() const { return m_fullScreen; }
-
-		inline int GetMultiSampleCount() { return m_multiSampleCount; }
-
-		inline HWND GetHostHWND() const { return m_deviceWindowHandle; }
-		inline PresentInterval GetPresentInterval() const { return m_presentInternal; }
-
-		inline void SetHostHWND(HWND host) { m_deviceWindowHandle = host; }
-		inline void SetSurfaceFormat(SurfaceFormat format) { m_backBufferFormat = format; }
+		inline void GetBackBufferFormat(SurfaceFormat format) { m_backBufferFormat = format; }
 		inline void SetBackBufferWidth(int width) { m_backBufferWidth = width; }
 		inline void SetBackBufferHeight(int height) { m_backBufferHeight = height; }
 		inline void SetDepthStencilFormat(DepthFormat format) { m_depthStencilFormat = format; }
+		inline void SetHostHWND(HWND host) { m_deviceWindowHandle = host; }
 		inline void SetIsFullScreen(bool isfullScreen) { m_fullScreen = isfullScreen; }
+		inline void SetMultiSampleCount(int multiSampleCount) { m_multiSampleCount = multiSampleCount; }
 		inline void SetPresentInterval(PresentInterval interval) { m_presentInternal = interval; }
 		inline void SetRenderTargetUsage(RenderTargetUsage usage) { m_usage = usage; }
-
-		inline void SetMultiSampleCount(int multiSampleCount) { m_multiSampleCount = multiSampleCount; }
 
 		bool operator ==(const PresentationParameters &other) const
 		{
@@ -52,6 +44,7 @@ namespace TrioEngine
 				m_fullScreen == other.m_fullScreen &&
 				m_usage == other.m_usage;
 		}
+
 	private:
 		void Clear();
 

@@ -15,6 +15,8 @@
 #include "Shader.h"
 #include "TextureCollection.h"
 #include "VertexBuffer.h"
+#include "SwapChain.h"
+
 
 namespace TrioEngine
 {
@@ -66,6 +68,11 @@ namespace TrioEngine
 
 		m_depthStencilStateDirty(false),
 		m_depthStencilState(nullptr)
+#if TRIO_DIRECTX
+		,
+		m_d3dMinFeatureLevel(D3D_FEATURE_LEVEL_10_0),
+		m_d3dFeatureLevel(D3D_FEATURE_LEVEL_9_1)
+#endif
 	{
 		CreateDeviceResources();
 		CreateWindowSizeDependentResources();
@@ -262,16 +269,19 @@ namespace TrioEngine
 		{
 			m_d3dContext->ClearDepthStencilView(m_depthStencilBuffer->GetDepthStencilView(), flags, depth, stencil);
 		}
+
+		//TODO: mover esto de aca?
+		m_d3dContext->OMSetRenderTargets(1, &m_currentRenderTargets[0], m_depthStencilBuffer->m_depthStencilView.Get());
 #endif
 	}
 
 	void GraphicsDevice::CreateDeviceResources()
 	{
 #ifdef TRIO_DIRECTX
-		// This flag adds support for surfaces with a different color channel ordering
-		// than the API default. It is required for compatibility with Direct2D.
 		// D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-		UINT creationFlags = 0;
+		//0
+		uint32_t creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+		//uint32_t creationFlags = 0;
 
 #if defined(_DEBUG)
 		if (SdkLayersAvailable())
@@ -279,7 +289,18 @@ namespace TrioEngine
 			// If the project is in a debug build, enable debugging via SDK Layers with this flag.
 			creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 		}
+		else
+		{
+			OutputDebugStringA("WARNING: Direct3D Debug Device is not available\n");
+		}
 #endif
+		CreateFactory();
+
+		// Determines whether tearing support is available for fullscreen borderless windows.
+		//TODO: AllowTearing
+
+		// Disable HDR if we are on an OS that can't support FLIP swap effects
+		//TODO:
 		// Determine DirectX hardware feature levels this app will support.
 		static const D3D_FEATURE_LEVEL s_featureLevels[] =
 		{
@@ -292,45 +313,43 @@ namespace TrioEngine
 			D3D_FEATURE_LEVEL_9_1,
 		};
 
+		uint32_t featLevelCount = 0;
+		for (; featLevelCount < _countof(s_featureLevels); ++featLevelCount)
+		{
+			if (s_featureLevels[featLevelCount] < m_d3dMinFeatureLevel)
+				break;
+		}
+
 		IDXGIAdapter1* adapter = m_adapter->GetD3DAdapter();
 
 		D3D_FEATURE_LEVEL d3dFeatureLevel = D3D_FEATURE_LEVEL_11_0;
 		// Create the Direct3D 11 API device object and a corresponding context.
+		Microsoft::WRL::ComPtr<ID3D11Device> device;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
+
 		HRESULT hr = E_FAIL;
 		if (adapter)
 		{
 			hr = D3D11CreateDevice(
 				adapter,
 				D3D_DRIVER_TYPE_UNKNOWN,
-				0,
+				nullptr,
 				creationFlags,
 				s_featureLevels,
 				ARRAYSIZE(s_featureLevels),
 				D3D11_SDK_VERSION,
-				m_d3dDevice.ReleaseAndGetAddressOf(),   // Returns the Direct3D device created.
-				&m_d3dFeatureLevel,                     // Returns feature level of device created.
-				m_d3dContext.ReleaseAndGetAddressOf()   // Returns the device immediate context.
+				device.GetAddressOf(),  // Returns the Direct3D device created.
+				&m_d3dFeatureLevel,     // Returns feature level of device created.
+				context.GetAddressOf()  // Returns the device immediate context.
 			);
 
-			if (hr == E_INVALIDARG)
-			{
-				assert(s_featureLevels[0] == D3D_FEATURE_LEVEL_11_1);
-
-				// DirectX 11.0 platforms will not recognize D3D_FEATURE_LEVEL_11_1 so we need to retry without it
-				hr = D3D11CreateDevice(
-					adapter,
-					D3D_DRIVER_TYPE_UNKNOWN,
-					nullptr,
-					creationFlags,
-					&s_featureLevels[1],
-					ARRAYSIZE(s_featureLevels) - 1,
-					D3D11_SDK_VERSION,
-					m_d3dDevice.ReleaseAndGetAddressOf(),
-					&m_d3dFeatureLevel,
-					m_d3dContext.ReleaseAndGetAddressOf()
-				);
-			}
 		}
+#if defined(NDEBUG)
+		else
+		{
+			throw std::exception("No Direct3D hardware device found");
+		}
+#else
 		if (FAILED(hr))
 		{
 			// If the initialization fails, fall back to the WARP device.
@@ -339,46 +358,28 @@ namespace TrioEngine
 			hr = D3D11CreateDevice(
 				nullptr,
 				D3D_DRIVER_TYPE_WARP, // Create a WARP device instead of a hardware device.
-				0,
+				nullptr,
 				creationFlags,
 				s_featureLevels,
 				ARRAYSIZE(s_featureLevels),
 				D3D11_SDK_VERSION,
-				m_d3dDevice.ReleaseAndGetAddressOf(),
+				device.GetAddressOf(),
 				&m_d3dFeatureLevel,
-				m_d3dContext.ReleaseAndGetAddressOf()
+				context.GetAddressOf()
 			);
-
-			if (hr == E_INVALIDARG)
-			{
-				assert(s_featureLevels[0] == D3D_FEATURE_LEVEL_11_1);
-
-				// DirectX 11.0 platforms will not recognize D3D_FEATURE_LEVEL_11_1 so we need to retry without it
-				hr = D3D11CreateDevice(
-					nullptr,
-					D3D_DRIVER_TYPE_WARP,
-					nullptr,
-					creationFlags,
-					&s_featureLevels[1],
-					ARRAYSIZE(s_featureLevels) - 1,
-					D3D11_SDK_VERSION,
-					m_d3dDevice.ReleaseAndGetAddressOf(),
-					&m_d3dFeatureLevel,
-					m_d3dContext.ReleaseAndGetAddressOf()
-				);
-			}
 
 			if (SUCCEEDED(hr))
 			{
 				OutputDebugStringA("Direct3D Adapter - WARP\n");
 			}
 		}
+#endif
 
 		DX::ThrowIfFailed(hr);
 
 #ifndef NDEBUG
 		Microsoft::WRL::ComPtr<ID3D11Debug> d3dDebug;
-		if (SUCCEEDED(m_d3dDevice.As(&d3dDebug)))
+		if (SUCCEEDED(device.As(&d3dDebug)))
 		{
 			Microsoft::WRL::ComPtr<ID3D11InfoQueue> d3dInfoQueue;
 			if (SUCCEEDED(d3dDebug.As(&d3dInfoQueue)))
@@ -400,13 +401,46 @@ namespace TrioEngine
 #endif
 
 		// Obtain Direct3D 11.1 interfaces (if available)
-		if (SUCCEEDED(m_d3dDevice.As(&m_d3dDevice1)))
-		{
-			(void)m_d3dContext.As(&m_d3dContext1);
-			(void)m_d3dContext.As(&m_d3dAnnotation);
-		}
+
+		DX::ThrowIfFailed(device.As(&m_d3dDevice));
+		DX::ThrowIfFailed(context.As(&m_d3dContext));
+		DX::ThrowIfFailed(context.As(&m_d3dAnnotation));
 #endif
 	}
+
+#if TRIO_DIRECTX
+	void GraphicsDevice::CreateFactory()
+	{
+#if defined(_DEBUG) && (_WIN32_WINNT >= 0x0603 /*_WIN32_WINNT_WINBLUE*/)
+		bool debugDXGI = false;
+		{
+			ComPtr<IDXGIInfoQueue> dxgiInfoQueue;
+			if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(dxgiInfoQueue.GetAddressOf()))))
+			{
+				debugDXGI = true;
+
+				ThrowIfFailed(CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(m_dxgiFactory.ReleaseAndGetAddressOf())));
+
+				dxgiInfoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_ERROR, true);
+				dxgiInfoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_CORRUPTION, true);
+
+				DXGI_INFO_QUEUE_MESSAGE_ID hide[] =
+				{
+					80 /* IDXGISwapChain::GetContainingOutput: The swapchain's adapter does not control the output on which the swapchain's window resides. */,
+				};
+				DXGI_INFO_QUEUE_FILTER filter = {};
+				filter.DenyList.NumIDs = _countof(hide);
+				filter.DenyList.pIDList = hide;
+				dxgiInfoQueue->AddStorageFilterEntries(DXGI_DEBUG_DXGI, &filter);
+			}
+		}
+
+		if (!debugDXGI)
+#endif
+
+		DX::ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(m_dxgiFactory.ReleaseAndGetAddressOf())));
+	}
+#endif
 
 	void GraphicsDevice::CreateWindowSizeDependentResources()
 	{
@@ -421,8 +455,10 @@ namespace TrioEngine
 		m_d3dContext->OMSetRenderTargets(_countof(nullViews), nullViews, nullptr);
 		m_currentRenderTargets = std::vector<ID3D11RenderTargetView*>(4, nullptr);
 
-		m_depthStencilBuffer.reset();
+		m_renderTarget.Reset();
 		m_d3dRenderTargetView.Reset();
+
+		m_depthStencilBuffer.reset();
 		m_d3dContext->Flush();
 
 		// Determine the render target size in pixels.
@@ -432,19 +468,20 @@ namespace TrioEngine
 		if (m_swapChain)
 		{
 			// If the swap chain already exists, resize it.
-			HRESULT hr = m_swapChain->ResizeBuffers(
+			DeviceErrorStatus status = m_swapChain->ResizeBuffers
+			(
 				m_backBufferCount,
 				backBufferWidth,
 				backBufferHeight,
-				ToFormat(m_presentationParameters.GetBackBufferFormat()),
-				0
+				m_presentationParameters.GetBackBufferFormat(),
+				SwapChainFlags::None
 			);
 
-			if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
+			if (status == DeviceErrorStatus::DeviceRemoved || status == DeviceErrorStatus::DeviceReset)
 			{
 #ifdef _DEBUG
 				char buff[64] = {};
-				sprintf_s(buff, "Device Lost on ResizeBuffers: Reason code 0x%08X\n", (hr == DXGI_ERROR_DEVICE_REMOVED) ? m_d3dDevice->GetDeviceRemovedReason() : hr);
+				sprintf_s(buff, "Device Lost on ResizeBuffers: Reason code 0x%08X\n", (status == DeviceErrorStatus::DeviceRemoved) ? m_d3dDevice->GetDeviceRemovedReason() : (long)status);
 				OutputDebugStringA(buff);
 #endif
 				// If the device was removed for any reason, a new device and swap chain will need to be created.
@@ -456,86 +493,38 @@ namespace TrioEngine
 			}
 			else
 			{
-				DX::ThrowIfFailed(hr);
+				DX::ThrowIfFailed(status);
 			}
 		}
 		else
 		{
-			// Otherwise, create a new one using the same adapter as the existing Direct3D device.
+			m_swapChain.reset(new SwapChain(this, backBufferWidth, backBufferHeight,
+				m_presentationParameters.GetHostHWND(), m_presentationParameters.GetBackBufferFormat(),
+				m_backBufferCount));
+		}
 
-			// This sequence obtains the DXGI factory that was used to create the Direct3D device above.
-			Microsoft::WRL::ComPtr<IDXGIDevice1> dxgiDevice;
-			DX::ThrowIfFailed(m_d3dDevice.As(&dxgiDevice));
+		// Handle color space settings for HDR
+		//UpdateColorSpace();
 
-			Microsoft::WRL::ComPtr<IDXGIAdapter> dxgiAdapter;
-			DX::ThrowIfFailed(dxgiDevice->GetAdapter(dxgiAdapter.GetAddressOf()));
-
-			Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory;
-			DX::ThrowIfFailed(dxgiAdapter->GetParent(IID_PPV_ARGS(dxgiFactory.GetAddressOf())));
-
-			Microsoft::WRL::ComPtr<IDXGIFactory2> dxgiFactory2;
-			if (SUCCEEDED(dxgiFactory.As(&dxgiFactory2)))
+		DXGI_COLOR_SPACE_TYPE colorSpace = DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709;
+		Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain3;
+		if (SUCCEEDED(m_swapChain->GetDxSwapChain()->QueryInterface(__uuidof(IDXGISwapChain3), &swapChain3)))
+		{
+			UINT colorSpaceSupport = 0;
+			if (SUCCEEDED(swapChain3->CheckColorSpaceSupport(colorSpace, &colorSpaceSupport))
+				&& (colorSpaceSupport & DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG_PRESENT))
 			{
-				// DirectX 11.1 or later
-				DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-				swapChainDesc.Width = backBufferWidth;
-				swapChainDesc.Height = backBufferHeight;
-				swapChainDesc.Format = ToFormat(m_presentationParameters.GetBackBufferFormat());
-				swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-				swapChainDesc.BufferCount = m_backBufferCount;
-				swapChainDesc.SampleDesc.Count = 1;
-				swapChainDesc.SampleDesc.Quality = 0;
-				swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
-				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-				swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
-
-				DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = { 0 };
-				fsSwapChainDesc.Windowed = TRUE;
-
-				// Create a SwapChain from a Win32 window.
-				DX::ThrowIfFailed(dxgiFactory2->CreateSwapChainForHwnd(
-					m_d3dDevice.Get(),
-					m_presentationParameters.GetHostHWND(),
-					&swapChainDesc,
-					&fsSwapChainDesc,
-					nullptr, m_swapChain1.ReleaseAndGetAddressOf()
-				));
-
-				DX::ThrowIfFailed(m_swapChain1.As(&m_swapChain));
+				DX::ThrowIfFailed(swapChain3->SetColorSpace1(colorSpace));
 			}
-			else
-			{
-				// DirectX 11.0
-				DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-				swapChainDesc.BufferDesc.Width = backBufferWidth;
-				swapChainDesc.BufferDesc.Height = backBufferHeight;
-				swapChainDesc.BufferDesc.Format = ToFormat(m_presentationParameters.GetBackBufferFormat());
-				swapChainDesc.SampleDesc.Count = 1;
-				swapChainDesc.SampleDesc.Quality = 0;
-				swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-				swapChainDesc.BufferCount = m_backBufferCount;
-				swapChainDesc.OutputWindow = m_presentationParameters.GetHostHWND();
-				swapChainDesc.Windowed = TRUE;
-				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-				DX::ThrowIfFailed(dxgiFactory->CreateSwapChain(
-					m_d3dDevice.Get(),
-					&swapChainDesc,
-					m_swapChain.ReleaseAndGetAddressOf()
-				));
-			}
-
-			// This class does not support exclusive full-screen mode and prevents DXGI from responding to the ALT+ENTER shortcut
-			DX::ThrowIfFailed(dxgiFactory->MakeWindowAssociation(m_presentationParameters.GetHostHWND(), DXGI_MWA_NO_ALT_ENTER));
 		}
 
 		// Create a render target view of the swap chain back buffer.
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
-		DX::ThrowIfFailed(m_swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf())));
+		DX::ThrowIfFailed(m_swapChain->GetDxSwapChain()->GetBuffer(0, IID_PPV_ARGS(m_renderTarget.ReleaseAndGetAddressOf())));
 
+		CD3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc(D3D11_RTV_DIMENSION_TEXTURE2D, ToFormat(m_presentationParameters.GetBackBufferFormat()));
 		DX::ThrowIfFailed(m_d3dDevice->CreateRenderTargetView(
-			backBuffer.Get(),
-			nullptr,
+			m_renderTarget.Get(),
+			&renderTargetViewDesc,
 			m_d3dRenderTargetView.ReleaseAndGetAddressOf()
 		));
 
@@ -557,7 +546,6 @@ namespace TrioEngine
 
 		// Set the viewport.
 		m_d3dContext->RSSetViewports(1, m_viewport.Get11());
-
 #endif
 	}
 
@@ -605,13 +593,12 @@ namespace TrioEngine
 		DeviceLost();
 
 		m_depthStencilBuffer.reset();
+
 		m_d3dRenderTargetView.Reset();
-		m_swapChain.Reset();
-		m_swapChain1.Reset();
+		m_renderTarget.Reset();
+		m_swapChain.reset();
 		m_d3dContext.Reset();
-		m_d3dContext1.Reset();
 		m_d3dAnnotation.Reset();
-		m_d3dDevice1.Reset();
 
 #ifdef _DEBUG
 		{
@@ -623,6 +610,7 @@ namespace TrioEngine
 		}
 #endif
 		m_d3dDevice.Reset();
+		m_dxgiFactory.Reset();
 
 		CreateDeviceResources();
 		CreateWindowSizeDependentResources();
@@ -633,32 +621,39 @@ namespace TrioEngine
 	void GraphicsDevice::Present()
 	{
 #ifdef TRIO_DIRECTX
-		// The first argument instructs DXGI to block until VSync, putting the application
-		// to sleep until the next VSync. This ensures we don't waste any cycles rendering
-		// frames that will never be displayed to the screen.
-		HRESULT hr = m_swapChain->Present(1, 0);
+		DeviceErrorStatus hr = DeviceErrorStatus::Fail;
+		//if (m_options & c_AllowTearing)
+		//{
+		//	// Recommended to always use tearing if supported when using a sync interval of 0.
+		//	hr = m_swapChain->Present(0, DXGI_PRESENT_ALLOW_TEARING);
+		//}
+		//else
+		//{
+			// The first argument instructs DXGI to block until VSync, putting the application
+			// to sleep until the next VSync. This ensures we don't waste any cycles rendering
+			// frames that will never be displayed to the screen.
+			hr = m_swapChain->Present(1, 0);
+		//}
 
-		if (m_d3dContext1)
+		 // Discard the contents of the render target.
+		// This is a valid operation only when the existing contents will be entirely
+		// overwritten. If dirty or scroll rects are used, this call should be removed.
+		m_d3dContext->DiscardView(m_d3dRenderTargetView.Get());
+
+		if (m_depthStencilBuffer != nullptr && m_depthStencilBuffer->GetDepthStencilView())
 		{
-			// Discard the contents of the render target.
-			// This is a valid operation only when the existing contents will be entirely
-			// overwritten. If dirty or scroll rects are used, this call should be removed.
-			m_d3dContext1->DiscardView(m_d3dRenderTargetView.Get());
-
-			if (m_depthStencilBuffer->GetDepthStencilView())
-			{
-				// Discard the contents of the depth stencil.
-				m_d3dContext1->DiscardView(m_depthStencilBuffer->GetDepthStencilView());
-			}
+			// Discard the contents of the depth stencil.
+			m_d3dContext->DiscardView(m_depthStencilBuffer->GetDepthStencilView());
 		}
 
 		// If the device was removed either by a disconnection or a driver upgrade, we 
 		// must recreate all device resources.
-		if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
+		if (hr == DeviceErrorStatus::DeviceRemoved || hr == DeviceErrorStatus::DeviceReset)
 		{
 #ifdef _DEBUG
 			char buff[64] = {};
-			sprintf_s(buff, "Device Lost on Present: Reason code 0x%08X\n", (hr == DXGI_ERROR_DEVICE_REMOVED) ? m_d3dDevice->GetDeviceRemovedReason() : hr);
+			sprintf_s(buff, "Device Lost on Present: Reason code 0x%08X\n",
+				static_cast<unsigned int>((hr == DeviceErrorStatus::DeviceRemoved) ? m_d3dDevice->GetDeviceRemovedReason() : (long)hr));
 			OutputDebugStringA(buff);
 #endif
 			HandleDeviceLost();
@@ -666,6 +661,12 @@ namespace TrioEngine
 		else
 		{
 			DX::ThrowIfFailed(hr);
+
+			if (!m_dxgiFactory->IsCurrent())
+			{
+				// Output information is cached on the DXGI Factory. If it is stale we need to create a new factory.
+				CreateFactory();
+			}
 		}
 #endif
 	}

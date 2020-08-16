@@ -25,7 +25,6 @@ namespace EsteroFramework.Editor
             if (viewModel == null)
                 throw new ArgumentNullException(nameof(viewModel));
 
-            // Look for a view based on the class.
             var type = viewModel.GetType();
             while (type != null)
             {

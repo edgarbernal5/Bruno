@@ -95,6 +95,7 @@ namespace TrioEngine
 	void GraphicsAdapter::PopulateAdapters()
 	{
 #ifdef TRIO_DIRECTX
+		//TODO: EnumAdapterByGpuPreference
 		Microsoft::WRL::ComPtr<IDXGIFactory2> dxgiFactory;
 		DX::ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(dxgiFactory.GetAddressOf())));
 
@@ -103,7 +104,8 @@ namespace TrioEngine
 		g_Adapters.clear();
 
 		int idx = 0;
-		for (uint32_t adapterIndex = 0; dxgiFactory->EnumAdapters1(adapterIndex, &adapter) != DXGI_ERROR_NOT_FOUND; ++adapterIndex)
+		for (uint32_t adapterIndex = 0; dxgiFactory->EnumAdapters1(adapterIndex, &adapter) != DXGI_ERROR_NOT_FOUND; 
+			++adapterIndex)
 		{
 			DXGI_ADAPTER_DESC1 desc;
 			adapter->GetDesc1(&desc);
@@ -115,9 +117,9 @@ namespace TrioEngine
 			}
 
 #ifdef _DEBUG
-			//wchar_t buff[256] = {};
-			//swprintf_s(buff, L"Direct3D Adapter (%u): VID:%04X, PID:%04X - %ls\n", adapterIndex, desc.VendorId, desc.DeviceId, desc.Description);
-			//OutputDebugStringW(buff);
+			wchar_t buff[256] = {};
+			swprintf_s(buff, L"Direct3D Adapter (%u): VID:%04X, PID:%04X - %ls\n", adapterIndex, desc.VendorId, desc.DeviceId, desc.Description);
+			OutputDebugStringW(buff);
 #endif
 
 			g_Adapters.push_back(new GraphicsAdapter(adapter.Detach(), idx));
