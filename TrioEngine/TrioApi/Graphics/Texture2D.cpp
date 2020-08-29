@@ -27,21 +27,21 @@ namespace TrioEngine
 		CommonConstructor(width, height, 1, SurfaceType::TextureType, 1, 0, false, 1);
 	}
 
-	Texture2D::Texture2D(GraphicsDevice* graphicsDevice, int width, int height, uint32_t mipmap, SurfaceFormat format, SurfaceType type, uint32_t multiSamples, uint32_t msQuality, bool shared) :
+	Texture2D::Texture2D(GraphicsDevice* graphicsDevice, int width, int height, uint32_t mipmap, SurfaceFormat format, SurfaceType surfaceType, uint32_t multiSamples, uint32_t msQuality, bool shared) :
 		Texture(graphicsDevice, format),
 		m_width(width),
 		m_height(height),
-		m_surfaceType(type),
+		m_surfaceType(surfaceType),
 		m_shared(shared)
 	{
-		CommonConstructor(width, height, mipmap, type, multiSamples, msQuality, shared, 1);
+		CommonConstructor(width, height, mipmap, surfaceType, multiSamples, msQuality, shared, 1);
 	}
 
-	void Texture2D::CommonConstructor(int width, int height, uint32_t mipmap, SurfaceType type, uint32_t multiSamples, uint32_t msQuality, bool shared, uint32_t uArraySize)
+	void Texture2D::CommonConstructor(int width, int height, uint32_t mipmap, SurfaceType surfaceType, uint32_t multiSamples, uint32_t msQuality, bool shared, uint32_t uArraySize)
 	{
 		m_width = width;
 		m_height = height;
-		m_surfaceType = type;
+		m_surfaceType = surfaceType;
 		m_shared = shared;
 
 		m_levelCount = mipmap;
@@ -51,8 +51,9 @@ namespace TrioEngine
 		m_arraySize = uArraySize;
 
 		m_usage = ResourceUsage::Default;
+		m_stagingTex = nullptr;
 
-		if (type == SurfaceType::SwapChainRenderTarget)
+		if (surfaceType == SurfaceType::SwapChainRenderTarget)
 			return;
 
 		//
@@ -91,7 +92,7 @@ namespace TrioEngine
 	}
 
 #ifdef TRIO_DIRECTX
-	void Texture2D::CreateTexture(D3D11_SUBRESOURCE_DATA * subdata)
+	void Texture2D::CreateTexture(D3D11_SUBRESOURCE_DATA* subdata)
 	{
 		m_tex2DDesc = { 0 };
 		m_tex2DDesc.Width = m_width;
@@ -99,12 +100,12 @@ namespace TrioEngine
 		m_tex2DDesc.MipLevels = m_levelCount;
 		m_tex2DDesc.ArraySize = m_arraySize;
 		m_tex2DDesc.Format = ToFormat(m_format);
-		m_tex2DDesc.BindFlags = (UINT)BindFlags::ShaderResource;
-		m_tex2DDesc.CPUAccessFlags = (UINT)CpuAccessFlags::None;
+		m_tex2DDesc.BindFlags = (uint32_t)BindFlags::ShaderResource;
+		m_tex2DDesc.CPUAccessFlags = (uint32_t)CpuAccessFlags::None;
 		m_tex2DDesc.SampleDesc.Count = m_multiSamples;
 		m_tex2DDesc.SampleDesc.Quality = m_msQuality;
 		m_tex2DDesc.Usage = (D3D11_USAGE)m_usage;
-		m_tex2DDesc.MiscFlags = (UINT)ResourceOptionFlags::None;
+		m_tex2DDesc.MiscFlags = (uint32_t)ResourceOptionFlags::None;
 
 		if (m_surfaceType == SurfaceType::RenderTarget)
 		{

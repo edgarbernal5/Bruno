@@ -1,4 +1,5 @@
-﻿using EsteroWindows.Interop;
+﻿using EsteroFramework.Graphics;
+using EsteroWindows.Interop;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,6 +15,8 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TrioApi.Net.Graphics.Core;
+using TrioWpfFramework.Net.Graphics;
 
 namespace EsteroFramework.Editor
 {
@@ -136,6 +139,24 @@ namespace EsteroFramework.Editor
                 // to this element when a menu command is executed or a top menu item is closed
                 // using mouse click or escape key.)
                 eventArgs.Handled = true;
+            }
+        }
+
+        private Texture2D texture;
+
+        private void EsteroImageControl_Render()
+        {
+            var device = GraphicsDeviceService.Service.GraphicsDevice;
+
+            device.Clear(TrioWpfFramework.Net.Graphics.Core.Color.Aqua);
+
+            if (texture == null)
+            {
+                texture = new Texture2D(device, 960, 960, SurfaceFormat.Color);
+                texture.LoadFromFile();
+
+                byte[] bytes = new byte[960 * 960 * 4];
+                texture.GetData(bytes);
             }
         }
     }

@@ -4,6 +4,7 @@ using Estero.ServiceLocation;
 using EsteroFramework;
 using EsteroFramework.Editor;
 using EsteroFramework.Editor.Menus;
+using EsteroFramework.Editor.Units.Game;
 using System.Windows;
 
 namespace TrioWpfEditor
@@ -37,6 +38,7 @@ namespace TrioWpfEditor
 
             //Core units
             _editor.Units.Add(new MenuUnit());
+            _editor.Units.Add(new GameUnit());
 
             _editor.Configure();
         }

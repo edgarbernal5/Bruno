@@ -12,6 +12,7 @@
 #define TRIO_API_EXPORT
 
 #endif
+
 namespace TrioEngine
 {
 	class Game;
@@ -24,6 +25,8 @@ namespace TrioEngine
 	class GameObject;
 	class Component;
 	class Object;
+	class Texture2D;
+	class RenderTarget2D;
 
 	//class ContentManager;
 	//class ContentReader;

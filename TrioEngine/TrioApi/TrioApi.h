@@ -138,6 +138,14 @@ extern "C" TRIO_API_EXPORT char* __stdcall Object_GetName(Object* object);
 extern "C" TRIO_API_EXPORT void __stdcall Object_SetName(Object* object, const char* name);
 
 /*
+RenderTarget2D
+*/
+extern "C" TRIO_API_EXPORT RenderTarget2D* __stdcall RenderTarget2D_Ctor(GraphicsDevice* device, int width, int height, SurfaceFormat format);
+extern "C" TRIO_API_EXPORT RenderTarget2D * __stdcall RenderTarget2D_Ctor2(GraphicsDevice* device, int width, int height, uint32_t mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, RenderTargetUsage usage);
+extern "C" TRIO_API_EXPORT RenderTarget2D * __stdcall RenderTarget2D_Ctor3(GraphicsDevice* device, int width, int height, uint32_t mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat);
+extern "C" TRIO_API_EXPORT void __stdcall RenderTarget2D_Dctor(RenderTarget2D* renderTarget);
+
+/*
 RasterizerState
 */
 extern "C" TRIO_API_EXPORT RasterizerState* __stdcall RasterizerState_Ctor();
@@ -169,6 +177,16 @@ extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalPosition(Transform* 
 extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalRotation(Transform* transform, Quaternion *rotation);
 extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalScale(Transform* transform, Vector3 *scale);
 extern "C" TRIO_API_EXPORT void __stdcall Transform_SetParent(Transform* transform, Transform* parent);
+
+/*
+Texture2D
+*/
+extern "C" TRIO_API_EXPORT Texture2D* __stdcall Texture2D_Ctor(GraphicsDevice* device, int width, int height);
+extern "C" TRIO_API_EXPORT Texture2D* __stdcall Texture2D_Ctor2(GraphicsDevice* device, int width, int height, SurfaceFormat format);
+extern "C" TRIO_API_EXPORT void __stdcall Texture2D_GetData(Texture2D* texture, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes);
+extern "C" TRIO_API_EXPORT void __stdcall Texture2D_TestLoadFromFile(Texture2D* texture);
+extern "C" TRIO_API_EXPORT int __stdcall Texture2D_GetWidth(Texture2D* texture);
+extern "C" TRIO_API_EXPORT int __stdcall Texture2D_GetHeight(Texture2D* texture);
 
 /*
 Vector3

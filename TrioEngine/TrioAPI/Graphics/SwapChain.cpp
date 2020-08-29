@@ -50,8 +50,8 @@ namespace TrioEngine
 		);
 	}
 
-	DeviceErrorStatus SwapChain::Present(uint32_t SyncInterval, uint32_t Flags)
+	DeviceErrorStatus SwapChain::Present(uint32_t syncInterval, uint32_t flags)
 	{
-		return (DeviceErrorStatus)m_swapChain->Present(SyncInterval, Flags);
+		return (DeviceErrorStatus)m_swapChain->Present(syncInterval, flags);
 	}
 }

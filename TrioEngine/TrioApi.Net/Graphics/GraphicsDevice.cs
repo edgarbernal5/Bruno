@@ -110,6 +110,11 @@ namespace TrioWpfFramework.Net.Graphics
             BlendState = BlendState.Opaque;
         }
 
+        public void Clear(Color color)
+        {
+            Internal_Clear(m_nativePtr, color.PackedColor);
+        }
+
         public void Present()
         {
             Internal_Present(m_nativePtr);
@@ -128,13 +133,14 @@ namespace TrioWpfFramework.Net.Graphics
                 {
                     disposed = true;
                     Internal_dtor(m_nativePtr);
+                    m_nativePtr = IntPtr.Zero;
                 }
             }
         }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
     }

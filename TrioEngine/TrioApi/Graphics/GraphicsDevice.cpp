@@ -445,11 +445,6 @@ namespace TrioEngine
 	void GraphicsDevice::CreateWindowSizeDependentResources()
 	{
 #ifdef TRIO_DIRECTX
-		if (!m_presentationParameters.GetHostHWND())
-		{
-			throw std::exception("Call SetWindow with a valid Win32 window handle");
-		}
-
 		// Clear the previous window size specific context.
 		ID3D11RenderTargetView* nullViews[] = { nullptr };
 		m_d3dContext->OMSetRenderTargets(_countof(nullViews), nullViews, nullptr);
@@ -464,6 +459,11 @@ namespace TrioEngine
 		// Determine the render target size in pixels.
 		uint32_t backBufferWidth = std::max<uint32_t>(m_presentationParameters.GetBackBufferWidth(), 1);
 		uint32_t backBufferHeight = std::max<uint32_t>(m_presentationParameters.GetBackBufferHeight(), 1);
+
+		if (m_presentationParameters.GetHostHWND() == nullptr)
+		{
+			return;
+		}
 
 		if (m_swapChain)
 		{
@@ -632,6 +632,7 @@ namespace TrioEngine
 			// The first argument instructs DXGI to block until VSync, putting the application
 			// to sleep until the next VSync. This ensures we don't waste any cycles rendering
 			// frames that will never be displayed to the screen.
+			//var syncInterval = PresentationParameters.PresentationInterval.GetSyncInterval();
 			hr = m_swapChain->Present(1, 0);
 		//}
 

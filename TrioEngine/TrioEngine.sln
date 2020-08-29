@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EsteroWindows", "EsteroWind
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EsteroFramework", "EsteroFramework\EsteroFramework.csproj", "{434DC78E-F052-4F5E-9D3B-B74CF92C28EE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EsteroEngine", "EsteroEngine\EsteroEngine.vcxproj", "{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,16 @@ Global
 		{434DC78E-F052-4F5E-9D3B-B74CF92C28EE}.Release|x64.Build.0 = Release|Any CPU
 		{434DC78E-F052-4F5E-9D3B-B74CF92C28EE}.Release|x86.ActiveCfg = Release|Any CPU
 		{434DC78E-F052-4F5E-9D3B-B74CF92C28EE}.Release|x86.Build.0 = Release|Any CPU
+		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Debug|x64.ActiveCfg = Debug|x64
+		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Debug|x64.Build.0 = Debug|x64
+		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Debug|x86.ActiveCfg = Debug|Win32
+		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Debug|x86.Build.0 = Debug|Win32
+		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Release|Any CPU.ActiveCfg = Release|Win32
+		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Release|x64.ActiveCfg = Release|x64
+		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Release|x64.Build.0 = Release|x64
+		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Release|x86.ActiveCfg = Release|Win32
+		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

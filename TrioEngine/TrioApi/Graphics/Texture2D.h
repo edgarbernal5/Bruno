@@ -49,7 +49,7 @@ namespace TrioEngine
 
 		//friend class SpriteBatch;
 	protected:
-		Texture2D(GraphicsDevice* graphicsDevice, int width, int height, uint32_t mipmap, SurfaceFormat format, SurfaceType type, uint32_t multiSamples, uint32_t msQuality, bool shared);
+		Texture2D(GraphicsDevice* graphicsDevice, int width, int height, uint32_t mipmap, SurfaceFormat format, SurfaceType surfaceType, uint32_t multiSamples, uint32_t msQuality, bool shared);
 
 		int m_width;
 		int m_height;
@@ -65,6 +65,7 @@ namespace TrioEngine
 		void CommonConstructor(int width, int height, uint32_t mipmap, SurfaceType type, uint32_t multiSamples, uint32_t msQuality, bool shared, uint32_t uArraySize);
 
 #ifdef TRIO_DIRECTX
+		ID3D11Texture2D* m_stagingTex;
 		void CreateTexture(D3D11_SUBRESOURCE_DATA* subdata);
 #endif
 	private:
@@ -81,7 +82,7 @@ namespace TrioEngine
 	}
 
 	template <class T>
-	void Texture2D::GetData(int level, Rectangle * rect, T* data, int length, int startIndex, int elementCount)
+	void Texture2D::GetData(int level, Rectangle* rect, T* data, int length, int startIndex, int elementCount)
 	{
 		if (data == nullptr)
 			return;
@@ -114,25 +115,26 @@ namespace TrioEngine
 		}
 
 #ifdef TRIO_DIRECTX
-		D3D11_TEXTURE2D_DESC desc;
-		desc.Usage = (D3D11_USAGE)ResourceUsage::Staging;
-		desc.Width = m_width;
-		desc.Height = m_height;
-		desc.MipLevels = 1;
-		desc.ArraySize = 1;
-		desc.Format = ToFormat(m_format);
-		desc.BindFlags = (UINT)BindFlags::None;
-		desc.CPUAccessFlags = (UINT)CpuAccessFlags::Read;
-		desc.MiscFlags = (UINT)ResourceOptionFlags::None;
+		if (m_stagingTex == nullptr)
+		{
+			D3D11_TEXTURE2D_DESC desc;
+			desc.Usage = (D3D11_USAGE)ResourceUsage::Staging;
+			desc.Width = m_width;
+			desc.Height = m_height;
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.Format = ToFormat(m_format);
+			desc.BindFlags = (UINT)BindFlags::None;
+			desc.CPUAccessFlags = (UINT)CpuAccessFlags::Read;
+			desc.MiscFlags = (UINT)ResourceOptionFlags::None;
+			desc.SampleDesc.Count = m_multiSamples;
+			desc.SampleDesc.Quality = m_msQuality;
 
-		desc.SampleDesc.Count = m_multiSamples;
-		desc.SampleDesc.Quality = m_msQuality;
-
-		//TO-DO: hacer un pool de texturas staging.
-		ID3D11Texture2D *stagingTex = nullptr;
-		DX::ThrowIfFailed(
-			m_device->GetD3DDevice()->CreateTexture2D(&desc, nullptr, &stagingTex)
-		);
+			//TO-DO: hacer un pool de texturas staging.
+			DX::ThrowIfFailed(
+				m_device->GetD3DDevice()->CreateTexture2D(&desc, nullptr, &m_stagingTex)
+			);
+		}
 
 		D3D11_BOX region;
 		region.front = 0;
@@ -143,17 +145,15 @@ namespace TrioEngine
 		region.left = x;
 		region.right = x + w;
 
-		m_device->GetD3DDeviceContext()->CopySubresourceRegion(stagingTex, 0, 0, 0, 0, m_texture, level, &region);
+		m_device->GetD3DDeviceContext()->CopySubresourceRegion(m_stagingTex, 0, 0, 0, 0, m_texture, level, &region);
 
 		D3D11_MAPPED_SUBRESOURCE mapsource;
-		m_device->GetD3DDeviceContext()->Map(stagingTex, 0, (D3D11_MAP)MapMode::Read, 0, &mapsource);
+		m_device->GetD3DDeviceContext()->Map(m_stagingTex, 0, (D3D11_MAP)MapMode::Read, 0, &mapsource);
 
 		T *pData = reinterpret_cast<T*>(mapsource.pData);
 		memcpy(data + startIndex, pData + startIndex, sizeof(T) * elementCount);
 
-		m_device->GetD3DDeviceContext()->Unmap(stagingTex, 0);
-
-		RELEASE_COM(stagingTex);
+		m_device->GetD3DDeviceContext()->Unmap(m_stagingTex, 0);
 #endif
 	}
 

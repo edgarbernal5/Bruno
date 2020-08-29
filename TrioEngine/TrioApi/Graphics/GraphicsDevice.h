@@ -83,7 +83,7 @@ namespace TrioEngine
 
 		friend class EffectPass;
 	private:
-		std::unique_ptr <SwapChain> m_swapChain;
+		std::unique_ptr<SwapChain>					m_swapChain;
 		GraphicsCapabilities						m_graphicsCapabilities;
 		TextureCollection*							m_vertexTextureCollection;
 
@@ -134,7 +134,7 @@ namespace TrioEngine
 		// Direct3D rendering objects. Required for 3D.
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_d3dRenderTargetView;
 		
-		std::vector<ID3D11RenderTargetView *>			m_currentRenderTargets;
+		std::vector<ID3D11RenderTargetView*>			m_currentRenderTargets;
 
 		D3D_FEATURE_LEVEL                               m_d3dMinFeatureLevel;
 		D3D_FEATURE_LEVEL                               m_d3dFeatureLevel;

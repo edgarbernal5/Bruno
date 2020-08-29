@@ -7,7 +7,7 @@ namespace TrioEngine
 	// Defines how "GraphicsDevice.Present updates the game window.
 	enum class PresentInterval
 	{
-		//Equivalent to "PresentInterval.One"/>.
+		//Equivalent to "PresentInterval.One".
 		Default = 0,
 
 		//The driver waits for the vertical retrace period, before updating window client area. 

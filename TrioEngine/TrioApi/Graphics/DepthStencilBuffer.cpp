@@ -28,8 +28,8 @@ namespace TrioEngine
 		m_glDepthBuffer(0),
 		m_glStencilBuffer(0),
 #endif
-		m_device(device) {
-
+		m_device(device)
+	{
 #ifdef TRIO_DIRECTX
 
 		// Create a depth stencil view for use with 3D rendering if needed.
@@ -54,12 +54,12 @@ namespace TrioEngine
 			&depthStencilViewDesc,
 			m_depthStencilView.ReleaseAndGetAddressOf()
 		));
-
 #endif
 	}
 
 #ifdef TRIO_DIRECTX
-	DepthStencilBuffer::DepthStencilBuffer(GraphicsDevice* device, int width, int height, DepthFormat format, DepthStencilViewDimension viewDimension, DepthStencilViewFlags viewFlags) {
+	DepthStencilBuffer::DepthStencilBuffer(GraphicsDevice* device, int width, int height, DepthFormat format, DepthStencilViewDimension viewDimension, DepthStencilViewFlags viewFlags)
+	{
 
 	}
 

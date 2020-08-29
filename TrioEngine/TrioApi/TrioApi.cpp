@@ -21,10 +21,13 @@
 #include "Graphics/VertexPosition.h"
 #include "Graphics/VertexPositionColor.h"
 #include "Graphics/VertexPositionNormalTexture.h"
+#include "Graphics/Texture2D.h"
+#include "Graphics/RenderTarget2D.h"
 
 #include "Scene.h"
 #include "Transform.h"
 #include "GameObject.h"
+#include "Utils/TextureLoader.h"
 
 #include "Content/Pipeline/Tasks/BuildCoordinator.h"
 
@@ -291,7 +294,6 @@ void Game_Tick(Game* game)
 	game->Tick();
 }
 
-
 /*
 GameObject
 */
@@ -539,6 +541,29 @@ void Object_SetName(Object* object, const char* name)
 }
 
 /*
+RenderTarget2D
+*/
+RenderTarget2D* RenderTarget2D_Ctor(GraphicsDevice* device, int width, int height, SurfaceFormat preferredFormat)
+{
+	return new RenderTarget2D(device, width, height, preferredFormat);
+}
+
+RenderTarget2D* RenderTarget2D_Ctor2(GraphicsDevice* device, int width, int height, uint32_t mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
+{
+	return new RenderTarget2D(device, width, height, mipmap, preferredFormat, preferredDepthFormat);
+}
+
+RenderTarget2D* RenderTarget2D_Ctor3(GraphicsDevice* device, int width, int height, uint32_t mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, RenderTargetUsage usage)
+{
+	return new RenderTarget2D(device, width, height, mipmap, preferredFormat, preferredDepthFormat, usage);
+}
+
+void RenderTarget2D_Dctor(RenderTarget2D* renderTarget)
+{
+	delete renderTarget;
+}
+
+/*
 RasterizerState
 */
 RasterizerState* RasterizerState_Ctor()
@@ -645,6 +670,43 @@ void Transform_SetLocalScale(Transform* transform, Vector3 *scale)
 void Transform_SetParent(Transform* transform, Transform* parent)
 {
 	transform->SetParent(std::shared_ptr<Transform>(parent));
+}
+
+/*
+Texture2D
+*/
+Texture2D* Texture2D_Ctor(GraphicsDevice* device, int width, int height)
+{
+	return new Texture2D(device, width, height);
+}
+
+Texture2D* Texture2D_Ctor2(GraphicsDevice* device, int width, int height, SurfaceFormat format)
+{
+	return new Texture2D(device, width, height, format);
+}
+
+
+void Texture2D_GetData(Texture2D* texture, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes)
+{
+	texture->GetData<uint8_t>(0, nullptr, data, sizeArrayBytes, 0, elementCount);
+}
+
+void Texture2D_TestLoadFromFile(Texture2D * texture)
+{
+	TextureLoader texLoader;
+	TextureLoader::ImageInfo imgInfo = texLoader.GetTextureFromFile("D:\\Edgar\\Documentos\\Proyectos\\CG\\TrioEngineGit\\TrioEngine\\TrioWin32Sample\\edgar.jpg");
+
+	texture->SetData<uint8_t>(imgInfo.Data, imgInfo.SizeOfData);
+}
+
+int Texture2D_GetWidth(Texture2D* texture)
+{
+	return texture->GetWidth();
+}
+
+int Texture2D_GetHeight(Texture2D* texture)
+{
+	return texture->GetHeight();
 }
 
 /*

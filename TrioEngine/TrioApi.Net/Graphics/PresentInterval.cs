@@ -8,7 +8,7 @@ namespace TrioWpfFramework.Net.Graphics
 {
     public enum PresentInterval
     {
-        //Equivalent to "PresentInterval.One"/>.
+        //Equivalent to "PresentInterval.One".
         Default = 0,
 
         //The driver waits for the vertical retrace period, before updating window client area. 

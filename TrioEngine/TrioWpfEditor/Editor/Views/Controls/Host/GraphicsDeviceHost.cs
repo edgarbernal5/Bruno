@@ -1,4 +1,5 @@
-﻿//using System;
+﻿//using EsteroWindows.Interop;
+//using System;
 //using System.Runtime.InteropServices;
 //using System.Windows;
 //using System.Windows.Input;
@@ -6,7 +7,6 @@
 //using System.Windows.Media;
 //using TrioWpEditor.Editor;
 //using TrioWpfFramework.Net.Graphics;
-//using TrioWpfFramework.Windows.Interop;
 
 //namespace TrioWpfEditor.Views.Controls
 //{
@@ -456,7 +456,7 @@
 
 //                        hWndprev = Win32.GetFocus();
 //                        Win32.SetFocus(hWnd);
-                        
+
 //                        // send the track mouse event so that we get the WM_MOUSELEAVE message
 //                        TRACKMOUSEEVENT tme = new TRACKMOUSEEVENT();
 //                        tme.cbSize = Marshal.SizeOf(typeof(TRACKMOUSEEVENT));

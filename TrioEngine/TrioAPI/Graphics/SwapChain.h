@@ -15,7 +15,7 @@ namespace TrioEngine
 		SwapChain(GraphicsDevice* graphicsDevice, int width, int height, HWND window, SurfaceFormat backBufferformat, uint32_t bufferCount);
 
 		DeviceErrorStatus ResizeBuffers(uint32_t bufferCount, int width, int height, SurfaceFormat format, SwapChainFlags flags);
-		DeviceErrorStatus Present(uint32_t SyncInterval, uint32_t Flags);
+		DeviceErrorStatus Present(uint32_t syncInterval, uint32_t flags);
 
 #if TRIO_DIRECTX
 		IDXGISwapChain1* GetDxSwapChain() const { return m_swapChain.Get(); }

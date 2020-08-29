@@ -342,6 +342,7 @@
     <ClInclude Include="Graphics\PresentInterval.h" />
     <ClInclude Include="Graphics\PrimitiveType.h" />
     <ClInclude Include="Graphics\RasterizerState.h" />
+    <ClInclude Include="Graphics\RenderTarget2D.h" />
     <ClInclude Include="Graphics\RenderTargetUsage.h" />
     <ClInclude Include="Graphics\ResourceOptionFlags.h" />
     <ClInclude Include="Graphics\ResourceUsage.h" />
@@ -487,6 +488,7 @@
     <ClCompile Include="Graphics\ModelMaterial.cpp" />
     <ClCompile Include="Graphics\PresentationParameters.cpp" />
     <ClCompile Include="Graphics\RasterizerState.cpp" />
+    <ClCompile Include="Graphics\RenderTarget2D.cpp" />
     <ClCompile Include="Graphics\SamplerState.cpp" />
     <ClCompile Include="Graphics\SamplerStateCollection.cpp" />
     <ClCompile Include="Graphics\SceneNode.cpp" />

@@ -77,7 +77,17 @@
     </Compile>
     <Compile Include="Editor\ExitCode.cs" />
     <Compile Include="Editor\IEditorService.cs" />
+    <Compile Include="Editor\Timing\GameStepTimer.cs" />
+    <Compile Include="Editor\Timing\GameTime.cs" />
+    <Compile Include="Editor\Units\Game\GameUnit.cs" />
     <Compile Include="Editor\Units\Menus\MenuUnit.cs" />
+    <Compile Include="Graphics\GraphicsDeviceService.cs" />
+    <Compile Include="Graphics\GraphicsService.cs" />
+    <Compile Include="Graphics\IGraphicsService.cs" />
+    <Compile Include="Graphics\Interop\GameImageControl.cs" />
+    <Compile Include="Graphics\Interop\EsteroImageSource.cs" />
+    <Compile Include="Graphics\Interop\HwndMouseEventArgs.cs" />
+    <Compile Include="Graphics\Interop\HwndMouseState.cs" />
     <Compile Include="ScreenManagement\IActivate.cs" />
     <Compile Include="ScreenManagement\IDeactivate.cs" />
     <Compile Include="ScreenManagement\IGuardClose.cs" />
@@ -117,6 +127,10 @@
     <ProjectReference Include="..\Estero\Estero.csproj">
       <Project>{CC7DC8BC-3D51-4AE2-A2C4-1410A65252DC}</Project>
       <Name>Estero</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TrioApi.Net\TrioApi.Net.csproj">
+      <Project>{EB11A614-A4A3-47B3-B276-64BF6129351F}</Project>
+      <Name>TrioApi.Net</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
