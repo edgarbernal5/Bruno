@@ -16,6 +16,17 @@ namespace EsteroFramework.Editor
 
         public event EventHandler<EventArgs> WindowActivated;
 
+        internal static EditorViewModel DesignInstance
+        {
+            get
+            {
+                return new EditorViewModel(new ServiceContainer())
+                {
+                    ApplicationName = "MyEditor"
+                };
+            }
+        }
+
         public string ApplicationName
         {
             get => _applicationName;

@@ -18,6 +18,17 @@ namespace EsteroFramework.Editor
         }
         private object _commandParameter;
 
+        public object Icon
+        {
+            get => _icon;
+            set
+            {
+                _icon = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        private object _icon;
+
         public string Text
         {
             get => _text; 

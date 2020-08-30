@@ -1,5 +1,6 @@
 ﻿using Estero.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace EsteroFramework.Editor
 {
@@ -19,6 +20,9 @@ namespace EsteroFramework.Editor
 
         internal void Update(List<TreeNodeCollection<ICommandItem>> menuNodes)
         {
+            //foreach (var item in CommandItems)
+            //    PropertyChangedEventManager.RemoveListener(item, this, nameof(ICommandItem.IsVisible));
+
             Nodes.Clear();
             MergeNodes(Nodes, menuNodes);
 

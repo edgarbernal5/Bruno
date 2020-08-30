@@ -36,7 +36,7 @@ namespace EsteroFramework.Editor.Units.Game
 
         private void GameStepTimer_OnTick()
         {
-            Console.WriteLine("Ticking elapsed = {0}, total = {1}", m_gameStepTimer.ElapsedTime.TotalSeconds, m_gameStepTimer.TotalTime.TotalSeconds);
+            //Console.WriteLine("Ticking elapsed = {0}, total = {1}", m_gameStepTimer.ElapsedTime.TotalSeconds, m_gameStepTimer.TotalTime.TotalSeconds);
         }
 
         protected override void OnStartup()

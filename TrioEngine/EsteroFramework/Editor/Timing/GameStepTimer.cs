@@ -85,6 +85,7 @@ namespace EsteroFramework.Editor.Timing
             _stopwatch = new Stopwatch();
 
             m_isFixedTimeStep = false;
+            m_leftOverTime = TimeSpan.Zero;
             m_maxStepDelta = TimeSpan.FromTicks(Stopwatch.Frequency / 10);
             m_targetElapsedTime = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 60);
             m_stepSizeTolerance = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 4000);
@@ -163,7 +164,7 @@ namespace EsteroFramework.Editor.Timing
                 secondCounterTicks %= Stopwatch.Frequency;
                 m_qpcSecondCounter = TimeSpan.FromTicks(secondCounterTicks);
 
-                Console.WriteLine(string.Format("FPS = {0}", m_framesPerSecond));
+                //Console.WriteLine(string.Format("FPS = {0}", m_framesPerSecond));
             }
         }
     }

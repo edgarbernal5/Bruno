@@ -9,9 +9,26 @@ namespace EsteroFramework.Editor
         public string Name { get; }
         public ICommand Command => null;
 
+        public object CommandParameter => null;
+
+        public object Icon => null;
+
         public string Text => null;
 
-        public bool IsVisible { get => true; set => throw new NotImplementedException(); }
+        public bool IsVisible
+        {
+            get => _isVisible;
+            set
+            {
+                _isVisible = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        private bool _isVisible = true;
+
+        public bool IsCheckable => false;
+
+        public bool IsChecked => false;
 
         public MenuItemViewModel CreateMenuItem()
         {
