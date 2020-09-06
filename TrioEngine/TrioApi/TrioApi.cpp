@@ -416,6 +416,16 @@ void GraphicsDevice_SetViewport(GraphicsDevice* device, Viewport viewport)
 	device->SetViewport(viewport);
 }
 
+void GraphicsDevice_SetRenderTarget(GraphicsDevice* device, RenderTarget2D* renderTarget)
+{
+	device->SetRenderTarget(renderTarget);
+}
+
+void GraphicsDevice_SetRenderTargets(GraphicsDevice * device, RenderTarget2D * *renderTarget, int size)
+{
+
+}
+
 /*
 IndexBuffer
 */
@@ -548,14 +558,14 @@ RenderTarget2D* RenderTarget2D_Ctor(GraphicsDevice* device, int width, int heigh
 	return new RenderTarget2D(device, width, height, preferredFormat);
 }
 
-RenderTarget2D* RenderTarget2D_Ctor2(GraphicsDevice* device, int width, int height, uint32_t mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
+RenderTarget2D* RenderTarget2D_Ctor2(GraphicsDevice* device, int width, int height, uint32_t mipmapLevels, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, RenderTargetUsage usage)
 {
-	return new RenderTarget2D(device, width, height, mipmap, preferredFormat, preferredDepthFormat);
+	return new RenderTarget2D(device, width, height, mipmapLevels, preferredFormat, preferredDepthFormat, usage);
 }
 
-RenderTarget2D* RenderTarget2D_Ctor3(GraphicsDevice* device, int width, int height, uint32_t mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, RenderTargetUsage usage)
+RenderTarget2D* RenderTarget2D_Ctor3(GraphicsDevice* device, int width, int height, uint32_t mipmapLevels, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
 {
-	return new RenderTarget2D(device, width, height, mipmap, preferredFormat, preferredDepthFormat, usage);
+	return new RenderTarget2D(device, width, height, mipmapLevels, preferredFormat, preferredDepthFormat);
 }
 
 void RenderTarget2D_Dctor(RenderTarget2D* renderTarget)

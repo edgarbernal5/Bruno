@@ -9,6 +9,7 @@
 #include "PrimitiveType.h"
 #include "ShaderStage.h"
 #include "VertexBufferBinding.h"
+#include "RenderTargetBinding.h"
 
 #include "DeviceErrorStatus.h"
 #include "..\Math\MathVector.h"
@@ -46,7 +47,7 @@ namespace TrioEngine
 
 #ifdef TRIO_DIRECTX
 		UINT                    GetBackBufferCount() const { return m_backBufferCount; }
-		ID3D11RenderTargetView*	GetBackBufferRenderTargetView() const { return m_d3dRenderTargetView.Get(); }
+		ID3D11RenderTargetView*	GetBackBufferRenderTargetView() const { return m_d3dDefaultRenderTargetView.Get(); }
 		ID3D11Device1*          GetD3DDevice() const noexcept { return m_d3dDevice.Get(); }
 		ID3D11DeviceContext1*   GetD3DDeviceContext() const noexcept { return m_d3dContext.Get(); }
 		auto                    GetDXGIFactory() const noexcept { return m_dxgiFactory.Get(); }
@@ -78,6 +79,8 @@ namespace TrioEngine
 		void SetViewport(Viewport viewport);
 		void SetPixelShader(Shader* shader);
 
+		void SetRenderTarget(RenderTarget2D* renderTarget);
+
 		Event<> DeviceLost;
 		Event<> DeviceRestored;
 
@@ -101,6 +104,8 @@ namespace TrioEngine
 		VertexBuffer* m_vertexBuffer;
 		bool m_vertexBufferDirty;
 		VertexBufferBindings m_vertexBindings;
+
+		RenderTargetBindings m_renderTargetBindings;
 
 		Shader* m_vertexShader;
 		bool m_vertexShaderDirty;
@@ -129,12 +134,14 @@ namespace TrioEngine
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext1>        m_d3dContext;
 		Microsoft::WRL::ComPtr<ID3DUserDefinedAnnotation>	m_d3dAnnotation;
 
-		Microsoft::WRL::ComPtr<ID3D11Texture2D>         m_renderTarget;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D>         m_defaultD3dRenderTarget;
 
 		// Direct3D rendering objects. Required for 3D.
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_d3dRenderTargetView;
-		
-		std::vector<ID3D11RenderTargetView*>			m_currentRenderTargets;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_d3dDefaultRenderTargetView;
+
+		ID3D11DepthStencilView*							m_defaultD3dDepthStencilView;
+		std::vector<ID3D11RenderTargetView*>			m_currentD3dRenderTargets;
+		ID3D11DepthStencilView*							m_currentD3dDepthStencilView;
 
 		D3D_FEATURE_LEVEL                               m_d3dMinFeatureLevel;
 		D3D_FEATURE_LEVEL                               m_d3dFeatureLevel;
@@ -154,6 +161,8 @@ namespace TrioEngine
 		void CreateWindowSizeDependentResources();
 		void HandleDeviceLost();
 		void SetConstantBuffer(ShaderStage stage, int slot, ConstantBuffer* buffer);
+
+		void SetRenderTargets(RenderTargetBindings& bindings);
 	};
 
 }

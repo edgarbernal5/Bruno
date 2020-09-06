@@ -67,11 +67,10 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 		ID3D11Texture2D* m_stagingTex;
 		void CreateTexture(D3D11_SUBRESOURCE_DATA* subdata);
-#endif
-	private:
-#ifdef TRIO_DIRECTX
+
 		D3D11_TEXTURE2D_DESC m_tex2DDesc;
 #endif
+	private:
 
 	};
 

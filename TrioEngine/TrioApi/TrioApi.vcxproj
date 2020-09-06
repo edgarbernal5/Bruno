@@ -336,6 +336,7 @@
     <ClInclude Include="Graphics\IndexBuffer.h" />
     <ClInclude Include="Graphics\IndexElementSize.h" />
     <ClInclude Include="Graphics\InputLayoutCache.h" />
+    <ClInclude Include="Graphics\IRenderTarget.h" />
     <ClInclude Include="Graphics\IServiceBase.h" />
     <ClInclude Include="Graphics\MapMode.h" />
     <ClInclude Include="Graphics\Mesh.h" />
@@ -346,6 +347,7 @@
     <ClInclude Include="Graphics\PrimitiveType.h" />
     <ClInclude Include="Graphics\RasterizerState.h" />
     <ClInclude Include="Graphics\RenderTarget2D.h" />
+    <ClInclude Include="Graphics\RenderTargetBinding.h" />
     <ClInclude Include="Graphics\RenderTargetUsage.h" />
     <ClInclude Include="Graphics\ResourceOptionFlags.h" />
     <ClInclude Include="Graphics\ResourceUsage.h" />
@@ -492,6 +494,7 @@
     <ClCompile Include="Graphics\PresentationParameters.cpp" />
     <ClCompile Include="Graphics\RasterizerState.cpp" />
     <ClCompile Include="Graphics\RenderTarget2D.cpp" />
+    <ClCompile Include="Graphics\RenderTargetBinding.cpp" />
     <ClCompile Include="Graphics\SamplerState.cpp" />
     <ClCompile Include="Graphics\SamplerStateCollection.cpp" />
     <ClCompile Include="Graphics\SceneNode.cpp" />

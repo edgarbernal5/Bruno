@@ -32,11 +32,21 @@ namespace EsteroFramework.Editor.Units.Game
         private void CompositionTarget_Rendering(object sender, EventArgs e)
         {
             m_gameStepTimer.Tick();
+            Render();
         }
 
         private void GameStepTimer_OnTick()
         {
             //Console.WriteLine("Ticking elapsed = {0}, total = {1}", m_gameStepTimer.ElapsedTime.TotalSeconds, m_gameStepTimer.TotalTime.TotalSeconds);
+        }
+
+        private void Render()
+        {
+            foreach (var surfaceTarget in m_graphicsService.GameSurfaceTargets)
+            {
+                var graphicsScreens = surfaceTarget.GameGraphicsScreens;
+                m_graphicsService.Render(surfaceTarget, graphicsScreens);
+            }
         }
 
         protected override void OnStartup()
@@ -51,8 +61,10 @@ namespace EsteroFramework.Editor.Units.Game
 
         protected override void OnShutdown()
         {
-            CompositionTarget.Rendering -= CompositionTarget_Rendering;
             m_gameStepTimer.Stop();
+
+            CompositionTarget.Rendering -= CompositionTarget_Rendering;
+            
             m_gameStepTimer.OnTimeChanged -= GameStepTimer_OnTick;
         }
 

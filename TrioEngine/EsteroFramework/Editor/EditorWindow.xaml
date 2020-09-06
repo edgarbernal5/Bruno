@@ -23,6 +23,9 @@
             
         </Grid>
         <Grid>
+            <local:GameSurfaceTarget>
+                
+            </local:GameSurfaceTarget>
         </Grid>
     </DockPanel>
 </Window>

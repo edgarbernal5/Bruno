@@ -81,13 +81,19 @@
     <Compile Include="Editor\Timing\GameTime.cs" />
     <Compile Include="Editor\Units\Game\GameUnit.cs" />
     <Compile Include="Editor\Units\Menus\MenuUnit.cs" />
+    <Compile Include="Graphics\Screens\BasicGraphicsScreen.cs" />
+    <Compile Include="Graphics\Screens\GameGraphicsScreen.cs" />
     <Compile Include="Graphics\GraphicsDeviceService.cs" />
     <Compile Include="Graphics\GraphicsService.cs" />
     <Compile Include="Graphics\IGraphicsService.cs" />
-    <Compile Include="Graphics\Interop\GameImageControl.cs" />
-    <Compile Include="Graphics\Interop\EsteroImageSource.cs" />
+    <Compile Include="Graphics\Interop\GameImageSource.cs" />
+    <Compile Include="Graphics\Interop\GameSurfaceTarget.xaml.cs">
+      <DependentUpon>GameSurfaceTarget.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Graphics\Interop\HwndMouseEventArgs.cs" />
     <Compile Include="Graphics\Interop\HwndMouseState.cs" />
+    <Compile Include="Graphics\Interop\IGameSurfaceTarget.cs" />
+    <Compile Include="Graphics\RenderContext.cs" />
     <Compile Include="ScreenManagement\IActivate.cs" />
     <Compile Include="ScreenManagement\IDeactivate.cs" />
     <Compile Include="ScreenManagement\IGuardClose.cs" />
@@ -135,6 +141,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Editor\EditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Graphics\Interop\GameSurfaceTarget.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

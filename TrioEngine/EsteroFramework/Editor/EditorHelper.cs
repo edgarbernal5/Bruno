@@ -1,7 +1,9 @@
 ﻿
 using System;
+using System.Linq;
 using System.Windows;
 using Estero.ServiceLocation;
+using EsteroWindows;
 
 namespace EsteroFramework.Editor
 {
@@ -24,6 +26,30 @@ namespace EsteroFramework.Editor
         public static void UnregisterResources(ResourceDictionary resources)
         {
             Application.Current.Resources.MergedDictionaries.Remove(resources);
+        }
+
+        public static IEditorService GetEditor(this DependencyObject element)
+        {
+            if (element == null)
+                return null;
+
+            var window = element as Window;
+            if (window == null)
+                window = Window.GetWindow(element);
+
+            if (window != null)
+            {
+                return window.DataContext as IEditorService;
+            }
+
+            foreach (var e in element.GetSelfAndVisualAncestors().OfType<FrameworkElement>())
+            {
+                var editor = e.DataContext as IEditorService;
+                if (editor != null)
+                    return editor;
+            }
+
+            return null;
         }
     }
 }

@@ -4,6 +4,7 @@
 #include "Texture2D.h"
 
 #include "RenderTargetUsage.h"
+#include "IRenderTarget.h"
 
 #include <string>
 
@@ -12,7 +13,7 @@ namespace TrioEngine
 	class GraphicsDevice;
 	class DepthStencilBuffer;
 
-	class TRIO_API_EXPORT RenderTarget2D : public Texture2D
+	class TRIO_API_EXPORT RenderTarget2D : public Texture2D, public IRenderTarget
 	{
 	public:
 		RenderTarget2D(GraphicsDevice* graphicsDevice, int width, int height);
@@ -21,6 +22,14 @@ namespace TrioEngine
 		RenderTarget2D(GraphicsDevice* graphicsDevice, int width, int height, uint32_t mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, RenderTargetUsage usage);
 
 		~RenderTarget2D();
+
+		int GetWidth();
+		int GetHeight();
+
+#if TRIO_DIRECTX
+		ID3D11RenderTargetView* GetRenderTargetView(int arraySlice);
+		ID3D11DepthStencilView* GetDepthStencilView();
+#endif
 
 	protected:
 		void CommonConstructor();

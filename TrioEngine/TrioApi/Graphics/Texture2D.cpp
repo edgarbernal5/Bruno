@@ -27,24 +27,24 @@ namespace TrioEngine
 		CommonConstructor(width, height, 1, SurfaceType::TextureType, 1, 0, false, 1);
 	}
 
-	Texture2D::Texture2D(GraphicsDevice* graphicsDevice, int width, int height, uint32_t mipmap, SurfaceFormat format, SurfaceType surfaceType, uint32_t multiSamples, uint32_t msQuality, bool shared) :
+	Texture2D::Texture2D(GraphicsDevice* graphicsDevice, int width, int height, uint32_t mipmapLevels, SurfaceFormat format, SurfaceType surfaceType, uint32_t multiSamples, uint32_t msQuality, bool shared) :
 		Texture(graphicsDevice, format),
 		m_width(width),
 		m_height(height),
 		m_surfaceType(surfaceType),
 		m_shared(shared)
 	{
-		CommonConstructor(width, height, mipmap, surfaceType, multiSamples, msQuality, shared, 1);
+		CommonConstructor(width, height, mipmapLevels, surfaceType, multiSamples, msQuality, shared, 1);
 	}
 
-	void Texture2D::CommonConstructor(int width, int height, uint32_t mipmap, SurfaceType surfaceType, uint32_t multiSamples, uint32_t msQuality, bool shared, uint32_t uArraySize)
+	void Texture2D::CommonConstructor(int width, int height, uint32_t mipmapLevels, SurfaceType surfaceType, uint32_t multiSamples, uint32_t msQuality, bool shared, uint32_t uArraySize)
 	{
 		m_width = width;
 		m_height = height;
 		m_surfaceType = surfaceType;
 		m_shared = shared;
 
-		m_levelCount = mipmap;
+		m_levelCount = mipmapLevels == 0 ? 1 : mipmapLevels;
 		m_multiSamples = multiSamples;
 		m_msQuality = msQuality;
 

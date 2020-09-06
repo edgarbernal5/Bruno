@@ -12,7 +12,7 @@ using TrioWpfFramework.Net.Graphics;
 
 namespace EsteroFramework.Graphics.Interop
 {
-    public class EsteroImageSource : IDisposable
+    public class GameImageSource : IDisposable
     {
         // the render target we draw to
         private RenderTarget2D renderTarget;
@@ -47,7 +47,7 @@ namespace EsteroFramework.Graphics.Interop
         /// <param name="graphics">The GraphicsDevice to use.</param>
         /// <param name="width">The width of the image source.</param>
         /// <param name="height">The height of the image source.</param>
-        public EsteroImageSource(GraphicsDevice graphics, int width, int height)
+        public GameImageSource(GraphicsDevice graphics, int width, int height)
         {
             // create the render target and buffer to hold the data
             renderTarget = new RenderTarget2D(
@@ -61,7 +61,7 @@ namespace EsteroFramework.Graphics.Interop
                 PixelFormats.Bgra32, null);
         }
 
-        ~EsteroImageSource()
+        ~GameImageSource()
         {
             Dispose(false);
         }
@@ -90,12 +90,12 @@ namespace EsteroFramework.Graphics.Interop
             // because the only 32 bit pixel format for WPF is 
             // BGRA but XNA is all RGBA, we have to swap the R 
             // and B bytes for each pixel
-            for (int i = 0; i < buffer.Length - 2; i += 4)
-            {
-                byte r = buffer[i];
-                buffer[i] = buffer[i + 2];
-                buffer[i + 2] = r;
-            }
+            //for (int i = 0; i < buffer.Length - 2; i += 4)
+            //{
+            //    byte r = buffer[i];
+            //    buffer[i] = buffer[i + 2];
+            //    buffer[i + 2] = r;
+            //}
 
             // write our pixels into the bitmap source
             writeableBitmap.Lock();

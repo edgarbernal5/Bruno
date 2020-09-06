@@ -16,7 +16,7 @@
 #include "TextureCollection.h"
 #include "VertexBuffer.h"
 #include "SwapChain.h"
-
+#include "RenderTarget2D.h"
 
 namespace TrioEngine
 {
@@ -42,6 +42,13 @@ namespace TrioEngine
 #endif
 
 	GraphicsDevice::GraphicsDevice(GraphicsAdapter* adapter, PresentationParameters parameters) :
+#if TRIO_DIRECTX
+		m_currentD3dDepthStencilView(nullptr),
+		m_defaultD3dDepthStencilView(nullptr),
+		m_d3dMinFeatureLevel(D3D_FEATURE_LEVEL_10_0),
+		m_d3dFeatureLevel(D3D_FEATURE_LEVEL_9_1),
+#endif
+
 		m_currentDepthStencilBuffer(nullptr),
 
 		m_vertexTextureCollection(nullptr),
@@ -68,11 +75,7 @@ namespace TrioEngine
 
 		m_depthStencilStateDirty(false),
 		m_depthStencilState(nullptr)
-#if TRIO_DIRECTX
-		,
-		m_d3dMinFeatureLevel(D3D_FEATURE_LEVEL_10_0),
-		m_d3dFeatureLevel(D3D_FEATURE_LEVEL_9_1)
-#endif
+
 	{
 		CreateDeviceResources();
 		CreateWindowSizeDependentResources();
@@ -252,9 +255,9 @@ namespace TrioEngine
 		if ((options & ClearOptions::Target) == ClearOptions::Target)
 		{
 			const float* colorFloat = reinterpret_cast<const float*>(&color);
-			for (int i = 0; i < m_currentRenderTargets.size() && m_currentRenderTargets[i] != nullptr; i++)
+			for (int i = 0; i < m_currentD3dRenderTargets.size() && m_currentD3dRenderTargets[i] != nullptr; i++)
 			{
-				m_d3dContext->ClearRenderTargetView(m_currentRenderTargets[i], colorFloat);
+				m_d3dContext->ClearRenderTargetView(m_currentD3dRenderTargets[i], colorFloat);
 			}
 		}
 		uint32_t flags = 0;
@@ -271,7 +274,7 @@ namespace TrioEngine
 		}
 
 		//TODO: mover esto de aca?
-		m_d3dContext->OMSetRenderTargets(1, &m_currentRenderTargets[0], m_depthStencilBuffer->m_depthStencilView.Get());
+		m_d3dContext->OMSetRenderTargets(1, &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
 #endif
 	}
 
@@ -448,11 +451,12 @@ namespace TrioEngine
 		// Clear the previous window size specific context.
 		ID3D11RenderTargetView* nullViews[] = { nullptr };
 		m_d3dContext->OMSetRenderTargets(_countof(nullViews), nullViews, nullptr);
-		m_currentRenderTargets = std::vector<ID3D11RenderTargetView*>(4, nullptr);
+		m_currentD3dRenderTargets = std::vector<ID3D11RenderTargetView*>(4, nullptr);
 
-		m_renderTarget.Reset();
-		m_d3dRenderTargetView.Reset();
+		m_defaultD3dRenderTarget.Reset();
+		m_d3dDefaultRenderTargetView.Reset();
 
+		m_defaultD3dDepthStencilView = nullptr;
 		m_depthStencilBuffer.reset();
 		m_d3dContext->Flush();
 
@@ -519,22 +523,25 @@ namespace TrioEngine
 		}
 
 		// Create a render target view of the swap chain back buffer.
-		DX::ThrowIfFailed(m_swapChain->GetDxSwapChain()->GetBuffer(0, IID_PPV_ARGS(m_renderTarget.ReleaseAndGetAddressOf())));
+		DX::ThrowIfFailed(m_swapChain->GetDxSwapChain()->GetBuffer(0, IID_PPV_ARGS(m_defaultD3dRenderTarget.ReleaseAndGetAddressOf())));
 
 		CD3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc(D3D11_RTV_DIMENSION_TEXTURE2D, ToFormat(m_presentationParameters.GetBackBufferFormat()));
 		DX::ThrowIfFailed(m_d3dDevice->CreateRenderTargetView(
-			m_renderTarget.Get(),
+			m_defaultD3dRenderTarget.Get(),
 			&renderTargetViewDesc,
-			m_d3dRenderTargetView.ReleaseAndGetAddressOf()
+			m_d3dDefaultRenderTargetView.ReleaseAndGetAddressOf()
 		));
 
+		m_defaultD3dDepthStencilView = nullptr;
 		if (m_presentationParameters.GetDepthStencilFormat() != DepthFormat::None)
 		{
 			m_depthStencilBuffer.reset(new DepthStencilBuffer(this, backBufferWidth, backBufferHeight, m_presentationParameters.GetDepthStencilFormat()));
+			m_defaultD3dDepthStencilView = m_depthStencilBuffer->m_depthStencilView.Get();
 		}
+		m_currentD3dDepthStencilView = m_defaultD3dDepthStencilView;
 
-		m_currentRenderTargets[0] = m_d3dRenderTargetView.Get();
-		m_d3dContext->OMSetRenderTargets(1, &m_currentRenderTargets[0], m_depthStencilBuffer->m_depthStencilView.Get());
+		m_currentD3dRenderTargets[0] = m_d3dDefaultRenderTargetView.Get();
+		m_d3dContext->OMSetRenderTargets(1, &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
 
 		// Set the 3D rendering viewport to target the entire window.
 		m_viewport = CD3D11_VIEWPORT(
@@ -593,9 +600,12 @@ namespace TrioEngine
 		DeviceLost();
 
 		m_depthStencilBuffer.reset();
+		m_defaultD3dDepthStencilView = nullptr;
+		m_currentD3dDepthStencilView = nullptr;
 
-		m_d3dRenderTargetView.Reset();
-		m_renderTarget.Reset();
+		m_d3dDefaultRenderTargetView.Reset();
+
+		m_defaultD3dRenderTarget.Reset();
 		m_swapChain.reset();
 		m_d3dContext.Reset();
 		m_d3dAnnotation.Reset();
@@ -639,7 +649,7 @@ namespace TrioEngine
 		 // Discard the contents of the render target.
 		// This is a valid operation only when the existing contents will be entirely
 		// overwritten. If dirty or scroll rects are used, this call should be removed.
-		m_d3dContext->DiscardView(m_d3dRenderTargetView.Get());
+		m_d3dContext->DiscardView(m_d3dDefaultRenderTargetView.Get());
 
 		if (m_depthStencilBuffer != nullptr && m_depthStencilBuffer->GetDepthStencilView())
 		{
@@ -725,6 +735,74 @@ namespace TrioEngine
 
 		m_rasterizerState = state;
 		m_rasterizerStateDirty = true;
+	}
+
+	void GraphicsDevice::SetRenderTarget(RenderTarget2D* renderTarget)
+	{
+		if (renderTarget == nullptr)
+		{
+			RenderTargetBindings bindings;
+
+			SetRenderTargets(bindings);
+		}
+		else
+		{
+			RenderTargetBindings bindings(RenderTargetBinding(dynamic_cast<Texture*>(renderTarget)));
+
+			SetRenderTargets(bindings);
+		}
+	}
+
+	void GraphicsDevice::SetRenderTargets(RenderTargetBindings& bindings)
+	{
+		if (m_renderTargetBindings.size() == bindings.size())
+		{
+			bool areTheSame = true;
+			for (int i = 0; i < m_renderTargetBindings.size(); i++)
+			{
+				if (m_renderTargetBindings[i].RenderTarget != bindings[i].RenderTarget ||
+					m_renderTargetBindings[i].ArraySlice != bindings[i].ArraySlice)
+				{
+					areTheSame = false;
+					break;
+				}
+			}
+
+			if (areTheSame)
+				return;
+		}
+
+		m_renderTargetBindings.clear();
+
+		if (bindings.size() == 0)
+		{
+			//m_currentD3dRenderTargets = std::vector<ID3D11RenderTargetView*>(4, nullptr);
+
+			m_currentD3dDepthStencilView = m_defaultD3dDepthStencilView;
+			m_currentD3dRenderTargets[0] = m_d3dDefaultRenderTargetView.Get();
+			m_d3dContext->OMSetRenderTargets(1, &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
+		}
+		else
+		{
+			//m_currentD3dRenderTargets = std::vector<ID3D11RenderTargetView*>(bindings.size(), nullptr);
+
+			for (size_t i = 0; i < bindings.size(); i++)
+			{
+				const RenderTargetBinding& binding = bindings[i];
+				IRenderTarget* target = dynamic_cast<IRenderTarget*>(binding.RenderTarget);
+				m_currentD3dRenderTargets[i] = target->GetRenderTargetView(binding.ArraySlice);
+
+				if (i == 0) {
+					m_currentD3dDepthStencilView = target->GetDepthStencilView();
+				}
+			}
+
+			m_d3dContext->OMSetRenderTargets(bindings.size(), &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
+
+			m_renderTargetBindings = bindings;
+		}
+
+		//viewport = ?
 	}
 
 	void GraphicsDevice::SetSamplerState(int index, SamplerState* state)
