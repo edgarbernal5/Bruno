@@ -11,6 +11,10 @@ namespace EsteroFramework.Graphics.Interop
 
         int Height { get; }
 
+        int LastWidth { get; set; }
+
+        int LastHeight { get; set; }
+
         List<GameGraphicsScreen> GameGraphicsScreens { get; }
 
         GameImageSource GameImageSource { get; }

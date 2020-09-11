@@ -15,7 +15,6 @@ namespace EsteroFramework.Editor.Timing
 
         private TimeSpan m_qpcSecondCounter = TimeSpan.Zero;
         private int m_framesThisSecond;
-        private int m_framesPerSecond;
 
         private int m_frameCount = 0;
 
@@ -74,6 +73,15 @@ namespace EsteroFramework.Editor.Timing
                 m_isFixedTimeStep = value;
             }
         }
+
+        public int FramesPerSecond
+        {
+            get
+            {
+                return m_framesPerSecond;
+            }
+        }
+        private int m_framesPerSecond;
 
         private Stopwatch _stopwatch;
 
@@ -163,8 +171,6 @@ namespace EsteroFramework.Editor.Timing
                 var secondCounterTicks = m_qpcSecondCounter.Ticks;
                 secondCounterTicks %= Stopwatch.Frequency;
                 m_qpcSecondCounter = TimeSpan.FromTicks(secondCounterTicks);
-
-                //Console.WriteLine(string.Format("FPS = {0}", m_framesPerSecond));
             }
         }
     }

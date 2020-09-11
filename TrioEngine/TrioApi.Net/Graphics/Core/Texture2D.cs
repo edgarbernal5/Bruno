@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using TrioWpfFramework.Net;
 using TrioWpfFramework.Net.Graphics;
-using TrioWpfFramework.Net.Graphics.Core;
 
 namespace TrioApi.Net.Graphics.Core
 {
@@ -18,24 +14,22 @@ namespace TrioApi.Net.Graphics.Core
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_Ctor2", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_Ctor2(IntPtr device, int width, int height, int format);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_GetData", CallingConvention = CallingConvention.StdCall)]
-        private static extern IntPtr Internal_GetData(IntPtr texture, IntPtr bytes, uint elementCount, uint sizeArray);
+        
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_TestLoadFromFile", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_TestLoadFromFile(IntPtr texture);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_GetWidth", CallingConvention = CallingConvention.StdCall)]
-        private static extern int Internal_GetWidth(IntPtr texture);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_GetHeight", CallingConvention = CallingConvention.StdCall)]
-        private static extern int Internal_GetHeight(IntPtr texture);
 
         internal IntPtr m_nativePtr;
 
         protected bool m_disposed = false;
 
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_GetWidth", CallingConvention = CallingConvention.StdCall)]
+        private static extern int Internal_GetWidth(IntPtr texture);
         public int Width { get { return Internal_GetWidth(m_nativePtr); } }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_GetHeight", CallingConvention = CallingConvention.StdCall)]
+        private static extern int Internal_GetHeight(IntPtr texture);
         public int Height { get { return Internal_GetHeight(m_nativePtr); } }
 
         public Texture2D(GraphicsDevice device, int width, int height)
@@ -68,6 +62,9 @@ namespace TrioApi.Net.Graphics.Core
             GetData(0, 0, null, data, 0, data.Length);
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_GetData", CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr Internal_GetData(IntPtr texture, IntPtr bytes, uint elementCount, uint sizeArray);
+
         public void GetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             int elementSize = Marshal.SizeOf(typeof(T));
@@ -77,7 +74,8 @@ namespace TrioApi.Net.Graphics.Core
             {
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
 
-                Internal_GetData(m_nativePtr, dataPtr, (uint)(data.Length), (uint)(data.Length * elementSize));
+                int elemCount = (data.Length) / 4;
+                Internal_GetData(m_nativePtr, dataPtr, (uint)elemCount, (uint)(data.Length * elementSize));
             }
             finally
             {

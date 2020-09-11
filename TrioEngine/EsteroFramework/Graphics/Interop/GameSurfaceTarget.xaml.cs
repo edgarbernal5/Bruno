@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
 using TrioWpfFramework.Net.Graphics;
 
@@ -12,11 +13,32 @@ namespace EsteroFramework.Graphics.Interop
 {
     public partial class GameSurfaceTarget : UserControl, IGameSurfaceTarget
     {
-        public IntPtr Handle => throw new NotImplementedException();
+        public IntPtr Handle
+        {
+            get
+            {
+                //(PresentationSource.FromVisual(this) as HwndSource).Handle
+                //HwndSource source = (HwndSource)HwndSource.FromVisual(this);
+                //source.Handle;
+                return (PresentationSource.FromVisual(this) as HwndSource).Handle;
+            }
+        }
 
-        public int Width => throw new NotImplementedException();
+        public new int Width
+        {
+            get
+            {
+                return (int)ActualWidth;
+            }
+        }
 
-        public int Height => throw new NotImplementedException();
+        public new int Height
+        {
+            get
+            {
+                return (int)ActualHeight;
+            }
+        }
 
         public List<GameGraphicsScreen> GameGraphicsScreens
         {
@@ -29,6 +51,10 @@ namespace EsteroFramework.Graphics.Interop
 
         public GameImageSource GameImageSource => m_gameImageSource;
         private GameImageSource m_gameImageSource;
+
+        public int LastWidth { get; set; }
+
+        public int LastHeight { get; set; }
 
 
         private IGraphicsService m_graphicsService;
@@ -60,10 +86,10 @@ namespace EsteroFramework.Graphics.Interop
             m_graphicsService = editor.Services.GetInstance<IGraphicsService>();
             m_device = m_graphicsService.GraphicsDevice;
 
-            m_graphicsService.GameSurfaceTargets.Add(this);
-
-            m_gameImageSource = new GameImageSource(m_device, (int)ActualWidth, (int)ActualHeight);
+            m_gameImageSource = new GameImageSource(m_device, Width, Height);
             rootImage.Source = m_gameImageSource.WriteableBitmap;
+
+            m_graphicsService.GameSurfaceTargets.Add(this);
         }
 
         private void GameSurfaceTarget_Unloaded(object sender, RoutedEventArgs e)
@@ -76,7 +102,7 @@ namespace EsteroFramework.Graphics.Interop
             if (!WindowsPlatform.InDesignMode && m_graphicsService != null)
             {
                 m_gameImageSource.Dispose();
-                m_gameImageSource = new GameImageSource(m_device, (int)ActualWidth, (int)ActualHeight);
+                m_gameImageSource = new GameImageSource(m_device, Width, Height);
 
                 rootImage.Source = m_gameImageSource.WriteableBitmap;
             }
@@ -101,6 +127,7 @@ namespace EsteroFramework.Graphics.Interop
             m_device.SetRenderTarget(null);
 
             m_gameImageSource.Commit();
+            //m_device.Flush();
         }
     }
 }

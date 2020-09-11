@@ -9,21 +9,24 @@
 
 namespace TrioEngine
 {
-	DXGI_FORMAT ToFormat(SurfaceFormat format);
-	DXGI_FORMAT ToFormat(DepthFormat format);
-	DepthFormat FromFormat(DXGI_FORMAT format);
-	SurfaceFormat ToSurfaceFormat(DXGI_FORMAT format);
-	bool HasStencil(DXGI_FORMAT format);
-	bool HasStencil(DepthFormat format);
+	class FormatHelper {
+	public:
+		static DXGI_FORMAT ToFormat(SurfaceFormat format);
+		static  DXGI_FORMAT ToFormat(DepthFormat format);
+		static DepthFormat FromFormat(DXGI_FORMAT format);
+		static SurfaceFormat ToSurfaceFormat(DXGI_FORMAT format);
+		static bool HasStencil(DXGI_FORMAT format);
+		static bool HasStencil(DepthFormat format);
 
-	D3D_PRIMITIVE_TOPOLOGY FormatToPrimitive(PrimitiveType format);
-	int GetElementCountArray(PrimitiveType format, int primitiveCount);
-	DXGI_FORMAT ToFormat(IndexElementSize size);
+		static D3D_PRIMITIVE_TOPOLOGY FormatToPrimitive(PrimitiveType format);
+		static int GetElementCountArray(PrimitiveType format, int primitiveCount);
+		static DXGI_FORMAT ToFormat(IndexElementSize size);
 
-	int GetTypeSize(DXGI_FORMAT format);
-	int GetTypeSize(SurfaceFormat format);
-	int GetTypeSize(VertexElementFormat elementFormat);
+		static int GetTypeSize(DXGI_FORMAT format);
+		static int GetTypeSize(SurfaceFormat format);
+		static int GetTypeSize(VertexElementFormat elementFormat);
 
-	DXGI_SWAP_EFFECT ToSwapEffect(PresentInterval presentInterval);
-	uint32_t GetFrameLatency(PresentInterval interval);
+		static DXGI_SWAP_EFFECT ToSwapEffect(PresentInterval presentInterval);
+		static uint32_t GetFrameLatency(PresentInterval interval);
+	};
 }

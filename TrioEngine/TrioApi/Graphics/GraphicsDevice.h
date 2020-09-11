@@ -64,6 +64,7 @@ namespace TrioEngine
 		inline TextureCollection* GetVertexTextures() { return m_textureCollection; }
 		inline Viewport GetViewport() { return m_viewport; }
 		
+		void Flush();
 		void Present();
 		void Reset(PresentationParameters presentationParameters);
 		void Reset(PresentationParameters presentationParameters, GraphicsAdapter* graphicsAdapter);

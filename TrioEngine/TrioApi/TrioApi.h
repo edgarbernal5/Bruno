@@ -105,6 +105,7 @@ extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetRasterizerState(Grap
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetViewport(GraphicsDevice* device, Viewport viewport);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetRenderTarget(GraphicsDevice* device, RenderTarget2D* renderTarget);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetRenderTargets(GraphicsDevice * device, RenderTarget2D** renderTarget, int size);
+extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Flush(GraphicsDevice * device);
 
 /*
 IndexBuffer

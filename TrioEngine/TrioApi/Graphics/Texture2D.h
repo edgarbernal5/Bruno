@@ -31,8 +31,7 @@ namespace TrioEngine
 		template <class T>
 		void GetData(T* data, int length);
 
-		template <class T>
-		void GetData(int level, Rectangle* rect, T* data, int length, int startIndex, int elementCount);
+		void GetData(int level, Rectangle* rect, uint8_t* data, int length, int startIndex, int elementCount);
 
 		ResourceUsage GetUsage() { return m_usage; }
 
@@ -54,7 +53,6 @@ namespace TrioEngine
 		int m_width;
 		int m_height;
 
-		uint32_t m_arraySize;
 		uint32_t m_multiSamples;
 		uint32_t m_msQuality;
 
@@ -67,6 +65,7 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 		ID3D11Texture2D* m_stagingTex;
 		void CreateTexture(D3D11_SUBRESOURCE_DATA* subdata);
+		void CreateStagingTexture();
 
 		D3D11_TEXTURE2D_DESC m_tex2DDesc;
 #endif
@@ -77,83 +76,7 @@ namespace TrioEngine
 	template <class T>
 	void Texture2D::GetData(T* data, int length)
 	{
-		GetData<T>(0, nullptr, data, length, 0, length);
-	}
-
-	template <class T>
-	void Texture2D::GetData(int level, Rectangle* rect, T* data, int length, int startIndex, int elementCount)
-	{
-		if (data == nullptr)
-			return;
-
-		int x, y, w, h;
-		if (rect != nullptr)
-		{
-			x = rect->x;
-			y = rect->y;
-			w = rect->width;
-			h = rect->height;
-		}
-		else
-		{
-			x = 0;
-			y = 0;
-			w = std::max<int>(m_width >> level, 1);
-			h = std::max<int>(m_height >> level, 1);
-
-			//TO-DO: modificar h y w con formatos Dxt1, etc.
-			// Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-			if (m_format == SurfaceFormat::Dxt1 ||
-				m_format == SurfaceFormat::Dxt1a ||
-				m_format == SurfaceFormat::Dxt3 ||
-				m_format == SurfaceFormat::Dxt5)
-			{
-				w = (w + 3) & ~3;
-				h = (h + 3) & ~3;
-			}
-		}
-
-#ifdef TRIO_DIRECTX
-		if (m_stagingTex == nullptr)
-		{
-			D3D11_TEXTURE2D_DESC desc;
-			desc.Usage = (D3D11_USAGE)ResourceUsage::Staging;
-			desc.Width = m_width;
-			desc.Height = m_height;
-			desc.MipLevels = 1;
-			desc.ArraySize = 1;
-			desc.Format = ToFormat(m_format);
-			desc.BindFlags = (UINT)BindFlags::None;
-			desc.CPUAccessFlags = (UINT)CpuAccessFlags::Read;
-			desc.MiscFlags = (UINT)ResourceOptionFlags::None;
-			desc.SampleDesc.Count = m_multiSamples;
-			desc.SampleDesc.Quality = m_msQuality;
-
-			//TO-DO: hacer un pool de texturas staging.
-			DX::ThrowIfFailed(
-				m_device->GetD3DDevice()->CreateTexture2D(&desc, nullptr, &m_stagingTex)
-			);
-		}
-
-		D3D11_BOX region;
-		region.front = 0;
-		region.back = 1;
-
-		region.top = y;
-		region.bottom = y + h;
-		region.left = x;
-		region.right = x + w;
-
-		m_device->GetD3DDeviceContext()->CopySubresourceRegion(m_stagingTex, 0, 0, 0, 0, m_texture, level, &region);
-
-		D3D11_MAPPED_SUBRESOURCE mapsource;
-		m_device->GetD3DDeviceContext()->Map(m_stagingTex, 0, (D3D11_MAP)MapMode::Read, 0, &mapsource);
-
-		T *pData = reinterpret_cast<T*>(mapsource.pData);
-		memcpy(data + startIndex, pData + startIndex, sizeof(T) * elementCount);
-
-		m_device->GetD3DDeviceContext()->Unmap(m_stagingTex, 0);
-#endif
+		GetData(0, nullptr, reinterpret_cast<uint8_t*>(data), length * sizeof(T), 0, length);
 	}
 
 	template <class T>

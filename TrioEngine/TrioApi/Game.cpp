@@ -48,7 +48,6 @@ namespace TrioEngine
 
 		m_host->Resume += [=]()
 		{
-
 			m_timer.ResetElapsedTime();
 		};
 	}

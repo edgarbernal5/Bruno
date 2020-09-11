@@ -34,7 +34,7 @@ namespace TrioEngine
 
 		// Create a depth stencil view for use with 3D rendering if needed.
 		CD3D11_TEXTURE2D_DESC depthStencilDesc(
-			ToFormat(format),
+			FormatHelper::ToFormat(format),
 			width,
 			height,
 			1, // This depth stencil view has only one texture.
@@ -45,12 +45,20 @@ namespace TrioEngine
 		DX::ThrowIfFailed(device->GetD3DDevice()->CreateTexture2D(
 			&depthStencilDesc,
 			nullptr,
-			m_depthStencil.GetAddressOf()
+			m_depthStencilTexture.GetAddressOf()
 		));
 
-		CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
+		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+		ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+		depthStencilViewDesc.Format = FormatHelper::ToFormat(format);
+		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		depthStencilViewDesc.Texture2D.MipSlice = 0;
+		
+		/*CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D,
+			FormatHelper::ToFormat(format));*/
+
 		DX::ThrowIfFailed(device->GetD3DDevice()->CreateDepthStencilView(
-			m_depthStencil.Get(),
+			m_depthStencilTexture.Get(),
 			&depthStencilViewDesc,
 			m_depthStencilView.ReleaseAndGetAddressOf()
 		));
@@ -68,7 +76,7 @@ namespace TrioEngine
 	{
 #ifdef TRIO_DIRECTX
 		m_depthStencilView.Reset();
-		m_depthStencil.Reset();
+		m_depthStencilTexture.Reset();
 		//m_depthStencilBuffer.Reset();
 #endif
 	}

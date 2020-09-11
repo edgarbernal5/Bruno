@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using TrioWpfFramework.Net;
 using TrioWpfFramework.Net.Graphics;
 
@@ -11,7 +8,6 @@ namespace TrioApi.Net.Graphics.Core
 {
     public class RenderTarget2D : Texture2D
     {
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "RenderTarget2D_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_Ctor(IntPtr device, int width, int height, int preferredFormat);
         public RenderTarget2D(GraphicsDevice device, int width, int height)

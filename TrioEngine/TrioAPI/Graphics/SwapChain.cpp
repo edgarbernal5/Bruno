@@ -10,7 +10,7 @@ namespace TrioEngine
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 		swapChainDesc.Width = width;
 		swapChainDesc.Height = height;
-		swapChainDesc.Format = ToFormat(backBufferformat);
+		swapChainDesc.Format = FormatHelper::ToFormat(backBufferformat);
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.BufferCount = bufferCount;
 		swapChainDesc.SampleDesc.Count = 1;
@@ -45,7 +45,7 @@ namespace TrioEngine
 			bufferCount,
 			width,
 			height,
-			ToFormat(format),
+			FormatHelper::ToFormat(format),
 			0
 		);
 	}

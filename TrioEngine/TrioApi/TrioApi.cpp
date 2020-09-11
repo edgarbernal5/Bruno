@@ -426,6 +426,11 @@ void GraphicsDevice_SetRenderTargets(GraphicsDevice * device, RenderTarget2D * *
 
 }
 
+void GraphicsDevice_Flush(GraphicsDevice * device)
+{
+	device->Flush();
+}
+
 /*
 IndexBuffer
 */
@@ -698,7 +703,7 @@ Texture2D* Texture2D_Ctor2(GraphicsDevice* device, int width, int height, Surfac
 
 void Texture2D_GetData(Texture2D* texture, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes)
 {
-	texture->GetData<uint8_t>(0, nullptr, data, sizeArrayBytes, 0, elementCount);
+	texture->GetData(0, nullptr, data, sizeArrayBytes, 0, elementCount);
 }
 
 void Texture2D_TestLoadFromFile(Texture2D * texture)

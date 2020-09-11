@@ -8,8 +8,9 @@
         mc:Ignorable="d"
         UseLayoutRounding="True"
         d:DataContext="{x:Static editor:EditorViewModel.DesignInstance}"
-        Height="450" Width="800">
-
+        
+        Height="343" Width="1005">
+    
     <DockPanel LastChildFill="True">
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
@@ -20,12 +21,12 @@
                   ItemsSource="{Binding Menu}"
                   PreviewGotKeyboardFocus="OnPreviewMenuGotKeyboardFocus"
                   UsesItemContainerTemplate="True" />
-            
+
         </Grid>
-        <Grid>
-            <local:GameSurfaceTarget>
-                
-            </local:GameSurfaceTarget>
-        </Grid>
+        <local:GameSurfaceTarget>
+
+        </local:GameSurfaceTarget>
     </DockPanel>
 </Window>
+
+<!--Height="450" Width="800">-->

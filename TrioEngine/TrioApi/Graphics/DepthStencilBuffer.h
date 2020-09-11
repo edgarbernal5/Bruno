@@ -31,7 +31,7 @@ namespace TrioEngine
 	protected:
 
 #ifdef TRIO_DIRECTX
-		Microsoft::WRL::ComPtr<ID3D11Texture2D>				m_depthStencil;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D>				m_depthStencilTexture;
 
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>		m_depthStencilView;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	m_shaderResourceView;

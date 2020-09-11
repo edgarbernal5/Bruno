@@ -138,7 +138,7 @@ namespace TrioEngine
 			if (m_indexBuffer)
 			{
 #ifdef TRIO_DIRECTX
-				m_d3dContext->IASetIndexBuffer(m_indexBuffer->m_buffer, ToFormat(m_indexBuffer->m_elementSize), 0);
+				m_d3dContext->IASetIndexBuffer(m_indexBuffer->m_buffer, FormatHelper::ToFormat(m_indexBuffer->m_elementSize), 0);
 #elif TRIO_OPENGL
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer->m_Buffer);
 				GraphicsExtensions::checkGLError("Apply State GL_ELEMENT_ARRAY_BUFFER");
@@ -239,11 +239,11 @@ namespace TrioEngine
 	{
 		ClearOptions options = ClearOptions::Target;
 
-		if (m_depthStencilBuffer != nullptr)
+		if (m_currentD3dDepthStencilView != nullptr)
 		{
 			options = options | ClearOptions::DepthBuffer;
-			if (HasStencil(m_depthStencilBuffer->GetDepthFormat()))
-				options = options | ClearOptions::Stencil;
+			/*if (FormatHelper::HasStencil(m_depthStencilBuffer->GetDepthFormat()))
+				options = options | ClearOptions::Stencil;*/
 		}
 
 		Clear(options, color, m_viewport.maxDepth, 0);
@@ -252,10 +252,14 @@ namespace TrioEngine
 	void GraphicsDevice::Clear(ClearOptions options, Color &color, float depth, uint8_t stencil)
 	{
 #ifdef TRIO_DIRECTX
+		//TODO: mover esto de aca?
+		m_d3dContext->OMSetRenderTargets(1, &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
+
 		if ((options & ClearOptions::Target) == ClearOptions::Target)
 		{
 			const float* colorFloat = reinterpret_cast<const float*>(&color);
 			for (int i = 0; i < m_currentD3dRenderTargets.size() && m_currentD3dRenderTargets[i] != nullptr; i++)
+			//for (int i = 0; i < m_renderTargetBindings.size(); i++)
 			{
 				m_d3dContext->ClearRenderTargetView(m_currentD3dRenderTargets[i], colorFloat);
 			}
@@ -268,13 +272,14 @@ namespace TrioEngine
 		if ((options & ClearOptions::Stencil) == ClearOptions::Stencil)
 			flags |= D3D11_CLEAR_STENCIL;
 
-		if (flags != 0 && m_depthStencilBuffer != nullptr)
+		if (flags != 0 && m_currentD3dDepthStencilView != nullptr)
 		{
-			m_d3dContext->ClearDepthStencilView(m_depthStencilBuffer->GetDepthStencilView(), flags, depth, stencil);
+			m_d3dContext->ClearDepthStencilView(m_currentD3dDepthStencilView, flags, depth, stencil);
 		}
 
-		//TODO: mover esto de aca?
-		m_d3dContext->OMSetRenderTargets(1, &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
+		//m_d3dContext->OMSetRenderTargets(m_renderTargetBindings.size(), &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
+
+		//m_d3dContext->RSSetViewports(1, m_viewport.Get11());
 #endif
 	}
 
@@ -525,7 +530,7 @@ namespace TrioEngine
 		// Create a render target view of the swap chain back buffer.
 		DX::ThrowIfFailed(m_swapChain->GetDxSwapChain()->GetBuffer(0, IID_PPV_ARGS(m_defaultD3dRenderTarget.ReleaseAndGetAddressOf())));
 
-		CD3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc(D3D11_RTV_DIMENSION_TEXTURE2D, ToFormat(m_presentationParameters.GetBackBufferFormat()));
+		CD3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc(D3D11_RTV_DIMENSION_TEXTURE2D, FormatHelper::ToFormat(m_presentationParameters.GetBackBufferFormat()));
 		DX::ThrowIfFailed(m_d3dDevice->CreateRenderTargetView(
 			m_defaultD3dRenderTarget.Get(),
 			&renderTargetViewDesc,
@@ -561,12 +566,12 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 		ApplyState(true);
 
-		m_d3dContext->IASetPrimitiveTopology(FormatToPrimitive(primitiveType));
+		m_d3dContext->IASetPrimitiveTopology(FormatHelper::FormatToPrimitive(primitiveType));
 		
 		m_textureCollection->BindAllTextures(this);
 		m_samplerCollection->BindAllSamplers(this);
 
-		int indexCount = GetElementCountArray(primitiveType, primitiveCount);
+		int indexCount = FormatHelper::GetElementCountArray(primitiveType, primitiveCount);
 		m_d3dContext->DrawIndexed(indexCount, startIndex, baseVertex);
 #endif
 	}
@@ -626,6 +631,13 @@ namespace TrioEngine
 		CreateWindowSizeDependentResources();
 
 		DeviceRestored();
+	}
+
+	void GraphicsDevice::Flush()
+	{
+#ifdef TRIO_DIRECTX
+		m_d3dContext->Flush();
+#endif
 	}
 
 	void GraphicsDevice::Present()

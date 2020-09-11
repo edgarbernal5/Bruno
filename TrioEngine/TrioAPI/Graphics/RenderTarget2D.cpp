@@ -49,6 +49,7 @@ namespace TrioEngine
 #endif
 
 		Texture2D::~Texture2D();
+		m_initialized = false;
 	}
 
 	void RenderTarget2D::CommonConstructor()
@@ -83,7 +84,7 @@ namespace TrioEngine
 				ID3D11RenderTargetView* renderTargetView = nullptr;
 
 				D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-				renderTargetViewDesc.Format = ToFormat(m_format);
+				renderTargetViewDesc.Format = FormatHelper::ToFormat(m_format);
 				renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 				renderTargetViewDesc.Texture2D.MipSlice = 0;
 				DX::ThrowIfFailed(m_device->GetD3DDevice()->CreateRenderTargetView(m_texture, &renderTargetViewDesc, &renderTargetView));

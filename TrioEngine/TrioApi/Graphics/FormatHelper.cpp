@@ -5,7 +5,7 @@
 namespace TrioEngine
 {
 	//TO-DO: Faltan formatos...
-	DXGI_FORMAT ToFormat(SurfaceFormat format)
+	DXGI_FORMAT FormatHelper::ToFormat(SurfaceFormat format)
 	{
 		switch (format)
 		{
@@ -83,7 +83,7 @@ namespace TrioEngine
 	}
 
 
-	SurfaceFormat ToSurfaceFormat(DXGI_FORMAT format)
+	SurfaceFormat FormatHelper::ToSurfaceFormat(DXGI_FORMAT format)
 	{
 		switch (format)
 		{
@@ -99,7 +99,7 @@ namespace TrioEngine
 	}
 
 	//TO-DO: Faltan formatos...
-	DXGI_FORMAT ToFormat(DepthFormat format)
+	DXGI_FORMAT FormatHelper::ToFormat(DepthFormat format)
 	{
 		switch (format)
 		{
@@ -118,7 +118,7 @@ namespace TrioEngine
 		}
 	}
 
-	DepthFormat FromFormat(DXGI_FORMAT format)
+	DepthFormat FormatHelper::FromFormat(DXGI_FORMAT format)
 	{
 		switch (format)
 		{
@@ -131,18 +131,18 @@ namespace TrioEngine
 		}
 	}
 
-	bool HasStencil(DXGI_FORMAT format)
+	bool FormatHelper::HasStencil(DXGI_FORMAT format)
 	{
 		return format == DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT ||
 			format == DXGI_FORMAT::DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
 	}
 
-	bool HasStencil(DepthFormat format)
+	bool FormatHelper::HasStencil(DepthFormat format)
 	{
 		return format == DepthFormat::Depth24Stencil8;
 	}
 
-	D3D_PRIMITIVE_TOPOLOGY FormatToPrimitive(PrimitiveType format)
+	D3D_PRIMITIVE_TOPOLOGY FormatHelper::FormatToPrimitive(PrimitiveType format)
 	{
 		switch (format)
 		{
@@ -160,7 +160,7 @@ namespace TrioEngine
 			return (D3D_PRIMITIVE_TOPOLOGY)format;
 		}
 	}
-	int GetElementCountArray(PrimitiveType format, int primitiveCount)
+	int FormatHelper::GetElementCountArray(PrimitiveType format, int primitiveCount)
 	{
 		switch (format)
 		{
@@ -179,7 +179,7 @@ namespace TrioEngine
 		}
 	}
 
-	DXGI_FORMAT ToFormat(IndexElementSize size)
+	DXGI_FORMAT FormatHelper::ToFormat(IndexElementSize size)
 	{
 		switch (size)
 		{
@@ -192,7 +192,7 @@ namespace TrioEngine
 		}
 	}
 
-	int GetTypeSize(DXGI_FORMAT format)
+	int FormatHelper::GetTypeSize(DXGI_FORMAT format)
 	{
 		switch (format)
 		{
@@ -225,7 +225,7 @@ namespace TrioEngine
 		}
 	}
 
-	int GetTypeSize(SurfaceFormat format)
+	int FormatHelper::GetTypeSize(SurfaceFormat format)
 	{
 		switch (format)
 		{
@@ -273,11 +273,12 @@ namespace TrioEngine
 			return 8;
 		case SurfaceFormat::Vector4:
 			return 16;
+		default:
 			return 0;
 		}
 	}
 
-	int GetTypeSize(VertexElementFormat elementFormat)
+	int FormatHelper::GetTypeSize(VertexElementFormat elementFormat)
 	{
 		switch (elementFormat)
 		{
@@ -320,7 +321,7 @@ namespace TrioEngine
 		return 0;
 	}
 
-	DXGI_SWAP_EFFECT ToSwapEffect(PresentInterval presentInterval)
+	DXGI_SWAP_EFFECT FormatHelper::ToSwapEffect(PresentInterval presentInterval)
 	{
 		DXGI_SWAP_EFFECT effect = DXGI_SWAP_EFFECT_DISCARD;
 
@@ -338,7 +339,7 @@ namespace TrioEngine
 		return effect;
 	}
 
-	uint32_t GetFrameLatency(PresentInterval interval)
+	uint32_t FormatHelper::GetFrameLatency(PresentInterval interval)
 	{
 		switch (interval)
 		{

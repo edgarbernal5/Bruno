@@ -6,11 +6,19 @@ namespace TrioEngine
 {
 	enum class MapMode : int
 	{
-		Read = 1,
-		Write = 2,
-		ReadWrite = 3,
-		WriteDiscard = 4,
-		WriteNoOverwrite = 5,
+#if TRIO_DIRECTX
+		Read = D3D11_MAP_READ,
+		Write = D3D11_MAP_WRITE,
+		ReadWrite = D3D11_MAP_READ_WRITE,
+		WriteDiscard = D3D11_MAP_WRITE_DISCARD,
+		WriteNoOverwrite = D3D11_MAP_WRITE_NO_OVERWRITE,
+#else
+		Read,
+		Write,
+		ReadWrite,
+		WriteDiscard,
+		WriteNoOverwrite
+#endif
 	};
 	DEFINE_ENUM_FLAG_OPERATORS(MapMode);
 }

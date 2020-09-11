@@ -69,7 +69,7 @@ namespace TrioWpfFramework.Net.Graphics
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_GetViewport", CallingConvention = CallingConvention.StdCall)]
         private static extern Viewport Internal_GetViewport(IntPtr device);
-        
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetViewport", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_SetViewport(IntPtr device, Viewport viewport);
 
@@ -155,6 +155,14 @@ namespace TrioWpfFramework.Net.Graphics
                 return;
             }
             Internal_SetRenderTarget(m_nativePtr, renderTarget.m_nativePtr);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Flush", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Flush(IntPtr device);
+
+        public void Flush()
+        {
+            Internal_Flush(m_nativePtr);
         }
     }
 }

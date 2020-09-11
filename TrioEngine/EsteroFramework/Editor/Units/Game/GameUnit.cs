@@ -1,6 +1,7 @@
 ﻿using EsteroFramework.Editor.Timing;
 using EsteroFramework.Graphics;
 using System;
+using System.Windows.Interop;
 using System.Windows.Media;
 using TrioWpfFramework.Net.Graphics;
 
@@ -10,6 +11,7 @@ namespace EsteroFramework.Editor.Units.Game
     {
         private GraphicsService m_graphicsService;
         private GameStepTimer m_gameStepTimer;
+        private bool m_idle;
 
         public GameUnit()
         {
@@ -22,6 +24,7 @@ namespace EsteroFramework.Editor.Units.Game
             presentationParameters.BackBufferWidth = 1;
             presentationParameters.BackBufferHeight = 1;
             presentationParameters.DeviceWindowHandle = IntPtr.Zero;
+            //presentationParameters.BackBufferFormat = SurfaceFormat.Color;
 
             var graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, presentationParameters);
 
@@ -33,11 +36,12 @@ namespace EsteroFramework.Editor.Units.Game
         {
             m_gameStepTimer.Tick();
             Render();
+            m_idle = false;
         }
 
         private void GameStepTimer_OnTick()
         {
-            //Console.WriteLine("Ticking elapsed = {0}, total = {1}", m_gameStepTimer.ElapsedTime.TotalSeconds, m_gameStepTimer.TotalTime.TotalSeconds);
+            //Console.WriteLine("Ticking elapsed = {0}, total = {1}: FPS = {2}", m_gameStepTimer.ElapsedTime.TotalSeconds, m_gameStepTimer.TotalTime.TotalSeconds, m_gameStepTimer.FramesPerSecond);
         }
 
         private void Render()
@@ -45,6 +49,19 @@ namespace EsteroFramework.Editor.Units.Game
             foreach (var surfaceTarget in m_graphicsService.GameSurfaceTargets)
             {
                 var graphicsScreens = surfaceTarget.GameGraphicsScreens;
+
+                var sizeWidth = surfaceTarget.Width;
+                var sizeHeight = surfaceTarget.Height;
+
+                var lastSizeWith = surfaceTarget.LastWidth;
+                var lastSizeHeight = surfaceTarget.LastHeight;
+
+                if ((sizeWidth != lastSizeWith || sizeHeight != lastSizeHeight) && !m_idle)
+                    continue;
+
+                surfaceTarget.LastWidth = sizeWidth;
+                surfaceTarget.LastHeight = sizeHeight;
+
                 m_graphicsService.Render(surfaceTarget, graphicsScreens);
             }
         }
@@ -55,8 +72,13 @@ namespace EsteroFramework.Editor.Units.Game
             m_gameStepTimer.OnTimeChanged += GameStepTimer_OnTick;
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;
+            ComponentDispatcher.ThreadIdle += OnApplicationIdle;
 
             m_gameStepTimer.Start();
+        }
+        private void OnApplicationIdle(object sender, EventArgs eventArgs)
+        {
+            m_idle = true;
         }
 
         protected override void OnShutdown()
@@ -64,7 +86,8 @@ namespace EsteroFramework.Editor.Units.Game
             m_gameStepTimer.Stop();
 
             CompositionTarget.Rendering -= CompositionTarget_Rendering;
-            
+            ComponentDispatcher.ThreadIdle -= OnApplicationIdle;
+
             m_gameStepTimer.OnTimeChanged -= GameStepTimer_OnTick;
         }
 
