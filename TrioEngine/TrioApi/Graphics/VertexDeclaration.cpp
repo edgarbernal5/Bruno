@@ -57,7 +57,7 @@ namespace TrioEngine
 		
 		for (int i = 0; i < m_elements.size(); i++)
 		{
-			m_vertexStride += FormatHelper::GetTypeSize(m_elements[i].m_format);
+			m_vertexStride += FormatHelper::GetByteSizeFrom(m_elements[i].m_format);
 
 			signature += m_elements[i].GetSignature();
 		}

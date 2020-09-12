@@ -55,11 +55,11 @@ namespace TrioEngine
 		case SurfaceFormat::RgbPvrtc4Bpp:
 		case SurfaceFormat::RgbaPvrtc4Bpp:
 			//Debug.Assert(MathHelper.IsPowerOfTwo(width), "This format must be power of two!");
-			pitch = ((width + 3) / 4) * FormatHelper::GetTypeSize(m_format);
+			pitch = ((width + 3) / 4) * FormatHelper::GetByteSizeFrom(m_format);
 			break;
 
 		default:
-			pitch = width * FormatHelper::GetTypeSize(m_format);
+			pitch = width * FormatHelper::GetByteSizeFrom(m_format);
 			break;
 		};
 

@@ -192,7 +192,7 @@ namespace TrioEngine
 		}
 	}
 
-	int FormatHelper::GetTypeSize(DXGI_FORMAT format)
+	int FormatHelper::GetByteSizeFrom(DXGI_FORMAT format)
 	{
 		switch (format)
 		{
@@ -225,7 +225,7 @@ namespace TrioEngine
 		}
 	}
 
-	int FormatHelper::GetTypeSize(SurfaceFormat format)
+	int FormatHelper::GetByteSizeFrom(SurfaceFormat format)
 	{
 		switch (format)
 		{
@@ -278,7 +278,7 @@ namespace TrioEngine
 		}
 	}
 
-	int FormatHelper::GetTypeSize(VertexElementFormat elementFormat)
+	int FormatHelper::GetByteSizeFrom(VertexElementFormat elementFormat)
 	{
 		switch (elementFormat)
 		{

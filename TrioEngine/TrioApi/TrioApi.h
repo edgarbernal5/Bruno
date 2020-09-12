@@ -181,12 +181,19 @@ extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalRotation(Transform* 
 extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalScale(Transform* transform, Vector3 *scale);
 extern "C" TRIO_API_EXPORT void __stdcall Transform_SetParent(Transform* transform, Transform* parent);
 
+
+/*
+Texture
+*/
+extern "C" TRIO_API_EXPORT SurfaceFormat __stdcall Texture_GetFormat(Texture* texture);
+
 /*
 Texture2D
 */
 extern "C" TRIO_API_EXPORT Texture2D* __stdcall Texture2D_Ctor(GraphicsDevice* device, int width, int height);
 extern "C" TRIO_API_EXPORT Texture2D* __stdcall Texture2D_Ctor2(GraphicsDevice* device, int width, int height, SurfaceFormat format);
-extern "C" TRIO_API_EXPORT void __stdcall Texture2D_GetData(Texture2D* texture, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes);
+extern "C" TRIO_API_EXPORT void __stdcall Texture2D_Dctor(Texture2D * texture);
+extern "C" TRIO_API_EXPORT void __stdcall Texture2D_GetData(Texture2D* texture, uint8_t* data, uint32_t elementCount);
 extern "C" TRIO_API_EXPORT void __stdcall Texture2D_TestLoadFromFile(Texture2D* texture);
 extern "C" TRIO_API_EXPORT int __stdcall Texture2D_GetWidth(Texture2D* texture);
 extern "C" TRIO_API_EXPORT int __stdcall Texture2D_GetHeight(Texture2D* texture);

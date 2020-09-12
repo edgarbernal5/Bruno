@@ -31,7 +31,7 @@ namespace TrioEngine
 		template <class T>
 		void GetData(T* data, int length);
 
-		void GetData(int level, Rectangle* rect, uint8_t* data, int length, int startIndex, int elementCount);
+		void GetData(int level, Rectangle* rect, uint8_t* data, int startIndex, int elementCount);
 
 		ResourceUsage GetUsage() { return m_usage; }
 
@@ -76,7 +76,7 @@ namespace TrioEngine
 	template <class T>
 	void Texture2D::GetData(T* data, int length)
 	{
-		GetData(0, nullptr, reinterpret_cast<uint8_t*>(data), length * sizeof(T), 0, length);
+		GetData(0, nullptr, reinterpret_cast<uint8_t*>(data), 0, length);
 	}
 
 	template <class T>

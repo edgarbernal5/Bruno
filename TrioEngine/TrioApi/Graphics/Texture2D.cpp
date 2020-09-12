@@ -178,7 +178,7 @@ namespace TrioEngine
 	}
 #endif
 
-	void Texture2D::GetData(int level, Rectangle* rect, uint8_t* data, int length, int startIndex, int elementCount)
+	void Texture2D::GetData(int level, Rectangle* rect, uint8_t* data, int startIndex, int elementCount)
 	{
 		if (data == nullptr)
 			return;
@@ -225,17 +225,17 @@ namespace TrioEngine
 		//m_device->GetD3DDeviceContext()->CopySubresourceRegion1(m_stagingTex, 0, 0, 0, 0, m_texture, level, &region, D3D11_COPY_NO_OVERWRITE);
 		m_device->GetD3DDeviceContext()->CopySubresourceRegion(m_stagingTex, 0, 0, 0, 0, m_texture, level, &region);
 
-		int tInBytes = FormatHelper::GetTypeSize(m_format);
+		int baseElementInBytes = FormatHelper::GetByteSizeFrom(m_format);
 		int elementsInRow = rectWidth;
-		int rowSize = tInBytes * elementsInRow;
+		int rowSizeInBytes = baseElementInBytes * elementsInRow;
 
 		D3D11_MAPPED_SUBRESOURCE mapsource;
 		m_device->GetD3DDeviceContext()->Map(m_stagingTex, 0, (D3D11_MAP)MapMode::Read, 0, &mapsource);
 
 		uint8_t* pData = reinterpret_cast<uint8_t*>(mapsource.pData);
 
-		int totalBytes = tInBytes * elementCount;
-		if (rowSize == mapsource.RowPitch)
+		int totalBytes = baseElementInBytes * elementCount;
+		if (rowSizeInBytes == mapsource.RowPitch)
 		{
 			memcpy(data + startIndex, pData + startIndex, totalBytes);
 		}
@@ -244,15 +244,15 @@ namespace TrioEngine
 			int offsetpData = 0;
 			for (size_t row = 0; row < rectHeight; row++)
 			{
-				int maxElements = (row + 1) * rowSize;
-				int rowStart = row * rowSize;
+				int maxElements = (row + 1) * rowSizeInBytes;
+				int rowStart = row * rowSizeInBytes;
 
-				memcpy(data + rowStart + startIndex, pData + offsetpData + rowStart + startIndex, rowSize);
+				memcpy(data + rowStart + startIndex, pData + offsetpData + rowStart + startIndex, rowSizeInBytes);
 
 				/*if (maxElements >= elementCount * tInBytes)
 					break;*/
 
-				offsetpData += mapsource.RowPitch - rowSize;
+				offsetpData += mapsource.RowPitch - rowSizeInBytes;
 			}
 		}
 		m_device->GetD3DDeviceContext()->Unmap(m_stagingTex, 0);

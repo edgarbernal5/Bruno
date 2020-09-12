@@ -56,9 +56,6 @@ namespace TrioApi.Net.Graphics.Core
             Internal_Dctor(m_nativePtr);
             m_nativePtr = IntPtr.Zero;
             m_disposed = true;
-
-            // Call the base class implementation.
-            base.Dispose(disposing);
         }
 
     }

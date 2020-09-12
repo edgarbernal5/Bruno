@@ -690,6 +690,14 @@ void Transform_SetParent(Transform* transform, Transform* parent)
 /*
 Texture2D
 */
+SurfaceFormat Texture_GetFormat(Texture* texture)
+{
+	return texture->GetFormat();
+}
+
+/*
+Texture2D
+*/
 Texture2D* Texture2D_Ctor(GraphicsDevice* device, int width, int height)
 {
 	return new Texture2D(device, width, height);
@@ -700,10 +708,14 @@ Texture2D* Texture2D_Ctor2(GraphicsDevice* device, int width, int height, Surfac
 	return new Texture2D(device, width, height, format);
 }
 
-
-void Texture2D_GetData(Texture2D* texture, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes)
+void Texture2D_Dctor(Texture2D* texture)
 {
-	texture->GetData(0, nullptr, data, sizeArrayBytes, 0, elementCount);
+	delete texture;
+}
+
+void Texture2D_GetData(Texture2D* texture, uint8_t* data, uint32_t elementCount)
+{
+	texture->GetData(0, nullptr, data, 0, elementCount);
 }
 
 void Texture2D_TestLoadFromFile(Texture2D * texture)

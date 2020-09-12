@@ -22,9 +22,9 @@ namespace TrioEngine
 		static int GetElementCountArray(PrimitiveType format, int primitiveCount);
 		static DXGI_FORMAT ToFormat(IndexElementSize size);
 
-		static int GetTypeSize(DXGI_FORMAT format);
-		static int GetTypeSize(SurfaceFormat format);
-		static int GetTypeSize(VertexElementFormat elementFormat);
+		static int GetByteSizeFrom(DXGI_FORMAT format);
+		static int GetByteSizeFrom(SurfaceFormat format);
+		static int GetByteSizeFrom(VertexElementFormat elementFormat);
 
 		static DXGI_SWAP_EFFECT ToSwapEffect(PresentInterval presentInterval);
 		static uint32_t GetFrameLatency(PresentInterval interval);

@@ -83,6 +83,7 @@
     <Compile Include="Graphics\Core\RenderTarget2D.cs" />
     <Compile Include="Graphics\Core\ResourceUsage.cs" />
     <Compile Include="Graphics\Core\SetDataOptions.cs" />
+    <Compile Include="Graphics\Core\Texture.cs" />
     <Compile Include="Graphics\Core\Texture2D.cs" />
     <Compile Include="Graphics\Core\VertexBuffer.cs" />
     <Compile Include="Graphics\Core\VertexDeclaration.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Graphics\Core\VertexPosition.cs" />
     <Compile Include="Graphics\Core\VertexPositionColor.cs" />
     <Compile Include="Graphics\Core\VertexPositionNormalTexture.cs" />
+    <Compile Include="Graphics\Utilities\FormatExtensions.cs" />
     <Compile Include="Graphics\Utilities\PackUtils.cs" />
     <Compile Include="Graphics\DepthFormat.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
