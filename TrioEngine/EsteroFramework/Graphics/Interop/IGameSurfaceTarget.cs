@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+using EsteroFramework.Editor.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace EsteroFramework.Graphics.Interop
@@ -15,7 +17,7 @@ namespace EsteroFramework.Graphics.Interop
 
         int LastHeight { get; set; }
 
-        List<GameGraphicsScreen> GameGraphicsScreens { get; }
+        IList<GameGraphicsScreen> GameGraphicsScreens { get; }
 
         GameImageSource GameImageSource { get; }
 

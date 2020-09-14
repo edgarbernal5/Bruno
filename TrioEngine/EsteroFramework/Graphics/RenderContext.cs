@@ -1,9 +1,6 @@
-﻿using EsteroFramework.Graphics.Interop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using EsteroFramework.Editor.Graphics;
+using EsteroFramework.Graphics.Interop;
 using TrioApi.Net.Graphics.Core;
 using TrioWpfFramework.Net.Graphics;
 

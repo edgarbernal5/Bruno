@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrioWpfFramework.Net.Game
 {
     public class Scene
     {
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_Ctor", CallingConvention = CallingConvention.StdCall)]
-        private static extern IntPtr Internal_ctor();
+        internal IntPtr m_nativePtr;
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_GetActiveScene", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_GetActiveScene();
-
-        internal IntPtr m_nativePtr;
 
         public static Scene ActiveScene
         {
@@ -24,6 +18,9 @@ namespace TrioWpfFramework.Net.Game
                 return new Scene(Internal_GetActiveScene());
             }
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_Ctor", CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr Internal_ctor();
 
         public Scene()
         {

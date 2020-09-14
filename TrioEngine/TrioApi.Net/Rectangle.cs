@@ -15,43 +15,43 @@ namespace TrioApi.Net
 
         public int Left
         {
-            get { return this.X; }
+            get { return X; }
         }
 
         public int Right
         {
-            get { return (this.X + this.Width); }
+            get { return (X + Width); }
         }
 
         public int Top
         {
-            get { return this.Y; }
+            get { return Y; }
         }
 
         public int Bottom
         {
-            get { return (this.Y + this.Height); }
+            get { return (Y + Height); }
         }
 
         public bool IsEmpty
         {
             get
             {
-                return ((((this.Width == 0) && (this.Height == 0)) && (this.X == 0)) && (this.Y == 0));
+                return (Width == 0 && Height == 0 && X == 0 && Y == 0);
             }
         }
 
         public Rectangle(int x, int y, int width, int height)
         {
-            this.X = x;
-            this.Y = y;
-            this.Width = width;
-            this.Height = height;
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
         }
 
         public bool Equals(Rectangle other)
         {
-            return this.X == other.X && this.Y == other.Y && this.Width == other.Width && this.Height == other.Height;
+            return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height;
         }
 
         public override bool Equals(object obj)
@@ -59,13 +59,14 @@ namespace TrioApi.Net
             bool result = false;
             if (obj is Rectangle)
             {
-                result = this.Equals((Rectangle)obj);
+                result = Equals((Rectangle)obj);
             }
             return result;
         }
+
         public override int GetHashCode()
         {
-            return this.X.GetHashCode() + this.Y.GetHashCode() + this.Width.GetHashCode() + this.Height.GetHashCode();
+            return X.GetHashCode() + Y.GetHashCode() + Width.GetHashCode() + Height.GetHashCode();
         }
 
         public static bool operator ==(Rectangle a, Rectangle b)

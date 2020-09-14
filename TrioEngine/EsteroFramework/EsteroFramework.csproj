@@ -76,13 +76,19 @@
       <DependentUpon>EditorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Editor\ExitCode.cs" />
+    <Compile Include="Editor\Game\SceneProjectFile.cs" />
+    <Compile Include="Editor\Game\SceneView.xaml.cs">
+      <DependentUpon>SceneView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Game\SceneViewModel.cs" />
     <Compile Include="Editor\IEditorService.cs" />
     <Compile Include="Editor\Timing\GameStepTimer.cs" />
     <Compile Include="Editor\Timing\GameTime.cs" />
     <Compile Include="Editor\Units\Game\GameUnit.cs" />
     <Compile Include="Editor\Units\Menus\MenuUnit.cs" />
-    <Compile Include="Graphics\Screens\BasicGraphicsScreen.cs" />
-    <Compile Include="Graphics\Screens\GameGraphicsScreen.cs" />
+    <Compile Include="Editor\Game\Screens\EditorGameGraphicsScreen.cs" />
+    <Compile Include="Editor\Game\Screens\GameGraphicsScreen.cs" />
+    <Compile Include="Editor\Units\ProjectFiles\ProjectFile.cs" />
     <Compile Include="Graphics\GraphicsDeviceService.cs" />
     <Compile Include="Graphics\GraphicsService.cs" />
     <Compile Include="Graphics\IGraphicsService.cs" />
@@ -144,6 +150,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Editor\Game\SceneView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Graphics\Interop\GameSurfaceTarget.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -151,6 +161,10 @@
     <Page Include="Resources\EditorDataTemplates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Scenes\EditorSceneDataTemplates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup />

@@ -1,21 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using EsteroFramework.Graphics;
+using System;
+using TrioWpfFramework.Net.Game;
 
-namespace EsteroFramework.Graphics
+namespace EsteroFramework.Editor.Graphics
 {
     public abstract class GameGraphicsScreen
     {
+        public bool IsVisible { get; set; }
+
         public string Name { get; set; }
 
-        public bool IsVisible { get; set; }
+        public Scene Scene { get; set; }
 
         public GameGraphicsScreen()
         {
             IsVisible = true;
-        
+            Scene = null;
         }
 
         public abstract void Update(TimeSpan deltaTime);

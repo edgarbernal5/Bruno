@@ -1,12 +1,14 @@
 ﻿
+using EsteroFramework.Graphics;
 using System;
 using TrioWpfFramework.Net.Graphics.Core;
 
-namespace EsteroFramework.Graphics
+namespace EsteroFramework.Editor.Graphics
 {
-    public class BasicGraphicsScreen : GameGraphicsScreen
+    public class EditorGameGraphicsScreen : GameGraphicsScreen
     {
-        public BasicGraphicsScreen() : base()
+        public EditorGameGraphicsScreen() 
+            : base()
         {
 
         }
@@ -26,6 +28,8 @@ namespace EsteroFramework.Graphics
         private void DoOnRender(RenderContext renderContext)
         {
             renderContext.GraphicsDevice.Clear(Color.Red);
+
+            //
         }
     }
 }

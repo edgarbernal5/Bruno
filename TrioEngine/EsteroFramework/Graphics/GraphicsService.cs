@@ -1,9 +1,7 @@
-﻿using EsteroFramework.Graphics.Interop;
-using System;
+﻿
+using EsteroFramework.Editor.Graphics;
+using EsteroFramework.Graphics.Interop;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TrioWpfFramework.Net.Graphics;
 
 namespace EsteroFramework.Graphics
@@ -29,7 +27,7 @@ namespace EsteroFramework.Graphics
             m_renderContext = new RenderContext();
         }
 
-        public void Render(IGameSurfaceTarget surfaceTarget, List<GameGraphicsScreen> graphicsScreens)
+        public void Render(IGameSurfaceTarget surfaceTarget, IList<GameGraphicsScreen> graphicsScreens)
         {
             m_renderContext.GraphicsDevice = m_graphicsDevice;
 
@@ -53,7 +51,7 @@ namespace EsteroFramework.Graphics
             surfaceTarget.EndRender();
         }
 
-        private void CacheScreens(List<GameGraphicsScreen> graphicsScreens)
+        private void CacheScreens(IList<GameGraphicsScreen> graphicsScreens)
         {
             m_cachedScreens.Clear();
             for (int i = 0; i < graphicsScreens.Count; i++)

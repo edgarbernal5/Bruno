@@ -3,8 +3,7 @@ using Estero.Logging;
 using Estero.ServiceLocation;
 using EsteroFramework;
 using EsteroFramework.Editor;
-using EsteroFramework.Editor.Menus;
-using EsteroFramework.Editor.Units.Game;
+using EsteroFramework.Editor.Units;
 using System.Windows;
 
 namespace TrioWpfEditor

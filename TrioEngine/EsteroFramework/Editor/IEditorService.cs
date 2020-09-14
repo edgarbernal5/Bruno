@@ -24,5 +24,7 @@ namespace EsteroFramework.Editor
         MenuItemViewModelCollection Menu { get; }
 
         List<TreeNodeCollection<ICommandItem>> MenuNodes { get; }
+
+        void ActivateItem(object item);
     }
 }

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:EsteroFramework.Graphics.Interop"
+        xmlns:local="clr-namespace:EsteroFramework.Editor.Game"
         xmlns:editor="clr-namespace:EsteroFramework.Editor"
         mc:Ignorable="d"
         UseLayoutRounding="True"
@@ -23,10 +23,13 @@
                   UsesItemContainerTemplate="True" />
 
         </Grid>
-        <local:GameSurfaceTarget>
+        <Grid>
+            <local:SceneView DataContext="{Binding SceneDetail}">
 
-        </local:GameSurfaceTarget>
+            </local:SceneView>
+        </Grid>
     </DockPanel>
 </Window>
 
+<!--d:DataContext="{x:Static editor:EditorViewModel.DesignInstance}"-->
 <!--Height="450" Width="800">-->

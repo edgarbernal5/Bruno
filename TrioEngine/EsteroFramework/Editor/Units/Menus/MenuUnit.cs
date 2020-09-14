@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EsteroFramework.Editor.Menus
+namespace EsteroFramework.Editor.Units
 {
     public class MenuUnit : EditorUnit
     {

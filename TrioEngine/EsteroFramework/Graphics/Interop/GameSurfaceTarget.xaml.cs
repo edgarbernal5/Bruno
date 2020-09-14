@@ -1,12 +1,12 @@
 ﻿
 using EsteroFramework.Editor;
+using EsteroFramework.Editor.Graphics;
 using EsteroWindows;
 using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using System.Windows.Media;
 using TrioWpfFramework.Net.Graphics;
 
 namespace EsteroFramework.Graphics.Interop
@@ -40,14 +40,17 @@ namespace EsteroFramework.Graphics.Interop
             }
         }
 
-        public List<GameGraphicsScreen> GameGraphicsScreens
+        public IList<GameGraphicsScreen> GameGraphicsScreens
         {
-            get
-            {
-                return m_gameGraphicsScreens;
-            }
+            get { return (IList<GameGraphicsScreen>)GetValue(GameGraphicsScreensProperty); }
+            set { SetValue(GameGraphicsScreensProperty, value); }
         }
-        private List<GameGraphicsScreen> m_gameGraphicsScreens;
+
+        public static readonly DependencyProperty GameGraphicsScreensProperty = DependencyProperty.Register(
+            "GameGraphicsScreens",
+            typeof(IList<GameGraphicsScreen>),
+            typeof(GameSurfaceTarget),
+            new PropertyMetadata(new List<GameGraphicsScreen>(), OnGameGraphicsScreensChanged));
 
         public GameImageSource GameImageSource => m_gameImageSource;
         private GameImageSource m_gameImageSource;
@@ -66,16 +69,21 @@ namespace EsteroFramework.Graphics.Interop
 
             if (WindowsPlatform.InDesignMode) return;
 
-            m_gameGraphicsScreens = new List<GameGraphicsScreen>();
             Loaded += GameSurfaceTarget_Loaded;
             Unloaded += GameSurfaceTarget_Unloaded;
-
-            m_gameGraphicsScreens.Add(new BasicGraphicsScreen());
         }
 
         ~GameSurfaceTarget()
         {
             m_gameImageSource.Dispose();
+        }
+
+        private static void OnGameGraphicsScreensChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            //var target = (GameSurfaceTarget)dependencyObject;
+            //var oldValue = (IEnumerable<GameGraphicsScreen>)eventArgs.OldValue;
+            //var newValue = (IEnumerable<GameGraphicsScreen>)eventArgs.NewValue;
+            //target.OnGraphicsScreensChanged(oldValue, newValue);
         }
 
         private void GameSurfaceTarget_Loaded(object sender, RoutedEventArgs e)

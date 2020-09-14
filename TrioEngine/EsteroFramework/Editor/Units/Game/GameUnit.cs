@@ -1,11 +1,12 @@
 ﻿using EsteroFramework.Editor.Timing;
 using EsteroFramework.Graphics;
 using System;
+using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using TrioWpfFramework.Net.Graphics;
 
-namespace EsteroFramework.Editor.Units.Game
+namespace EsteroFramework.Editor.Units
 {
     public class GameUnit : EditorUnit
     {
@@ -76,6 +77,7 @@ namespace EsteroFramework.Editor.Units.Game
 
             m_gameStepTimer.Start();
         }
+
         private void OnApplicationIdle(object sender, EventArgs eventArgs)
         {
             m_idle = true;

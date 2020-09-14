@@ -1,6 +1,7 @@
 ﻿using Estero.Collections;
 using Estero.Logging;
 using Estero.ServiceLocation;
+using EsteroFramework.Editor.Game;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,8 @@ namespace EsteroFramework.Editor
                 };
             }
         }
+
+        public SceneViewModel SceneDetail { get; set; }
 
         public string ApplicationName
         {
@@ -101,6 +104,9 @@ namespace EsteroFramework.Editor
             {
                 unit.Initialize(this);
             }
+
+            SceneDetail = new SceneViewModel();
+            (SceneDetail as IActivate).Activate();
         }
 
         public void Startup()
@@ -112,7 +118,9 @@ namespace EsteroFramework.Editor
                 unit.Startup();
             }
 
+
             RecreateUI();
+            
         }
 
         private void RecreateUI()
@@ -146,6 +154,11 @@ namespace EsteroFramework.Editor
                 _exitCode = exitCode;
             }
             _window.Close();
+        }
+
+        public void ActivateItem(object item)
+        {
+
         }
     }
 }
