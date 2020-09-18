@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Graphics
+namespace TrioApi.Net.Graphics
 {
     public interface IGraphicsDeviceService
     {

@@ -235,7 +235,7 @@ namespace TrioEngine
 		return true;
 	}
 
-	void GraphicsDevice::Clear(Color &color)
+	void GraphicsDevice::Clear(ColorRGBA8 &color)
 	{
 		ClearOptions options = ClearOptions::Target;
 
@@ -249,19 +249,29 @@ namespace TrioEngine
 		Clear(options, color, m_viewport.maxDepth, 0);
 	}
 
-	void GraphicsDevice::Clear(ClearOptions options, Color &color, float depth, uint8_t stencil)
+	void GraphicsDevice::Clear(const float* color)
+	{
+		ClearOptions options = ClearOptions::Target;
+
+		if (m_currentD3dDepthStencilView != nullptr)
+		{
+			options = options | ClearOptions::DepthBuffer;
+			/*if (FormatHelper::HasStencil(m_depthStencilBuffer->GetDepthFormat()))
+				options = options | ClearOptions::Stencil;*/
+		}
+
+		Clear(options, color, m_viewport.maxDepth, 0);
+	}
+
+	void GraphicsDevice::Clear(ClearOptions options, const float* color, float depth, uint8_t stencil)
 	{
 #ifdef TRIO_DIRECTX
-		//TODO: mover esto de aca?
-		m_d3dContext->OMSetRenderTargets(1, &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
-
 		if ((options & ClearOptions::Target) == ClearOptions::Target)
 		{
-			const float* colorFloat = reinterpret_cast<const float*>(&color);
 			for (int i = 0; i < m_currentD3dRenderTargets.size() && m_currentD3dRenderTargets[i] != nullptr; i++)
 			//for (int i = 0; i < m_renderTargetBindings.size(); i++)
 			{
-				m_d3dContext->ClearRenderTargetView(m_currentD3dRenderTargets[i], colorFloat);
+				m_d3dContext->ClearRenderTargetView(m_currentD3dRenderTargets[i], color);
 			}
 		}
 		uint32_t flags = 0;
@@ -277,6 +287,9 @@ namespace TrioEngine
 			m_d3dContext->ClearDepthStencilView(m_currentD3dDepthStencilView, flags, depth, stencil);
 		}
 
+		//TODO: mover esto de aca?
+		m_d3dContext->OMSetRenderTargets(1, &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
+
 		//m_d3dContext->OMSetRenderTargets(m_renderTargetBindings.size(), &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
 
 		//m_d3dContext->RSSetViewports(1, m_viewport.Get11());
@@ -289,7 +302,6 @@ namespace TrioEngine
 		// D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 		//0
 		uint32_t creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-		//uint32_t creationFlags = 0;
 
 #if defined(_DEBUG)
 		if (SdkLayersAvailable())
@@ -842,7 +854,7 @@ namespace TrioEngine
 		m_vertexBindings[0].Stride = buffer->GetVertexDeclaration()->GetVertexStride();
 
 #ifdef TRIO_DIRECTX
-		m_vertexBuffers[0] = buffer->m_buffer;
+		m_vertexBuffers[0] = buffer->m_buffer.Get();
 		m_vertexOffsets[0] = 0;
 		m_vertexStrides[0] = m_vertexBindings[0].Stride;
 #endif
@@ -857,7 +869,7 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 		for (int i = 0; i < m_vertexBindings.size(); i++)
 		{
-			m_vertexBuffers[i] = m_vertexBindings[i].Buffer->m_buffer;
+			m_vertexBuffers[i] = m_vertexBindings[i].Buffer->m_buffer.Get();
 			m_vertexOffsets[i] = m_vertexBindings[i].Offset;
 			m_vertexStrides[i] = m_vertexBindings[i].Stride;
 		}

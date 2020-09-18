@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Graphics.Core
+namespace TrioApi.Net.Graphics.Core
 {
     public class EffectPass : INamedItem
     {
@@ -22,6 +22,14 @@ namespace TrioWpfFramework.Net.Graphics.Core
         {
             m_nativePtr = nativePtr;
             Name = Internal_GetName(m_nativePtr);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "EffectPass_Apply", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Apply(IntPtr pass);
+
+        public void Apply()
+        {
+            Internal_Apply(m_nativePtr);
         }
     }
 }

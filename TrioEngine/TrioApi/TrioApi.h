@@ -58,6 +58,7 @@ extern "C" TRIO_API_EXPORT void __stdcall EffectParameter_SetValueColor(EffectPa
 EffectPass
 */
 extern "C" TRIO_API_EXPORT char* __stdcall EffectPass_GetName(EffectPass* pass);
+extern "C" TRIO_API_EXPORT void __stdcall EffectPass_Apply(EffectPass * pass);
 
 /*
 EffectTechnique
@@ -92,7 +93,9 @@ GraphicsDevice
 */
 extern "C" TRIO_API_EXPORT GraphicsDevice* __stdcall GraphicsDevice_Ctor(GraphicsAdapter* adapter, PresentationParameters parameters);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Dtor(GraphicsDevice* device);
-extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Clear(GraphicsDevice* device, uint32_t color);
+extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Clear(GraphicsDevice * device, float* colorAsFloat);
+extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_ClearAsRGBA8(GraphicsDevice * device, uint32_t packedColor);
+extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_DrawIndexedPrimitives(GraphicsDevice * device, PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount);
 extern "C" TRIO_API_EXPORT BlendState* __stdcall GraphicsDevice_GetBlendState(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall GraphicsDevice_GetDepthStencilState(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT RasterizerState* __stdcall GraphicsDevice_GetRasterizerState(GraphicsDevice* device);
@@ -102,6 +105,8 @@ extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Reset(GraphicsDevice* d
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetBlendState(GraphicsDevice* device, BlendState* state);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetDepthStencilState(GraphicsDevice* device, DepthStencilState* state);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetRasterizerState(GraphicsDevice* device, RasterizerState* state);
+extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetIndexBuffer(GraphicsDevice * device, IndexBuffer *indexBuffer);
+extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetVertexBuffer(GraphicsDevice * device, VertexBuffer * vertexBuffer);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetViewport(GraphicsDevice* device, Viewport viewport);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetRenderTarget(GraphicsDevice* device, RenderTarget2D* renderTarget);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetRenderTargets(GraphicsDevice * device, RenderTarget2D** renderTarget, int size);
@@ -111,6 +116,8 @@ extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Flush(GraphicsDevice * 
 IndexBuffer
 */
 extern "C" TRIO_API_EXPORT IndexBuffer* __stdcall IndexBuffer_Ctor(GraphicsDevice* device, int elementSize, int indexCount, int usage);
+extern "C" TRIO_API_EXPORT IndexBuffer * __stdcall IndexBuffer_Ctor2(GraphicsDevice * device, int elementSize, int indexCount);
+extern "C" TRIO_API_EXPORT void __stdcall IndexBuffer_Dctor(IndexBuffer* indexBuffer);
 extern "C" TRIO_API_EXPORT void __stdcall IndexBuffer_SetData(IndexBuffer* buffer, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes);
 
 /*
@@ -219,6 +226,7 @@ VertexBuffer
 */
 extern "C" TRIO_API_EXPORT VertexBuffer* __stdcall VertexBuffer_Ctor(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount, int usage);
 extern "C" TRIO_API_EXPORT VertexBuffer* __stdcall VertexBuffer_Ctor2(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount);
+extern "C" TRIO_API_EXPORT void __stdcall VertexBuffer_Dctor(VertexBuffer* vertexBuffer);
 extern "C" TRIO_API_EXPORT void __stdcall VertexBuffer_SetData(VertexBuffer* buffer, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes);
 
 /*

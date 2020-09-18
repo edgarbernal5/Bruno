@@ -2,7 +2,7 @@
 using EsteroFramework.Editor.Graphics;
 using EsteroFramework.Graphics.Interop;
 using System.Collections.Generic;
-using TrioWpfFramework.Net.Graphics;
+using TrioApi.Net.Graphics;
 
 namespace EsteroFramework.Graphics
 {

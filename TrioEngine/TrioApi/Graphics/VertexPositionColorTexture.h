@@ -20,7 +20,7 @@ namespace TrioEngine
 		VertexPositionColorTexture(VertexPositionColorTexture&&) = default;
 		VertexPositionColorTexture& operator=(VertexPositionColorTexture&&) = default;
 
-		VertexPositionColorTexture(Vector3 const& position, Vector4 const& color, Vector2 const& textureCoordinate)
+		VertexPositionColorTexture(Vector3 const& position, ColorRGBA8 const& color, Vector2 const& textureCoordinate)
 			: m_position(position),
 			m_color(color),
 			m_textureCoordinate(textureCoordinate)
@@ -30,12 +30,12 @@ namespace TrioEngine
 		VertexPositionColorTexture(DirectX::FXMVECTOR position, DirectX::FXMVECTOR color, DirectX::CXMVECTOR textureCoordinate)
 		{
 			XMStoreFloat3(&this->m_position, position);
-			XMStoreFloat4(&this->m_color, color);
+			XMStoreColor(&this->m_color, color);
 			XMStoreFloat2(&this->m_textureCoordinate, textureCoordinate);
 		}
 #endif
 		const Vector3& GetPosition() { return m_position; }
-		const Vector4& GetColor() { return m_color; }
+		const ColorRGBA8& GetColor() { return m_color; }
 		const Vector2& GetTexCoord() { return m_textureCoordinate; }
 
 		static const int InputElementCount = 3;
@@ -48,7 +48,7 @@ namespace TrioEngine
 
 	private:
 		Vector3 m_position;
-		Vector4 m_color;
+		ColorRGBA8 m_color;
 		Vector2 m_textureCoordinate;
 
 		static VertexDeclaration* g_vertexDeclaration;

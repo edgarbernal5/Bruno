@@ -4,7 +4,7 @@ using System;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
-using TrioWpfFramework.Net.Graphics;
+using TrioApi.Net.Graphics;
 
 namespace EsteroFramework.Editor.Units
 {
@@ -16,7 +16,7 @@ namespace EsteroFramework.Editor.Units
 
         public GameUnit()
         {
-
+            Priority = int.MaxValue - 1;
         }
 
         protected override void OnInitialize()

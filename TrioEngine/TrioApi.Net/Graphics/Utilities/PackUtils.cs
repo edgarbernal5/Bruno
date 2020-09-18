@@ -1,5 +1,5 @@
 ﻿
-namespace TrioWpfFramework.Net.Graphics.Utilities
+namespace TrioApi.Net.Graphics.Utilities
 {
     internal static class PackUtils
     {

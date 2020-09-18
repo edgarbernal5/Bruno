@@ -5,9 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using TrioWpfFramework.Net.Maths;
+using TrioApi.Net.Maths;
 
-namespace TrioWpfFramework.Net.Graphics.Core
+namespace TrioApi.Net.Graphics.Core
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct VertexPositionNormalTexture : IVertexType

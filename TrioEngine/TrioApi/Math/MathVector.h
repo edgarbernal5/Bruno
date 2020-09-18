@@ -764,6 +764,40 @@ namespace TrioEngine
 	Color operator/ (const Color& C1, const Color& C2);
 	Color operator* (float S, const Color& C);
 
+	struct ColorRGBA8 : DirectX::PackedVector::XMCOLOR
+	{
+		ColorRGBA8() noexcept : DirectX::PackedVector::XMCOLOR(0, 0, 0, 1.0f) {}
+		ColorRGBA8(float _r, float _g, float _b) : DirectX::PackedVector::XMCOLOR(_r, _g, _b, 1.0f) {}
+		ColorRGBA8(float _r, float _g, float _b, float _a) : DirectX::PackedVector::XMCOLOR(_r, _g, _b, _a) {}
+		explicit ColorRGBA8(_In_reads_(4) const float* pArray) : DirectX::PackedVector::XMCOLOR(pArray) {}
+		XM_CONSTEXPR ColorRGBA8(uint32_t _color) : DirectX::PackedVector::XMCOLOR(_color) {}
+
+		ColorRGBA8(const ColorRGBA8&) = default;
+		ColorRGBA8& operator=(const ColorRGBA8&) = default;
+
+		ColorRGBA8(ColorRGBA8&&) = default;
+		ColorRGBA8& operator=(ColorRGBA8&&) = default;
+
+		operator const float* () const { return reinterpret_cast<const float*>(this); }
+
+		// Comparison operators
+		bool operator == (const ColorRGBA8& c) const;
+		bool operator != (const ColorRGBA8& c) const;
+
+		// Properties
+		uint8_t R() const { return r; }
+		void R(uint8_t _r) { r = _r; }
+
+		uint8_t G() const { return g; }
+		void G(uint8_t _g) { g = _g; }
+
+		uint8_t B() const { return b; }
+		void B(uint8_t _b) { b = _b; }
+
+		uint8_t A() const { return a; }
+		void A(uint8_t _a) { a = _a; }
+	};
+
 	//------------------------------------------------------------------------------
 	// Ray
 	class Ray
@@ -4240,6 +4274,32 @@ namespace TrioEngine
 		Color result;
 		XMStoreFloat4(&result, XMVectorLerp(C0, C1, t));
 		return result;
+	}
+
+	/****************************************************************************
+	 *
+	 * ColorRGBA8
+	 *
+	 ****************************************************************************/
+
+
+	//------------------------------------------------------------------------------
+	// Comparision operators
+	//------------------------------------------------------------------------------
+	inline bool ColorRGBA8::operator == (const ColorRGBA8& c) const
+	{
+		using namespace DirectX;
+		DirectX::XMVECTOR c1 = XMLoadColor(this);
+		DirectX::XMVECTOR c2 = XMLoadColor(&c);
+		return XMColorEqual(c1, c2);
+	}
+
+	inline bool ColorRGBA8::operator != (const ColorRGBA8& c) const
+	{
+		using namespace DirectX;
+		DirectX::XMVECTOR c1 = XMLoadColor(this);
+		DirectX::XMVECTOR c2 = XMLoadColor(&c);
+		return XMColorNotEqual(c1, c2);
 	}
 
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using TrioWpfFramework.Net.Graphics;
+using TrioApi.Net.Graphics;
 
 namespace TrioWpEditor.Editor
 {

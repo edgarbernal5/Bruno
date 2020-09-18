@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Graphics.Core
+namespace TrioApi.Net.Graphics.Core
 {
     public enum SetDataOptions
     {

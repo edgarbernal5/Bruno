@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Graphics
+namespace TrioApi.Net.Graphics
 {
     public class GraphicsAdapter
     {

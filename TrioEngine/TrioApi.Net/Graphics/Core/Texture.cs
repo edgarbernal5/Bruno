@@ -1,8 +1,7 @@
 ﻿
+
 using System;
 using System.Runtime.InteropServices;
-using TrioWpfFramework.Net;
-using TrioWpfFramework.Net.Graphics;
 
 namespace TrioApi.Net.Graphics.Core
 {

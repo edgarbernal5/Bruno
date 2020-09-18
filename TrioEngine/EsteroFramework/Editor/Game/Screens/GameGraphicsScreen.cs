@@ -1,7 +1,7 @@
 ﻿
 using EsteroFramework.Graphics;
 using System;
-using TrioWpfFramework.Net.Game;
+using TrioApi.Net.Game;
 
 namespace EsteroFramework.Editor.Graphics
 {

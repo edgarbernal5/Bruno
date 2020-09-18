@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Graphics.Core
+namespace TrioApi.Net.Graphics.Core
 {
     public class EffectTechnique : INamedItem
     {
@@ -20,6 +20,14 @@ namespace TrioWpfFramework.Net.Graphics.Core
         public string Name { get; private set; }
 
         internal IntPtr m_nativePtr;
+
+        public EffectPassCollection Passes
+        {
+            get
+            {
+                return m_passes;
+            }
+        }
         private EffectPassCollection m_passes;
 
         internal EffectTechnique(IntPtr nativePtr)

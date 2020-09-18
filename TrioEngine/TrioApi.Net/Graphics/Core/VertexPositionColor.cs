@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using TrioWpfFramework.Net.Maths;
+using TrioApi.Net.Maths;
 
-namespace TrioWpfFramework.Net.Graphics.Core
+namespace TrioApi.Net.Graphics.Core
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct VertexPositionColor : IVertexType
@@ -16,7 +12,7 @@ namespace TrioWpfFramework.Net.Graphics.Core
         private static extern IntPtr Internal_GetPC();
 
         public Vector3 Position;
-        public Color Color;
+        public ColorRGBA8 Color;
 
         public static readonly VertexDeclaration VertexDeclaration;
 
@@ -28,10 +24,10 @@ namespace TrioWpfFramework.Net.Graphics.Core
             }
         }
 
-        public VertexPositionColor(Vector3 position, Color color)
+        public VertexPositionColor(Vector3 position, ColorRGBA8 color)
         {
-            this.Position = position;
-            this.Color = color;
+            Position = position;
+            Color = color;
         }
 
         public override int GetHashCode()

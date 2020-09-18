@@ -31,14 +31,16 @@ namespace TrioWin32
 		void Update(StepTimer const& timer) override;
 		void Initialize() override;
 
-		IndexBuffer* m_pIndexBuffer;
-		VertexBuffer* m_pVertexBuffer;
+		IndexBuffer* m_pIndexBuffer, *m_gridIdxBuffer;
+		VertexBuffer* m_pVertexBuffer, *m_gridVertexBuffer;
 
-		Effect* m_pEffect;
+		Effect* m_pEffect, *m_gridEffect;
 
 		void Magic();
 
 		float mRadius;
 		Vector3 m_position;
+
+
 	};
 }

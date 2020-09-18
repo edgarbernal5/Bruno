@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Content.Tasks
+namespace TrioApi.Net.Content.Tasks
 {
     public class BuildCoordinator : IDisposable
     {
@@ -22,8 +19,8 @@ namespace TrioWpfFramework.Net.Content.Tasks
         public BuildCoordinator(BuildCoordinatorSettings settings)
         {
             m_nativePtr = Internal_ctor(settings.IntermediateDirectory, settings.OutputDirectory, settings.RootDirectory);
-
         }
+
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)

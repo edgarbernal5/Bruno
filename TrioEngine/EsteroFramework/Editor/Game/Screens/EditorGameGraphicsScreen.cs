@@ -1,16 +1,30 @@
 ﻿
 using EsteroFramework.Graphics;
+using EsteroFramework.Graphics.Editor;
 using System;
-using TrioWpfFramework.Net.Graphics.Core;
+using TrioApi.Net.Graphics.Core;
 
 namespace EsteroFramework.Editor.Graphics
 {
     public class EditorGameGraphicsScreen : GameGraphicsScreen
     {
+        public GridMesh GridMesh
+        {
+            get
+            {
+                return m_gridMesh;
+            }
+            set
+            {
+                m_gridMesh = value;
+            }
+        }
+        private GridMesh m_gridMesh;
+
         public EditorGameGraphicsScreen() 
             : base()
         {
-
+            
         }
 
         public override void Update(TimeSpan deltaTime)
@@ -30,6 +44,7 @@ namespace EsteroFramework.Editor.Graphics
             renderContext.GraphicsDevice.Clear(Color.Red);
 
             //
+            m_gridMesh.Render(renderContext);
         }
     }
 }

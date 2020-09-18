@@ -295,7 +295,7 @@ namespace TrioEngine
 			return 16;
 
 		case VertexElementFormat::Color:
-			return 16;
+			return 4;
 
 		case VertexElementFormat::Byte4:
 			return 4;

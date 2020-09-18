@@ -4,8 +4,8 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using TrioApi.Net.Graphics;
 using TrioApi.Net.Graphics.Core;
-using TrioWpfFramework.Net.Graphics;
 
 namespace EsteroFramework.Graphics.Interop
 {
@@ -67,12 +67,12 @@ namespace EsteroFramework.Graphics.Interop
             // because the only 32 bit pixel format for WPF is 
             // BGRA but XNA is all RGBA, we have to swap the R 
             // and B bytes for each pixel
-            //for (int i = 0; i < m_buffer.Length - 2; i += 4)
-            //{
-            //    byte r = m_buffer[i];
-            //    m_buffer[i] = m_buffer[i + 2];
-            //    m_buffer[i + 2] = r;
-            //}
+            for (int i = 0; i < m_buffer.Length - 2; i += 4)
+            {
+                byte r = m_buffer[i];
+                m_buffer[i] = m_buffer[i + 2];
+                m_buffer[i + 2] = r;
+            }
 
             // write our pixels into the bitmap source
             m_writeableBitmap.Lock();

@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace TrioWpfFramework.Net.Game
+namespace TrioApi.Net.Game
 {
     public class Component : Object
     {

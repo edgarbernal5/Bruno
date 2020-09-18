@@ -1,7 +1,7 @@
 ﻿
 using System.Runtime.InteropServices;
 
-namespace TrioWpfFramework.Net.Graphics
+namespace TrioApi.Net.Graphics
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Viewport
@@ -21,6 +21,18 @@ namespace TrioWpfFramework.Net.Graphics
             this.height = height;
             this.minDepth = 0.0f;
             this.maxDepth = 1.0f;
+        }
+
+        public float AspectRatio
+        {
+            get
+            {
+                if (height == 0 || width == 0)
+                {
+                    return 0f;
+                }
+                return width / height;
+            }
         }
     }
 }

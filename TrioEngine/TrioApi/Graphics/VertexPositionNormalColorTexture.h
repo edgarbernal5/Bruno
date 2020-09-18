@@ -18,7 +18,7 @@ namespace TrioEngine
 		VertexPositionNormalColorTexture(VertexPositionNormalColorTexture&&) = default;
 		VertexPositionNormalColorTexture& operator=(VertexPositionNormalColorTexture&&) = default;
 
-		VertexPositionNormalColorTexture(Vector3 const& position, Vector3 const& normal, Vector4 const& color, Vector2 const& textureCoordinate)
+		VertexPositionNormalColorTexture(Vector3 const& position, Vector3 const& normal, ColorRGBA8 const& color, Vector2 const& textureCoordinate)
 			: m_position(position),
 			m_normal(normal),
 			m_color(color),
@@ -30,13 +30,13 @@ namespace TrioEngine
 		{
 			XMStoreFloat3(&this->m_position, position);
 			XMStoreFloat3(&this->m_normal, normal);
-			XMStoreFloat4(&this->m_color, color);
+			XMStoreColor(&this->m_color, color);
 			XMStoreFloat2(&this->m_textureCoordinate, textureCoordinate);
 		}
 #endif
 		const Vector3& GetPosition() { return m_position; }
 		const Vector3& GetNormal() { return m_normal; }
-		const Vector4& GetColor() { return m_color; }
+		const ColorRGBA8& GetColor() { return m_color; }
 		const Vector2& GetTexCoord() { return m_textureCoordinate; }
 
 		static VertexDeclaration* GetVertexDeclaration();
@@ -50,7 +50,7 @@ namespace TrioEngine
 	private:
 		Vector3 m_position;
 		Vector3 m_normal;
-		Vector4 m_color;
+		ColorRGBA8 m_color;
 		Vector2 m_textureCoordinate;
 
 		static VertexDeclaration* g_vertexDeclaration;

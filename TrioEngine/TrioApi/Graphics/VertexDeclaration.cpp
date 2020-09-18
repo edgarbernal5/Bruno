@@ -63,7 +63,6 @@ namespace TrioEngine
 		}
 
 		m_iHashKey = ComputeHash(signature.data(), signature.size());
-
 	}
 
 #ifdef TRIO_DIRECTX

@@ -1,8 +1,8 @@
 ﻿
 using EsteroFramework.Editor.Graphics;
 using EsteroFramework.Graphics.Interop;
+using TrioApi.Net.Graphics;
 using TrioApi.Net.Graphics.Core;
-using TrioWpfFramework.Net.Graphics;
 
 namespace EsteroFramework.Graphics
 {

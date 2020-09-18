@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
+using System;
 using System.Threading;
-using System.Threading.Tasks;
-using TrioWpfFramework.Net.Graphics;
+using TrioApi.Net.Graphics;
 
 namespace EsteroFramework.Graphics
 {

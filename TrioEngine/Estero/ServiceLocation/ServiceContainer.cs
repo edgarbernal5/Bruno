@@ -6,9 +6,6 @@ using System.Reflection;
 
 namespace Estero.ServiceLocation
 {
-    /// <summary>
-    /// A simple IoC container.
-    /// </summary>
     public class ServiceContainer : IDisposable
     {
         private static readonly Type delegateType = typeof(Delegate);

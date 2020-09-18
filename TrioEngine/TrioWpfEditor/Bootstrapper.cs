@@ -38,6 +38,7 @@ namespace TrioWpfEditor
             //Core units
             _editor.Units.Add(new MenuUnit());
             _editor.Units.Add(new GameUnit());
+            _editor.Units.Add(new PrimitivesUnit());
 
             _editor.Configure();
         }

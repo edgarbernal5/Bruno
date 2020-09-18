@@ -2,9 +2,9 @@
 using System;
 using System.Runtime.InteropServices;
 using TrioApi.Net.Graphics.Core;
-using TrioWpfFramework.Net.Graphics.Core;
+using TrioApi.Net.Graphics.Core;
 
-namespace TrioWpfFramework.Net.Graphics
+namespace TrioApi.Net.Graphics
 {
     public class GraphicsDevice : IDisposable
     {
@@ -66,7 +66,6 @@ namespace TrioWpfFramework.Net.Graphics
             }
         }
 
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_GetViewport", CallingConvention = CallingConvention.StdCall)]
         private static extern Viewport Internal_GetViewport(IntPtr device);
 
@@ -121,11 +120,35 @@ namespace TrioWpfFramework.Net.Graphics
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Clear", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Clear(IntPtr device, uint packedColor);
+        private static extern void Internal_Clear(IntPtr device, ref float colorAsFloat);
 
         public void Clear(Color color)
         {
-            Internal_Clear(m_nativePtr, color.PackedColor);
+            Internal_Clear(m_nativePtr, ref color.R);
+        }
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_ClearAsRGBA8", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_ClearRGBA8(IntPtr device, uint packedColor);
+
+        public void Clear(ColorRGBA8 color)
+        {
+            Internal_ClearRGBA8(m_nativePtr, color.PackedColor);
+        }
+        
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_DrawIndexedPrimitives", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_DrawIndexedPrimitives(IntPtr device, PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount);
+
+        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
+        {
+            Internal_DrawIndexedPrimitives(m_nativePtr, primitiveType, baseVertex, minVertexIndex, numVertices, startIndex, primitiveCount);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Flush", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Flush(IntPtr device);
+
+        public void Flush()
+        {
+            Internal_Flush(m_nativePtr);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Present", CallingConvention = CallingConvention.StdCall)]
@@ -157,12 +180,30 @@ namespace TrioWpfFramework.Net.Graphics
             Internal_SetRenderTarget(m_nativePtr, renderTarget.m_nativePtr);
         }
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Flush", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Flush(IntPtr device);
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetVertexBuffer", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetVertexBuffer(IntPtr device, IntPtr vertexBuffer);
 
-        public void Flush()
+        public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
-            Internal_Flush(m_nativePtr);
+            if (vertexBuffer == null)
+            {
+                Internal_SetVertexBuffer(m_nativePtr, IntPtr.Zero);
+                return;
+            }
+            Internal_SetVertexBuffer(m_nativePtr, vertexBuffer.m_nativePtr);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetIndexBuffer", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetIndexBuffer(IntPtr device, IntPtr indexBuffer);
+
+        public void SetIndexBuffer(IndexBuffer indexBuffer)
+        {
+            if (indexBuffer == null)
+            {
+                Internal_SetIndexBuffer(m_nativePtr, IntPtr.Zero);
+                return;
+            }
+            Internal_SetIndexBuffer(m_nativePtr, indexBuffer.m_nativePtr);
         }
     }
 }

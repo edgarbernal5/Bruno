@@ -240,6 +240,11 @@ char* EffectPass_GetName(EffectPass* pass)
 	return pszReturn;
 }
 
+void EffectPass_Apply(EffectPass * pass)
+{
+	pass->Apply();
+}
+
 /*
 EffectTechnique
 */
@@ -360,10 +365,20 @@ void GraphicsDevice_Dtor(GraphicsDevice* device)
 	delete device;
 }
 
-void GraphicsDevice_Clear(GraphicsDevice* device, uint32_t packedColor)
+void GraphicsDevice_Clear(GraphicsDevice* device, float* colorAsFloat)
 {
-	Color color(packedColor);
+	device->Clear(colorAsFloat);
+}
+
+void GraphicsDevice_ClearAsRGBA8(GraphicsDevice * device, uint32_t packedColor)
+{
+	ColorRGBA8 color(packedColor);
 	device->Clear(color);
+}
+
+void GraphicsDevice_DrawIndexedPrimitives(GraphicsDevice* device, PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
+{
+	device->DrawIndexedPrimitives(primitiveType, baseVertex, minVertexIndex, numVertices, startIndex, primitiveCount);
 }
 
 BlendState* GraphicsDevice_GetBlendState(GraphicsDevice* device)
@@ -411,6 +426,16 @@ void GraphicsDevice_SetRasterizerState(GraphicsDevice* device, RasterizerState* 
 	device->SetRasterizerState(state);
 }
 
+void GraphicsDevice_SetIndexBuffer(GraphicsDevice* device, IndexBuffer* indexBuffer)
+{
+	device->SetIndexBuffer(indexBuffer);
+}
+
+void GraphicsDevice_SetVertexBuffer(GraphicsDevice * device, VertexBuffer * vertexBuffer)
+{
+	device->SetVertexBuffer(vertexBuffer);
+}
+
 void GraphicsDevice_SetViewport(GraphicsDevice* device, Viewport viewport)
 {
 	device->SetViewport(viewport);
@@ -437,6 +462,16 @@ IndexBuffer
 IndexBuffer* IndexBuffer_Ctor(GraphicsDevice* device, int elementSize, int indexCount, int usage)
 {
 	return new IndexBuffer(device, (IndexElementSize)elementSize, indexCount, (ResourceUsage)usage);
+}
+
+IndexBuffer* IndexBuffer_Ctor2(GraphicsDevice* device, int elementSize, int indexCount)
+{
+	return new IndexBuffer(device, (IndexElementSize)elementSize, indexCount);
+}
+
+void IndexBuffer_Dctor(IndexBuffer* indexBuffer)
+{
+	delete indexBuffer;
 }
 
 void IndexBuffer_SetData(IndexBuffer* buffer, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes)
@@ -810,6 +845,11 @@ VertexBuffer* VertexBuffer_Ctor(GraphicsDevice* device, VertexDeclaration* verte
 VertexBuffer* VertexBuffer_Ctor2(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount)
 {
 	return new VertexBuffer(device, vertexDeclaration, vertexCount);
+}
+
+void VertexBuffer_Dctor(VertexBuffer * vertexBuffer)
+{
+	delete vertexBuffer;
 }
 
 void VertexBuffer_SetData(VertexBuffer* buffer, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes)

@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace TrioWpfFramework.Net.Graphics
+namespace TrioApi.Net.Graphics
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct PresentationParameters

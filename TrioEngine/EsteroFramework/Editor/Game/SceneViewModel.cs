@@ -1,5 +1,6 @@
 ﻿
 using EsteroFramework.Editor.Graphics;
+using EsteroFramework.Graphics.Editor;
 using System.Collections.Generic;
 
 namespace EsteroFramework.Editor.Game
@@ -18,12 +19,12 @@ namespace EsteroFramework.Editor.Game
         private List<GameGraphicsScreen> m_gameGraphicsScreens;
 
         private EditorGameGraphicsScreen m_editorGameGraphicsScreen;
+        private readonly IEditorService m_editor;
 
-        public SceneViewModel()
+        public SceneViewModel(IEditorService editor)
         {
+            m_editor = editor;
             m_gameGraphicsScreens = new List<GameGraphicsScreen>();
-
-            InitializeGameScreens();
         }
 
         private void InitializeGameScreens()
@@ -33,6 +34,10 @@ namespace EsteroFramework.Editor.Game
                 m_editorGameGraphicsScreen = new EditorGameGraphicsScreen();
                 m_gameGraphicsScreens.Add(m_editorGameGraphicsScreen);
             }
+
+            var primitivesService = m_editor.Services.GetInstance<IEditorPrimitivesService>();
+            m_editorGameGraphicsScreen.GridMesh = primitivesService.GridMesh;
+            m_editorGameGraphicsScreen.Scene = SceneProjectFile.Scene;
         }
 
         protected override void OnActivate()
@@ -40,7 +45,8 @@ namespace EsteroFramework.Editor.Game
             SceneProjectFile = new SceneProjectFile();
             SceneProjectFile.New();
 
-            m_editorGameGraphicsScreen.Scene = SceneProjectFile.Scene;
+            InitializeGameScreens();
+
             base.OnActivate();
         }
     }

@@ -37,8 +37,9 @@ namespace TrioEngine
 		GraphicsDevice(GraphicsAdapter* adapter, PresentationParameters parameters);
 		~GraphicsDevice();
 
-		void Clear(Color &color);
-		void Clear(ClearOptions options, Color &color, float depth, uint8_t stencil);
+		void Clear(ColorRGBA8 &color);
+		void Clear(const float* color);
+		void Clear(ClearOptions options, const float* color, float depth, uint8_t stencil);
 
 		void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount);
 		void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount);

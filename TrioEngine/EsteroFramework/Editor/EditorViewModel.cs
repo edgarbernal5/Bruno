@@ -104,9 +104,6 @@ namespace EsteroFramework.Editor
             {
                 unit.Initialize(this);
             }
-
-            SceneDetail = new SceneViewModel();
-            (SceneDetail as IActivate).Activate();
         }
 
         public void Startup()
@@ -118,6 +115,8 @@ namespace EsteroFramework.Editor
                 unit.Startup();
             }
 
+            SceneDetail = new SceneViewModel(this);
+            (SceneDetail as IActivate).Activate();
 
             RecreateUI();
             

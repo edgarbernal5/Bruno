@@ -1,6 +1,6 @@
 ﻿using Estero.Collections;
 
-namespace TrioWpfFramework.Net.Graphics.Core
+namespace TrioApi.Net.Graphics.Core
 {
     public class EffectPassCollection : FixedSizeNamedList<EffectPass>
     {

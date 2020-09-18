@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Game
+namespace TrioApi.Net.Game
 {
     public class GameObject : Object
     {

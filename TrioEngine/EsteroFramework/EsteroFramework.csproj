@@ -88,7 +88,11 @@
     <Compile Include="Editor\Units\Menus\MenuUnit.cs" />
     <Compile Include="Editor\Game\Screens\EditorGameGraphicsScreen.cs" />
     <Compile Include="Editor\Game\Screens\GameGraphicsScreen.cs" />
+    <Compile Include="Editor\Units\Primitives\PrimitivesUnit.cs" />
     <Compile Include="Editor\Units\ProjectFiles\ProjectFile.cs" />
+    <Compile Include="Graphics\Editor\EditorPrimitivesService.cs" />
+    <Compile Include="Graphics\Editor\GridMesh.cs" />
+    <Compile Include="Graphics\Editor\IEditorPrimitivesService.cs" />
     <Compile Include="Graphics\GraphicsDeviceService.cs" />
     <Compile Include="Graphics\GraphicsService.cs" />
     <Compile Include="Graphics\IGraphicsService.cs" />

@@ -74,11 +74,11 @@ namespace TrioEngine
 		VertexDeclaration(VertexElement const* pElements, int size);
 
 		int m_vertexStride;
-		std::vector<D3D11_INPUT_ELEMENT_DESC> m_d3d11Elements;
 		std::vector<VertexElement> m_elements;
 		int m_iHashKey;
 
 #ifdef TRIO_DIRECTX
+		std::vector<D3D11_INPUT_ELEMENT_DESC> m_d3d11Elements;
 		const std::vector<D3D11_INPUT_ELEMENT_DESC>& GetD3D11InputElements();
 #elif TRIO_OPENGL
 		std::map<int, VertexDeclarationAttributeInfo> m_shaderAttributeInfo;

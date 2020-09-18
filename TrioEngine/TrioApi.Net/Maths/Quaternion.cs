@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Maths
+namespace TrioApi.Net.Maths
 {
     public struct Quaternion : IEquatable<Quaternion>
     {

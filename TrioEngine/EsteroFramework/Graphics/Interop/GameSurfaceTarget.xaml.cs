@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using TrioWpfFramework.Net.Graphics;
+using TrioApi.Net.Graphics;
 
 namespace EsteroFramework.Graphics.Interop
 {

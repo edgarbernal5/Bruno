@@ -1,6 +1,6 @@
 ﻿
 using EsteroFramework.Editor.Units;
-using TrioWpfFramework.Net.Game;
+using TrioApi.Net.Game;
 
 namespace EsteroFramework.Editor.Game
 {

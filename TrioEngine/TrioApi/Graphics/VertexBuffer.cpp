@@ -6,20 +6,8 @@
 
 namespace TrioEngine
 {
-	VertexBuffer::VertexBuffer() :
-		
-#ifdef TRIO_DIRECTX
-		m_buffer(nullptr),
-#elif TRIO_OPENGL
-		m_pBuffer(0),
-#endif
-		m_device(nullptr) {
-	
-	}
-
 	VertexBuffer::VertexBuffer(GraphicsDevice* device, VertexDeclaration *vertexDeclaration, int vertexCount, ResourceUsage usage) :
 #ifdef TRIO_DIRECTX
-		m_buffer(nullptr),
 #elif OPENGL
 		m_pBuffer(0),
 #endif
@@ -29,12 +17,10 @@ namespace TrioEngine
 
 		m_device(device)
 	{
-
 	}
 
 	VertexBuffer::VertexBuffer(GraphicsDevice* device, VertexDeclaration *vertexDeclaration, int vertexCount) :
 #ifdef TRIO_DIRECTX
-		m_buffer(nullptr),
 #elif OPENGL
 		m_pBuffer(0),
 #endif
@@ -44,16 +30,18 @@ namespace TrioEngine
 
 		m_device(device)
 	{
-
 	}
 
 	VertexBuffer::~VertexBuffer()
 	{
+		m_device = nullptr;
+		m_vertexDeclaration = nullptr;
 	}
 
 #ifdef TRIO_DIRECTX
 	void VertexBuffer::CreateBuffer(D3D11_SUBRESOURCE_DATA* subdata)
 	{
+		//D3D11_BUFFER_DESC vbd = { 0 };
 		D3D11_BUFFER_DESC vbd = {};
 
 		ResourceUsage usage = ResourceUsage::Default;
@@ -72,7 +60,7 @@ namespace TrioEngine
 		vbd.StructureByteStride = 0;
 
 		DX::ThrowIfFailed(
-			m_device->GetD3DDevice()->CreateBuffer(&vbd, subdata, &m_buffer)
+			m_device->GetD3DDevice()->CreateBuffer(&vbd, subdata, m_buffer.GetAddressOf())
 		);
 	}
 #endif

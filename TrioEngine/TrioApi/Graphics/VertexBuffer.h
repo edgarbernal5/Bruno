@@ -19,7 +19,6 @@ namespace TrioEngine
 	class TRIO_API_EXPORT VertexBuffer
 	{
 	public:
-		VertexBuffer();
 		VertexBuffer(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount, ResourceUsage usage);
 		VertexBuffer(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount);
 		virtual ~VertexBuffer();
@@ -42,7 +41,7 @@ namespace TrioEngine
 		friend class GraphicsDevice;
 	private:
 #ifdef TRIO_DIRECTX
-		ID3D11Buffer* m_buffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
 		//ID3D11InputLayout* m_InputLayout;
 
 		void CreateBuffer(D3D11_SUBRESOURCE_DATA* subdata);
@@ -156,7 +155,7 @@ namespace TrioEngine
 				region.left = offsetInBytes;
 				region.right = offsetInBytes + (elementCount * elementSizeInBytes);
 
-				m_device->GetD3DDeviceContext()->UpdateSubresource(m_buffer, 0, &region, (data + startIndex), elementSizeInBytes, 0);
+				m_device->GetD3DDeviceContext()->UpdateSubresource(m_buffer.Get(), 0, &region, (data + startIndex), elementSizeInBytes, 0);
 			}
 			break;
 		case ResourceUsage::Dynamic:
@@ -175,7 +174,7 @@ namespace TrioEngine
 
 				D3D11_MAPPED_SUBRESOURCE resource;
 
-				m_device->GetD3DDeviceContext()->Map(m_buffer, 0, (D3D11_MAP)mode, 0, &resource);
+				m_device->GetD3DDeviceContext()->Map(m_buffer.Get(), 0, (D3D11_MAP)mode, 0, &resource);
 
 				T* pDataResource = (T*)((uint8_t*)(resource.pData) + offsetInBytes);
 
@@ -183,7 +182,7 @@ namespace TrioEngine
 
 				memcpy(pDataResource, pData, elementSizeInBytes * elementCount);
 
-				m_device->GetD3DDeviceContext()->Unmap(m_buffer, 0);
+				m_device->GetD3DDeviceContext()->Unmap(m_buffer.Get(), 0);
 			}
 			break;
 		case ResourceUsage::Default:

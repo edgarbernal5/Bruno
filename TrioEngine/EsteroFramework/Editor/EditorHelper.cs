@@ -23,6 +23,7 @@ namespace EsteroFramework.Editor
         {
             Application.Current.Resources.MergedDictionaries.Add(resources);
         }
+
         public static void UnregisterResources(ResourceDictionary resources)
         {
             Application.Current.Resources.MergedDictionaries.Remove(resources);

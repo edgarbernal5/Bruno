@@ -10,6 +10,7 @@
 #include "Graphics/EffectPass.h"
 #include "Graphics/GraphicsDeviceManager.h"
 #include "Graphics/TextureCollection.h"
+#include "Graphics/DepthStencilState.h"
 
 #include "Graphics/Texture2D.h"
 #include "Utils/TextureLoader.h"
@@ -33,6 +34,9 @@ namespace TrioWin32
 	void DemoGame::Magic() {
 		m_pEffect = new Effect(GetGraphicsDevice());
 		m_pEffect->CompileEffectFromFile("LineEffect.fx");
+
+		m_gridEffect = new Effect(GetGraphicsDevice());
+		m_gridEffect->CompileEffectFromFile("GridEffect.fx");
 
 		m_pIndexBuffer = new IndexBuffer(GetGraphicsDevice(), IndexElementSize::ThirtyTwoBits, 36, ResourceUsage::Immutable);
 
@@ -62,7 +66,7 @@ namespace TrioWin32
 			4, 3, 7
 		};
 
-		m_pIndexBuffer->SetData<uint32_t>(indices, 36);
+		//m_pIndexBuffer->SetData<uint32_t>(indices, 36);
 
 		Color whiteColor(1, 1, 1);
 		Color blackColor(0, 0, 0);
@@ -101,7 +105,7 @@ namespace TrioWin32
 		//tmpConst.x = 4.0f;
 		int sizeVPC = sizeof(VertexPositionColorTexture);
 		m_pVertexBuffer = new VertexBuffer(GetGraphicsDevice(), VertexPositionColorTexture::GetVertexDeclaration(), 8);
-		m_pVertexBuffer->SetData<VertexPositionColorTexture>(vertexs, 8);
+		//m_pVertexBuffer->SetData<VertexPositionColorTexture>(vertexs, 8);
 
 		//m_pVertexBuffer = new VertexBuffer(GetGraphicsDevice(), VertexPositionColor::GetVertexDeclaration(), 8);
 		//m_pVertexBuffer->SetData<VertexPositionColor>(vertexs, 8);
@@ -113,42 +117,102 @@ namespace TrioWin32
 		tex2D->SetData<uint8_t>(imgInfo.Data, imgInfo.SizeOfData);
 
 		GetGraphicsDevice()->GetTextures()->SetTexture(0, tex2D);
+
+		const int m_gridSize = 16;
+		const int totalIndices = m_gridSize * 2;
+
+		int gridindices[totalIndices];
+		for (int i = 0; i < m_gridSize; i++)
+		{
+			gridindices[i * 2] = (i * 2);
+			gridindices[i * 2 + 1] = (i * 2 + 1);
+		}
+
+		m_gridIdxBuffer = new IndexBuffer(GetGraphicsDevice(), IndexElementSize::ThirtyTwoBits, totalIndices);
+		m_gridIdxBuffer->SetData(gridindices, totalIndices);
+
+		const int totalVertices = m_gridSize * 2;
+
+		m_gridVertexBuffer = new VertexBuffer(GetGraphicsDevice(), VertexPositionColor::GetVertexDeclaration(), totalVertices);
+
+		VertexPositionColor gridVertices[totalVertices];
+		//Color colorWhite(1, 1, 1);
+		ColorRGBA8 colorWhite=0xffffffff;
+		for (int i = 0; i < m_gridSize; i++)
+		{
+			auto positionFront = Vector3(i - m_gridSize * 0.5f, 0.0f, -m_gridSize * 0.5f);
+			auto positionBack = Vector3(i - m_gridSize * 0.5f, 0.0f, m_gridSize * 0.5f);
+
+			gridVertices[i * 2] = VertexPositionColor(positionFront, colorWhite);
+			gridVertices[i * 2 + 1] = VertexPositionColor(positionBack, colorWhite);
+		}
+
+		m_gridVertexBuffer->SetData(gridVertices, totalVertices);
 	}
 
 	void DemoGame::Draw(StepTimer const & timer)
 	{
 		//using namespace DirectX::SimpleMath;
 		Color LightSteelBlue(0.69f, 0.77f, 0.87f);
+		Color Red(1.0f, 0.0f, 0.0f);
 
 		auto device = GetGraphicsDevice();
-		device->Clear(LightSteelBlue);
+		device->Clear(Red);
 
-		device->SetIndexBuffer(m_pIndexBuffer);
-		device->SetVertexBuffer(m_pVertexBuffer);
+		//device->SetIndexBuffer(m_pIndexBuffer);
+		//device->SetVertexBuffer(m_pVertexBuffer);
 
-		////device->SetDepthStencilState(DepthStencilState::Default);
+		//////device->SetDepthStencilState(DepthStencilState::Default);
+		//////device->SetBlendState(BlendState::Opaque);
+		//device->SetRasterizerState(RasterizerState::CullClockwise);
+		//device->SetSamplerState(0, SamplerState::LinearWrap);
+
+		//Matrix view;
+		//Matrix proj;
+		//Matrix viewProj;
+
+		//float ratio = (float)device->GetPresentationParameters().GetBackBufferWidth() / device->GetPresentationParameters().GetBackBufferHeight();
+		//proj = Matrix::CreatePerspectiveFieldOfView(0.25f * 3.1415926535f, ratio, 0.5f, 100.0f);
+
+		//Vector3 zero(0, 0, 0);
+		//Vector3 up(0, 1, 0);
+
+		//view = Matrix::CreateLookAt(m_position, zero, up);
+
+		//viewProj = view * proj;
+
+		//m_pEffect->GetParameters()["gWorldViewProj"]->SetValue(viewProj);
+		//m_pEffect->GetTechniques()[0]->GetPasses()[0]->Apply();
+
+		//device->DrawIndexedPrimitives(PrimitiveType::TriangleList, 0, 0, 8, 0, 12);
+		const int m_gridSize = 16;
+
+		device->SetIndexBuffer(m_gridIdxBuffer);
+		device->SetVertexBuffer(m_gridVertexBuffer);
+
+		device->SetDepthStencilState(DepthStencilState::None);
 		////device->SetBlendState(BlendState::Opaque);
-		device->SetRasterizerState(RasterizerState::CullClockwise);
-		device->SetSamplerState(0, SamplerState::LinearWrap);
+		device->SetRasterizerState(RasterizerState::CullNone);
+		//device->SetSamplerState(0, SamplerState::LinearWrap);
 
 		Matrix view;
 		Matrix proj;
 		Matrix viewProj;
 
 		float ratio = (float)device->GetPresentationParameters().GetBackBufferWidth() / device->GetPresentationParameters().GetBackBufferHeight();
-		proj = Matrix::CreatePerspectiveFieldOfView(0.25f * 3.1415926535f, ratio, 0.5f, 100.0f);
+		proj = Matrix::CreatePerspectiveFieldOfView(1.5708, ratio, 0.5f, 100.0f);
 
 		Vector3 zero(0, 0, 0);
 		Vector3 up(0, 1, 0);
 
-		view = Matrix::CreateLookAt(m_position, zero, up);
+		view = Matrix::CreateLookAt(Vector3(5.0f, 5.0f, 5.0f), zero, up);
 
 		viewProj = view * proj;
 
-		m_pEffect->GetParameters()["gWorldViewProj"]->SetValue(viewProj);
-		m_pEffect->GetTechniques()[0]->GetPasses()[0]->Apply();
+		m_gridEffect->GetParameters()["gWorldViewProj"]->SetValue(viewProj);
+		m_gridEffect->GetTechniques()[0]->GetPasses()[0]->Apply();
 
-		device->DrawIndexedPrimitives(PrimitiveType::TriangleList, 0, 0, 8, 0, 12);
+		device->DrawIndexedPrimitives(PrimitiveType::LineList, 0, 0, m_gridSize * 2, 0, m_gridSize);
 	}
 
 	void DemoGame::Update(StepTimer const& timer)

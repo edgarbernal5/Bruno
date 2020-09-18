@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Maths
+namespace TrioApi.Net.Maths
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Vector3 : IEquatable<Vector3>

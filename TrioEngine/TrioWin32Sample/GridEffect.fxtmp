@@ -1,0 +1,56 @@
+struct TextureSampler2D {
+    Texture2D    t;
+    SamplerState s;
+};
+struct TextureSampler2DShadow {
+    Texture2D                t;
+    SamplerComparisonState   s;
+};
+struct TextureSampler3D {
+    Texture3D    t;
+    SamplerState s;
+};
+struct TextureSamplerCube {
+    TextureCube  t;
+    SamplerState s;
+};
+TextureSampler2D CreateTextureSampler2D(Texture2D t, SamplerState s) {
+    TextureSampler2D ts;
+    ts.t = t; ts.s = s;
+    return ts;
+}
+TextureSampler2DShadow CreateTextureSampler2DShadow(Texture2D t, SamplerComparisonState s) {
+    TextureSampler2DShadow ts;
+    ts.t = t; ts.s = s;
+    return ts;
+}
+TextureSampler3D CreateTextureSampler3D(Texture3D t, SamplerState s) {
+    TextureSampler3D ts;
+    ts.t = t; ts.s = s;
+    return ts;
+}
+TextureSamplerCube CreateTextureSamplerCube(TextureCube t, SamplerState s) {
+    TextureSamplerCube ts;
+    ts.t = t; ts.s = s;
+    return ts;
+}
+cbuffer cbPerObject {
+    float4x4 gWorldViewProj;
+};
+struct VertexIn {
+    float3 PosL : SV_POSITION;
+    float4 Color : COLOR;
+};
+struct VertexOut {
+    float4 PosH : SV_POSITION;
+    float4 Color : COLOR;
+};
+VertexOut VS(VertexIn vin) {
+    VertexOut vout;
+    ((vout).PosH = mul(float4((vin).PosL, 1.000000), gWorldViewProj));
+    ((vout).Color = (vin).Color);
+    return vout;
+};
+float4 PS(VertexOut pin) : SV_Target {
+    return (pin).Color;
+};

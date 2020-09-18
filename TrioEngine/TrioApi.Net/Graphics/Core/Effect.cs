@@ -5,15 +5,12 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Graphics.Core
+namespace TrioApi.Net.Graphics.Core
 {
     public class Effect
     {
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_Ctor(IntPtr device);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_CompileEffectFromFile", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        private static extern void Internal_CompileEffectFromFile(IntPtr effect, string filename);
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_GetParameters", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_GetParameters(IntPtr effect, ref IntPtr parameters, ref int size);
@@ -22,8 +19,27 @@ namespace TrioWpfFramework.Net.Graphics.Core
         private static extern void Internal_GetTechniques(IntPtr effect, ref IntPtr techniques, ref int size);
 
         internal IntPtr m_nativePtr;
+
+        public EffectTechniqueCollection Techniques
+        {
+            get
+            {
+                return m_technniques;
+            }
+        }
         private EffectTechniqueCollection m_technniques;
+
+        public EffectParameterCollection Parameters
+        {
+            get
+            {
+                return m_parameters;
+            }
+        }
         private EffectParameterCollection m_parameters;
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_CompileEffectFromFile", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        private static extern void Internal_CompileEffectFromFile(IntPtr effect, string filename);
 
         public Effect(GraphicsDevice device, string filename)
         {

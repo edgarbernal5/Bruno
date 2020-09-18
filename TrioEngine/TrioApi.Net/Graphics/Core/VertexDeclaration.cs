@@ -5,22 +5,22 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrioWpfFramework.Net.Graphics.Core
+namespace TrioApi.Net.Graphics.Core
 {
     public class VertexDeclaration
     {
+        internal IntPtr m_nativePtr;
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "VertexDeclaration_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr _ctor(int vertexStride, VertexElement[] elements, int sizeElements);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "VertexDeclaration_Ctor2", CallingConvention = CallingConvention.StdCall)]
-        private static extern IntPtr _ctor(VertexElement[] elements, int sizeElements);
-
-        internal IntPtr m_nativePtr;
 
         public VertexDeclaration(int vertexStride, VertexElement[] elements)
         {
             m_nativePtr = _ctor(vertexStride, elements, elements.Length);
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "VertexDeclaration_Ctor2", CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr _ctor(VertexElement[] elements, int sizeElements);
 
         public VertexDeclaration(VertexElement[] elements)
         {

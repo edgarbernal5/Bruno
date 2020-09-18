@@ -14,7 +14,7 @@ namespace TrioEngine
 	const D3D11_INPUT_ELEMENT_DESC VertexPositionColorTexture::InputElementsD3D11[] =
 	{
 		{ "SV_Position", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR",       0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR",       0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 #endif
@@ -22,7 +22,7 @@ namespace TrioEngine
 	{
 		{ 0, VertexElementFormat::Vector3, VertexElementUsage::Position, 0 },
 		{ 12, VertexElementFormat::Color, VertexElementUsage::Color, 0 },
-		{ 28, VertexElementFormat::Vector2, VertexElementUsage::TextureCoordinate, 0 }
+		{ 16, VertexElementFormat::Vector2, VertexElementUsage::TextureCoordinate, 0 }
 	};
 
 	VertexDeclaration* VertexPositionColorTexture::GetVertexDeclaration()
