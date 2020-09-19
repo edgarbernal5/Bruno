@@ -1,8 +1,6 @@
 ﻿
 using System;
 using System.Runtime.InteropServices;
-using TrioApi.Net;
-using TrioApi.Net.Graphics;
 
 namespace TrioApi.Net.Graphics.Core
 {
@@ -12,12 +10,12 @@ namespace TrioApi.Net.Graphics.Core
         private static extern IntPtr Internal_Ctor(IntPtr device, int width, int height, int preferredFormat);
         public RenderTarget2D(GraphicsDevice device, int width, int height)
         {
-            m_nativePtr = Internal_Ctor(device.m_nativePtr, width, height, (int)SurfaceFormat.Color);
+            m_nativePtr = Internal_Ctor(device.NativePointer, width, height, (int)SurfaceFormat.Color);
         }
 
         public RenderTarget2D(GraphicsDevice device, int width, int height, SurfaceFormat preferredFormat)
         {
-            m_nativePtr = Internal_Ctor(device.m_nativePtr, width, height, (int)preferredFormat);
+            m_nativePtr = Internal_Ctor(device.NativePointer, width, height, (int)preferredFormat);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "RenderTarget2D_Ctor2", CallingConvention = CallingConvention.StdCall)]
@@ -25,7 +23,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public RenderTarget2D(GraphicsDevice device, int width, int height, uint mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, RenderTargetUsage usage)
         {
-            m_nativePtr = Internal_Ctor2(device.m_nativePtr, width, height, mipmap, (int)preferredFormat, (int)preferredDepthFormat, (int)usage);
+            m_nativePtr = Internal_Ctor2(device.NativePointer, width, height, mipmap, (int)preferredFormat, (int)preferredDepthFormat, (int)usage);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "RenderTarget2D_Ctor3", CallingConvention = CallingConvention.StdCall)]
@@ -33,19 +31,14 @@ namespace TrioApi.Net.Graphics.Core
 
         public RenderTarget2D(GraphicsDevice device, int width, int height, uint mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
         {
-            m_nativePtr = Internal_Ctor3(device.m_nativePtr, width, height, mipmap, (int)preferredFormat, (int)preferredDepthFormat);
+            m_nativePtr = Internal_Ctor3(device.NativePointer, width, height, mipmap, (int)preferredFormat, (int)preferredDepthFormat);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "RenderTarget2D_Dctor", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Dctor(IntPtr renderTarget);
 
-        protected override void Dispose(bool disposing)
+        protected override void OnDisposing(bool disposing)
         {
-            if (m_disposed)
-            {
-                return;
-            }
-
             if (disposing)
             {
                 // TODO: dispose managed state (managed objects).
@@ -54,8 +47,6 @@ namespace TrioApi.Net.Graphics.Core
             // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
             // TODO: set large fields to null.
             Internal_Dctor(m_nativePtr);
-            m_nativePtr = IntPtr.Zero;
-            m_disposed = true;
         }
 
     }

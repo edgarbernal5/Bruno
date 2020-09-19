@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using Estero.Interop;
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrioApi.Net.Graphics.Core
 {
-    public class Effect
+    public class Effect : CppObject
     {
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_Ctor(IntPtr device);
@@ -17,8 +15,6 @@ namespace TrioApi.Net.Graphics.Core
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_GetTechniques", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_GetTechniques(IntPtr effect, ref IntPtr techniques, ref int size);
-
-        internal IntPtr m_nativePtr;
 
         public EffectTechniqueCollection Techniques
         {
@@ -43,7 +39,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public Effect(GraphicsDevice device, string filename)
         {
-            m_nativePtr = Internal_Ctor(device.m_nativePtr);
+            m_nativePtr = Internal_Ctor(device.NativePointer);
             Internal_CompileEffectFromFile(m_nativePtr, filename);
             LoadData();
         }
@@ -96,6 +92,10 @@ namespace TrioApi.Net.Graphics.Core
                 Marshal.FreeCoTaskMem(array);
                 m_technniques = new EffectTechniqueCollection(techniques);
             }
+        }
+
+        protected override void OnDisposing(bool disposing)
+        {
         }
     }
 }

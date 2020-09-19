@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using Estero.Interop;
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrioApi.Net.Graphics
 {
-    public class GraphicsAdapter
+    public class GraphicsAdapter : CppObject
     {
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsAdapter_GetAdapters", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_GetAdapters(ref IntPtr adapters, ref int size);
 
         private static GraphicsAdapter[] g_adapters;
-
-        internal IntPtr m_nativePtr;
 
         static GraphicsAdapter()
         {
@@ -48,6 +44,10 @@ namespace TrioApi.Net.Graphics
         internal GraphicsAdapter(IntPtr nativePtr)
         {
             m_nativePtr = nativePtr;
+        }
+
+        protected override void OnDisposing(bool disposing)
+        {
         }
     }
 }

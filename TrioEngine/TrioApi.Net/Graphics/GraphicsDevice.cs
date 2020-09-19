@@ -1,19 +1,15 @@
 ﻿
+using Estero.Interop;
 using System;
 using System.Runtime.InteropServices;
-using TrioApi.Net.Graphics.Core;
 using TrioApi.Net.Graphics.Core;
 
 namespace TrioApi.Net.Graphics
 {
-    public class GraphicsDevice : IDisposable
+    public class GraphicsDevice : CppObject
     {
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetDepthStencilState", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_SetDepthStencilState(IntPtr device, IntPtr depthStencilState);
-
-        bool disposed = false;
-
-        internal IntPtr m_nativePtr;
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_GetBlendState", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_GetBlendState(IntPtr device);
@@ -89,7 +85,7 @@ namespace TrioApi.Net.Graphics
 
         public GraphicsDevice(GraphicsAdapter adapter, PresentationParameters parameters)
         {
-            m_nativePtr = Internal_ctor(adapter.m_nativePtr, parameters);
+            m_nativePtr = Internal_ctor(adapter.NativePointer, parameters);
 
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
@@ -100,23 +96,12 @@ namespace TrioApi.Net.Graphics
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Dtor", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_dtor(IntPtr device);
 
-        protected virtual void Dispose(bool disposing)
+        protected override void OnDisposing(bool disposing)
         {
             if (disposing)
             {
-                if (!disposed)
-                {
-                    disposed = true;
-                    Internal_dtor(m_nativePtr);
-                    m_nativePtr = IntPtr.Zero;
-                }
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            Internal_dtor(m_nativePtr);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Clear", CallingConvention = CallingConvention.StdCall)]
@@ -177,7 +162,7 @@ namespace TrioApi.Net.Graphics
                 Internal_SetRenderTarget(m_nativePtr, IntPtr.Zero);
                 return;
             }
-            Internal_SetRenderTarget(m_nativePtr, renderTarget.m_nativePtr);
+            Internal_SetRenderTarget(m_nativePtr, renderTarget.NativePointer);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetVertexBuffer", CallingConvention = CallingConvention.StdCall)]
@@ -190,7 +175,7 @@ namespace TrioApi.Net.Graphics
                 Internal_SetVertexBuffer(m_nativePtr, IntPtr.Zero);
                 return;
             }
-            Internal_SetVertexBuffer(m_nativePtr, vertexBuffer.m_nativePtr);
+            Internal_SetVertexBuffer(m_nativePtr, vertexBuffer.NativePointer);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetIndexBuffer", CallingConvention = CallingConvention.StdCall)]
@@ -203,7 +188,7 @@ namespace TrioApi.Net.Graphics
                 Internal_SetIndexBuffer(m_nativePtr, IntPtr.Zero);
                 return;
             }
-            Internal_SetIndexBuffer(m_nativePtr, indexBuffer.m_nativePtr);
+            Internal_SetIndexBuffer(m_nativePtr, indexBuffer.NativePointer);
         }
     }
 }

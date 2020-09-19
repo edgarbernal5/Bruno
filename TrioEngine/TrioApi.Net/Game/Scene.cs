@@ -1,13 +1,12 @@
 ﻿
+using Estero.Interop;
 using System;
 using System.Runtime.InteropServices;
 
 namespace TrioApi.Net.Game
 {
-    public class Scene
+    public class Scene : CppObject
     {
-        internal IntPtr m_nativePtr;
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_GetActiveScene", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_GetActiveScene();
 
@@ -30,6 +29,14 @@ namespace TrioApi.Net.Game
         internal Scene(IntPtr nativePtr)
         {
             m_nativePtr = nativePtr;
+        }
+
+        protected override void OnDisposing(bool disposing)
+        {
+            if (disposing)
+            {
+
+            }
         }
     }
 }

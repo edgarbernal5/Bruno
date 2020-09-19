@@ -25,7 +25,6 @@ namespace EsteroFramework.Graphics.Editor
             m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\LineEffect.fx");
         }
 
-
         private void CreateVertexBuffer(GraphicsDevice device)
         {
             //int totalVertices = m_gridSize * 4 - 4;

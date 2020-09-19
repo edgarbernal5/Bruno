@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using Estero.Interop;
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using TrioApi.Net.Maths;
 
 namespace TrioApi.Net.Game
 {
-    public class Transform
+    public class Transform : CppObject
     {
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Transform_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_ctor();
@@ -54,9 +52,7 @@ namespace TrioApi.Net.Game
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Transform_SetParent", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_GetParent(IntPtr transform, IntPtr parent);
-
-        internal IntPtr m_nativePtr;
-        
+                
         public Vector3 Position
         {
             get
@@ -156,6 +152,14 @@ namespace TrioApi.Net.Game
         internal Transform(IntPtr nativePtr)
         {
             m_nativePtr = nativePtr;
+        }
+
+        protected override void OnDisposing(bool disposing)
+        {
+            if (disposing)
+            {
+
+            }
         }
     }
 }

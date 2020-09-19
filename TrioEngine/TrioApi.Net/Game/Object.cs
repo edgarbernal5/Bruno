@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Estero.Interop;
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrioApi.Net.Game
 {
-    public class Object
+    public class Object : CppObject
     {
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Object_GetId", CallingConvention = CallingConvention.StdCall)]
         private static extern int Internal_GetId(IntPtr objectPtr);
@@ -19,8 +16,6 @@ namespace TrioApi.Net.Game
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Object_SetName", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static extern void Internal_SetName(IntPtr objectPtr, [MarshalAs(UnmanagedType.LPStr)] string name);
         
-        internal IntPtr m_nativePtr;
-
         public int Id
         {
             get
@@ -44,6 +39,13 @@ namespace TrioApi.Net.Game
         protected Object(IntPtr nativePtr)
         {
             m_nativePtr = nativePtr;
+        }
+
+        protected override void OnDisposing(bool disposing)
+        {
+            if (disposing)
+            {
+            }
         }
     }
 }

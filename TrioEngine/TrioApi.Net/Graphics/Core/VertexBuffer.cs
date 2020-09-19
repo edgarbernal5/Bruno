@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using Estero.Interop;
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrioApi.Net.Graphics.Core
 {
-    public class VertexBuffer : IDisposable
+    public class VertexBuffer : CppObject
     {
-        internal IntPtr m_nativePtr;
-        private bool m_disposed;
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "VertexBuffer_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_Ctor(IntPtr device, IntPtr vertexDeclaration, int vertexCount, int usage);
 
         public VertexBuffer(GraphicsDevice device, VertexDeclaration vertexDeclaration, int vertexCount, ResourceUsage usage)
         {
-            m_nativePtr = Internal_Ctor(device.m_nativePtr, vertexDeclaration.m_nativePtr, vertexCount, (int)usage);
+            m_nativePtr = Internal_Ctor(device.NativePointer, vertexDeclaration.m_nativePtr, vertexCount, (int)usage);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "VertexBuffer_Ctor2", CallingConvention = CallingConvention.StdCall)]
@@ -25,7 +20,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public VertexBuffer(GraphicsDevice device, VertexDeclaration vertexDeclaration, int vertexCount)
         {
-            m_nativePtr = Internal_Ctor2(device.m_nativePtr, vertexDeclaration.m_nativePtr, vertexCount);
+            m_nativePtr = Internal_Ctor2(device.NativePointer, vertexDeclaration.m_nativePtr, vertexCount);
         }
 
         internal VertexBuffer(IntPtr nativePtr)
@@ -61,23 +56,12 @@ namespace TrioApi.Net.Graphics.Core
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "VertexBuffer_Dctor", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Dctor(IntPtr buffer);
 
-        protected virtual void Dispose(bool disposing)
+        protected override void OnDisposing(bool disposing)
         {
             if (disposing)
             {
-                if (!m_disposed)
-                {
-                    m_disposed = true;
-                    Internal_Dctor(m_nativePtr);
-                    m_nativePtr = IntPtr.Zero;
-                }
+                Internal_Dctor(m_nativePtr);
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

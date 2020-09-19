@@ -28,5 +28,12 @@ namespace TrioApi.Net.Game
             : base(nativePtr)
         {
         }
+
+        protected override void OnDisposing(bool disposing)
+        {
+            if (disposing)
+            {
+            }
+        }
     }
 }

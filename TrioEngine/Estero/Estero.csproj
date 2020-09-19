@@ -50,6 +50,8 @@
     <Compile Include="Collections\TreeMerger.cs" />
     <Compile Include="Collections\TreeNode.cs" />
     <Compile Include="Collections\WeakCollection.cs" />
+    <Compile Include="Interop\CppObject.cs" />
+    <Compile Include="Interop\DisposableBase.cs" />
     <Compile Include="Linq\LinqHelper.cs" />
     <Compile Include="Linq\TreeHelper.cs" />
     <Compile Include="Logging\CompositeLog.cs" />

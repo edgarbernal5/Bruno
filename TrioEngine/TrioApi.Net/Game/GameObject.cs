@@ -51,5 +51,12 @@ namespace TrioApi.Net.Game
         {
             return new GameObject(Internal_Create(name));
         }
+
+        protected override void OnDisposing(bool disposing)
+        {
+            if (disposing)
+            {
+            }
+        }
     }
 }

@@ -2,8 +2,6 @@
 using System;
 using System.Runtime.InteropServices;
 using TrioApi.Net.Graphics.Utilities;
-using TrioApi.Net;
-using TrioApi.Net.Graphics;
 
 namespace TrioApi.Net.Graphics.Core
 {
@@ -37,7 +35,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public Texture2D(GraphicsDevice device, int width, int height)
         {
-            m_nativePtr = Internal_Ctor(device.m_nativePtr, width, height);
+            m_nativePtr = Internal_Ctor(device.NativePointer, width, height);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_Ctor2", CallingConvention = CallingConvention.StdCall)]
@@ -45,7 +43,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public Texture2D(GraphicsDevice device, int width, int height, SurfaceFormat format)
         {
-            m_nativePtr = Internal_Ctor2(device.m_nativePtr, width, height, (int)format);
+            m_nativePtr = Internal_Ctor2(device.NativePointer, width, height, (int)format);
         }
 
         internal Texture2D(IntPtr nativePtr)
@@ -110,14 +108,9 @@ namespace TrioApi.Net.Graphics.Core
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_Dctor", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Dctor(IntPtr texture);
-        
-        protected override void Dispose(bool disposing)
-        {
-            if (m_disposed)
-            {
-                return;
-            }
 
+        protected override void OnDisposing(bool disposing)
+        {
             if (disposing)
             {
                 // TODO: dispose managed state (managed objects).
@@ -126,8 +119,6 @@ namespace TrioApi.Net.Graphics.Core
             // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
             // TODO: set large fields to null.
             Internal_Dctor(m_nativePtr);
-            m_nativePtr = IntPtr.Zero;
-            m_disposed = true;
         }
     }
 }
