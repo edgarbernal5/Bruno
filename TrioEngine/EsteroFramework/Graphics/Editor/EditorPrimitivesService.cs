@@ -16,7 +16,7 @@ namespace EsteroFramework.Graphics.Editor
         public void InitializeMeshes()
         {
             var device = m_graphicsService.GraphicsDevice;
-            GridMesh = new GridMesh(device, 16);
+            GridMesh = new GridMesh(device, 32);
         }
     }
 }

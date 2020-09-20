@@ -8,6 +8,7 @@ namespace TrioApi.Net.Graphics.Core
     {
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "RenderTarget2D_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_Ctor(IntPtr device, int width, int height, int preferredFormat);
+        
         public RenderTarget2D(GraphicsDevice device, int width, int height)
         {
             m_nativePtr = Internal_Ctor(device.NativePointer, width, height, (int)SurfaceFormat.Color);

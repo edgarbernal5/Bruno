@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Estero.Interop;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,13 +7,11 @@ using System.Reflection;
 
 namespace Estero.ServiceLocation
 {
-    public class ServiceContainer : IDisposable
+    public class ServiceContainer : DisposableBase
     {
         private static readonly Type delegateType = typeof(Delegate);
         private static readonly Type enumerableType = typeof(IEnumerable);
         private readonly Dictionary<ContainerRegistration, ContainerEntry> _registrations;
-
-        public bool IsDisposed { get; private set; }
 
         public bool EnablePropertyInjection { get; set; }
 
@@ -251,29 +250,18 @@ namespace Estero.ServiceLocation
                 .FirstOrDefault();
         }
 
-        public void Dispose()
+        protected override void OnDisposing(bool disposing)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
+            if (disposing)
             {
-                if (disposing)
+                lock (_registrations)
                 {
-                    lock (_registrations)
+                    foreach (var entry in _registrations.Values)
                     {
-                        foreach (var entry in _registrations.Values)
-                        {
-                            DisposeInstances(entry);
-                        }
-                        _registrations.Clear();
+                        DisposeInstances(entry);
                     }
+                    _registrations.Clear();
                 }
-
-                IsDisposed = true;
             }
         }
 

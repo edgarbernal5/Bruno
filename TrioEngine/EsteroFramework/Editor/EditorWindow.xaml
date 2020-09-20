@@ -9,7 +9,7 @@
         UseLayoutRounding="True"
         d:DataContext="{x:Static editor:EditorViewModel.DesignInstance}"
         
-        Height="343" Width="1005">
+        Height="600" Width="800">
     
     <DockPanel LastChildFill="True">
         <Grid DockPanel.Dock="Top">

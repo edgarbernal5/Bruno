@@ -37,6 +37,6 @@ namespace Estero.Interop
 
         protected abstract void OnDisposing(bool disposing);
 
-        protected abstract void OnDisposed();
+        protected virtual void OnDisposed() { }
     }
 }

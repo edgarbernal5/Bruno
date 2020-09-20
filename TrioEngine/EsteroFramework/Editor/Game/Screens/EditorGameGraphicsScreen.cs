@@ -41,7 +41,7 @@ namespace EsteroFramework.Editor.Graphics
 
         private void DoOnRender(RenderContext renderContext)
         {
-            renderContext.GraphicsDevice.Clear(Color.Red);
+            renderContext.GraphicsDevice.Clear(ColorRGBA8.CornflowerBlue);
 
             //
             m_gridMesh.Render(renderContext);
