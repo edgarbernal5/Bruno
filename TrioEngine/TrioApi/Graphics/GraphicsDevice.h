@@ -41,8 +41,7 @@ namespace TrioEngine
 		void Clear(const float* color);
 		void Clear(ClearOptions options, const float* color, float depth, uint8_t stencil);
 
-		void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount);
-		void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount);
+		void DrawIndexedPrimitives(PrimitiveType primitiveType, uint32_t baseVertex, uint32_t startIndex, uint32_t primitiveCount);
 
 		GraphicsAdapter*           GetAdapter() const { return m_adapter; }
 

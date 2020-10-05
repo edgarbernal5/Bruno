@@ -11,12 +11,12 @@ namespace TrioApi.Net.Graphics.Core
         
         public RenderTarget2D(GraphicsDevice device, int width, int height)
         {
-            m_nativePtr = Internal_Ctor(device.NativePointer, width, height, (int)SurfaceFormat.Color);
+            m_nativePointer = Internal_Ctor(device.NativePointer, width, height, (int)SurfaceFormat.Color);
         }
 
         public RenderTarget2D(GraphicsDevice device, int width, int height, SurfaceFormat preferredFormat)
         {
-            m_nativePtr = Internal_Ctor(device.NativePointer, width, height, (int)preferredFormat);
+            m_nativePointer = Internal_Ctor(device.NativePointer, width, height, (int)preferredFormat);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "RenderTarget2D_Ctor2", CallingConvention = CallingConvention.StdCall)]
@@ -24,7 +24,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public RenderTarget2D(GraphicsDevice device, int width, int height, uint mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, RenderTargetUsage usage)
         {
-            m_nativePtr = Internal_Ctor2(device.NativePointer, width, height, mipmap, (int)preferredFormat, (int)preferredDepthFormat, (int)usage);
+            m_nativePointer = Internal_Ctor2(device.NativePointer, width, height, mipmap, (int)preferredFormat, (int)preferredDepthFormat, (int)usage);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "RenderTarget2D_Ctor3", CallingConvention = CallingConvention.StdCall)]
@@ -32,7 +32,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public RenderTarget2D(GraphicsDevice device, int width, int height, uint mipmap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
         {
-            m_nativePtr = Internal_Ctor3(device.NativePointer, width, height, mipmap, (int)preferredFormat, (int)preferredDepthFormat);
+            m_nativePointer = Internal_Ctor3(device.NativePointer, width, height, mipmap, (int)preferredFormat, (int)preferredDepthFormat);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "RenderTarget2D_Dctor", CallingConvention = CallingConvention.StdCall)]
@@ -47,7 +47,7 @@ namespace TrioApi.Net.Graphics.Core
 
             // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
             // TODO: set large fields to null.
-            Internal_Dctor(m_nativePtr);
+            Internal_Dctor(m_nativePointer);
         }
 
     }

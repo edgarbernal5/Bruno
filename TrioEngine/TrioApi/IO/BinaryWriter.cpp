@@ -6,9 +6,9 @@
 namespace TrioIO
 {
 	BinaryWriter::BinaryWriter(Stream *_stream) 
-		: m_Stream(nullptr)
+		: m_stream(nullptr)
 	{
-		m_Stream = _stream;
+		m_stream = _stream;
 	}
 
 	void BinaryWriter::WriteInt32(int value)
@@ -92,7 +92,7 @@ namespace TrioIO
 
 	void BinaryWriter::WriteBytes(uint8_t *value, size_t size)
 	{
-		m_Stream->Write(value, 0, size);
+		m_stream->Write(value, 0, size);
 	}
 
 	void BinaryWriter::WriteString(std::string value)
@@ -114,6 +114,6 @@ namespace TrioIO
 
 	void BinaryWriter::WriteBuffer(uint8_t* buffer, int offset, int length)
 	{
-		m_Stream->Write(buffer, offset, length);
+		m_stream->Write(buffer, offset, length);
 	}
 }

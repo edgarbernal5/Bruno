@@ -84,12 +84,14 @@
     <Compile Include="Editor\IEditorService.cs" />
     <Compile Include="Editor\Timing\GameStepTimer.cs" />
     <Compile Include="Editor\Timing\GameTime.cs" />
+    <Compile Include="Editor\Units\Builder\BuilderUnit.cs" />
     <Compile Include="Editor\Units\Game\GameUnit.cs" />
     <Compile Include="Editor\Units\Menus\MenuUnit.cs" />
     <Compile Include="Editor\Game\Screens\EditorGameGraphicsScreen.cs" />
     <Compile Include="Editor\Game\Screens\GameGraphicsScreen.cs" />
     <Compile Include="Editor\Units\Primitives\PrimitivesUnit.cs" />
     <Compile Include="Editor\Units\ProjectFiles\ProjectFile.cs" />
+    <Compile Include="Graphics\Data\Cameras\Camera.cs" />
     <Compile Include="Graphics\Editor\EditorPrimitivesService.cs" />
     <Compile Include="Graphics\Editor\GridMesh.cs" />
     <Compile Include="Graphics\Editor\IEditorPrimitivesService.cs" />

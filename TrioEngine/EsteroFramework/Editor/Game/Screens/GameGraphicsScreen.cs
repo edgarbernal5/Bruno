@@ -1,5 +1,6 @@
 ﻿
 using EsteroFramework.Graphics;
+using EsteroFramework.Graphics.Data;
 using System;
 using TrioApi.Net.Game;
 
@@ -12,6 +13,8 @@ namespace EsteroFramework.Editor.Graphics
         public string Name { get; set; }
 
         public Scene Scene { get; set; }
+
+        public Camera Camera { get; set; }
 
         public GameGraphicsScreen()
         {

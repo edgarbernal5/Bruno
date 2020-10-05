@@ -18,9 +18,15 @@ namespace TrioEngine
 		{
 			m_processorName = "IndexCollectionWriter";
 		}
+
 		~IndexCollection()
 		{
 
+		}
+
+		void AddRange(const_iterator begin, const_iterator end)
+		{
+			m_indices.insert(m_indices.end(), begin, end);
 		}
 
 		const int & operator[](int nIndex) const

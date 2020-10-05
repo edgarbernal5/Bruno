@@ -58,12 +58,12 @@ namespace TrioApi.Net.Game
             get
             {
                 Vector3 position = Vector3.Zero;
-                Internal_GetPosition(m_nativePtr, ref position);
+                Internal_GetPosition(m_nativePointer, ref position);
                 return position;
             }
             set
             {
-                Internal_SetPosition(m_nativePtr, ref value);
+                Internal_SetPosition(m_nativePointer, ref value);
             }
         }
 
@@ -72,12 +72,12 @@ namespace TrioApi.Net.Game
             get
             {
                 Quaternion rotation = Quaternion.Identity;
-                Internal_GetRotation(m_nativePtr, ref rotation);
+                Internal_GetRotation(m_nativePointer, ref rotation);
                 return rotation;
             }
             set
             {
-                Internal_SetRotation(m_nativePtr, ref value);
+                Internal_SetRotation(m_nativePointer, ref value);
             }
         }
 
@@ -86,12 +86,12 @@ namespace TrioApi.Net.Game
             get
             {
                 Vector3 scale = Vector3.Zero;
-                Internal_GetScale(m_nativePtr, ref scale);
+                Internal_GetScale(m_nativePointer, ref scale);
                 return scale;
             }
             set
             {
-                Internal_SetScale(m_nativePtr, ref value);
+                Internal_SetScale(m_nativePointer, ref value);
             }
         }
 
@@ -100,12 +100,12 @@ namespace TrioApi.Net.Game
             get
             {
                 Vector3 position = Vector3.Zero;
-                Internal_GetLocalPosition(m_nativePtr, ref position);
+                Internal_GetLocalPosition(m_nativePointer, ref position);
                 return position;
             }
             set
             {
-                Internal_SetLocalPosition(m_nativePtr, ref value);
+                Internal_SetLocalPosition(m_nativePointer, ref value);
             }
         }
 
@@ -114,12 +114,12 @@ namespace TrioApi.Net.Game
             get
             {
                 Quaternion rotation = Quaternion.Identity;
-                Internal_GetLocalRotation(m_nativePtr, ref rotation);
+                Internal_GetLocalRotation(m_nativePointer, ref rotation);
                 return rotation;
             }
             set
             {
-                Internal_SetLocalRotation(m_nativePtr, ref value);
+                Internal_SetLocalRotation(m_nativePointer, ref value);
             }
         }
 
@@ -140,18 +140,18 @@ namespace TrioApi.Net.Game
             get
             {
                 Vector3 scale = Vector3.Zero;
-                Internal_GetLocalScale(m_nativePtr, ref scale);
+                Internal_GetLocalScale(m_nativePointer, ref scale);
                 return scale;
             }
             set
             {
-                Internal_SetLocalScale(m_nativePtr, ref value);
+                Internal_SetLocalScale(m_nativePointer, ref value);
             }
         }
 
         internal Transform(IntPtr nativePtr)
         {
-            m_nativePtr = nativePtr;
+            m_nativePointer = nativePtr;
         }
 
         protected override void OnDisposing(bool disposing)

@@ -16,5 +16,7 @@ namespace TrioIO
 		static std::string GetFilenameWithoutExtension(std::string path);
 		static std::string GetFullDirectory(const std::string& path);
 		static bool IsPathRooted(std::string path);
+
+		static const char DirectorySeparator = '\\';
 	};
 }

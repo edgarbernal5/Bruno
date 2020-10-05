@@ -572,26 +572,19 @@ namespace TrioEngine
 		m_d3dContext->RSSetViewports(1, m_viewport.Get11());
 #endif
 	}
-
-	void GraphicsDevice::DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
+	
+	void GraphicsDevice::DrawIndexedPrimitives(PrimitiveType primitiveType, uint32_t baseVertex, uint32_t startIndex, uint32_t primitiveCount)
 	{
 #ifdef TRIO_DIRECTX
 		ApplyState(true);
 
 		m_d3dContext->IASetPrimitiveTopology(FormatHelper::FormatToPrimitive(primitiveType));
-		
+
 		m_textureCollection->BindAllTextures(this);
 		m_samplerCollection->BindAllSamplers(this);
 
-		int indexCount = FormatHelper::GetElementCountArray(primitiveType, primitiveCount);
+		uint32_t indexCount = FormatHelper::GetElementCountArray(primitiveType, primitiveCount);
 		m_d3dContext->DrawIndexed(indexCount, startIndex, baseVertex);
-#endif
-	}
-	
-	void GraphicsDevice::DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
-	{
-#ifdef TRIO_DIRECTX
-
 #endif
 	}
 

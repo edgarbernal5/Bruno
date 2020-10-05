@@ -41,14 +41,14 @@ namespace TrioEngine
 			return m_materialContent;
 		}
 		
-		inline std::vector<uint32_t>& GetIndices()
+		inline std::vector<int>& GetIndices()
 		{
 			return m_indices;
 		}
 
 	private:
 		MeshContent* m_parent;
-		std::vector<uint32_t> m_indices;
+		std::vector<int> m_indices;
 
 		VertexContent* m_vertices;
 		MaterialContent* m_materialContent;

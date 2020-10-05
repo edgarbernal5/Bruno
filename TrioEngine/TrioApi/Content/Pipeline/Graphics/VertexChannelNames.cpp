@@ -41,6 +41,11 @@ namespace TrioEngine
 		return VertexElementUsage::Position;
 	}
 
+	std::string VertexChannelNames::Color(int usageIndex)
+	{
+		return EncodeBase("Color", usageIndex);
+	}
+
 	std::string VertexChannelNames::Normal()
 	{
 		return Normal(0);

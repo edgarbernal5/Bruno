@@ -9,6 +9,7 @@ namespace TrioEngine
 	class TRIO_API_EXPORT VertexChannelNames
 	{
 	public:
+		static std::string Color(int usageIndex);
 		static std::string Normal();
 		static std::string Normal(int usageIndex);
 		static std::string Weights(int usageIndex);

@@ -17,7 +17,7 @@ namespace TrioEngine
 		Texture2DWriter();
 		~Texture2DWriter();
 
-		std::string GetWriterName() { m_Name = "Texture2DWriter"; return m_Name; }
+		std::string GetWriterName() { m_name = "Texture2DWriter"; return m_name; }
 		std::string GetReaderName() { return "Texture2DReader"; }
 		void Write(ContentWriter *output, ContentItem* value);
 

@@ -24,7 +24,9 @@ namespace TrioEngine
 		material->Get(AI_MATKEY_NAME, name);
 		m_name = name.C_Str();
 
-		for (TextureType textureType = (TextureType)0; textureType < ModelMaterial::TextureType::TextureTypeEnd; textureType = (TextureType)(textureType + 1))
+		for (TextureType textureType = (TextureType)0; 
+			textureType < ModelMaterial::TextureType::TextureTypeEnd; 
+			textureType = (TextureType)(textureType + 1))
 		{
 			aiTextureType mappedTextureType = (aiTextureType)g_textureTypeMappings[textureType];
 

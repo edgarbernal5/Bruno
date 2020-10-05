@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\Tasks\BuildCoordinator.cs" />
     <Compile Include="Content\Tasks\BuildCoordinatorSettings.cs" />
     <Compile Include="Game\GameObject.cs" />
@@ -95,6 +96,8 @@
     <Compile Include="Graphics\Core\VertexPosition.cs" />
     <Compile Include="Graphics\Core\VertexPositionColor.cs" />
     <Compile Include="Graphics\Core\VertexPositionNormalTexture.cs" />
+    <Compile Include="Graphics\Models\Mesh.cs" />
+    <Compile Include="Graphics\Models\Model.cs" />
     <Compile Include="Graphics\Utilities\FormatExtensions.cs" />
     <Compile Include="Graphics\Utilities\PackUtils.cs" />
     <Compile Include="Graphics\DepthFormat.cs" />

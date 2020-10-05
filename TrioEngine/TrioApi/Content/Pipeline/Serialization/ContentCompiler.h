@@ -23,18 +23,15 @@ namespace TrioEngine
 		ContentCompiler();
 		~ContentCompiler();
 
-		void Compile(TrioIO::Stream *stream, ContentItem *object, bool compressContent);
+		void Compile(TrioIO::Stream *stream, ContentItem *object, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath);
 
 		ContentTypeWriter* GetTypeWriter(std::string name, std::vector<std::string> &dependencies);
 	private:
-		std::map<std::string, ContentTypeWriter*> m_WriterInstances;
-
-		std::map<ContentTypeWriter*, std::vector<std::string> > m_WriterDependencies;
-
-		ContentTypeWriter* GetTypeWriterInternal(std::string name);
-
-		ContentTypeWriterFactory *m_Factory;
+		std::map<std::string, ContentTypeWriter*> m_writerInstances;
+		std::map<ContentTypeWriter*, std::vector<std::string> > m_writerDependencies;
+		ContentTypeWriterFactory *m_factory;
 
 		void AddTypeWriter(ContentTypeWriter* writer);
+		ContentTypeWriter* GetTypeWriterInternal(std::string name);
 	};
 }

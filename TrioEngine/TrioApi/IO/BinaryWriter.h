@@ -30,7 +30,7 @@ namespace TrioIO
 	private:
 
 	protected:
-		Stream* m_Stream;
+		Stream* m_stream;
 
 		uint8_t m_Buffer[0x10];
 

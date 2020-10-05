@@ -43,7 +43,7 @@ namespace TrioApi.Net.Graphics
 
         internal GraphicsAdapter(IntPtr nativePtr)
         {
-            m_nativePtr = nativePtr;
+            m_nativePointer = nativePtr;
         }
 
         protected override void OnDisposing(bool disposing)

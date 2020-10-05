@@ -8,18 +8,24 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "Content/Pipeline/ContentIdentity.h"
+
+#include <utility>
+#include <string>
+
 namespace TrioEngine
 {
 	class NodeContent;
 	class MeshContent;
 	class MaterialContent;
+	class GeometryContent;
 
 	class TRIO_API_EXPORT ModelImporter : public IContentImporter
 	{
 	public:
 		ModelImporter();
 
-		ContentItem* Import(std::string& filename);
+		ContentItem* Import(const std::string& filename);
 
 		friend class BuildCoordinator;
 
@@ -29,7 +35,7 @@ namespace TrioEngine
 	private:
 		enum TextureType : uint32_t
 		{
-			TextureTypeDifffuse = 0,
+			TextureTypeDiffuse = 0,
 			TextureTypeSpecularMap,
 			TextureTypeAmbient,
 			TextureTypeEmissive,
@@ -41,15 +47,19 @@ namespace TrioEngine
 			TextureTypeEnd
 		};
 
-		MeshContent* CreateMesh(aiMesh* mesh);
+		ContentIdentity m_identity;
+
+		GeometryContent* CreateGeometry(aiMesh* mesh, MeshContent* meshContent);
+
 		void GetTexturesForMaterial(MaterialContent* materialContent, std::string& directory, aiMaterial* material);
 		void ImportMaterials(const aiScene* scene, std::string directory);
-		NodeContent* ProcessNode(const aiScene* scene, const aiNode* node, Matrix parentTransform);
+		NodeContent* ImportNode(const aiScene* scene, const aiNode* node, Matrix parentTransform, NodeContent* parentContent);
 
 		std::vector<MaterialContent*> m_materials;
 
 		static void InitializeTextureTypeMappings();
-		static std::map<TextureType, uint32_t> g_textureTypeMappings;
-		static std::map<TextureType, std::string> g_textureNameMappings;
+
+		static std::map<TextureType, std::pair<uint32_t, std::string>> g_textureTypeMappings;
+		//static std::map<TextureType, std::string> g_textureNameMappings;
 	};
 }

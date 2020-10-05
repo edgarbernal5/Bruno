@@ -21,11 +21,11 @@ namespace TrioApi.Net.Graphics
         {
             get
             {
-                return new BlendState(Internal_GetBlendState(m_nativePtr));
+                return new BlendState(Internal_GetBlendState(m_nativePointer));
             }
             set
             {
-                Internal_SetBlendState(m_nativePtr, value.m_nativePtr);
+                Internal_SetBlendState(m_nativePointer, value.m_nativePtr);
             }
         }
 
@@ -36,11 +36,11 @@ namespace TrioApi.Net.Graphics
         {
             get
             {
-                return new DepthStencilState(Internal_GetDepthStencilState(m_nativePtr));
+                return new DepthStencilState(Internal_GetDepthStencilState(m_nativePointer));
             }
             set
             {
-                Internal_SetDepthStencilState(m_nativePtr, value.m_nativePtr);
+                Internal_SetDepthStencilState(m_nativePointer, value.m_nativePtr);
             }
         }
 
@@ -54,11 +54,11 @@ namespace TrioApi.Net.Graphics
         {
             get
             {
-                return new RasterizerState(Internal_GetRasterizerState(m_nativePtr));
+                return new RasterizerState(Internal_GetRasterizerState(m_nativePointer));
             }
             set
             {
-                Internal_SetRasterizerState(m_nativePtr, value.m_nativePtr);
+                Internal_SetRasterizerState(m_nativePointer, value.m_nativePtr);
             }
         }
 
@@ -72,11 +72,11 @@ namespace TrioApi.Net.Graphics
         {
             get
             {
-                return Internal_GetViewport(m_nativePtr);
+                return Internal_GetViewport(m_nativePointer);
             }
             set
             {
-                Internal_SetViewport(m_nativePtr, value);
+                Internal_SetViewport(m_nativePointer, value);
             }
         }
 
@@ -85,7 +85,7 @@ namespace TrioApi.Net.Graphics
 
         public GraphicsDevice(GraphicsAdapter adapter, PresentationParameters parameters)
         {
-            m_nativePtr = Internal_ctor(adapter.NativePointer, parameters);
+            m_nativePointer = Internal_ctor(adapter.NativePointer, parameters);
 
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
@@ -101,7 +101,7 @@ namespace TrioApi.Net.Graphics
             if (disposing)
             {
             }
-            Internal_dtor(m_nativePtr);
+            Internal_dtor(m_nativePointer);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Clear", CallingConvention = CallingConvention.StdCall)]
@@ -109,23 +109,22 @@ namespace TrioApi.Net.Graphics
 
         public void Clear(Color color)
         {
-            Internal_Clear(m_nativePtr, ref color.R);
+            Internal_Clear(m_nativePointer, ref color.R);
         }
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_ClearAsRGBA8", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_ClearRGBA8(IntPtr device, uint packedColor);
 
         public void Clear(ColorRGBA8 color)
         {
-            Internal_ClearRGBA8(m_nativePtr, color.PackedColor);
+            Internal_ClearRGBA8(m_nativePointer, color.PackedColor);
         }
         
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_DrawIndexedPrimitives", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_DrawIndexedPrimitives(IntPtr device, PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount);
+        private static extern void Internal_DrawIndexedPrimitives(IntPtr device, PrimitiveType primitiveType, uint baseVertex, uint startIndex, uint primitiveCount);
 
-        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
+        public void DrawIndexedPrimitives(PrimitiveType primitiveType, uint baseVertex, uint startIndex, uint primitiveCount)
         {
-            Internal_DrawIndexedPrimitives(m_nativePtr, primitiveType, baseVertex, minVertexIndex, numVertices, startIndex, primitiveCount);
+            Internal_DrawIndexedPrimitives(m_nativePointer, primitiveType, baseVertex, startIndex, primitiveCount);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Flush", CallingConvention = CallingConvention.StdCall)]
@@ -133,7 +132,7 @@ namespace TrioApi.Net.Graphics
 
         public void Flush()
         {
-            Internal_Flush(m_nativePtr);
+            Internal_Flush(m_nativePointer);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Present", CallingConvention = CallingConvention.StdCall)]
@@ -141,7 +140,7 @@ namespace TrioApi.Net.Graphics
 
         public void Present()
         {
-            Internal_Present(m_nativePtr);
+            Internal_Present(m_nativePointer);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Reset", CallingConvention = CallingConvention.StdCall)]
@@ -149,7 +148,7 @@ namespace TrioApi.Net.Graphics
 
         public void Reset(PresentationParameters parameters)
         {
-            Internal_Reset(m_nativePtr, parameters);
+            Internal_Reset(m_nativePointer, parameters);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetRenderTarget", CallingConvention = CallingConvention.StdCall)]
@@ -159,10 +158,10 @@ namespace TrioApi.Net.Graphics
         {
             if (renderTarget == null)
             {
-                Internal_SetRenderTarget(m_nativePtr, IntPtr.Zero);
+                Internal_SetRenderTarget(m_nativePointer, IntPtr.Zero);
                 return;
             }
-            Internal_SetRenderTarget(m_nativePtr, renderTarget.NativePointer);
+            Internal_SetRenderTarget(m_nativePointer, renderTarget.NativePointer);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetVertexBuffer", CallingConvention = CallingConvention.StdCall)]
@@ -172,10 +171,10 @@ namespace TrioApi.Net.Graphics
         {
             if (vertexBuffer == null)
             {
-                Internal_SetVertexBuffer(m_nativePtr, IntPtr.Zero);
+                Internal_SetVertexBuffer(m_nativePointer, IntPtr.Zero);
                 return;
             }
-            Internal_SetVertexBuffer(m_nativePtr, vertexBuffer.NativePointer);
+            Internal_SetVertexBuffer(m_nativePointer, vertexBuffer.NativePointer);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_SetIndexBuffer", CallingConvention = CallingConvention.StdCall)]
@@ -185,10 +184,10 @@ namespace TrioApi.Net.Graphics
         {
             if (indexBuffer == null)
             {
-                Internal_SetIndexBuffer(m_nativePtr, IntPtr.Zero);
+                Internal_SetIndexBuffer(m_nativePointer, IntPtr.Zero);
                 return;
             }
-            Internal_SetIndexBuffer(m_nativePtr, indexBuffer.NativePointer);
+            Internal_SetIndexBuffer(m_nativePointer, indexBuffer.NativePointer);
         }
     }
 }

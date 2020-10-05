@@ -4,39 +4,108 @@
 #include "Content/Pipeline/Graphics/GeometryContent.h"
 #include "Content/Pipeline/Graphics/MaterialContent.h"
 #include "Content/Pipeline/Graphics/MeshContent.h"
+#include "Content/Pipeline/Graphics/VertexContent.h"
+#include "Content/Pipeline/Graphics/VertexChannelCollection.h"
+
+#include "Content/Pipeline/Graphics/VertexChannelNames.h"
 #include "IO/File.h"
+
+#include "Errors/ContentPipelineException.h"
 
 namespace TrioEngine
 {
-	std::map<ModelImporter::TextureType, uint32_t> ModelImporter::g_textureTypeMappings;
-	std::map<ModelImporter::TextureType, std::string> ModelImporter::g_textureNameMappings;
+	std::map<ModelImporter::TextureType, std::pair<uint32_t, std::string>> ModelImporter::g_textureTypeMappings;
 
 	ModelImporter::ModelImporter()
 	{
+		InitializeTextureTypeMappings();
 	}
 
-	MeshContent* ModelImporter::CreateMesh(aiMesh* mesh)
+	GeometryContent* ModelImporter::CreateGeometry(aiMesh* mesh, MeshContent* meshContent)
 	{
-		MeshContent* meshContent = new MeshContent();
-		meshContent->SetName(mesh->mName.C_Str());
+		GeometryContent* geometryContent = new GeometryContent();
+		geometryContent->SetMaterial(m_materials[mesh->mMaterialIndex]);
 
+		int baseVertex = meshContent->GetPositions().size();
 		for (uint32_t v = 0; v < mesh->mNumVertices; v++)
 		{
 			meshContent->GetPositions().push_back(Vector3(mesh->mVertices[v].x, mesh->mVertices[v].y, mesh->mVertices[v].z));
 		}
 
-		GeometryContent* geom = new GeometryContent();
+		std::vector<int> vertexRange(mesh->mNumVertices);
+		for (int i = baseVertex; i < mesh->mNumVertices; i++) vertexRange[i - baseVertex] = i;
 
-		return meshContent;
+		geometryContent->GetVertices()->AddRange(vertexRange.data(), mesh->mNumVertices);
+
+		if (mesh->HasFaces())
+		{
+			for (uint32_t i = 0; i < mesh->mNumFaces; i++)
+			{
+				aiFace* face = &mesh->mFaces[i];
+
+				for (uint32_t j = 0; j < face->mNumIndices; j++)
+				{
+					geometryContent->GetIndices().push_back(face->mIndices[j]);
+				}
+			}
+		}
+
+		if (mesh->HasBones())
+		{
+			//TODO
+		}
+
+		if (mesh->HasNormals())
+		{
+			std::vector<Vector3> normals;
+			normals.reserve(mesh->mNumVertices);
+			for (uint32_t i = 0; i < mesh->mNumVertices; i++)
+			{
+				normals.push_back(Vector3(reinterpret_cast<const float*>(&mesh->mNormals[i])));
+			}
+
+			geometryContent->GetVertices()->GetChannels()->Add<Vector3>(VertexChannelNames::Normal(), normals.data(), mesh->mNumVertices);
+		}
+
+		uint32_t uvChannelCount = mesh->GetNumUVChannels();
+		for (uint32_t i = 0; i < uvChannelCount; i++)
+		{
+			std::vector<Vector3> textureCoordinates(mesh->mNumVertices);
+			
+			aiVector3D* aiTextureCoordinates = mesh->mTextureCoords[i];
+			for (uint32_t j = 0; j < mesh->mNumVertices; j++)
+			{
+				textureCoordinates[j] = Vector3(reinterpret_cast<const float*>(&aiTextureCoordinates[j]));
+			}
+
+			geometryContent->GetVertices()->GetChannels()->Add<Vector3>(VertexChannelNames::TextureCoordinate(i), textureCoordinates.data(), mesh->mNumVertices);
+		}
+
+		uint32_t colorChannelCount = mesh->GetNumColorChannels();
+		for (uint32_t i = 0; i < colorChannelCount; i++)
+		{
+			std::vector<Color> vertexColors(mesh->mNumVertices);
+
+			aiColor4D* aiVertexColors = mesh->mColors[i];
+			for (uint32_t j = 0; j < mesh->mNumVertices; j++)
+			{
+				vertexColors[j] = Color(reinterpret_cast<const float*>(&aiVertexColors[j]));
+			}
+
+			geometryContent->GetVertices()->GetChannels()->Add<Color>(VertexChannelNames::Color(i), vertexColors.data(), mesh->mNumVertices);
+		}
+
+		geometryContent->SetParent(meshContent);
+		return geometryContent;
 	}
 
-	void ModelImporter::GetTexturesForMaterial(MaterialContent* materialContent, std::string& directory, aiMaterial* material)
+	void ModelImporter::GetTexturesForMaterial(MaterialContent* materialContent, std::string& directory, aiMaterial* aiMaterial)
 	{
 		//TODO: terminar las demás propiedades.
-		for (TextureType textureType = (TextureType)0; textureType < ModelImporter::TextureType::TextureTypeEnd; textureType = (TextureType)(textureType + 1))
+		for (auto it = g_textureTypeMappings.begin(); it != g_textureTypeMappings.end(); ++it)
 		{
-			aiTextureType mappedTextureType = (aiTextureType)g_textureTypeMappings[textureType];
-			uint32_t textureCount = material->GetTextureCount(mappedTextureType);
+			aiTextureType mappedTextureType = (aiTextureType)(it->second.first);
+			uint32_t textureCount = aiMaterial->GetTextureCount(mappedTextureType);
 
 			if (textureCount > 0)
 			{
@@ -44,23 +113,38 @@ namespace TrioEngine
 				{
 					aiString textureRelativePath;
 					aiTextureMapping mapping = aiTextureMapping::aiTextureMapping_UV;
-					unsigned int uvIndex = 0;
+					uint32_t uvIndex = 0;
 					float blend = 0.0f;
+					aiTextureOp operation = aiTextureOp::aiTextureOp_Multiply;
+					aiTextureMapMode mapMode = aiTextureMapMode::aiTextureMapMode_Wrap;
 
-					if (material->GetTexture(mappedTextureType, textureIndex, &textureRelativePath, &mapping, &uvIndex, &blend) == AI_SUCCESS)
+					if (aiMaterial->GetTexture(mappedTextureType, textureIndex, &textureRelativePath, &mapping, &uvIndex, &blend, &operation, &mapMode) == AI_SUCCESS)
 					{
 						std::string filenameTexture = TrioIO::Path::Combine(directory, textureRelativePath.C_Str());
 						if (TrioIO::File::Exist(filenameTexture))
 						{
 							ExternalReference texture(filenameTexture);
+							texture.SetContentIdentity(m_identity);
+
+							std::string textureName = (it->second.second);
 
 							std::stringstream ss;
 							ss << "TextureCoordinate" << uvIndex;
-							texture.GetOpaqueData()["TextureCoordinate"] = ss.str();
+							texture.GetOpaqueData().set("TextureCoordinate", ss.str());
+							//texture.GetOpaqueData()["AddressU"] = aiTextureMapMode
+							//Operation
+							//AddressU
+							//AddressV
+							//Mapping
 
-							materialContent->GetTextures()[g_textureNameMappings[textureType]] = texture;
+							materialContent->GetTextures()[textureName] = texture;
 						}
 					}
+
+					aiColor3D color(1.0f, 1.0f, 1.0f);
+					aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+
+					materialContent->GetOpaqueData().set("DiffuseColor", color);
 				}
 			}
 		}
@@ -68,33 +152,26 @@ namespace TrioEngine
 
 	void ModelImporter::InitializeTextureTypeMappings()
 	{
-		if (g_textureTypeMappings.size() != ModelImporter::TextureType::TextureTypeEnd)
+		if (g_textureTypeMappings.size() == 0)
 		{
-			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeDifffuse] = aiTextureType_DIFFUSE;
-			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeSpecularMap] = aiTextureType_SPECULAR;
-			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeAmbient] = aiTextureType_AMBIENT;
-			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeHeightmap] = aiTextureType_HEIGHT;
-			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeNormalMap] = aiTextureType_NORMALS;
-			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeSpecularPowerMap] = aiTextureType_SHININESS;
-			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeDisplacementMap] = aiTextureType_DISPLACEMENT;
-			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeLightMap] = aiTextureType_LIGHTMAP;
-
-			g_textureNameMappings[ModelImporter::TextureType::TextureTypeDifffuse] = "Texture";
-			g_textureNameMappings[ModelImporter::TextureType::TextureTypeSpecularMap] = "SpecularTexture";
-			g_textureNameMappings[ModelImporter::TextureType::TextureTypeAmbient] = "AmbientTexture";
-			g_textureNameMappings[ModelImporter::TextureType::TextureTypeHeightmap] = "HeightTexture";
-			g_textureNameMappings[ModelImporter::TextureType::TextureTypeNormalMap] = "NormalTexture";
-			g_textureNameMappings[ModelImporter::TextureType::TextureTypeSpecularPowerMap] = "SpecularPowerTexture";
-			g_textureNameMappings[ModelImporter::TextureType::TextureTypeDisplacementMap] = "DisplacementTexture";
-			g_textureNameMappings[ModelImporter::TextureType::TextureTypeLightMap] = "LightMapTexture";
+			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeDiffuse] = std::make_pair(aiTextureType_DIFFUSE, "Texture");
+			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeSpecularMap] = std::make_pair(aiTextureType_SPECULAR, "SpecularTexture");
+			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeAmbient] = std::make_pair(aiTextureType_AMBIENT, "AmbientTexture");
+			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeEmissive] = std::make_pair(aiTextureType_EMISSIVE, "EmissiveTexture");
+			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeHeightmap] = std::make_pair(aiTextureType_HEIGHT, "HeightTexture");
+			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeNormalMap] = std::make_pair(aiTextureType_NORMALS, "NormalTexture");
+			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeSpecularPowerMap] = std::make_pair(aiTextureType_SHININESS, "SpecularPowerTexture");
+			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeDisplacementMap] = std::make_pair(aiTextureType_DISPLACEMENT, "DisplacementTexture");
+			g_textureTypeMappings[ModelImporter::TextureType::TextureTypeLightMap] = std::make_pair(aiTextureType_LIGHTMAP, "LightMapTexture");
 		}
 	}
 
-	ContentItem* ModelImporter::Import(std::string& filename)
+	ContentItem* ModelImporter::Import(const std::string& filename)
 	{
+		m_identity = ContentIdentity(filename, GetImporterName());
 		Assimp::Importer importer;
 
-		UINT flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_FlipWindingOrder;
+		uint32_t flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_FlipWindingOrder;
 		//if (loadParams.flipUVs)
 		//{
 		//	flags |= aiProcess_FlipUVs;
@@ -103,23 +180,15 @@ namespace TrioEngine
 		const aiScene* scene = importer.ReadFile(filename, flags);
 		if (scene == nullptr)
 		{
-			//throw GameException(importer.GetErrorString());
+			throw ContentPipelineException(importer.GetErrorString());
 		}
 
 		if (scene->HasMaterials())
 		{
 			ImportMaterials(scene, TrioIO::Path::GetDirectoryFromFilePath(filename));
 		}
-		NodeContent* rootNode = ProcessNode(scene, scene->mRootNode, Matrix::Identity);
 
-		if (scene->HasMeshes())
-		{
-			for (uint32_t i = 0; i < scene->mNumMeshes; i++)
-			{
-				/*Mesh* mesh = new Mesh(*this, *(scene->mMeshes[i]));
-				m_meshes.push_back(mesh);*/
-			}
-		}
+		NodeContent* rootNode = ImportNode(scene, scene->mRootNode, Matrix::Identity, nullptr);
 
 		if (scene->HasAnimations())
 		{
@@ -140,30 +209,71 @@ namespace TrioEngine
 	void ModelImporter::ImportMaterials(const aiScene* scene, std::string directory)
 	{
 		m_materials.clear();
-		for (UINT i = 0; i < scene->mNumMaterials; i++)
+		for (uint32_t i = 0; i < scene->mNumMaterials; i++)
 		{
-			aiMaterial* material = scene->mMaterials[i];
+			aiMaterial* aiMaterial = scene->mMaterials[i];
 			MaterialContent* materialContent = new MaterialContent();
+			materialContent->SetContentIdentity(m_identity);
 			
 			aiString name;
-			material->Get(AI_MATKEY_NAME, name);
+			aiMaterial->Get(AI_MATKEY_NAME, name);
 			materialContent->SetName(name.C_Str());
 
-			GetTexturesForMaterial(materialContent, directory, material);
+			GetTexturesForMaterial(materialContent, directory, aiMaterial);
 			
 			m_materials.push_back(materialContent);
 		}
 	}
 
-	NodeContent* ModelImporter::ProcessNode(const aiScene* scene, const aiNode* node, Matrix parentTransform) {
+	NodeContent* ModelImporter::ImportNode(const aiScene* scene, const aiNode* node, Matrix parentTransform, NodeContent* parentContent)
+	{
 		NodeContent* nodeContent = nullptr;
+		Matrix nodeTransform(&node->mTransformation.a1);
 
-		for (uint32_t i = 0; i < node->mNumMeshes; i++)
+		if (node->mNumMeshes > 0)
 		{
-			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+			MeshContent* meshContent = new MeshContent();
+			meshContent->SetName(node->mName.C_Str());
+			meshContent->SetContentIdentity(m_identity);
 
-			if (mesh->mNumVertices == 0)
-				continue;
+			meshContent->GetTransform() = nodeTransform * parentTransform;
+
+			for (uint32_t i = 0; i < node->mNumMeshes; i++)
+			{
+				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+				GeometryContent* geometryContent = CreateGeometry(mesh, meshContent);
+				meshContent->SetName(node->mName.C_Str());
+
+				/*if (mesh->mNumVertices == 0)
+					continue;*/
+
+				meshContent->GetGeometry().push_back(geometryContent);
+			}
+
+			nodeContent = meshContent;
+		}
+		else
+		{
+			nodeContent = new NodeContent();
+			nodeContent->SetName(node->mName.C_Str());
+			nodeContent->SetContentIdentity(m_identity);
+
+			nodeContent->GetTransform() = nodeTransform * parentTransform;
+		}
+		
+		if (nodeContent)
+		{
+			if (parentContent)
+			{
+				parentContent->GetChildren().push_back(nodeContent);
+			}
+		}
+
+		for (uint32_t i = 0; i < node->mNumChildren; i++)
+		{
+			aiNode* childNode = node->mChildren[i];
+			ImportNode(scene, childNode, nodeTransform, nodeContent);
 		}
 
 		return nodeContent;

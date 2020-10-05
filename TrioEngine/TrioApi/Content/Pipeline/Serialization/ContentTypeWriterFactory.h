@@ -22,7 +22,6 @@ namespace TrioEngine
 
 		ContentTypeWriter* CreateContentTypeInstance(std::string const& writerName)
 		{
-
 			ContentTypeWriter* writer = GetByWriterName(writerName);
 			ContentTypeWriter* clone = static_cast<ContentTypeWriter *>(malloc(sizeof(writer)));
 			memcpy(&clone, &writer, sizeof(writer));

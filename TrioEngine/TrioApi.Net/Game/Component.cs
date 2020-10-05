@@ -16,11 +16,11 @@ namespace TrioApi.Net.Game
         {
             get
             {
-                return Internal_GetEnabled(m_nativePtr);
+                return Internal_GetEnabled(m_nativePointer);
             }
             set
             {
-                Internal_SetEnabled(m_nativePtr, value);
+                Internal_SetEnabled(m_nativePointer, value);
             }
         }
 

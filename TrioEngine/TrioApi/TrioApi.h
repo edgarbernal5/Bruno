@@ -6,6 +6,7 @@
 
 using namespace TrioEngine;
 
+
 /*
 DepthStencilState
 */
@@ -26,14 +27,33 @@ extern "C" TRIO_API_EXPORT BlendState* __stdcall BlendState_Opaque();
 /*
 BuildCoordinator
 */
+struct BuildCoordinatorSettingsBridge {
+	char* IntermediateDirectory;
+	char* OutputDirectory;
+	char* RootDirectory;
+
+};
+
 extern "C" TRIO_API_EXPORT BuildCoordinator* __stdcall BuildCoordinator_Ctor(const char* intermediateDirectory, const char* outputDirectory, const char* rootDirectory);
-extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_RequestBuild(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues);
+extern "C" TRIO_API_EXPORT BuildCoordinator* __stdcall BuildCoordinator_Ctor2(BuildCoordinatorSettingsBridge settings);
+extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_Dtor(BuildCoordinator* buildCoordinator);
+extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_GetSettings(BuildCoordinator* coordinator, char* const intermediateDir, char* const outputDir, char* const rootDir);
+extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_GetSettings2(BuildCoordinator* coordinator, BuildCoordinatorSettingsBridge* managedSettings);
+extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_RequestBuildWithoutOpaqueData(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName);
+extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_RequestBuild(BuildCoordinator * coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues);
 extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_RunTheBuild(BuildCoordinator* coordinator);
 
 /*
 Component
 */
 extern "C" TRIO_API_EXPORT bool __stdcall Component_GetEnabled(Component* component);
+
+/*
+ContentManager
+*/
+extern "C" TRIO_API_EXPORT ContentManager* __stdcall ContentManager_Ctor(GraphicsDevice* device);
+extern "C" TRIO_API_EXPORT ContentManager* __stdcall ContentManager_Ctor2(GraphicsDevice* device, const char* rootDirectory);
+extern "C" TRIO_API_EXPORT uint8_t * __stdcall ContentManager_Load(ContentManager* contentManager, const char* assetName);
 
 /*
 Effect
@@ -95,7 +115,7 @@ extern "C" TRIO_API_EXPORT GraphicsDevice* __stdcall GraphicsDevice_Ctor(Graphic
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Dtor(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Clear(GraphicsDevice * device, float* colorAsFloat);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_ClearAsRGBA8(GraphicsDevice * device, uint32_t packedColor);
-extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_DrawIndexedPrimitives(GraphicsDevice * device, PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount);
+extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_DrawIndexedPrimitives(GraphicsDevice * device, PrimitiveType primitiveType, uint32_t baseVertex, uint32_t startIndex, uint32_t primitiveCount);
 extern "C" TRIO_API_EXPORT BlendState* __stdcall GraphicsDevice_GetBlendState(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall GraphicsDevice_GetDepthStencilState(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT RasterizerState* __stdcall GraphicsDevice_GetRasterizerState(GraphicsDevice* device);
@@ -141,6 +161,13 @@ extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateTRS(Matrix *pMatrix1, Vec
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateWorld(Matrix *pMatrix1, Vector3* position, Vector3* forward, Vector3* up);
 
 /*
+Model
+*/
+extern "C" TRIO_API_EXPORT Model * __stdcall Model_Ctor(GraphicsDevice* device);
+extern "C" TRIO_API_EXPORT void __stdcall Model_Dtor(Model * model);
+extern "C" TRIO_API_EXPORT void __stdcall Model_Draw(Model * model);
+
+/*
 Object
 */
 extern "C" TRIO_API_EXPORT int __stdcall Object_GetId(Object* object);
@@ -167,7 +194,9 @@ extern "C" TRIO_API_EXPORT RasterizerState* __stdcall RasterizerState_CullNone()
 Scene
 */
 extern "C" TRIO_API_EXPORT Scene* __stdcall Scene_Ctor();
+extern "C" TRIO_API_EXPORT void __stdcall Scene_Dtor(Scene* scene);
 extern "C" TRIO_API_EXPORT Scene* __stdcall Scene_GetActiveScene();
+extern "C" TRIO_API_EXPORT void __stdcall Scene_Update(Scene* scene);
 
 /*
 Transform

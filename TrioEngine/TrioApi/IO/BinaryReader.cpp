@@ -196,6 +196,9 @@ namespace TrioIO
 	std::string BinaryReader::ReadString()
 	{
 		uint32_t capacity = ReadUInt32();
+		if (capacity == 0) {
+			return "";
+		}
 		//
 		////std::vector<uint8_t> strBuffer = ReadBytes(capacity);
 		//std::vector<uint8_t> strBuffer(capacity);
@@ -210,19 +213,19 @@ namespace TrioIO
 		do
 		{
 			int count = ((capacity - num) > 0x80) ? 0x80 : (capacity - num);
-			int byteCount = m_Stream->Read(&strBuffer[0], 0, count);
+			int byteCount = m_Stream->Read(strBuffer.data(), 0, count);
 			if (byteCount == 0)
 			{
-				//error.
+				//error. End of file
 			}
 			if ((num == 0) && (byteCount == capacity))
 			{
 				strBuffer.push_back(0);
-				retstr = std::string((char*)(&strBuffer[0]), (char*)(&strBuffer[0 + capacity]));
+				retstr = std::string((char*)(strBuffer.data()), (char*)(strBuffer.data() + capacity));
 
 				return retstr;
 			}
-			retstr.insert(retstr.end(), (char*)(&strBuffer[0]), (char*)(&strBuffer[0 + count]));
+			retstr.insert(retstr.end(), (char*)(strBuffer.data()), (char*)(strBuffer.data() + count));
 			num += byteCount;
 		} while (num < capacity);
 

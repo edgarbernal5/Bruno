@@ -16,9 +16,9 @@ namespace TrioEngine
 
 	ContentItem* TextureProcessor::Process(ContentItem* input, ContentProcessorContext *context)
 	{
-		//TextureContent* inputContent = static_cast<TextureContent*>(input);
+		TextureContent* inputContent = reinterpret_cast<TextureContent*>(input);
 
-
+		inputContent->ConvertBitmapType();
 		return input;
 	}
 }

@@ -23,11 +23,12 @@ namespace TrioEngine
 		BuildCoordinator(BuildCoordinatorSettings settings, TimestampCache* timestampCache);
 		~BuildCoordinator();
 
+		void AddDependency(BuildItem* buildItem, std::string filename);
 		std::string GetAbsolutePath(std::string path);
 
 		BuildCoordinatorSettings& GetBuildSettings()
 		{
-			return m_Settings;
+			return m_settings;
 		}
 
 		inline ProcessorManager* GetProcessorManager()
@@ -37,30 +38,32 @@ namespace TrioEngine
 
 		inline std::string GetRelativePath(std::string path)
 		{
-			return m_Settings.GetRelativePath(path);
+			return m_settings.GetRelativePath(path);
 		}
 
 		void RequestBuild(std::string sourceFilename, std::string assetName, std::string importerName, std::string processorName, OpaqueData *processorParameters);
 		BuildItem* RequestBuild(BuildRequest *request);
 		void RunTheBuild();
+
 	private:
 		ContentItem* BuildAsset(BuildItem * item);
 		std::string ChooseOutputFilename(BuildRequest *request);
+		std::string GetAssetNameStub(std::string filename);
 		ContentItem* ImportAsset(BuildItem * item);
 		void RemoveBuildItem(BuildItem* item);
 		void SerializeAsset(BuildItem *item, ContentItem* assetObject);
 
-		bool m_BuildItemsChanged;
+		bool m_buildItemsChanged;
 
-		std::vector<std::string> m_RebuiltFiles;
+		std::vector<std::string> m_rebuiltFiles;
 
 		ImporterManager *m_importerManager;
 		ProcessorManager *m_processorManager;
 
-		ContentCompiler *m_ContentCompiler;
+		ContentCompiler *m_contentCompiler;
 
-		BuildCoordinatorSettings m_Settings;
-		BuildItemCollection *m_BuildItems;
+		BuildCoordinatorSettings m_settings;
+		BuildItemCollection *m_buildItems;
 		TimestampCache m_timestampCache;
 	};
 }

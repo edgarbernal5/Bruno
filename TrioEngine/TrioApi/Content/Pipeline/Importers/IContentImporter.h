@@ -11,7 +11,7 @@ namespace TrioEngine
 	class TRIO_API_EXPORT IContentImporter
 	{
 	public:
-		virtual ContentItem* Import(std::string& filename) = 0;
+		virtual ContentItem* Import(const std::string& filename) = 0;
 
 		friend class BuildCoordinator;
 

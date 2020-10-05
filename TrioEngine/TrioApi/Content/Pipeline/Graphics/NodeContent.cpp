@@ -3,7 +3,7 @@
 
 namespace TrioEngine
 {
-	NodeContent::NodeContent()
+	NodeContent::NodeContent() : m_parent(nullptr)
 	{
 	}
 

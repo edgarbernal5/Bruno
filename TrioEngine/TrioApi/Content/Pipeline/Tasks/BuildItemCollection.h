@@ -2,10 +2,19 @@
 
 #include "TrioApiRequisites.h"
 
+#include "BuildRequest.h"
 namespace TrioEngine
 {
 	class BuildItem;
 	class BuildRequest;
+
+
+
+	struct Compare_P {
+		bool operator()(BuildRequest const* a, BuildRequest const* b)const {
+			return a->m_sourceFileName < b->m_sourceFileName;
+		}
+	};
 
 	class TRIO_API_EXPORT BuildItemCollection
 	{
@@ -22,22 +31,22 @@ namespace TrioEngine
 
 		const BaseType & operator[](int nIndex) const
 		{
-			return m_Items[nIndex];
+			return m_items[nIndex];
 		}
 
 		BaseType & operator[](int nIndex)
 		{
-			return m_Items[nIndex];
+			return m_items[nIndex];
 		}
 
 		inline std::vector<BuildItem*>::size_type Size()
 		{
-			return m_Items.size();
+			return m_items.size();
 		}
 
 		inline int WantedItemsCount()
 		{
-			return m_WantedItems.size();
+			return m_wantedItems.size();
 		}
 
 		void Clear();
@@ -52,13 +61,24 @@ namespace TrioEngine
 		void ReverseWantedItems(int fromIndex);
 		BuildItem* PopWantedItem();
 		friend class BuildCoordinator;
+
+
 	private:
-		std::vector<BuildItem*> m_Items;
-		std::vector<BuildItem*> m_WantedItems;
+		//struct ptr_less {
+		//	bool operator()(const BuildRequest* lhs, const BuildRequest* rhs) {
+		//		return lhs->m_sourceFileName < rhs->m_sourceFileName;
+		//	}
+		//};
 
-		std::vector<std::string> m_PreviousOutputs;
+		std::vector<BuildItem*> m_items;
+		std::vector<BuildItem*> m_wantedItems;
 
-		std::map<BuildRequest*, BuildItem*> m_RequestTable;
-		std::map<std::string, BuildItem*> m_OutputFilenameTable;
+		std::vector<std::string> m_previousOutputs;
+
+		std::map<BuildRequest*, BuildItem*, Compare_P> m_requestTable;
+		std::map<std::string, BuildItem*> m_outputFilenameTable;
+
+
 	};
+
 }

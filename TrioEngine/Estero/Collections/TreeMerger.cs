@@ -33,7 +33,7 @@ namespace Estero.Collections
                         var targetNode = targetNodes[indexOfExistingNode];
                         if (node.Children != null && node.Children.Count > 0)
                         {
-                            Merge(targetNode.Children, node);
+                            Merge(targetNode.Children, node.Children);
                         }
                     }
                     else

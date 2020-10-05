@@ -2,6 +2,8 @@
 
 #include "TrioApiRequisites.h"
 
+#include "ContentTypeWriter.h"
+
 #include <string>
 
 namespace TrioEngine
@@ -10,27 +12,16 @@ namespace TrioEngine
 	class ContentWriter;
 	class ContentCompiler;
 
-	class ContentTypeWriter
+	class VertexBufferWriter : public ContentTypeWriter
 	{
 	public:
-		ContentTypeWriter() {}
-		virtual ~ContentTypeWriter(){}
+		VertexBufferWriter();
+		~VertexBufferWriter();
 
-		virtual std::string GetWriterName() = 0;
-		virtual std::string GetReaderName() = 0;
+		std::string GetWriterName() { m_name = "VertexBufferWriter"; return m_name; }
+		std::string GetReaderName() { return "VertexBufferReader"; }
 
-		virtual void Initialize(ContentCompiler *compiler) {}
-		virtual void Write(ContentWriter *output, ContentItem* value) = 0;
-
-		bool operator <(const ContentTypeWriter &other) const
-		{
-			return m_Name < other.m_Name;
-		}
-		bool operator <(const ContentTypeWriter *other) const
-		{
-			return m_Name < other->m_Name;
-		}
+		void Write(ContentWriter* output, ContentItem* value);
 	protected:
-		std::string m_Name;
 	};
 }

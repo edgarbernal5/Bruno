@@ -12,7 +12,7 @@ namespace TrioEngine
 		EffectImporter();
 		~EffectImporter();
 
-		ContentItem* Import(std::string& filename);
+		ContentItem* Import(const std::string& filename);
 
 		friend class BuildCoordinator;
 

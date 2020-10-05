@@ -7,49 +7,52 @@
 
 namespace TrioEngine
 {
-	ContentCompiler::ContentCompiler() : m_Factory(nullptr)
+	ContentCompiler::ContentCompiler() : m_factory(nullptr)
 	{
-		m_Factory = new ContentTypeWriterFactory();
+		m_factory = new ContentTypeWriterFactory();
 	}
 
 	ContentCompiler::~ContentCompiler()
 	{
+		if (m_factory)
+		{
+			delete m_factory;
+			m_factory = nullptr;
+		}
 	}
-
 
 	ContentTypeWriter* ContentCompiler::GetTypeWriter(std::string name, std::vector<std::string> &dependencies)
 	{
-		ContentTypeWriter* write = GetTypeWriterInternal(name);
-		std::map<ContentTypeWriter*, std::vector<std::string> >::iterator itm = m_WriterDependencies.find(write);
+		ContentTypeWriter* writer = GetTypeWriterInternal(name);
+		auto itm = m_writerDependencies.find(writer);
 		dependencies = (*itm).second;
-		return write;
+		return writer;
 	}
 
 	void ContentCompiler::AddTypeWriter(ContentTypeWriter* writer)
 	{
 		std::string name = writer->GetWriterName();
-		m_WriterInstances[name] = writer;
-		m_WriterDependencies[writer] = std::vector<std::string>();
+		m_writerInstances[name] = writer;
+		m_writerDependencies[writer] = std::vector<std::string>();
 	}
 
 	ContentTypeWriter* ContentCompiler::GetTypeWriterInternal(std::string name)
 	{
-		std::map<std::string, ContentTypeWriter*>::iterator itm = m_WriterInstances.find(name);
-		ContentTypeWriter* writer = nullptr;
-		if (itm != m_WriterInstances.end())
+		auto itm = m_writerInstances.find(name);
+		if (itm != m_writerInstances.end())
 		{
 			return (*itm).second;
 		}
 
-		writer = m_Factory->GetByWriterName(name);
+		ContentTypeWriter* writer = m_factory->GetByWriterName(name);
 		AddTypeWriter(writer);
 		//InitializeTypeWriter
 		return writer;
 	}
 
-	void ContentCompiler::Compile(TrioIO::Stream *stream, ContentItem *object, bool compressContent)
+	void ContentCompiler::Compile(TrioIO::Stream *stream, ContentItem *object, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath)
 	{
-		ContentWriter *writer = new ContentWriter(this, stream, compressContent);
+		ContentWriter *writer = new ContentWriter(this, stream, compressContent, rootDirectory, referenceRelocationPath);
 
 		writer->WriteObject(object);
 		writer->FlushOutput();

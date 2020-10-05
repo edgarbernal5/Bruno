@@ -14,25 +14,27 @@ namespace TrioEngine
 	class TRIO_API_EXPORT BuildItem
 	{
 	public:
-		BuildItem() : 
-			m_IsBuilt(false), m_IsWanted(false), m_BuildRequest(nullptr)
-		{
+		BuildItem();
 
-		}
+		bool ContainsDependency(std::string filename);
+		bool ContainsRequest(std::string filename);
+
+		void RemoveDependency(std::string filename);
+		void RemoveRequest(std::string filename);
 
 		friend class BuildCoordinator;
 		friend class BuildItemCollection;
 		friend class BasicContentProcessorContext;
 	private:
-		BuildRequest* m_BuildRequest;
+		BuildRequest* m_buildRequest;
 
-		std::map<std::string, std::chrono::system_clock::time_point> m_Dependencies;
-		std::vector<std::string> m_ExtraOutputFiles;
-		bool m_IsBuilt;
-		bool m_IsWanted;
-		std::string OutputFilename;
-		std::filesystem::file_time_type m_SourceTimestamp;
+		std::map<std::string, std::filesystem::file_time_type> m_dependencies;
+		std::vector<std::string> m_extraOutputFiles;
+		bool m_isBuilt;
+		bool m_isWanted;
+		std::string m_outputFilename;
+		std::filesystem::file_time_type m_sourceTimestamp;
 
-		std::vector<std::string> m_Requests;
+		std::vector<std::string> m_requests;
 	};
 }

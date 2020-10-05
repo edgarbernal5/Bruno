@@ -2,39 +2,37 @@
 #include "Path.h"
 
 #include <algorithm>
+#include <filesystem>
 
 namespace TrioIO
 {
 	bool Path::CreateFolder(const std::string& path)
 	{
-		return true;
+		std::error_code errorCode;
+		bool result = std::filesystem::create_directories(path, errorCode);
+		return result;
 	}
 
 	std::string Path::Combine(const std::string& p1, const std::string& p2)
 	{
-		char sep = '/';
 		std::string tmp = p1;
 
 		if (p1.empty())
 		{
-			if (!p2.empty() && p2[0] == '\\')
+			if (!p2.empty() && p2[0] == DirectorySeparator)
 				return p2.substr(1, p2.size());
 			return p2;
 		}
 
-#ifdef _WIN32
-		sep = '\\';
-#endif
-
-		if (p1[p1.length()] != sep) {
-			tmp += sep;
-			if (p2[0] == '\\')
+		if (p1[p1.length() - 1] != DirectorySeparator) {
+			tmp += DirectorySeparator;
+			if (p2[0] == DirectorySeparator)
 				return (tmp + p2.substr(1, p2.size()));
 			return(tmp + p2);
 		}
 		else
 		{
-			if (p2[0] == '\\')
+			if (p2[0] == DirectorySeparator)
 				return (tmp + p2.substr(1, p2.size()));
 		}
 		return(p1 + p2);

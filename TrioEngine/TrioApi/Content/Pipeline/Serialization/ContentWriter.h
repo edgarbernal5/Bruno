@@ -24,7 +24,7 @@ namespace TrioEngine
 	class ContentWriter : public TrioIO::BinaryWriter
 	{
 	public:
-		ContentWriter(ContentCompiler* compiler, TrioIO::Stream* _stream, bool compressContent);
+		ContentWriter(ContentCompiler* compiler, TrioIO::Stream* _stream, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath);
 		~ContentWriter();
 
 		void Write(Matrix value);
@@ -41,10 +41,16 @@ namespace TrioEngine
 		void BeginWrite();
 		void FlushOutput();
 	private:
-		ContentCompiler *m_Compiler;
+		const int HeaderSize = 7;
+		const char* FileExtension = "estero";
 
-		std::map<std::string, int> m_TypeTable;
-		std::vector<ContentTypeWriter *> m_TypeWriters;
+		std::string m_rootDirectory;
+		std::string m_referenceRelocationPath;
+
+		ContentCompiler *m_compiler;
+
+		std::map<std::string, int> m_typeTable;
+		std::vector<ContentTypeWriter *> m_typeWriters;
 
 		ContentTypeWriter* GetTypeWriter(std::string name, int &typeIndex);
 
@@ -54,14 +60,14 @@ namespace TrioEngine
 		void WriteHeader();
 		void WriteSharedResources();
 
-		TrioIO::MemoryStream* m_HeaderData;
-		TrioIO::MemoryStream* m_ContentData;
+		TrioIO::MemoryStream* m_headerData;
+		TrioIO::MemoryStream* m_contentData;
 
-		TrioIO::Stream* m_FinalOutput;
+		TrioIO::Stream* m_finalOutput;
 
 		//std::map<int, int> m_SharedResourceNames;
-		std::map<ContentItem*, int> m_SharedResourceNames;
-		std::queue<ContentItem*> m_SharedResources;
+		std::map<ContentItem*, int> m_sharedResourceNames;
+		std::queue<ContentItem*> m_sharedResources;
 
 		std::map<ContentItem*, bool> m_recurseDetector;
 	};

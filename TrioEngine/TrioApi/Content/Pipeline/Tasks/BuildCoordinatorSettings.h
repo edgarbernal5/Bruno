@@ -8,9 +8,32 @@ namespace TrioEngine
 {
 	struct TRIO_API_EXPORT BuildCoordinatorSettings
 	{
-		std::string IntermediateDirectory;
-		std::string OutputDirectory;
-		std::string RootDirectory;
+		inline std::string& GetIntermediateDirectory()
+		{
+			return m_intermediateDirectory;
+		}
+
+		inline std::string& GetOutputDirectory()
+		{
+			return m_outputDirectory;
+		}
+
+		inline std::string& GetRootDirectory()
+		{
+			return m_rootDirectory;
+		}
+
+		void SetIntermediateDirectory(std::string directory) {
+			m_intermediateDirectory = directory;
+		}
+
+		void SetOutputDirectory(std::string directory) {
+			m_outputDirectory = directory;
+		}
+
+		void SetRootDirectory(std::string directory) {
+			m_rootDirectory = directory;
+		}
 
 		BuildCoordinatorSettings()
 		{
@@ -18,25 +41,30 @@ namespace TrioEngine
 
 		std::string GetCacheFilename()
 		{
-			return IntermediateDirectory + "Content-Pipeline.xml";
+			return m_intermediateDirectory + "Content-Pipeline.xml";
 		}
 
 		void InitializePaths()
 		{
-			RootDirectory = TrioIO::Path::GetFullDirectory(RootDirectory);
-			IntermediateDirectory = PrepareOutputDirectory(IntermediateDirectory, "obj");
-			OutputDirectory = PrepareOutputDirectory(OutputDirectory, "bin");
+			if (m_rootDirectory.size() == 0)
+			{
+				m_rootDirectory = ".";
+			}
+			m_rootDirectory = TrioIO::Path::GetFullDirectory(m_rootDirectory + TrioIO::Path::DirectorySeparator);
+			m_intermediateDirectory = PrepareOutputDirectory(m_intermediateDirectory, "tmpObjects");
+			m_outputDirectory = PrepareOutputDirectory(m_outputDirectory, "finalObjects");
 		}
 
 		std::string PrepareOutputDirectory(std::string directory, std::string defaultValue)
 		{
 			if (directory.empty())
 			{
-				directory = TrioIO::Path::Combine(RootDirectory, defaultValue);
+				directory = TrioIO::Path::Combine(m_rootDirectory, defaultValue)
+					+ TrioIO::Path::DirectorySeparator;
 			}
 			else
 			{
-				directory = TrioIO::Path::GetFullDirectory(directory);
+				directory = TrioIO::Path::GetFullDirectory(directory + TrioIO::Path::DirectorySeparator);
 			}
 			TrioIO::Path::CreateFolder(directory);
 			return directory;
@@ -47,20 +75,26 @@ namespace TrioEngine
 			if (path.size() >= 2 && path[1] == ':')
 				return path;
 
-			return TrioIO::Path::Combine(RootDirectory, path);
+			return TrioIO::Path::Combine(m_rootDirectory, path);
 		}
 
 		std::string GetRelativePath(std::string path)
 		{
-			if (path.size() < RootDirectory.size())
+			if (path.size() < m_rootDirectory.size())
 			{
 				return path;
 			}
-			else if (path.substr(0, RootDirectory.size()) != RootDirectory)
+			else if (path.substr(0, m_rootDirectory.size()) != m_rootDirectory)
 			{
 				return path;
 			}
-			return path.substr(RootDirectory.length());
+			return path.substr(m_rootDirectory.size());
 		}
+
+	private:
+		std::string m_intermediateDirectory;
+		std::string m_outputDirectory;
+		std::string m_rootDirectory;
+
 	};
 }

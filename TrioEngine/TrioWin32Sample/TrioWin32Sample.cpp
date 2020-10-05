@@ -212,7 +212,7 @@ namespace TrioWin32
 		m_gridEffect->GetParameters()["gWorldViewProj"]->SetValue(viewProj);
 		m_gridEffect->GetTechniques()[0]->GetPasses()[0]->Apply();
 
-		device->DrawIndexedPrimitives(PrimitiveType::LineList, 0, 0, m_gridSize * 2, 0, m_gridSize);
+		device->DrawIndexedPrimitives(PrimitiveType::LineList, 0, 0, m_gridSize);
 	}
 
 	void DemoGame::Update(StepTimer const& timer)

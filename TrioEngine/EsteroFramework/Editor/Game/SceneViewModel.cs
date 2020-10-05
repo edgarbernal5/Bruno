@@ -1,13 +1,17 @@
 ﻿
 using EsteroFramework.Editor.Graphics;
+using EsteroFramework.Graphics.Data;
 using EsteroFramework.Graphics.Editor;
 using System.Collections.Generic;
+using TrioApi.Net.Maths;
 
 namespace EsteroFramework.Editor.Game
 {
     public class SceneViewModel : Screen
     {
         public SceneProjectFile SceneProjectFile { get; set; }
+
+        public Camera Camera { get; set; }
 
         public IList<GameGraphicsScreen> GameGraphicsScreens
         {
@@ -38,12 +42,22 @@ namespace EsteroFramework.Editor.Game
             var primitivesService = m_editor.Services.GetInstance<IEditorPrimitivesService>();
             m_editorGameGraphicsScreen.GridMesh = primitivesService.GridMesh;
             m_editorGameGraphicsScreen.Scene = SceneProjectFile.Scene;
+            m_editorGameGraphicsScreen.Camera = Camera;
         }
 
         protected override void OnActivate()
         {
             SceneProjectFile = new SceneProjectFile();
             SceneProjectFile.New();
+
+            Camera = new Camera();
+            Camera.FieldOfView = 60.0f * 3.1416f / 180.0f;
+            Camera.NearPlane = 0.1f;
+            Camera.FarPlane = 100.0f;
+
+            Camera.Position = new Vector3(5.0f, 15.0f, 5.0f);
+            Camera.Target = Vector3.Zero;
+            Camera.Up = Vector3.Up;
 
             InitializeGameScreens();
 

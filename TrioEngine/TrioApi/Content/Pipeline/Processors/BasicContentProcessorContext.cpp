@@ -10,9 +10,9 @@
 namespace TrioEngine
 {
 	BasicContentProcessorContext::BasicContentProcessorContext(BuildCoordinator *buildCoordinator, BuildItem *buildItem, std::string buildConfiguration) :
-		m_BuildCoordinator(buildCoordinator),
-		m_BuildItem(buildItem),
-		m_BuildConfiguration(buildConfiguration)
+		m_buildCoordinator(buildCoordinator),
+		m_buildItem(buildItem),
+		m_buildConfiguration(buildConfiguration)
 	{
 	}
 
@@ -28,7 +28,7 @@ namespace TrioEngine
 
 	OpaqueData* BasicContentProcessorContext::GetParameters()
 	{
-		return m_OpaqueData;
+		return m_opaqueData;
 	}
 
 	void BasicContentProcessorContext::AddDependency(std::string filename)
@@ -42,21 +42,21 @@ namespace TrioEngine
 	BuildItem* BasicContentProcessorContext::RequestBuild(ExternalReference sourceAsset, std::string assetName, std::string importerName, std::string processorName, OpaqueData* processorParameters)
 	{
 		BuildRequest* request = new BuildRequest();
-		request->m_SourceFileName = sourceAsset.GetFilename();
-		request->m_AssetName = assetName;
-		request->m_ImporterName = importerName;
-		request->m_ProcessorName = processorName;
+		request->m_sourceFileName = sourceAsset.GetFilename();
+		request->m_assetName = assetName;
+		request->m_importerName = importerName;
+		request->m_processorName = processorName;
 
 		if (processorParameters != nullptr)
 		{
-			request->m_OpaqueData = new OpaqueData(*processorParameters);
+			request->m_opaqueData = new OpaqueData(*processorParameters);
 		}
-		return m_BuildCoordinator->RequestBuild(request);
+		return m_buildCoordinator->RequestBuild(request);
 	}
 
 	ContentItem* BasicContentProcessorContext::Convert(ContentItem* input, std::string processorName, OpaqueData *processorParameters)
 	{
-		ProcessorManager* processorManager = m_BuildCoordinator->GetProcessorManager();
+		ProcessorManager* processorManager = m_buildCoordinator->GetProcessorManager();
 		IContentProcessor *processor = processorManager->GetByProcessorName(processorName, processorParameters);
 		return (processor->Process(input, this));
 	}
@@ -65,10 +65,10 @@ namespace TrioEngine
 	{
 		BuildItem* item = RequestBuild(sourceAsset, assetName, importerName, processorName, processorParameters);
 
-		std::vector<std::string>::iterator itv = find(item->m_Requests.begin(), item->m_Requests.end(), item->OutputFilename);
-		if (itv == item->m_Requests.end())
-			item->m_Requests.push_back(item->OutputFilename);
+		std::vector<std::string>::iterator itv = find(item->m_requests.begin(), item->m_requests.end(), item->m_outputFilename);
+		if (itv == item->m_requests.end())
+			item->m_requests.push_back(item->m_outputFilename);
 
-		return ExternalReference(m_BuildCoordinator->GetAbsolutePath(item->OutputFilename));
+		return ExternalReference(m_buildCoordinator->GetAbsolutePath(item->m_outputFilename));
 	}
 }

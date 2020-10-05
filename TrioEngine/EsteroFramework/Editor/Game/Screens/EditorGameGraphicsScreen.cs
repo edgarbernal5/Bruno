@@ -29,7 +29,7 @@ namespace EsteroFramework.Editor.Graphics
 
         public override void Update(TimeSpan deltaTime)
         {
-
+            //Scene.Update
         }
 
         public override void Render(RenderContext renderContext)
@@ -44,7 +44,10 @@ namespace EsteroFramework.Editor.Graphics
             renderContext.GraphicsDevice.Clear(ColorRGBA8.CornflowerBlue);
 
             //
+            renderContext.Camera = Camera;
             m_gridMesh.Render(renderContext);
+
+
         }
     }
 }

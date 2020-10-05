@@ -9,23 +9,23 @@ namespace Estero.Interop
         {
             get
             {
-                return m_nativePtr;
+                return m_nativePointer;
             }
         }
-        protected IntPtr m_nativePtr;
+        protected IntPtr m_nativePointer;
 
         public CppObject(IntPtr nativePointer)
         {
-            m_nativePtr = nativePointer;
+            m_nativePointer = nativePointer;
         }
         protected CppObject()
         {
-            m_nativePtr = IntPtr.Zero;
+            m_nativePointer = IntPtr.Zero;
         }
 
         protected override void OnDisposed()
         {
-            m_nativePtr = IntPtr.Zero;
+            m_nativePointer = IntPtr.Zero;
         }
     }
 }

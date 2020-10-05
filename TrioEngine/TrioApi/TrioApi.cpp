@@ -24,12 +24,31 @@
 #include "Graphics/Texture2D.h"
 #include "Graphics/RenderTarget2D.h"
 
+#include "Graphics/Models/Model.h"
 #include "Scene.h"
 #include "Transform.h"
 #include "GameObject.h"
 #include "Utils/TextureLoader.h"
 
 #include "Content/Pipeline/Tasks/BuildCoordinator.h"
+#include "Content/ContentManager.h"
+
+namespace TrioDLL {
+	char* AllocateMemoryForString(const char* source) {
+		const char* szSampleString = source;
+
+		ULONG ulSize = strlen(szSampleString) + sizeof(char);
+		char* pszReturn = NULL;
+
+		pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
+		// Copy the contents of szSampleString
+		// to the memory pointed to by pszReturn.
+		strcpy_s(pszReturn, ulSize, szSampleString);
+		// Return pszReturn.
+
+		return pszReturn;
+	}
+}
 
 /*
 DepthStencilState
@@ -91,20 +110,69 @@ BuildCoordinator* BuildCoordinator_Ctor(const char* intermediateDirectory, const
 
 	if (intermediateDirectory)
 	{
-		settings.IntermediateDirectory = intermediateDirectory;
+		settings.SetIntermediateDirectory(intermediateDirectory);
 	}
 	
 	if (outputDirectory)
 	{
-		settings.OutputDirectory = outputDirectory;
+		settings.SetOutputDirectory(outputDirectory);
 	}
 
 	if (rootDirectory)
 	{
-		settings.RootDirectory = rootDirectory;
+		settings.SetRootDirectory(rootDirectory);
 	}
 
 	return new BuildCoordinator(settings, nullptr);
+}
+
+BuildCoordinator * BuildCoordinator_Ctor2(BuildCoordinatorSettingsBridge managedSettings)
+{
+	BuildCoordinatorSettings settings;
+
+	if (managedSettings.IntermediateDirectory)
+	{
+		settings.SetIntermediateDirectory(managedSettings.IntermediateDirectory);
+	}
+
+	if (managedSettings.OutputDirectory)
+	{
+		settings.SetOutputDirectory(managedSettings.OutputDirectory);
+	}
+
+	if (managedSettings.RootDirectory)
+	{
+		settings.SetRootDirectory(managedSettings.RootDirectory);
+	}
+
+	return new BuildCoordinator(settings, nullptr);
+}
+
+void BuildCoordinator_Dtor(BuildCoordinator * buildCoordinator)
+{
+	delete buildCoordinator;
+}
+
+void BuildCoordinator_GetSettings(BuildCoordinator * coordinator, char* const intermediateDir, char* const outputDir, char* const rootDir)
+{
+	auto& settings = coordinator->GetBuildSettings();
+	strcpy(intermediateDir, settings.GetIntermediateDirectory().c_str());
+	/*strcpy(outputDir, settings.GetOutputDirectory().c_str());
+	strcpy(rootDir, settings.GetRootDirectory().c_str());*/
+}
+
+void BuildCoordinator_GetSettings2(BuildCoordinator* coordinator, BuildCoordinatorSettingsBridge* managedSettings)
+{
+	auto& settings = coordinator->GetBuildSettings();
+
+	managedSettings->IntermediateDirectory = TrioDLL::AllocateMemoryForString(settings.GetIntermediateDirectory().c_str());
+	managedSettings->OutputDirectory = TrioDLL::AllocateMemoryForString(settings.GetOutputDirectory().c_str());
+	managedSettings->RootDirectory = TrioDLL::AllocateMemoryForString(settings.GetIntermediateDirectory().c_str());
+}
+
+void BuildCoordinator_RequestBuildWithoutOpaqueData(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName)
+{
+	coordinator->RequestBuild(sourceFilename, assetName, importerName, processorName, nullptr);
 }
 
 void BuildCoordinator_RequestBuild(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues)
@@ -123,6 +191,23 @@ Component
 bool Component_GetEnabled(Component* component)
 {
 	return component->GetEnabled();
+}
+
+/*
+ContentManager
+*/
+ContentManager* ContentManager_Ctor(GraphicsDevice* device)
+{
+	return new ContentManager(device);
+}
+ContentManager* ContentManager_Ctor2(GraphicsDevice* device, const char* rootDirectory)
+{
+	return new ContentManager(device, rootDirectory);
+}
+
+uint8_t* ContentManager_Load(ContentManager* contentManager, const char* assetName)
+{
+	return contentManager->Load< uint8_t >(assetName);
 }
 
 /*
@@ -177,19 +262,9 @@ EffectParameter
 */
 char* EffectParameter_GetName(EffectParameter* parameter)
 {
-	const char *szSampleString = parameter->GetName();
-
-	ULONG ulSize = strlen(szSampleString) + sizeof(char);
-	char* pszReturn = NULL;
-
-	pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
-	// Copy the contents of szSampleString
-	// to the memory pointed to by pszReturn.
-	strcpy_s(pszReturn, ulSize, szSampleString);
-	// Return pszReturn.
-
-	return pszReturn;
+	return TrioDLL::AllocateMemoryForString(parameter->GetName());
 }
+
 void EffectParameter_SetValueScalar(EffectParameter* parameter, float scalar)
 {
 	parameter->SetValue(scalar);
@@ -226,18 +301,7 @@ EffectPass
 */
 char* EffectPass_GetName(EffectPass* pass)
 {
-	const char *szSampleString = pass->GetName();
-
-	ULONG ulSize = strlen(szSampleString) + sizeof(char);
-	char* pszReturn = NULL;
-
-	pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
-	// Copy the contents of szSampleString
-	// to the memory pointed to by pszReturn.
-	strcpy_s(pszReturn, ulSize, szSampleString);
-	// Return pszReturn.
-
-	return pszReturn;
+	return TrioDLL::AllocateMemoryForString(pass->GetName());
 }
 
 void EffectPass_Apply(EffectPass * pass)
@@ -376,9 +440,9 @@ void GraphicsDevice_ClearAsRGBA8(GraphicsDevice * device, uint32_t packedColor)
 	device->Clear(color);
 }
 
-void GraphicsDevice_DrawIndexedPrimitives(GraphicsDevice* device, PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
+void GraphicsDevice_DrawIndexedPrimitives(GraphicsDevice* device, PrimitiveType primitiveType, uint32_t baseVertex, uint32_t startIndex, uint32_t primitiveCount)
 {
-	device->DrawIndexedPrimitives(primitiveType, baseVertex, minVertexIndex, numVertices, startIndex, primitiveCount);
+	device->DrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
 }
 
 BlendState* GraphicsDevice_GetBlendState(GraphicsDevice* device)
@@ -562,6 +626,24 @@ void Matrix_CreateWorld(Matrix *pMatrix1, Vector3* position, Vector3* forward, V
 }
 
 /*
+Model
+*/
+Model* Model_Ctor(GraphicsDevice* device)
+{
+	return new Model(device);
+}
+
+void Model_Dtor(Model * model)
+{
+	delete model;
+}
+
+void Model_Draw(Model* model)
+{
+	model->Draw();
+}
+
+/*
 Object
 */
 int Object_GetId(Object* object)
@@ -643,10 +725,18 @@ Scene* Scene_Ctor()
 {
 	return new Scene();
 }
+void Scene_Dtor(Scene* scene) {
+	delete scene;
+}
 
 Scene* Scene_GetActiveScene()
 {
 	return Scene::ActiveScene();
+}
+
+void Scene_Update(Scene * scene)
+{
+	scene->Update();
 }
 
 /*

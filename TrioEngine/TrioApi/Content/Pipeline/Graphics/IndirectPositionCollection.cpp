@@ -8,8 +8,8 @@
 
 namespace TrioEngine
 {
-	IndirectPositionCollection::IndirectPositionCollection(GeometryContent* geom, VertexChannel* positionIndices) :
-		m_geometry(geom),
+	IndirectPositionCollection::IndirectPositionCollection(GeometryContent* geometryContent, VertexChannel* positionIndices) :
+		m_geometry(geometryContent),
 		m_positionIndices(positionIndices)
 	{
 	}

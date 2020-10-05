@@ -4,18 +4,25 @@
 #include "ContentTypeWriter.h"
 
 #include "EffectWriter.h"
+#include "ModelWriter.h"
+#include "Texture2DWriter.h"
+#include "VertexBufferWriter.h"
+#include "IndexCollectionWriter.h"
+#include "MaterialWriter.h"
+#include "ExternalReferenceWriter.h"
+
 namespace TrioEngine
 {
 	ContentTypeWriterFactory::ContentTypeWriterFactory()
 	{
-		//RegisterContentTypeWriter<Texture2DWriter>();
-		//RegisterContentTypeWriter<ModelWriter>();
-		//RegisterContentTypeWriter<VertexBufferWriter>();
-		//RegisterContentTypeWriter<IndexCollectionWriter>();
-		//RegisterContentTypeWriter<MaterialWriter>();
+		RegisterContentTypeWriter<Texture2DWriter>();
+		RegisterContentTypeWriter<ModelWriter>();
+		RegisterContentTypeWriter<VertexBufferWriter>();
+		RegisterContentTypeWriter<IndexCollectionWriter>();
+		RegisterContentTypeWriter<MaterialWriter>();
 		RegisterContentTypeWriter<EffectWriter>();
 		//RegisterContentTypeWriter<EffectMaterialWriter>();
-		//RegisterContentTypeWriter<ExternalReferenceWriter>();
+		RegisterContentTypeWriter<ExternalReferenceWriter>();
 
 		for (int i = 0; i < m_TypeWriters.size(); i++)
 		{

@@ -4,13 +4,21 @@
 #include "ContentTypeReader.h"
 #include "ContentReader.h"
 
+#include "Pipeline/Readers/ExternalReferenceReader.h"
+#include "Pipeline/Readers/ModelReader.h"
+#include "Pipeline/Readers/Texture2DReader.h"
+#include "Pipeline/Readers/VertexBufferReader.h"
+#include "Pipeline/Readers/IndexCollectionReader.h"
+#include "Pipeline/Readers/MaterialReader.h"
+#include "Pipeline/Readers/EffectReader.h"
+
 namespace TrioEngine
 {
-	std::map<std::string, ContentTypeReader*>* ContentTypeReaderManager::m_NameToReader = new std::map<std::string, ContentTypeReader*>();
-	std::vector<ContentTypeReader*> ContentTypeReaderManager::m_TypeReaders2;
+	std::map<std::string, ContentTypeReader*>* ContentTypeReaderManager::m_nameToReader = new std::map<std::string, ContentTypeReader*>();
+	std::vector<ContentTypeReader*> ContentTypeReaderManager::m_typeReaders2;
 
 	ContentTypeReaderManager::ContentTypeReaderManager(ContentReader* reader)
-		: m_Reader(reader)
+		: m_reader(reader)
 	{
 	}
 
@@ -20,24 +28,24 @@ namespace TrioEngine
 
 	ContentTypeReader* ContentTypeReaderManager::GetTypeReaderByName(std::string name)
 	{
-		for (int i = 0; i < m_TypeReaders2.size(); i++)
+		for (int i = 0; i < m_typeReaders2.size(); i++)
 		{
-			if (m_TypeReaders2[i]->GetReaderName() == name)
-				return m_TypeReaders2[i];
+			if (m_typeReaders2[i]->GetReaderName() == name)
+				return m_typeReaders2[i];
 		}
 		return nullptr;
 	}
 
 	void ContentTypeReaderManager::RegisterStandardTypes()
 	{
-		//RegisterContentTypeReader<Texture2DReader>();
-		//RegisterContentTypeReader<ModelReader>();
-		//RegisterContentTypeReader<VertexBufferReader>();
-		//RegisterContentTypeReader<IndexCollectionReader>();
-		//RegisterContentTypeReader<MaterialReader>();
-		//RegisterContentTypeReader<EffectReader>();
+		RegisterContentTypeReader<Texture2DReader>();
+		RegisterContentTypeReader<ModelReader>();
+		RegisterContentTypeReader<VertexBufferReader>();
+		RegisterContentTypeReader<IndexCollectionReader>();
+		RegisterContentTypeReader<MaterialReader>();
+		RegisterContentTypeReader<EffectReader>();
 		//RegisterContentTypeReader<EffectMaterialReader>();
-		//RegisterContentTypeReader<ExternalReferenceReader>();
+		RegisterContentTypeReader<ExternalReferenceReader>();
 	}
 
 	std::vector<ContentTypeReader*> ContentTypeReaderManager::ReadTypeManifest(uint32_t typeCount, ContentReader* contentReader)
@@ -63,8 +71,8 @@ namespace TrioEngine
 	{
 		ContentTypeReader* reader = nullptr;
 
-		std::map<std::string, ContentTypeReader*>::iterator itm = m_NameToReader->find(readerTypeName);
-		if (itm != m_NameToReader->end())
+		auto itm = m_nameToReader->find(readerTypeName);
+		if (itm != m_nameToReader->end())
 			return (*itm).second;
 
 		reader = GetTypeReaderByName(readerTypeName);

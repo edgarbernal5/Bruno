@@ -7,18 +7,23 @@
 #include "ContentCompiler.h"
 #include "ContentTypeWriter.h"
 
+#include "Errors/ContentPipelineException.h"
+
+#include <filesystem>
+
 namespace TrioEngine
 {
-	ContentWriter::ContentWriter(ContentCompiler *compiler, TrioIO::Stream *_stream, bool compressContent) :
+	ContentWriter::ContentWriter(ContentCompiler *compiler, TrioIO::Stream *_stream, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath) :
 		TrioIO::BinaryWriter(_stream),
-		m_Compiler(compiler),
-
-		m_FinalOutput(_stream)
+		m_compiler(compiler),
+		m_rootDirectory(rootDirectory),
+		m_referenceRelocationPath(referenceRelocationPath),
+		m_finalOutput(_stream)
 	{
-		m_HeaderData = new TrioIO::MemoryStream();
-		m_ContentData = new TrioIO::MemoryStream();
+		m_headerData = new TrioIO::MemoryStream();
+		m_contentData = new TrioIO::MemoryStream();
 
-		m_Stream = m_ContentData;
+		m_stream = m_contentData;
 	}
 
 	ContentWriter::~ContentWriter()
@@ -64,46 +69,49 @@ namespace TrioEngine
 
 	void ContentWriter::WriteFinalOutput()
 	{
-		m_Stream = m_FinalOutput;
+		m_stream = m_finalOutput;
 
+		WriteChar('E');
+		WriteChar('S');
 		WriteChar('T');
+		WriteChar('E');
 		WriteChar('R');
-		WriteChar('I');
 		WriteChar('O');
-		WriteByte((uint8_t)0); //plataforma: Windows
+		WriteByte((uint8_t)0); //plataforma: Windows = 0
 
 		WriteUncompressedOutput();
 	}
 
 	void ContentWriter::WriteUncompressedOutput()
 	{
-		int length = (int)m_HeaderData->GetLength();
-		int count = (int)m_ContentData->GetLength();
+		int headerLength = (int)m_headerData->GetLength();
+		int contentLength = (int)m_contentData->GetLength();
 
-		WriteInt32((int)((6 + 4 + length) + count));
+		WriteInt32((int)(HeaderSize + sizeof(int) + headerLength + contentLength));
 
-		m_Stream->Write(m_HeaderData->GetBuffer(), 0, length);
-		m_Stream->Write(m_ContentData->GetBuffer(), 0, count);
+		m_stream->Write(m_headerData->GetBuffer(), 0, headerLength);
+		m_stream->Write(m_contentData->GetBuffer(), 0, contentLength);
 	}
 
 	ContentTypeWriter* ContentWriter::GetTypeWriter(std::string name, int &typeIndex)
 	{
-		std::map<std::string, int>::iterator itm = m_TypeTable.find(name);
-		if (itm != m_TypeTable.end())
+		auto itm = m_typeTable.find(name);
+		if (itm != m_typeTable.end())
 		{
 			typeIndex = (*itm).second;
-			return m_TypeWriters[(*itm).second];
+			return m_typeWriters[(*itm).second];
 		}
 
 		std::vector<std::string> dependencies;
-		ContentTypeWriter* writer = m_Compiler->GetTypeWriter(name, dependencies);
-		typeIndex = m_TypeWriters.size();
-		m_TypeWriters.push_back(writer);
-		m_TypeTable[name] = typeIndex;
+		ContentTypeWriter* writer = m_compiler->GetTypeWriter(name, dependencies);
+		typeIndex = m_typeWriters.size();
+		m_typeWriters.push_back(writer);
+		m_typeTable[name] = typeIndex;
 
-		for (int i = 0; i < dependencies.size(); i++)
+		for (auto& current : dependencies)
 		{
-			//
+			int num;
+			GetTypeWriter(current, num);
 		}
 		return writer;
 	}
@@ -117,49 +125,47 @@ namespace TrioEngine
 		if (value == nullptr)
 		{
 			WriteInt32(0);
+			return;
 		}
-		else
+
+		int typeIndex = -1;
+		ContentTypeWriter* typeWriter = nullptr;
+
+		if (value->m_processorName.size() == 0)
+			throw ContentPipelineException("Processor name is null");
+		
+		typeWriter = GetTypeWriter(value->m_processorName, typeIndex);
+
+		WriteInt32(typeIndex + 1);
+		auto itm = m_recurseDetector.find(value);
+		if (itm != m_recurseDetector.end())
 		{
-			int num = -1;
-			ContentTypeWriter *typeWriter = nullptr;
-
-			if (value->m_processorName.size() == 0)
-				throw std::exception("Processor name null");
-			else
-				typeWriter = GetTypeWriter(value->m_processorName, num);
-
-			WriteInt32(num + 1);
-			std::map<ContentItem*, bool>::iterator itm = m_recurseDetector.find(value);
-			if (itm != m_recurseDetector.end())
-			{
-				throw std::exception("FoundCyclicReference");
-			}
-			m_recurseDetector[value] = true;
-			typeWriter->Write(this, value);
-			m_recurseDetector.erase(value);
+			throw ContentPipelineException("found cyclic reference");
 		}
+		m_recurseDetector[value] = true;
+		typeWriter->Write(this, value);
+		m_recurseDetector.erase(value);
+
 	}
 
 	void ContentWriter::WriteHeader()
 	{
-		m_Stream = m_HeaderData;
+		m_stream = m_headerData;
 
-		WriteUInt32((uint32_t)m_TypeWriters.size());
-		for (int i = 0; i < m_TypeWriters.size(); i++)
+		WriteUInt32((uint32_t)m_typeWriters.size());
+		for (int i = 0; i < m_typeWriters.size(); i++)
 		{
-			WriteString(m_TypeWriters[i]->GetReaderName());
+			WriteString(m_typeWriters[i]->GetReaderName());
 		}
-		WriteUInt32((uint32_t)m_SharedResourceNames.size());
+		WriteUInt32((uint32_t)m_sharedResourceNames.size());
 	}
 
 	void ContentWriter::WriteSharedResources()
 	{
-		int contador = 0;
-		while (m_SharedResources.size() > 0)
+		while (m_sharedResources.size() > 0)
 		{
-			ContentItem* sq = m_SharedResources.front(); m_SharedResources.pop();
+			ContentItem* sq = m_sharedResources.front(); m_sharedResources.pop();
 			WriteObject(sq);
-			contador++;
 		}
 	}
 
@@ -176,8 +182,28 @@ namespace TrioEngine
 		else
 		{
 			std::string filename = reference.GetFilename();
+			if (filename.empty()) {
+				WriteString(nullptr);
+				return;
+			}
+			if (TrioIO::Path::GetFileExtension(filename) != FileExtension)
+			{
+				throw ContentPipelineException("external reference is not a .estero file");
+			}
 
-			WriteString(filename);
+			filename = filename.substr(0, filename.size() - strlen(FileExtension) - 1);
+			if (filename.substr(0, m_rootDirectory.size()) != m_rootDirectory)
+			{
+				throw ContentPipelineException("external reference with bad path");
+			}
+			std::filesystem::path basePath(m_referenceRelocationPath);
+			std::filesystem::path path(filename);
+
+			auto outputPath = std::filesystem::relative(path, basePath).string();
+			if (outputPath.size() > 3 && outputPath.substr(0, 3) == "..\\") {
+				outputPath = outputPath.substr(3);
+			}
+			WriteString(outputPath);
 		}
 	}
 
@@ -189,19 +215,21 @@ namespace TrioEngine
 		}
 		else
 		{
-			int num = -1;
+			int resourceIndex = -1;
 			//std::map<int, int>::iterator itm = m_SharedResourceNames.find(resource->GetID());
-			std::map<ContentItem*, int>::iterator itm = m_SharedResourceNames.find(resource);
-			if (itm == m_SharedResourceNames.end())
+			auto itm = m_sharedResourceNames.find(resource);
+			if (itm == m_sharedResourceNames.end())
 			{
-				num = m_SharedResourceNames.size() + 1;
-				m_SharedResourceNames[resource] = num;
-				m_SharedResources.push(resource);
+				resourceIndex = m_sharedResourceNames.size() + 1;
+				m_sharedResourceNames[resource] = resourceIndex;
+				m_sharedResources.push(resource);
 			}
 			else
-				num = (*itm).second;
+			{
+				resourceIndex = (*itm).second;
+			}
 
-			WriteInt32(num);
+			WriteInt32(resourceIndex);
 		}
 	}
 }

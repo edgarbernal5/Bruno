@@ -18,6 +18,7 @@ namespace TrioEngine
 	{
 	public:
 		ContentManager(GraphicsDevice* device);
+		ContentManager(GraphicsDevice* device, std::string rootDirectory);
 		ContentManager(IServiceProvider* serviceProvider);
 		~ContentManager();
 
@@ -33,55 +34,44 @@ namespace TrioEngine
 			return m_device;
 		}
 
+		std::string GetRootDirectory();
+		void SetRootDirectory(std::string directory);
+
 		friend class ContentReader;
 	private:
-		std::map<std::string, void*> m_LoadedAssets;
+		std::map<std::string, void*> m_loadedAssets;
 
-		std::string m_RootDirectory;
+		std::string m_rootDirectory;
 
 		void* LoadInternal(std::string assetName);
 
-		template <class T>
-		T* ReadAsset(std::string assetName);
+		uint8_t* ReadAsset(std::string assetName);
 
 		IServiceProvider* m_serviceProvider;
 		GraphicsDevice* m_device;
+
+	protected:
+		TrioIO::Stream* OpenStream(std::string assetName);
 	};
 
 
 	template <class T>
 	T* ContentManager::Load(std::string assetName)
 	{
-		std::map<std::string, void*>::iterator it = m_LoadedAssets.find(assetName);
-		if (it != m_LoadedAssets.end())
+		std::map<std::string, void*>::iterator it = m_loadedAssets.find(assetName);
+		if (it != m_loadedAssets.end())
 		{
-			T* casteo = static_cast<T*>(it->second);
+			T* casteo = reinterpret_cast<T*>(it->second);
 			if (casteo != nullptr)
 				return casteo;
 
 			return nullptr;
 		}
 
-		T* local = ReadAsset<T>(assetName);
-		m_LoadedAssets[assetName] = local;
+		T* local = reinterpret_cast<T*>(ReadAsset(assetName));
+		m_loadedAssets[assetName] = local;
 		return local;
 	}
 
-	template <class T>
-	T* ContentManager::ReadAsset(std::string assetName)
-	{
-		T* local = nullptr;
-
-		TrioIO::FileStream* fileStream = new TrioIO::FileStream(assetName, TrioIO::FileAccess::Read);
-		{
-			ContentReader* reader = ContentReader::Create(this, fileStream, assetName);
-			local = reader->ReadAsset<T>();
-
-			delete reader;
-		}
-		fileStream->Close();
-		delete fileStream;
-
-		return local;
-	}
+	
 }

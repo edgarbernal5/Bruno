@@ -1,11 +1,28 @@
 #include "stdafx.h"
-#include "ContentItem.h"
+#include "MaterialWriter.h"
+
+#include "Content/Pipeline/Graphics/MaterialContent.h"
+#include "Content/Pipeline/Serialization/ContentWriter.h"
 
 namespace TrioEngine
 {
-	ContentItem::ContentItem()
+	MaterialWriter::MaterialWriter()
 	{
-		m_importerName = "";
-		m_processorName = "";
+	}
+
+	MaterialWriter::~MaterialWriter()
+	{
+	}
+
+	void MaterialWriter::Write(ContentWriter* output, ContentItem* value)
+	{
+		MaterialContent* inputContent = reinterpret_cast<MaterialContent*>(value);
+
+		output->WriteUInt32(inputContent->GetTextures().size());
+		for (auto& pair : inputContent->GetTextures()) {
+			output->WriteString(pair.first);
+			output->WriteExternalReference(pair.second);
+		}
+		//TODO: write opaquedata
 	}
 }

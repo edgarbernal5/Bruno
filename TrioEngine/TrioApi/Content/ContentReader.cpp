@@ -2,13 +2,17 @@
 #include "ContentReader.h"
 
 #include "IO/Stream.h"
+#include "IO/Path.h"
+
 #include "ContentTypeReaderManager.h"
 #include "ContentManager.h"
+
+#include "Errors/ContentPipelineException.h"
 
 namespace TrioEngine
 {
 	ContentReader::ContentReader(ContentManager* contentManager, TrioIO::Stream *stream, std::string assetName) :
-		BinaryReader(stream), m_contentManager(contentManager), m_Stream(stream), m_AssetName(assetName)
+		BinaryReader(stream), m_contentManager(contentManager), m_stream(stream), m_assetName(assetName)
 	{
 	}
 
@@ -32,23 +36,26 @@ namespace TrioEngine
 	{
 		BinaryReader reader(input);
 
-		if (reader.ReadChar() != 'T' || 
-			reader.ReadChar() != 'R' || 
-			reader.ReadChar() != 'I' || 
+		if (reader.ReadChar() != 'E' || 
+			reader.ReadChar() != 'S' || 
+			reader.ReadChar() != 'T' || 
+			reader.ReadChar() != 'E' ||
+			reader.ReadChar() != 'R' ||
 			reader.ReadChar() != 'O')
 		{
-			throw std::exception("bad trio");
+			throw ContentPipelineException("bad file header");
 		}
 
 		if (reader.ReadByte() != 0) // plataforma windows.
 		{
-			throw std::exception("bad platform");
+			throw ContentPipelineException("bad platform");
 		}
 		
-		int num2 = reader.ReadInt32();
-		if (input->CanSeek() && ((num2 - 10) > (input->GetLength() - input->GetPosition())))
+		int totalSizeInBytes = reader.ReadInt32();
+		int headerAndContentSize = HeaderSize + sizeof(int);
+		if (input->CanSeek() && ((totalSizeInBytes - headerAndContentSize) > (input->GetLength() - input->GetPosition())))
 		{
-			throw std::exception();
+			throw ContentPipelineException("corrupt file");
 		}
 		//TO-DO: integrar compresión de archivos.
 
@@ -56,38 +63,46 @@ namespace TrioEngine
 
 	void* ContentReader::ReadExternalReference()
 	{
-		std::string cleanPath = ReadString();
-		if (cleanPath.size() == 0)
+		std::string referenceName = ReadString();
+		if (referenceName.size() == 0)
 			return nullptr;
 
-		return m_contentManager->LoadInternal(cleanPath);
+		std::size_t directorySeparatorIndex = m_assetName.find_last_of("/\\");
+		std::string path;
+
+		if (directorySeparatorIndex != std::string::npos) {
+			path = m_assetName.substr(0, directorySeparatorIndex);
+		}
+		std::string cleandPath = TrioIO::Path::Combine(path, referenceName);
+
+		return m_contentManager->LoadInternal(cleandPath);
 	}
 
 	Vector2 ContentReader::ReadVector2()
 	{
-		Vector2 vector2;
-		vector2.x = ReadSingle();
-		vector2.y = ReadSingle();
-		return vector2;
+		Vector2 vector;
+		vector.x = ReadSingle();
+		vector.y = ReadSingle();
+		return vector;
 	}
 
 	Vector3 ContentReader::ReadVector3()
 	{
-		Vector3 vector2;
-		vector2.x = ReadSingle();
-		vector2.y = ReadSingle();
-		vector2.z = ReadSingle();
-		return vector2;
+		Vector3 vector;
+		vector.x = ReadSingle();
+		vector.y = ReadSingle();
+		vector.z = ReadSingle();
+		return vector;
 	}
 
 	Vector4 ContentReader::ReadVector4()
 	{
-		Vector4 vector2;
-		vector2.x = ReadSingle();
-		vector2.y = ReadSingle();
-		vector2.z = ReadSingle();
-		vector2.w = ReadSingle();
-		return vector2;
+		Vector4 vector;
+		vector.x = ReadSingle();
+		vector.y = ReadSingle();
+		vector.z = ReadSingle();
+		vector.w = ReadSingle();
+		return vector;
 	}
 
 	Matrix ContentReader::ReadMatrix()
@@ -105,7 +120,7 @@ namespace TrioEngine
 	{
 		uint32_t typeCount = ReadUInt32();
 
-		m_TypeReaders = ContentTypeReaderManager::ReadTypeManifest(typeCount, this);
+		m_typeReaders = ContentTypeReaderManager::ReadTypeManifest(typeCount, this);
 
 		uint32_t sharedResources = ReadUInt32();
 
@@ -123,7 +138,7 @@ namespace TrioEngine
 		std::vector<uint8_t> buffer(size);
 		for (int i = 0; i < size; i += num2)
 		{
-			num2 = Read(&buffer[0], i, size - i);
+			num2 = Read(buffer.data(), i, size - i);
 			if (num2 == 0)
 			{
 				throw std::exception("bad xnb");

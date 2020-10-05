@@ -43,6 +43,9 @@ namespace TrioEngine
 		template <class T>
 		T* ReadObject();
 
+		/*template <class T>
+		T* ReadExternalReference();*/
+
 		void* ReadExternalReference();
 
 		void ReadSharedResource(std::function<void(ContentItem*)> action);
@@ -50,24 +53,23 @@ namespace TrioEngine
 
 		ContentManager* GetContentManager();
 	private:
-		ContentManager* m_contentManager;
-		std::string m_AssetName;
+		static const int HeaderSize = 7;
 
-		TrioIO::Stream* m_Stream;
+		ContentManager* m_contentManager;
+		std::string m_assetName;
+
+		TrioIO::Stream* m_stream;
+		std::vector<class ContentTypeReader*> m_typeReaders;
+		std::vector<std::vector<std::function<void(ContentItem*)> > > m_sharedResourceFixups;
 
 		static void PrepareStream(TrioIO::Stream *input);
 		uint32_t ReadHeader();
-
-		std::vector<class ContentTypeReader*> m_TypeReaders;
 
 		template <class T>
 		T* ReadObjectInternal(ContentItem* existingInstance);
 
 		void ReadSharedResources(uint32_t sharedResourceCount);
-
-		std::vector<std::vector<std::function<void(ContentItem*)> > > m_sharedResourceFixups;
 	};
-
 
 	template <class T>
 	T* ContentReader::ReadAsset()
@@ -95,11 +97,21 @@ namespace TrioEngine
 			return nullptr;
 
 		index--;
-		if (index >= m_TypeReaders.size())
+		if (index >= m_typeReaders.size())
 		{
-			throw std::exception("Bad xnb");
+			throw std::exception("Bad estero type readers");
 		}
 
-		return (T*)m_TypeReaders[index]->Read(this);
+		return reinterpret_cast<T*>(m_typeReaders[index]->Read(this));
 	}
+
+	//template <class T>
+	//T* ContentReader::ReadExternalReference()
+	//{
+	//	std::string cleanPath = ReadString();
+	//	if (cleanPath.size() == 0)
+	//		return nullptr;
+
+	//	return m_contentManager->Load<T>(cleanPath);
+	//}
 }

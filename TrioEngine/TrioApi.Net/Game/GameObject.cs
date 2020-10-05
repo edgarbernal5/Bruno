@@ -25,11 +25,11 @@ namespace TrioApi.Net.Game
         {
             get
             {
-                return Internal_IsActiveSelf(m_nativePtr);
+                return Internal_IsActiveSelf(m_nativePointer);
             }
             set
             {
-                Internal_SetActiveSelf(m_nativePtr, value);
+                Internal_SetActiveSelf(m_nativePointer, value);
             }
         }
 
@@ -38,7 +38,7 @@ namespace TrioApi.Net.Game
         {
             get
             {
-                return Internal_IsActiveInTree(m_nativePtr);
+                return Internal_IsActiveInTree(m_nativePointer);
             }
         }
 

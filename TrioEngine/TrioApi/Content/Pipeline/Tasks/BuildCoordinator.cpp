@@ -14,20 +14,22 @@
 #include "Content/Pipeline/Tasks/BuildItemCollection.h"
 #include "Content/Pipeline/Tasks/BuildRequest.h"
 
+#include "Errors/ContentPipelineException.h"
+
 namespace TrioEngine
 {
 	BuildCoordinator::BuildCoordinator(BuildCoordinatorSettings settings, TimestampCache* timestampCache) :
-		m_importerManager(nullptr), m_processorManager(nullptr), m_BuildItems(nullptr), m_BuildItemsChanged(false),
-		m_Settings(settings)
+		m_importerManager(nullptr), m_processorManager(nullptr), m_buildItems(nullptr), m_buildItemsChanged(false),
+		m_settings(settings)
 	{
-		m_Settings.InitializePaths();
+		m_settings.InitializePaths();
 
 		m_importerManager = new ImporterManager();
 		m_processorManager = new ProcessorManager();
 
-		m_ContentCompiler = new ContentCompiler();
+		m_contentCompiler = new ContentCompiler();
 
-		m_BuildItems = new BuildItemCollection();
+		m_buildItems = new BuildItemCollection();
 
 		if (timestampCache)
 		{
@@ -47,56 +49,78 @@ namespace TrioEngine
 			delete m_processorManager;
 			m_processorManager = nullptr;
 		}
-		if (m_ContentCompiler != nullptr)
+		if (m_contentCompiler != nullptr)
 		{
-			delete m_ContentCompiler;
-			m_ContentCompiler = nullptr;
+			delete m_contentCompiler;
+			m_contentCompiler = nullptr;
 		}
-		if (m_BuildItems != nullptr)
+		if (m_buildItems != nullptr)
 		{
-			delete m_BuildItems;
-			m_BuildItems = nullptr;
+			delete m_buildItems;
+			m_buildItems = nullptr;
 		}
+	}
+
+	void BuildCoordinator::AddDependency(BuildItem* buildItem, std::string filename)
+	{
+		std::string relativePath = GetRelativePath(filename);
+		auto timestamp = m_timestampCache.GetTimestamp(filename);
+
+		buildItem->m_dependencies[relativePath] = timestamp;
 	}
 
 	void BuildCoordinator::RunTheBuild()
 	{
 		BuildItem* item = nullptr;
-		m_BuildItems->ReverseWantedItems(0);
+		m_buildItems->ReverseWantedItems(0);
 
-		while ((item = m_BuildItems->PopWantedItem()) != nullptr)
+		while ((item = m_buildItems->PopWantedItem()) != nullptr)
 		{
-			if (!item->m_IsBuilt)
+			if (!item->m_isBuilt)
 			{
-				int wantedItemsCount = m_BuildItems->WantedItemsCount();
+				int wantedItemsCount = m_buildItems->WantedItemsCount();
 
 				BuildAsset(item);
+				//for each dependency in item
+				for (auto& pair : item->m_dependencies)
+				{
+					BuildItem* item2 = m_buildItems->FindItem(pair.first);
+					if (item2)
+					{
+						m_buildItems->WantItem(item2);
+					}
+				}
 
 				//for item.Requests
 				//wantitem
+				for (auto& current : item->m_requests)
+				{
+					m_buildItems->WantItem(m_buildItems->FindItem(current));
+				}
 
-				m_BuildItems->ReverseWantedItems(wantedItemsCount);
+				m_buildItems->ReverseWantedItems(wantedItemsCount);
 			}
 		}
 	}
 
 	ContentItem* BuildCoordinator::BuildAsset(BuildItem* item)
 	{
-		if (item->m_IsBuilt)
+		if (item->m_isBuilt)
 		{
 			return nullptr;
 		}
 
-		m_BuildItemsChanged = true;
-		item->m_Dependencies.clear();
-		item->m_ExtraOutputFiles.clear();
+		m_buildItemsChanged = true;
+		item->m_dependencies.clear();
+		item->m_requests.clear();
+		item->m_extraOutputFiles.clear();
 
 		ContentItem* input = ImportAsset(item);
 
 		ContentItem* output = input;
 		if (input != nullptr)
 		{
-			std::string& processorName = item->m_BuildRequest->m_ProcessorName;
+			std::string& processorName = item->m_buildRequest->m_processorName;
 
 			if (processorName.size() > 0)
 			{
@@ -113,23 +137,23 @@ namespace TrioEngine
 		//TO-DO: iniciarlizar un ID único para el BuildItem (Asset).
 		SerializeAsset(item, output);
 
-		item->m_IsBuilt = true;
+		item->m_isBuilt = true;
 		return output;
 	}
 
 	ContentItem* BuildCoordinator::ImportAsset(BuildItem* item)
 	{
-		std::string absolutePath = GetAbsolutePath(item->m_BuildRequest->m_SourceFileName);
-		std::string& importerName = item->m_BuildRequest->m_ImporterName;
+		std::string absolutePath = GetAbsolutePath(item->m_buildRequest->m_sourceFileName);
+		std::string& importerName = item->m_buildRequest->m_importerName;
 
-		item->m_SourceTimestamp = m_timestampCache.GetTimestamp(absolutePath);
+		item->m_sourceTimestamp = m_timestampCache.GetTimestamp(absolutePath);
 		
 		IContentImporter* instance = m_importerManager->GetByImporterName(importerName);
 		ContentItem* input = instance->Import(absolutePath);
 
 		if (input != nullptr)
 		{
-			input->m_importerName = item->m_BuildRequest->m_ImporterName;
+			input->m_importerName = item->m_buildRequest->m_importerName;
 		}
 
 		return input;
@@ -138,35 +162,32 @@ namespace TrioEngine
 	void BuildCoordinator::SerializeAsset(BuildItem* item, ContentItem* assetObject)
 	{
 		//__typeof(assetObject);
-		TrioIO::Path::CreateFolder(TrioIO::Path::GetDirectoryFromFilePath(GetAbsolutePath(item->OutputFilename)));
-		std::string absolutePath = GetAbsolutePath(item->OutputFilename);
+		TrioIO::Path::CreateFolder(TrioIO::Path::GetDirectoryFromFilePath(GetAbsolutePath(item->m_outputFilename)));
+		std::string absolutePath = GetAbsolutePath(item->m_outputFilename);
 		m_timestampCache.Remove(absolutePath);
 
 		TrioIO::FileStream* fileStream = new TrioIO::FileStream(absolutePath, TrioIO::FileAccess::Write);
 		{
-			m_ContentCompiler->Compile(fileStream, assetObject, false);
+			m_contentCompiler->Compile(fileStream, assetObject, false, m_settings.GetOutputDirectory(), absolutePath);
 			fileStream->Close();
 		}
 		delete fileStream;
 
-		m_RebuiltFiles.push_back(absolutePath);
+		m_rebuiltFiles.push_back(absolutePath);
 	}
 
 	void BuildCoordinator::RequestBuild(std::string sourceFilename, std::string assetName, std::string importerName, std::string processorName, OpaqueData* processorParameters)
 	{
 		BuildRequest* request = new BuildRequest();
-		request->m_AssetName = assetName;
-		request->m_SourceFileName = sourceFilename;
-		request->m_ImporterName = importerName;
-		request->m_ProcessorName = processorName;
+		request->m_assetName = assetName;
+		request->m_sourceFileName = sourceFilename;
+		request->m_importerName = importerName;
+		request->m_processorName = processorName;
 
+		request->m_opaqueData = new OpaqueData();
 		if (processorParameters != nullptr)
 		{
-			request->m_OpaqueData = new OpaqueData(*processorParameters);
-		}
-		else
-		{
-			request->m_OpaqueData = new OpaqueData();
+			request->m_opaqueData->addProperties(processorParameters->begin(), processorParameters->end());
 		}
 
 		RequestBuild(request);
@@ -174,20 +195,20 @@ namespace TrioEngine
 
 	BuildItem* BuildCoordinator::RequestBuild(BuildRequest* request)
 	{
-		request->m_SourceFileName = GetRelativePath(request->m_SourceFileName);
-		if (request->m_ImporterName.size() == 0)
+		request->m_sourceFileName = GetRelativePath(request->m_sourceFileName);
+		if (request->m_importerName.size() == 0)
 		{
 			//Adivinar el importador por medio de la extension del archivo.
-			request->m_ImporterName = m_importerManager->GetImporterNameByExtension
+			request->m_importerName = m_importerManager->GetImporterNameByExtension
 			(
-				TrioIO::Path::GetFileExtension(request->m_SourceFileName)
+				TrioIO::Path::GetFileExtension(request->m_sourceFileName)
 			);
 		}
 
 		//TO-DO: verificar el "hashcode" de BuildRequest.
-		BuildItem* item = m_BuildItems->FindItem(request);
+		BuildItem* item = m_buildItems->FindItem(request);
 
-		if (((item != nullptr) && (item->m_BuildRequest->m_AssetName.size() == 0)) && (request->m_AssetName.size() > 0))
+		if (((item != nullptr) && (item->m_buildRequest->m_assetName.size() == 0)) && (request->m_assetName.size() > 0))
 		{
 			RemoveBuildItem(item);
 			item = nullptr;
@@ -196,47 +217,47 @@ namespace TrioEngine
 		if (item == nullptr)
 		{
 			item = new BuildItem();
-			item->m_BuildRequest = request;
-			item->OutputFilename = ChooseOutputFilename(request);
-			m_BuildItems->PushBack(item);
+			item->m_buildRequest = request;
+			item->m_outputFilename = ChooseOutputFilename(request);
+			m_buildItems->PushBack(item);
 
-			m_BuildItemsChanged = true;
+			m_buildItemsChanged = true;
 		}
 
-		m_BuildItems->WantItem(item);
+		m_buildItems->WantItem(item);
 		return item;
 	}
 
 	void BuildCoordinator::RemoveBuildItem(BuildItem* item)
 	{
-		m_BuildItems->Remove(item);
-		std::string absolutePath = GetAbsolutePath(item->OutputFilename);
+		m_buildItems->Remove(item);
+		std::string absolutePath = GetAbsolutePath(item->m_outputFilename);
 
-		std::vector<std::string>::iterator its = find(m_RebuiltFiles.begin(), m_RebuiltFiles.end(), item->OutputFilename);
-		if (its != m_RebuiltFiles.end())
+		auto its = std::find(m_rebuiltFiles.begin(), m_rebuiltFiles.end(), item->m_outputFilename);
+		if (its != m_rebuiltFiles.end())
 		{
-			m_RebuiltFiles.erase(its);
+			m_rebuiltFiles.erase(its);
 		}
-		//timestampCache.remove
+		m_timestampCache.Remove(absolutePath);
 		TrioIO::File::Delete(absolutePath);
 
-		for (int i = 0; i < m_BuildItems->Size(); i++)
+		for (int i = 0; i < m_buildItems->Size(); i++)
 		{
-			BuildItem* item2 = (*m_BuildItems)[i];
-			its = find(item2->m_Requests.begin(), item2->m_Requests.end(), item2->OutputFilename);
-			if (its != item2->m_Requests.end())
+			BuildItem* current = (*m_buildItems)[i];
+			if (current->ContainsDependency(item->m_outputFilename) || current->ContainsRequest(item->m_outputFilename))
 			{
-				item2->m_Requests.erase(its);
-				//item2->m_SourceTime = 
-				if (item2->m_IsBuilt)
+				current->RemoveDependency(item->m_outputFilename);
+				current->RemoveRequest(item->m_outputFilename);
+				current->m_sourceTimestamp = std::filesystem::file_time_type::min();
+				if (current->m_isBuilt)
 				{
-					its = find(m_RebuiltFiles.begin(), m_RebuiltFiles.end(), GetAbsolutePath(item2->OutputFilename));
-					if (its != m_RebuiltFiles.end())
-						m_RebuiltFiles.erase(its);
+					its = find(m_rebuiltFiles.begin(), m_rebuiltFiles.end(), GetAbsolutePath(current->m_outputFilename));
+					if (its != m_rebuiltFiles.end())
+						m_rebuiltFiles.erase(its);
 
-					item2->m_IsBuilt = false;
-					item2->m_IsWanted = false;
-					m_BuildItems->WantItem(item2);
+					current->m_isBuilt = false;
+					current->m_isWanted = false;
+					m_buildItems->WantItem(current);
 				}
 			}
 		}
@@ -244,35 +265,80 @@ namespace TrioEngine
 
 	std::string BuildCoordinator::GetAbsolutePath(std::string path)
 	{
-		return m_Settings.GetAbsolutePath(path);
+		return m_settings.GetAbsolutePath(path);
 	}
 
 	std::string BuildCoordinator::ChooseOutputFilename(BuildRequest *request)
 	{
-		std::string intermediateDirectory = m_Settings.OutputDirectory;
+		std::string intermediateDirectory = m_settings.GetOutputDirectory();
+		std::string outputExtension = ".estero";
+		std::string outputFilename;
 
-		if (request->m_AssetName.size() == 0)
+		if (request->m_assetName.size() == 0)
 		{
-			if (!TrioIO::Path::IsPathRooted(request->m_SourceFileName))
+			if (!TrioIO::Path::IsPathRooted(request->m_sourceFileName))
 			{
-				std::string directoryName = TrioIO::Path::GetDirectoryFromFilePath(request->m_SourceFileName);
-				std::string str5 = GetRelativePath(m_Settings.IntermediateDirectory);
+				std::string directoryName = TrioIO::Path::GetDirectoryFromFilePath(request->m_sourceFileName);
+				std::string relativePath = GetRelativePath(m_settings.GetIntermediateDirectory());
+				if (directoryName.size() > 0 && directoryName.find(relativePath) == 0)
+				{
+					directoryName = directoryName.substr(relativePath.size());
+				}
+				if (directoryName.size() > 0) {
+					intermediateDirectory = intermediateDirectory + directoryName + '\\';
+				}
 			}
-			request->m_AssetName = TrioIO::Path::Combine(TrioIO::Path::GetDirectoryFromFilePath(request->m_SourceFileName), TrioIO::Path::GetFilenameWithoutExtension(request->m_SourceFileName));
+			std::string assetNameStub = GetAssetNameStub(request->m_sourceFileName);
+			int num = 0;
+			do {
+				std::stringstream ss;
+				ss << intermediateDirectory << assetNameStub << '_' << num << outputExtension;
+
+				outputFilename = GetRelativePath(ss.str());
+
+				++num;
+			} while (m_buildItems->FindItem(assetNameStub));
+
+			//request->m_assetName = TrioIO::Path::Combine(TrioIO::Path::GetDirectoryFromFilePath(request->m_sourceFileName), TrioIO::Path::GetFilenameWithoutExtension(request->m_sourceFileName));
+		}
+		else
+		{
+			std::stringstream ss;
+			ss << intermediateDirectory << request->m_assetName << outputExtension;
+
+			outputFilename = GetRelativePath(ss.str());
+			BuildItem* buildItem = m_buildItems->FindItem(outputFilename);
+			if (buildItem)
+			{
+				if (buildItem->m_isWanted)
+				{
+					throw ContentPipelineException("Compiled asset filename conflict");
+				}
+				RemoveBuildItem(buildItem);
+			}
 		}
 
-		std::string relativePath = GetRelativePath(TrioIO::Path::Combine(intermediateDirectory, request->m_AssetName) + ".trio");
+		/*std::string relativePath = GetRelativePath(TrioIO::Path::Combine(intermediateDirectory, request->m_assetName) + ".trio");
 
-		BuildItem* item = m_BuildItems->FindItem(relativePath);
+		BuildItem* item = m_buildItems->FindItem(relativePath);
 
 		if (item != nullptr)
 		{
-			if (item->m_IsWanted)
+			if (item->m_isWanted)
 			{
 				throw std::exception();
 			}
 			RemoveBuildItem(item);
+		}*/
+		return outputFilename;
+	}
+
+	std::string BuildCoordinator::GetAssetNameStub(std::string filename)
+	{
+		std::string text = TrioIO::Path::GetFilenameWithoutExtension(filename);
+		if (text.size() > 32) {
+			text = text.substr(0, 32);
 		}
-		return relativePath;
+		return text;
 	}
 }

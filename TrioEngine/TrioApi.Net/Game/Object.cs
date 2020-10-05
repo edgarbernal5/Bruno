@@ -20,7 +20,7 @@ namespace TrioApi.Net.Game
         {
             get
             {
-                return Internal_GetId(m_nativePtr);
+                return Internal_GetId(m_nativePointer);
             }
         }
 
@@ -28,17 +28,17 @@ namespace TrioApi.Net.Game
         {
             get
             {
-                return Internal_GetName(m_nativePtr);
+                return Internal_GetName(m_nativePointer);
             }
             set
             {
-                Internal_SetName(m_nativePtr, value);
+                Internal_SetName(m_nativePointer, value);
             }
         }
 
         protected Object(IntPtr nativePtr)
         {
-            m_nativePtr = nativePtr;
+            m_nativePointer = nativePtr;
         }
 
         protected override void OnDisposing(bool disposing)

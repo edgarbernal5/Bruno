@@ -13,7 +13,7 @@ namespace TrioEngine
 		IndexCollectionWriter();
 		~IndexCollectionWriter();
 
-		std::string GetWriterName() { m_Name = "IndexCollectionWriter"; return m_Name; }
+		std::string GetWriterName() { m_name = "IndexCollectionWriter"; return m_name; }
 		std::string GetReaderName() { return "IndexCollectionReader"; }
 		void Write(ContentWriter *output, ContentItem* value);
 	};

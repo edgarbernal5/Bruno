@@ -15,7 +15,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public IndexBuffer(GraphicsDevice device, IndexElementSize elementSize, int indexCount, ResourceUsage usage)
         {
-            m_nativePtr = Internal_Ctor(device.NativePointer, (int)elementSize, indexCount, (int)usage);
+            m_nativePointer = Internal_Ctor(device.NativePointer, (int)elementSize, indexCount, (int)usage);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "IndexBuffer_Ctor2", CallingConvention = CallingConvention.StdCall)]
@@ -23,12 +23,12 @@ namespace TrioApi.Net.Graphics.Core
 
         public IndexBuffer(GraphicsDevice device, IndexElementSize elementSize, int indexCount)
         {
-            m_nativePtr = Internal_Ctor2(device.NativePointer, (int)elementSize, indexCount);
+            m_nativePointer = Internal_Ctor2(device.NativePointer, (int)elementSize, indexCount);
         }
 
         internal IndexBuffer(IntPtr nativePtr)
         {
-            m_nativePtr = nativePtr;
+            m_nativePointer = nativePtr;
         }
 
         public void SetData<T>(T[] data) where T : struct
@@ -48,7 +48,7 @@ namespace TrioApi.Net.Graphics.Core
             {
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
 
-                Internal_SetData(m_nativePtr, dataPtr, (uint)(data.Length), (uint)(data.Length * elementSize));
+                Internal_SetData(m_nativePointer, dataPtr, (uint)(data.Length), (uint)(data.Length * elementSize));
             }
             finally
             {
@@ -64,7 +64,7 @@ namespace TrioApi.Net.Graphics.Core
         {
             if (disposing)
             {
-                Internal_Dctor(m_nativePtr);
+                Internal_Dctor(m_nativePointer);
             }
         }
     }

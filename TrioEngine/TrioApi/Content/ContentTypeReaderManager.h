@@ -21,18 +21,18 @@ namespace TrioEngine
 
 		template<typename T> static void RegisterContentTypeReader()
 		{
-			m_TypeReaders2.push_back(new T());
+			m_typeReaders2.push_back(new T());
 		}
+
 		static std::vector<ContentTypeReader*> ReadTypeManifest(uint32_t typeCount, ContentReader* contentReader);
 	private:
-		ContentReader* m_Reader;
+		ContentReader* m_reader;
 
-		static std::map<std::string, ContentTypeReader*> *m_NameToReader;
+		static std::map<std::string, ContentTypeReader*> *m_nameToReader;
 
 		static ContentTypeReader* GetTypeReaderByName(std::string name);
 
-		static std::vector<ContentTypeReader*> m_TypeReaders2;
-
+		static std::vector<ContentTypeReader*> m_typeReaders2;
 
 		static ContentTypeReader* GetTypeReader(std::string readerTypeName, ContentReader* contentReader, std::vector<ContentTypeReader*> &newTypeReaders);
 		static void AddTypeReader(std::string readerTypeName, ContentReader* contentReader, ContentTypeReader* reader);

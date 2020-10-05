@@ -8,13 +8,15 @@
 #include "ModelMaterial.h"
 #include "Mesh.h"
 
+#include "Errors/GameException.h"
+
 namespace TrioEngine
 {
 	Model::Model(const std::string& filename, ModelLoadParams loadParams)
 	{
 		Assimp::Importer importer;
 
-		UINT flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_FlipWindingOrder;
+		uint32_t flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_FlipWindingOrder;
 		if (loadParams.flipUVs)
 		{
 			flags |= aiProcess_FlipUVs;
@@ -23,12 +25,12 @@ namespace TrioEngine
 		const aiScene* scene = importer.ReadFile(filename, flags);
 		if (scene == nullptr)
 		{
-			//throw GameException(importer.GetErrorString());
+			throw GameException(importer.GetErrorString());
 		}
 
 		if (scene->HasMaterials())
 		{
-			for (UINT i = 0; i < scene->mNumMaterials; i++)
+			for (uint32_t i = 0; i < scene->mNumMaterials; i++)
 			{
 				m_materials.push_back(new ModelMaterial(scene->mMaterials[i]));
 			}
@@ -36,7 +38,7 @@ namespace TrioEngine
 
 		if (scene->HasMeshes())
 		{
-			for (UINT i = 0; i < scene->mNumMeshes; i++)
+			for (uint32_t i = 0; i < scene->mNumMeshes; i++)
 			{
 				Mesh* mesh = new Mesh(*this, *(scene->mMeshes[i]));
 				m_meshes.push_back(mesh);

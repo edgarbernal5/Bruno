@@ -8,13 +8,21 @@ namespace TrioEngine
 {
 	TextureImporter::TextureImporter()
 	{
+		ilInit();
+		iluInit();
+
+		if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION ||
+			iluGetInteger(ILU_VERSION_NUM) < ILU_VERSION) {
+			//ilutGetInteger(ILUT_VERSION_NUM) < ILUT_VERSION) {
+			printf("DevIL version is different...exiting!\n");
+		}
 	}
 
 	TextureImporter::~TextureImporter()
 	{
 	}
 
-	ContentItem* TextureImporter::Import(std::string& filename)
+	ContentItem* TextureImporter::Import(const std::string& filename)
 	{
 		ILuint imgId;
 
@@ -50,14 +58,15 @@ namespace TrioEngine
 	{
 		BitmapContentAndInfo item = CreateAppropriateTypeOfBitmapContent(ilInfo, ilInfo.Width, ilInfo.Height);
 
-		ILubyte	*buffer = new ILubyte[ilInfo.Width * ilInfo.Height * ilInfo.Depth * item.BytesPerPixel];
+		uint32_t sizeInBytes = ilInfo.Width * ilInfo.Height * ilInfo.Depth * item.BytesPerPixel;
+		ILubyte	*buffer = new ILubyte[sizeInBytes];
 
 		ilCopyPixels(0, 0, 0, ilInfo.Width, ilInfo.Height, ilInfo.Depth, ilInfo.Format, IL_UNSIGNED_BYTE, buffer);
 
 		BitmapContent *bitmapContent = item.BitmapContent;
 		bitmapContent->SetPixelData(buffer);
 
-		delete buffer;
+		delete[] buffer;
 
 		return bitmapContent;
 	}
@@ -75,14 +84,14 @@ namespace TrioEngine
 			{
 			case IL_RGB:
 			case IL_BGR:
-				info.BitmapContent = new PixelBitmapContent<Color>(ilInfo.Width, ilInfo.Height);
-				info.BytesPerPixel = sizeof(Color);
+				info.BitmapContent = new PixelBitmapContent<ColorRGBA8>(ilInfo.Width, ilInfo.Height);
+				info.BytesPerPixel = sizeof(ColorRGBA8);
 				break;
 
 			case IL_RGBA:
 			case IL_BGRA:
-				info.BitmapContent = new PixelBitmapContent<Color>(ilInfo.Width, ilInfo.Height);
-				info.BytesPerPixel = sizeof(Color);
+				info.BitmapContent = new PixelBitmapContent<ColorRGBA8>(ilInfo.Width, ilInfo.Height);
+				info.BytesPerPixel = sizeof(ColorRGBA8);
 				break;
 			default:
 				break;

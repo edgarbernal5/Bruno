@@ -29,7 +29,7 @@ namespace TrioEngine
 
 		typedef std::map<std::string, IContentProcessor*(*)()> map_type;
 
-		map_type importersMap;
+		map_type m_importersMap;
 	};
 
 	template<typename T>
@@ -38,6 +38,6 @@ namespace TrioEngine
 	template<typename T>
 	void ProcessorManager::RegisterTypeProcessor(std::string importerName)
 	{
-		importersMap[importerName] = &CreateInstance <T>;
+		m_importersMap[importerName] = &CreateInstance <T>;
 	}
 }

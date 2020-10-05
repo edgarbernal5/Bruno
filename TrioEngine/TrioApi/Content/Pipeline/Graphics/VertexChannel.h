@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TrioApiRequisites.h"
+#include "Errors/ContentPipelineException.h"
 
 namespace TrioEngine
 {
@@ -88,7 +89,7 @@ namespace TrioEngine
 			int stride = sizeof(T);
 			if (m_sizeInBytesOfT > 0 && stride != m_sizeInBytesOfT)
 			{
-				throw std::exception();
+				throw ContentPipelineException("");
 			}
 
 			const uint8_t* dataBytes = reinterpret_cast<const uint8_t*>(data);

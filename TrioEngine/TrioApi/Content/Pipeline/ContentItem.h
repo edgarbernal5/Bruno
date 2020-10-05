@@ -52,10 +52,10 @@ namespace TrioEngine
 
 		std::string m_name;
 
-		ContentIdentity m_contentIdentity;
-
 	protected:
 		std::string m_importerName;
 		std::string m_processorName;
+
+		ContentIdentity m_contentIdentity;
 	};
 }

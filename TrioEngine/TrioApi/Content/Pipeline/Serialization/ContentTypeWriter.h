@@ -24,13 +24,13 @@ namespace TrioEngine
 
 		bool operator <(const ContentTypeWriter &other) const
 		{
-			return m_Name < other.m_Name;
+			return m_name < other.m_name;
 		}
 		bool operator <(const ContentTypeWriter *other) const
 		{
-			return m_Name < other->m_Name;
+			return m_name < other->m_name;
 		}
 	protected:
-		std::string m_Name;
+		std::string m_name;
 	};
 }

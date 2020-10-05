@@ -13,7 +13,7 @@ namespace TrioEngine
 		EffectWriter();
 		~EffectWriter();
 
-		std::string GetWriterName() { m_Name = "EffectWriter"; return m_Name; }
+		std::string GetWriterName() { m_name = "EffectWriter"; return m_name; }
 		std::string GetReaderName() { return "EffectReader"; }
 		void Write(ContentWriter *output, ContentItem* value);
 	};

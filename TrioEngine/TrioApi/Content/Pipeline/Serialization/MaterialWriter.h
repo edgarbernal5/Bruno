@@ -7,14 +7,14 @@
 
 namespace TrioEngine
 {
-	class EffectWriter : public ContentTypeWriter
+	class MaterialWriter : public ContentTypeWriter
 	{
 	public:
-		EffectWriter();
-		~EffectWriter();
+		MaterialWriter();
+		~MaterialWriter();
 
-		std::string GetWriterName() { m_Name = "EffectWriter"; return m_Name; }
-		std::string GetReaderName() { return "EffectReader"; }
+		std::string GetWriterName() { m_name = "MaterialWriter"; return m_name; }
+		std::string GetReaderName() { return "MaterialReader"; }
 		void Write(ContentWriter *output, ContentItem* value);
 	};
 }

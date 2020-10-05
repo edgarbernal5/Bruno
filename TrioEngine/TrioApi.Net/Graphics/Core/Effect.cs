@@ -39,8 +39,8 @@ namespace TrioApi.Net.Graphics.Core
 
         public Effect(GraphicsDevice device, string filename)
         {
-            m_nativePtr = Internal_Ctor(device.NativePointer);
-            Internal_CompileEffectFromFile(m_nativePtr, filename);
+            m_nativePointer = Internal_Ctor(device.NativePointer);
+            Internal_CompileEffectFromFile(m_nativePointer, filename);
             LoadData();
         }
 
@@ -54,7 +54,7 @@ namespace TrioApi.Net.Graphics.Core
         {
             int total = 0;
             IntPtr array = IntPtr.Zero;
-            Internal_GetParameters(m_nativePtr, ref array, ref total);
+            Internal_GetParameters(m_nativePointer, ref array, ref total);
 
             if (total > 0)
             {
@@ -76,7 +76,7 @@ namespace TrioApi.Net.Graphics.Core
         {
             int total = 0;
             IntPtr array = IntPtr.Zero;
-            Internal_GetTechniques(m_nativePtr, ref array, ref total);
+            Internal_GetTechniques(m_nativePointer, ref array, ref total);
 
             if (total > 0)
             {

@@ -14,14 +14,14 @@ namespace TrioApi.Net.Graphics.Core
         {
             get
             {
-                return Internal_GetFormat(m_nativePtr);
+                return Internal_GetFormat(m_nativePointer);
             }
         }
 
         protected Texture() 
             : base()
         {
-            m_nativePtr = IntPtr.Zero;
+            m_nativePointer = IntPtr.Zero;
         }
     }
 }

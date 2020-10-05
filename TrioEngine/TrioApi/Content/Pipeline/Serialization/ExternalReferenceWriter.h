@@ -13,7 +13,7 @@ namespace TrioEngine
 		ExternalReferenceWriter();
 		~ExternalReferenceWriter();
 
-		std::string GetWriterName() { m_Name = "ExternalReferenceWriter"; return m_Name; }
+		std::string GetWriterName() { m_name = "ExternalReferenceWriter"; return m_name; }
 		std::string GetReaderName() { return "ExternalReferenceReader"; }
 		void Write(ContentWriter *output, ContentItem* value);
 	};

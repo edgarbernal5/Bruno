@@ -16,7 +16,7 @@ namespace TrioApi.Net.Graphics.Core
         {
             get
             {
-                return Internal_GetWidth(m_nativePtr);
+                return Internal_GetWidth(m_nativePointer);
             }
         }
 
@@ -26,7 +26,7 @@ namespace TrioApi.Net.Graphics.Core
         {
             get
             {
-                return Internal_GetHeight(m_nativePtr);
+                return Internal_GetHeight(m_nativePointer);
             }
         }
 
@@ -35,7 +35,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public Texture2D(GraphicsDevice device, int width, int height)
         {
-            m_nativePtr = Internal_Ctor(device.NativePointer, width, height);
+            m_nativePointer = Internal_Ctor(device.NativePointer, width, height);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_Ctor2", CallingConvention = CallingConvention.StdCall)]
@@ -43,22 +43,22 @@ namespace TrioApi.Net.Graphics.Core
 
         public Texture2D(GraphicsDevice device, int width, int height, SurfaceFormat format)
         {
-            m_nativePtr = Internal_Ctor2(device.NativePointer, width, height, (int)format);
+            m_nativePointer = Internal_Ctor2(device.NativePointer, width, height, (int)format);
         }
 
         internal Texture2D(IntPtr nativePtr)
         {
-            m_nativePtr = nativePtr;
+            m_nativePointer = nativePtr;
         }
 
         internal Texture2D()
         {
-            m_nativePtr = IntPtr.Zero;
+            m_nativePointer = IntPtr.Zero;
         }
 
         public void LoadFromFile()
         {
-            Internal_TestLoadFromFile(m_nativePtr);
+            Internal_TestLoadFromFile(m_nativePointer);
         }
 
 
@@ -75,7 +75,7 @@ namespace TrioApi.Net.Graphics.Core
 
                 int baseElementInBytes = Format.GetByteSize();
                 uint elementCount = (uint)(elementSizeInBytes * data.Length / baseElementInBytes);
-                Internal_GetData(m_nativePtr, dataPtr, elementCount);
+                Internal_GetData(m_nativePointer, dataPtr, elementCount);
             }
             finally
             {
@@ -118,7 +118,7 @@ namespace TrioApi.Net.Graphics.Core
 
             // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
             // TODO: set large fields to null.
-            Internal_Dctor(m_nativePtr);
+            Internal_Dctor(m_nativePointer);
         }
     }
 }

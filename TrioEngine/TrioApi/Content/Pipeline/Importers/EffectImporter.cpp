@@ -13,9 +13,9 @@ namespace TrioEngine
 	{
 	}
 
-	ContentItem* EffectImporter::Import(std::string& filename)
+	ContentItem* EffectImporter::Import(const std::string& filename)
 	{
-		EffectContent* content = new EffectContent(filename);
+		EffectContent* content = new EffectContent(const_cast<std::string&>(filename));
 
 		return content;
 	}

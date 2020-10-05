@@ -13,7 +13,7 @@ namespace TrioEngine
 	public:
 		typedef Vector3 BaseType;
 
-		IndirectPositionCollection(GeometryContent* geom, VertexChannel* positionIndices);
+		IndirectPositionCollection(GeometryContent* geometryContent, VertexChannel* positionIndices);
 		~IndirectPositionCollection();
 
 		const BaseType & operator[](int nIndex) const;

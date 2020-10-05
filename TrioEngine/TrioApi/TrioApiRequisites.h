@@ -27,8 +27,9 @@ namespace TrioEngine
 	class Object;
 	class Texture2D;
 	class RenderTarget2D;
+	class Model;
 
-	//class ContentManager;
+	class ContentManager;
 	//class ContentReader;
 
 	class BuildCoordinator;
