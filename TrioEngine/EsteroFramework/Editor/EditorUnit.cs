@@ -1,4 +1,5 @@
-﻿using Estero.Logging;
+﻿
+using Estero.Logging;
 using System;
 
 namespace EsteroFramework.Editor

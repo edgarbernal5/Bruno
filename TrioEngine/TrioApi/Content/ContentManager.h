@@ -54,7 +54,6 @@ namespace TrioEngine
 		TrioIO::Stream* OpenStream(std::string assetName);
 	};
 
-
 	template <class T>
 	T* ContentManager::Load(std::string assetName)
 	{

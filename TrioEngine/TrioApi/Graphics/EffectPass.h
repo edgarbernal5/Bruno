@@ -20,8 +20,8 @@ namespace TrioEngine
 		void Apply();
 
 		inline const char* GetName() { return m_name.c_str(); }
-	private:
 
+	private:
 		Effect* m_effect;
 		Shader* m_vertexShader;
 		Shader* m_pixelShader;

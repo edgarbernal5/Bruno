@@ -43,7 +43,6 @@ namespace TrioEngine
 		friend class GraphicsDevice;
 
 	private:
-
 		GraphicsDevice*				m_device;
 		int							m_indexCount;
 		IndexElementSize			m_elementSize;

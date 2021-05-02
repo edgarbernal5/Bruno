@@ -12,8 +12,7 @@ namespace TrioEngine
 	Texture2D::Texture2D(GraphicsDevice* graphicsDevice, int width, int height, SurfaceFormat format) :
 		Texture(graphicsDevice, format)
 #if TRIO_DIRECTX
-		,
-		m_stagingTex (nullptr)
+		, m_stagingTex (nullptr)
 #endif
 	{
 		CommonConstructor(width, height, 1, SurfaceType::TextureType, 1, 0, false, 1);
@@ -22,8 +21,7 @@ namespace TrioEngine
 	Texture2D::Texture2D(GraphicsDevice* graphicsDevice, int width, int height, uint32_t mipmap, SurfaceFormat format) :
 		Texture(graphicsDevice, format)
 #if TRIO_DIRECTX
-		,
-		m_stagingTex(nullptr)
+		, m_stagingTex(nullptr)
 #endif
 	{
 		CommonConstructor(width, height, mipmap, SurfaceType::TextureType, 1, 0, false, 1);
@@ -32,8 +30,7 @@ namespace TrioEngine
 	Texture2D::Texture2D(GraphicsDevice* graphicsDevice, int width, int height) :
 		Texture(graphicsDevice, SurfaceFormat::Color)
 #if TRIO_DIRECTX
-		,
-		m_stagingTex(nullptr)
+		, m_stagingTex(nullptr)
 #endif
 	{
 		CommonConstructor(width, height, 1, SurfaceType::TextureType, 1, 0, false, 1);

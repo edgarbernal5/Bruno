@@ -16,22 +16,25 @@
 namespace TrioEngine
 {
 	class Game;
-	class Effect;
-	class EffectTechnique;
-	class EffectParameter;
-	class EffectPass;
-	class Scene;
-	class Transform;
-	class GameObject;
-	class Component;
-	class Object;
-	class Texture2D;
-	class RenderTarget2D;
-	class Model;
 
-	class ContentManager;
-	//class ContentReader;
+	//class Game;
+	//class Effect;
+	//class EffectTechnique;
+	//class EffectParameter;
+	//class EffectPass;
+	//class Scene;
+	//class Transform;
+	//class GameObject;
+	//class Component;
+	//class Object;
+	//class Texture2D;
+	//class RenderTarget2D;
+	//class Model;
+	//class ModelMesh;
 
-	class BuildCoordinator;
-	class TextureContent;
+	//class ContentManager;
+	////class ContentReader;
+
+	//class BuildCoordinator;
+	//class TextureContent;
 }

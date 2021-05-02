@@ -4,6 +4,7 @@ using EsteroFramework.Graphics.Data;
 using EsteroFramework.Graphics.Editor;
 using System.Collections.Generic;
 using TrioApi.Net.Maths;
+using TrioApi.Net.Renderer;
 
 namespace EsteroFramework.Editor.Game
 {
@@ -43,6 +44,7 @@ namespace EsteroFramework.Editor.Game
             m_editorGameGraphicsScreen.GridMesh = primitivesService.GridMesh;
             m_editorGameGraphicsScreen.Scene = SceneProjectFile.Scene;
             m_editorGameGraphicsScreen.Camera = Camera;
+            m_editorGameGraphicsScreen.RenderPath = new RenderPathForward(SceneProjectFile.Scene);
         }
 
         protected override void OnActivate()
@@ -55,7 +57,7 @@ namespace EsteroFramework.Editor.Game
             Camera.NearPlane = 0.1f;
             Camera.FarPlane = 100.0f;
 
-            Camera.Position = new Vector3(5.0f, 15.0f, 5.0f);
+            Camera.Position = new Vector3(5.0f, 5.0f, -5.0f);
             Camera.Target = Vector3.Zero;
             Camera.Up = Vector3.Up;
 

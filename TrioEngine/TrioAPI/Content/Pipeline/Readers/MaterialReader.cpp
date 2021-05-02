@@ -19,15 +19,10 @@ namespace TrioEngine
 
 	void* MaterialReader::Read(ContentReader* input)
 	{
-		/*MaterialContent* inputContent = reinterpret_cast<MaterialContent*>(value);
-
-		output->WriteUInt32(inputContent->GetTextures().size());
-		for (auto& pair : inputContent->GetTextures()) {
-			output->WriteString(pair.first);
-			output->WriteExternalReference(pair.second);
-		}*/
-
 		Material* material = new Material();
+
+		std::string name = input->ReadString();
+		material->SetName(name);
 
 		uint32_t textureCount = input->ReadUInt32();
 		for (size_t i = 0; i < textureCount; i++)

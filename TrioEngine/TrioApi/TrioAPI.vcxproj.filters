@@ -121,6 +121,15 @@
     <Filter Include="Header Files\Content\Pipeline\Readers">
       <UniqueIdentifier>{58a5f652-803d-4840-ad12-2563ea9581c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ECS">
+      <UniqueIdentifier>{ba53e8ef-f433-4734-9306-7aaef43f0887}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ECS">
+      <UniqueIdentifier>{b05d159d-21fd-4623-bda1-9970f0e4eeeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ECS\Components">
+      <UniqueIdentifier>{e02d5f30-591d-4125-b8ca-c23475e61900}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -414,9 +423,6 @@
     <ClInclude Include="Memory\Allocator.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="DataTypes\Array.h">
-      <Filter>Header Files\Collection</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\VertexPositionNormalTexture.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
@@ -442,15 +448,6 @@
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
@@ -735,6 +732,69 @@
     <ClInclude Include="Graphics\Models\Material.h">
       <Filter>Header Files\Graphics\Models</Filter>
     </ClInclude>
+    <ClInclude Include="Ecs\ComponentManager.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Ecs\Entity.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Ecs\Components\MeshComponent.h">
+      <Filter>Header Files\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Ecs\Components\NameComponent.h">
+      <Filter>Header Files\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Ecs\Components\HierarchyComponent.h">
+      <Filter>Header Files\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Ecs\Components\TransformComponent.h">
+      <Filter>Header Files\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Ecs\Components\MaterialComponent.h">
+      <Filter>Header Files\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Ecs\Components.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Processors\SceneModelProcessor.h">
+      <Filter>Header Files\Content\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Processors\SceneContent.h">
+      <Filter>Header Files\Content\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Serialization\SceneWriter.h">
+      <Filter>Header Files\Content\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Processors\SceneMeshContent.h">
+      <Filter>Header Files\Content\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Processors\SceneSubMeshContent.h">
+      <Filter>Header Files\Content\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pipeline\Readers\SceneReader.h">
+      <Filter>Header Files\Content\Pipeline\Readers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\Array.h">
+      <Filter>Header Files\Collection</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderPaths\RenderPath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderPaths\RenderPathForward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\FrameCulling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -919,18 +979,6 @@
     </ClCompile>
     <ClCompile Include="Utils\StringUtility.cpp">
       <Filter>Source Files\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
@@ -1165,6 +1213,33 @@
     </ClCompile>
     <ClCompile Include="Graphics\Models\Material.cpp">
       <Filter>Source Files\Graphics\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Ecs\ComponentManager.cpp">
+      <Filter>Source Files\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Processors\SceneModelProcessor.cpp">
+      <Filter>Source Files\Content\Pipeline\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Processors\SceneContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Serialization\SceneWriter.cpp">
+      <Filter>Source Files\Content\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Processors\SceneMeshContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Processors\SceneSubMeshContent.cpp">
+      <Filter>Source Files\Content\Pipeline\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pipeline\Readers\SceneReader.cpp">
+      <Filter>Source Files\Content\Pipeline\Readers</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\RenderPaths\RenderPathForward.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Renderer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

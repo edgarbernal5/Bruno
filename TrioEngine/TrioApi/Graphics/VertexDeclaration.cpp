@@ -70,7 +70,7 @@ namespace TrioEngine
 	{
 		if (m_d3d11Elements.size() == 0)
 		{
-			m_d3d11Elements.reserve(m_elements.size());
+			m_d3d11Elements.resize(m_elements.size());
 			for (int i = 0; i < m_elements.size(); i++)
 			{
 				m_d3d11Elements[i] = m_elements[i].GetD3D11InputElement();

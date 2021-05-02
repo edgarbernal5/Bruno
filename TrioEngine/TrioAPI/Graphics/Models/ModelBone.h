@@ -23,7 +23,7 @@ namespace TrioEngine
 		friend class ModelReader;
 
 	private:
-		Matrix m_Transform;
+		Matrix m_transform;
 		ModelBone* m_parent;
 
 		std::vector<ModelBone*> m_children;

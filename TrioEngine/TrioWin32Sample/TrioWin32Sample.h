@@ -17,10 +17,32 @@
 
 #include "Math/MathVector.h"
 
+//#pragma comment(lib,"TrioApi.lib")
+
 using namespace TrioEngine;
 
 namespace TrioWin32
 {
+	//int s_componentCounter;
+	//template <class T>
+	//int GetId()
+	//{
+	//	static int s_componentId = s_componentCounter++;
+	//	return s_componentId;
+	//}
+
+	//struct TransformComponent
+	//{
+	//	float position{ 1.0f };
+	//	float rotation{ 2.0f };
+	//};
+
+	//struct NameComponent
+	//{
+	//	std::string name;
+	//};
+
+
 	class DemoGame : public Game
 	{
 	public:

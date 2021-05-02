@@ -3,6 +3,7 @@ using EsteroFramework.Graphics;
 using EsteroFramework.Graphics.Editor;
 using System;
 using TrioApi.Net.Graphics.Core;
+using TrioApi.Net.Renderer;
 
 namespace EsteroFramework.Editor.Graphics
 {
@@ -20,6 +21,19 @@ namespace EsteroFramework.Editor.Graphics
             }
         }
         private GridMesh m_gridMesh;
+
+        public RenderPath RenderPath
+        {
+            get
+            {
+                return m_renderPath;
+            }
+            set
+            {
+                m_renderPath = value;
+            }
+        }
+        private RenderPath m_renderPath;
 
         public EditorGameGraphicsScreen() 
             : base()

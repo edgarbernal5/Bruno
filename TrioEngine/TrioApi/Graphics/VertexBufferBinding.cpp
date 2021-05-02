@@ -3,7 +3,6 @@
 
 namespace TrioEngine
 {
-
 	VertexBufferBindings::VertexBufferBindings() :
 		
 		m_n(0),

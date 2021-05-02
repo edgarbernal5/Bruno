@@ -18,7 +18,7 @@
 
 namespace TrioEngine
 {
-	BuildCoordinator::BuildCoordinator(BuildCoordinatorSettings settings, TimestampCache* timestampCache) :
+	BuildCoordinator::BuildCoordinator(BuildCoordinatorSettings& settings, TimestampCache* timestampCache) :
 		m_importerManager(nullptr), m_processorManager(nullptr), m_buildItems(nullptr), m_buildItemsChanged(false),
 		m_settings(settings)
 	{

@@ -70,6 +70,6 @@ namespace TrioEngine
 	{
 		EffectLoader loader(this);
 
-		loader.LoadEffect(filename);
+		loader.LoadFromFile(filename);
 	}
 }

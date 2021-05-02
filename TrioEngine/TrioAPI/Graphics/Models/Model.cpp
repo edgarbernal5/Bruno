@@ -1,10 +1,6 @@
 #include "stdafx.h"
 #include "Model.h"
 
-//#include <assimp/Importer.hpp>
-//#include <assimp/scene.h>
-//#include <assimp/postprocess.h>
-
 #include "Graphics/GraphicsDevice.h"
 #include "ModelMeshPart.h"
 #include "ModelMesh.h"
@@ -14,7 +10,9 @@
 
 namespace TrioEngine
 {
-	Model::Model(GraphicsDevice* device) : m_device(device),m_root(nullptr)
+	Model::Model(GraphicsDevice* device) : 
+		m_device(device), 
+		m_root(nullptr)
 	{
 	}
 
@@ -25,9 +23,11 @@ namespace TrioEngine
 
 	void Model::Draw()
 	{
-		for (size_t i = 0; i < m_modelMeshs.size(); i++)
+		auto meshCount = m_modelMeshes.size();
+
+		for (size_t i = 0; i < meshCount; i++)
 		{
-			ModelMesh* mesh = m_modelMeshs[i];
+			ModelMesh* mesh = m_modelMeshes[i];
 			for (size_t j = 0; j < mesh->GetModelMeshParts().size(); j++)
 			{
 				ModelMeshPart* meshPart = mesh->GetModelMeshParts()[j];

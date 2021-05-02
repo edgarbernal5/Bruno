@@ -222,7 +222,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Component.h" />
     <ClInclude Include="Content\ContentManager.h" />
     <ClInclude Include="Content\ContentReader.h" />
     <ClInclude Include="Content\ContentTypeReader.h" />
@@ -269,12 +268,17 @@
     <ClInclude Include="Content\Pipeline\Processors\ModelMeshPartContent.h" />
     <ClInclude Include="Content\Pipeline\Processors\ModelProcessor.h" />
     <ClInclude Include="Content\Pipeline\Processors\ProcessorManager.h" />
+    <ClInclude Include="Content\Pipeline\Processors\SceneContent.h" />
+    <ClInclude Include="Content\Pipeline\Processors\SceneMeshContent.h" />
+    <ClInclude Include="Content\Pipeline\Processors\SceneModelProcessor.h" />
+    <ClInclude Include="Content\Pipeline\Processors\SceneSubMeshContent.h" />
     <ClInclude Include="Content\Pipeline\Processors\TextureProcessor.h" />
     <ClInclude Include="Content\Pipeline\Readers\EffectReader.h" />
     <ClInclude Include="Content\Pipeline\Readers\ExternalReferenceReader.h" />
     <ClInclude Include="Content\Pipeline\Readers\IndexCollectionReader.h" />
     <ClInclude Include="Content\Pipeline\Readers\MaterialReader.h" />
     <ClInclude Include="Content\Pipeline\Readers\ModelReader.h" />
+    <ClInclude Include="Content\Pipeline\Readers\SceneReader.h" />
     <ClInclude Include="Content\Pipeline\Readers\Texture2DReader.h" />
     <ClInclude Include="Content\Pipeline\Readers\VertexBufferReader.h" />
     <ClInclude Include="Content\Pipeline\Serialization\ContentCompiler.h" />
@@ -286,6 +290,7 @@
     <ClInclude Include="Content\Pipeline\Serialization\IndexCollectionWriter.h" />
     <ClInclude Include="Content\Pipeline\Serialization\MaterialWriter.h" />
     <ClInclude Include="Content\Pipeline\Serialization\ModelWriter.h" />
+    <ClInclude Include="Content\Pipeline\Serialization\SceneWriter.h" />
     <ClInclude Include="Content\Pipeline\Serialization\Texture2DWriter.h" />
     <ClInclude Include="Content\Pipeline\Serialization\VertexBufferWriter.h" />
     <ClInclude Include="Content\Pipeline\Tasks\BuildCoordinator.h" />
@@ -294,7 +299,15 @@
     <ClInclude Include="Content\Pipeline\Tasks\BuildItemCollection.h" />
     <ClInclude Include="Content\Pipeline\Tasks\BuildRequest.h" />
     <ClInclude Include="Content\Pipeline\Tasks\TimestampCache.h" />
-    <ClInclude Include="DataTypes\Array.h" />
+    <ClInclude Include="Ecs\ComponentManager.h" />
+    <ClInclude Include="Containers\Array.h" />
+    <ClInclude Include="Ecs\Components.h" />
+    <ClInclude Include="Ecs\Components\HierarchyComponent.h" />
+    <ClInclude Include="Ecs\Components\MaterialComponent.h" />
+    <ClInclude Include="Ecs\Components\MeshComponent.h" />
+    <ClInclude Include="Ecs\Components\NameComponent.h" />
+    <ClInclude Include="Ecs\Components\TransformComponent.h" />
+    <ClInclude Include="Ecs\Entity.h" />
     <ClInclude Include="Errors\ContentPipelineException.h" />
     <ClInclude Include="Errors\GameException.h" />
     <ClInclude Include="Event.h" />
@@ -310,7 +323,6 @@
     <ClInclude Include="FX\StringPool.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameHost.h" />
-    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameServiceContainer.h" />
     <ClInclude Include="GameWindow.h" />
     <ClInclude Include="Graphics\BindFlags.h" />
@@ -413,12 +425,17 @@
     <ClInclude Include="Memory\BitCopier.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PlatformDirectives.h" />
+    <ClInclude Include="Renderer\Camera.h" />
+    <ClInclude Include="Renderer\FrameCulling.h" />
+    <ClInclude Include="Renderer\Renderer.h" />
+    <ClInclude Include="Renderer\RenderPass.h" />
+    <ClInclude Include="Renderer\RenderPaths\RenderPath.h" />
+    <ClInclude Include="Renderer\RenderPaths\RenderPathForward.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StepTimer.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Transform.h" />
     <ClInclude Include="TrioApi.h" />
     <ClInclude Include="TrioApiRequisites.h" />
     <ClInclude Include="Utils\Hash.h" />
@@ -428,7 +445,6 @@
     <ClInclude Include="WindowsGameWindow.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Component.cpp" />
     <ClCompile Include="Content\ContentManager.cpp" />
     <ClCompile Include="Content\ContentReader.cpp" />
     <ClCompile Include="Content\ContentTypeReaderManager.cpp" />
@@ -466,12 +482,17 @@
     <ClCompile Include="Content\Pipeline\Processors\ModelMeshPartContent.cpp" />
     <ClCompile Include="Content\Pipeline\Processors\ModelProcessor.cpp" />
     <ClCompile Include="Content\Pipeline\Processors\ProcessorManager.cpp" />
+    <ClCompile Include="Content\Pipeline\Processors\SceneContent.cpp" />
+    <ClCompile Include="Content\Pipeline\Processors\SceneMeshContent.cpp" />
+    <ClCompile Include="Content\Pipeline\Processors\SceneModelProcessor.cpp" />
+    <ClCompile Include="Content\Pipeline\Processors\SceneSubMeshContent.cpp" />
     <ClCompile Include="Content\Pipeline\Processors\TextureProcessor.cpp" />
     <ClCompile Include="Content\Pipeline\Readers\EffectReader.cpp" />
     <ClCompile Include="Content\Pipeline\Readers\ExternalReferenceReader.cpp" />
     <ClCompile Include="Content\Pipeline\Readers\IndexCollectionReader.cpp" />
     <ClCompile Include="Content\Pipeline\Readers\MaterialReader.cpp" />
     <ClCompile Include="Content\Pipeline\Readers\ModelReader.cpp" />
+    <ClCompile Include="Content\Pipeline\Readers\SceneReader.cpp" />
     <ClCompile Include="Content\Pipeline\Readers\Texture2DReader.cpp" />
     <ClCompile Include="Content\Pipeline\Readers\VertexBufferReader.cpp" />
     <ClCompile Include="Content\Pipeline\Serialization\ContentCompiler.cpp" />
@@ -482,6 +503,7 @@
     <ClCompile Include="Content\Pipeline\Serialization\IndexCollectionWriter.cpp" />
     <ClCompile Include="Content\Pipeline\Serialization\MaterialWriter.cpp" />
     <ClCompile Include="Content\Pipeline\Serialization\ModelWriter.cpp" />
+    <ClCompile Include="Content\Pipeline\Serialization\SceneWriter.cpp" />
     <ClCompile Include="Content\Pipeline\Serialization\Texture2DWriter.cpp" />
     <ClCompile Include="Content\Pipeline\Serialization\VertexBufferWriter.cpp" />
     <ClCompile Include="Content\Pipeline\Tasks\BuildCoordinator.cpp" />
@@ -489,6 +511,7 @@
     <ClCompile Include="Content\Pipeline\Tasks\BuildItemCollection.cpp" />
     <ClCompile Include="Content\Pipeline\Tasks\BuildRequest.cpp" />
     <ClCompile Include="Content\Pipeline\Tasks\TimestampCache.cpp" />
+    <ClCompile Include="Ecs\ComponentManager.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Errors\ContentPipelineException.cpp" />
     <ClCompile Include="Errors\GameException.cpp" />
@@ -503,7 +526,6 @@
     <ClCompile Include="FX\StringPool.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameHost.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameServiceContainer.cpp" />
     <ClCompile Include="Graphics\BlendState.cpp" />
     <ClCompile Include="Graphics\ConstantBuffer.cpp" />
@@ -560,7 +582,8 @@
     <ClCompile Include="IO\MemoryStream.cpp" />
     <ClCompile Include="IO\Path.cpp" />
     <ClCompile Include="Math\MathVector.cpp" />
-    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Renderer\Renderer.cpp" />
+    <ClCompile Include="Renderer\RenderPaths\RenderPathForward.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -571,7 +594,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TrioApi.cpp" />
     <ClCompile Include="Utils\Hash.cpp" />
     <ClCompile Include="Utils\StringUtility.cpp" />

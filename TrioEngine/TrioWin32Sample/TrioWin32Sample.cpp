@@ -8,12 +8,17 @@
 #include "Graphics/EffectParameter.h"
 #include "Graphics/EffectTechnique.h"
 #include "Graphics/EffectPass.h"
+#include "Graphics/Models/Model.h"
 #include "Graphics/GraphicsDeviceManager.h"
 #include "Graphics/TextureCollection.h"
 #include "Graphics/DepthStencilState.h"
 
 #include "Graphics/Texture2D.h"
 #include "Utils/TextureLoader.h"
+
+#include "Content/Pipeline/Tasks/BuildCoordinator.h"
+#include "Content/ContentManager.h"
+//#include "Scene.h"
 
 namespace TrioWin32
 {
@@ -23,11 +28,28 @@ namespace TrioWin32
 		mRadius = 5.0f;
 		GraphicsDeviceManager* graphicsManager = new GraphicsDeviceManager(this);
 		graphicsManager->SetDepthStencilFormat(DepthFormat::Depth32);
+
+		//int aa = GetId<TransformComponent>();
+		//int aa2 = GetId<TransformComponent>();
+		//int aa3 = GetId<NameComponent>();
 	}
 
 	void DemoGame::Initialize()
 	{
 		Game::Initialize();
+
+		BuildCoordinatorSettings settings;
+		BuildCoordinator builder(settings, nullptr);
+
+		std::string modelFilename = "D:/Edgar/Documentos/Proyectos/CG/TrioEngineGit/Models/Car/Car.fbx";
+		std::string modelPath = "Car.fbx";
+		builder.RequestBuild(modelFilename, modelPath, "ModelImporter", "ModelProcessor", nullptr);
+		builder.RunTheBuild();
+
+		ContentManager contentManager(GetGraphicsDevice(), settings.GetOutputDirectory());
+		Model* model = contentManager.Load<Model>(modelPath);
+		GetScene()->LoadFromModel(model);
+		//Scene::GetActiveScene()->LoadFromModel(model);
 		Magic();
 	}
 
@@ -137,7 +159,7 @@ namespace TrioWin32
 
 		VertexPositionColor gridVertices[totalVertices];
 		//Color colorWhite(1, 1, 1);
-		ColorRGBA8 colorWhite=0xffffffff;
+		ColorRGBA8 colorWhite = 0xffffffff;
 		for (int i = 0; i < m_gridSize; i++)
 		{
 			auto positionFront = Vector3(i - m_gridSize * 0.5f, 0.0f, -m_gridSize * 0.5f);
@@ -195,24 +217,17 @@ namespace TrioWin32
 		device->SetRasterizerState(RasterizerState::CullNone);
 		//device->SetSamplerState(0, SamplerState::LinearWrap);
 
-		Matrix view;
-		Matrix proj;
-		Matrix viewProj;
+		Camera& camera = *Scene::GetCamera();
+		Matrix viewMatrix = Matrix::CreateLookAt(camera.GetPosition(), camera.GetTarget(), camera.GetUp());
+		Matrix projectionMatrix = Matrix::CreatePerspectiveFieldOfView(camera.GetFieldOfView(), camera.GetAspectRatio(), camera.GetNearPlane(), camera.GetFarPlane());
+		Matrix viewProjection = viewMatrix * projectionMatrix;
 
-		float ratio = (float)device->GetPresentationParameters().GetBackBufferWidth() / device->GetPresentationParameters().GetBackBufferHeight();
-		proj = Matrix::CreatePerspectiveFieldOfView(1.5708, ratio, 0.5f, 100.0f);
-
-		Vector3 zero(0, 0, 0);
-		Vector3 up(0, 1, 0);
-
-		view = Matrix::CreateLookAt(Vector3(5.0f, 5.0f, 5.0f), zero, up);
-
-		viewProj = view * proj;
-
-		m_gridEffect->GetParameters()["gWorldViewProj"]->SetValue(viewProj);
+		m_gridEffect->GetParameters()["gWorldViewProj"]->SetValue(viewProjection);
 		m_gridEffect->GetTechniques()[0]->GetPasses()[0]->Apply();
 
 		device->DrawIndexedPrimitives(PrimitiveType::LineList, 0, 0, m_gridSize);
+
+		Game::Draw(timer);
 	}
 
 	void DemoGame::Update(StepTimer const& timer)

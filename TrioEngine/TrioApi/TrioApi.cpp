@@ -25,6 +25,9 @@
 #include "Graphics/RenderTarget2D.h"
 
 #include "Graphics/Models/Model.h"
+#include "Graphics/Models/ModelMesh.h"
+#include "Graphics/Models/ModelMeshPart.h"
+
 #include "Scene.h"
 #include "Transform.h"
 #include "GameObject.h"
@@ -32,6 +35,9 @@
 
 #include "Content/Pipeline/Tasks/BuildCoordinator.h"
 #include "Content/ContentManager.h"
+
+#include "Renderer/Renderer.h"
+#include "Renderer/RenderPaths/RenderPathForward.h"
 
 namespace TrioDLL {
 	char* AllocateMemoryForString(const char* source) {
@@ -200,6 +206,7 @@ ContentManager* ContentManager_Ctor(GraphicsDevice* device)
 {
 	return new ContentManager(device);
 }
+
 ContentManager* ContentManager_Ctor2(GraphicsDevice* device, const char* rootDirectory)
 {
 	return new ContentManager(device, rootDirectory);
@@ -331,18 +338,7 @@ void EffectTechnique_GetPasses(EffectTechnique* technique, EffectPass*** passes,
 
 char* EffectTechnique_GetName(EffectTechnique* technique)
 {
-	const char *szSampleString = technique->GetName();
-
-	ULONG ulSize = strlen(szSampleString) + sizeof(char);
-	char* pszReturn = NULL;
-
-	pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
-	// Copy the contents of szSampleString
-	// to the memory pointed to by pszReturn.
-	strcpy_s(pszReturn, ulSize, szSampleString);
-	// Return pszReturn.
-
-	return pszReturn;
+	return TrioDLL::AllocateMemoryForString(technique->GetName());
 }
 
 /*
@@ -366,35 +362,35 @@ void Game_Tick(Game* game)
 /*
 GameObject
 */
-GameObject* GameObject_Create(const char* name)
-{
-	return GameObject::Create(name).get();
-}
-
-void GameObject_Destroy(GameObject *gameObject)
-{
-	//GameObject::Destroy(std::make_shared<GameObject>(gameObject));
-}
-
-Transform* GameObject_GetTransform(GameObject* gameObject)
-{
-	return gameObject->GetTransform().get();
-}
-
-bool GameObject_IsActiveInTree(GameObject* gameObject)
-{
-	return gameObject->IsActiveInTree();
-}
-
-bool GameObject_IsActiveSelf(GameObject* gameObject)
-{
-	return gameObject->IsActiveSelf();
-}
-
-void GameObject_SetActiveSelf(GameObject* gameObject, bool active)
-{
-	gameObject->SetActiveSelf(active);
-}
+//GameObject* GameObject_Create(const char* name)
+//{
+//	return GameObject::Create(name).get();
+//}
+//
+//void GameObject_Destroy(GameObject *gameObject)
+//{
+//	//GameObject::Destroy(std::make_shared<GameObject>(gameObject));
+//}
+//
+//Transform* GameObject_GetTransform(GameObject* gameObject)
+//{
+//	return gameObject->GetTransform().get();
+//}
+//
+//bool GameObject_IsActiveInTree(GameObject* gameObject)
+//{
+//	return gameObject->IsActiveInTree();
+//}
+//
+//bool GameObject_IsActiveSelf(GameObject* gameObject)
+//{
+//	return gameObject->IsActiveSelf();
+//}
+//
+//void GameObject_SetActiveSelf(GameObject* gameObject, bool active)
+//{
+//	gameObject->SetActiveSelf(active);
+//}
 
 /*
 GraphicsAdapter
@@ -638,38 +634,148 @@ void Model_Dtor(Model * model)
 	delete model;
 }
 
+void Model_GetModelMeshes(Model * model, ModelMesh ***modelMeshes, int* size)
+{
+	auto list = model->GetModelMeshes();
+	auto n = list.size();
+
+	*size = n;
+	if (n > 0)
+	{
+		ModelMesh** newArray = (ModelMesh**)CoTaskMemAlloc(sizeof(ModelMesh*) * n);
+		for (size_t i = 0; i < n; i++)
+		{
+			newArray[i] = list[i];
+		}
+		*modelMeshes = newArray;
+	}
+}
+
 void Model_Draw(Model* model)
 {
 	model->Draw();
 }
 
 /*
+ModelMesh
+*/
+void ModelMesh_Dtor(ModelMesh* modelMesh)
+{
+	delete modelMesh;
+}
+
+char* ModelMesh_GetName(ModelMesh* modelMesh)
+{
+	return TrioDLL::AllocateMemoryForString(modelMesh->GetName());
+}
+
+void ModelMesh_GetModelMeshParts(ModelMesh * modelMesh, ModelMeshPart * **modelMeshParts, int* size)
+{
+	auto list = modelMesh->GetModelMeshParts();
+	auto n = list.size();
+
+	*size = n;
+	if (n > 0)
+	{
+		ModelMeshPart** newArray = (ModelMeshPart**)CoTaskMemAlloc(sizeof(ModelMeshPart*) * n);
+		for (size_t i = 0; i < n; i++)
+		{
+			newArray[i] = list[i];
+		}
+		*modelMeshParts = newArray;
+	}
+}
+
+/*
+ModelMeshPart
+*/
+void ModelMeshPart_Dtor(ModelMeshPart* modelMeshPart)
+{
+	delete modelMeshPart;
+}
+
+VertexBuffer* ModelMeshPart_GetVertexBuffer(ModelMeshPart* modelMeshPart)
+{
+	return modelMeshPart->GetVertexBuffer();
+}
+
+IndexBuffer * ModelMeshPart_GetIndexBuffer(ModelMeshPart * modelMeshPart)
+{
+	return modelMeshPart->GetIndexBuffer();
+}
+
+Material * ModelMeshPart_GetMaterial(ModelMeshPart * modelMeshPart)
+{
+	return modelMeshPart->GetMaterial();
+}
+
+uint32_t ModelMeshPart_GetVertexCount(ModelMeshPart * modelMeshPart)
+{
+	return modelMeshPart->GetVertexCount();
+}
+
+uint32_t ModelMeshPart_GetPrimitiveCount(ModelMeshPart * modelMeshPart)
+{
+	return modelMeshPart->GetPrimitiveCount();
+}
+
+uint32_t ModelMeshPart_GetVertexOffset(ModelMeshPart * modelMeshPart)
+{
+	return modelMeshPart->GetVertexOffset();
+}
+
+uint32_t ModelMeshPart_GetStartIndex(ModelMeshPart * modelMeshPart)
+{
+	return modelMeshPart->GetStartIndex();
+}
+
+PrimitiveType ModelMeshPart_GetPrimitiveType(ModelMeshPart* modelMeshPart)
+{
+	return modelMeshPart->GetPrimitiveType();
+}
+
+/*
 Object
 */
-int Object_GetId(Object* object)
+//int Object_GetId(Object* object)
+//{
+//	return object->GetId();
+//}
+//
+//char* Object_GetName(Object* object)
+//{
+//	return TrioDLL::AllocateMemoryForString(object->GetName().c_str());
+//}
+//
+//void Object_SetName(Object* object, const char* name)
+//{
+//	object->SetName(name);
+//}
+
+/*
+Renderer
+*/
+void Renderer_DrawScene(Camera camera)
 {
-	return object->GetId();
+
 }
 
-char* Object_GetName(Object* object)
+void Renderer_Initialize(GraphicsDevice* device)
 {
-	const char *szSampleString = object->GetName().c_str();
-
-	ULONG ulSize = strlen(szSampleString) + sizeof(char);
-	char* pszReturn = NULL;
-
-	pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
-	// Copy the contents of szSampleString
-	// to the memory pointed to by pszReturn.
-	strcpy_s(pszReturn, ulSize, szSampleString);
-	// Return pszReturn.
-
-	return pszReturn;
+	Renderer::Initialize(device);
 }
 
-void Object_SetName(Object* object, const char* name)
+void UpdatePerFrameData()
 {
-	object->SetName(name);
+
+}
+
+/*
+RenderPathForward
+*/
+RenderPathForward* RenderPathForward_Ctor()
+{
+	return new RenderPathForward();
 }
 
 /*
@@ -731,7 +837,7 @@ void Scene_Dtor(Scene* scene) {
 
 Scene* Scene_GetActiveScene()
 {
-	return Scene::ActiveScene();
+	return Scene::GetActiveScene();
 }
 
 void Scene_Update(Scene * scene)
@@ -742,75 +848,75 @@ void Scene_Update(Scene * scene)
 /*
 Transform
 */
-Transform* Transform_GetParent(Transform* transform)
-{
-	return transform->GetParent().get();
-}
-
-void Transform_GetPosition(Transform* transform, Vector3 *position)
-{
-	*position = transform->GetPosition();
-}
-
-void Transform_GetRotation(Transform* transform, Quaternion *rotation)
-{
-	*rotation = transform->GetRotation();
-}
-
-void Transform_GetScale(Transform* transform, Vector3 *scale)
-{
-	*scale = transform->GetScale();
-}
-
-void Transform_SetPosition(Transform* transform, Vector3 *position)
-{
-	transform->SetPosition(*position);
-}
-
-void Transform_SetRotation(Transform* transform, Quaternion *rotation)
-{
-	transform->SetRotation(*rotation);
-}
-
-void Transform_SetScale(Transform* transform, Vector3 *scale)
-{
-	transform->SetScale(*scale);
-}
-
-void Transform_GetLocalPosition(Transform* transform, Vector3 *position)
-{
-	*position = transform->GetLocalPosition();
-}
-
-void Transform_GetLocalRotation(Transform* transform, Quaternion *rotation)
-{
-	*rotation = transform->GetRotation();
-}
-
-void Transform_GetLocalScale(Transform* transform, Vector3 *scale)
-{
-	*scale = transform->GetLocalScale();
-}
-
-void Transform_SetLocalPosition(Transform* transform, Vector3 *position)
-{
-	transform->SetLocalPosition(*position);
-}
-
-void Transform_SetLocalRotation(Transform* transform, Quaternion *rotation)
-{
-	transform->SetLocalRotation(*rotation);
-}
-
-void Transform_SetLocalScale(Transform* transform, Vector3 *scale)
-{
-	transform->SetLocalScale(*scale);
-}
-
-void Transform_SetParent(Transform* transform, Transform* parent)
-{
-	transform->SetParent(std::shared_ptr<Transform>(parent));
-}
+//Transform* Transform_GetParent(Transform* transform)
+//{
+//	return transform->GetParent().get();
+//}
+//
+//void Transform_GetPosition(Transform* transform, Vector3 *position)
+//{
+//	*position = transform->GetPosition();
+//}
+//
+//void Transform_GetRotation(Transform* transform, Quaternion *rotation)
+//{
+//	*rotation = transform->GetRotation();
+//}
+//
+//void Transform_GetScale(Transform* transform, Vector3 *scale)
+//{
+//	*scale = transform->GetScale();
+//}
+//
+//void Transform_SetPosition(Transform* transform, Vector3 *position)
+//{
+//	transform->SetPosition(*position);
+//}
+//
+//void Transform_SetRotation(Transform* transform, Quaternion *rotation)
+//{
+//	transform->SetRotation(*rotation);
+//}
+//
+//void Transform_SetScale(Transform* transform, Vector3 *scale)
+//{
+//	transform->SetScale(*scale);
+//}
+//
+//void Transform_GetLocalPosition(Transform* transform, Vector3 *position)
+//{
+//	*position = transform->GetLocalPosition();
+//}
+//
+//void Transform_GetLocalRotation(Transform* transform, Quaternion *rotation)
+//{
+//	*rotation = transform->GetRotation();
+//}
+//
+//void Transform_GetLocalScale(Transform* transform, Vector3 *scale)
+//{
+//	*scale = transform->GetLocalScale();
+//}
+//
+//void Transform_SetLocalPosition(Transform* transform, Vector3 *position)
+//{
+//	transform->SetLocalPosition(*position);
+//}
+//
+//void Transform_SetLocalRotation(Transform* transform, Quaternion *rotation)
+//{
+//	transform->SetLocalRotation(*rotation);
+//}
+//
+//void Transform_SetLocalScale(Transform* transform, Vector3 *scale)
+//{
+//	transform->SetLocalScale(*scale);
+//}
+//
+//void Transform_SetParent(Transform* transform, Transform* parent)
+//{
+//	transform->SetParent(std::shared_ptr<Transform>(parent));
+//}
 
 /*
 Texture2D

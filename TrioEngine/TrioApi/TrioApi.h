@@ -3,9 +3,37 @@
 #include "TrioApiRequisites.h"
 
 #include "Content/Pipeline/Tasks/BuildCoordinatorSettings.h"
+#include "Renderer/Camera.h"
 
 using namespace TrioEngine;
 
+namespace TrioEngine {
+
+	class Game;
+	class Effect;
+	class EffectTechnique;
+	class EffectParameter;
+	class EffectPass;
+	class Scene;
+	class Transform;
+	class GameObject;
+	class Component;
+	class Object;
+	class Texture2D;
+	class RenderTarget2D;
+	class Model;
+	class ModelMesh;
+	class ModelMeshPart;
+	class Material;
+
+	class ContentManager;
+	//class ContentReader;
+
+	class BuildCoordinator;
+	class TextureContent;
+
+	class RenderPathForward;
+}
 
 /*
 DepthStencilState
@@ -96,12 +124,12 @@ extern "C" TRIO_API_EXPORT void __stdcall Game_Tick(Game* game);
 /*
 GameObject
 */
-extern "C" TRIO_API_EXPORT GameObject* __stdcall GameObject_Create(const char* name);
-extern "C" TRIO_API_EXPORT void __stdcall GameObject_Destroy(GameObject *gameObject);
-extern "C" TRIO_API_EXPORT Transform* __stdcall GameObject_GetTransform(GameObject* gameObject);
-extern "C" TRIO_API_EXPORT bool __stdcall GameObject_IsActiveInTree(GameObject* gameObject);
-extern "C" TRIO_API_EXPORT bool __stdcall GameObject_IsActiveSelf(GameObject* gameObject);
-extern "C" TRIO_API_EXPORT void __stdcall GameObject_SetActiveSelf(GameObject* gameObject, bool active);
+//extern "C" TRIO_API_EXPORT GameObject* __stdcall GameObject_Create(const char* name);
+//extern "C" TRIO_API_EXPORT void __stdcall GameObject_Destroy(GameObject *gameObject);
+//extern "C" TRIO_API_EXPORT Transform* __stdcall GameObject_GetTransform(GameObject* gameObject);
+//extern "C" TRIO_API_EXPORT bool __stdcall GameObject_IsActiveInTree(GameObject* gameObject);
+//extern "C" TRIO_API_EXPORT bool __stdcall GameObject_IsActiveSelf(GameObject* gameObject);
+//extern "C" TRIO_API_EXPORT void __stdcall GameObject_SetActiveSelf(GameObject* gameObject, bool active);
 
 /*
 GraphicsAdapter
@@ -165,14 +193,49 @@ Model
 */
 extern "C" TRIO_API_EXPORT Model * __stdcall Model_Ctor(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT void __stdcall Model_Dtor(Model * model);
+extern "C" TRIO_API_EXPORT void __stdcall Model_GetModelMeshes(Model * model, ModelMesh * **modelMeshes, int* size);
 extern "C" TRIO_API_EXPORT void __stdcall Model_Draw(Model * model);
+
+/*
+ModelMesh
+*/
+//extern "C" TRIO_API_EXPORT Model * __stdcall ModelMesh_Ctor(GraphicsDevice * device);
+extern "C" TRIO_API_EXPORT void __stdcall ModelMesh_Dtor(ModelMesh * modelMesh);
+extern "C" TRIO_API_EXPORT char* __stdcall ModelMesh_GetName(ModelMesh * modelMesh);
+extern "C" TRIO_API_EXPORT void __stdcall ModelMesh_GetModelMeshParts(ModelMesh * modelMesh, ModelMeshPart * **modelMeshParts, int* size);
+
+/*
+ModelMeshPart
+*/
+//extern "C" TRIO_API_EXPORT Model * __stdcall ModelMesh_Ctor(GraphicsDevice * device);
+extern "C" TRIO_API_EXPORT void __stdcall ModelMeshPart_Dtor(ModelMeshPart * modelMeshPart);
+extern "C" TRIO_API_EXPORT VertexBuffer* __stdcall ModelMeshPart_GetVertexBuffer(ModelMeshPart * modelMeshPart);
+extern "C" TRIO_API_EXPORT IndexBuffer * __stdcall ModelMeshPart_GetIndexBuffer(ModelMeshPart * modelMeshPart);
+extern "C" TRIO_API_EXPORT Material * __stdcall ModelMeshPart_GetMaterial(ModelMeshPart * modelMeshPart);
+extern "C" TRIO_API_EXPORT uint32_t __stdcall ModelMeshPart_GetVertexCount(ModelMeshPart * modelMeshPart);
+extern "C" TRIO_API_EXPORT uint32_t __stdcall ModelMeshPart_GetPrimitiveCount(ModelMeshPart * modelMeshPart);
+extern "C" TRIO_API_EXPORT uint32_t __stdcall ModelMeshPart_GetVertexOffset(ModelMeshPart * modelMeshPart);
+extern "C" TRIO_API_EXPORT uint32_t __stdcall ModelMeshPart_GetStartIndex(ModelMeshPart * modelMeshPart);
+extern "C" TRIO_API_EXPORT PrimitiveType __stdcall ModelMeshPart_GetPrimitiveType(ModelMeshPart * modelMeshPart);
 
 /*
 Object
 */
-extern "C" TRIO_API_EXPORT int __stdcall Object_GetId(Object* object);
-extern "C" TRIO_API_EXPORT char* __stdcall Object_GetName(Object* object);
-extern "C" TRIO_API_EXPORT void __stdcall Object_SetName(Object* object, const char* name);
+//extern "C" TRIO_API_EXPORT int __stdcall Object_GetId(Object* object);
+//extern "C" TRIO_API_EXPORT char* __stdcall Object_GetName(Object* object);
+//extern "C" TRIO_API_EXPORT void __stdcall Object_SetName(Object* object, const char* name);
+
+/*
+Renderer
+*/
+extern "C" TRIO_API_EXPORT void __stdcall Renderer_DrawScene(Camera camera);
+extern "C" TRIO_API_EXPORT void __stdcall Renderer_Initialize(GraphicsDevice* device);
+extern "C" TRIO_API_EXPORT void __stdcall UpdatePerFrameData();
+
+/*
+RenderPathForward
+*/
+extern "C" TRIO_API_EXPORT RenderPathForward * __stdcall RenderPathForward_Ctor();
 
 /*
 RenderTarget2D
@@ -201,21 +264,21 @@ extern "C" TRIO_API_EXPORT void __stdcall Scene_Update(Scene* scene);
 /*
 Transform
 */
-extern "C" TRIO_API_EXPORT Transform* __stdcall Transform_GetParent(Transform* transform);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_GetPosition(Transform* transform, Vector3 *position);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_GetRotation(Transform* transform, Quaternion *rotation);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_GetScale(Transform* transform, Vector3 *scale);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_GetLocalPosition(Transform* transform, Vector3 *position);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_GetLocalRotation(Transform* transform, Quaternion *rotation);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_GetLocalScale(Transform* transform, Vector3 *scale);
-
-extern "C" TRIO_API_EXPORT void __stdcall Transform_SetPosition(Transform* transform, Vector3 *position);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_SetRotation(Transform* transform, Quaternion *rotation);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_SetScale(Transform* transform, Vector3 *scale);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalPosition(Transform* transform, Vector3 *position);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalRotation(Transform* transform, Quaternion *rotation);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalScale(Transform* transform, Vector3 *scale);
-extern "C" TRIO_API_EXPORT void __stdcall Transform_SetParent(Transform* transform, Transform* parent);
+//extern "C" TRIO_API_EXPORT Transform* __stdcall Transform_GetParent(Transform* transform);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_GetPosition(Transform* transform, Vector3 *position);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_GetRotation(Transform* transform, Quaternion *rotation);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_GetScale(Transform* transform, Vector3 *scale);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_GetLocalPosition(Transform* transform, Vector3 *position);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_GetLocalRotation(Transform* transform, Quaternion *rotation);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_GetLocalScale(Transform* transform, Vector3 *scale);
+//
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_SetPosition(Transform* transform, Vector3 *position);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_SetRotation(Transform* transform, Quaternion *rotation);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_SetScale(Transform* transform, Vector3 *scale);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalPosition(Transform* transform, Vector3 *position);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalRotation(Transform* transform, Quaternion *rotation);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_SetLocalScale(Transform* transform, Vector3 *scale);
+//extern "C" TRIO_API_EXPORT void __stdcall Transform_SetParent(Transform* transform, Transform* parent);
 
 
 /*

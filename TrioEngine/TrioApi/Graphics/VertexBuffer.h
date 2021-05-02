@@ -19,6 +19,7 @@ namespace TrioEngine
 	class TRIO_API_EXPORT VertexBuffer
 	{
 	public:
+		VertexBuffer();
 		VertexBuffer(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount, ResourceUsage usage);
 		VertexBuffer(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount);
 		virtual ~VertexBuffer();

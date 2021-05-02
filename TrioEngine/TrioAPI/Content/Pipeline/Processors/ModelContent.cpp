@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "ModelContent.h"
 
-
 namespace TrioEngine
 {
 	ModelContent::ModelContent() :

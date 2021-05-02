@@ -48,10 +48,12 @@ namespace TrioEngine
 		{
 			return m_material;
 		}
+
 		inline VertexBufferContent* GetVertexBuffer()
 		{
 			return m_vertexBuffer;
 		}
+
 		inline IndexCollection* GetIndexBuffer()
 		{
 			return m_indexBuffer;

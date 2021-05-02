@@ -61,7 +61,7 @@ namespace TrioEngine
 			const ModelBone* bone = model->m_modelBones[i];
 			if (bone->m_parent == nullptr)
 			{
-				model->m_bonesMatrices[i] = bone->m_Transform;
+				model->m_bonesMatrices[i] = bone->m_transform;
 			}
 			else
 			{
@@ -73,7 +73,7 @@ namespace TrioEngine
 				XMStoreFloat4x4(&model->m_BonesMatrices[i], mult);
 				*/
 
-				model->m_bonesMatrices[i] = bone->m_Transform * model->m_bonesMatrices[bone->m_parent->m_index];
+				model->m_bonesMatrices[i] = bone->m_transform * model->m_bonesMatrices[bone->m_parent->m_index];
 			}
 		}
 	}
@@ -98,7 +98,7 @@ namespace TrioEngine
 			std::vector<ModelMeshPart*> meshParts = ReadMeshParts(input);
 			meshes[i] = new ModelMesh(name, parentBone, /*boundingSphere, boundingBox,*/ meshParts);
 		}
-		model->m_modelMeshs = meshes;
+		model->m_modelMeshes = meshes;
 	}
 	
 	std::vector<ModelMeshPart*> ModelReader::ReadMeshParts(ContentReader* input)
@@ -116,20 +116,20 @@ namespace TrioEngine
 			meshParts[i]->m_primitiveType = PrimitiveType::TriangleList;
 
 			int uniqueCopyOfI = i;
-			input->ReadSharedResource([=](ContentItem* vb)
+			input->ReadSharedResource([=](ContentItem* item)
 				{
-					meshParts[uniqueCopyOfI]->m_vertexBuffer = (VertexBuffer*)vb;
+					meshParts[uniqueCopyOfI]->m_vertexBuffer = (VertexBuffer*)item;
 				});
 
 			//input->ReadSharedResource([=](ContentItem* ib)
-			input->ReadSharedResource([meshParts, uniqueCopyOfI](ContentItem* ib)
+			input->ReadSharedResource([meshParts, uniqueCopyOfI](ContentItem* item)
 				{
-					meshParts[uniqueCopyOfI]->m_indexBuffer = (IndexBuffer*)ib;
+					meshParts[uniqueCopyOfI]->m_indexBuffer = (IndexBuffer*)item;
 				});
 
-			input->ReadSharedResource([=](ContentItem* ma)
+			input->ReadSharedResource([=](ContentItem* item)
 				{
-					Material* material = (Material*)ma;
+					Material* material = (Material*)item;
 
 					meshParts[uniqueCopyOfI]->m_material = material;
 
@@ -149,19 +149,19 @@ namespace TrioEngine
 
 	ModelBone* ModelReader::ReadBoneReference(Model* model, ContentReader* input)
 	{
-		int num2 = model->m_modelBones.size() + 1;
-		int num = 0;
-		if (num2 <= 0xff)
+		int totalBones = model->m_modelBones.size() + 1;
+		int boneId = 0;
+		if (totalBones <= 0xff)
 		{
-			num = input->BinaryReader::ReadByte();
+			boneId = input->ReadByte();
 		}
 		else
 		{
-			num = input->ReadInt32();
+			boneId = input->ReadInt32();
 		}
-		if (num != 0)
+		if (boneId != 0)
 		{
-			return model->m_modelBones[num - 1];
+			return model->m_modelBones[boneId - 1];
 		}
 		return nullptr;
 	}

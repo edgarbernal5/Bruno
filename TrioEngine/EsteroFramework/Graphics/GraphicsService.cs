@@ -3,6 +3,7 @@ using EsteroFramework.Editor.Graphics;
 using EsteroFramework.Graphics.Interop;
 using System.Collections.Generic;
 using TrioApi.Net.Graphics;
+using TrioApi.Net.Renderer;
 
 namespace EsteroFramework.Graphics
 {
@@ -25,6 +26,8 @@ namespace EsteroFramework.Graphics
 
             m_cachedScreens = new List<GameGraphicsScreen>();
             m_renderContext = new RenderContext();
+
+            Renderer.Initialize(graphicsDevice);
         }
 
         public void Render(IGameSurfaceTarget surfaceTarget, IList<GameGraphicsScreen> graphicsScreens)

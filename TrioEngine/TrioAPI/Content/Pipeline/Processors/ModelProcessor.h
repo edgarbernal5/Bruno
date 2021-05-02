@@ -3,6 +3,7 @@
 #include "TrioApiRequisites.h"
 
 #include "IContentProcessor.h"
+#include <vector>
 
 namespace TrioEngine
 {
@@ -29,7 +30,7 @@ namespace TrioEngine
 	private:
 		MaterialContent* ConvertMaterial(MaterialContent* material, ContentProcessorContext* context);
 		void ProcessGeometryUsingMaterial(MaterialContent* material, std::vector< GeometryContent*> & geometryList, ContentProcessorContext* context);
-		void GetFlattenNodes(NodeContent* input, std::vector<NodeContent*> &outputNodes);
+		void GetFlattenedNodes(NodeContent* input, std::vector<NodeContent*> &outputNodes);
 
 		ModelBoneContent* ProcessNode(NodeContent* node, ModelBoneContent* parent, std::vector< ModelBoneContent*>& boneList, std::vector< ModelMeshContent*>& meshList, ContentProcessorContext* context);
 		ModelMeshContent* ProcessMesh(MeshContent* mesh, ModelBoneContent* parent, ContentProcessorContext* context);

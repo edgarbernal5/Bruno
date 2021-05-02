@@ -54,6 +54,19 @@ namespace TrioEngine
 		}
 	}
 
+	void ModelWriter::WriteBoneIndex(ContentWriter* output, std::vector<ModelBoneContent*>& bones, ModelBoneContent* bone)
+	{
+		int totalBones = bones.size() + 1;
+		int boneId = (bone == nullptr) ? 0 : (bone->GetIndex() + 1);
+		if (totalBones <= 0xff)
+		{
+			output->WriteByte((uint8_t)boneId);
+			return;
+		}
+
+		output->WriteInt32(boneId);
+	}
+
 	void ModelWriter::WriteMeshes(ContentWriter* output, ModelContent* content)
 	{
 		auto meshes = content->m_meshes;
@@ -71,20 +84,6 @@ namespace TrioEngine
 			//output->Write(m_meshes[i]->GetBoundingBox().Max);
 
 			WriteMeshParts(output, meshes[i]->GetMeshParts());
-		}
-	}
-
-	void ModelWriter::WriteBoneIndex(ContentWriter* output, std::vector<ModelBoneContent*> &bones, ModelBoneContent* bone)
-	{
-		int num2 = bones.size() + 1;
-		int num = (bone == nullptr) ? 0 : (bone->GetIndex() + 1);
-		if (num2 <= 0xff)
-		{
-			output->WriteByte((uint8_t)num);
-		}
-		else
-		{
-			output->WriteInt32(num);
 		}
 	}
 

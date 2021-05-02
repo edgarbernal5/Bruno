@@ -5,6 +5,7 @@
 
 #include "Content/Pipeline/Processors/TextureProcessor.h"
 #include "Content/Pipeline/Processors/ModelProcessor.h"
+//#include "Content/Pipeline/Processors/SceneModelProcessor.h"
 #include "Content/Pipeline/Processors/MaterialProcessor.h"
 #include "Content/Pipeline/Processors/EffectProcessor.h"
 
@@ -22,6 +23,7 @@ namespace TrioEngine
 	void ProcessorManager::RegisterStandardTypes()
 	{
 		RegisterTypeProcessor<TextureProcessor>("TextureProcessor");
+		//RegisterTypeProcessor<SceneModelProcessor>("SceneModelProcessor");
 		RegisterTypeProcessor<ModelProcessor>("ModelProcessor");
 		RegisterTypeProcessor<MaterialProcessor>("MaterialProcessor");
 		RegisterTypeProcessor<EffectProcessor>("EffectProcessor");

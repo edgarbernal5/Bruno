@@ -20,9 +20,14 @@ namespace TrioEngine
 		{
 			return m_ModelMeshParts;
 		}
+
 		inline ModelBone* GetParentBone()
 		{
 			return m_parentBone;
+		}
+
+		const char* GetName() {
+			return m_name.c_str();
 		}
 
 		/*inline const BoundingSphere& GetBoundingSphere()

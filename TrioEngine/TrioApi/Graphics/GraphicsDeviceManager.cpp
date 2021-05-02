@@ -233,7 +233,7 @@ namespace TrioEngine
 		m_device = new GraphicsDevice(newInfo.Adapter, newInfo.Parameters);
 		m_device->DeviceLost += ([=]()
 		{
-
+			
 		});
 
 		DeviceCreated();

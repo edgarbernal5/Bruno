@@ -5,12 +5,16 @@
 #include "Graphics\IGraphicsDeviceService.h"
 #include "Graphics\GraphicsDevice.h"
 
+#include "Renderer\RenderPaths\RenderPathForward.h"
+#include "Renderer\Renderer.h"
+#include "Scene.h"
+
 namespace TrioEngine
 {
 	Game::Game() :
 		m_doneFirstUpdate(false),
 		m_doneFirstDraw(false),
-		m_inRun(false),
+		m_isRunning(false),
 
 		m_graphicsDevice(nullptr),
 		m_host(nullptr),
@@ -39,16 +43,19 @@ namespace TrioEngine
 
 		m_host->Activated += [=]()
 		{
-
 		};
 		m_host->Deactivated += [=]()
 		{
-
 		};
 
 		m_host->Resume += [=]()
 		{
 			m_timer.ResetElapsedTime();
+		};
+
+		m_host->GetWindow()->ClientSizeChanged += [=]() {
+			auto bounds = m_host->GetWindow()->GetClientBounds();
+			m_scene->OnWindowSizeChanged(bounds.width, bounds.height);
 		};
 	}
 
@@ -62,6 +69,11 @@ namespace TrioEngine
 		}
 	}
 
+	void Game::Draw(StepTimer const& timer)
+	{
+		m_renderPath->Render();
+	}
+
 	void Game::EndDraw()
 	{
 		if (m_graphicsDeviceManager)
@@ -72,6 +84,15 @@ namespace TrioEngine
 
 	void Game::Initialize()
 	{
+		Renderer::Initialize(m_graphicsDevice);
+
+		m_scene = new Scene();
+		Scene::SetActiveScene(m_scene);
+
+		auto bounds = m_host->GetWindow()->GetClientBounds();
+		m_scene->OnWindowSizeChanged(bounds.width, bounds.height);
+
+		m_renderPath = new RenderPathForward();
 	}
 
 	void Game::Run()
@@ -93,13 +114,13 @@ namespace TrioEngine
 			m_graphicsDevice = service->GetGraphicsDevice();
 		}
 		Initialize();
-		m_inRun = true;
+		m_isRunning = true;
 		Update(m_timer);
 		m_doneFirstUpdate = true;
 
 		if (useBlockingRun)
 		{
-			if (m_host != nullptr)
+			if (m_host)
 			{
 				m_host->Run();
 			}
@@ -111,7 +132,7 @@ namespace TrioEngine
 			return;
 		}
 
-		m_inRun = false;
+		m_isRunning = false;
 	}
 
 	void Game::Tick()
@@ -128,5 +149,7 @@ namespace TrioEngine
 	{
 		double dt = timer.GetElapsedSeconds();
 		double total = timer.GetTotalSeconds();
+
+		m_scene->Update();
 	}
 }

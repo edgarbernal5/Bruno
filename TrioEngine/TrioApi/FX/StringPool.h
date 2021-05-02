@@ -2,7 +2,7 @@
 
 #include "TrioApiRequisites.h"
 
-#include "../DataTypes/Array.h"
+#include "Containers/Array.h"
 
 namespace TrioFX
 {

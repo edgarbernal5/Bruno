@@ -24,7 +24,7 @@ namespace TrioEngine
 		//RegisterContentTypeWriter<EffectMaterialWriter>();
 		RegisterContentTypeWriter<ExternalReferenceWriter>();
 
-		for (int i = 0; i < m_TypeWriters.size(); i++)
+		for (int i = 0; i < m_typeWriters.size(); i++)
 		{
 			//m_TypeWriters[i]->Initialize(this);
 		}
@@ -36,9 +36,9 @@ namespace TrioEngine
 
 	ContentTypeWriter* ContentTypeWriterFactory::GetByWriterName(std::string const& writerName)
 	{
-		for (int i = 0; i < m_TypeWriters.size(); i++)
+		for (int i = 0; i < m_typeWriters.size(); i++)
 		{
-			ContentTypeWriter* writer = m_TypeWriters[i];
+			ContentTypeWriter* writer = m_typeWriters[i];
 			if (writer->GetWriterName() == writerName)
 			{
 				return writer;

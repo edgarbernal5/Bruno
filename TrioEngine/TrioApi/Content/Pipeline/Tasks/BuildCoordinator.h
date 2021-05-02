@@ -20,7 +20,7 @@ namespace TrioEngine
 	class TRIO_API_EXPORT BuildCoordinator
 	{
 	public:
-		BuildCoordinator(BuildCoordinatorSettings settings, TimestampCache* timestampCache);
+		BuildCoordinator(BuildCoordinatorSettings& settings, TimestampCache* timestampCache);
 		~BuildCoordinator();
 
 		void AddDependency(BuildItem* buildItem, std::string filename);
@@ -62,7 +62,7 @@ namespace TrioEngine
 
 		ContentCompiler *m_contentCompiler;
 
-		BuildCoordinatorSettings m_settings;
+		BuildCoordinatorSettings& m_settings;
 		BuildItemCollection *m_buildItems;
 		TimestampCache m_timestampCache;
 	};

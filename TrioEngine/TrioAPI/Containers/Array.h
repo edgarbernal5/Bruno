@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../FX/AssertFX.h"
-#include "../Memory/Allocator.h"
+#include "FX/AssertFX.h"
+#include "Memory/Allocator.h"
 
 namespace TrioData
 {

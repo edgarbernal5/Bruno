@@ -73,9 +73,9 @@ namespace TrioEngine
 		if (directorySeparatorIndex != std::string::npos) {
 			path = m_assetName.substr(0, directorySeparatorIndex);
 		}
-		std::string cleandPath = TrioIO::Path::Combine(path, referenceName);
+		std::string cleanPath = TrioIO::Path::Combine(path, referenceName);
 
-		return m_contentManager->LoadInternal(cleandPath);
+		return m_contentManager->LoadInternal(cleanPath);
 	}
 
 	Vector2 ContentReader::ReadVector2()
@@ -141,7 +141,7 @@ namespace TrioEngine
 			num2 = Read(buffer.data(), i, size - i);
 			if (num2 == 0)
 			{
-				throw std::exception("bad xnb");
+				throw ContentPipelineException("bad estero");
 			}
 		}
 		return buffer;
@@ -155,7 +155,7 @@ namespace TrioEngine
 			index--;
 			if (index >= m_sharedResourceFixups.size())
 			{
-				throw std::exception();
+				throw ContentPipelineException("bad estero");
 			}
 			m_sharedResourceFixups[index].push_back(action);
 		}

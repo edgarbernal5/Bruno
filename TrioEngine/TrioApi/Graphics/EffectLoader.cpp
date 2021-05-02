@@ -23,7 +23,7 @@ namespace TrioEngine
 
 	}
 
-	bool EffectLoader::LoadEffect(std::string filename)
+	bool EffectLoader::LoadFromFile(std::string filename)
 	{
 		std::string inputFileContent;
 

@@ -1,133 +1,138 @@
 #include "stdafx.h"
 #include "Scene.h"
 
-#include "GameObject.h"
+#include "Graphics/Models/Model.h"
+#include "Graphics/Models/ModelMesh.h"
+#include "Graphics/Models/ModelMeshPart.h"
+#include "Graphics/Models/Material.h"
+
+#include <unordered_set>
 
 namespace TrioEngine
 {
 	Scene* Scene::g_activeScene = nullptr;
-	
+	Camera* Scene::g_mainCamera = nullptr;
+
 	Scene::Scene()
 	{
-		m_scenes.push_back(this);
-		if (g_activeScene == nullptr)
-		{
-			g_activeScene = this;
-		}
+		g_mainCamera = new Camera();
 	}
 
 	Scene::~Scene()
 	{
-		m_addedObjects.clear();
-		m_removedObjects.clear();
-		m_objects.clear();
-
-		for (int i = 0; i < m_scenes.size(); ++i)
-		{
-			if (m_scenes[i] == this)
-			{
-				m_scenes.erase(m_scenes.begin() + i);
-				break;
-			}
-		}
-		if (g_activeScene == this)
-		{
-			if (m_scenes.size() == 0)
-			{
-				g_activeScene = nullptr;
-			}
-			else
-			{
-				g_activeScene = m_scenes[0];
-			}
+		if (g_mainCamera != nullptr) {
+			delete g_mainCamera;
+			g_mainCamera = nullptr;
 		}
 	}
 
-	Scene* Scene::ActiveScene()
+	Scene* Scene::GetActiveScene()
 	{
 		return g_activeScene;
 	}
 
-	void Scene::AddGameObject(const std::shared_ptr<GameObject>& obj)
+	void Scene::SetActiveScene(Scene* scene)
 	{
-		m_addedObjects.push_back(obj);
+		g_activeScene = scene;
 	}
 
-	void Scene::RemoveGameObject(const std::shared_ptr<GameObject>& obj)
+	Camera* Scene::GetCamera()
 	{
-		bool found = false;
-		for (int i = 0; i < m_addedObjects.size(); i++)
-		{
-			if (m_addedObjects[i] == obj)
-			{
-				found = true;
-				m_addedObjects.erase(m_addedObjects.begin() + i);
-				break;
+		return g_mainCamera;
+	}
+
+	Entity Scene::CreateMaterialEntity(std::string name)
+	{
+		Entity entity = CreateEntity();
+		NameComponent& nameComponent = m_names.Create(entity);
+		nameComponent.m_name = name;
+
+		m_materials.Create(entity);
+
+		return entity;
+	}
+
+	Entity Scene::CreateMesh(std::string name)
+	{
+		Entity entity = CreateEntity();
+
+		NameComponent& nameComponent = m_names.Create(entity);
+		nameComponent.m_name = name;
+
+		m_meshes.Create(entity);
+
+		return entity;
+	}
+
+	void Scene::LoadFromModel(Model* model)
+	{
+		m_names.Clear();
+		m_transforms.Clear();
+		m_hierarchy.Clear();
+		m_meshes.Clear();
+		m_materials.Clear();
+
+		std::unordered_set<Material*> allMaterials;
+		std::unordered_map<Material*, Entity> materialIndexes;
+
+		for (auto modelMesh : model->GetModelMeshes()) {
+			for (auto meshPart : modelMesh->GetModelMeshParts()) {
+				if (meshPart->GetMaterial()) {
+					if (allMaterials.find(meshPart->GetMaterial()) == allMaterials.end()) {
+						allMaterials.insert(meshPart->GetMaterial());
+					}
+				}
 			}
 		}
 
-		if (!found)
-		{
-			m_removedObjects.push_back(obj);
+		for (auto modelMaterial : allMaterials) {
+			Entity materialEntity = CreateMaterialEntity(modelMaterial->GetName());
+			MaterialComponent& material = *m_materials.GetComponent(materialEntity);
+
+			const Vector3& diffuse = modelMaterial->GetDiffuseColor();
+			material.baseColor = Vector4(diffuse.x, diffuse.y, diffuse.z, 1.0f);
+
+			materialIndexes[modelMaterial] = materialEntity;
 		}
+
+		int meshIndex = 0;
+		for (auto modelMesh : model->GetModelMeshes()) {
+			meshIndex++;
+
+			std::stringstream ss;
+			ss << "mesh_" << meshIndex;
+			Entity meshEntity = CreateMesh(ss.str());
+
+			MeshComponent& mesh = *m_meshes.GetComponent(meshEntity);
+
+			for (auto meshPart : modelMesh->GetModelMeshParts()) {
+				mesh.m_subMeshes.push_back(MeshComponent::SubMesh());
+
+				MeshComponent::SubMesh& subMesh = mesh.m_subMeshes.back();
+				subMesh.m_startIndex = meshPart->GetStartIndex();
+				subMesh.m_vertexOffset = meshPart->GetVertexOffset();
+				subMesh.m_primitiveCount = meshPart->GetPrimitiveCount();
+				subMesh.m_vertexCount = meshPart->GetVertexCount();
+
+				mesh.m_vertexBuffer = *meshPart->GetVertexBuffer();
+				mesh.m_indexBuffer = *meshPart->GetIndexBuffer();
+
+				subMesh.m_materialId = materialIndexes[meshPart->GetMaterial()];
+			}
+		}
+	}
+
+	void Scene::OnWindowSizeChanged(int width, int height) {
+		float aspectRatio = (float)width / (float)height;
+		g_mainCamera->SetAspectRatio(aspectRatio);
 	}
 
 	void Scene::Update()
 	{
-		for (auto& item : m_objects)
+		for (size_t i = 0; i < m_transforms.GetCount(); i++)
 		{
-			auto& object = item.second;
-			if (object->IsActiveInTree())
-			{
-				object->Update();
-			}
+			TransformComponent& transform = m_transforms[i];
+			transform.Update();
 		}
-
-		do
-		{
-			std::vector<std::shared_ptr<GameObject>> added = m_addedObjects;
-			m_addedObjects.clear();
-
-			for (int i = 0; i < added.size(); ++i)
-			{
-				auto& object = added[i];
-				if (object->IsActiveInTree())
-				{
-					object->Update();
-				}
-
-				m_objects[object->GetId()] = object;
-			}
-
-			added.clear();
-
-		} while (m_addedObjects.size() > 0);
-
-		for (int i = 0; i < m_removedObjects.size(); ++i)
-		{
-			const auto& object = m_removedObjects[i];
-			m_objects.erase(object->GetId());
-		}
-		m_removedObjects.clear();
-	}
-
-	std::shared_ptr<GameObject> Scene::GetGameObject(const GameObject* object)
-	{
-		for (int i = 0; i < m_addedObjects.size(); ++i)
-		{
-			const auto& objectRef = m_addedObjects[i];
-			if (objectRef.get() == object)
-			{
-				return objectRef;
-			}
-		}
-
-		auto it = m_objects.find(object->GetId());
-		if (it != m_objects.end())
-		{
-			return it->second;
-		}
-
-		return std::shared_ptr<GameObject>();
 	}
 }

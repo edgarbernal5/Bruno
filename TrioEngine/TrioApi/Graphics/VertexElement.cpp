@@ -99,7 +99,7 @@ namespace TrioEngine
 		switch (m_usage)
 		{
 		case VertexElementUsage::Position:
-			element.SemanticName = "POSITION";
+			element.SemanticName = "SV_Position";
 			break;
 		case VertexElementUsage::Color:
 			element.SemanticName = "COLOR";

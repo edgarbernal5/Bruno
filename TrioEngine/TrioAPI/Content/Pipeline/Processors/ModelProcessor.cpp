@@ -17,8 +17,6 @@
 
 #include "Content/Pipeline/Processors/ContentProcessorContext.h"
 
-
-
 namespace TrioEngine
 {
 	ModelProcessor::ModelProcessor()
@@ -34,16 +32,13 @@ namespace TrioEngine
 		NodeContent* inputContent = (NodeContent*)input;
 
 		std::vector<NodeContent*> nodes;
-		GetFlattenNodes(inputContent, nodes);
-		std::vector<MeshContent*> meshes;
+		GetFlattenedNodes(inputContent, nodes);
 		std::vector<GeometryContent*> geometries;
 		std::vector<MaterialContent*> materials;
 
 		for (auto& node : nodes) {
 			auto mesh = dynamic_cast<MeshContent*>(node);
 			if (mesh) {
-				meshes.push_back(mesh);
-				
 				for (auto& geometry : mesh->GetGeometry()) {
 					geometries.push_back(geometry);
 
@@ -85,11 +80,11 @@ namespace TrioEngine
 		}
 	}
 
-	void ModelProcessor::GetFlattenNodes(NodeContent* input, std::vector<NodeContent*>& outputNodes)
+	void ModelProcessor::GetFlattenedNodes(NodeContent* input, std::vector<NodeContent*>& outputNodes)
 	{
 		outputNodes.push_back(input);
 		for (auto& child : input->GetChildren()) {
-			GetFlattenNodes(child, outputNodes);
+			GetFlattenedNodes(child, outputNodes);
 		}
 	}
 

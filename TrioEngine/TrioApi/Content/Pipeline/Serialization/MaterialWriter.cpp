@@ -18,6 +18,8 @@ namespace TrioEngine
 	{
 		MaterialContent* inputContent = reinterpret_cast<MaterialContent*>(value);
 
+		output->WriteString(inputContent->GetName());
+
 		output->WriteUInt32(inputContent->GetTextures().size());
 		for (auto& pair : inputContent->GetTextures()) {
 			output->WriteString(pair.first);

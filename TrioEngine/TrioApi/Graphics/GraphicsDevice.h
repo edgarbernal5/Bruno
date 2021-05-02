@@ -30,6 +30,7 @@ namespace TrioEngine
 	class TextureCollection;
 	class VertexBuffer;
 	class SwapChain;
+	class RenderTarget2D;
 	
 	class TRIO_API_EXPORT GraphicsDevice
 	{

@@ -15,6 +15,7 @@ namespace TrioEngine
 		VertexBufferBinding(VertexBuffer* buffer, uint32_t offset, uint32_t stride) : Buffer(buffer), Offset(offset), Stride(stride)
 		{
 		}
+
 		VertexBufferBinding(const VertexBufferBinding& rhs)
 		{
 			Buffer = rhs.Buffer;

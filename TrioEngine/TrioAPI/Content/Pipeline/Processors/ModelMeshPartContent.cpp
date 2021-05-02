@@ -17,4 +17,9 @@ namespace TrioEngine
 		//m_indexBuffer = new IndexCollection(*indices);
 		m_indexBuffer = indices;
 	}
+
+	ModelMeshPartContent::~ModelMeshPartContent()
+	{
+
+	}
 }

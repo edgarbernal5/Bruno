@@ -23,7 +23,7 @@ namespace TrioEngine
 		EffectLoader(Effect* effect);
 		~EffectLoader();
 
-		bool LoadEffect(std::string filename);
+		bool LoadFromFile(std::string filename);
 
 	private:
 		Effect& m_effect;

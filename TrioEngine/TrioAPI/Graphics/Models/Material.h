@@ -15,6 +15,16 @@ namespace TrioEngine
 		Material();
 		~Material();
 
+		inline const Vector3& GetDiffuseColor()
+		{
+			return m_diffuseColor;
+		}
+
+		inline const char* GetName()
+		{
+			return m_name.c_str();
+		}
+
 		inline std::map<std::string, Texture*>& GetTextures()
 		{
 			return m_textures;
@@ -28,12 +38,27 @@ namespace TrioEngine
 
 			return itm->second;
 		}
+
 		inline void InsertTexture(std::string name, Texture* texture)
 		{
 			m_textures[name] = texture;
 		}
+		
+		inline void SetDiffuseColor(Vector3& color)
+		{
+			m_diffuseColor = color;
+		}
+
+		inline void SetName(std::string& name)
+		{
+			m_name = name;
+		}
 
 	private:
+		std::string m_name;
+
+		Vector3 m_diffuseColor;
+
 		std::map<std::string, Texture*> m_textures;
 	};
 }

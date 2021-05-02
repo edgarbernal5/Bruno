@@ -30,7 +30,7 @@ namespace TrioEngine
 	{
 	}
 
-	void ContentWriter::Write(Matrix value)
+	void ContentWriter::Write(const Matrix& value)
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -39,20 +39,20 @@ namespace TrioEngine
 		}
 	}
 
-	void ContentWriter::Write(Vector2 value)
+	void ContentWriter::Write(const Vector2& value)
 	{
 		WriteSingle(value.x);
 		WriteSingle(value.y);
 	}
 
-	void ContentWriter::Write(Vector3 value)
+	void ContentWriter::Write(const Vector3& value)
 	{
 		WriteSingle(value.x);
 		WriteSingle(value.y);
 		WriteSingle(value.z);
 	}
 
-	void ContentWriter::Write(Vector4 value)
+	void ContentWriter::Write(const Vector4& value)
 	{
 		WriteSingle(value.x);
 		WriteSingle(value.y);
@@ -173,7 +173,7 @@ namespace TrioEngine
 	{
 	}
 
-	void ContentWriter::WriteExternalReference(ExternalReference& reference)
+	void ContentWriter::WriteExternalReference(ExternalReference& const reference)
 	{
 		if (reference.GetFilename().size() == 0)
 		{
@@ -183,9 +183,10 @@ namespace TrioEngine
 		{
 			std::string filename = reference.GetFilename();
 			if (filename.empty()) {
-				WriteString(nullptr);
+				WriteString("");
 				return;
 			}
+
 			if (TrioIO::Path::GetFileExtension(filename) != FileExtension)
 			{
 				throw ContentPipelineException("external reference is not a .estero file");

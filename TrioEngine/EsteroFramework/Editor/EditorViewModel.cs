@@ -119,7 +119,6 @@ namespace EsteroFramework.Editor
             (SceneDetail as IActivate).Activate();
 
             RecreateUI();
-            
         }
 
         private void RecreateUI()

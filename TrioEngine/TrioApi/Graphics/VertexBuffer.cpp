@@ -6,6 +6,15 @@
 
 namespace TrioEngine
 {
+	VertexBuffer::VertexBuffer() :
+		m_vertexDeclaration(nullptr),
+		m_device(nullptr),
+		m_vertexCount(0),
+		m_usage(ResourceUsage::Default)
+	{
+
+	}
+
 	VertexBuffer::VertexBuffer(GraphicsDevice* device, VertexDeclaration *vertexDeclaration, int vertexCount, ResourceUsage usage) :
 #ifdef TRIO_DIRECTX
 #elif OPENGL

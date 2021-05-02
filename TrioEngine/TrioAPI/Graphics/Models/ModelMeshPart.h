@@ -54,15 +54,16 @@ namespace TrioEngine
 		{
 			return m_vertexOffset;
 		}
+
 		inline uint32_t GetStartIndex()
 		{
 			return m_startIndex;
 		}
+
 		inline PrimitiveType GetPrimitiveType()
 		{
 			return m_primitiveType;
 		}
-
 
 		friend class Model;
 
@@ -78,10 +79,7 @@ namespace TrioEngine
 		uint32_t m_vertexOffset;
 		uint32_t m_startIndex;
 
-		ModelBone* m_parentMesh;
 		PrimitiveType m_primitiveType;
-
-		ModelMesh* m_parent;
 
 		Texture2D* m_diffuseTexture;
 		Material* m_material;

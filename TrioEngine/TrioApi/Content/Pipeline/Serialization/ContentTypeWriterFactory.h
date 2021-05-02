@@ -17,7 +17,7 @@ namespace TrioEngine
 
 		template<typename T> void RegisterContentTypeWriter()
 		{
-			m_TypeWriters.push_back(new T());
+			m_typeWriters.push_back(new T());
 		}
 
 		ContentTypeWriter* CreateContentTypeInstance(std::string const& writerName)
@@ -32,6 +32,6 @@ namespace TrioEngine
 		}
 		ContentTypeWriter* GetByWriterName(std::string const& writerName);
 	private:
-		std::vector<ContentTypeWriter *> m_TypeWriters;
+		std::vector<ContentTypeWriter *> m_typeWriters;
 	};
 }

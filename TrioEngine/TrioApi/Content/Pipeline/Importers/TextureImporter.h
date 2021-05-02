@@ -7,6 +7,7 @@
 namespace TrioEngine
 {
 	class BitmapContent;
+	class TextureContent;
 
 	class TRIO_API_EXPORT TextureImporter : public IContentImporter
 	{

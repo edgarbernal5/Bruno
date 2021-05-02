@@ -71,7 +71,6 @@ namespace TrioEngine
 		return local;
 	}
 
-
 	TrioIO::Stream* ContentManager::OpenStream(std::string assetName)
 	{
 		//ou = TrioIO::Path::GetFullDirectory(m_rootDirectory + TrioIO::Path::DirectorySeparator);
@@ -79,7 +78,7 @@ namespace TrioEngine
 		if (rootDirectory.size() == 0) rootDirectory = ".";
 
 		std::string fullDirectory = TrioIO::Path::GetFullDirectory(rootDirectory + TrioIO::Path::DirectorySeparator);
-		std::string path = TrioIO::Path::Combine(m_rootDirectory, assetName + ".estero");
+		std::string path = TrioIO::Path::Combine(fullDirectory, assetName + ".estero");
 		
 		TrioIO::FileStream* fileStream = new TrioIO::FileStream(path, TrioIO::FileAccess::Read);
 

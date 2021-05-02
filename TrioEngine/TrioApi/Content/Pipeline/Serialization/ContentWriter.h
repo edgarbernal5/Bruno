@@ -27,16 +27,16 @@ namespace TrioEngine
 		ContentWriter(ContentCompiler* compiler, TrioIO::Stream* _stream, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath);
 		~ContentWriter();
 
-		void Write(Matrix value);
-		void Write(Vector2 value);
-		void Write(Vector3 value);
-		void Write(Vector4 value);
+		void Write(const Matrix& value);
+		void Write(const Vector2& value);
+		void Write(const Vector3& value);
+		void Write(const Vector4& value);
 
 		//template <ContentItem* T>
 		void WriteObject(ContentItem* value);
 		void WriteSharedResource(ContentItem* resource);
 
-		void WriteExternalReference(ExternalReference& reference);
+		void WriteExternalReference(ExternalReference& const reference);
 
 		void BeginWrite();
 		void FlushOutput();

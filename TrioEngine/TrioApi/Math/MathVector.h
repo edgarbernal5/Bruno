@@ -26,7 +26,6 @@
 
 #endif //  TRIO_DIRECTX
 
-
 namespace TrioEngine
 {
 	struct Vector2;
