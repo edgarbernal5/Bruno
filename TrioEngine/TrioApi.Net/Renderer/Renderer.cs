@@ -8,6 +8,7 @@ namespace TrioApi.Net.Renderer
 {
     public static class Renderer
     {
+        [StructLayout(LayoutKind.Sequential)]
         public struct Camera
         {
             Vector3 m_position;
@@ -17,15 +18,15 @@ namespace TrioApi.Net.Renderer
             float m_nearPlane;
             float m_farPlane;
             float m_fieldOfView;
+            float m_aspectRatio;
         }
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Renderer_Initialize", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Initialize(IntPtr device);
-
 
         public static void DrawScene(Camera camera)
         {
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Renderer_Initialize", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Initialize(IntPtr device);
 
         public static void Initialize(GraphicsDevice device)
         {

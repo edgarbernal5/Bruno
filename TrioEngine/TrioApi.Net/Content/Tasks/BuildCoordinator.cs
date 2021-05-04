@@ -31,7 +31,6 @@ namespace TrioApi.Net.Content.Tasks
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "BuildCoordinator_GetSettings2", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static extern void Internal_GetSettings2(IntPtr buildCoordinator, ref BuildCoordinatorSettings settings);
 
-
         public BuildCoordinatorSettings Settings
         {
             get

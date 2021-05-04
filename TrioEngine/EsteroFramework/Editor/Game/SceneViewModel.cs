@@ -44,7 +44,7 @@ namespace EsteroFramework.Editor.Game
             m_editorGameGraphicsScreen.GridMesh = primitivesService.GridMesh;
             m_editorGameGraphicsScreen.Scene = SceneProjectFile.Scene;
             m_editorGameGraphicsScreen.Camera = Camera;
-            m_editorGameGraphicsScreen.RenderPath = new RenderPathForward(SceneProjectFile.Scene);
+            m_editorGameGraphicsScreen.RenderPath = new RenderPathForward();
         }
 
         protected override void OnActivate()
@@ -52,12 +52,14 @@ namespace EsteroFramework.Editor.Game
             SceneProjectFile = new SceneProjectFile();
             SceneProjectFile.New();
 
+            TrioApi.Net.Game.Scene.ActiveScene = SceneProjectFile.Scene;
+
             Camera = new Camera();
             Camera.FieldOfView = 60.0f * 3.1416f / 180.0f;
             Camera.NearPlane = 0.1f;
             Camera.FarPlane = 100.0f;
 
-            Camera.Position = new Vector3(5.0f, 5.0f, -5.0f);
+            Camera.Position = new Vector3(5.0f, 5.0f, 5.0f);
             Camera.Target = Vector3.Zero;
             Camera.Up = Vector3.Up;
 

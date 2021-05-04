@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using TrioApi.Net.Game;
 
 namespace TrioApi.Net.Renderer
@@ -13,8 +9,8 @@ namespace TrioApi.Net.Renderer
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "RenderPathForward_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_ctor();
 
-        public RenderPathForward(Scene scene) 
-            : base(scene)
+        public RenderPathForward() 
+            : base()
         {
             m_nativePointer = Internal_ctor();
         }
@@ -29,7 +25,7 @@ namespace TrioApi.Net.Renderer
 
         public override void Render()
         {
-
+            Internal_Render(m_nativePointer);
         }
     }
 }

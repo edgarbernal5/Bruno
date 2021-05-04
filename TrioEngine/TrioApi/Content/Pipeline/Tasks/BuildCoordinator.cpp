@@ -18,11 +18,11 @@
 
 namespace TrioEngine
 {
-	BuildCoordinator::BuildCoordinator(BuildCoordinatorSettings& settings, TimestampCache* timestampCache) :
+	BuildCoordinator::BuildCoordinator(BuildCoordinatorSettings* settings, TimestampCache* timestampCache) :
 		m_importerManager(nullptr), m_processorManager(nullptr), m_buildItems(nullptr), m_buildItemsChanged(false),
 		m_settings(settings)
 	{
-		m_settings.InitializePaths();
+		m_settings->InitializePaths();
 
 		m_importerManager = new ImporterManager();
 		m_processorManager = new ProcessorManager();
@@ -168,7 +168,7 @@ namespace TrioEngine
 
 		TrioIO::FileStream* fileStream = new TrioIO::FileStream(absolutePath, TrioIO::FileAccess::Write);
 		{
-			m_contentCompiler->Compile(fileStream, assetObject, false, m_settings.GetOutputDirectory(), absolutePath);
+			m_contentCompiler->Compile(fileStream, assetObject, false, m_settings->GetOutputDirectory(), absolutePath);
 			fileStream->Close();
 		}
 		delete fileStream;
@@ -265,12 +265,12 @@ namespace TrioEngine
 
 	std::string BuildCoordinator::GetAbsolutePath(std::string path)
 	{
-		return m_settings.GetAbsolutePath(path);
+		return m_settings->GetAbsolutePath(path);
 	}
 
 	std::string BuildCoordinator::ChooseOutputFilename(BuildRequest *request)
 	{
-		std::string intermediateDirectory = m_settings.GetOutputDirectory();
+		std::string intermediateDirectory = m_settings->GetOutputDirectory();
 		std::string outputExtension = ".estero";
 		std::string outputFilename;
 
@@ -279,7 +279,7 @@ namespace TrioEngine
 			if (!TrioIO::Path::IsPathRooted(request->m_sourceFileName))
 			{
 				std::string directoryName = TrioIO::Path::GetDirectoryFromFilePath(request->m_sourceFileName);
-				std::string relativePath = GetRelativePath(m_settings.GetIntermediateDirectory());
+				std::string relativePath = GetRelativePath(m_settings->GetIntermediateDirectory());
 				if (directoryName.size() > 0 && directoryName.find(relativePath) == 0)
 				{
 					directoryName = directoryName.substr(relativePath.size());

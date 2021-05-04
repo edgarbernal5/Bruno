@@ -61,7 +61,8 @@ namespace EsteroFramework.Editor.Graphics
             renderContext.Camera = Camera;
             m_gridMesh.Render(renderContext);
 
-
+            //Renderer.Camera ranco = TrioApi.Net.Game.Scene.Camera;
+            m_renderPath.Render();
         }
     }
 }

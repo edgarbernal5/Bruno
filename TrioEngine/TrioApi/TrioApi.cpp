@@ -112,21 +112,21 @@ BuildCoordinator
 */
 BuildCoordinator* BuildCoordinator_Ctor(const char* intermediateDirectory, const char* outputDirectory, const char* rootDirectory)
 {
-	BuildCoordinatorSettings settings;
+	BuildCoordinatorSettings* settings = new BuildCoordinatorSettings();
 
 	if (intermediateDirectory)
 	{
-		settings.SetIntermediateDirectory(intermediateDirectory);
+		settings->SetIntermediateDirectory(intermediateDirectory);
 	}
 	
 	if (outputDirectory)
 	{
-		settings.SetOutputDirectory(outputDirectory);
+		settings->SetOutputDirectory(outputDirectory);
 	}
 
 	if (rootDirectory)
 	{
-		settings.SetRootDirectory(rootDirectory);
+		settings->SetRootDirectory(rootDirectory);
 	}
 
 	return new BuildCoordinator(settings, nullptr);
@@ -134,21 +134,21 @@ BuildCoordinator* BuildCoordinator_Ctor(const char* intermediateDirectory, const
 
 BuildCoordinator * BuildCoordinator_Ctor2(BuildCoordinatorSettingsBridge managedSettings)
 {
-	BuildCoordinatorSettings settings;
+	BuildCoordinatorSettings* settings = new BuildCoordinatorSettings();
 
 	if (managedSettings.IntermediateDirectory)
 	{
-		settings.SetIntermediateDirectory(managedSettings.IntermediateDirectory);
+		settings->SetIntermediateDirectory(managedSettings.IntermediateDirectory);
 	}
 
 	if (managedSettings.OutputDirectory)
 	{
-		settings.SetOutputDirectory(managedSettings.OutputDirectory);
+		settings->SetOutputDirectory(managedSettings.OutputDirectory);
 	}
 
 	if (managedSettings.RootDirectory)
 	{
-		settings.SetRootDirectory(managedSettings.RootDirectory);
+		settings->SetRootDirectory(managedSettings.RootDirectory);
 	}
 
 	return new BuildCoordinator(settings, nullptr);
@@ -771,6 +771,14 @@ void UpdatePerFrameData()
 }
 
 /*
+RenderPath
+*/
+void RenderPath_Render(RenderPath* renderPath)
+{
+	renderPath->Render();
+}
+
+/*
 RenderPathForward
 */
 RenderPathForward* RenderPathForward_Ctor()
@@ -840,9 +848,29 @@ Scene* Scene_GetActiveScene()
 	return Scene::GetActiveScene();
 }
 
+void Scene_SetActiveScene(Scene* scene)
+{
+	Scene::SetActiveScene(scene);
+}
+
 void Scene_Update(Scene * scene)
 {
 	scene->Update();
+}
+
+Camera Scene_GetCamera()
+{
+	return *Scene::GetCamera();
+}
+
+void Scene_UpdateCamera(Camera camera)
+{
+	Scene::UpdateCamera(camera);
+}
+
+void Scene_LoadFromModel(Scene* scene, Model* model)
+{
+	scene->LoadFromModel(model);
 }
 
 /*

@@ -39,7 +39,7 @@ namespace TrioWin32
 		Game::Initialize();
 
 		BuildCoordinatorSettings settings;
-		BuildCoordinator builder(settings, nullptr);
+		BuildCoordinator builder(&settings, nullptr);
 
 		std::string modelFilename = "D:/Edgar/Documentos/Proyectos/CG/TrioEngineGit/Models/Car/Car.fbx";
 		std::string modelPath = "Car.fbx";

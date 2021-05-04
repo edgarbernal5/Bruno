@@ -41,6 +41,10 @@ namespace TrioEngine
 		return g_mainCamera;
 	}
 
+	void Scene::UpdateCamera(const Camera& camera) {
+		*g_mainCamera = camera;
+	}
+
 	Entity Scene::CreateMaterialEntity(std::string name)
 	{
 		Entity entity = CreateEntity();

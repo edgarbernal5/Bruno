@@ -37,6 +37,7 @@ namespace TrioEngine
 		static void SetActiveScene(Scene* scene);
 
 		static Camera* GetCamera();
+		static void UpdateCamera(const Camera& camera);
 
 	private:
 		static Scene* g_activeScene;

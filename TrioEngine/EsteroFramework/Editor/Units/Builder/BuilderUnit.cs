@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using TrioApi.Net.Content;
 using TrioApi.Net.Content.Tasks;
+using TrioApi.Net.Game;
 using TrioApi.Net.Graphics;
 
 namespace EsteroFramework.Editor.Units
@@ -77,6 +78,9 @@ namespace EsteroFramework.Editor.Units
             string path = @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\TrioEngine\TrioWpfEditor\bin\x64\Debug\finalObjects\RacerCar_0";
 
             string finale = GetRelativePath(basePath, path);
+
+            Scene.ActiveScene.LoadFromModel(model);
+
             buildCoordinator.Dispose();
         }
 

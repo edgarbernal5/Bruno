@@ -20,15 +20,15 @@ namespace TrioEngine
 	class TRIO_API_EXPORT BuildCoordinator
 	{
 	public:
-		BuildCoordinator(BuildCoordinatorSettings& settings, TimestampCache* timestampCache);
+		BuildCoordinator(BuildCoordinatorSettings* settings, TimestampCache* timestampCache);
 		~BuildCoordinator();
 
 		void AddDependency(BuildItem* buildItem, std::string filename);
 		std::string GetAbsolutePath(std::string path);
 
-		BuildCoordinatorSettings& GetBuildSettings()
+		inline BuildCoordinatorSettings& GetBuildSettings()
 		{
-			return m_settings;
+			return *m_settings;
 		}
 
 		inline ProcessorManager* GetProcessorManager()
@@ -38,7 +38,7 @@ namespace TrioEngine
 
 		inline std::string GetRelativePath(std::string path)
 		{
-			return m_settings.GetRelativePath(path);
+			return m_settings->GetRelativePath(path);
 		}
 
 		void RequestBuild(std::string sourceFilename, std::string assetName, std::string importerName, std::string processorName, OpaqueData *processorParameters);
@@ -62,7 +62,7 @@ namespace TrioEngine
 
 		ContentCompiler *m_contentCompiler;
 
-		BuildCoordinatorSettings& m_settings;
+		BuildCoordinatorSettings* m_settings;
 		BuildItemCollection *m_buildItems;
 		TimestampCache m_timestampCache;
 	};

@@ -1,22 +1,18 @@
-﻿using Estero.Interop;
+﻿
+using Estero.Interop;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TrioApi.Net.Game;
+using System.Runtime.InteropServices;
 
 namespace TrioApi.Net.Renderer
 {
     public abstract class RenderPath : CppObject
     {
-        private Scene m_scene;
-        public Scene Scene { get { return m_scene; } }
-
-        protected RenderPath(Scene scene)
+        protected RenderPath()
         {
-            m_scene = scene;
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "RenderPath_Render", CallingConvention = CallingConvention.StdCall)]
+        protected static extern void Internal_Render(IntPtr renderPath);
 
         public abstract void Render();
     }

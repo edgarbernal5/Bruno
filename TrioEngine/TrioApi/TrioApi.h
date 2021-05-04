@@ -33,6 +33,7 @@ namespace TrioEngine {
 	class TextureContent;
 
 	class RenderPathForward;
+	class RenderPath;
 }
 
 /*
@@ -233,6 +234,11 @@ extern "C" TRIO_API_EXPORT void __stdcall Renderer_Initialize(GraphicsDevice* de
 extern "C" TRIO_API_EXPORT void __stdcall UpdatePerFrameData();
 
 /*
+RenderPath
+*/
+extern "C" TRIO_API_EXPORT void __stdcall RenderPath_Render(RenderPath* renderPath);
+
+/*
 RenderPathForward
 */
 extern "C" TRIO_API_EXPORT RenderPathForward * __stdcall RenderPathForward_Ctor();
@@ -259,7 +265,11 @@ Scene
 extern "C" TRIO_API_EXPORT Scene* __stdcall Scene_Ctor();
 extern "C" TRIO_API_EXPORT void __stdcall Scene_Dtor(Scene* scene);
 extern "C" TRIO_API_EXPORT Scene* __stdcall Scene_GetActiveScene();
+extern "C" TRIO_API_EXPORT void __stdcall Scene_SetActiveScene(Scene* scene);
 extern "C" TRIO_API_EXPORT void __stdcall Scene_Update(Scene* scene);
+extern "C" TRIO_API_EXPORT Camera __stdcall Scene_GetCamera();
+extern "C" TRIO_API_EXPORT void __stdcall Scene_UpdateCamera(Camera camera);
+extern "C" TRIO_API_EXPORT void __stdcall Scene_LoadFromModel(Scene* scene, Model* model);
 
 /*
 Transform
