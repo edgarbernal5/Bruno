@@ -66,6 +66,7 @@ struct BuildCoordinatorSettingsBridge {
 extern "C" TRIO_API_EXPORT BuildCoordinator* __stdcall BuildCoordinator_Ctor(const char* intermediateDirectory, const char* outputDirectory, const char* rootDirectory);
 extern "C" TRIO_API_EXPORT BuildCoordinator* __stdcall BuildCoordinator_Ctor2(BuildCoordinatorSettingsBridge settings);
 extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_Dtor(BuildCoordinator* buildCoordinator);
+extern "C" TRIO_API_EXPORT char* __stdcall BuildCoordinator_GetRelativePath(BuildCoordinator* coordinator, char* const path);
 extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_GetSettings(BuildCoordinator* coordinator, char* const intermediateDir, char* const outputDir, char* const rootDir);
 extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_GetSettings2(BuildCoordinator* coordinator, BuildCoordinatorSettingsBridge* managedSettings);
 extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_RequestBuildWithoutOpaqueData(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName);

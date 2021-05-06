@@ -158,6 +158,10 @@ void BuildCoordinator_Dtor(BuildCoordinator * buildCoordinator)
 {
 	delete buildCoordinator;
 }
+char* __stdcall BuildCoordinator_GetRelativePath(BuildCoordinator* coordinator, char* const path)
+{
+	return TrioDLL::AllocateMemoryForString(coordinator->GetRelativePath(path).c_str());
+}
 
 void BuildCoordinator_GetSettings(BuildCoordinator * coordinator, char* const intermediateDir, char* const outputDir, char* const rootDir)
 {
@@ -173,7 +177,7 @@ void BuildCoordinator_GetSettings2(BuildCoordinator* coordinator, BuildCoordinat
 
 	managedSettings->IntermediateDirectory = TrioDLL::AllocateMemoryForString(settings.GetIntermediateDirectory().c_str());
 	managedSettings->OutputDirectory = TrioDLL::AllocateMemoryForString(settings.GetOutputDirectory().c_str());
-	managedSettings->RootDirectory = TrioDLL::AllocateMemoryForString(settings.GetIntermediateDirectory().c_str());
+	managedSettings->RootDirectory = TrioDLL::AllocateMemoryForString(settings.GetRootDirectory().c_str());
 }
 
 void BuildCoordinator_RequestBuildWithoutOpaqueData(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName)

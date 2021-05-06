@@ -65,17 +65,19 @@ namespace EsteroFramework.Editor.Units
 
             settings = buildCoordinator.Settings;
 
-            buildCoordinator.RequestBuild(filename, Path.GetFileName(filename), "ModelImporter", "ModelProcessor");
+            var assetNamePath = buildCoordinator.GetRelativePath(filename); //Path.GetFileName(filename);
+
+            buildCoordinator.RequestBuild(filename, assetNamePath, "ModelImporter", "ModelProcessor");
             buildCoordinator.RunTheBuild();
 
             var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
             ContentManager contentManager = new ContentManager(graphicsDevice, settings.OutputDirectory);
 
-            var modelPath = Path.GetFileName(filename);
-            Model model = contentManager.Load<Model>(modelPath);
 
-            string basePath = @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\TrioEngine\TrioWpfEditor\bin\x64\Debug\finalObjects\Car.fbx.estero";
-            string path = @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\TrioEngine\TrioWpfEditor\bin\x64\Debug\finalObjects\RacerCar_0";
+            Model model = contentManager.Load<Model>(assetNamePath);
+
+            string basePath = @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\TrioEngine\TrioWpfEditor\bin\x64\Debug\finalObjects\Content";
+            string path = @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\TrioEngine\TrioWpfEditor\bin\x64\Debug\finalObjects\Content\Models\Car\RacerCar_0";
 
             string finale = GetRelativePath(basePath, path);
 

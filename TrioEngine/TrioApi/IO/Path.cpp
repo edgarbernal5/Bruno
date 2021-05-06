@@ -88,7 +88,7 @@ namespace TrioIO
 
 	bool Path::IsPathRooted(std::string path)
 	{
-		if (path.size() <= 0)
+		if (path.size() == 0)
 			return false;
 
 		if (path[0] == '\\')

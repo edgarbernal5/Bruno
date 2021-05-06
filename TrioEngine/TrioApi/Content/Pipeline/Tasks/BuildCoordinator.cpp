@@ -196,6 +196,15 @@ namespace TrioEngine
 	BuildItem* BuildCoordinator::RequestBuild(BuildRequest* request)
 	{
 		request->m_sourceFileName = GetRelativePath(request->m_sourceFileName);
+
+		if (request->m_assetName.size() > 0) {
+			if (TrioIO::Path::IsPathRooted(request->m_assetName) || request->m_assetName.find("..")!= std::string::npos)
+			{
+				throw ContentPipelineException("Invalid asset name");
+			}
+			//request->m_assetName = request->m_assetName.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+		}
+
 		if (request->m_importerName.size() == 0)
 		{
 			//Adivinar el importador por medio de la extension del archivo.

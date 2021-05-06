@@ -69,5 +69,14 @@ namespace TrioApi.Net.Content.Tasks
         {
             Internal_RequestBuildWithoutOpaqueData(m_nativePointer, sourceFilename, assetName, importerName, processorName);
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "BuildCoordinator_GetRelativePath", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        private static extern string Internal_GetRelativePath(IntPtr coordinator, [MarshalAs(UnmanagedType.LPStr)] string path);
+
+        public string GetRelativePath(string path)
+        {
+            return Internal_GetRelativePath(m_nativePointer, path);
+        }
     }
 }
