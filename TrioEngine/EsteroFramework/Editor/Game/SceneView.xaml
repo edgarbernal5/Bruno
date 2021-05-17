@@ -8,17 +8,22 @@
              xmlns:game2="clr-namespace:EsteroFramework.Editor.Game"
              xmlns:beh="clr-namespace:EsteroFramework.Editor.Game.Interaction"
              d:DataContext="{d:DesignInstance game2:SceneViewModel, IsDesignTimeCreatable=False}"
-             
              mc:Ignorable="d" 
              
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <game:GameSurfaceTarget x:Name="gameSurfaceTarget"
+        <!--<game:GameSurfaceTarget x:Name="gameSurfaceTarget"
                                 GameGraphicsScreens ="{Binding GameGraphicsScreens}">
             <i:Interaction.Behaviors>
                 <beh:CameraMouseBehavior Camera="{Binding Camera}" />
             </i:Interaction.Behaviors>
-        </game:GameSurfaceTarget>
+        </game:GameSurfaceTarget>-->
+
+        <game:GameSurfaceTargetHwndHost x:Name="gameSurfaceTarget" GameGraphicsScreens ="{Binding GameGraphicsScreens}">
+            <!--<i:Interaction.Behaviors>
+                <beh:CameraMouseBehavior Camera="{Binding Camera}" />
+            </i:Interaction.Behaviors>-->
+        </game:GameSurfaceTargetHwndHost>
     </Grid>
 </UserControl>
 <!--d:DataContext="EsteroFramework.Editor.Game.SceneViewModel"-->

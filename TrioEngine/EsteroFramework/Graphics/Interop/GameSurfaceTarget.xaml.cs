@@ -59,7 +59,6 @@ namespace EsteroFramework.Graphics.Interop
 
         public int LastHeight { get; set; }
 
-
         private IGraphicsService m_graphicsService;
         private GraphicsDevice m_device;
 

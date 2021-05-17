@@ -62,6 +62,20 @@ namespace TrioApi.Net.Graphics
             }
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_GetPresentationParameters", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_GetPresentationParameters(IntPtr device, ref PresentationParameters parameters);
+
+        public PresentationParameters PresentationParameters
+        {
+            get
+            {
+                PresentationParameters result = new PresentationParameters();
+                Internal_GetPresentationParameters(m_nativePointer, ref result);
+
+                return result;
+            }
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_GetViewport", CallingConvention = CallingConvention.StdCall)]
         private static extern Viewport Internal_GetViewport(IntPtr device);
 

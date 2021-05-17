@@ -78,6 +78,14 @@ namespace TrioApi.Net.Graphics.Core
             }
         }
 
+        public static Color CornflowerBlue
+        {
+            get
+            {
+                return new Color(1.0f, 0.0f, 0.0f);
+            }
+        }
+
         #endregion
 
     }

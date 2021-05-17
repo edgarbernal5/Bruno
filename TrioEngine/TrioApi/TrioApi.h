@@ -151,6 +151,7 @@ extern "C" TRIO_API_EXPORT BlendState* __stdcall GraphicsDevice_GetBlendState(Gr
 extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall GraphicsDevice_GetDepthStencilState(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT RasterizerState* __stdcall GraphicsDevice_GetRasterizerState(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT Viewport __stdcall GraphicsDevice_GetViewport(GraphicsDevice* device);
+extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_GetPresentationParameters(GraphicsDevice* device, PresentationParameters* parameters);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Present(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Reset(GraphicsDevice* device, PresentationParameters parameters);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_SetBlendState(GraphicsDevice* device, BlendState* state);

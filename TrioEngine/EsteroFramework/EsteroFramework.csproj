@@ -86,6 +86,7 @@
       <DependentUpon>SceneView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Editor\Game\SceneViewModel.cs" />
+    <Compile Include="Editor\Game\Screens\EmptyGameGraphicsScreen.cs" />
     <Compile Include="Editor\IEditorService.cs" />
     <Compile Include="Editor\Timing\GameStepTimer.cs" />
     <Compile Include="Editor\Timing\GameTime.cs" />
@@ -102,15 +103,18 @@
     <Compile Include="Graphics\Editor\IEditorPrimitivesService.cs" />
     <Compile Include="Graphics\GraphicsDeviceService.cs" />
     <Compile Include="Graphics\GraphicsService.cs" />
+    <Compile Include="Graphics\IAddHwndHostRef.cs" />
     <Compile Include="Graphics\IGraphicsService.cs" />
     <Compile Include="Graphics\Interop\GameImageSource.cs" />
     <Compile Include="Graphics\Interop\GameSurfaceTarget.xaml.cs">
       <DependentUpon>GameSurfaceTarget.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Graphics\Interop\GameSurfaceTargetHwndHost.cs" />
     <Compile Include="Graphics\Interop\HwndMouseEventArgs.cs" />
     <Compile Include="Graphics\Interop\HwndMouseState.cs" />
     <Compile Include="Graphics\Interop\IGameSurfaceTarget.cs" />
     <Compile Include="Graphics\RenderContext.cs" />
+    <Compile Include="Graphics\WpfGraphicsDeviceService.cs" />
     <Compile Include="ScreenManagement\IActivate.cs" />
     <Compile Include="ScreenManagement\IDeactivate.cs" />
     <Compile Include="ScreenManagement\IGuardClose.cs" />

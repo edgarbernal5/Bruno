@@ -25,12 +25,18 @@ namespace EsteroFramework.Editor.Units
             presentationParameters.BackBufferWidth = 1;
             presentationParameters.BackBufferHeight = 1;
             presentationParameters.DeviceWindowHandle = IntPtr.Zero;
-            //presentationParameters.BackBufferFormat = SurfaceFormat.Color;
+            presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
+            presentationParameters.BackBufferFormat = SurfaceFormat.Color;
+            presentationParameters.PresentationInterval = PresentInterval.Immediate;
+            presentationParameters.IsFullScreen = false;
 
             var graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, presentationParameters);
 
             m_graphicsService = new GraphicsService(graphicsDevice);
             Editor.Services.RegisterInstance(typeof(IGraphicsService), null, m_graphicsService);
+
+            var graphicsDeviceService = new WpfGraphicsDeviceService(graphicsDevice);
+            Editor.Services.RegisterInstance(typeof(IAddHwndHostRef), null, graphicsDeviceService);
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
@@ -57,8 +63,8 @@ namespace EsteroFramework.Editor.Units
                 var lastSizeWith = surfaceTarget.LastWidth;
                 var lastSizeHeight = surfaceTarget.LastHeight;
 
-                if ((sizeWidth != lastSizeWith || sizeHeight != lastSizeHeight) && !m_idle)
-                    continue;
+                //if ((sizeWidth != lastSizeWith || sizeHeight != lastSizeHeight) && !m_idle)
+                //    continue;
 
                 surfaceTarget.LastWidth = sizeWidth;
                 surfaceTarget.LastHeight = sizeHeight;

@@ -58,7 +58,8 @@ namespace EsteroFramework.Editor.Graphics
 
         private void DoOnRender(RenderContext renderContext)
         {
-            renderContext.GraphicsDevice.Clear(ColorRGBA8.CornflowerBlue);
+            //renderContext.GraphicsDevice.Clear(ColorRGBA8.CornflowerBlue);
+            renderContext.GraphicsDevice.Clear(Color.CornflowerBlue);
 
             //
             renderContext.Camera = Camera;

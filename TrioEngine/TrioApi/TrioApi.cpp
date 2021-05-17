@@ -498,6 +498,12 @@ Viewport GraphicsDevice_GetViewport(GraphicsDevice* device)
 	return device->GetViewport();
 }
 
+void GraphicsDevice_GetPresentationParameters(GraphicsDevice* device, PresentationParameters* parameters)
+{
+	PresentationParameters& devideParams = device->GetPresentationParameters();
+	*parameters = devideParams;
+}
+
 void GraphicsDevice_Present(GraphicsDevice* device)
 {
 	device->Present();

@@ -82,13 +82,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="Editor\Views\Controls\Host\HwndMouseEventArgs.cs" />
-    <Compile Include="Editor\Views\Controls\Host\HwndMouseState.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Editor\Views\Controls\Host\GraphicsDeviceHost.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -135,6 +132,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Editor\Views\Controls\Host\" />
     <Folder Include="Editor\Views\World\" />
     <Folder Include="Helpers\" />
     <Folder Include="Windows\" />
