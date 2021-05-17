@@ -47,6 +47,7 @@ namespace EsteroFramework.Graphics
                 {
                     var screen = m_cachedScreens[i];
 
+                    screen.Camera.AspectRatio = (float)surfaceTarget.Width / (float)surfaceTarget.Height;
                     screen.Render(m_renderContext);
                 }
             }

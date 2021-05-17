@@ -3,13 +3,18 @@
 
 #include "Scene.h"
 #include "Graphics/GraphicsDevice.h"
+#include "Graphics/EffectParameter.h"
+#include "Graphics/TextureCollection.h"
+#include "Graphics/SamplerState.h"
+#include "Graphics/RasterizerState.h"
+#include "Graphics/BlendState.h"
 
 namespace TrioEngine
 {
 	GraphicsDevice* Renderer::g_device = nullptr;
 	std::unordered_map<const Camera*, FrameCulling> Renderer::g_frameCullings;
 
-	void Renderer::DrawScene(/*const Camera& camera*/)
+	void Renderer::DrawScene(EffectParameter* parameter, Matrix& viewProjection /*const Camera& camera*/)
 	{
 		Scene& scene = *Scene::GetActiveScene();
 		GraphicsDevice* device = g_device;
@@ -20,6 +25,7 @@ namespace TrioEngine
 
 			device->SetVertexBuffer(&mesh.m_vertexBuffer);
 			device->SetIndexBuffer(&mesh.m_indexBuffer);
+			TransformComponent& transform = scene.GetTransforms()[i];
 
 			for (size_t j = 0; j < mesh.m_subMeshes.size(); j++)
 			{
@@ -27,6 +33,16 @@ namespace TrioEngine
 
 				if (subMesh.m_vertexCount == 0) continue;
 
+				MaterialComponent& material = *scene.GetMaterials().GetComponent(subMesh.m_materialId);
+
+				device->GetTextures()->SetTexture(0, material.diffuseTexture);
+				device->SetSamplerState(0, SamplerState::LinearWrap);
+				device->SetRasterizerState(RasterizerState::CullCounterClockwise);
+				device->SetBlendState(BlendState::Opaque);
+
+				//Matrix meshWorld = viewProjection * transform.m_world;
+				Matrix meshWorld = viewProjection * transform.m_world;
+				parameter->SetValue(meshWorld);
 				device->DrawIndexedPrimitives(PrimitiveType::TriangleList, subMesh.m_vertexOffset, subMesh.m_startIndex, subMesh.m_primitiveCount);
 			}
 		}
@@ -36,8 +52,8 @@ namespace TrioEngine
 	{
 		g_device = device;
 
-		Camera& camera = *Scene::GetCamera();
-		g_frameCullings[&camera].Clear();
+		Camera* camera = Scene::GetCamera();
+		g_frameCullings[camera].Clear();
 	}
 
 	void Renderer::UpdatePerFrameData()

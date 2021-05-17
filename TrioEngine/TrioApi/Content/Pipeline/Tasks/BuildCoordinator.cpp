@@ -101,6 +101,8 @@ namespace TrioEngine
 				m_buildItems->ReverseWantedItems(wantedItemsCount);
 			}
 		}
+
+		m_buildItemsChanged |= m_buildItems->RemoveUnwantedItems();
 	}
 
 	ContentItem* BuildCoordinator::BuildAsset(BuildItem* item)
@@ -109,7 +111,7 @@ namespace TrioEngine
 		{
 			return nullptr;
 		}
-
+		//log ?
 		m_buildItemsChanged = true;
 		item->m_dependencies.clear();
 		item->m_requests.clear();
@@ -349,5 +351,16 @@ namespace TrioEngine
 			text = text.substr(0, 32);
 		}
 		return text;
+	}
+
+	std::vector<std::string> BuildCoordinator::GetOutputFiles()
+	{
+		std::vector<std::string> output;
+		for (size_t i = 0; i < m_buildItems->Size(); i++)
+		{
+			auto item = (*m_buildItems)[i];
+			output.push_back(GetAbsolutePath(item->m_outputFilename));
+		}
+		return output;
 	}
 }

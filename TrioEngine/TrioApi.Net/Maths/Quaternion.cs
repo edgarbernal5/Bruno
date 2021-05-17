@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,9 +34,38 @@ namespace TrioApi.Net.Maths
             this.W = w;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Quaternion_CreateFromAxisAngle", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateFromAxisAngle(ref Quaternion quaternion, ref Vector3 axis, float angle);
+
+        public static Quaternion CreateFromAxisAngle(Vector3 axis, float angle)
+        {
+            Quaternion result = Quaternion.Identity;
+            Internal_CreateFromAxisAngle(ref result, ref axis, angle);
+            return result;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Quaternion_CreateFromYawPitchRoll", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateFromYawPitchRoll(ref Quaternion quaternion, float yaw, float pitch, float roll);
+
+        public static Quaternion CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+        {
+            Quaternion result = Quaternion.Identity;
+            Internal_CreateFromYawPitchRoll(ref result, yaw, pitch, roll);
+            return result;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Quaternion_MultiplyTwoQuats", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_MultiplyTwoQuats(ref Quaternion quaternion1, ref Quaternion quaternion2);
+
+        public static Quaternion operator *(Quaternion quaternion1, Quaternion quaternion2)
+        {
+            Internal_MultiplyTwoQuats(ref quaternion1, ref quaternion2);
+            return quaternion1;
+        }
+
         /// <summary>Determines whether the specified Object is equal to the Quaternion.</summary>
-		/// <param name="other">The Quaternion to compare with the current Quaternion.</param>
-		public bool Equals(Quaternion other)
+        /// <param name="other">The Quaternion to compare with the current Quaternion.</param>
+        public bool Equals(Quaternion other)
         {
             return this.X == other.X && this.Y == other.Y && this.Z == other.Z && this.W == other.W;
         }

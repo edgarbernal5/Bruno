@@ -22,12 +22,18 @@ namespace TrioEngine
 		virtual ~Scene();
 
 		void LoadFromModel(Model* model);
-		
-		inline ComponentManager<NameComponent>& GetNames() {
-			return m_names;
+
+		inline ComponentManager<MaterialComponent>& GetMaterials() {
+			return m_materials;
 		}
 		inline ComponentManager<MeshComponent>& GetMeshes() {
 			return m_meshes;
+		}
+		inline ComponentManager<NameComponent>& GetNames() {
+			return m_names;
+		}
+		inline ComponentManager<TransformComponent>& GetTransforms() {
+			return m_transforms;
 		}
 
 		void OnWindowSizeChanged(int width, int height);

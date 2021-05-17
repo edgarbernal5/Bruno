@@ -96,7 +96,7 @@ namespace TrioEngine
 	{
 #ifdef TRIO_DIRECTX
 		//TODO: EnumAdapterByGpuPreference
-		Microsoft::WRL::ComPtr<IDXGIFactory2> dxgiFactory;
+		Microsoft::WRL::ComPtr<IDXGIFactory6> dxgiFactory;
 		DX::ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(dxgiFactory.GetAddressOf())));
 
 		Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
@@ -104,7 +104,8 @@ namespace TrioEngine
 		g_Adapters.clear();
 
 		int idx = 0;
-		for (uint32_t adapterIndex = 0; dxgiFactory->EnumAdapters1(adapterIndex, &adapter) != DXGI_ERROR_NOT_FOUND; 
+		for (uint32_t adapterIndex = 0; dxgiFactory->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
+			IID_PPV_ARGS(adapter.ReleaseAndGetAddressOf())) != DXGI_ERROR_NOT_FOUND;
 			++adapterIndex)
 		{
 			DXGI_ADAPTER_DESC1 desc;
@@ -125,6 +126,8 @@ namespace TrioEngine
 			g_Adapters.push_back(new GraphicsAdapter(adapter.Detach(), idx));
 			++idx;
 		}
+		//TODO: fallback to dxgiFactory->EnumAdapters1 if adapter is null
+
 
 #elif TRIO_OPENGL
 		//m_vAdapters.push_back(new GraphicsAdapter(0));

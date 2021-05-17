@@ -236,7 +236,8 @@ namespace TrioEngine
 			meshContent->SetName(node->mName.C_Str());
 			meshContent->SetContentIdentity(m_identity);
 
-			meshContent->GetTransform() = nodeTransform * parentTransform;
+			meshContent->GetTransform() = parentTransform * nodeTransform;
+			//meshContent->GetTransform() = nodeTransform * parentTransform;
 
 			for (uint32_t i = 0; i < node->mNumMeshes; i++)
 			{
@@ -259,7 +260,8 @@ namespace TrioEngine
 			nodeContent->SetName(node->mName.C_Str());
 			nodeContent->SetContentIdentity(m_identity);
 
-			nodeContent->GetTransform() = nodeTransform * parentTransform;
+			nodeContent->GetTransform() = parentTransform * nodeTransform;
+			//nodeContent->GetTransform() = nodeTransform * parentTransform;
 		}
 		
 		if (nodeContent)

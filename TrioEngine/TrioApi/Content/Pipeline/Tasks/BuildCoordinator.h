@@ -41,6 +41,8 @@ namespace TrioEngine
 			return m_settings->GetRelativePath(path);
 		}
 
+		std::vector<std::string> GetOutputFiles();
+
 		void RequestBuild(std::string sourceFilename, std::string assetName, std::string importerName, std::string processorName, OpaqueData *processorParameters);
 		BuildItem* RequestBuild(BuildRequest *request);
 		void RunTheBuild();

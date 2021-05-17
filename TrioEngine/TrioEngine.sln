@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EsteroFramework", "EsteroFr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EsteroEngine", "EsteroEngine\EsteroEngine.vcxproj", "{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EsteroGraphicsHost", "EsteroGraphicsHost\EsteroGraphicsHost.csproj", "{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +135,18 @@ Global
 		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Release|x64.Build.0 = Release|x64
 		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Release|x86.ActiveCfg = Release|Win32
 		{6F398E1F-0A64-4D40-BFE6-8C6B25CD1F08}.Release|x86.Build.0 = Release|Win32
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Debug|x64.Build.0 = Debug|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Debug|x86.Build.0 = Debug|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Release|x64.ActiveCfg = Release|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Release|x64.Build.0 = Release|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Release|x86.ActiveCfg = Release|Any CPU
+		{60B3C64A-6EBB-4E47-9DB7-0832EBEEB611}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -72,6 +72,7 @@ extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_GetSettings2(BuildCoo
 extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_RequestBuildWithoutOpaqueData(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName);
 extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_RequestBuild(BuildCoordinator * coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues);
 extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_RunTheBuild(BuildCoordinator* coordinator);
+extern "C" TRIO_API_EXPORT void __stdcall BuildCoordinator_GetOutputFiles(BuildCoordinator* coordinator, char*** outputFilenames, int *size);
 
 /*
 Component
@@ -309,6 +310,16 @@ extern "C" TRIO_API_EXPORT int __stdcall Texture2D_GetWidth(Texture2D* texture);
 extern "C" TRIO_API_EXPORT int __stdcall Texture2D_GetHeight(Texture2D* texture);
 
 /*
+Vector2
+*/
+extern "C" TRIO_API_EXPORT float __stdcall Vector2_Length(Vector2 * pVector);
+extern "C" TRIO_API_EXPORT void __stdcall Vector2_MultiplyScalar(Vector2 * pVector, float scalar);
+extern "C" TRIO_API_EXPORT void __stdcall Vector2_SubTwoVectors(Vector2 * pVector1, Vector2 * pVector2);
+extern "C" TRIO_API_EXPORT void __stdcall Vector2_SumTwoVectors(Vector2 * pVector1, Vector2 * pVector2);
+extern "C" TRIO_API_EXPORT void __stdcall Vector2_UnaryNegation(Vector2 * pVector);
+
+
+/*
 Vector3
 */
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_Clamp(Vector3 *pVector1, Vector3 *pMin, Vector3 *pMax);
@@ -316,10 +327,12 @@ extern "C" TRIO_API_EXPORT void __stdcall Vector3_Cross(Vector3 *pVector1, Vecto
 extern "C" TRIO_API_EXPORT float __stdcall Vector3_Distance(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" TRIO_API_EXPORT float __stdcall Vector3_DistanceSquared(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" TRIO_API_EXPORT float __stdcall Vector3_Dot(Vector3 *pVector1, Vector3 *pVector2);
+extern "C" TRIO_API_EXPORT float __stdcall Vector3_Length(Vector3 *pVector);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_MultiplyDivision(Vector3 *pVector, float scalar);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_MultiplyTwoVectors(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_MultiplyScalar(Vector3 *pVector, float scalar);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_Normalize(Vector3 *pVector);
+extern "C" TRIO_API_EXPORT void __stdcall Vector3_Transform(Vector3 * pVector, Quaternion * pRotation);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_SubTwoVectors(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_SumTwoVectors(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_UnaryNegation(Vector3 *pVector);
@@ -340,3 +353,10 @@ extern "C" TRIO_API_EXPORT VertexDeclaration* __stdcall VertexDeclaration_Ctor2(
 extern "C" TRIO_API_EXPORT VertexDeclaration* __stdcall VertexDeclaration_GetP();
 extern "C" TRIO_API_EXPORT VertexDeclaration* __stdcall VertexDeclaration_GetPC();
 extern "C" TRIO_API_EXPORT VertexDeclaration* __stdcall VertexDeclaration_GetPNT();
+
+/*
+Quaternion
+*/
+extern "C" TRIO_API_EXPORT void __stdcall Quaternion_CreateFromAxisAngle(Quaternion * quaternion, Vector3 * pAxis, float angle);
+extern "C" TRIO_API_EXPORT void __stdcall Quaternion_CreateFromYawPitchRoll(Quaternion * quaternion, float yaw, float pitch, float roll);
+extern "C" TRIO_API_EXPORT void __stdcall Quaternion_MultiplyTwoQuats(Quaternion * quaternion1, Quaternion * quaternion2);

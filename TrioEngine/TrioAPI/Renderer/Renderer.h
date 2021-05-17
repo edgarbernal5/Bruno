@@ -17,11 +17,12 @@ namespace TrioEngine
 	//};
 
 	class GraphicsDevice;
+	class EffectParameter;
 
 	class TRIO_API_EXPORT Renderer
 	{
 	public:
-		static void DrawScene(/*const Camera& camera*/);
+		static void DrawScene(EffectParameter* parameter, Matrix& viewProjection /*const Camera& camera*/);
 		static GraphicsDevice* GetDevice();
 		static void Initialize(GraphicsDevice* device);
 		static void UpdatePerFrameData();

@@ -29,7 +29,7 @@ namespace TrioApi.Net.Graphics
             {
                 if (height == 0 || width == 0)
                 {
-                    return 0f;
+                    return 0.0f;
                 }
                 return width / height;
             }

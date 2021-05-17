@@ -63,6 +63,7 @@ namespace TrioEngine
 		NameComponent& nameComponent = m_names.Create(entity);
 		nameComponent.m_name = name;
 
+		m_transforms.Create(entity);
 		m_meshes.Create(entity);
 
 		return entity;
@@ -96,6 +97,9 @@ namespace TrioEngine
 			const Vector3& diffuse = modelMaterial->GetDiffuseColor();
 			material.baseColor = Vector4(diffuse.x, diffuse.y, diffuse.z, 1.0f);
 
+			Texture* diffuseTexture = modelMaterial->GetTextureByName("Texture");
+			material.diffuseTexture = reinterpret_cast<Texture2D*>(diffuseTexture);
+
 			materialIndexes[modelMaterial] = materialEntity;
 		}
 
@@ -108,6 +112,13 @@ namespace TrioEngine
 			Entity meshEntity = CreateMesh(ss.str());
 
 			MeshComponent& mesh = *m_meshes.GetComponent(meshEntity);
+			TransformComponent& transform = *m_transforms.GetComponent(meshEntity);
+			
+			modelMesh->GetTransform().Decompose(transform.m_localScale, transform.m_localRotation, transform.m_localPosition);
+			/*transform.SetDirty();
+			transform.Update();*/
+
+			transform.m_world = modelMesh->GetTransform();
 
 			for (auto meshPart : modelMesh->GetModelMeshParts()) {
 				mesh.m_subMeshes.push_back(MeshComponent::SubMesh());

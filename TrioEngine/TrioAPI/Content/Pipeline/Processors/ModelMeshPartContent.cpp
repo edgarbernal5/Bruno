@@ -12,10 +12,10 @@ namespace TrioEngine
 		m_vertexOffset(vertexOffset),
 		m_startIndex(startIndex),
 		m_primitiveCount(primitiveCount),
-		m_numVertices(numVertices)
+		m_numVertices(numVertices),
+		m_indexBuffer(indices),
+		m_material(nullptr)
 	{
-		//m_indexBuffer = new IndexCollection(*indices);
-		m_indexBuffer = indices;
 	}
 
 	ModelMeshPartContent::~ModelMeshPartContent()

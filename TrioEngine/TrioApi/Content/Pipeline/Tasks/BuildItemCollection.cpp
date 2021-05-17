@@ -68,6 +68,26 @@ namespace TrioEngine
 		}
 	}
 
+	bool BuildItemCollection::RemoveUnwantedItems()
+	{
+		bool result = false;
+		int i = 0;
+		while (i < m_items.size())
+		{
+			if (m_items[i]->m_isWanted)
+			{
+				i++;
+			}
+			else
+			{
+				//base.RemoveAt(i);
+				m_items.erase(m_items.begin() + i);
+				result = true;
+			}
+		}
+		return result;
+	}
+
 	void BuildItemCollection::PushBack(BuildItem *item)
 	{
 		if (m_requestTable.find(item->m_buildRequest) != m_requestTable.end())

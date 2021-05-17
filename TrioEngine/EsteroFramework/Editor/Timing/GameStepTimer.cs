@@ -125,6 +125,7 @@ namespace EsteroFramework.Editor.Timing
 
             if (timeDelta > m_maxStepDelta)
             {
+                //Console.WriteLine("max delta " + m_maxStepDelta);
                 timeDelta = m_maxStepDelta;
             }
 

@@ -13,6 +13,20 @@ namespace TrioApi.Net.Maths
         public float X;
         public float Y;
 
+        private static Vector2 g_zero;
+        public static Vector2 Zero
+        {
+            get
+            {
+                return g_zero;
+            }
+        }
+
+        static Vector2()
+        {
+            g_zero = new Vector2();
+        }
+
         public Vector2(float _x, float _y)
         {
             X = _x;
@@ -29,6 +43,41 @@ namespace TrioApi.Net.Maths
         {
             X = sameValue;
             Y = sameValue;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector2_Length", CallingConvention = CallingConvention.StdCall)]
+        private static extern float Internal_Cross(ref Vector2 vector);
+
+        public float Length()
+        {
+            return Internal_Cross(ref this);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector2_SubTwoVectors", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SubTwoVectors(ref Vector2 vector, ref Vector2 vector2);
+
+        public static Vector2 operator -(Vector2 vector1, Vector2 vector2)
+        {
+            Internal_SubTwoVectors(ref vector1, ref vector2);
+            return vector1;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector2_SumTwoVectors", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SumTwoVectors(ref Vector2 vector, ref Vector2 vector2);
+
+        public static Vector2 operator +(Vector2 vector1, Vector2 vector2)
+        {
+            Internal_SubTwoVectors(ref vector1, ref vector2);
+            return vector1;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector2_MultiplyScalar", CallingConvention = CallingConvention.StdCall)]
+        private static extern float Internal_MultiplyScalar(ref Vector2 vector, float scalar);
+
+        public static Vector2 operator *(Vector2 vector, float scaleFactor)
+        {
+            Internal_MultiplyScalar(ref vector, scaleFactor);
+            return vector;
         }
 
         /// <summary>Tests vectors for equality.</summary>

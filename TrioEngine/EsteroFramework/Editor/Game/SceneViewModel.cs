@@ -12,7 +12,16 @@ namespace EsteroFramework.Editor.Game
     {
         public SceneProjectFile SceneProjectFile { get; set; }
 
-        public Camera Camera { get; set; }
+        public Camera Camera
+        {
+            get => m_camera; 
+            set
+            {
+                m_camera = value; 
+                NotifyOfPropertyChange(); 
+            }
+        }
+        private Camera m_camera;
 
         public IList<GameGraphicsScreen> GameGraphicsScreens
         {
@@ -22,6 +31,15 @@ namespace EsteroFramework.Editor.Game
             }
         }
         private List<GameGraphicsScreen> m_gameGraphicsScreens;
+
+        //TODO
+        /*
+         *  public static readonly DependencyProperty GraphicsScreensProperty = DependencyProperty.Register(
+            "GraphicsScreens",
+            typeof(IList<GraphicsScreen>),
+            typeof(GamePresentationTarget),
+            new PropertyMetadata(null, OnGraphicsScreensChanged));
+         */
 
         private EditorGameGraphicsScreen m_editorGameGraphicsScreen;
         private readonly IEditorService m_editor;
@@ -54,18 +72,28 @@ namespace EsteroFramework.Editor.Game
 
             TrioApi.Net.Game.Scene.ActiveScene = SceneProjectFile.Scene;
 
-            Camera = new Camera();
-            Camera.FieldOfView = 60.0f * 3.1416f / 180.0f;
-            Camera.NearPlane = 0.1f;
-            Camera.FarPlane = 100.0f;
-
-            Camera.Position = new Vector3(5.0f, 5.0f, 5.0f);
-            Camera.Target = Vector3.Zero;
-            Camera.Up = Vector3.Up;
-
+            InitializeCamera();
             InitializeGameScreens();
 
             base.OnActivate();
+        }
+
+        private void InitializeCamera()
+        {
+            Camera = new Camera();
+            Camera.FieldOfView = 60.0f * 3.1416f / 180.0f;
+            Camera.NearPlane = 0.1f;
+            Camera.FarPlane = 1000.0f;
+
+            Camera.Position = new Vector3(70.0f, 70.0f, 70.0f);
+            Camera.Target = Vector3.Zero;
+            Camera.Up = Vector3.Up;
+
+            Camera.Distance = 5.0f;
+            Camera.View = Matrix.Identity;
+            Camera.Rotation = Quaternion.CreateFromYawPitchRoll(0, -0.3f, 0);
+
+            Camera.Recalculate();
         }
     }
 }

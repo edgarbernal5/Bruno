@@ -57,13 +57,15 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 			if (texture == nullptr)
 			{
+				//TODO: crear una constante de esto *view
+				ID3D11ShaderResourceView* view = nullptr;
 				switch (m_stage)
 				{
 				case ShaderStage::Vertex:
-					device->GetD3DDeviceContext()->VSSetShaderResources(i, 1, nullptr);
+					device->GetD3DDeviceContext()->VSSetShaderResources(i, 1, &view);
 					break;
 				case ShaderStage::Pixel:
-					device->GetD3DDeviceContext()->PSSetShaderResources(i, 1, nullptr);
+					device->GetD3DDeviceContext()->PSSetShaderResources(i, 1, &view);
 					break;
 				case ShaderStage::Geometry:
 					break;

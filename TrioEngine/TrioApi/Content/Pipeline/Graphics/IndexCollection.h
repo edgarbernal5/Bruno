@@ -21,7 +21,6 @@ namespace TrioEngine
 
 		~IndexCollection()
 		{
-
 		}
 
 		void AddRange(const_iterator begin, const_iterator end)

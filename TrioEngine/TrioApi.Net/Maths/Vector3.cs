@@ -13,9 +13,6 @@ namespace TrioApi.Net.Maths
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Clamp", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Clamp(ref Vector3 vector, ref Vector3 vMin, ref Vector3 vMax);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Cross", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Cross(ref Vector3 vector, ref Vector3 vector2);
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Distance", CallingConvention = CallingConvention.StdCall)]
         private static extern float Internal_Distance(ref Vector3 vector, ref Vector3 vector2);
 
@@ -31,14 +28,8 @@ namespace TrioApi.Net.Maths
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_MultiplyTwoVectors", CallingConvention = CallingConvention.StdCall)]
         private static extern float Internal_MultiplyTwoVectors(ref Vector3 vector, ref Vector3 vector2);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_MultiplyScalar", CallingConvention = CallingConvention.StdCall)]
-        private static extern float Internal_MultiplyScalar(ref Vector3 vector, float scalar);
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Normalize", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Normalize(ref Vector3 vector);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_SubTwoVectors", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_SubTwoVectors(ref Vector3 vector, ref Vector3 vector2);
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_SumTwoVectors", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_SumTwoVectors(ref Vector3 vector, ref Vector3 vector2);
@@ -169,6 +160,15 @@ namespace TrioApi.Net.Maths
             Z = sameValue;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Cross", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Cross(ref Vector3 vector, ref Vector3 vector2);
+
+        public static Vector3 Cross(Vector3 vector1, Vector3 vector2)
+        {
+            Internal_Cross(ref vector1, ref vector2);
+            return vector1;
+        }
+
         public static float Distance(Vector3 value1, Vector3 value2)
         {
             return Internal_Distance(ref value1, ref value2);
@@ -179,10 +179,27 @@ namespace TrioApi.Net.Maths
             return Internal_DistanceSquared(ref value1, ref value2);
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Length", CallingConvention = CallingConvention.StdCall)]
+        private static extern float Internal_Cross(ref Vector3 vector);
+
+        public float Length()
+        {
+            return Internal_Cross(ref this);
+        }
+
         public static Vector3 Normalize(Vector3 vector)
         {
             Internal_Normalize(ref vector);
             return vector;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Transform", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Transform(ref Vector3 up, ref Quaternion quaternion);
+
+        public static Vector3 Transform(Vector3 up, Quaternion rotation)
+        {
+            Internal_Transform(ref up, ref rotation);
+            return up;
         }
 
         public static Vector3 operator -(Vector3 vectorIn)
@@ -196,6 +213,18 @@ namespace TrioApi.Net.Maths
             Internal_SumTwoVectors(ref vector1, ref vector2);
             return vector1;
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_SubTwoVectors", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SubTwoVectors(ref Vector3 vector, ref Vector3 vector2);
+
+        public static Vector3 operator -(Vector3 vector1, Vector3 vector2)
+        {
+            Internal_SubTwoVectors(ref vector1, ref vector2);
+            return vector1;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_MultiplyScalar", CallingConvention = CallingConvention.StdCall)]
+        private static extern float Internal_MultiplyScalar(ref Vector3 vector, float scalar);
 
         public static Vector3 operator *(Vector3 vector1, float scaleFactor)
         {

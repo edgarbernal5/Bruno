@@ -7,12 +7,6 @@ namespace TrioApi.Net.Graphics.Core
 {
     public class Effect : CppObject
     {
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_Ctor", CallingConvention = CallingConvention.StdCall)]
-        private static extern IntPtr Internal_Ctor(IntPtr device);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_GetParameters", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_GetParameters(IntPtr effect, ref IntPtr parameters, ref int size);
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_GetTechniques", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_GetTechniques(IntPtr effect, ref IntPtr techniques, ref int size);
 
@@ -25,6 +19,9 @@ namespace TrioApi.Net.Graphics.Core
         }
         private EffectTechniqueCollection m_technniques;
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_GetParameters", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_GetParameters(IntPtr effect, ref IntPtr parameters, ref int size);
+
         public EffectParameterCollection Parameters
         {
             get
@@ -33,6 +30,9 @@ namespace TrioApi.Net.Graphics.Core
             }
         }
         private EffectParameterCollection m_parameters;
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_Ctor", CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr Internal_Ctor(IntPtr device);
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Effect_CompileEffectFromFile", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
         private static extern void Internal_CompileEffectFromFile(IntPtr effect, string filename);
@@ -53,13 +53,13 @@ namespace TrioApi.Net.Graphics.Core
         private void LoadParameters()
         {
             int total = 0;
-            IntPtr array = IntPtr.Zero;
-            Internal_GetParameters(m_nativePointer, ref array, ref total);
+            IntPtr unmanagedArray = IntPtr.Zero;
+            Internal_GetParameters(m_nativePointer, ref unmanagedArray, ref total);
 
             if (total > 0)
             {
                 IntPtr[] parametersPtrs = new IntPtr[total];
-                Marshal.Copy(array, parametersPtrs, 0, total);
+                Marshal.Copy(unmanagedArray, parametersPtrs, 0, total);
 
                 var parameters = new EffectParameter[total];
                 for (int i = 0; i < total; i++)
@@ -67,7 +67,7 @@ namespace TrioApi.Net.Graphics.Core
                     parameters[i] = new EffectParameter(parametersPtrs[i]);
                 }
 
-                Marshal.FreeCoTaskMem(array);
+                Marshal.FreeCoTaskMem(unmanagedArray);
                 m_parameters = new EffectParameterCollection(parameters);
             }
         }
@@ -75,13 +75,13 @@ namespace TrioApi.Net.Graphics.Core
         private void LoadTechniques()
         {
             int total = 0;
-            IntPtr array = IntPtr.Zero;
-            Internal_GetTechniques(m_nativePointer, ref array, ref total);
+            IntPtr unmanagedArray = IntPtr.Zero;
+            Internal_GetTechniques(m_nativePointer, ref unmanagedArray, ref total);
 
             if (total > 0)
             {
                 IntPtr[] techniquePtrs = new IntPtr[total];
-                Marshal.Copy(array, techniquePtrs, 0, total);
+                Marshal.Copy(unmanagedArray, techniquePtrs, 0, total);
 
                 var techniques = new EffectTechnique[total];
                 for (int i = 0; i < total; i++)
@@ -89,7 +89,7 @@ namespace TrioApi.Net.Graphics.Core
                     techniques[i] = new EffectTechnique(techniquePtrs[i]);
                 }
 
-                Marshal.FreeCoTaskMem(array);
+                Marshal.FreeCoTaskMem(unmanagedArray);
                 m_technniques = new EffectTechniqueCollection(techniques);
             }
         }

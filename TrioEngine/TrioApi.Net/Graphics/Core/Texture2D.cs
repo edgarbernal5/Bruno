@@ -64,6 +64,7 @@ namespace TrioApi.Net.Graphics.Core
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_GetData", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_GetData(IntPtr texture, IntPtr bytes, uint elementCount);
+        
         public void GetData<T>(T[] data) where T : struct
         {
             int elementSizeInBytes = Marshal.SizeOf(typeof(T));

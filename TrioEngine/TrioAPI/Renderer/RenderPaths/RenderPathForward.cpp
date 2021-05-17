@@ -20,7 +20,7 @@ namespace TrioEngine
 
 		effectLoader.LoadFromFile("D:/Edgar/Documentos/Proyectos/CG/TrioEngineGit/Shaders/SceneTest.fx");
 
-		m_mainParameter = effect->GetParameters()[0];
+		m_mainParameter = effect->GetParameters()["gWorldViewProj"];
 		m_mainPass = effect->GetTechniques()[0]->GetPasses()[0];
 	}
 
@@ -33,9 +33,9 @@ namespace TrioEngine
 		Matrix projectionMatrix = Matrix::CreatePerspectiveFieldOfView(camera.GetFieldOfView(), camera.GetAspectRatio(), camera.GetNearPlane(), camera.GetFarPlane());
 		Matrix viewProjection = viewMatrix * projectionMatrix;
 
-		m_mainParameter->SetValue(viewProjection);
+		//m_mainParameter->SetValue(viewProjection);
 		m_mainPass->Apply();
-		Renderer::DrawScene();
+		Renderer::DrawScene(m_mainParameter, viewProjection);
 	}
 
 	void RenderPathForward::RenderShadows() const

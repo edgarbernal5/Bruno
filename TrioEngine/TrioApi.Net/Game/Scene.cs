@@ -79,7 +79,6 @@ namespace TrioApi.Net.Game
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_UpdateCamera", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Update(Camera camera);
 
-
         public static void UpdateCamera(Camera camera)
         {
             Internal_Update(camera);

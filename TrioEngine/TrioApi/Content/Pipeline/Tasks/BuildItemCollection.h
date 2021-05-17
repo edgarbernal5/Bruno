@@ -57,6 +57,7 @@ namespace TrioEngine
 		BuildItem* FindItem(BuildRequest *request);
 
 		void Remove(BuildItem* item);
+		bool RemoveUnwantedItems();
 		void WantItem(BuildItem* item);
 		void ReverseWantedItems(int fromIndex);
 		BuildItem* PopWantedItem();

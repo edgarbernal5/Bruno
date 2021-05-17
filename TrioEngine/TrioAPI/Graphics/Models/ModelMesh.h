@@ -13,7 +13,7 @@ namespace TrioEngine
 	{
 	public:
 		ModelMesh();
-		ModelMesh(std::string name, ModelBone* parentBone/*, BoundingSphere boundingSphere, BoundingBox boundingBox*/, std::vector<ModelMeshPart*>& meshParts);
+		ModelMesh(std::string name, ModelBone* parentBone, Matrix& transform /*, BoundingSphere boundingSphere, BoundingBox boundingBox*/, std::vector<ModelMeshPart*>& meshParts);
 		~ModelMesh();
 
 		inline const std::vector<ModelMeshPart*>& GetModelMeshParts()
@@ -30,6 +30,10 @@ namespace TrioEngine
 			return m_name.c_str();
 		}
 
+		inline Matrix& GetTransform() {
+			return m_transform;
+		}
+
 		/*inline const BoundingSphere& GetBoundingSphere()
 		{
 			return m_boundingSphere;
@@ -43,6 +47,7 @@ namespace TrioEngine
 		std::string m_name;
 		std::vector<ModelMeshPart*> m_ModelMeshParts;
 		ModelBone* m_parentBone;
+		Matrix m_transform;
 
 		/*BoundingSphere m_boundingSphere;
 		BoundingBox m_boundingBox;*/

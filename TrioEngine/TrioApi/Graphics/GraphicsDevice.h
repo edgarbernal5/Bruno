@@ -49,8 +49,8 @@ namespace TrioEngine
 #ifdef TRIO_DIRECTX
 		UINT                    GetBackBufferCount() const { return m_backBufferCount; }
 		ID3D11RenderTargetView*	GetBackBufferRenderTargetView() const { return m_d3dDefaultRenderTargetView.Get(); }
-		ID3D11Device1*          GetD3DDevice() const noexcept { return m_d3dDevice.Get(); }
-		ID3D11DeviceContext1*   GetD3DDeviceContext() const noexcept { return m_d3dContext.Get(); }
+		inline ID3D11Device1*          GetD3DDevice() const noexcept { return m_d3dDevice.Get(); }
+		inline ID3D11DeviceContext1*   GetD3DDeviceContext() const noexcept { return m_d3dContext.Get(); }
 		auto                    GetDXGIFactory() const noexcept { return m_dxgiFactory.Get(); }
 		D3D_FEATURE_LEVEL       GetDeviceFeatureLevel() const { return m_d3dFeatureLevel; }
 		//ID3D11DepthStencilView* GetDepthStencilView() const					{ return m_depthStencilBuffer->m_d3dDepthStencilView.Get(); }

@@ -84,4 +84,49 @@ namespace TrioEngine
 
 		return fileStream;
 	}
+
+	/*
+	string GetCleanPath(string path)
+{
+	path = path.Replace('/', '\\');
+	path = path.Replace("\\.\\", "\\");
+	while (path.StartsWith(".\\"))
+	{
+		path = path.Substring(".\\".Length);
+	}
+	while (path.EndsWith("\\."))
+	{
+		if (path.Length > "\\.".Length)
+		{
+			path = path.Substring(0, path.Length - "\\.".Length);
+		}
+		else
+		{
+			path = "\\";
+		}
+	}
+	for (int i = 1; i < path.Length; i = TitleContainer.CollapseParentDirectory(ref path, i, "\\..\\".Length))
+	{
+		i = path.IndexOf("\\..\\", i);
+		if (i < 0)
+		{
+			break;
+		}
+	}
+	if (path.EndsWith("\\.."))
+	{
+		int i = path.Length - "\\..".Length;
+		if (i > 0)
+		{
+			TitleContainer.CollapseParentDirectory(ref path, i, "\\..".Length);
+		}
+	}
+	if (path == ".")
+	{
+		path = string.Empty;
+	}
+	return path;
+}
+
+*/
 }

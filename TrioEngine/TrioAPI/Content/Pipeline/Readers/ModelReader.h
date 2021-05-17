@@ -4,6 +4,7 @@
 
 #include "Content/ContentTypeReader.h"
 
+#include "Math/MathVector.h"
 #include <vector>
 
 namespace TrioEngine
@@ -25,7 +26,9 @@ namespace TrioEngine
 		void ReadBones(Model* model, ContentReader* input);
 		void ReadMeshes(Model* model, ContentReader* input);
 		std::vector<ModelMeshPart*> ReadMeshParts(ContentReader* input);
-		ModelBone* ReadBoneReference(Model* model, ContentReader* input);
+		ModelBone* ReadBoneReference(Model* model, ContentReader* input, int& boneIndex);
+
+		//Matrix GetAbsoluteTransform(Model* model);
 	};
 	
 }

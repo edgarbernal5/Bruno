@@ -11,7 +11,7 @@ namespace EsteroFramework.Editor.Units
     public class GameUnit : EditorUnit
     {
         private GraphicsService m_graphicsService;
-        private GameStepTimer m_gameStepTimer;
+        public static GameStepTimer m_gameStepTimer;
         private bool m_idle;
 
         public GameUnit()

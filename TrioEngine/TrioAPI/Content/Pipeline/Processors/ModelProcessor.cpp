@@ -98,11 +98,10 @@ namespace TrioEngine
 			meshList.push_back(ProcessMesh(nodeAsMesh, boneContent, context));
 		}
 
-		std::vector< ModelBoneContent*> children;
+		std::vector<ModelBoneContent*> children;
 		for (auto& child : node->GetChildren()) {
 			children.push_back(ProcessNode(child, boneContent, boneList, meshList, context));
 		}
-
 		boneContent->SetChildren(children);
 
 		return boneContent;
@@ -112,7 +111,7 @@ namespace TrioEngine
 	{
 		VertexBufferContent* vertexBuffer = new VertexBufferContent();
 		IndexCollection* indexBuffer = new IndexCollection();
-		std::vector< ModelMeshPartContent*> parts;
+		std::vector<ModelMeshPartContent*> parts;
 
 		int startVertex = 0;
 		for (auto& geometry : mesh->GetGeometry()) {

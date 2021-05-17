@@ -83,6 +83,7 @@ namespace EsteroFramework.Editor.Units
 
             Scene.ActiveScene.LoadFromModel(model);
 
+            var outputFiles = buildCoordinator.GetOutputFiles();
             buildCoordinator.Dispose();
         }
 

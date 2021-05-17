@@ -38,20 +38,37 @@
 
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderPaths/RenderPathForward.h"
+#include <strsafe.h>
 
 namespace TrioDLL {
 	char* AllocateMemoryForString(const char* source) {
-		const char* szSampleString = source;
+		/*
+			https://limbioliong.wordpress.com/2011/06/16/returning-strings-from-a-c-api/
+			https://limbioliong.wordpress.com/2011/08/14/returning-an-array-of-strings-from-c-to-c-part-1/
+		*/
 
+		//const char* szSampleString = source;
+
+		//ULONG ulSize = strlen(szSampleString) + sizeof(char);
+		//char* pszReturn = NULL;
+
+		//pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
+		//// Copy the contents of szSampleString
+		//// to the memory pointed to by pszReturn.
+		//strcpy_s(pszReturn, ulSize, szSampleString);
+		//// Return pszReturn.
+
+		//return pszReturn;
+
+		const char* szSampleString = source;
 		ULONG ulSize = strlen(szSampleString) + sizeof(char);
 		char* pszReturn = NULL;
 
-		pszReturn = (char*)::GlobalAlloc(GMEM_FIXED, ulSize);
+		pszReturn = (char*)::CoTaskMemAlloc(ulSize);
 		// Copy the contents of szSampleString
 		// to the memory pointed to by pszReturn.
-		strcpy_s(pszReturn, ulSize, szSampleString);
+		strcpy(pszReturn, szSampleString);
 		// Return pszReturn.
-
 		return pszReturn;
 	}
 }
@@ -195,6 +212,22 @@ void BuildCoordinator_RunTheBuild(BuildCoordinator* coordinator)
 	coordinator->RunTheBuild();
 }
 
+void BuildCoordinator_GetOutputFiles(BuildCoordinator * coordinator, char*** outputFilenames, int* size)
+{
+	auto list = coordinator->GetOutputFiles();
+	auto n = list.size();
+
+	*size = n;
+	if (n > 0)
+	{
+		char** newArray = (char**)CoTaskMemAlloc(sizeof(char*) * n);
+		for (size_t i = 0; i < n; i++)
+		{
+			newArray[i] = TrioDLL::AllocateMemoryForString(list[i].c_str());
+		}
+		*outputFilenames = newArray;
+	}
+}
 /*
 Component
 */
@@ -761,7 +794,7 @@ Renderer
 */
 void Renderer_DrawScene(Camera camera)
 {
-
+	//Renderer::DrawScene();
 }
 
 void Renderer_Initialize(GraphicsDevice* device)
@@ -1000,6 +1033,35 @@ int Texture2D_GetHeight(Texture2D* texture)
 }
 
 /*
+Vector2
+*/
+
+float Vector2_Length(Vector2* pVector)
+{
+	return pVector->Length();
+}
+
+void Vector2_MultiplyScalar(Vector2* pVector, float scalar)
+{
+	*pVector *= scalar;
+}
+
+void Vector2_SubTwoVectors(Vector2* pVector1, Vector2* pVector2)
+{
+	*pVector1 -= *pVector2;
+}
+
+void Vector2_SumTwoVectors(Vector2* pVector1, Vector2* pVector2)
+{
+	*pVector1 += *pVector2;
+}
+
+void Vector2_UnaryNegation(Vector2* pVector)
+{
+	*pVector = -*pVector;
+}
+
+/*
 Vector3
 */
 void Vector3_Clamp(Vector3 *pVector1, Vector3 *pMin, Vector3 *pMax)
@@ -1027,6 +1089,11 @@ float Vector3_Dot(Vector3 *pVector1, Vector3 *pVector2)
 	return pVector1->Dot(*pVector2);
 }
 
+float Vector3_Length(Vector3 * pVector)
+{
+	return pVector->Length();
+}
+
 void Vector3_MultiplyDivision(Vector3 *pVector, float scalar)
 {
 	*pVector /= scalar;
@@ -1045,6 +1112,11 @@ void Vector3_MultiplyScalar(Vector3 *pVector, float scalar)
 void Vector3_Normalize(Vector3 *pVector)
 {
 	pVector->Normalize();
+}
+
+void Vector3_Transform(Vector3* pVector, Quaternion* pRotation)
+{
+	*pVector = pVector->Transform(*pVector, *pRotation);
 }
 
 void Vector3_SubTwoVectors(Vector3 *pVector1, Vector3 *pVector2)
@@ -1113,4 +1185,22 @@ VertexDeclaration* VertexDeclaration_GetPC()
 VertexDeclaration* VertexDeclaration_GetPNT()
 {
 	return VertexPositionNormalTexture::GetVertexDeclaration();
+}
+
+/*
+Quaternion
+*/
+void Quaternion_CreateFromAxisAngle(Quaternion* quaternion, Vector3* pAxis, float angle)
+{
+	*quaternion = quaternion->CreateFromAxisAngle(*pAxis, angle);
+}
+
+void Quaternion_CreateFromYawPitchRoll(Quaternion * quaternion, float yaw, float pitch, float roll)
+{
+	*quaternion = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
+}
+
+void Quaternion_MultiplyTwoQuats(Quaternion * quaternion1, Quaternion * quaternion2)
+{
+	*quaternion1 *= *quaternion2;
 }

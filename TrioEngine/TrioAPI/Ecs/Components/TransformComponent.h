@@ -68,9 +68,13 @@ namespace TrioEngine
 
 				*/
 
-			return Matrix::CreateScale(m_localScale) *
+			//return Matrix::CreateScale(m_localScale) *
+			//	Matrix::CreateFromQuaternion(m_localRotation) *
+			//	Matrix::CreateTranslation(m_localPosition);
+
+			return Matrix::CreateTranslation(m_localPosition)  *
 				Matrix::CreateFromQuaternion(m_localRotation) *
-				Matrix::CreateTranslation(m_localPosition);
+				Matrix::CreateScale(m_localScale);
 		}
 	};
 }

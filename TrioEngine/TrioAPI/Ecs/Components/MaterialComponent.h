@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Math/MathVector.h"
+#include "Graphics/Texture2D.h"
 
 namespace TrioEngine
 {
-	class Texture2D;
+	//class Texture2D;
 
 	struct MaterialComponent
 	{

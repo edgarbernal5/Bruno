@@ -21,6 +21,7 @@ namespace TrioEngine
 		friend class Model;
 
 		friend class ModelReader;
+		friend class SceneReader;
 
 	private:
 		Matrix m_transform;

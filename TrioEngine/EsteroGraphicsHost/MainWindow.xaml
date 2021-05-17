@@ -1,0 +1,14 @@
+﻿<Window x:Class="EsteroGraphicsHost.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EsteroGraphicsHost"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <local:GraphicsDeviceHost OnRender="GraphicsDeviceHost_OnRender" OnLoaded="GraphicsDeviceHost_OnLoaded" HwndLButtonDown="GraphicsDeviceHost_HwndLButtonDown" HwndLButtonUp="GraphicsDeviceHost_HwndLButtonUp" HwndMouseMove="GraphicsDeviceHost_HwndMouseMove">
+            
+        </local:GraphicsDeviceHost>
+    </Grid>
+</Window>

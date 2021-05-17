@@ -26,7 +26,8 @@ namespace TrioEngine
 
 		ReadBones(model, input);
 		ReadMeshes(model, input);
-		model->m_root = ReadBoneReference(model, input);
+		int rootIndex;
+		model->m_root = ReadBoneReference(model, input, rootIndex);
 
 		return model;
 	}
@@ -44,12 +45,13 @@ namespace TrioEngine
 		model->m_modelBones = bones;
 		for (int i = 0; i < boneCount; i++)
 		{
-			ModelBone* newParent = ReadBoneReference(model, input);
+			int rootIndex;
+			ModelBone* newParent = ReadBoneReference(model, input, rootIndex);
 			int childCount = input->ReadInt32();
 			std::vector<ModelBone*> newChildren(childCount, nullptr);
 			for (int j = 0; j < childCount; j++)
 			{
-				newChildren[j] = ReadBoneReference(model, input);
+				newChildren[j] = ReadBoneReference(model, input, rootIndex);
 			}
 			model->m_modelBones[i]->m_parent = newParent;
 			model->m_modelBones[i]->m_children = newChildren;
@@ -85,7 +87,8 @@ namespace TrioEngine
 		for (int i = 0; i < meshCount; i++)
 		{
 			std::string name = input->ReadString();
-			ModelBone* parentBone = ReadBoneReference(model, input);
+			int rootIndex;
+			ModelBone* parentBone = ReadBoneReference(model, input, rootIndex);
 
 			/*BoundingSphere boundingSphere;
 			boundingSphere.Center = input->ReadVector3();
@@ -95,11 +98,16 @@ namespace TrioEngine
 			boundingBox.Min = input->ReadVector3();
 			boundingBox.Max = input->ReadVector3();*/
 
+			Matrix transform = model->m_bonesMatrices[rootIndex]; //GetAbsoluteTransform(model);
 			std::vector<ModelMeshPart*> meshParts = ReadMeshParts(input);
-			meshes[i] = new ModelMesh(name, parentBone, /*boundingSphere, boundingBox,*/ meshParts);
+			meshes[i] = new ModelMesh(name, parentBone, transform, /*boundingSphere, boundingBox,*/ meshParts);
 		}
 		model->m_modelMeshes = meshes;
 	}
+
+	//Matrix ModelReader::GetAbsoluteTransform(Model* model) {
+
+	//}
 	
 	std::vector<ModelMeshPart*> ModelReader::ReadMeshParts(ContentReader* input)
 	{
@@ -147,7 +155,7 @@ namespace TrioEngine
 		return meshParts;
 	}
 
-	ModelBone* ModelReader::ReadBoneReference(Model* model, ContentReader* input)
+	ModelBone* ModelReader::ReadBoneReference(Model* model, ContentReader* input, int& boneIndex)
 	{
 		int totalBones = model->m_modelBones.size() + 1;
 		int boneId = 0;
@@ -161,8 +169,10 @@ namespace TrioEngine
 		}
 		if (boneId != 0)
 		{
+			boneIndex = boneId - 1;
 			return model->m_modelBones[boneId - 1];
 		}
+		boneIndex = 0;
 		return nullptr;
 	}
 }

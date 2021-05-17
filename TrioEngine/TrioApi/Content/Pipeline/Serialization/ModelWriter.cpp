@@ -69,7 +69,7 @@ namespace TrioEngine
 
 	void ModelWriter::WriteMeshes(ContentWriter* output, ModelContent* content)
 	{
-		auto meshes = content->m_meshes;
+		auto &meshes = content->m_meshes;
 
 		output->WriteUInt32(meshes.size());
 		for (int i = 0; i < meshes.size(); i++)

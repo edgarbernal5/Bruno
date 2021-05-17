@@ -1,8 +1,11 @@
 ﻿
+using EsteroFramework.Editor.Units;
 using EsteroFramework.Graphics;
+using EsteroFramework.Graphics.Data;
 using EsteroFramework.Graphics.Editor;
 using System;
 using TrioApi.Net.Graphics.Core;
+using TrioApi.Net.Maths;
 using TrioApi.Net.Renderer;
 
 namespace EsteroFramework.Editor.Graphics
@@ -59,10 +62,31 @@ namespace EsteroFramework.Editor.Graphics
 
             //
             renderContext.Camera = Camera;
+
+            //float time = (float)GameUnit.m_gameStepTimer.TotalTime.TotalSeconds;
+            //Camera.Rotation = Quaternion.CreateFromYawPitchRoll(time * 0.1f, -0.3f, 0);
+
+            //Camera.Recalculate();
+
             m_gridMesh.Render(renderContext);
 
-            //Renderer.Camera ranco = TrioApi.Net.Game.Scene.Camera;
+            TrioApi.Net.Game.Scene.UpdateCamera(ConvertToCamera(Camera));
             m_renderPath.Render();
+        }
+
+        private Renderer.Camera ConvertToCamera(Camera camera)
+        {
+            return new Renderer.Camera()
+            {
+                m_position = camera.Position,
+                m_target = camera.Target,
+                m_up = camera.Up,
+
+                m_nearPlane = camera.NearPlane,
+                m_farPlane = camera.FarPlane,
+                m_fieldOfView = camera.FieldOfView,
+                m_aspectRatio = camera.AspectRatio
+            };
         }
     }
 }
