@@ -306,7 +306,6 @@ namespace EsteroFramework.Graphics.Interop
                 case WindowMessages.WM_MOUSEWHEEL:
                     if (m_mouseInWindow)
                     {
-
                         int delta = Win32.GetWheelDeltaWParam(wParam);
                         HwndMouseWheel?.Invoke(this, new HwndMouseEventArgs(m_mouseState, delta, 0));
                     }

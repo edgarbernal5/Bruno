@@ -60,7 +60,6 @@ namespace EsteroFramework.Editor.Game.Interaction
             var cameraNode = Camera;
             if (cameraNode == null)
             {
-                // No camera found.
                 return;
             }
             AssociatedObject.CaptureMouse();
@@ -170,6 +169,5 @@ namespace EsteroFramework.Editor.Game.Interaction
         {
             return (_previousMousePosition - currentMousePosition);
         }
-
     }
 }

@@ -81,7 +81,6 @@
     </Compile>
     <Compile Include="Editor\ExitCode.cs" />
     <Compile Include="Editor\Game\Interaction\CameraMouseHwndHostBehavior.cs" />
-    <Compile Include="Editor\Game\Interaction\IMouseHwndHost.cs" />
     <Compile Include="Editor\Game\SceneProjectFile.cs" />
     <Compile Include="Editor\Game\SceneView.xaml.cs">
       <DependentUpon>SceneView.xaml</DependentUpon>
