@@ -12,17 +12,10 @@
              
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <!--<game:GameSurfaceTarget x:Name="gameSurfaceTarget"
-                                GameGraphicsScreens ="{Binding GameGraphicsScreens}">
-            <i:Interaction.Behaviors>
-                <beh:CameraMouseBehavior Camera="{Binding Camera}" />
-            </i:Interaction.Behaviors>
-        </game:GameSurfaceTarget>-->
-
         <game:GameSurfaceTargetHwndHost x:Name="gameSurfaceTarget" GameGraphicsScreens ="{Binding GameGraphicsScreens}">
-            <!--<i:Interaction.Behaviors>
-                <beh:CameraMouseBehavior Camera="{Binding Camera}" />
-            </i:Interaction.Behaviors>-->
+            <i:Interaction.Behaviors>
+                <beh:CameraMouseHwndHostBehavior Camera="{Binding Camera}" />
+            </i:Interaction.Behaviors>
         </game:GameSurfaceTargetHwndHost>
     </Grid>
 </UserControl>

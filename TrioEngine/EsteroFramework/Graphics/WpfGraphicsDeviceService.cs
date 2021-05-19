@@ -4,7 +4,7 @@ using TrioApi.Net.Graphics;
 
 namespace EsteroFramework.Graphics
 {
-    public class WpfGraphicsDeviceService : IAddHwndHostRef
+    public class WpfGraphicsDeviceService : IHwndHostRef
     {
         private GraphicsDevice m_graphicsDevice;
 
@@ -13,7 +13,6 @@ namespace EsteroFramework.Graphics
             m_graphicsDevice = graphicsDevice;
         }
 
-        public bool IsReady => m_isReady;
         private bool m_isReady;
 
         public WpfGraphicsDeviceService()
@@ -21,7 +20,7 @@ namespace EsteroFramework.Graphics
             m_isReady = false;
         }
 
-        public void AddHostRef(IntPtr windowHandle, int width, int height)
+        public void AddRef(IntPtr windowHandle, int width, int height)
         {
             var parameters = m_graphicsDevice.PresentationParameters;
 
@@ -43,6 +42,11 @@ namespace EsteroFramework.Graphics
             parameters.BackBufferHeight = Math.Max(height, 1);
 
             m_graphicsDevice.Reset(parameters);
+        }
+
+        public void RemoveRef(IntPtr windowHandle)
+        {
+
         }
     }
 }

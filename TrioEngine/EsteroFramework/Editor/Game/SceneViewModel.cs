@@ -57,7 +57,7 @@ namespace EsteroFramework.Editor.Game
                 m_editorGameGraphicsScreen = new EditorGameGraphicsScreen();
                 m_gameGraphicsScreens.Add(m_editorGameGraphicsScreen);
             }
-
+            
             var primitivesService = m_editor.Services.GetInstance<IEditorPrimitivesService>();
             m_editorGameGraphicsScreen.GridMesh = primitivesService.GridMesh;
             m_editorGameGraphicsScreen.Scene = SceneProjectFile.Scene;

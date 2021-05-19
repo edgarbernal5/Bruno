@@ -80,7 +80,8 @@
       <DependentUpon>EditorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Editor\ExitCode.cs" />
-    <Compile Include="Editor\Game\Interaction\CameraMouseBehavior.cs" />
+    <Compile Include="Editor\Game\Interaction\CameraMouseHwndHostBehavior.cs" />
+    <Compile Include="Editor\Game\Interaction\IMouseHwndHost.cs" />
     <Compile Include="Editor\Game\SceneProjectFile.cs" />
     <Compile Include="Editor\Game\SceneView.xaml.cs">
       <DependentUpon>SceneView.xaml</DependentUpon>
@@ -103,7 +104,7 @@
     <Compile Include="Graphics\Editor\IEditorPrimitivesService.cs" />
     <Compile Include="Graphics\GraphicsDeviceService.cs" />
     <Compile Include="Graphics\GraphicsService.cs" />
-    <Compile Include="Graphics\IAddHwndHostRef.cs" />
+    <Compile Include="Graphics\IHwndHostRef.cs" />
     <Compile Include="Graphics\IGraphicsService.cs" />
     <Compile Include="Graphics\Interop\GameImageSource.cs" />
     <Compile Include="Graphics\Interop\GameSurfaceTarget.xaml.cs">

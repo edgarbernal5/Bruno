@@ -92,6 +92,9 @@ namespace EsteroWindows.Interop
         [DllImport("user32.dll")]
         public static extern int ShowCursor(bool bShow);
 
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetCapture(IntPtr hWnd);
+
         /// <summary>
         /// Gets the mouse cursor's position, in screen coordinates.
         /// </summary>
@@ -350,6 +353,20 @@ namespace EsteroWindows.Interop
             return HIWORD(lParam.ToInt32());
         }
 
+        internal static ushort HIWORD(IntPtr dwValue)
+        {
+            return (ushort)((((long)dwValue) >> 0x10) & 0xffff);
+        }
+
+        internal static ushort HIWORD(uint dwValue)
+        {
+            return (ushort)(dwValue >> 0x10);
+        }
+
+        public static int GetWheelDeltaWParam(IntPtr wParam)
+        {
+            return (short)HIWORD(wParam);
+        }
 
         /// <summary>
         /// Gets the low-order word from the specified value.

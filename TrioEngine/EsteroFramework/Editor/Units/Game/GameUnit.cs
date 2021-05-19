@@ -36,7 +36,7 @@ namespace EsteroFramework.Editor.Units
             Editor.Services.RegisterInstance(typeof(IGraphicsService), null, m_graphicsService);
 
             var graphicsDeviceService = new WpfGraphicsDeviceService(graphicsDevice);
-            Editor.Services.RegisterInstance(typeof(IAddHwndHostRef), null, graphicsDeviceService);
+            Editor.Services.RegisterInstance(typeof(IHwndHostRef), null, graphicsDeviceService);
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)

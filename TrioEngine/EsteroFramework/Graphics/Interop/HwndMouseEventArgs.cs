@@ -54,14 +54,17 @@ namespace EsteroFramework.Graphics.Interop
         public int HorizontalWheelDelta { get; private set; }
 
         /// <summary>
-        /// Gets the current position of the mouse.
+        /// Gets the position of the mouse in screen coordinates.
         /// </summary>
-        public Point Position { get; private set; }
+        public Point ScreenPosition { get; private set; }
 
         /// <summary>
-        /// Gets the previous position of the mouse.
+        ///  Calculates the position of the mouse relative to a particular element. 
         /// </summary>
-        public Point PreviousPosition { get; private set; }
+        public Point GetPosition(UIElement relativeTo)
+        {
+            return relativeTo.PointFromScreen(ScreenPosition);
+        }
 
         /// <summary>
         /// Initializes a new HwndMouseEventArgs.
@@ -74,8 +77,7 @@ namespace EsteroFramework.Graphics.Interop
             MiddleButton = state.MiddleButton;
             X1Button = state.X1Button;
             X2Button = state.X2Button;
-            Position = state.Position;
-            PreviousPosition = state.PreviousPosition;
+            ScreenPosition = state.ScreenPosition;
         }
 
         /// <summary>
@@ -83,6 +85,7 @@ namespace EsteroFramework.Graphics.Interop
         /// </summary>
         /// <param name="state">The state from which to initialize the properties.</param>
         /// <param name="mouseWheelDelta">The mouse wheel rotation delta.</param>
+        /// <param name="mouseHWheelDelta">The horizontal mouse wheel delta.</param>
         public HwndMouseEventArgs(HwndMouseState state, int mouseWheelDelta, int mouseHWheelDelta)
             : this(state)
         {

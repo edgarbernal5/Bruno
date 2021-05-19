@@ -4,8 +4,10 @@ using EsteroFramework.Editor.Graphics;
 using EsteroWindows.Interop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using TrioApi.Net.Graphics;
 
@@ -13,10 +15,15 @@ namespace EsteroFramework.Graphics.Interop
 {
     public class GameSurfaceTargetHwndHost : HwndHost, IGameSurfaceTarget
     {
-        private const string windowClass = "GameSurfaceTargetHwndHostWindowClass";
+        private const string WINDOWS_CLASS = "GameSurfaceTargetHwndHostWindowClass";
 
         private IntPtr m_hWnd;
-        IGraphicsService m_graphicsService;
+        private IntPtr m_hWndPrev;
+        private bool m_applicationHasFocus;
+        private bool m_mouseInWindow;
+        private Point m_previousMousePosition;
+        private bool m_isMouseCaptured;
+        private readonly HwndMouseState m_mouseState = new HwndMouseState();
 
         public int LastWidth { get; set; }
 
@@ -56,10 +63,60 @@ namespace EsteroFramework.Graphics.Interop
         //    }
         //}
 
+        public event EventHandler<HwndMouseEventArgs> HwndLButtonDown;
+
+        public event EventHandler<HwndMouseEventArgs> HwndLButtonUp;
+
+        public event EventHandler<HwndMouseEventArgs> HwndLButtonDblClick;
+
+        public event EventHandler<HwndMouseEventArgs> HwndRButtonDown;
+
+        public event EventHandler<HwndMouseEventArgs> HwndRButtonUp;
+
+        public event EventHandler<HwndMouseEventArgs> HwndRButtonDblClick;
+
+        public event EventHandler<HwndMouseEventArgs> HwndMButtonDown;
+
+        public event EventHandler<HwndMouseEventArgs> HwndMButtonUp;
+
+        public event EventHandler<HwndMouseEventArgs> HwndMButtonDblClick;
+
+        public event EventHandler<HwndMouseEventArgs> HwndX1ButtonDown;
+
+        public event EventHandler<HwndMouseEventArgs> HwndX1ButtonUp;
+
+        public event EventHandler<HwndMouseEventArgs> HwndX1ButtonDblClick;
+
+        public event EventHandler<HwndMouseEventArgs> HwndX2ButtonDown;
+
+        public event EventHandler<HwndMouseEventArgs> HwndX2ButtonUp;
+
+        public event EventHandler<HwndMouseEventArgs> HwndX2ButtonDblClick;
+
+        public event EventHandler<HwndMouseEventArgs> HwndMouseMove;
+
+        public event EventHandler<HwndMouseEventArgs> HwndMouseEnter;
+
+        public event EventHandler<HwndMouseEventArgs> HwndMouseLeave;
+
+        public event EventHandler<HwndMouseEventArgs> HwndMouseWheel;
+
+        public new bool IsMouseCaptured
+        {
+            get { return m_isMouseCaptured; }
+        }
 
         public GameSurfaceTargetHwndHost()
         {
             Initialize();
+            HookEvents();
+        }
+
+        private void HookEvents()
+        {
+            Application.Current.Activated += Current_Activated;
+            Application.Current.Deactivated += Current_Deactivated;
+
             Loaded += GameSurfaceTargetHost_Loaded;
             Unloaded += GameSurfaceTargetHost_Unloaded;
             SizeChanged += GameSurfaceTargetHwndHost_SizeChanged;
@@ -68,50 +125,87 @@ namespace EsteroFramework.Graphics.Interop
         private void Initialize()
         {
             m_hWnd = IntPtr.Zero;
+
+            if (Application.Current.Windows.Cast<Window>().Any(x => x.IsActive))
+                m_applicationHasFocus = true;
+        }
+
+        private void Current_Activated(object sender, EventArgs e)
+        {
+            m_applicationHasFocus = true;
+        }
+
+        private void Current_Deactivated(object sender, EventArgs e)
+        {
+            m_applicationHasFocus = false;
+            ResetMouseState();
+
+            if (m_mouseInWindow)
+            {
+                m_mouseInWindow = false;
+                HwndMouseLeave?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+            }
+
+            ReleaseMouseCapture();
+        }
+
+        private void ResetMouseState()
+        {
+            // We need to invoke events for any buttons that were pressed
+            bool fireL = m_mouseState.LeftButton == MouseButtonState.Pressed;
+            bool fireM = m_mouseState.MiddleButton == MouseButtonState.Pressed;
+            bool fireR = m_mouseState.RightButton == MouseButtonState.Pressed;
+            bool fireX1 = m_mouseState.X1Button == MouseButtonState.Pressed;
+            bool fireX2 = m_mouseState.X2Button == MouseButtonState.Pressed;
+
+            // Update the state of all of the buttons
+            m_mouseState.LeftButton = MouseButtonState.Released;
+            m_mouseState.MiddleButton = MouseButtonState.Released;
+            m_mouseState.RightButton = MouseButtonState.Released;
+            m_mouseState.X1Button = MouseButtonState.Released;
+            m_mouseState.X2Button = MouseButtonState.Released;
+
+            // Fire any events
+            var args = new HwndMouseEventArgs(m_mouseState);
+            if (fireL)
+                HwndLButtonUp?.Invoke(this, args);
+            if (fireM)
+                HwndMButtonUp?.Invoke(this, args);
+            if (fireR)
+                HwndRButtonUp?.Invoke(this, args);
+            if (fireX1)
+                HwndX1ButtonUp?.Invoke(this, args);
+            if (fireX2)
+                HwndX2ButtonUp?.Invoke(this, args);
+
+            // The mouse is no longer considered to be in our window
+            m_mouseInWindow = false;
         }
 
         private void GameSurfaceTargetHost_Loaded(object sender, RoutedEventArgs e)
         {
             var editor = this.GetEditor();
-            m_graphicsService = editor.Services.GetInstance<IGraphicsService>();
-            var graphicsDeviceService = editor.Services.GetInstance<IAddHwndHostRef>();
+            var graphicsService = editor.Services.GetInstance<IGraphicsService>();
+            var graphicsDeviceService = editor.Services.GetInstance<IHwndHostRef>();
 
-            m_graphicsService.GameSurfaceTargets.Add(this);
-            graphicsDeviceService.AddHostRef(m_hWnd, (int)ActualWidth, (int)ActualHeight);
-
-            //GameGraphicsScreens = new List<GameGraphicsScreen>();
-            //GameGraphicsScreens.Add(new EmptyGameGraphicsScreen());
-
-            //var editor = this.GetEditor();
-            //var presentationParameters = new PresentationParameters();
-            //presentationParameters.BackBufferWidth = (int)ActualWidth;
-            //presentationParameters.BackBufferHeight = (int)ActualHeight;
-            //presentationParameters.DeviceWindowHandle = m_hWnd;
-            //presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
-            //presentationParameters.BackBufferFormat = SurfaceFormat.Color;
-            //presentationParameters.PresentationInterval = PresentInterval.Immediate;
-            //presentationParameters.IsFullScreen = false;
-
-            //var graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, presentationParameters);
-
-            //m_graphicsService = new GraphicsService(graphicsDevice);
-            //editor.Services.RegisterInstance(typeof(IGraphicsService), null, m_graphicsService);
-
-            //var graphicsDeviceService = new WpfGraphicsDeviceService(graphicsDevice);
-            //editor.Services.RegisterInstance(typeof(IAddHwndHostRef), null, graphicsDeviceService);
-            //m_graphicsService.GameSurfaceTargets.Add(this);
+            graphicsService.GameSurfaceTargets.Add(this);
+            graphicsDeviceService.AddRef(m_hWnd, (int)ActualWidth, (int)ActualHeight);
         }
-
 
         private void GameSurfaceTargetHost_Unloaded(object sender, RoutedEventArgs e)
         {
-            m_graphicsService.GameSurfaceTargets.Remove(this);
+            var editor = this.GetEditor();
+            var graphicsService = editor.Services.GetInstance<IGraphicsService>();
+            var graphicsDeviceService = editor.Services.GetInstance<IHwndHostRef>();
+
+            graphicsService.GameSurfaceTargets.Remove(this);
+            graphicsDeviceService.RemoveRef(m_hWnd);
         }
 
         private void GameSurfaceTargetHwndHost_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             var editor = this.GetEditor();
-            var graphicsDeviceService = editor.Services.GetInstance<IAddHwndHostRef>();
+            var graphicsDeviceService = editor.Services.GetInstance<IHwndHostRef>();
             
             if (graphicsDeviceService != null)
             {
@@ -132,7 +226,9 @@ namespace EsteroFramework.Graphics.Interop
 
         public void EndRender()
         {
-            m_graphicsService.GraphicsDevice.Present();
+            var editor = this.GetEditor();
+            var graphicsService = editor.Services.GetInstance<IGraphicsService>();
+            graphicsService.GraphicsDevice.Present();
         }
 
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
@@ -148,7 +244,7 @@ namespace EsteroFramework.Graphics.Interop
             RegisterWindowClass();
 
             // Create the window
-            return Win32.CreateWindowEx(0, windowClass, "",
+            return Win32.CreateWindowEx(0, WINDOWS_CLASS, "",
                (int)(WindowStyles.WS_CHILD | WindowStyles.WS_VISIBLE),
                0, 0, (int)Width, (int)Height, hWndParent, IntPtr.Zero, IntPtr.Zero, 0);
         }
@@ -159,7 +255,7 @@ namespace EsteroFramework.Graphics.Interop
             wndClass.cbSize = (uint)Marshal.SizeOf(wndClass);
             wndClass.hInstance = Win32.GetModuleHandle(null);
             wndClass.lpfnWndProc = Win32.DefaultWindowProc;
-            wndClass.lpszClassName = windowClass;
+            wndClass.lpszClassName = WINDOWS_CLASS;
             wndClass.hCursor = Win32.LoadCursor(IntPtr.Zero, (int)LoadCursorNames.IDC_ARROW);
 
             Win32.RegisterClassEx(ref wndClass);
@@ -172,30 +268,167 @@ namespace EsteroFramework.Graphics.Interop
             m_hWnd = IntPtr.Zero;
         }
 
-        //protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        //{
-        //    switch (msg)
-        //    {
-        //        case WindowMessages.WM_MOUSEWHEEL:
-        //        case WindowMessages.WM_LBUTTONDOWN:
-        //        case WindowMessages.WM_LBUTTONUP:
-        //        case WindowMessages.WM_LBUTTONDBLCLK:
-        //        case WindowMessages.WM_RBUTTONDOWN:
-        //        case WindowMessages.WM_RBUTTONUP:
-        //        case WindowMessages.WM_RBUTTONDBLCLK:
-        //        case WindowMessages.WM_MBUTTONDOWN:
-        //        case WindowMessages.WM_MBUTTONUP:
-        //        case WindowMessages.WM_MBUTTONDBLCLK:
-        //        case WindowMessages.WM_XBUTTONDOWN:
-        //        case WindowMessages.WM_XBUTTONUP:
-        //        case WindowMessages.WM_XBUTTONDBLCLK:
-        //        case WindowMessages.WM_MOUSEMOVE:
-        //        case WindowMessages.WM_MOUSELEAVE:
-        //            handled = false;
-        //            //return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
-        //            return IntPtr.Zero;
-        //    }
-        //    return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
-        //}
+        protected override void Dispose(bool disposing)
+        {
+            if (Application.Current != null)
+            {
+                Application.Current.Activated -= Current_Activated;
+                Application.Current.Deactivated -= Current_Deactivated;
+            }
+
+            base.Dispose(disposing);
+        }
+
+        public new void CaptureMouse()
+        {
+            // Don't do anything if the mouse is already captured
+            if (m_isMouseCaptured)
+                return;
+
+            Win32.SetCapture(m_hWnd);
+            m_isMouseCaptured = true;
+        }
+
+        public new void ReleaseMouseCapture()
+        {
+            // Don't do anything if the mouse is not captured
+            if (!m_isMouseCaptured)
+                return;
+
+            Win32.ReleaseCapture();
+            m_isMouseCaptured = false;
+        }
+
+        protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            switch (msg)
+            {
+                case WindowMessages.WM_MOUSEWHEEL:
+                    if (m_mouseInWindow)
+                    {
+
+                        int delta = Win32.GetWheelDeltaWParam(wParam);
+                        HwndMouseWheel?.Invoke(this, new HwndMouseEventArgs(m_mouseState, delta, 0));
+                    }
+                    break;
+                case WindowMessages.WM_LBUTTONDOWN:
+                    m_mouseState.LeftButton = MouseButtonState.Pressed;
+                    HwndLButtonDown?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    break;
+                case WindowMessages.WM_LBUTTONUP:
+                    m_mouseState.LeftButton = MouseButtonState.Released;
+                    HwndLButtonUp?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    break;
+                case WindowMessages.WM_LBUTTONDBLCLK:
+                    HwndLButtonDblClick?.Invoke(this, new HwndMouseEventArgs(m_mouseState, MouseButton.Left));
+                    break;
+                case WindowMessages.WM_RBUTTONDOWN:
+                    m_mouseState.RightButton = MouseButtonState.Pressed;
+                    HwndRButtonDown?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    break;
+                case WindowMessages.WM_RBUTTONUP:
+                    m_mouseState.RightButton = MouseButtonState.Released;
+                    HwndRButtonUp?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    break;
+                case WindowMessages.WM_RBUTTONDBLCLK:
+                    HwndRButtonDblClick?.Invoke(this, new HwndMouseEventArgs(m_mouseState, MouseButton.Right));
+                    break;
+                case WindowMessages.WM_MBUTTONDOWN:
+                    m_mouseState.MiddleButton = MouseButtonState.Pressed;
+                    HwndMButtonDown?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    break;
+                case WindowMessages.WM_MBUTTONUP:
+                    m_mouseState.MiddleButton = MouseButtonState.Released;
+                    HwndMButtonUp?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    break;
+                case WindowMessages.WM_MBUTTONDBLCLK:
+                    HwndMButtonDblClick?.Invoke(this, new HwndMouseEventArgs(m_mouseState, MouseButton.Middle));
+                    break;
+                case WindowMessages.WM_XBUTTONDOWN:
+                    if (((int)wParam & WindowMessages.MK_XBUTTON1) != 0)
+                    {
+                        m_mouseState.X1Button = MouseButtonState.Pressed;
+                        HwndX1ButtonDown?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    }
+                    else if (((int)wParam & WindowMessages.MK_XBUTTON2) != 0)
+                    {
+                        m_mouseState.X2Button = MouseButtonState.Pressed;
+                        HwndX2ButtonDown?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    }
+                    break;
+                case WindowMessages.WM_XBUTTONUP:
+                    if (((int)wParam & WindowMessages.MK_XBUTTON1) != 0)
+                    {
+                        m_mouseState.X1Button = MouseButtonState.Released;
+                        HwndX1ButtonUp?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    }
+                    else if (((int)wParam & WindowMessages.MK_XBUTTON2) != 0)
+                    {
+                        m_mouseState.X2Button = MouseButtonState.Released;
+                        HwndX2ButtonUp?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    }
+                    break;
+                case WindowMessages.WM_XBUTTONDBLCLK:
+                    if (((int)wParam & WindowMessages.MK_XBUTTON1) != 0)
+                        HwndX1ButtonDblClick?.Invoke(this, new HwndMouseEventArgs(m_mouseState, MouseButton.XButton1));
+                    else if (((int)wParam & WindowMessages.MK_XBUTTON2) != 0)
+                        HwndX2ButtonDblClick?.Invoke(this, new HwndMouseEventArgs(m_mouseState, MouseButton.XButton2));
+                    break;
+                case WindowMessages.WM_MOUSEMOVE:
+                    // If the application isn't in focus, we don't handle this message
+                    if (!m_applicationHasFocus)
+                        break;
+
+                    // record the prevous and new position of the mouse
+                    m_mouseState.ScreenPosition = PointToScreen(new Point(
+                        Win32.GET_X_LPARAM(lParam),
+                        Win32.GET_Y_LPARAM(lParam)));
+
+                    if (!m_mouseInWindow)
+                    {
+                        m_mouseInWindow = true;
+
+                        HwndMouseEnter?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+
+                        // Track the previously focused window, and set focus to this window.
+                        m_hWndPrev = Win32.GetFocus();
+                        Win32.SetFocus(m_hWnd);
+
+                        // send the track mouse event so that we get the WM_MOUSELEAVE message
+                        var tme = new TRACKMOUSEEVENT
+                        {
+                            cbSize = Marshal.SizeOf(typeof(TRACKMOUSEEVENT)),
+                            dwFlags = Win32.TME_LEAVE,
+                            hWnd = hwnd
+                        };
+                        Win32.TrackMouseEvent(ref tme);
+                    }
+
+                    if (m_mouseState.ScreenPosition != m_previousMousePosition)
+                        HwndMouseMove?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+
+                    m_previousMousePosition = m_mouseState.ScreenPosition;
+
+                    break;
+                case WindowMessages.WM_MOUSELEAVE:
+
+                    // If we have capture, we ignore this message because we're just
+                    // going to reset the cursor position back into the window
+                    if (m_isMouseCaptured)
+                        break;
+
+                    // Reset the state which releases all buttons and 
+                    // marks the mouse as not being in the window.
+                    ResetMouseState();
+
+                    HwndMouseLeave?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+
+                    Win32.SetFocus(m_hWndPrev);
+
+                    break;
+            }
+
+            return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
+        }
     }
 }

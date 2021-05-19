@@ -6,11 +6,12 @@ using System;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interactivity;
+using System.Windows.Interop;
 using TrioApi.Net.Maths;
 
 namespace EsteroFramework.Editor.Game.Interaction
 {
-    public class CameraMouseBehavior : Behavior<GameSurfaceTarget>
+    public class CameraMouseHwndHostBehavior : Behavior<GameSurfaceTargetHwndHost>
     {
         private Camera _currentCamera;
         private Matrix _originalViewMatrix;
@@ -20,7 +21,7 @@ namespace EsteroFramework.Editor.Game.Interaction
         public static readonly DependencyProperty CameraNodeProperty = DependencyProperty.Register(
             "Camera",
             typeof(Camera),
-            typeof(CameraMouseBehavior),
+            typeof(CameraMouseHwndHostBehavior),
             new FrameworkPropertyMetadata(null));
 
         public Camera Camera
@@ -32,42 +33,23 @@ namespace EsteroFramework.Editor.Game.Interaction
         protected override void OnAttached()
         {
             base.OnAttached();
-            AssociatedObject.MouseDown += OnMouseDown;
-            AssociatedObject.MouseWheel += OnMouseWheel;
+            AssociatedObject.HwndLButtonDown += OnHwndLButtonDown;
+            AssociatedObject.HwndMouseWheel += OnHwndMouseWheel;
+        }
+
+        private void OnHwndLButtonDown(object sender, HwndMouseEventArgs eventArgs)
+        {
+            BeginOrbit(eventArgs);
         }
 
         protected override void OnDetaching()
         {
-            AssociatedObject.MouseDown -= OnMouseDown;
-            AssociatedObject.MouseWheel -= OnMouseWheel;
+            AssociatedObject.HwndLButtonDown -= OnHwndLButtonDown;
+            AssociatedObject.HwndMouseWheel -= OnHwndMouseWheel;
             base.OnDetaching();
         }
 
-        private void OnMouseWheel(object sender, MouseWheelEventArgs eventArgs)
-        {
-            if (eventArgs.Handled)
-                return;
-
-            var cameraNode = Camera;
-            if (cameraNode == null)
-                return;
-
-            float wheel = (float)eventArgs.Delta*0.01f;
-            float distance = cameraNode.Distance - wheel;
-
-            cameraNode.Distance = distance;
-            cameraNode.Recalculate();
-
-            eventArgs.Handled = true;
-        }
-
-        private void OnMouseDown(object sender, MouseButtonEventArgs eventArgs)
-        {
-            if (!eventArgs.Handled && eventArgs.ChangedButton == MouseButton.Left)
-                BeginOrbit(eventArgs);
-        }
-
-        private void BeginOrbit(MouseButtonEventArgs eventArgs)
+        private void BeginOrbit(HwndMouseEventArgs eventArgs)
         {
             if (Mouse.Captured != null && !Equals(Mouse.Captured, AssociatedObject))
             {
@@ -81,21 +63,23 @@ namespace EsteroFramework.Editor.Game.Interaction
                 // No camera found.
                 return;
             }
-            if (!AssociatedObject.CaptureMouse())
-            {
-                // Failed to capture mouse.
-                return;
-            }
+            AssociatedObject.CaptureMouse();
+            //if (!AssociatedObject.CaptureMouse())
+            //{
+            //    // Failed to capture mouse.
+            //    return;
+            //}
 
             _currentCamera = cameraNode;
             _originalViewMatrix = _currentCamera.View;
 
+            AssociatedObject.HwndMouseMove += OnHwndMouseMove;
+            AssociatedObject.HwndLButtonUp += OnHwndLButtonUp;
             AssociatedObject.PreviewKeyDown += OnKeyDown;
-            AssociatedObject.LostMouseCapture += OnLostMouseCapture;
-            AssociatedObject.MouseMove += OnMouseMove;
-            AssociatedObject.MouseUp += OnMouseUp;
 
-            _previousMousePosition = ConvertToVector2(eventArgs.GetPosition(AssociatedObject));
+            //AssociatedObject.LostMouseCapture += OnLostMouseCapture;
+
+            _previousMousePosition = ConvertToVector2(eventArgs.ScreenPosition);
 
             if (!AssociatedObject.IsKeyboardFocused)
             {
@@ -103,7 +87,29 @@ namespace EsteroFramework.Editor.Game.Interaction
                 AssociatedObject.Focus();
             }
 
-            eventArgs.Handled = true;
+            //eventArgs.Handled = true;
+        }
+
+        private void OnHwndLButtonUp(object sender, HwndMouseEventArgs eventArgs)
+        {
+            EndOrbit(true);
+        }
+
+        private void OnHwndMouseMove(object sender, HwndMouseEventArgs eventArgs)
+        {
+            if (eventArgs.LeftButton == MouseButtonState.Pressed)
+            {
+                var currentMousePosition = ConvertToVector2(eventArgs.ScreenPosition);
+                var localRotation = GetMouseSpeed(currentMousePosition);
+                if (localRotation != Vector2.Zero)
+                {
+                    yawPitch += localRotation * (float)GameUnit.m_gameStepTimer.ElapsedTime.TotalSeconds * 0.5f;
+                    _currentCamera.Rotation = Quaternion.CreateFromYawPitchRoll(yawPitch.X, yawPitch.Y, 0);
+                }
+
+                _currentCamera.Recalculate();
+                _previousMousePosition = currentMousePosition;
+            }
         }
 
         private Vector2 ConvertToVector2(Point point)
@@ -113,10 +119,11 @@ namespace EsteroFramework.Editor.Game.Interaction
 
         private void EndOrbit(bool commit)
         {
+            //AssociatedObject.LostMouseCapture -= OnLostMouseCapture;
+
+            AssociatedObject.HwndMouseMove -= OnHwndMouseMove;
+            AssociatedObject.HwndLButtonUp -= OnHwndLButtonUp;
             AssociatedObject.PreviewKeyDown -= OnKeyDown;
-            AssociatedObject.LostMouseCapture -= OnLostMouseCapture;
-            AssociatedObject.MouseMove -= OnMouseMove;
-            AssociatedObject.MouseUp -= OnMouseUp;
 
             AssociatedObject.ReleaseMouseCapture();
 
@@ -146,36 +153,23 @@ namespace EsteroFramework.Editor.Game.Interaction
             eventArgs.Handled = true;
         }
 
-        private void OnMouseUp(object sender, MouseButtonEventArgs eventArgs)
+        private void OnHwndMouseWheel(object sender, HwndMouseEventArgs eventArgs)
         {
-            if (eventArgs.ChangedButton == MouseButton.Left)
-            {
-                // End orbiting, commit camera pose.
-                EndOrbit(true);
-                eventArgs.Handled = true;
-            }
-        }
+            var cameraNode = Camera;
+            if (cameraNode == null)
+                return;
 
-        private void OnMouseMove(object sender, MouseEventArgs eventArgs)
-        {
-            if (eventArgs.LeftButton == MouseButtonState.Pressed)
-            {
-                var currentMousePosition = ConvertToVector2(eventArgs.GetPosition(AssociatedObject));
-                var localRotation = GetMouseSpeed(currentMousePosition);
-                if (localRotation != Vector2.Zero)
-                {
-                    yawPitch += localRotation * (float)GameUnit.m_gameStepTimer.ElapsedTime.TotalSeconds * 0.5f;
-                    _currentCamera.Rotation = Quaternion.CreateFromYawPitchRoll(yawPitch.X, yawPitch.Y, 0);
-                }
+            float wheel = (float)eventArgs.WheelDelta * 0.01f;
+            float distance = cameraNode.Distance - wheel;
 
-                _currentCamera.Recalculate();
-                _previousMousePosition = currentMousePosition;
-            }
+            cameraNode.Distance = distance;
+            cameraNode.Recalculate();
         }
 
         private Vector2 GetMouseSpeed(Vector2 currentMousePosition)
         {
             return (_previousMousePosition - currentMousePosition);
         }
+
     }
 }
