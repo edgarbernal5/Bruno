@@ -5,6 +5,7 @@
 #include "Graphics/Models/ModelMesh.h"
 #include "Graphics/Models/ModelMeshPart.h"
 #include "Graphics/Models/Material.h"
+#include "Utils/TextureLoader.h"
 
 #include <unordered_set>
 
@@ -146,8 +147,8 @@ namespace TrioEngine
 	{
 		for (size_t i = 0; i < m_transforms.GetCount(); i++)
 		{
-			TransformComponent& transform = m_transforms[i];
-			transform.Update();
+			//TransformComponent& transform = m_transforms[i];
+			//transform.Update();
 		}
 	}
 }

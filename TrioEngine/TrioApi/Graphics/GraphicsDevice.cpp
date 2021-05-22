@@ -288,11 +288,11 @@ namespace TrioEngine
 		}
 
 		//TODO: mover esto de aca?
-		m_d3dContext->OMSetRenderTargets(1, &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
+		m_d3dContext->OMSetRenderTargets(1, m_currentD3dRenderTargets.data(), m_currentD3dDepthStencilView);
 
 		//m_d3dContext->OMSetRenderTargets(m_renderTargetBindings.size(), &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
 
-		//m_d3dContext->RSSetViewports(1, m_viewport.Get11());
+		m_d3dContext->RSSetViewports(1, m_viewport.Get11());
 #endif
 	}
 
@@ -527,17 +527,17 @@ namespace TrioEngine
 		// Handle color space settings for HDR
 		//UpdateColorSpace();
 
-		DXGI_COLOR_SPACE_TYPE colorSpace = DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709;
-		Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain3;
-		if (SUCCEEDED(m_swapChain->GetDxSwapChain()->QueryInterface(__uuidof(IDXGISwapChain3), &swapChain3)))
-		{
-			UINT colorSpaceSupport = 0;
-			if (SUCCEEDED(swapChain3->CheckColorSpaceSupport(colorSpace, &colorSpaceSupport))
-				&& (colorSpaceSupport & DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG_PRESENT))
-			{
-				DX::ThrowIfFailed(swapChain3->SetColorSpace1(colorSpace));
-			}
-		}
+		//DXGI_COLOR_SPACE_TYPE colorSpace = DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709;
+		//Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain3;
+		//if (SUCCEEDED(m_swapChain->GetDxSwapChain()->QueryInterface(__uuidof(IDXGISwapChain3), &swapChain3)))
+		//{
+		//	UINT colorSpaceSupport = 0;
+		//	if (SUCCEEDED(swapChain3->CheckColorSpaceSupport(colorSpace, &colorSpaceSupport))
+		//		&& (colorSpaceSupport & DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG_PRESENT))
+		//	{
+		//		DX::ThrowIfFailed(swapChain3->SetColorSpace1(colorSpace));
+		//	}
+		//}
 
 		// Create a render target view of the swap chain back buffer.
 		DX::ThrowIfFailed(m_swapChain->GetDxSwapChain()->GetBuffer(0, IID_PPV_ARGS(m_defaultD3dRenderTarget.ReleaseAndGetAddressOf())));
@@ -558,7 +558,7 @@ namespace TrioEngine
 		m_currentD3dDepthStencilView = m_defaultD3dDepthStencilView;
 
 		m_currentD3dRenderTargets[0] = m_d3dDefaultRenderTargetView.Get();
-		m_d3dContext->OMSetRenderTargets(1, &m_currentD3dRenderTargets[0], m_currentD3dDepthStencilView);
+		m_d3dContext->OMSetRenderTargets(1, m_currentD3dRenderTargets.data(), m_currentD3dDepthStencilView);
 
 		// Set the 3D rendering viewport to target the entire window.
 		m_viewport = CD3D11_VIEWPORT(

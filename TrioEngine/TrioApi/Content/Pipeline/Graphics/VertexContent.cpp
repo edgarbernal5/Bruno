@@ -11,14 +11,14 @@
 
 namespace TrioEngine
 {
-	VertexContent::VertexContent(GeometryContent* geom)
+	VertexContent::VertexContent(GeometryContent* geometry)
 	{
 		m_positionIndices = new VertexChannel("PositionIndices");
 		m_positionIndices->SetTypeOf(typeid(int).name());
 		m_positionIndices->SetSizeOfBase(sizeof(int));
 
 		m_channels = new VertexChannelCollection(this);
-		m_positions = new IndirectPositionCollection(geom, m_positionIndices);
+		m_positions = new IndirectPositionCollection(geometry, m_positionIndices);
 	}
 
 	VertexContent::~VertexContent()

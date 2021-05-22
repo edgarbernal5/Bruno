@@ -47,7 +47,7 @@ namespace TrioEngine
 		GraphicsAdapter*           GetAdapter() const { return m_adapter; }
 
 #ifdef TRIO_DIRECTX
-		UINT                    GetBackBufferCount() const { return m_backBufferCount; }
+		uint32_t                GetBackBufferCount() const { return m_backBufferCount; }
 		ID3D11RenderTargetView*	GetBackBufferRenderTargetView() const { return m_d3dDefaultRenderTargetView.Get(); }
 		inline ID3D11Device1*          GetD3DDevice() const noexcept { return m_d3dDevice.Get(); }
 		inline ID3D11DeviceContext1*   GetD3DDeviceContext() const noexcept { return m_d3dContext.Get(); }

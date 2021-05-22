@@ -18,6 +18,7 @@ namespace TrioEngine
 	public:
 		ModelMeshPart();
 		ModelMeshPart(uint32_t vertexOffset, uint32_t numVertices, uint32_t startIndex, uint32_t primitiveCount);
+		ModelMeshPart(uint32_t vertexOffset, uint32_t numVertices, uint32_t startIndex, uint32_t primitiveCount, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, Material* material);
 		~ModelMeshPart();
 
 		inline Texture2D* GetDiffuseTexture()

@@ -8,6 +8,8 @@ using TrioApi.Net.Content;
 using TrioApi.Net.Content.Tasks;
 using TrioApi.Net.Game;
 using TrioApi.Net.Graphics;
+using TrioApi.Net.Graphics.Core;
+using TrioApi.Net.Maths;
 
 namespace EsteroFramework.Editor.Units
 {
@@ -47,6 +49,45 @@ namespace EsteroFramework.Editor.Units
                     Text = "Build",
                 }
             );
+
+            CommandItems.Add(
+                new CommandItem("Box", new DelegateCommand(() => Box()))
+                {
+                    Text = "Box",
+                }
+            );
+        }
+
+        private void Box()
+        {
+            var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
+
+            VertexDeclaration vertexDeclaration = VertexPositionNormalTexture.VertexDeclaration;
+            VertexBuffer vertexBuffer = new VertexBuffer(graphicsDevice, vertexDeclaration, 4);
+            VertexPositionNormalTexture[] vertices = new VertexPositionNormalTexture[]
+            { 
+                new VertexPositionNormalTexture(new Vector3(5, 0, 5), Vector3.Up, new Vector2(1, 1)),
+                new VertexPositionNormalTexture(new Vector3(-5, 0, 5), Vector3.Up, new Vector2(0, 1) ),
+                new VertexPositionNormalTexture(new Vector3(-5, 0, -5), Vector3.Up,  Vector2.Zero),
+                new VertexPositionNormalTexture(new Vector3(5, 0, -5), Vector3.Up,  new Vector2(1, 0))
+            };
+            vertexBuffer.SetData(vertices);
+
+            IndexBuffer indexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, 6);
+            short[] indices = new short[] 
+            {
+                0, 1, 2,
+                3, 0, 2
+            };
+
+            indexBuffer.SetData(indices);
+
+            Material material = new Material("material");
+            Texture2D texture = new Texture2D(graphicsDevice, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Models\Car\RacerCar.png");
+            material.InsertTexture("Texture", texture);
+
+            Model model = new Model(graphicsDevice, vertexBuffer, indexBuffer, material);
+            Scene.ActiveScene.LoadFromModel(model);
         }
 
         private void Build()
@@ -72,7 +113,6 @@ namespace EsteroFramework.Editor.Units
 
             var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
             ContentManager contentManager = new ContentManager(graphicsDevice, settings.OutputDirectory);
-
 
             Model model = contentManager.Load<Model>(assetNamePath);
 
@@ -108,7 +148,8 @@ namespace EsteroFramework.Editor.Units
             _menuNodes = new TreeNodeCollection<ICommandItem>()
             {
                 new TreeNode<ICommandItem>(new CommandGroup("FileGroup", "File"),
-                    new TreeNode<ICommandItem>(CommandItems["Build"]))
+                    new TreeNode<ICommandItem>(CommandItems["Build"]),
+                    new TreeNode<ICommandItem>(CommandItems["Box"]))
             };
 
             Editor.MenuNodes.Add(_menuNodes);

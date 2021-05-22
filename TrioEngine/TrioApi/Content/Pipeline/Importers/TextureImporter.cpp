@@ -4,6 +4,8 @@
 #include "Content/Pipeline/Graphics/PixelBitmapContent.h"
 #include "Content/Pipeline/Graphics/Texture2DContent.h"
 
+#include "Errors/ContentPipelineException.h"
+
 namespace TrioEngine
 {
 	TextureImporter::TextureImporter()
@@ -54,14 +56,15 @@ namespace TrioEngine
 		return content;
 	}
 
-	BitmapContent* TextureImporter::CreateAndFillBitmapContent(ILinfo ilInfo)
+	BitmapContent* TextureImporter::CreateAndFillBitmapContent(ILinfo& ilInfo)
 	{
 		BitmapContentAndInfo item = CreateAppropriateTypeOfBitmapContent(ilInfo, ilInfo.Width, ilInfo.Height);
 
 		uint32_t sizeInBytes = ilInfo.Width * ilInfo.Height * ilInfo.Depth * item.BytesPerPixel;
 		ILubyte	*buffer = new ILubyte[sizeInBytes];
 
-		ilCopyPixels(0, 0, 0, ilInfo.Width, ilInfo.Height, ilInfo.Depth, ilInfo.Format, IL_UNSIGNED_BYTE, buffer);
+		//No estoy seguro si usar siempre en type = IL_UNSIGNED_BYTE, o segun tipo de formato
+		ilCopyPixels(0, 0, 0, ilInfo.Width, ilInfo.Height, ilInfo.Depth, item.TargetFormatToDevIl, item.TargetTypeToDevIl, buffer);
 
 		BitmapContent *bitmapContent = item.BitmapContent;
 		bitmapContent->SetPixelData(buffer);
@@ -71,7 +74,7 @@ namespace TrioEngine
 		return bitmapContent;
 	}
 
-	TextureImporter::BitmapContentAndInfo TextureImporter::CreateAppropriateTypeOfBitmapContent(ILinfo ilInfo, int width, int height)
+	TextureImporter::BitmapContentAndInfo TextureImporter::CreateAppropriateTypeOfBitmapContent(ILinfo& ilInfo, int width, int height)
 	{
 		BitmapContentAndInfo info;
 
@@ -80,24 +83,28 @@ namespace TrioEngine
 		case IL_BYTE:
 			break;
 		case IL_UNSIGNED_BYTE:
+			info.TargetTypeToDevIl = IL_UNSIGNED_BYTE;
 			switch (ilInfo.Format)
 			{
 			case IL_RGB:
 			case IL_BGR:
 				info.BitmapContent = new PixelBitmapContent<ColorRGBA8>(ilInfo.Width, ilInfo.Height);
 				info.BytesPerPixel = sizeof(ColorRGBA8);
+				info.TargetFormatToDevIl = IL_RGBA;
 				break;
 
 			case IL_RGBA:
 			case IL_BGRA:
 				info.BitmapContent = new PixelBitmapContent<ColorRGBA8>(ilInfo.Width, ilInfo.Height);
 				info.BytesPerPixel = sizeof(ColorRGBA8);
+				info.TargetFormatToDevIl = IL_RGBA;
 				break;
 			default:
 				break;
 			}
 			break;
 		default:
+			throw ContentPipelineException("ILinfo.Type is not supported");
 			break;
 		}
 
@@ -140,7 +147,7 @@ namespace TrioEngine
 		}
 	}
 
-	TextureContent* TextureImporter::Import2DTexture(ILinfo ilImageInfo)
+	TextureContent* TextureImporter::Import2DTexture(ILinfo& ilImageInfo)
 	{
 		Texture2DContent *content = new Texture2DContent();
 
@@ -150,7 +157,7 @@ namespace TrioEngine
 		return content;
 	}
 	
-	TextureContent* TextureImporter::Import3DTexture(ILinfo ilImageInfo)
+	TextureContent* TextureImporter::Import3DTexture(ILinfo& ilImageInfo)
 	{
 		return nullptr;
 	}

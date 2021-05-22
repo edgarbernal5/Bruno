@@ -13,6 +13,7 @@ namespace TrioEngine
 	{
 	public:
 		Material();
+		Material(std::string& name);
 		~Material();
 
 		inline const Vector3& GetDiffuseColor()

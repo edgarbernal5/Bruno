@@ -173,6 +173,13 @@ extern "C" TRIO_API_EXPORT void __stdcall IndexBuffer_Dctor(IndexBuffer* indexBu
 extern "C" TRIO_API_EXPORT void __stdcall IndexBuffer_SetData(IndexBuffer* buffer, uint8_t* data, uint32_t elementCount, uint32_t sizeArrayBytes);
 
 /*
+Material
+*/
+extern "C" TRIO_API_EXPORT Material* __stdcall Material_Ctor(const char* name);
+extern "C" TRIO_API_EXPORT void __stdcall Material_InsertTexture(Material* material, const char* name, Texture* texture);
+
+
+/*
 Matrix
 */
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateLookAt(Matrix *pMatrix1, Vector3* eye, Vector3* target, Vector3* up);
@@ -196,6 +203,7 @@ extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateWorld(Matrix *pMatrix1, V
 Model
 */
 extern "C" TRIO_API_EXPORT Model * __stdcall Model_Ctor(GraphicsDevice* device);
+extern "C" TRIO_API_EXPORT Model * __stdcall Model_Ctor2(GraphicsDevice* device, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, Material* material);
 extern "C" TRIO_API_EXPORT void __stdcall Model_Dtor(Model * model);
 extern "C" TRIO_API_EXPORT void __stdcall Model_GetModelMeshes(Model * model, ModelMesh * **modelMeshes, int* size);
 extern "C" TRIO_API_EXPORT void __stdcall Model_Draw(Model * model);
@@ -306,7 +314,7 @@ extern "C" TRIO_API_EXPORT Texture2D* __stdcall Texture2D_Ctor(GraphicsDevice* d
 extern "C" TRIO_API_EXPORT Texture2D* __stdcall Texture2D_Ctor2(GraphicsDevice* device, int width, int height, SurfaceFormat format);
 extern "C" TRIO_API_EXPORT void __stdcall Texture2D_Dctor(Texture2D * texture);
 extern "C" TRIO_API_EXPORT void __stdcall Texture2D_GetData(Texture2D* texture, uint8_t* data, uint32_t elementCount);
-extern "C" TRIO_API_EXPORT void __stdcall Texture2D_TestLoadFromFile(Texture2D* texture);
+extern "C" TRIO_API_EXPORT Texture2D* __stdcall Texture2D_CtorFromFile(GraphicsDevice * device, const char* filename);
 extern "C" TRIO_API_EXPORT int __stdcall Texture2D_GetWidth(Texture2D* texture);
 extern "C" TRIO_API_EXPORT int __stdcall Texture2D_GetHeight(Texture2D* texture);
 

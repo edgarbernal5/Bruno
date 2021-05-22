@@ -27,6 +27,7 @@
 #include "Graphics/Models/Model.h"
 #include "Graphics/Models/ModelMesh.h"
 #include "Graphics/Models/ModelMeshPart.h"
+#include "Graphics/Models/Material.h"
 
 #include "Scene.h"
 #include "Transform.h"
@@ -583,6 +584,20 @@ void IndexBuffer_SetData(IndexBuffer* buffer, uint8_t* data, uint32_t elementCou
 }
 
 /*
+Material
+*/
+Material* Material_Ctor(const char* name)
+{
+	std::string nameStr(name);
+	return new Material(nameStr);
+}
+
+void Material_InsertTexture(Material* material, const char* name, Texture* texture)
+{
+	material->InsertTexture(name, texture);
+}
+
+/*
 Matrix
 */
 void Matrix_CreateLookAt(Matrix *pMatrix1, Vector3* eye, Vector3* target, Vector3* up)
@@ -670,6 +685,10 @@ Model
 Model* Model_Ctor(GraphicsDevice* device)
 {
 	return new Model(device);
+}
+Model* Model_Ctor2(GraphicsDevice* device, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, Material* material)
+{
+	return new Model(device, vertexBuffer, indexBuffer, material);
 }
 
 void Model_Dtor(Model * model)
@@ -1020,12 +1039,15 @@ void Texture2D_GetData(Texture2D* texture, uint8_t* data, uint32_t elementCount)
 	texture->GetData(0, nullptr, data, 0, elementCount);
 }
 
-void Texture2D_TestLoadFromFile(Texture2D * texture)
+Texture2D* Texture2D_CtorFromFile(GraphicsDevice* device, const char* filename)
 {
 	TextureLoader texLoader;
-	TextureLoader::ImageInfo imgInfo = texLoader.GetTextureFromFile("D:\\Edgar\\Documentos\\Proyectos\\CG\\TrioEngineGit\\TrioEngine\\TrioWin32Sample\\edgar.jpg");
+	TextureLoader::ImageInfo imgInfo = texLoader.GetTextureFromFile(filename);
+
+	Texture2D* texture = new Texture2D(device, imgInfo.Width, imgInfo.Height);
 
 	texture->SetData<uint8_t>(imgInfo.Data, imgInfo.SizeOfData);
+	return texture;
 }
 
 int Texture2D_GetWidth(Texture2D* texture)

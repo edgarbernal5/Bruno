@@ -7,7 +7,9 @@
 #include "Graphics/TextureCollection.h"
 #include "Graphics/SamplerState.h"
 #include "Graphics/RasterizerState.h"
+#include "Graphics/DepthStencilState.h"
 #include "Graphics/BlendState.h"
+#include "Graphics/Models/Model.h"
 
 namespace TrioEngine
 {
@@ -18,7 +20,8 @@ namespace TrioEngine
 	{
 		Scene& scene = *Scene::GetActiveScene();
 		GraphicsDevice* device = g_device;
-
+			
+		
 		for (size_t i = 0; i < scene.GetMeshes().GetCount(); i++)
 		{
 			MeshComponent& mesh = scene.GetMeshes()[i];
@@ -38,10 +41,12 @@ namespace TrioEngine
 				device->GetTextures()->SetTexture(0, material.diffuseTexture);
 				device->SetSamplerState(0, SamplerState::LinearWrap);
 				device->SetRasterizerState(RasterizerState::CullCounterClockwise);
+				device->SetDepthStencilState(DepthStencilState::Default);
 				device->SetBlendState(BlendState::Opaque);
 
+				Matrix meshWorld = transform.m_world * viewProjection;
+				//Matrix meshWorld = viewProjection;
 				//Matrix meshWorld = viewProjection * transform.m_world;
-				Matrix meshWorld = viewProjection * transform.m_world;
 				parameter->SetValue(meshWorld);
 				device->DrawIndexedPrimitives(PrimitiveType::TriangleList, subMesh.m_vertexOffset, subMesh.m_startIndex, subMesh.m_primitiveCount);
 			}

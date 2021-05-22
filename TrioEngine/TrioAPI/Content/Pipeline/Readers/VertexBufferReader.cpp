@@ -40,7 +40,7 @@ namespace TrioEngine
 		std::vector<uint8_t> dataInBytes = input->ReadByteBuffer(size);
 
 		VertexBuffer* buffer = new VertexBuffer(GraphicsContentHelper::GraphicsDeviceFromContentReader(input), vertexDeclaration, vertexCount);
-		//buffer->SetData<uint8_t>(&data[0], data.size());
+		
 		buffer->SetData<uint8_t>(0, dataInBytes.data(), dataInBytes.size(), 0, vertexCount, vertexStride, SetDataOptions::None);
 		return buffer;
 	}

@@ -12,7 +12,6 @@ namespace EsteroFramework.Editor.Units
     {
         public PrimitivesUnit()
         {
-
         }
 
         protected override void OnInitialize()

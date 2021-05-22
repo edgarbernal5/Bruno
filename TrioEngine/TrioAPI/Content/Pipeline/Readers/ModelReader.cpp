@@ -98,16 +98,12 @@ namespace TrioEngine
 			boundingBox.Min = input->ReadVector3();
 			boundingBox.Max = input->ReadVector3();*/
 
-			Matrix transform = model->m_bonesMatrices[rootIndex]; //GetAbsoluteTransform(model);
+			Matrix transform = model->m_bonesMatrices[rootIndex];
 			std::vector<ModelMeshPart*> meshParts = ReadMeshParts(input);
 			meshes[i] = new ModelMesh(name, parentBone, transform, /*boundingSphere, boundingBox,*/ meshParts);
 		}
 		model->m_modelMeshes = meshes;
 	}
-
-	//Matrix ModelReader::GetAbsoluteTransform(Model* model) {
-
-	//}
 	
 	std::vector<ModelMeshPart*> ModelReader::ReadMeshParts(ContentReader* input)
 	{

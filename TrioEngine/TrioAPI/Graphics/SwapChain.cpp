@@ -25,15 +25,15 @@ namespace TrioEngine
 
 		// Create a SwapChain from a Win32 window.
 		DX::ThrowIfFailed(
-			graphicsDevice->GetDXGIFactory()->CreateSwapChainForHwnd
-			(
+			graphicsDevice->GetDXGIFactory()->CreateSwapChainForHwnd(
 				graphicsDevice->GetD3DDevice(),
 				window,
 				&swapChainDesc,
 				&fsSwapChainDesc,
 				nullptr,
 				m_swapChain.ReleaseAndGetAddressOf()
-		));
+			)
+		);
 
 		// This class does not support exclusive full-screen mode and prevents DXGI from responding to the ALT+ENTER shortcut
 		DX::ThrowIfFailed(graphicsDevice->GetDXGIFactory()->MakeWindowAssociation(window, DXGI_MWA_NO_ALT_ENTER));

@@ -15,7 +15,7 @@ namespace TrioEngine
 	class TRIO_API_EXPORT VertexContent
 	{
 	public:
-		VertexContent(GeometryContent* geom);
+		VertexContent(GeometryContent* geometry);
 		~VertexContent();
 
 		int Add(int positionIndex);

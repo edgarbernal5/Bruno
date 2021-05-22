@@ -38,25 +38,26 @@ cbuffer cbPerObject {
     float4x4 gWorldViewProj;
 };
 struct VertexIn {
-    float3 PosL : SV_POSITION;
+    float4 PosL : POSITION;
     float3 Normal : NORMAL;
-    float2 Textura : TEXCOORD0;
+    float2 Textura : TEXCOORD;
 };
 Texture2D gDiffuseMap : register(t0);
 SamplerState linear_sampler : register(s0);
 struct VertexOut {
     float4 PosH : SV_POSITION;
     float4 Color : COLOR;
-    float2 Textura : TEXCOORD0;
+    float2 Textura : TEXCOORD;
 };
 VertexOut VS(VertexIn vin) {
     VertexOut vout;
-    ((vout).PosH = mul(float4((vin).PosL, 1.000000), gWorldViewProj));
+    ((vout).PosH = mul((vin).PosL, gWorldViewProj));
     ((vout).Color = float4(1, 1, 1, 1));
     ((vout).Textura = (vin).Textura);
     return vout;
 };
 float4 PS(VertexOut pin) : SV_Target {
     float4 texColor = gDiffuseMap.Sample(linear_sampler, (pin).Textura);
+    ((texColor).a = 1.000000);
     return texColor;
 };

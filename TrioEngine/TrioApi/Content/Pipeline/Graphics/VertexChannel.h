@@ -46,6 +46,10 @@ namespace TrioEngine
 			m_itemsSize = 0;
 		}
 
+		BaseType Data() {
+			return m_rawData;
+		}
+
 		void SetTypeOf(std::string typeId)
 		{
 			m_typeId = typeId;

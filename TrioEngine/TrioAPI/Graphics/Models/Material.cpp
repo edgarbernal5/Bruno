@@ -7,6 +7,11 @@ namespace TrioEngine
 	{
 	}
 
+	Material::Material(std::string& name) :
+		m_name(name)
+	{
+
+	}
 
 	Material::~Material()
 	{

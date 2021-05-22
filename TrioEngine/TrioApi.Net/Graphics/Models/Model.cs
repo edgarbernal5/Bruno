@@ -2,14 +2,12 @@
 using Estero.Interop;
 using System;
 using System.Runtime.InteropServices;
+using TrioApi.Net.Graphics.Core;
 
 namespace TrioApi.Net.Graphics
 {
     public class Model : CppObject
     {
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Model_Ctor", CallingConvention = CallingConvention.StdCall)]
-        private static extern IntPtr Internal_ctor([MarshalAs(UnmanagedType.LPStr)] string filename);
-
         public ModelMeshCollection ModelMeshes
         {
             get
@@ -19,10 +17,19 @@ namespace TrioApi.Net.Graphics
         }
         private ModelMeshCollection m_modelMeshes;
 
+
         public Model()
             : base()
         {
+        }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Model_Ctor", CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr Internal_ctor(IntPtr device);
+
+        public Model(GraphicsDevice device)
+            : base()
+        {
+            m_nativePointer = Internal_ctor(device.NativePointer);
         }
 
         internal Model(IntPtr nativePtr)
@@ -34,10 +41,13 @@ namespace TrioApi.Net.Graphics
             LoadData();
         }
 
-        public Model(string filename) 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Model_Ctor2", CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr Internal_ctor(IntPtr device, IntPtr vertexBuffer, IntPtr indexBuffer, IntPtr material);
+
+        public Model(GraphicsDevice device, VertexBuffer vertexBuffer, IndexBuffer indexBuffer, Material material) 
             : base()
         {
-            m_nativePointer = Internal_ctor(filename);
+            m_nativePointer = Internal_ctor(device.NativePointer, vertexBuffer.NativePointer, indexBuffer.NativePointer, material.NativePointer);
         }
 
         private void LoadData()

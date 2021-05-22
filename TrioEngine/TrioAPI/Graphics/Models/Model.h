@@ -9,6 +9,9 @@ namespace TrioEngine
 {
 	class ModelBone;
 	class ModelMesh;
+	class VertexBuffer;
+	class IndexBuffer;
+	class Material;
 
 	class GraphicsDevice;
 
@@ -16,6 +19,7 @@ namespace TrioEngine
 	{
 	public:
 		Model(GraphicsDevice* device);
+		Model(GraphicsDevice* device, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, Material* material);
 		~Model();
 
 		void Draw();

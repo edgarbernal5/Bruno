@@ -7,9 +7,6 @@ namespace TrioApi.Net.Graphics.Core
 {
     public class Texture2D : Texture
     {
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_TestLoadFromFile", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_TestLoadFromFile(IntPtr texture);
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_GetWidth", CallingConvention = CallingConvention.StdCall)]
         private static extern int Internal_GetWidth(IntPtr texture);
         public int Width
@@ -56,9 +53,12 @@ namespace TrioApi.Net.Graphics.Core
             m_nativePointer = IntPtr.Zero;
         }
 
-        public void LoadFromFile()
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Texture2D_CtorFromFile", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        private static extern IntPtr Internal_TestLoadFromFile(IntPtr texture, [MarshalAs(UnmanagedType.LPStr)] string filename);
+
+        public Texture2D(GraphicsDevice device, string filename)
         {
-            Internal_TestLoadFromFile(m_nativePointer);
+            m_nativePointer = Internal_TestLoadFromFile(device.NativePointer, filename);
         }
 
 

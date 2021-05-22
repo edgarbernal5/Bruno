@@ -53,8 +53,10 @@ namespace TrioEngine
 
 		void GetTexturesForMaterial(MaterialContent* materialContent, std::string& directory, aiMaterial* material);
 		void ImportMaterials(const aiScene* scene, std::string directory);
-		NodeContent* ImportNode(const aiScene* scene, const aiNode* node, Matrix parentTransform, NodeContent* parentContent);
+		NodeContent* ImportNode(const aiScene* scene, const aiNode* node, const aiNode* parentNode, NodeContent* parentContent);
 
+		Matrix GetRelativeTransform(const aiNode* node, const aiNode* ancestor);
+		Matrix ToMatrix(const aiMatrix4x4& aiMatrix);
 		std::vector<MaterialContent*> m_materials;
 
 		static void InitializeTextureTypeMappings();

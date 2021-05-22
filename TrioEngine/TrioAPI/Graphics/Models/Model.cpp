@@ -2,9 +2,13 @@
 #include "Model.h"
 
 #include "Graphics/GraphicsDevice.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
+
 #include "ModelMeshPart.h"
 #include "ModelMesh.h"
 #include "ModelBone.h"
+#include "Material.h"
 
 #include "Errors/GameException.h"
 
@@ -16,9 +20,21 @@ namespace TrioEngine
 	{
 	}
 
+	Model::Model(GraphicsDevice* device, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, Material* material) :
+		m_device(device),
+		m_root(nullptr)
+	{
+		std::vector< ModelMeshPart*> modelMeshParts;
+		ModelMeshPart* modelMeshPart = new ModelMeshPart(0, vertexBuffer->GetVertexCount(), 0, indexBuffer->GetIndexCount(), vertexBuffer, indexBuffer, material);
+		modelMeshParts.push_back(modelMeshPart);
+		
+		Matrix transform = Matrix::Identity;
+		ModelMesh* modelMesh = new ModelMesh("modelo", nullptr, transform, modelMeshParts);
+		m_modelMeshes.push_back(modelMesh);
+	}
+
 	Model::~Model()
 	{
-
 	}
 
 	void Model::Draw()

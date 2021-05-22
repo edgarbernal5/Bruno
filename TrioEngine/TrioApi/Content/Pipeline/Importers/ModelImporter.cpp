@@ -70,15 +70,15 @@ namespace TrioEngine
 		uint32_t uvChannelCount = mesh->GetNumUVChannels();
 		for (uint32_t i = 0; i < uvChannelCount; i++)
 		{
-			std::vector<Vector3> textureCoordinates(mesh->mNumVertices);
+			std::vector<Vector2> textureCoordinates(mesh->mNumVertices);
 			
 			aiVector3D* aiTextureCoordinates = mesh->mTextureCoords[i];
 			for (uint32_t j = 0; j < mesh->mNumVertices; j++)
 			{
-				textureCoordinates[j] = Vector3(reinterpret_cast<const float*>(&aiTextureCoordinates[j]));
+				textureCoordinates[j] = Vector2(reinterpret_cast<const float*>(&aiTextureCoordinates[j]));
 			}
 
-			geometryContent->GetVertices()->GetChannels()->Add<Vector3>(VertexChannelNames::TextureCoordinate(i), textureCoordinates.data(), mesh->mNumVertices);
+			geometryContent->GetVertices()->GetChannels()->Add<Vector2>(VertexChannelNames::TextureCoordinate(i), textureCoordinates.data(), mesh->mNumVertices);
 		}
 
 		uint32_t colorChannelCount = mesh->GetNumColorChannels();
@@ -174,7 +174,7 @@ namespace TrioEngine
 		uint32_t flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_FlipWindingOrder;
 		//if (loadParams.flipUVs)
 		//{
-		//	flags |= aiProcess_FlipUVs;
+			flags |= aiProcess_FlipUVs;
 		//}
 
 		const aiScene* scene = importer.ReadFile(filename, flags);
@@ -188,7 +188,7 @@ namespace TrioEngine
 			ImportMaterials(scene, TrioIO::Path::GetDirectoryFromFilePath(filename));
 		}
 
-		NodeContent* rootNode = ImportNode(scene, scene->mRootNode, Matrix::Identity, nullptr);
+		NodeContent* rootNode = ImportNode(scene, scene->mRootNode, nullptr, nullptr);
 
 		if (scene->HasAnimations())
 		{
@@ -225,10 +225,49 @@ namespace TrioEngine
 		}
 	}
 
-	NodeContent* ModelImporter::ImportNode(const aiScene* scene, const aiNode* node, Matrix parentTransform, NodeContent* parentContent)
+	Matrix ModelImporter::GetRelativeTransform(const aiNode* node, const aiNode* ancestor)
+	{
+		aiMatrix4x4 aiTransform = node->mTransformation;
+		aiNode* parent = node->mParent;
+		while (parent != nullptr && parent != ancestor)
+		{
+			aiTransform *= parent->mTransformation;
+			parent = parent->mParent;
+		}
+
+		return ToMatrix(aiTransform);
+	}
+
+	Matrix ModelImporter::ToMatrix(const aiMatrix4x4& aiMatrix)
+	{
+		Matrix transform;
+		transform._11 = aiMatrix.a1;
+		transform._12 = aiMatrix.b1;
+		transform._13 = aiMatrix.c1;
+		transform._14 = aiMatrix.d1;
+
+		transform._21 = aiMatrix.a2;
+		transform._22 = aiMatrix.b2;
+		transform._23 = aiMatrix.c2;
+		transform._24 = aiMatrix.d2;
+
+		transform._31 = aiMatrix.a3;
+		transform._32 = aiMatrix.b3;
+		transform._33 = aiMatrix.c3;
+		transform._34 = aiMatrix.d3;
+
+		transform._41 = aiMatrix.a4;
+		transform._42 = aiMatrix.b4;
+		transform._43 = aiMatrix.c4;
+		transform._44 = aiMatrix.d4;
+
+		return transform;
+	}
+
+	NodeContent* ModelImporter::ImportNode(const aiScene* scene, const aiNode* node, const aiNode* parentNode, NodeContent* parentContent)
 	{
 		NodeContent* nodeContent = nullptr;
-		Matrix nodeTransform(&node->mTransformation.a1);
+		Matrix nodeTransform = ToMatrix(node->mTransformation);
 
 		if (node->mNumMeshes > 0)
 		{
@@ -236,8 +275,9 @@ namespace TrioEngine
 			meshContent->SetName(node->mName.C_Str());
 			meshContent->SetContentIdentity(m_identity);
 
-			meshContent->GetTransform() = parentTransform * nodeTransform;
+			//meshContent->GetTransform() = parentTransform * nodeTransform;
 			//meshContent->GetTransform() = nodeTransform * parentTransform;
+			meshContent->GetTransform() = GetRelativeTransform(node, parentNode);
 
 			for (uint32_t i = 0; i < node->mNumMeshes; i++)
 			{
@@ -260,8 +300,9 @@ namespace TrioEngine
 			nodeContent->SetName(node->mName.C_Str());
 			nodeContent->SetContentIdentity(m_identity);
 
-			nodeContent->GetTransform() = parentTransform * nodeTransform;
+			//nodeContent->GetTransform() = parentTransform * nodeTransform;
 			//nodeContent->GetTransform() = nodeTransform * parentTransform;
+			nodeContent->GetTransform() = GetRelativeTransform(node, parentNode);
 		}
 		
 		if (nodeContent)
@@ -275,7 +316,7 @@ namespace TrioEngine
 		for (uint32_t i = 0; i < node->mNumChildren; i++)
 		{
 			aiNode* childNode = node->mChildren[i];
-			ImportNode(scene, childNode, nodeTransform, nodeContent);
+			ImportNode(scene, childNode, node, nodeContent);
 		}
 
 		return nodeContent;
