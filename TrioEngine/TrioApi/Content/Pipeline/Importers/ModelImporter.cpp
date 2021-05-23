@@ -24,6 +24,7 @@ namespace TrioEngine
 	GeometryContent* ModelImporter::CreateGeometry(aiMesh* mesh, MeshContent* meshContent)
 	{
 		GeometryContent* geometryContent = new GeometryContent();
+		geometryContent->SetContentIdentity(m_identity);
 		geometryContent->SetMaterial(m_materials[mesh->mMaterialIndex]);
 
 		int baseVertex = meshContent->GetPositions().size();
@@ -33,7 +34,7 @@ namespace TrioEngine
 		}
 
 		std::vector<int> vertexRange(mesh->mNumVertices);
-		for (int i = baseVertex; i < mesh->mNumVertices; i++) vertexRange[i - baseVertex] = i;
+		for (int i = 0; i < mesh->mNumVertices; i++) vertexRange[i] = i + baseVertex;
 
 		geometryContent->GetVertices()->AddRange(vertexRange.data(), mesh->mNumVertices);
 
@@ -274,20 +275,17 @@ namespace TrioEngine
 			MeshContent* meshContent = new MeshContent();
 			meshContent->SetName(node->mName.C_Str());
 			meshContent->SetContentIdentity(m_identity);
-
-			//meshContent->GetTransform() = parentTransform * nodeTransform;
-			//meshContent->GetTransform() = nodeTransform * parentTransform;
 			meshContent->GetTransform() = GetRelativeTransform(node, parentNode);
 
 			for (uint32_t i = 0; i < node->mNumMeshes; i++)
 			{
 				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
+				if (mesh->mNumVertices == 0)
+					continue;
+
 				GeometryContent* geometryContent = CreateGeometry(mesh, meshContent);
 				meshContent->SetName(node->mName.C_Str());
-
-				/*if (mesh->mNumVertices == 0)
-					continue;*/
 
 				meshContent->GetGeometry().push_back(geometryContent);
 			}
@@ -299,9 +297,6 @@ namespace TrioEngine
 			nodeContent = new NodeContent();
 			nodeContent->SetName(node->mName.C_Str());
 			nodeContent->SetContentIdentity(m_identity);
-
-			//nodeContent->GetTransform() = parentTransform * nodeTransform;
-			//nodeContent->GetTransform() = nodeTransform * parentTransform;
 			nodeContent->GetTransform() = GetRelativeTransform(node, parentNode);
 		}
 		

@@ -40,7 +40,8 @@ namespace TrioEngine
 
 				device->GetTextures()->SetTexture(0, material.diffuseTexture);
 				device->SetSamplerState(0, SamplerState::LinearWrap);
-				device->SetRasterizerState(RasterizerState::CullCounterClockwise);
+				device->SetRasterizerState(RasterizerState::CullNone);
+				//device->SetRasterizerState(RasterizerState::CullCounterClockwise);
 				device->SetDepthStencilState(DepthStencilState::Default);
 				device->SetBlendState(BlendState::Opaque);
 
