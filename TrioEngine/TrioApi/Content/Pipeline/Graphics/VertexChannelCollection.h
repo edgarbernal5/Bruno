@@ -63,7 +63,7 @@ namespace TrioEngine
 		else
 		{
 			std::vector<T> tmpVec(size);
-			channel->InsertRange<T>(0, &tmpVec[0], size);
+			channel->InsertRange<T>(0, tmpVec.data(), size);
 		}
 		m_channels.insert(m_channels.begin() + index, channel);
 	}

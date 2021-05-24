@@ -90,10 +90,7 @@ namespace TrioApi.Net.Game
 
         public void LoadFromModel(Model model)
         {
-            Internal_LoadFromModel(this.NativePointer, model.NativePointer);
+            Internal_LoadFromModel(NativePointer, model.NativePointer);
         }
-
-
-        
     }
 }

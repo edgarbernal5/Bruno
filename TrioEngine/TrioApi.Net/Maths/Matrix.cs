@@ -49,12 +49,6 @@ namespace TrioApi.Net.Maths
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Transpose", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Transpose(ref Matrix mat);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateTRS", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_CreateTRS(ref Matrix mat, ref Vector3 position, ref Quaternion rotation, ref Vector3 scale);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateWorld", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_CreateWorld(ref Matrix mat, ref Vector3 position, ref Vector3 forward, ref Vector3 up);
-
         public float M11;
         public float M12;
         public float M13;
@@ -89,6 +83,32 @@ namespace TrioApi.Net.Maths
             }
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Right", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Right(ref Matrix matrix, ref Vector3 result);
+
+        public Vector3 Right
+        {
+            get
+            {
+                Vector3 result = new Vector3();
+                Internal_Right(ref this, ref result);
+                return result;
+            }
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Forward", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Forward(ref Matrix matrix, ref Vector3 result);
+
+        public Vector3 Forward
+        {
+            get
+            {
+                Vector3 result = new Vector3();
+                Internal_Forward(ref this, ref result);
+                return result;
+            }
+        }
+
         public Matrix(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44)
         {
             this.M11 = m11;
@@ -107,6 +127,11 @@ namespace TrioApi.Net.Maths
             this.M42 = m42;
             this.M43 = m43;
             this.M44 = m44;
+        }
+
+        public static object CreateCreateFromAxisAngle(object right, float x)
+        {
+            throw new NotImplementedException();
         }
 
         public unsafe Matrix(float* val)
@@ -158,6 +183,16 @@ namespace TrioApi.Net.Maths
             array[14] = M43;
             array[15] = M44;
             return array;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateFromAxisAngle", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateFromAxisAngle(ref Matrix matrix, ref Vector3 axis, float angle);
+        //
+        public static Matrix CreateCreateFromAxisAngle(Vector3 axis, float angle)
+        {
+            Matrix result = Matrix.Identity;
+            Internal_CreateFromAxisAngle(ref result, ref axis, angle);
+            return result;
         }
 
         public static Matrix CreateLookAt(Vector3 eye, Vector3 target, Vector3 up)
@@ -265,6 +300,9 @@ namespace TrioApi.Net.Maths
             return matrix;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateTRS", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateTRS(ref Matrix mat, ref Vector3 position, ref Quaternion rotation, ref Vector3 scale);
+
         public static Matrix CreateTRS(Vector3 position, Quaternion rotation, Vector3 scale)
         {
             var matrix = new Matrix();
@@ -272,11 +310,32 @@ namespace TrioApi.Net.Maths
             return matrix;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateWorld", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateWorld(ref Matrix mat, ref Vector3 position, ref Vector3 forward, ref Vector3 up);
+
         public static Matrix CreateWorld(Vector3 position, Vector3 forward, Vector3 up)
         {
             var matrix = new Matrix();
             Internal_CreateWorld(ref matrix, ref position, ref forward, ref up);
             return matrix;
+        }
+
+        public static Vector3 CreateEulerAnglesFromRotation(Matrix matrix)
+        {
+            Vector3 eulerAngles = new Vector3();
+
+            eulerAngles.Y =  (float)Math.Asin(-matrix.M32);                  // Pitch
+            if (Math.Cos(eulerAngles.X) > 0.0001)                 // Not at poles
+            {
+                eulerAngles.X = (float)Math.Atan2(matrix.M31, matrix.M33);     // Yaw
+                eulerAngles.Z = (float)Math.Atan2(matrix.M12, matrix.M22);     // Roll
+            }
+            else
+            {
+                eulerAngles.X = 0.0f;                         // Yaw
+                eulerAngles.Z = (float)Math.Atan2(-matrix.M21, matrix.M11);    // Roll
+            }
+            return eulerAngles;
         }
 
         /// <summary>Determines whether the specified Object is equal to the Matrix.</summary>

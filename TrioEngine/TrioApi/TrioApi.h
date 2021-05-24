@@ -182,6 +182,7 @@ extern "C" TRIO_API_EXPORT void __stdcall Material_InsertTexture(Material* mater
 /*
 Matrix
 */
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateFromAxisAngle(Matrix * pMatrix, Vector3* axis, float angle);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateLookAt(Matrix *pMatrix1, Vector3* eye, Vector3* target, Vector3* up);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreatePerspectiveFieldOfView(Matrix *pMatrix1, float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateRotationX(Matrix *pMatrix1, float radians);
@@ -193,7 +194,9 @@ extern "C" TRIO_API_EXPORT void __stdcall Matrix_Division(Matrix *pMatrix1, Matr
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Invert(Matrix *pMatrix);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Multiply(Matrix *pMatrix1, Matrix *pMatrix2);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_MultiplyScalar(Matrix *pMatrix1, float scalar);
-extern "C" TRIO_API_EXPORT void __stdcall Matrix_Sub(Matrix *pMatrix1, Matrix *pMatrix2);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_Forward(Matrix *pMatrix1, Vector3 *pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_Right(Matrix *pMatrix1, Vector3 *pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_Sub(Matrix *pMatrix, Matrix *pMatrix2);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Sum(Matrix *pMatrix1, Matrix *pMatrix2);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Transpose(Matrix *pMatrix);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateTRS(Matrix *pMatrix1, Vector3* position, Quaternion* rotation, Vector3* scale);
@@ -323,6 +326,7 @@ Vector2
 */
 extern "C" TRIO_API_EXPORT float __stdcall Vector2_Length(Vector2 * pVector);
 extern "C" TRIO_API_EXPORT void __stdcall Vector2_MultiplyScalar(Vector2 * pVector, float scalar);
+extern "C" TRIO_API_EXPORT void __stdcall Vector2_MultiplyTwoVectors(Vector2 * pVector1, Vector2 * pVector2);
 extern "C" TRIO_API_EXPORT void __stdcall Vector2_SubTwoVectors(Vector2 * pVector1, Vector2 * pVector2);
 extern "C" TRIO_API_EXPORT void __stdcall Vector2_SumTwoVectors(Vector2 * pVector1, Vector2 * pVector2);
 extern "C" TRIO_API_EXPORT void __stdcall Vector2_UnaryNegation(Vector2 * pVector);
@@ -341,7 +345,9 @@ extern "C" TRIO_API_EXPORT void __stdcall Vector3_MultiplyDivision(Vector3 *pVec
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_MultiplyTwoVectors(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_MultiplyScalar(Vector3 *pVector, float scalar);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_Normalize(Vector3 *pVector);
-extern "C" TRIO_API_EXPORT void __stdcall Vector3_Transform(Vector3 * pVector, Quaternion * pRotation);
+extern "C" TRIO_API_EXPORT void __stdcall Vector3_TransformQuat(Vector3 * pVector, Quaternion * pRotation);
+extern "C" TRIO_API_EXPORT void __stdcall Vector3_TransformMatrixPosition(Vector3 * pPosition, Matrix * pMatrix);
+extern "C" TRIO_API_EXPORT void __stdcall Vector3_TransformMatrixNormal(Vector3 * pNormal, Matrix * pMatrix);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_SubTwoVectors(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_SumTwoVectors(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" TRIO_API_EXPORT void __stdcall Vector3_UnaryNegation(Vector3 *pVector);
@@ -367,5 +373,7 @@ extern "C" TRIO_API_EXPORT VertexDeclaration* __stdcall VertexDeclaration_GetPNT
 Quaternion
 */
 extern "C" TRIO_API_EXPORT void __stdcall Quaternion_CreateFromAxisAngle(Quaternion * quaternion, Vector3 * pAxis, float angle);
+extern "C" TRIO_API_EXPORT void __stdcall Quaternion_CreateFromMatrix(Quaternion * quaternion, Matrix * pMatrix);
 extern "C" TRIO_API_EXPORT void __stdcall Quaternion_CreateFromYawPitchRoll(Quaternion * quaternion, float yaw, float pitch, float roll);
+extern "C" TRIO_API_EXPORT void __stdcall Quaternion_Inverse(Quaternion * quaternion);
 extern "C" TRIO_API_EXPORT void __stdcall Quaternion_MultiplyTwoQuats(Quaternion * quaternion1, Quaternion * quaternion2);

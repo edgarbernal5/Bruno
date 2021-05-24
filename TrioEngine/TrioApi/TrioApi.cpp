@@ -600,6 +600,11 @@ void Material_InsertTexture(Material* material, const char* name, Texture* textu
 /*
 Matrix
 */
+void Matrix_CreateFromAxisAngle(Matrix* pMatrix, Vector3* axis, float angle)
+{
+	*pMatrix = Matrix::CreateFromAxisAngle(*axis, angle);
+}
+
 void Matrix_CreateLookAt(Matrix *pMatrix1, Vector3* eye, Vector3* target, Vector3* up)
 {
 	*pMatrix1 = Matrix::CreateLookAt(*eye, *target, *up);
@@ -653,6 +658,16 @@ void Matrix_Multiply(Matrix *pMatrix1, Matrix *pMatrix2)
 void Matrix_MultiplyScalar(Matrix *pMatrix1, float scalar)
 {
 	*pMatrix1 /= scalar;
+}
+
+void Matrix_Forward(Matrix* pMatrix, Vector3* pResult)
+{
+	*pResult = pMatrix->Forward();
+}
+
+void Matrix_Right(Matrix* pMatrix, Vector3* pResult)
+{
+	*pResult = pMatrix->Right();
 }
 
 void Matrix_Sub(Matrix *pMatrix1, Matrix *pMatrix2)
@@ -1074,6 +1089,11 @@ void Vector2_MultiplyScalar(Vector2* pVector, float scalar)
 	*pVector *= scalar;
 }
 
+void Vector2_MultiplyTwoVectors(Vector2* pVector1, Vector2* pVector2)
+{
+	*pVector1 *= *pVector2;
+}
+
 void Vector2_SubTwoVectors(Vector2* pVector1, Vector2* pVector2)
 {
 	*pVector1 -= *pVector2;
@@ -1142,9 +1162,19 @@ void Vector3_Normalize(Vector3 *pVector)
 	pVector->Normalize();
 }
 
-void Vector3_Transform(Vector3* pVector, Quaternion* pRotation)
+void Vector3_TransformQuat(Vector3* pVector, Quaternion* pRotation)
 {
 	*pVector = pVector->Transform(*pVector, *pRotation);
+}
+
+void Vector3_TransformMatrixPosition(Vector3* pPosition, Matrix* pMatrix)
+{
+	*pPosition = Vector3::Transform(*pPosition, *pMatrix);
+}
+
+void Vector3_TransformMatrixNormal(Vector3* pNormal, Matrix* pMatrix)
+{
+	*pNormal = Vector3::TransformNormal(*pNormal, *pMatrix);
 }
 
 void Vector3_SubTwoVectors(Vector3 *pVector1, Vector3 *pVector2)
@@ -1223,9 +1253,19 @@ void Quaternion_CreateFromAxisAngle(Quaternion* quaternion, Vector3* pAxis, floa
 	*quaternion = quaternion->CreateFromAxisAngle(*pAxis, angle);
 }
 
+void Quaternion_CreateFromMatrix(Quaternion* quaternion, Matrix* pMatrix)
+{
+	*quaternion = Quaternion::CreateFromRotationMatrix(*pMatrix);
+}
+
 void Quaternion_CreateFromYawPitchRoll(Quaternion * quaternion, float yaw, float pitch, float roll)
 {
 	*quaternion = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
+}
+
+void Quaternion_Inverse(Quaternion* quaternion)
+{
+	quaternion->Inverse(*quaternion);
 }
 
 void Quaternion_MultiplyTwoQuats(Quaternion * quaternion1, Quaternion * quaternion2)

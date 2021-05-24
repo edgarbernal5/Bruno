@@ -44,6 +44,16 @@ namespace TrioApi.Net.Maths
             return result;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Quaternion_CreateFromMatrix", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateFromMatrix(ref Quaternion quaternion, ref Matrix matrix);
+
+        public static Quaternion CreateFromMatrix(Matrix matrix)
+        {
+            Quaternion result = Quaternion.Identity;
+            Internal_CreateFromMatrix(ref result, ref matrix);
+            return result;
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Quaternion_CreateFromYawPitchRoll", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_CreateFromYawPitchRoll(ref Quaternion quaternion, float yaw, float pitch, float roll);
 
@@ -52,6 +62,15 @@ namespace TrioApi.Net.Maths
             Quaternion result = Quaternion.Identity;
             Internal_CreateFromYawPitchRoll(ref result, yaw, pitch, roll);
             return result;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Quaternion_Inverse", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Inverse(ref Quaternion quaternion);
+
+        public static Quaternion Inverse(Quaternion quaternion)
+        {
+            Internal_Inverse(ref quaternion);
+            return quaternion;
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Quaternion_MultiplyTwoQuats", CallingConvention = CallingConvention.StdCall)]
@@ -87,5 +106,33 @@ namespace TrioApi.Net.Maths
         {
             return this.X.GetHashCode() + this.Y.GetHashCode() + this.Z.GetHashCode() + this.W.GetHashCode();
         }
+
+        public static Vector3 EulerAngles(Quaternion q)
+        {
+            Vector3 angles = new Vector3();
+            //WIP
+
+            // roll (x-axis rotation)
+            //double sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+            //double cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
+            //angles.roll = std::atan2(sinr_cosp, cosr_cosp);
+
+            // pitch (y-axis rotation)
+            double sinp = 2 * (q.W * q.Y - q.Z * q.X);
+            if (Math.Abs(sinp) >= 1)
+                angles.Y = (float)(Math.PI / 2) * Math.Sign(sinp); // use 90 degrees if out of range
+            else
+                angles.Y = (float)Math.Asin(sinp);
+
+            // yaw (z-axis rotation)
+            double siny_cosp = 2 * (q.W * q.Z + q.X * q.Y);
+            double cosy_cosp = 1 - 2 * (q.Y * q.Y + q.Z * q.Z);
+            angles.X = (float)Math.Atan2(siny_cosp, cosy_cosp);
+
+
+
+            return angles;
+        }
+        
     }
 }

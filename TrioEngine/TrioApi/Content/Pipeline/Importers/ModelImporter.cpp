@@ -265,27 +265,27 @@ namespace TrioEngine
 		return transform;
 	}
 
-	NodeContent* ModelImporter::ImportNode(const aiScene* scene, const aiNode* node, const aiNode* parentNode, NodeContent* parentContent)
+	NodeContent* ModelImporter::ImportNode(const aiScene* scene, const aiNode* currentNode, const aiNode* parentNode, NodeContent* parentContent)
 	{
 		NodeContent* nodeContent = nullptr;
-		Matrix nodeTransform = ToMatrix(node->mTransformation);
+		Matrix nodeTransform = ToMatrix(currentNode->mTransformation);
 
-		if (node->mNumMeshes > 0)
+		if (currentNode->mNumMeshes > 0)
 		{
 			MeshContent* meshContent = new MeshContent();
-			meshContent->SetName(node->mName.C_Str());
+			meshContent->SetName(currentNode->mName.C_Str());
 			meshContent->SetContentIdentity(m_identity);
-			meshContent->GetTransform() = GetRelativeTransform(node, parentNode);
+			meshContent->GetTransform() = GetRelativeTransform(currentNode, parentNode);
 
-			for (uint32_t i = 0; i < node->mNumMeshes; i++)
+			for (uint32_t i = 0; i < currentNode->mNumMeshes; i++)
 			{
-				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+				aiMesh* mesh = scene->mMeshes[currentNode->mMeshes[i]];
 
 				if (mesh->mNumVertices == 0)
 					continue;
 
 				GeometryContent* geometryContent = CreateGeometry(mesh, meshContent);
-				meshContent->SetName(node->mName.C_Str());
+				meshContent->SetName(currentNode->mName.C_Str());
 
 				meshContent->GetGeometry().push_back(geometryContent);
 			}
@@ -295,9 +295,9 @@ namespace TrioEngine
 		else
 		{
 			nodeContent = new NodeContent();
-			nodeContent->SetName(node->mName.C_Str());
+			nodeContent->SetName(currentNode->mName.C_Str());
 			nodeContent->SetContentIdentity(m_identity);
-			nodeContent->GetTransform() = GetRelativeTransform(node, parentNode);
+			nodeContent->GetTransform() = GetRelativeTransform(currentNode, parentNode);
 		}
 		
 		if (nodeContent)
@@ -308,10 +308,10 @@ namespace TrioEngine
 			}
 		}
 
-		for (uint32_t i = 0; i < node->mNumChildren; i++)
+		for (uint32_t i = 0; i < currentNode->mNumChildren; i++)
 		{
-			aiNode* childNode = node->mChildren[i];
-			ImportNode(scene, childNode, node, nodeContent);
+			aiNode* childNode = currentNode->mChildren[i];
+			ImportNode(scene, childNode, currentNode, nodeContent);
 		}
 
 		return nodeContent;

@@ -80,6 +80,15 @@ namespace TrioApi.Net.Maths
             return vector;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector2_MultiplyTwoVectors", CallingConvention = CallingConvention.StdCall)]
+        private static extern float Internal_MultiplyTwoVectors(ref Vector2 vector1, ref Vector2 vector2);
+
+        public static Vector2 operator *(Vector2 vector1, Vector2 vector2)
+        {
+            Internal_MultiplyTwoVectors(ref vector1, ref vector2);
+            return vector1;
+        }
+
         /// <summary>Tests vectors for equality.</summary>
         /// <param name="value1">Source vector.</param>
         /// <param name="value2">Source vector.</param>

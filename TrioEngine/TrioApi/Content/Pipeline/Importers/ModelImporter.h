@@ -53,7 +53,7 @@ namespace TrioEngine
 
 		void GetTexturesForMaterial(MaterialContent* materialContent, std::string& directory, aiMaterial* material);
 		void ImportMaterials(const aiScene* scene, std::string directory);
-		NodeContent* ImportNode(const aiScene* scene, const aiNode* node, const aiNode* parentNode, NodeContent* parentContent);
+		NodeContent* ImportNode(const aiScene* scene, const aiNode* currentNode, const aiNode* parentNode, NodeContent* parentContent);
 
 		Matrix GetRelativeTransform(const aiNode* node, const aiNode* ancestor);
 		Matrix ToMatrix(const aiMatrix4x4& aiMatrix);

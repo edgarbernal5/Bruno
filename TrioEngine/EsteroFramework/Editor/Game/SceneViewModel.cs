@@ -85,15 +85,9 @@ namespace EsteroFramework.Editor.Game
             Camera.NearPlane = 0.1f;
             Camera.FarPlane = 1000.0f;
 
-            Camera.Position = new Vector3(70.0f, 70.0f, 70.0f);
+            Camera.Position = new Vector3(5.0f, 5.0f, 5.0f);
             Camera.Target = Vector3.Zero;
             Camera.Up = Vector3.Up;
-
-            Camera.Distance = 5.0f;
-            Camera.View = Matrix.Identity;
-            Camera.Rotation = Quaternion.CreateFromYawPitchRoll(0, -0.3f, 0);
-
-            Camera.Recalculate();
         }
     }
 }

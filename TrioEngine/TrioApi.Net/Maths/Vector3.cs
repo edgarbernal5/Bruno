@@ -19,24 +19,6 @@ namespace TrioApi.Net.Maths
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_DistanceSquared", CallingConvention = CallingConvention.StdCall)]
         private static extern float Internal_DistanceSquared(ref Vector3 vector, ref Vector3 vector2);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Dot", CallingConvention = CallingConvention.StdCall)]
-        private static extern float Internal_Dot(ref Vector3 vector, ref Vector3 vector2);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_MultiplyDivision", CallingConvention = CallingConvention.StdCall)]
-        private static extern float Internal_MultiplyDivision(ref Vector3 vector, float scalar);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_MultiplyTwoVectors", CallingConvention = CallingConvention.StdCall)]
-        private static extern float Internal_MultiplyTwoVectors(ref Vector3 vector, ref Vector3 vector2);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Normalize", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Normalize(ref Vector3 vector);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_SumTwoVectors", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_SumTwoVectors(ref Vector3 vector, ref Vector3 vector2);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_UnaryNegation", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_UnaryNegation(ref Vector3 vector);
-
         public float X;
         public float Y;
         public float Z;
@@ -179,6 +161,14 @@ namespace TrioApi.Net.Maths
             return Internal_DistanceSquared(ref value1, ref value2);
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Dot", CallingConvention = CallingConvention.StdCall)]
+        private static extern float Internal_Dot(ref Vector3 vector, ref Vector3 vector2);
+
+        public static float Dot(Vector3 vector1, Vector3 vector2)
+        {
+            return Internal_Dot(ref vector1, ref vector2);
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Length", CallingConvention = CallingConvention.StdCall)]
         private static extern float Internal_Cross(ref Vector3 vector);
 
@@ -187,26 +177,53 @@ namespace TrioApi.Net.Maths
             return Internal_Cross(ref this);
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Normalize", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Normalize(ref Vector3 vector);
+
         public static Vector3 Normalize(Vector3 vector)
         {
             Internal_Normalize(ref vector);
             return vector;
         }
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Transform", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Transform(ref Vector3 up, ref Quaternion quaternion);
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_TransformQuat", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformQuat(ref Vector3 up, ref Quaternion quaternion);
 
         public static Vector3 Transform(Vector3 up, Quaternion rotation)
         {
-            Internal_Transform(ref up, ref rotation);
+            Internal_TransformQuat(ref up, ref rotation);
             return up;
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_TransformMatrixPosition", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformMatrix(ref Vector3 up, ref Matrix matrix);
+
+        public static Vector3 Transform(Vector3 position, Matrix matrix)
+        {
+            Internal_TransformMatrix(ref position, ref matrix);
+            return position;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_TransformMatrixNormal", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformMatrixNormal(ref Vector3 normal, ref Matrix matrix);
+
+        public static Vector3 TransformNormal(Vector3 normal, Matrix matrix)
+        {
+            Internal_TransformMatrixNormal(ref normal, ref matrix);
+            return normal;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_UnaryNegation", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_UnaryNegation(ref Vector3 vector);
 
         public static Vector3 operator -(Vector3 vectorIn)
         {
             Internal_UnaryNegation(ref vectorIn);
             return vectorIn;
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_SumTwoVectors", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SumTwoVectors(ref Vector3 vector, ref Vector3 vector2);
 
         public static Vector3 operator +(Vector3 vector1, Vector3 vector2)
         {
@@ -238,11 +255,17 @@ namespace TrioApi.Net.Maths
             return vector1;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_MultiplyTwoVectors", CallingConvention = CallingConvention.StdCall)]
+        private static extern float Internal_MultiplyTwoVectors(ref Vector3 vector, ref Vector3 vector2);
+
         public static Vector3 operator *(Vector3 vector1, Vector3 vector2)
         {
             Internal_MultiplyTwoVectors(ref vector1, ref vector2);
             return vector1;
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_MultiplyDivision", CallingConvention = CallingConvention.StdCall)]
+        private static extern float Internal_MultiplyDivision(ref Vector3 vector, float scalar);
 
         public static Vector3 operator /(Vector3 vector, float divider)
         {

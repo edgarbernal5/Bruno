@@ -112,6 +112,7 @@
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="ImportConfiguration.cs" />
+    <Compile Include="Maths\MathHelper.cs" />
     <Compile Include="Maths\Matrix.cs" />
     <Compile Include="Maths\Quaternion.cs" />
     <Compile Include="Maths\Vector2.cs" />

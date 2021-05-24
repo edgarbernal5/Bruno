@@ -1,4 +1,5 @@
-﻿using Estero.Interop;
+﻿
+using Estero.Interop;
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -8,7 +9,6 @@ namespace TrioApi.Net.Content
 {
     public class ContentManager : CppObject
     {
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "ContentManager_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_Ctor(IntPtr device);
 
