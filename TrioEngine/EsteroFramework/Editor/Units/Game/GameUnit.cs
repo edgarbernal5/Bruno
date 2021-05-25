@@ -63,8 +63,8 @@ namespace EsteroFramework.Editor.Units
                 var lastSizeWith = surfaceTarget.LastWidth;
                 var lastSizeHeight = surfaceTarget.LastHeight;
 
-                //if ((sizeWidth != lastSizeWith || sizeHeight != lastSizeHeight) && !m_idle)
-                //    continue;
+                if ((sizeWidth != lastSizeWith || sizeHeight != lastSizeHeight) && !m_idle)
+                    continue;
 
                 surfaceTarget.LastWidth = sizeWidth;
                 surfaceTarget.LastHeight = sizeHeight;

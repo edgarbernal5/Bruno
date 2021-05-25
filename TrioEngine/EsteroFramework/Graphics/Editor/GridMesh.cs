@@ -22,12 +22,18 @@ namespace EsteroFramework.Graphics.Editor
 
         private Effect m_effect;
 
+        public ColorRGBA8 AxisXColor { get; set; }
+        public ColorRGBA8 AxisZColor { get; set; }
+
         public GridMesh(GraphicsDevice device, int gridSize)
         {
             m_gridSize = gridSize;
             if (m_gridSize % 2 == 0) m_gridSize++;
 
             m_gridExtends = m_gridSize / 2;
+
+            AxisXColor = ColorRGBA8.Red;
+            AxisZColor = ColorRGBA8.Blue;
 
             CreateIndexBuffer(device);
             CreateVertexBuffer(device);
@@ -46,8 +52,13 @@ namespace EsteroFramework.Graphics.Editor
                 var positionFront = new Vector3((float)(i - halfSize) , 0.0f, -m_gridExtends);
                 var positionBack = new Vector3((float)(i - halfSize) , 0.0f, m_gridExtends);
 
-                vertices.Add(new VertexPositionColor(positionFront, colorWhiteVector4));
-                vertices.Add(new VertexPositionColor(positionBack, colorWhiteVector4));
+                var color = colorWhiteVector4;
+                if (i - halfSize == 0)
+                {
+                    color = AxisXColor;
+                }
+                vertices.Add(new VertexPositionColor(positionFront, color));
+                vertices.Add(new VertexPositionColor(positionBack, color));
             }
 
             for (int i = 1; i < m_gridSize - 1; i++)
@@ -55,8 +66,13 @@ namespace EsteroFramework.Graphics.Editor
                 var positionFront = new Vector3(-m_gridExtends, 0.0f, (float)(i - halfSize));
                 var positionBack = new Vector3(m_gridExtends, 0.0f, (float)(i - halfSize));
 
-                vertices.Add(new VertexPositionColor(positionFront, colorWhiteVector4));
-                vertices.Add(new VertexPositionColor(positionBack, colorWhiteVector4));
+                var color = colorWhiteVector4;
+                if (i - halfSize == 0)
+                {
+                    color = AxisZColor;
+                }
+                vertices.Add(new VertexPositionColor(positionFront, color));
+                vertices.Add(new VertexPositionColor(positionBack, color));
             }
 
             m_totalVertices = vertices.Count; 

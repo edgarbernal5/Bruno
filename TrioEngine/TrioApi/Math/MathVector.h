@@ -777,7 +777,8 @@ namespace TrioEngine
 		ColorRGBA8(ColorRGBA8&&) = default;
 		ColorRGBA8& operator=(ColorRGBA8&&) = default;
 
-		operator const float* () const { return reinterpret_cast<const float*>(this); }
+		Color ToColor() const;
+		Vector4 ToVector4() const;
 
 		// Comparison operators
 		bool operator == (const ColorRGBA8& c) const;
@@ -4280,7 +4281,14 @@ namespace TrioEngine
 	 * ColorRGBA8
 	 *
 	 ****************************************************************************/
-
+	inline Color ColorRGBA8::ToColor() const
+	{
+		return Color(b / 255.0f, g / 255.0f, r / 255.0f, a / 255.0f);
+	}
+	inline Vector4 ColorRGBA8::ToVector4() const
+	{
+		return Vector4(b / 255.0f, g / 255.0f, r / 255.0f, a / 255.0f);
+	}
 
 	//------------------------------------------------------------------------------
 	// Comparision operators

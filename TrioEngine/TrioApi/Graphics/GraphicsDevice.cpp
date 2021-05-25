@@ -245,8 +245,8 @@ namespace TrioEngine
 			/*if (FormatHelper::HasStencil(m_depthStencilBuffer->GetDepthFormat()))
 				options = options | ClearOptions::Stencil;*/
 		}
-
-		Clear(options, color, m_viewport.maxDepth, 0);
+		
+		Clear(options, color.ToColor(), m_viewport.maxDepth, 0);
 	}
 
 	void GraphicsDevice::Clear(const float* color)
