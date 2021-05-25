@@ -7,6 +7,9 @@ using TrioApi.Net.Maths;
 
 namespace EsteroFramework.Graphics.Editor
 {
+    /*
+     * http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+     */
     public class GridMesh : DisposableBase
     {
         private VertexBuffer m_vertexBuffer;

@@ -13,12 +13,6 @@ namespace TrioApi.Net.Maths
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Clamp", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Clamp(ref Vector3 vector, ref Vector3 vMin, ref Vector3 vMax);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Distance", CallingConvention = CallingConvention.StdCall)]
-        private static extern float Internal_Distance(ref Vector3 vector, ref Vector3 vector2);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_DistanceSquared", CallingConvention = CallingConvention.StdCall)]
-        private static extern float Internal_DistanceSquared(ref Vector3 vector, ref Vector3 vector2);
-
         public float X;
         public float Y;
         public float Z;
@@ -151,10 +145,16 @@ namespace TrioApi.Net.Maths
             return vector1;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Distance", CallingConvention = CallingConvention.StdCall)]
+        private static extern float Internal_Distance(ref Vector3 vector, ref Vector3 vector2);
+
         public static float Distance(Vector3 value1, Vector3 value2)
         {
             return Internal_Distance(ref value1, ref value2);
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_DistanceSquared", CallingConvention = CallingConvention.StdCall)]
+        private static extern float Internal_DistanceSquared(ref Vector3 vector, ref Vector3 vector2);
 
         public static float DistanceSquared(Vector3 value1, Vector3 value2)
         {
@@ -184,6 +184,11 @@ namespace TrioApi.Net.Maths
         {
             Internal_Normalize(ref vector);
             return vector;
+        }
+
+        public void Normalize()
+        {
+            Internal_Normalize(ref this);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_TransformQuat", CallingConvention = CallingConvention.StdCall)]

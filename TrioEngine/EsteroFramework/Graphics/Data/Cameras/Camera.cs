@@ -1,5 +1,4 @@
 ﻿
-using System;
 using TrioApi.Net.Maths;
 
 namespace EsteroFramework.Graphics.Data
@@ -16,5 +15,14 @@ namespace EsteroFramework.Graphics.Data
         public float AspectRatio { get; set; }
 
         public Matrix View { get; set; }
+
+        public Camera(Vector3 position, Vector3 target, Vector3 up)
+        {
+            Position = position;
+            Target = target;
+            Up = up;
+
+            View = Matrix.CreateLookAt(position, target, up);
+        }
     }
 }

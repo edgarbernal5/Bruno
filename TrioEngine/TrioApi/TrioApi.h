@@ -196,6 +196,8 @@ extern "C" TRIO_API_EXPORT void __stdcall Matrix_Multiply(Matrix *pMatrix1, Matr
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_MultiplyScalar(Matrix *pMatrix1, float scalar);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Forward(Matrix *pMatrix1, Vector3 *pResult);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Right(Matrix *pMatrix1, Vector3 *pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_Translation(Matrix *pMatrix1, Vector3 *pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_Up(Matrix *pMatrix1, Vector3 *pResult);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Sub(Matrix *pMatrix, Matrix *pMatrix2);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Sum(Matrix *pMatrix1, Matrix *pMatrix2);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Transpose(Matrix *pMatrix);

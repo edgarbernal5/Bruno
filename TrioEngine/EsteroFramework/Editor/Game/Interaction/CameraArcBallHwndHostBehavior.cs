@@ -14,16 +14,25 @@ namespace EsteroFramework.Editor.Game.Interaction
      */
     public class CameraArcBallHwndHostBehavior : Behavior<GameSurfaceTargetHwndHost>
     {
-        private Camera _currentCamera;
-        private Matrix _originalViewMatrix;
+        struct CameraState
+        {
+            public Matrix m_view;
+            public Vector3 m_target;
+            public Vector3 m_position;
+            public Vector3 m_up;
+            public Vector2 m_yawPitch;
+        }
+        private CameraState m_cameraState;
+        private Camera m_currentCamera;
+
         private Vector2 _previousMousePosition;
-        private Vector2 m_yawPitch;
+        private Vector2 m_currentYawPitch;
 
         public static readonly DependencyProperty CameraNodeProperty = DependencyProperty.Register(
             "Camera",
             typeof(Camera),
             typeof(CameraArcBallHwndHostBehavior),
-            new FrameworkPropertyMetadata(null));
+            new PropertyMetadata(null, OnCameraChanged));
 
         public Camera Camera
         {
@@ -35,7 +44,6 @@ namespace EsteroFramework.Editor.Game.Interaction
         {
             base.OnAttached();
             AssociatedObject.HwndLButtonDown += OnHwndLButtonDown;
-            AssociatedObject.HwndMouseWheel += OnHwndMouseWheel;
         }
 
         private void OnHwndLButtonDown(object sender, HwndMouseEventArgs eventArgs)
@@ -46,8 +54,15 @@ namespace EsteroFramework.Editor.Game.Interaction
         protected override void OnDetaching()
         {
             AssociatedObject.HwndLButtonDown -= OnHwndLButtonDown;
-            AssociatedObject.HwndMouseWheel -= OnHwndMouseWheel;
             base.OnDetaching();
+        }
+
+        private static void OnCameraChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            var target = (CameraArcBallHwndHostBehavior)dependencyObject;
+            
+            var newValue = (Camera)eventArgs.NewValue;
+            target.GetInitialYawPitch(newValue);
         }
 
         private void BeginOrbit(HwndMouseEventArgs eventArgs)
@@ -70,9 +85,12 @@ namespace EsteroFramework.Editor.Game.Interaction
             //    return;
             //}
 
-            _currentCamera = cameraNode;
-            _originalViewMatrix = _currentCamera.View;
-            GetYawPitch();
+            m_currentCamera = cameraNode;
+            m_cameraState.m_view = m_currentCamera.View;
+            m_cameraState.m_target = m_currentCamera.Target;
+            m_cameraState.m_position = m_currentCamera.Position;
+            m_cameraState.m_up = m_currentCamera.Up;
+            m_cameraState.m_yawPitch = m_currentYawPitch;
 
             AssociatedObject.HwndMouseMove += OnHwndMouseMove;
             AssociatedObject.HwndLButtonUp += OnHwndLButtonUp;
@@ -91,13 +109,14 @@ namespace EsteroFramework.Editor.Game.Interaction
             //eventArgs.Handled = true;
         }
 
-        private void GetYawPitch()
+        private void GetInitialYawPitch(Camera camera)
         {
-            var viewMatrix = Matrix.CreateLookAt(_currentCamera.Position, _currentCamera.Target, _currentCamera.Up);
+            var viewMatrix = Matrix.CreateLookAt(camera.Position, camera.Target, camera.Up);
 
-            var yawPitchRoll = Matrix.CreateEulerAnglesFromRotation(Matrix.Invert(viewMatrix));
-            m_yawPitch.X = yawPitchRoll.X;
-            m_yawPitch.Y = yawPitchRoll.Y;
+            var yawPitchRoll = Quaternion.EulerAngles(Quaternion.Inverse(Quaternion.CreateFromMatrix(viewMatrix)));
+
+            m_currentYawPitch.X = yawPitchRoll.X;
+            m_currentYawPitch.Y = yawPitchRoll.Y;
         }
 
         private void OnHwndLButtonUp(object sender, HwndMouseEventArgs eventArgs)
@@ -107,15 +126,15 @@ namespace EsteroFramework.Editor.Game.Interaction
 
         private void RecalculateViewMatrix(Quaternion rotation)
         {
-            float distance = (_currentCamera.Position - _currentCamera.Target).Length();
+            float distance = (m_currentCamera.Position - m_currentCamera.Target).Length();
             Vector3 translation = new Vector3(0.0f, 0.0f, distance);
             translation = Vector3.Transform(translation, rotation);
 
-            _currentCamera.Position = _currentCamera.Target + translation;
+            m_currentCamera.Position = m_currentCamera.Target + translation;
 
-            _currentCamera.Up = Vector3.Transform(Vector3.Up, rotation);
+            m_currentCamera.Up = Vector3.Transform(Vector3.Up, rotation);
 
-            _currentCamera.View = Matrix.CreateLookAt(_currentCamera.Position, _currentCamera.Target, _currentCamera.Up);
+            m_currentCamera.View = Matrix.CreateLookAt(m_currentCamera.Position, m_currentCamera.Target, m_currentCamera.Up);
         }
 
         private void OnHwndMouseMove(object sender, HwndMouseEventArgs eventArgs)
@@ -129,11 +148,11 @@ namespace EsteroFramework.Editor.Game.Interaction
                 
                 var deltaAngles = new Vector2(2.0f * MathHelper.Pi / viewportWidth, MathHelper.Pi / viewportHeight);
 
-                var mouseVector = GetMouseSpeed(currentMousePosition);
-                var angles = mouseVector * deltaAngles;
+                var mouseVelocity = GetMouseVelocity(currentMousePosition);
+                var angles = mouseVelocity * deltaAngles;
 
-                m_yawPitch += angles;
-                Quaternion rotation = Quaternion.CreateFromYawPitchRoll(m_yawPitch.X, m_yawPitch.Y, 0);
+                m_currentYawPitch += angles;
+                Quaternion rotation = Quaternion.CreateFromYawPitchRoll(m_currentYawPitch.X, m_currentYawPitch.Y, 0);
 
                 RecalculateViewMatrix(rotation);
                 _previousMousePosition = currentMousePosition;
@@ -157,11 +176,14 @@ namespace EsteroFramework.Editor.Game.Interaction
 
             if (!commit)
             {
-                // Operation canceled, revert camera pose.
-                _currentCamera.View = _originalViewMatrix;
+                m_currentCamera.View = m_cameraState.m_view;
+                m_currentCamera.Target = m_cameraState.m_target;
+                m_currentCamera.Position = m_cameraState.m_position;
+                m_currentCamera.Up = m_cameraState.m_up;
+                m_currentYawPitch = m_cameraState.m_yawPitch;
             }
 
-            _currentCamera = null;
+            m_currentCamera = null;
         }
 
         private void OnKeyDown(object sender, KeyEventArgs eventArgs)
@@ -181,20 +203,7 @@ namespace EsteroFramework.Editor.Game.Interaction
             eventArgs.Handled = true;
         }
 
-        private void OnHwndMouseWheel(object sender, HwndMouseEventArgs eventArgs)
-        {
-            var cameraNode = Camera;
-            if (cameraNode == null)
-                return;
-
-            //float wheel = (float)eventArgs.WheelDelta * 0.01f;
-            //float distance = cameraNode.Distance - wheel;
-
-            //cameraNode.Distance = distance;
-            //cameraNode.Recalculate();
-        }
-
-        private Vector2 GetMouseSpeed(Vector2 currentMousePosition)
+        private Vector2 GetMouseVelocity(Vector2 currentMousePosition)
         {
             return (_previousMousePosition - currentMousePosition);
         }

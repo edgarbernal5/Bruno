@@ -80,14 +80,10 @@ namespace EsteroFramework.Editor.Game
 
         private void InitializeCamera()
         {
-            Camera = new Camera();
+            Camera = new Camera(new Vector3(5.0f, 5.0f, 5.0f), Vector3.Zero, Vector3.Up);
             Camera.FieldOfView = 60.0f * 3.1416f / 180.0f;
             Camera.NearPlane = 0.1f;
             Camera.FarPlane = 1000.0f;
-
-            Camera.Position = new Vector3(5.0f, 5.0f, 5.0f);
-            Camera.Target = Vector3.Zero;
-            Camera.Up = Vector3.Up;
         }
     }
 }

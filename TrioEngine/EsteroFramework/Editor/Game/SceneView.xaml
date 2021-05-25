@@ -15,6 +15,8 @@
         <game:GameSurfaceTargetHwndHost x:Name="gameSurfaceTarget" GameGraphicsScreens ="{Binding GameGraphicsScreens}">
             <i:Interaction.Behaviors>
                 <beh:CameraArcBallHwndHostBehavior Camera="{Binding Camera}" />
+                <beh:CameraZoomHwndHostBehavior Camera="{Binding Camera}" />
+                <beh:CameraHandToolHwndHostBehavior Camera="{Binding Camera}" />
             </i:Interaction.Behaviors>
         </game:GameSurfaceTargetHwndHost>
     </Grid>

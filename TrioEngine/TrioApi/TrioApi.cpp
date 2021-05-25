@@ -670,6 +670,16 @@ void Matrix_Right(Matrix* pMatrix, Vector3* pResult)
 	*pResult = pMatrix->Right();
 }
 
+void Matrix_Translation(Matrix* pMatrix, Vector3* pResult)
+{
+	*pResult = pMatrix->Translation();
+}
+
+void Matrix_Up(Matrix* pMatrix, Vector3* pResult)
+{
+	*pResult = pMatrix->Up();
+}
+
 void Matrix_Sub(Matrix *pMatrix1, Matrix *pMatrix2)
 {
 	*pMatrix1 -= *pMatrix2;
@@ -1119,7 +1129,7 @@ void Vector3_Clamp(Vector3 *pVector1, Vector3 *pMin, Vector3 *pMax)
 
 void Vector3_Cross(Vector3 *pVector1, Vector3 *pVector2)
 {
-	pVector1->Cross(*pVector2);
+	pVector1->Cross(*pVector2, *pVector1);
 }
 
 float Vector3_Distance(Vector3 *pVector1, Vector3 *pVector2)

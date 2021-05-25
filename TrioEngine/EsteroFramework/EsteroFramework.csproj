@@ -81,6 +81,8 @@
     </Compile>
     <Compile Include="Editor\ExitCode.cs" />
     <Compile Include="Editor\Game\Interaction\CameraArcBallHwndHostBehavior.cs" />
+    <Compile Include="Editor\Game\Interaction\CameraHandToolHwndHostBehavior.cs" />
+    <Compile Include="Editor\Game\Interaction\CameraZoomHwndHostBehavior.cs" />
     <Compile Include="Editor\Game\SceneProjectFile.cs" />
     <Compile Include="Editor\Game\SceneView.xaml.cs">
       <DependentUpon>SceneView.xaml</DependentUpon>

@@ -96,6 +96,19 @@ namespace TrioApi.Net.Maths
             }
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Up", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Up(ref Matrix matrix, ref Vector3 result);
+
+        public Vector3 Up
+        {
+            get
+            {
+                Vector3 result = new Vector3();
+                Internal_Up(ref this, ref result);
+                return result;
+            }
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Forward", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Forward(ref Matrix matrix, ref Vector3 result);
 
@@ -105,6 +118,19 @@ namespace TrioApi.Net.Maths
             {
                 Vector3 result = new Vector3();
                 Internal_Forward(ref this, ref result);
+                return result;
+            }
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Translation", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Translation(ref Matrix matrix, ref Vector3 result);
+
+        public Vector3 Translation
+        {
+            get
+            {
+                Vector3 result = new Vector3();
+                Internal_Translation(ref this, ref result);
                 return result;
             }
         }
@@ -324,8 +350,8 @@ namespace TrioApi.Net.Maths
         {
             Vector3 eulerAngles = new Vector3();
 
-            eulerAngles.Y =  (float)Math.Asin(-matrix.M32);                  // Pitch
-            if (Math.Cos(eulerAngles.X) > 0.0001)                 // Not at poles
+            eulerAngles.Y = (float)Math.Asin(-matrix.M32);                  // Pitch
+            if (Math.Cos(eulerAngles.Y) > 0.0001)                 // Not at poles
             {
                 eulerAngles.X = (float)Math.Atan2(matrix.M31, matrix.M33);     // Yaw
                 eulerAngles.Z = (float)Math.Atan2(matrix.M12, matrix.M22);     // Roll
