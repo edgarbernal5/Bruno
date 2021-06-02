@@ -1,4 +1,5 @@
-﻿using EsteroFramework.Graphics;
+﻿using EsteroFramework.Editor.Game.Gizmos;
+using EsteroFramework.Graphics;
 using EsteroFramework.Graphics.Editor;
 using System;
 using System.Collections.Generic;
@@ -17,9 +18,12 @@ namespace EsteroFramework.Editor.Units
         protected override void OnInitialize()
         {
             var graphicsService = Editor.Services.GetInstance<IGraphicsService>();
-            var editorPrimitivesService = new EditorPrimitivesService(graphicsService);
 
+            var editorPrimitivesService = new EditorPrimitivesService(graphicsService);
             Editor.Services.RegisterInstance(typeof(IEditorPrimitivesService), null, editorPrimitivesService);
+
+            var gizmoService = new GizmoService(graphicsService);
+            Editor.Services.RegisterInstance(typeof(IGizmoService), null, gizmoService);
         }
 
         protected override void OnStartup()

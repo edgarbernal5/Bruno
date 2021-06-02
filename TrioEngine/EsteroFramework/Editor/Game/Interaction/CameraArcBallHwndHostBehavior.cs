@@ -62,6 +62,8 @@ namespace EsteroFramework.Editor.Game.Interaction
             var target = (CameraArcBallHwndHostBehavior)dependencyObject;
             
             var newValue = (Camera)eventArgs.NewValue;
+            if (newValue == null) return;
+
             target.GetInitialYawPitch(newValue);
         }
 
@@ -146,7 +148,7 @@ namespace EsteroFramework.Editor.Game.Interaction
                 var viewportWidth = (float)AssociatedObject.ActualWidth;
                 var viewportHeight = (float)AssociatedObject.ActualHeight;
                 
-                var deltaAngles = new Vector2(2.0f * MathHelper.Pi / viewportWidth, MathHelper.Pi / viewportHeight);
+                var deltaAngles = new Vector2(2.0f * MathHelper.PI / viewportWidth, MathHelper.PI / viewportHeight);
 
                 var mouseVelocity = GetMouseVelocity(currentMousePosition);
                 var angles = mouseVelocity * deltaAngles;

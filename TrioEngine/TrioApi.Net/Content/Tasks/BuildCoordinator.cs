@@ -21,6 +21,11 @@ namespace TrioApi.Net.Content.Tasks
         {
             //m_nativePointer = Internal_ctor(settings.IntermediateDirectory, settings.OutputDirectory, settings.RootDirectory);
             m_nativePointer = Internal_ctor2(settings);
+
+            var newSettings = Settings;
+            settings.IntermediateDirectory = newSettings.IntermediateDirectory;
+            settings.OutputDirectory = newSettings.OutputDirectory;
+            settings.RootDirectory = newSettings.RootDirectory;
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "BuildCoordinator_Dtor", CallingConvention = CallingConvention.StdCall)]

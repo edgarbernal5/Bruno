@@ -25,6 +25,19 @@ namespace EsteroFramework.Editor.Graphics
         }
         private GridMesh m_gridMesh;
 
+        public IAxisGizmoRenderer AxisGizmoRenderer
+        {
+            get
+            {
+                return m_axisGizmoRenderer;
+            }
+            set
+            {
+                m_axisGizmoRenderer = value;
+            }
+        }
+        private IAxisGizmoRenderer m_axisGizmoRenderer;
+
         public RenderPath RenderPath
         {
             get
@@ -46,7 +59,7 @@ namespace EsteroFramework.Editor.Graphics
 
         public override void Update(TimeSpan deltaTime)
         {
-            //Scene.Update
+            //Scene.Update();
         }
 
         public override void Render(RenderContext renderContext)
@@ -58,6 +71,8 @@ namespace EsteroFramework.Editor.Graphics
 
         private void DoOnRender(RenderContext renderContext)
         {
+            Scene.Update();
+
             renderContext.GraphicsDevice.Clear(ColorRGBA8.CornflowerBlue);
             //renderContext.GraphicsDevice.Clear(Color.CornflowerBlue);
 
@@ -69,7 +84,8 @@ namespace EsteroFramework.Editor.Graphics
 
             //Camera.Recalculate();
 
-            m_gridMesh.Render(renderContext);
+            //m_gridMesh.Render(renderContext);
+            m_axisGizmoRenderer.Render(renderContext);
 
             TrioApi.Net.Game.Scene.UpdateCamera(ConvertToCamera(Camera));
             m_renderPath.Render();

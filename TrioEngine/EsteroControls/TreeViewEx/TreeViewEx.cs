@@ -44,8 +44,8 @@ namespace EsteroControls
                 FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
                 OnSelectedItemsChanged));
 
-        [Description("Gets or sets the collection of currently selected items.")]
-        [Category(Categories.Appearance)]
+        //[Description("Gets or sets the collection of currently selected items.")]
+        //[Category(Categories.Appearance)]
         [Bindable(true)]
         public IList SelectedItems
         {

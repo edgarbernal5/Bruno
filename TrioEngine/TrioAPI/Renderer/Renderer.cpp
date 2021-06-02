@@ -20,14 +20,17 @@ namespace TrioEngine
 	{
 		Scene& scene = *Scene::GetActiveScene();
 		GraphicsDevice* device = g_device;
-		
+		//scene.Update();
+
 		for (size_t i = 0; i < scene.GetMeshes().GetCount(); i++)
 		{
 			MeshComponent& mesh = scene.GetMeshes()[i];
+			Entity meshEntity = scene.GetMeshes().GetEntity(i);
 
 			device->SetVertexBuffer(&mesh.m_vertexBuffer);
 			device->SetIndexBuffer(&mesh.m_indexBuffer);
-			TransformComponent& transform = scene.GetTransforms()[i];
+			TransformComponent& transform = *scene.GetTransforms().GetComponent(meshEntity);
+			//HierarchyComponent& hierarchy = scene.Hierarchy()[i];
 
 			for (size_t j = 0; j < mesh.m_subMeshes.size(); j++)
 			{

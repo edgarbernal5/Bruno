@@ -69,11 +69,11 @@ namespace TrioApi.Net.Game
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_Update", CallingConvention = CallingConvention.StdCall)]
-        private static extern IntPtr Internal_Update();
+        private static extern IntPtr Internal_Update(IntPtr scene);
 
         public void Update()
         {
-            Internal_Update();
+            Internal_Update(m_nativePointer);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_UpdateCamera", CallingConvention = CallingConvention.StdCall)]
@@ -87,10 +87,47 @@ namespace TrioApi.Net.Game
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_LoadFromModel", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_LoadFromModel(IntPtr scene, IntPtr model);
 
-
         public void LoadFromModel(Model model)
         {
             Internal_LoadFromModel(NativePointer, model.NativePointer);
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct HierarchyComponentBridge
+        {
+            public long id;
+            public long parentId;
+            [MarshalAs(UnmanagedType.LPStr)]
+            public string name;
+        };
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_GetHierarchies", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_GetHierarchies(IntPtr scene, ref int size, ref IntPtr collection);
+
+        public HierarchyComponentBridge[] GetHierarchies()
+        {
+            int size = 0;
+            IntPtr unmanagedArray = IntPtr.Zero;
+            Internal_GetHierarchies(NativePointer, ref size, ref unmanagedArray);
+            
+            if (size > 0)
+            {
+                HierarchyComponentBridge[] outcome = new HierarchyComponentBridge[size];
+                for (int i = 0; i < size; i++)
+                {
+                    IntPtr unmanagedItemPtr = unmanagedArray + Marshal.SizeOf<HierarchyComponentBridge>() * i;
+                    outcome[i] = Marshal.PtrToStructure<HierarchyComponentBridge>(unmanagedItemPtr);
+
+                    IntPtr unmanagedNameFieldPtr = unmanagedItemPtr + Marshal.SizeOf<long>() * 2;
+                    IntPtr namePtr = Marshal.ReadIntPtr(unmanagedNameFieldPtr);
+                    Marshal.FreeCoTaskMem(namePtr);
+                }
+
+                Marshal.FreeCoTaskMem(unmanagedArray);
+
+                return outcome;
+            }
+            return new HierarchyComponentBridge[0];
         }
     }
 }

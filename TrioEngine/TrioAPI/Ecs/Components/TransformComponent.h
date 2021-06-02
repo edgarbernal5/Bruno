@@ -42,9 +42,18 @@ namespace TrioEngine
 			m_localRotation = Quaternion::Identity;
 
 			m_world = Matrix::Identity;
+			SetDirty(true);
 		}
 
-		inline void SetDirty(bool value = true)
+		void UpdateTransformParented(const TransformComponent& parent) {
+			Matrix localMatrix = GetLocalMatrix();
+			Matrix localParentMatrix = parent.m_world;
+			localMatrix = localMatrix * localParentMatrix;
+
+			m_world = localMatrix;
+		}
+
+		inline void SetDirty(bool value)
 		{
 			if (value) { _flags |= DIRTY; }
 			else { _flags &= ~DIRTY; }
@@ -54,27 +63,31 @@ namespace TrioEngine
 		{
 			return _flags & DIRTY; 
 		}
+		void ApplyTransform() {
+			SetDirty(true);
+
+			m_world.Decompose(m_localScale, m_localRotation, m_localPosition);
+		}
+
+		void MatrixTransform(const Matrix& matrix) {
+			SetDirty(true);
+
+			Vector3 scale, translation;
+			Quaternion rotation;
+			Matrix LM = GetLocalMatrix() * matrix;
+			LM.Decompose(scale, rotation, translation);
+
+			m_localScale = scale;
+			m_localRotation = rotation;
+			m_localPosition = translation;
+		}
 
 	private:
 		Matrix GetLocalMatrix() const
 		{
-			/*XMVECTOR S_local = XMLoadFloat3(&scale_local);
-			XMVECTOR R_local = XMLoadFloat4(&rotation_local);
-			XMVECTOR T_local = XMLoadFloat3(&translation_local);
-			return
-				XMMatrixScalingFromVector(S_local) *
-				XMMatrixRotationQuaternion(R_local) *
-				XMMatrixTranslationFromVector(T_local);
-
-				*/
-
-			//return Matrix::CreateScale(m_localScale) *
-			//	Matrix::CreateFromQuaternion(m_localRotation) *
-			//	Matrix::CreateTranslation(m_localPosition);
-
-			return Matrix::CreateTranslation(m_localPosition)  *
+			return Matrix::CreateScale(m_localScale) *
 				Matrix::CreateFromQuaternion(m_localRotation) *
-				Matrix::CreateScale(m_localScale);
+				Matrix::CreateTranslation(m_localPosition);
 		}
 	};
 }

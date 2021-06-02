@@ -26,8 +26,7 @@ namespace TrioEngine
 
 		ReadBones(model, input);
 		ReadMeshes(model, input);
-		int rootIndex;
-		model->m_root = ReadBoneReference(model, input, rootIndex);
+		model->m_root = ReadBoneReference(model, input);
 
 		return model;
 	}
@@ -45,13 +44,12 @@ namespace TrioEngine
 		model->m_modelBones = bones;
 		for (int i = 0; i < boneCount; i++)
 		{
-			int rootIndex;
-			ModelBone* newParent = ReadBoneReference(model, input, rootIndex);
+			ModelBone* newParent = ReadBoneReference(model, input);
 			int childCount = input->ReadInt32();
 			std::vector<ModelBone*> newChildren(childCount, nullptr);
 			for (int j = 0; j < childCount; j++)
 			{
-				newChildren[j] = ReadBoneReference(model, input, rootIndex);
+				newChildren[j] = ReadBoneReference(model, input);
 			}
 			model->m_modelBones[i]->m_parent = newParent;
 			model->m_modelBones[i]->m_children = newChildren;
@@ -87,8 +85,7 @@ namespace TrioEngine
 		for (int i = 0; i < meshCount; i++)
 		{
 			std::string name = input->ReadString();
-			int rootIndex;
-			ModelBone* parentBone = ReadBoneReference(model, input, rootIndex);
+			ModelBone* parentBone = ReadBoneReference(model, input);
 
 			/*BoundingSphere boundingSphere;
 			boundingSphere.Center = input->ReadVector3();
@@ -98,7 +95,7 @@ namespace TrioEngine
 			boundingBox.Min = input->ReadVector3();
 			boundingBox.Max = input->ReadVector3();*/
 
-			Matrix transform = model->m_bonesMatrices[rootIndex];
+			Matrix transform = model->m_bonesMatrices[parentBone->GetIndex()];
 			std::vector<ModelMeshPart*> meshParts = ReadMeshParts(input);
 			meshes[i] = new ModelMesh(name, parentBone, transform, /*boundingSphere, boundingBox,*/ meshParts);
 		}
@@ -151,7 +148,7 @@ namespace TrioEngine
 		return meshParts;
 	}
 
-	ModelBone* ModelReader::ReadBoneReference(Model* model, ContentReader* input, int& boneIndex)
+	ModelBone* ModelReader::ReadBoneReference(Model* model, ContentReader* input)
 	{
 		int totalBones = model->m_modelBones.size() + 1;
 		int boneId = 0;
@@ -165,10 +162,8 @@ namespace TrioEngine
 		}
 		if (boneId != 0)
 		{
-			boneIndex = boneId - 1;
 			return model->m_modelBones[boneId - 1];
 		}
-		boneIndex = 0;
 		return nullptr;
 	}
 }

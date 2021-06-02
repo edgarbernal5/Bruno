@@ -278,6 +278,12 @@ extern "C" TRIO_API_EXPORT RasterizerState* __stdcall RasterizerState_CullNone()
 /*
 Scene
 */
+struct HierarchyComponentBridge {
+	uint64_t id;
+	uint64_t parentId;
+	char* name;
+};
+
 extern "C" TRIO_API_EXPORT Scene* __stdcall Scene_Ctor();
 extern "C" TRIO_API_EXPORT void __stdcall Scene_Dtor(Scene* scene);
 extern "C" TRIO_API_EXPORT Scene* __stdcall Scene_GetActiveScene();
@@ -286,6 +292,7 @@ extern "C" TRIO_API_EXPORT void __stdcall Scene_Update(Scene* scene);
 extern "C" TRIO_API_EXPORT Camera __stdcall Scene_GetCamera();
 extern "C" TRIO_API_EXPORT void __stdcall Scene_UpdateCamera(Camera camera);
 extern "C" TRIO_API_EXPORT void __stdcall Scene_LoadFromModel(Scene* scene, Model* model);
+extern "C" TRIO_API_EXPORT void __stdcall Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** outHierarchies);
 
 /*
 Transform

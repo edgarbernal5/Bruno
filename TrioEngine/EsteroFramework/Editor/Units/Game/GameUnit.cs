@@ -105,6 +105,7 @@ namespace EsteroFramework.Editor.Units
             device.Dispose();
 
             Editor.Services.UnregisterHandler(typeof(IGraphicsService));
+            Editor.Services.UnregisterHandler(typeof(IHwndHostRef));
         }
     }
 }

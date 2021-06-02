@@ -100,22 +100,20 @@ namespace TrioEngine
 
 		inline Entity GetEntity(size_t index) const { return m_entities[index]; }
 
-		inline void MoveItem(size_t index_from, size_t index_to)
+		inline void MoveItem(size_t indexFrom, size_t indexTo)
 		{
-			assert(index_from < GetCount());
-			assert(index_to < GetCount());
-			if (index_from == index_to)
+			if (indexFrom == indexTo)
 			{
 				return;
 			}
 
 			// Save the moved component and entity:
-			Component component = std::move(m_components[index_from]);
-			Entity entity = m_entities[index_from];
+			Component component = std::move(m_components[indexFrom]);
+			Entity entity = m_entities[indexFrom];
 
 			// Every other entity-component that's in the way gets moved by one and lut is kept updated:
-			const int direction = index_from < index_to ? 1 : -1;
-			for (size_t i = index_from; i != index_to; i += direction)
+			const int direction = indexFrom < indexTo ? 1 : -1;
+			for (size_t i = indexFrom; i != indexTo; i += direction)
 			{
 				const size_t next = i + direction;
 				m_components[i] = std::move(m_components[next]);
@@ -124,9 +122,9 @@ namespace TrioEngine
 			}
 
 			// Saved entity-component moved to the required position:
-			m_components[index_to] = std::move(component);
-			m_entities[index_to] = entity;
-			m_lookup[entity] = index_to;
+			m_components[indexTo] = std::move(component);
+			m_entities[indexTo] = entity;
+			m_lookup[entity] = indexTo;
 		}
 
 		inline void Remove(Entity entity)
@@ -146,6 +144,37 @@ namespace TrioEngine
 
 					// Update the lookup table:
 					m_lookup[m_entities[index]] = index;
+				}
+
+				// Shrink the container:
+				m_components.pop_back();
+				m_entities.pop_back();
+				m_lookup.erase(entity);
+			}
+		}
+		
+		inline void RemoveKeepSorted(Entity entity)
+		{
+			auto it = m_lookup.find(entity);
+			if (it != m_lookup.end())
+			{
+				// Directly index into components and entities array:
+				const size_t index = it->second;
+				const Entity entity = m_entities[index];
+
+				if (index < m_components.size() - 1)
+				{
+					// Move every component left by one that is after this element:
+					for (size_t i = index + 1; i < m_components.size(); ++i)
+					{
+						m_components[i - 1] = std::move(m_components[i]);
+					}
+					// Move every entity left by one that is after this element and update lut:
+					for (size_t i = index + 1; i < m_entities.size(); ++i)
+					{
+						m_entities[i - 1] = m_entities[i];
+						m_lookup[m_entities[i - 1]] = i - 1;
+					}
 				}
 
 				// Shrink the container:

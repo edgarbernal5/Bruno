@@ -8,7 +8,7 @@ namespace TrioEngine
 
 	}
 
-	ModelBone::ModelBone(std::string name, Matrix transform, int index) : m_parent(nullptr), m_index(index)
+	ModelBone::ModelBone(std::string name, Matrix transform, int index) : m_name(name), m_parent(nullptr), m_index(index)
 	{
 		m_transform = transform;
 	}

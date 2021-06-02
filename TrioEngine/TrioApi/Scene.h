@@ -35,6 +35,9 @@ namespace TrioEngine
 		inline ComponentManager<TransformComponent>& GetTransforms() {
 			return m_transforms;
 		}
+		inline ComponentManager<HierarchyComponent>& GetHierarchies() {
+			return m_hierarchies;
+		}
 
 		void OnWindowSizeChanged(int width, int height);
 		void Update();
@@ -49,12 +52,16 @@ namespace TrioEngine
 		static Scene* g_activeScene;
 		static Camera* g_mainCamera;
 
-		Entity CreateMaterialEntity(std::string name);
-		Entity CreateMesh(std::string name);
+		Entity CreateEntityForMaterial(std::string name);
+		Entity CreateEntityForMesh(std::string name);
+		Entity CreateEntityForBone(std::string name);
+
+		void ComponentAttach(Entity entity, Entity parent, bool child_already_in_local_space);
+		void ComponentDetach(Entity entity);
 
 		ComponentManager<NameComponent> m_names;
 		ComponentManager<TransformComponent> m_transforms;
-		ComponentManager<HierarchyComponent> m_hierarchy;
+		ComponentManager<HierarchyComponent> m_hierarchies;
 		ComponentManager<MeshComponent> m_meshes;
 		ComponentManager<MaterialComponent> m_materials;
 	};

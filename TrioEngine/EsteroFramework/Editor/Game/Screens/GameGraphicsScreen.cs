@@ -19,7 +19,6 @@ namespace EsteroFramework.Editor.Graphics
         public GameGraphicsScreen()
         {
             IsVisible = true;
-            Scene = null;
         }
 
         public abstract void Update(TimeSpan deltaTime);

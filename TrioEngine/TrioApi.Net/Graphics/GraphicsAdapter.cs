@@ -15,21 +15,21 @@ namespace TrioApi.Net.Graphics
         static GraphicsAdapter()
         {
             int total = 0;
-            IntPtr array = IntPtr.Zero;
-            Internal_GetAdapters(ref array, ref total);
+            IntPtr unmanagedArray = IntPtr.Zero;
+            Internal_GetAdapters(ref unmanagedArray, ref total);
 
             if (total > 0)
             {
-                IntPtr[] adapters = new IntPtr[total];
-                Marshal.Copy(array, adapters, 0, total);
+                IntPtr[] unmanagedAdapters = new IntPtr[total];
+                Marshal.Copy(unmanagedArray, unmanagedAdapters, 0, total);
 
                 g_adapters = new GraphicsAdapter[total];
                 for (int i = 0; i < total; i++)
                 {
-                    g_adapters[i] = new GraphicsAdapter(adapters[i]);
+                    g_adapters[i] = new GraphicsAdapter(unmanagedAdapters[i]);
                 }
 
-                Marshal.FreeCoTaskMem(array);
+                Marshal.FreeCoTaskMem(unmanagedArray);
             }
         }
 

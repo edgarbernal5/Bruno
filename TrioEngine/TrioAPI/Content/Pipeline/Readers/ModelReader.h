@@ -26,7 +26,7 @@ namespace TrioEngine
 		void ReadBones(Model* model, ContentReader* input);
 		void ReadMeshes(Model* model, ContentReader* input);
 		std::vector<ModelMeshPart*> ReadMeshParts(ContentReader* input);
-		ModelBone* ReadBoneReference(Model* model, ContentReader* input, int& boneIndex);
+		ModelBone* ReadBoneReference(Model* model, ContentReader* input);
 
 		//Matrix GetAbsoluteTransform(Model* model);
 	};

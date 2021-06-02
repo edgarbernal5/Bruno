@@ -34,35 +34,35 @@ namespace EsteroGraphicsHost
             float time = (float)GraphicsDeviceHost.m_gameStepTimer.TotalTime.TotalSeconds;
            // camera.Rotation = Quaternion.CreateFromYawPitchRoll(time*0.1f, -0.3f, 0);
 
-            camera.Recalculate();
+            //camera.Recalculate();
             m_gridMesh.Render(m_renderContext);
         }
 
         private void GraphicsDeviceHost_OnLoaded()
         {
-            var device = GraphicsDeviceService.Service.GraphicsDevice;
-            m_gridMesh = new GridMesh(device, 32);
-            m_renderContext = new RenderContext();
-            m_renderContext.GraphicsDevice = device;
-            m_renderContext.Viewport = device.Viewport;
+            //var device = GraphicsDeviceService.Service.GraphicsDevice;
+            //m_gridMesh = new GridMesh(device, 32);
+            //m_renderContext = new RenderContext();
+            //m_renderContext.GraphicsDevice = device;
+            //m_renderContext.Viewport = device.Viewport;
 
-            var camera = new Camera();
-            camera.FieldOfView = 60.0f * 3.1416f / 180.0f;
-            camera.NearPlane = 0.1f;
-            camera.FarPlane = 1000.0f;
-            camera.AspectRatio = device.Viewport.AspectRatio;
+            //var camera = new Camera();
+            //camera.FieldOfView = 60.0f * 3.1416f / 180.0f;
+            //camera.NearPlane = 0.1f;
+            //camera.FarPlane = 1000.0f;
+            //camera.AspectRatio = device.Viewport.AspectRatio;
 
-            camera.Position = new Vector3(70.0f, 70.0f, 70.0f);
-            camera.Target = Vector3.Zero;
-            camera.Up = Vector3.Up;
+            //camera.Position = new Vector3(70.0f, 70.0f, 70.0f);
+            //camera.Target = Vector3.Zero;
+            //camera.Up = Vector3.Up;
 
-            camera.Distance = 5.0f;
-            camera.View = Matrix.Identity;
-            camera.Rotation = Quaternion.CreateFromYawPitchRoll(0, -0.3f, 0);
+            //camera.Distance = 5.0f;
+            //camera.View = Matrix.Identity;
+            //camera.Rotation = Quaternion.CreateFromYawPitchRoll(0, -0.3f, 0);
 
-            camera.Recalculate();
+            //camera.Recalculate();
 
-            m_renderContext.Camera = camera;
+            //m_renderContext.Camera = camera;
         }
 
         private void GraphicsDeviceHost_HwndLButtonDown(object sender, HwndMouseEventArgs eventArgs)
@@ -86,19 +86,19 @@ namespace EsteroGraphicsHost
         }
         private void GraphicsDeviceHost_HwndMouseMove(object sender, HwndMouseEventArgs eventArgs)
         {
-            if (!m_mouseDown) return;
-            var camera = m_renderContext.Camera;
+            //if (!m_mouseDown) return;
+            //var camera = m_renderContext.Camera;
 
-            var currentMousePosition = ConvertToVector2(eventArgs.Position);
-            var localRotation = GetMouseSpeed(currentMousePosition);
-            if (localRotation != Vector2.Zero)
-            {
-                yawPitch += localRotation * (float)GraphicsDeviceHost.m_gameStepTimer.ElapsedTime.TotalSeconds * 0.5f;
-                camera.Rotation = Quaternion.CreateFromYawPitchRoll(yawPitch.X, yawPitch.Y, 0);
-            }
+            //var currentMousePosition = ConvertToVector2(eventArgs.Position);
+            //var localRotation = GetMouseSpeed(currentMousePosition);
+            //if (localRotation != Vector2.Zero)
+            //{
+            //    yawPitch += localRotation * (float)GraphicsDeviceHost.m_gameStepTimer.ElapsedTime.TotalSeconds * 0.5f;
+            //    camera.Rotation = Quaternion.CreateFromYawPitchRoll(yawPitch.X, yawPitch.Y, 0);
+            //}
 
-            camera.Recalculate();
-            _previousMousePosition = currentMousePosition;
+            //camera.Recalculate();
+            //_previousMousePosition = currentMousePosition;
         }
     }
 }

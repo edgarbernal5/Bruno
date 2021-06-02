@@ -72,6 +72,7 @@
     <Compile Include="Interop\WindowStyles.cs" />
     <Compile Include="Interop\WindowStylesEx.cs" />
     <Compile Include="Interop\WNDCLASS.cs" />
+    <Compile Include="ObservableChildCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -1,16 +1,25 @@
 ﻿
+using EsteroFramework.Editor.Game.Gizmos;
 using EsteroFramework.Editor.Graphics;
+using EsteroFramework.Editor.Units;
 using EsteroFramework.Graphics.Data;
 using EsteroFramework.Graphics.Editor;
 using System.Collections.Generic;
+using System.ComponentModel;
 using TrioApi.Net.Maths;
 using TrioApi.Net.Renderer;
 
 namespace EsteroFramework.Editor.Game
 {
-    public class SceneViewModel : Screen
+    public class SceneViewModel : ProjectFileViewModel
     {
-        public SceneProjectFile SceneProjectFile { get; set; }
+        public new SceneProjectFile ProjectFile
+        {
+            get
+            {
+                return (SceneProjectFile)base.ProjectFile;
+            }
+        }
 
         public Camera Camera
         {
@@ -30,7 +39,7 @@ namespace EsteroFramework.Editor.Game
                 return m_gameGraphicsScreens;
             }
         }
-        private List<GameGraphicsScreen> m_gameGraphicsScreens;
+        private IList<GameGraphicsScreen> m_gameGraphicsScreens = new List<GameGraphicsScreen>();
 
         //TODO
         /*
@@ -44,10 +53,11 @@ namespace EsteroFramework.Editor.Game
         private EditorGameGraphicsScreen m_editorGameGraphicsScreen;
         private readonly IEditorService m_editor;
 
-        public SceneViewModel(IEditorService editor)
+        public SceneViewModel(SceneProjectFile sceneProjectFile)
+            : base(sceneProjectFile)
         {
-            m_editor = editor;
-            m_gameGraphicsScreens = new List<GameGraphicsScreen>();
+            m_editor = sceneProjectFile.Editor;
+            //m_gameGraphicsScreens = new List<GameGraphicsScreen>();
         }
 
         private void InitializeGameScreens()
@@ -60,17 +70,18 @@ namespace EsteroFramework.Editor.Game
             
             var primitivesService = m_editor.Services.GetInstance<IEditorPrimitivesService>();
             m_editorGameGraphicsScreen.GridMesh = primitivesService.GridMesh;
-            m_editorGameGraphicsScreen.Scene = SceneProjectFile.Scene;
+
+            var gizmoService = m_editor.Services.GetInstance<IGizmoService>();
+            m_editorGameGraphicsScreen.AxisGizmoRenderer = gizmoService.AxisGizmoRenderer;
+
+            m_editorGameGraphicsScreen.Scene = ProjectFile.Scene;
             m_editorGameGraphicsScreen.Camera = Camera;
             m_editorGameGraphicsScreen.RenderPath = new RenderPathForward();
         }
 
         protected override void OnActivate()
         {
-            SceneProjectFile = new SceneProjectFile();
-            SceneProjectFile.New();
-
-            TrioApi.Net.Game.Scene.ActiveScene = SceneProjectFile.Scene;
+            TrioApi.Net.Game.Scene.ActiveScene = ProjectFile.Scene;
 
             InitializeCamera();
             InitializeGameScreens();
@@ -80,7 +91,7 @@ namespace EsteroFramework.Editor.Game
 
         private void InitializeCamera()
         {
-            Camera = new Camera(new Vector3(5.0f, 5.0f, 5.0f), Vector3.Zero, Vector3.Up);
+            Camera = new Camera(new Vector3(20.0f, 50.0f, 50.0f), Vector3.Zero, Vector3.Up);
             Camera.FieldOfView = 60.0f * 3.1416f / 180.0f;
             Camera.NearPlane = 0.1f;
             Camera.FarPlane = 1000.0f;

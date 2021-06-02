@@ -1,0 +1,43 @@
+﻿
+using EsteroFramework.Editor.Game;
+
+namespace EsteroFramework.Editor.Units
+{
+    public class WorldOutlineUnit : EditorUnit, IWorldOutlineService
+    {
+        private WorldOutlineViewModel m_worldOutlineViewModel;
+        public WorldOutline WorldOutline
+        {
+            get => m_worldOutlineViewModel.Outline;
+            set => m_worldOutlineViewModel.Outline = value;
+        }
+
+        public WorldOutlineViewModel ViewModel => m_worldOutlineViewModel;
+
+        public WorldOutlineUnit()
+        {
+
+        }
+
+        protected override void OnInitialize()
+        {
+            Editor.Services.RegisterInstance(typeof(IWorldOutlineService), null, this);
+            m_worldOutlineViewModel = new WorldOutlineViewModel(Editor);
+        }
+
+        protected override void OnStartup()
+        {
+
+        }
+        protected override void OnUninitialize()
+        {
+            Editor.Services.UnregisterHandler(typeof(IWorldOutlineService));
+        }
+
+        protected override void OnShutdown()
+        {
+            m_worldOutlineViewModel = null;
+        }
+
+    }
+}

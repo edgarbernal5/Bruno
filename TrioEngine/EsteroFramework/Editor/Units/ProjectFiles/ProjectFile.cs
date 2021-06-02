@@ -6,9 +6,16 @@ namespace EsteroFramework.Editor.Units
 {
     public abstract class ProjectFile : PropertyChangedBase, IDisposable
     {
+        public IEditorService Editor { get; }
+
         public bool IsModified { get; private set; }
 
         public bool IsDisposed { get; private set; }
+
+        protected ProjectFile(IEditorService editor)
+        {
+            Editor = editor;
+        }
 
         public void Dispose()
         {
@@ -50,5 +57,7 @@ namespace EsteroFramework.Editor.Units
         }
 
         protected abstract void OnSave();
+
+        public abstract ProjectFileViewModel CreateViewModel();
     }
 }

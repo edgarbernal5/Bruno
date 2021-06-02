@@ -39,7 +39,7 @@ namespace EsteroFramework.Graphics.Interop
             "GameGraphicsScreens",
             typeof(IList<GameGraphicsScreen>),
             typeof(GameSurfaceTargetHwndHost),
-            new PropertyMetadata(new List<GameGraphicsScreen>(), OnGameGraphicsScreensChanged));
+            new PropertyMetadata(null, OnGameGraphicsScreensChanged));
 
         public GameImageSource GameImageSource => throw new NotImplementedException();
 
@@ -186,6 +186,7 @@ namespace EsteroFramework.Graphics.Interop
         {
             var editor = this.GetEditor();
             var graphicsService = editor.Services.GetInstance<IGraphicsService>();
+            if (graphicsService == null) return;
             var graphicsDeviceService = editor.Services.GetInstance<IHwndHostRef>();
 
             graphicsService.GameSurfaceTargets.Add(this);
@@ -214,6 +215,14 @@ namespace EsteroFramework.Graphics.Interop
         }
 
         private static void OnGameGraphicsScreensChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            var target = (GameSurfaceTargetHwndHost)dependencyObject;
+            var oldValue = (IList<GameGraphicsScreen>)eventArgs.OldValue;
+            var newValue = (IList<GameGraphicsScreen>)eventArgs.NewValue;
+            target.OnGameGraphicsScreensChanged(oldValue, newValue);
+        }
+
+        protected virtual void OnGameGraphicsScreensChanged(IList<GameGraphicsScreen> oldValue, IList<GameGraphicsScreen> newValue)
         {
         }
 
@@ -390,8 +399,8 @@ namespace EsteroFramework.Graphics.Interop
                         HwndMouseEnter?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
 
                         // Track the previously focused window, and set focus to this window.
-                        m_hWndPrev = Win32.GetFocus();
-                        Win32.SetFocus(m_hWnd);
+                        //m_hWndPrev = Win32.GetFocus();
+                        //Win32.SetFocus(m_hWnd);
 
                         // send the track mouse event so that we get the WM_MOUSELEAVE message
                         var tme = new TRACKMOUSEEVENT
@@ -422,7 +431,7 @@ namespace EsteroFramework.Graphics.Interop
 
                     HwndMouseLeave?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
 
-                    Win32.SetFocus(m_hWndPrev);
+                    //Win32.SetFocus(m_hWndPrev);
 
                     break;
             }

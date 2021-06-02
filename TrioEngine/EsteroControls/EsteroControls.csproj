@@ -54,6 +54,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IndentationMarginConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -85,6 +86,10 @@
     <ProjectReference Include="..\EsteroWindows\EsteroWindows.csproj">
       <Project>{CDD79FF0-CC5B-4034-9082-80708737DA56}</Project>
       <Name>EsteroWindows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Estero\Estero.csproj">
+      <Project>{cc7dc8bc-3d51-4ae2-a2c4-1410a65252dc}</Project>
+      <Name>Estero</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -61,21 +61,21 @@ namespace TrioApi.Net.Graphics
         private void LoadModelMeshes()
         {
             int total = 0;
-            IntPtr array = IntPtr.Zero;
-            Internal_GetModelMeshes(m_nativePointer, ref array, ref total);
+            IntPtr unmanagedArray = IntPtr.Zero;
+            Internal_GetModelMeshes(m_nativePointer, ref unmanagedArray, ref total);
 
             if (total > 0)
             {
-                IntPtr[] parametersPtrs = new IntPtr[total];
-                Marshal.Copy(array, parametersPtrs, 0, total);
+                IntPtr[] unmanagedModelMeshes = new IntPtr[total];
+                Marshal.Copy(unmanagedArray, unmanagedModelMeshes, 0, total);
 
                 var modelMeshes = new ModelMesh[total];
                 for (int i = 0; i < total; i++)
                 {
-                    modelMeshes[i] = new ModelMesh(parametersPtrs[i]);
+                    modelMeshes[i] = new ModelMesh(unmanagedModelMeshes[i]);
                 }
 
-                Marshal.FreeCoTaskMem(array);
+                Marshal.FreeCoTaskMem(unmanagedArray);
                 m_modelMeshes = new ModelMeshCollection(modelMeshes);
             }
         }

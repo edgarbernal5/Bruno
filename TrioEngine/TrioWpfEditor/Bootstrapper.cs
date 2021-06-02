@@ -40,6 +40,8 @@ namespace TrioWpfEditor
             _editor.Units.Add(new BuilderUnit());
             _editor.Units.Add(new GameUnit());
             _editor.Units.Add(new PrimitivesUnit());
+            _editor.Units.Add(new WorldOutlineUnit());
+            _editor.Units.Add(new ProjectFileUnit());
 
             _editor.Configure();
         }

@@ -2,8 +2,10 @@
 using Estero.Logging;
 using Estero.ServiceLocation;
 using EsteroFramework.Editor.Game;
+using EsteroFramework.Editor.Units;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +30,27 @@ namespace EsteroFramework.Editor
             }
         }
 
-        public SceneViewModel SceneDetail { get; set; }
+        public SceneViewModel SceneDetail
+        {
+            get => m_sceneDetail;
+            set
+            {
+                m_sceneDetail = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        private SceneViewModel m_sceneDetail;
+
+        public WorldOutlineViewModel WorldOutlineDetail
+        {
+            get => m_worldOutlineDetail;
+            set
+            {
+                m_worldOutlineDetail = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        private WorldOutlineViewModel m_worldOutlineDetail;
 
         public string ApplicationName
         {
@@ -115,10 +137,26 @@ namespace EsteroFramework.Editor
                 unit.Startup();
             }
 
-            SceneDetail = new SceneViewModel(this);
-            (SceneDetail as IActivate).Activate();
+            LoadLayout();
+            CreateEmptyScene();
 
             RecreateUI();
+        }
+
+        private void LoadLayout()
+        {
+            var worldOutlineService = Services.GetInstance<IWorldOutlineService>();
+            WorldOutlineDetail = worldOutlineService.ViewModel;
+        }
+
+        private void CreateEmptyScene()
+        {
+            var projectFileService = Services.GetInstance<IProjectFileService>();
+
+            var sceneFileType = projectFileService.Factories.SelectMany(factory => factory.SupportedFileTypes)
+                .Where(fileType => fileType.Name == "Scene").FirstOrDefault();
+
+            projectFileService.New(sceneFileType);
         }
 
         private void RecreateUI()
@@ -156,7 +194,16 @@ namespace EsteroFramework.Editor
 
         public void ActivateItem(object item)
         {
+            if (item is SceneViewModel)
+            {
+                SceneDetail = item as SceneViewModel;
+            }
 
+            var activate = item as IActivate;
+            if (activate != null)
+            {
+                activate.Activate();
+            }
         }
     }
 }

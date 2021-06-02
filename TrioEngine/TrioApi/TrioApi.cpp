@@ -960,6 +960,33 @@ void Scene_LoadFromModel(Scene* scene, Model* model)
 	scene->LoadFromModel(model);
 }
 
+void Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** outHierarchies)
+{
+	ComponentManager<HierarchyComponent>& hierarchyComponents = scene->GetHierarchies();
+	ComponentManager<NameComponent>& nameComponents = scene->GetNames();
+	ComponentManager<TransformComponent>& tComponents = scene->GetTransforms();
+	auto n = tComponents.GetCount();
+
+	*size = n;
+	if (n > 0)
+	{
+		HierarchyComponentBridge* newArray = (HierarchyComponentBridge*)CoTaskMemAlloc(sizeof(HierarchyComponentBridge) * n);
+		for (size_t i = 0; i < n; i++)
+		{
+			Entity entity = tComponents.GetEntity(i);
+
+			NameComponent& nameComp = *nameComponents.GetComponent(entity);
+
+			HierarchyComponent* hierarchyComp = hierarchyComponents.GetComponent(entity);
+
+			newArray[i].id = entity;
+			newArray[i].parentId = hierarchyComp ? hierarchyComp->m_parentId : 0;
+			newArray[i].name = TrioDLL::AllocateMemoryForString(nameComp.m_name.c_str());;
+		}
+		*outHierarchies = newArray;
+	}
+}
+
 /*
 Transform
 */

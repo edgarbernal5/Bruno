@@ -114,6 +114,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EsteroControls\EsteroControls.csproj">
+      <Project>{56fd7477-85c8-4273-a776-93407370673f}</Project>
+      <Name>EsteroControls</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EsteroFramework\EsteroFramework.csproj">
       <Project>{434dc78e-f052-4f5e-9d3b-b74cf92c28ee}</Project>
       <Name>EsteroFramework</Name>

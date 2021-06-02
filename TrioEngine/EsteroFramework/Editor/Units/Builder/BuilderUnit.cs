@@ -116,11 +116,6 @@ namespace EsteroFramework.Editor.Units
 
             Model model = contentManager.Load<Model>(assetNamePath);
 
-            string basePath = @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\TrioEngine\TrioWpfEditor\bin\x64\Debug\finalObjects\Content";
-            string path = @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\TrioEngine\TrioWpfEditor\bin\x64\Debug\finalObjects\Content\Models\Car\RacerCar_0";
-
-            string finale = GetRelativePath(basePath, path);
-
             Scene.ActiveScene.LoadFromModel(model);
 
             var outputFiles = buildCoordinator.GetOutputFiles();

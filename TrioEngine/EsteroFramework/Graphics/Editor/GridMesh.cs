@@ -17,7 +17,6 @@ namespace EsteroFramework.Graphics.Editor
         private int m_gridSize;
         private float m_gridExtends;
 
-        private int m_totalVertices;
         private int m_totalIndices;
 
         private Effect m_effect;
@@ -55,7 +54,7 @@ namespace EsteroFramework.Graphics.Editor
                 var color = colorWhiteVector4;
                 if (i - halfSize == 0)
                 {
-                    color = AxisXColor;
+                    color = AxisZColor;
                 }
                 vertices.Add(new VertexPositionColor(positionFront, color));
                 vertices.Add(new VertexPositionColor(positionBack, color));
@@ -69,13 +68,12 @@ namespace EsteroFramework.Graphics.Editor
                 var color = colorWhiteVector4;
                 if (i - halfSize == 0)
                 {
-                    color = AxisZColor;
+                    color = AxisXColor;
                 }
                 vertices.Add(new VertexPositionColor(positionFront, color));
                 vertices.Add(new VertexPositionColor(positionBack, color));
             }
 
-            m_totalVertices = vertices.Count; 
             m_vertexBuffer = new VertexBuffer(device, VertexPositionColor.VertexDeclaration, vertices.Count);
             m_vertexBuffer.SetData(vertices.ToArray());
         }

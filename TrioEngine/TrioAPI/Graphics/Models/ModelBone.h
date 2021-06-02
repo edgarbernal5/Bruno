@@ -18,6 +18,20 @@ namespace TrioEngine
 			return m_index;
 		}
 
+		inline const char* GetName()
+		{
+			return m_name.c_str();
+		}
+
+		inline Matrix& GetTransform()
+		{
+			return m_transform;
+		}
+
+		inline ModelBone* GetParentBone()
+		{
+			return m_parent;
+		}
 		friend class Model;
 
 		friend class ModelReader;
@@ -29,5 +43,6 @@ namespace TrioEngine
 
 		std::vector<ModelBone*> m_children;
 		uint32_t m_index;
+		std::string m_name;
 	};
 }

@@ -5,14 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:game="clr-namespace:EsteroFramework.Graphics.Interop"
-             xmlns:game2="clr-namespace:EsteroFramework.Editor.Game"
+             xmlns:local="clr-namespace:EsteroFramework.Editor.Game"
              xmlns:beh="clr-namespace:EsteroFramework.Editor.Game.Interaction"
-             d:DataContext="{d:DesignInstance game2:SceneViewModel, IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance local:SceneViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <game:GameSurfaceTargetHwndHost x:Name="gameSurfaceTarget" GameGraphicsScreens ="{Binding GameGraphicsScreens}">
+        <game:GameSurfaceTargetHwndHost x:Name="gameSurfaceTarget" GameGraphicsScreens ="{Binding Path=GameGraphicsScreens}">
             <i:Interaction.Behaviors>
                 <beh:CameraArcBallHwndHostBehavior Camera="{Binding Camera}" />
                 <beh:CameraZoomHwndHostBehavior Camera="{Binding Camera}" />
@@ -22,3 +22,6 @@
     </Grid>
 </UserControl>
 <!--d:DataContext="EsteroFramework.Editor.Game.SceneViewModel"-->
+
+<!--d:DataContext="{d:DesignInstance local:SceneViewModel, IsDesignTimeCreatable=False}"-->
+

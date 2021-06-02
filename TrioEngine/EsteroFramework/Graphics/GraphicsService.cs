@@ -58,6 +58,7 @@ namespace EsteroFramework.Graphics
         private void CacheScreens(IList<GameGraphicsScreen> graphicsScreens)
         {
             m_cachedScreens.Clear();
+            if (graphicsScreens == null) return;
             for (int i = 0; i < graphicsScreens.Count; i++)
             {
                 m_cachedScreens.Add(graphicsScreens[i]);

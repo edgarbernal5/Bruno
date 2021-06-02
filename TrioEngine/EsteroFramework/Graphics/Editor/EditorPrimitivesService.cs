@@ -1,4 +1,5 @@
 ﻿using System;
+using TrioApi.Net.Graphics.Core;
 
 namespace EsteroFramework.Graphics.Editor
 {

@@ -299,6 +299,7 @@ namespace TrioEngine
 			nodeContent->SetContentIdentity(m_identity);
 			nodeContent->GetTransform() = GetRelativeTransform(currentNode, parentNode);
 		}
+		//nodeContent->GetTransform() = nodeTransform;
 		
 		if (nodeContent)
 		{

@@ -24,9 +24,15 @@
 
         </Grid>
         <Grid>
-            <local:SceneView DataContext="{Binding SceneDetail}">
+            <StackPanel>
+                <local:SceneView DataContext="{Binding SceneDetail}" Height="400">
 
-            </local:SceneView>
+                </local:SceneView>
+                <local:WorldOutlineView DataContext="{Binding WorldOutlineDetail}" Height="200">
+
+                </local:WorldOutlineView>
+            </StackPanel>
+            
         </Grid>
     </DockPanel>
 </Window>
