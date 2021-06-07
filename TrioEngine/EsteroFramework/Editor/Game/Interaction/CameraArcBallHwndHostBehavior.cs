@@ -1,6 +1,7 @@
 ﻿
 using EsteroFramework.Graphics.Data;
 using EsteroFramework.Graphics.Interop;
+using EsteroWindows;
 using System;
 using System.Windows;
 using System.Windows.Input;
@@ -24,11 +25,12 @@ namespace EsteroFramework.Editor.Game.Interaction
         }
         private CameraState m_cameraState;
         private Camera m_currentCamera;
+        private bool m_canRotate;
 
         private Vector2 _previousMousePosition;
         private Vector2 m_currentYawPitch;
 
-        public static readonly DependencyProperty CameraNodeProperty = DependencyProperty.Register(
+        public static readonly DependencyProperty CameraProperty = DependencyProperty.Register(
             "Camera",
             typeof(Camera),
             typeof(CameraArcBallHwndHostBehavior),
@@ -36,14 +38,38 @@ namespace EsteroFramework.Editor.Game.Interaction
 
         public Camera Camera
         {
-            get { return (Camera)GetValue(CameraNodeProperty); }
-            set { SetValue(CameraNodeProperty, value); }
+            get { return (Camera)GetValue(CameraProperty); }
+            set { SetValue(CameraProperty, value); }
+        }
+
+        private static void OnCameraChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            var target = (CameraArcBallHwndHostBehavior)dependencyObject;
+
+            var newValue = (Camera)eventArgs.NewValue;
+            if (newValue == null) return;
+
+            target.GetInitialYawPitch(newValue);
         }
 
         protected override void OnAttached()
         {
             base.OnAttached();
+
+            if (WindowsPlatform.InDesignMode)
+                return;
+
             AssociatedObject.HwndLButtonDown += OnHwndLButtonDown;
+            AssociatedObject.PreviewKeyDown += OnKeyDown;
+            AssociatedObject.PreviewKeyUp += OnKeyUp;
+        }
+
+        protected override void OnDetaching()
+        {
+            AssociatedObject.HwndLButtonDown -= OnHwndLButtonDown;
+            AssociatedObject.PreviewKeyDown -= OnKeyDown;
+            AssociatedObject.PreviewKeyUp -= OnKeyUp;
+            base.OnDetaching();
         }
 
         private void OnHwndLButtonDown(object sender, HwndMouseEventArgs eventArgs)
@@ -51,29 +77,21 @@ namespace EsteroFramework.Editor.Game.Interaction
             BeginOrbit(eventArgs);
         }
 
-        protected override void OnDetaching()
-        {
-            AssociatedObject.HwndLButtonDown -= OnHwndLButtonDown;
-            base.OnDetaching();
-        }
-
-        private static void OnCameraChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
-        {
-            var target = (CameraArcBallHwndHostBehavior)dependencyObject;
-            
-            var newValue = (Camera)eventArgs.NewValue;
-            if (newValue == null) return;
-
-            target.GetInitialYawPitch(newValue);
-        }
-
         private void BeginOrbit(HwndMouseEventArgs eventArgs)
         {
+            //TODO: pasar esta logica al HwndHost. No estoy seguro de esto (? 50% de esto 
             if (Mouse.Captured != null && !Equals(Mouse.Captured, AssociatedObject))
             {
                 // Mouse is already captured by another element.
                 return;
             }
+
+            if (!AssociatedObject.IsKeyboardFocused)
+            {
+                AssociatedObject.Focus();
+            }
+
+            if (!m_canRotate) return;
 
             var cameraNode = Camera;
             if (cameraNode == null)
@@ -87,6 +105,8 @@ namespace EsteroFramework.Editor.Game.Interaction
             //    return;
             //}
 
+            _previousMousePosition = ConvertToVector2(eventArgs.GetPosition(AssociatedObject));
+
             m_currentCamera = cameraNode;
             m_cameraState.m_view = m_currentCamera.View;
             m_cameraState.m_target = m_currentCamera.Target;
@@ -96,26 +116,13 @@ namespace EsteroFramework.Editor.Game.Interaction
 
             AssociatedObject.HwndMouseMove += OnHwndMouseMove;
             AssociatedObject.HwndLButtonUp += OnHwndLButtonUp;
-            AssociatedObject.PreviewKeyDown += OnKeyDown;
 
-            //AssociatedObject.LostMouseCapture += OnLostMouseCapture;
-
-            _previousMousePosition = ConvertToVector2(eventArgs.ScreenPosition);
-
-            if (!AssociatedObject.IsKeyboardFocused)
-            {
-                // Focus element to receive keyboard events.
-                AssociatedObject.Focus();
-            }
-
-            //eventArgs.Handled = true;
+            AssociatedObject.LostMouseCapture += OnLostMouseCapture;
         }
 
         private void GetInitialYawPitch(Camera camera)
         {
-            var viewMatrix = Matrix.CreateLookAt(camera.Position, camera.Target, camera.Up);
-
-            var yawPitchRoll = Quaternion.EulerAngles(Quaternion.Inverse(Quaternion.CreateFromMatrix(viewMatrix)));
+            var yawPitchRoll = Quaternion.EulerAngles(Quaternion.Inverse(Quaternion.CreateFromMatrix(camera.View)));
 
             m_currentYawPitch.X = yawPitchRoll.X;
             m_currentYawPitch.Y = yawPitchRoll.Y;
@@ -126,7 +133,7 @@ namespace EsteroFramework.Editor.Game.Interaction
             EndOrbit(true);
         }
 
-        private void RecalculateViewMatrix(Quaternion rotation)
+        private void CalculateViewMatrix(Quaternion rotation)
         {
             float distance = (m_currentCamera.Position - m_currentCamera.Target).Length();
             Vector3 translation = new Vector3(0.0f, 0.0f, distance);
@@ -135,15 +142,13 @@ namespace EsteroFramework.Editor.Game.Interaction
             m_currentCamera.Position = m_currentCamera.Target + translation;
 
             m_currentCamera.Up = Vector3.Transform(Vector3.Up, rotation);
-
-            m_currentCamera.View = Matrix.CreateLookAt(m_currentCamera.Position, m_currentCamera.Target, m_currentCamera.Up);
         }
 
         private void OnHwndMouseMove(object sender, HwndMouseEventArgs eventArgs)
         {
             if (eventArgs.LeftButton == MouseButtonState.Pressed)
             {
-                var currentMousePosition = ConvertToVector2(eventArgs.ScreenPosition);
+                var currentMousePosition = ConvertToVector2(eventArgs.GetPosition(AssociatedObject));
 
                 var viewportWidth = (float)AssociatedObject.ActualWidth;
                 var viewportHeight = (float)AssociatedObject.ActualHeight;
@@ -156,7 +161,7 @@ namespace EsteroFramework.Editor.Game.Interaction
                 m_currentYawPitch += angles;
                 Quaternion rotation = Quaternion.CreateFromYawPitchRoll(m_currentYawPitch.X, m_currentYawPitch.Y, 0);
 
-                RecalculateViewMatrix(rotation);
+                CalculateViewMatrix(rotation);
                 _previousMousePosition = currentMousePosition;
             }
         }
@@ -168,11 +173,10 @@ namespace EsteroFramework.Editor.Game.Interaction
 
         private void EndOrbit(bool commit)
         {
-            //AssociatedObject.LostMouseCapture -= OnLostMouseCapture;
+            AssociatedObject.LostMouseCapture -= OnLostMouseCapture;
 
             AssociatedObject.HwndMouseMove -= OnHwndMouseMove;
             AssociatedObject.HwndLButtonUp -= OnHwndLButtonUp;
-            AssociatedObject.PreviewKeyDown -= OnKeyDown;
 
             AssociatedObject.ReleaseMouseCapture();
 
@@ -186,23 +190,37 @@ namespace EsteroFramework.Editor.Game.Interaction
             }
 
             m_currentCamera = null;
+            m_canRotate = false;
         }
 
         private void OnKeyDown(object sender, KeyEventArgs eventArgs)
         {
             if (eventArgs.Key == Key.Escape)
             {
-                // Cancel orbiting, revert camera pose.
                 EndOrbit(false);
+                eventArgs.Handled = true;
+            }
+            if (eventArgs.Key == Key.System && eventArgs.SystemKey == Key.LeftAlt)
+            {
+                m_canRotate = true;
+                eventArgs.Handled = true;
+            }
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs eventArgs)
+        {
+            if (eventArgs.Key == Key.System && eventArgs.SystemKey == Key.LeftAlt)
+            {
+                m_canRotate = false;
                 eventArgs.Handled = true;
             }
         }
 
         private void OnLostMouseCapture(object sender, MouseEventArgs eventArgs)
         {
-            // Cancel orbiting, revert camera pose.
             EndOrbit(false);
             eventArgs.Handled = true;
+            m_canRotate = false;
         }
 
         private Vector2 GetMouseVelocity(Vector2 currentMousePosition)

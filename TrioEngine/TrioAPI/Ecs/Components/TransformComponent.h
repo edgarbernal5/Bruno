@@ -63,7 +63,9 @@ namespace TrioEngine
 		{
 			return _flags & DIRTY; 
 		}
-		void ApplyTransform() {
+
+		void ApplyTransform()
+		{
 			SetDirty(true);
 
 			m_world.Decompose(m_localScale, m_localRotation, m_localPosition);
@@ -80,6 +82,11 @@ namespace TrioEngine
 			m_localScale = scale;
 			m_localRotation = rotation;
 			m_localPosition = translation;
+		}
+
+		void Translate(const Vector3& delta) {
+			m_localPosition += delta;
+			SetDirty(true);
 		}
 
 	private:

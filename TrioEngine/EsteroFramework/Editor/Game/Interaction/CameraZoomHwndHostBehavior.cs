@@ -1,5 +1,6 @@
 ﻿using EsteroFramework.Graphics.Data;
 using EsteroFramework.Graphics.Interop;
+using EsteroWindows;
 using System;
 using System.Windows;
 using System.Windows.Input;
@@ -10,7 +11,7 @@ namespace EsteroFramework.Editor.Game.Interaction
 {
     public class CameraZoomHwndHostBehavior : Behavior<GameSurfaceTargetHwndHost>
     {
-        public static readonly DependencyProperty CameraNodeProperty = DependencyProperty.Register(
+        public static readonly DependencyProperty CameraProperty = DependencyProperty.Register(
             "Camera",
             typeof(Camera),
             typeof(CameraZoomHwndHostBehavior),
@@ -18,13 +19,17 @@ namespace EsteroFramework.Editor.Game.Interaction
 
         public Camera Camera
         {
-            get { return (Camera)GetValue(CameraNodeProperty); }
-            set { SetValue(CameraNodeProperty, value); }
+            get { return (Camera)GetValue(CameraProperty); }
+            set { SetValue(CameraProperty, value); }
         }
 
         protected override void OnAttached()
         {
             base.OnAttached();
+
+            if (WindowsPlatform.InDesignMode)
+                return;
+
             AssociatedObject.HwndMouseWheel += OnMouseWheel;
         }
 

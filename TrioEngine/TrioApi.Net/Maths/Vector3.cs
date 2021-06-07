@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrioApi.Net.Maths
 {
@@ -126,6 +123,13 @@ namespace TrioApi.Net.Maths
         {
             X = _x;
             Y = _y;
+            Z = _z;
+        }
+
+        public Vector3(Vector2 _xy, float _z)
+        {
+            X = _xy.X;
+            Y = _xy.Y;
             Z = _z;
         }
 
@@ -278,31 +282,21 @@ namespace TrioApi.Net.Maths
             return vector;
         }
 
-        /// <summary>Tests vectors for equality.</summary>
-        /// <param name="value1">Source vector.</param>
-        /// <param name="value2">Source vector.</param>
         public static bool operator ==(Vector3 value1, Vector3 value2)
         {
             return value1.X == value2.X && value1.Y == value2.Y && value1.Z == value2.Z;
         }
 
-        /// <summary>Tests vectors for inequality.</summary>
-        /// <param name="value1">Vector to compare.</param>
-        /// <param name="value2">Vector to compare.</param>
         public static bool operator !=(Vector3 value1, Vector3 value2)
         {
             return value1.X != value2.X || value1.Y != value2.Y || value1.Z != value2.Z;
         }
 
-        /// <summary>Determines whether the specified Object is equal to the Vector3.</summary>
-		/// <param name="other">The Vector3 to compare with the current Vector3.</param>
 		public bool Equals(Vector3 other)
         {
             return this.X == other.X && this.Y == other.Y && this.Z == other.Z;
         }
 
-        /// <summary>Returns a value that indicates whether the current instance is equal to a specified object.</summary>
-        /// <param name="obj">Object to make the comparison with.</param>
         public override bool Equals(object obj)
         {
             bool result = false;
@@ -313,10 +307,14 @@ namespace TrioApi.Net.Maths
             return result;
         }
 
-        /// <summary>Gets the hash code of the vector object.</summary>
         public override int GetHashCode()
         {
-            return this.X.GetHashCode() + this.Y.GetHashCode() + this.Z.GetHashCode();
+            return X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"{{X = {X}; Y = {Y}; Z = {Z}}}";
         }
     }
 }

@@ -81,6 +81,8 @@
     </Compile>
     <Compile Include="Editor\ExitCode.cs" />
     <Compile Include="Editor\Game\Gizmos\GizmoService.cs" />
+    <Compile Include="Editor\Game\Gizmos\GizmosHandlerHwndHostBehavior.cs" />
+    <Compile Include="Editor\Game\Gizmos\IGizmoService.cs" />
     <Compile Include="Editor\Game\Interaction\CameraArcBallHwndHostBehavior.cs" />
     <Compile Include="Editor\Game\Interaction\CameraHandToolHwndHostBehavior.cs" />
     <Compile Include="Editor\Game\Interaction\CameraZoomHwndHostBehavior.cs" />

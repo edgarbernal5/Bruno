@@ -5,12 +5,12 @@ namespace EsteroFramework.Editor.Units
 {
     public class WorldOutlineUnit : EditorUnit, IWorldOutlineService
     {
-        private WorldOutlineViewModel m_worldOutlineViewModel;
         public WorldOutline WorldOutline
         {
             get => m_worldOutlineViewModel.Outline;
             set => m_worldOutlineViewModel.Outline = value;
         }
+        private WorldOutlineViewModel m_worldOutlineViewModel;
 
         public WorldOutlineViewModel ViewModel => m_worldOutlineViewModel;
 

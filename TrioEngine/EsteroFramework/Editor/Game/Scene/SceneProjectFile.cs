@@ -7,6 +7,9 @@ using TrioApi.Net.Content.Tasks;
 using TrioApi.Net.Game;
 using TrioApi.Net.Graphics;
 using System.Linq;
+using System.Collections.Specialized;
+using EsteroFramework.Editor.Game.Gizmos;
+using TrioApi.Net.Maths;
 
 namespace EsteroFramework.Editor.Game
 {
@@ -23,24 +26,75 @@ namespace EsteroFramework.Editor.Game
         }
         private Scene m_scene;
 
+        public GizmoService GizmoService
+        {
+            get => m_gizmoService;
+            set
+            {
+                m_gizmoService = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        private GizmoService m_gizmoService;
+
         private WorldOutline m_worldOutline;
+        private IWorldOutlineService m_outlineService;
 
         public SceneProjectFile(IEditorService editor) :
             base(editor)
         {
+            m_outlineService = Editor.Services.GetInstance<IWorldOutlineService>();
+
+            var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
+            GizmoService = new GizmoService(graphicsDevice);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
         }
 
         private void UpdateWorldOutline()
         {
             if (m_worldOutline != null)
             {
+                m_worldOutline.SelectedItems.CollectionChanged -= OnWorldOutlineSelectionChanged;
                 m_worldOutline.Dispose();
             }
             m_worldOutline = new WorldOutline();
             PopulateHierarchyFromScene();
+            m_worldOutline.SelectedItems.CollectionChanged += OnWorldOutlineSelectionChanged;
 
-            var outlineService = Editor.Services.GetInstance<IWorldOutlineService>();
-            outlineService.WorldOutline = m_worldOutline;
+            m_gizmoService.OnTranslationChanged += OnGizmoTranslationChanged;
+
+            //TODO: hacer esto si y solo si es el documento activo (pestaña)
+            m_outlineService.WorldOutline = m_worldOutline;
+        }
+
+        private void OnWorldOutlineSelectionChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
+        {
+            if (m_worldOutline == null)
+                return;
+
+            if (m_outlineService.WorldOutline != m_worldOutline)
+                return;
+
+            m_gizmoService.IsActive = m_worldOutline.SelectedItems.Count > 0;
+            if (m_worldOutline.SelectedItems.Count > 0)
+            {
+                var id = m_worldOutline.SelectedItems[0].Id;
+                var sceneTransform = m_scene.GetSceneTransformFor(id);
+
+                m_gizmoService.SetObjectSelected(new GizmoTransformable(id, sceneTransform));
+            }
+        }
+
+        private void OnGizmoTranslationChanged(GizmoTransformable gizmoTransformable, Vector3 delta)
+        {
+            m_scene.TransformTranslate(gizmoTransformable.Id, delta);
+
+            //var sceneTransform = m_scene.GetSceneTransformFor(gizmoTransformable.Id);
+            //m_gizmoService.SetObjectSelected(new GizmoTransformable(gizmoTransformable.Id, sceneTransform));
         }
 
         private WorldOutlineItem CreateOutlineItem(long entity, long parentId, string name)
@@ -80,6 +134,10 @@ namespace EsteroFramework.Editor.Game
                                 container.Children.Add(CreateOutlineItem(entityName.id, item.Parent, entityName.name));
                                 break;
                             }
+                            else
+                            {
+                                throw new System.Exception();
+                            }
                         }
                     }
                 }
@@ -96,9 +154,9 @@ namespace EsteroFramework.Editor.Game
                 if (item.Id == parentId)
                     return item;
 
-                var ret = FindParent(item, parentId);
-                if (ret != null)
-                    return ret;
+                var parentResult = FindParent(item, parentId);
+                if (parentResult != null)
+                    return parentResult;
             }
 
             return null;
@@ -106,7 +164,7 @@ namespace EsteroFramework.Editor.Game
 
         protected override void OnNew()
         {
-            m_scene = new Scene();
+            Scene = new Scene();
             UpdateWorldOutline();
         }
 
@@ -130,7 +188,7 @@ namespace EsteroFramework.Editor.Game
 
             Model model = contentManager.Load<Model>(assetNamePath);
 
-            m_scene = new Scene();
+            Scene = new Scene();
             m_scene.LoadFromModel(model);
 
             UpdateWorldOutline();

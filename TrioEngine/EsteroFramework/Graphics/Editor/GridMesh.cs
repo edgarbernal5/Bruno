@@ -130,12 +130,7 @@ namespace EsteroFramework.Graphics.Editor
             device.SetVertexBuffer(m_vertexBuffer);
             device.SetIndexBuffer(m_indexBuffer);
 
-            Matrix view = Matrix.CreateLookAt(renderContext.Camera.Position, renderContext.Camera.Target, renderContext.Camera.Up);
-            Matrix projection = Matrix.CreatePerspectiveFieldOfView(renderContext.Camera.FieldOfView, renderContext.Viewport.AspectRatio, renderContext.Camera.NearPlane, renderContext.Camera.FarPlane);
-
-            Matrix viewProjection = view * projection;
-
-            m_effect.Parameters["gWorldViewProj"].SetValue(viewProjection);
+            m_effect.Parameters["gWorldViewProj"].SetValue(renderContext.Camera.ViewProjection);
             m_effect.Techniques[0].Passes[0].Apply();
 
             device.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, (uint)(m_totalIndices / 2));

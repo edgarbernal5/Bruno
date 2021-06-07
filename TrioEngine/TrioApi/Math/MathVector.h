@@ -2,7 +2,7 @@
 
 #include "TrioApiRequisites.h"
 
-#ifdef  TRIO_DIRECTX
+#ifdef TRIO_DIRECTX
 
 #if !defined(__d3d11_h__) && !defined(__d3d11_x_h__) && !defined(__d3d12_h__) && !defined(__d3d12_x_h__)
 #error include d3d11.h or d3d12.h before including SimpleMath.h
@@ -33,6 +33,7 @@ namespace TrioEngine
 	struct Matrix;
 	struct Quaternion;
 	struct Plane;
+	struct BoundingBox;
 
 #ifdef TRIO_DIRECTX
 	//using namespace DirectX;

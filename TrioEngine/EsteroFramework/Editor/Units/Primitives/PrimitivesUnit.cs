@@ -21,9 +21,6 @@ namespace EsteroFramework.Editor.Units
 
             var editorPrimitivesService = new EditorPrimitivesService(graphicsService);
             Editor.Services.RegisterInstance(typeof(IEditorPrimitivesService), null, editorPrimitivesService);
-
-            var gizmoService = new GizmoService(graphicsService);
-            Editor.Services.RegisterInstance(typeof(IGizmoService), null, gizmoService);
         }
 
         protected override void OnStartup()

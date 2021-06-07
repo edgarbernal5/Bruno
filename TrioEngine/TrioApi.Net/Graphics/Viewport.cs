@@ -1,38 +1,57 @@
 ﻿
 using System.Runtime.InteropServices;
+using TrioApi.Net.Maths;
 
 namespace TrioApi.Net.Graphics
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Viewport
     {
-        public float x;
-        public float y;
-        public float width;
-        public float height;
-        public float minDepth;
-        public float maxDepth;
+        public float X;
+        public float Y;
+        public float Width;
+        public float Height;
+        public float MinDepth;
+        public float MaxDepth;
 
         public Viewport(float x, float y, float width, float height)
         {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-            this.minDepth = 0.0f;
-            this.maxDepth = 1.0f;
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
+            MinDepth = 0.0f;
+            MaxDepth = 1.0f;
         }
 
         public float AspectRatio
         {
             get
             {
-                if (height == 0 || width == 0)
+                if (Height == 0 || Width == 0)
                 {
                     return 0.0f;
                 }
-                return width / height;
+                return Width / Height;
             }
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Viewport_Project", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Project(ref Viewport viewport, ref Vector3 source, ref Matrix projection, ref Matrix view, ref Matrix world);
+
+        public Vector3 Project(Vector3 source, Matrix projection, Matrix view, Matrix world)
+        {
+            Internal_Project(ref this, ref source, ref projection, ref view, ref world);
+            return source;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Viewport_Unproject", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Unproject(ref Viewport viewport, ref Vector3 source, ref Matrix projection, ref Matrix view, ref Matrix world);
+
+        public Vector3 Unproject(Vector3 source, Matrix projection, Matrix view, Matrix world)
+        {
+            Internal_Unproject(ref this, ref source, ref projection, ref view, ref world);
+            return source;
         }
     }
 }

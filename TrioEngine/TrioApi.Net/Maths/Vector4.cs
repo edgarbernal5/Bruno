@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrioApi.Net.Maths
 {
@@ -67,6 +64,11 @@ namespace TrioApi.Net.Maths
         public override int GetHashCode()
         {
             return X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode() + W.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"X = {X}; Y = {Y}; Z = {Z}; W = {W}";
         }
     }
 }

@@ -19,20 +19,11 @@ namespace TrioApi.Net.Maths
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateRotationY", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_CreateRotationY(ref Matrix mat, float radians);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateRotationZ", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_CreateRotationZ(ref Matrix mat, float radians);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateScale", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_CreateScale(ref Matrix mat, ref Vector3 scales);
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateTranslation", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_CreateTranslation(ref Matrix mat, ref Vector3 position);
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Division", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Division(ref Matrix mat, ref Matrix mat2);
-
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Invert", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Invert(ref Matrix mat);
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Multiply", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Multiply(ref Matrix mat, ref Matrix mat2);
@@ -75,6 +66,7 @@ namespace TrioApi.Net.Maths
                 return m_identity;
             }
         }
+
         public static Matrix Zero
         {
             get
@@ -83,76 +75,104 @@ namespace TrioApi.Net.Maths
             }
         }
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Right", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Right(ref Matrix matrix, ref Vector3 result);
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_GetRight", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_GetRight(ref Matrix matrix, ref Vector3 result);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_SetRight", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetRight(ref Matrix matrix, ref Vector3 result);
 
         public Vector3 Right
         {
             get
             {
                 Vector3 result = new Vector3();
-                Internal_Right(ref this, ref result);
+                Internal_GetRight(ref this, ref result);
                 return result;
+            }
+            set
+            {
+                Internal_SetRight(ref this, ref value);
             }
         }
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Up", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Up(ref Matrix matrix, ref Vector3 result);
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_GetUp", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_GetUp(ref Matrix matrix, ref Vector3 result);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_SetUp", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetUp(ref Matrix matrix, ref Vector3 result);
 
         public Vector3 Up
         {
             get
             {
                 Vector3 result = new Vector3();
-                Internal_Up(ref this, ref result);
+                Internal_GetUp(ref this, ref result);
                 return result;
+            }
+            set
+            {
+                Internal_SetUp(ref this, ref value);
             }
         }
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Forward", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Forward(ref Matrix matrix, ref Vector3 result);
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_GetForward", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_GetForward(ref Matrix matrix, ref Vector3 result);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_SetForward", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetForward(ref Matrix matrix, ref Vector3 result);
 
         public Vector3 Forward
         {
             get
             {
                 Vector3 result = new Vector3();
-                Internal_Forward(ref this, ref result);
+                Internal_GetForward(ref this, ref result);
                 return result;
+            }
+            set
+            {
+                Internal_SetForward(ref this, ref value);
             }
         }
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Translation", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Translation(ref Matrix matrix, ref Vector3 result);
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_GetTranslation", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_GetTranslation(ref Matrix matrix, ref Vector3 result);
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_SetTranslation", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetTranslation(ref Matrix matrix, ref Vector3 result);
 
         public Vector3 Translation
         {
             get
             {
                 Vector3 result = new Vector3();
-                Internal_Translation(ref this, ref result);
+                Internal_GetTranslation(ref this, ref result);
                 return result;
+            }
+            set
+            {
+                Internal_SetTranslation(ref this, ref value);
             }
         }
 
         public Matrix(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44)
         {
-            this.M11 = m11;
-            this.M12 = m12;
-            this.M13 = m13;
-            this.M14 = m14;
-            this.M21 = m21;
-            this.M22 = m22;
-            this.M23 = m23;
-            this.M24 = m24;
-            this.M31 = m31;
-            this.M32 = m32;
-            this.M33 = m33;
-            this.M34 = m34;
-            this.M41 = m41;
-            this.M42 = m42;
-            this.M43 = m43;
-            this.M44 = m44;
+            M11 = m11;
+            M12 = m12;
+            M13 = m13;
+            M14 = m14;
+            M21 = m21;
+            M22 = m22;
+            M23 = m23;
+            M24 = m24;
+            M31 = m31;
+            M32 = m32;
+            M33 = m33;
+            M34 = m34;
+            M41 = m41;
+            M42 = m42;
+            M43 = m43;
+            M44 = m44;
         }
 
         public static object CreateCreateFromAxisAngle(object right, float x)
@@ -253,6 +273,9 @@ namespace TrioApi.Net.Maths
             return matrix;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateRotationZ", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateRotationZ(ref Matrix mat, float radians);
+
         public static Matrix CreateRotationZ(float radians)
         {
             var matrix = new Matrix();
@@ -260,6 +283,9 @@ namespace TrioApi.Net.Maths
 
             return matrix;
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateScale", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateScale(ref Matrix mat, ref Vector3 scales);
 
         public static Matrix CreateScale(Vector3 scales)
         {
@@ -282,6 +308,9 @@ namespace TrioApi.Net.Maths
             Internal_Division(ref matrix1, ref matrix2);
             return matrix1;
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Invert", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Invert(ref Matrix mat);
 
         public static Matrix Invert(Matrix matrix)
         {

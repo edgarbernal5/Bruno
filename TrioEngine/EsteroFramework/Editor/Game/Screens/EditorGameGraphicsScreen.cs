@@ -1,4 +1,5 @@
 ﻿
+using EsteroFramework.Editor.Game.Gizmos;
 using EsteroFramework.Editor.Units;
 using EsteroFramework.Graphics;
 using EsteroFramework.Graphics.Data;
@@ -14,40 +15,22 @@ namespace EsteroFramework.Editor.Graphics
     {
         public GridMesh GridMesh
         {
-            get
-            {
-                return m_gridMesh;
-            }
-            set
-            {
-                m_gridMesh = value;
-            }
+            get => m_gridMesh;
+            set => m_gridMesh = value;
         }
         private GridMesh m_gridMesh;
 
-        public IAxisGizmoRenderer AxisGizmoRenderer
+        public IGizmoService GizmoService
         {
-            get
-            {
-                return m_axisGizmoRenderer;
-            }
-            set
-            {
-                m_axisGizmoRenderer = value;
-            }
+            get => m_gizmoService;
+            set => m_gizmoService = value;
         }
-        private IAxisGizmoRenderer m_axisGizmoRenderer;
+        private IGizmoService m_gizmoService;
 
         public RenderPath RenderPath
         {
-            get
-            {
-                return m_renderPath;
-            }
-            set
-            {
-                m_renderPath = value;
-            }
+            get => m_renderPath;
+            set => m_renderPath = value;
         }
         private RenderPath m_renderPath;
 
@@ -74,7 +57,6 @@ namespace EsteroFramework.Editor.Graphics
             Scene.Update();
 
             renderContext.GraphicsDevice.Clear(ColorRGBA8.CornflowerBlue);
-            //renderContext.GraphicsDevice.Clear(Color.CornflowerBlue);
 
             //
             renderContext.Camera = Camera;
@@ -84,11 +66,12 @@ namespace EsteroFramework.Editor.Graphics
 
             //Camera.Recalculate();
 
-            //m_gridMesh.Render(renderContext);
-            m_axisGizmoRenderer.Render(renderContext);
+            m_gridMesh.Render(renderContext);
 
             TrioApi.Net.Game.Scene.UpdateCamera(ConvertToCamera(Camera));
             m_renderPath.Render();
+
+            m_gizmoService.Render(renderContext);
         }
 
         private Renderer.Camera ConvertToCamera(Camera camera)

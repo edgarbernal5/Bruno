@@ -30,8 +30,7 @@ namespace TrioEngine
 			device->SetVertexBuffer(&mesh.m_vertexBuffer);
 			device->SetIndexBuffer(&mesh.m_indexBuffer);
 			TransformComponent& transform = *scene.GetTransforms().GetComponent(meshEntity);
-			//HierarchyComponent& hierarchy = scene.Hierarchy()[i];
-
+			
 			for (size_t j = 0; j < mesh.m_subMeshes.size(); j++)
 			{
 				auto& subMesh = mesh.m_subMeshes[j];
@@ -47,8 +46,7 @@ namespace TrioEngine
 				device->SetBlendState(BlendState::Opaque);
 
 				Matrix meshWorld = transform.m_world * viewProjection;
-				//Matrix meshWorld = viewProjection;
-				//Matrix meshWorld = viewProjection * transform.m_world;
+
 				parameter->SetValue(meshWorld);
 				device->DrawIndexedPrimitives(PrimitiveType::TriangleList, subMesh.m_vertexOffset, subMesh.m_startIndex, subMesh.m_primitiveCount);
 			}

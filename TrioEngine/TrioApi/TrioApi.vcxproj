@@ -422,6 +422,7 @@
     <ClInclude Include="IO\Path.h" />
     <ClInclude Include="IO\Stream.h" />
     <ClInclude Include="IServiceProvider.h" />
+    <ClInclude Include="Math\MathCollision.h" />
     <ClInclude Include="Math\MathVector.h" />
     <ClInclude Include="Math\Rectangle.h" />
     <ClInclude Include="Memory\Allocator.h" />
@@ -584,6 +585,7 @@
     <ClCompile Include="IO\FileStream.cpp" />
     <ClCompile Include="IO\MemoryStream.cpp" />
     <ClCompile Include="IO\Path.cpp" />
+    <ClCompile Include="Math\MathCollision.cpp" />
     <ClCompile Include="Math\MathVector.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Renderer\RenderPaths\RenderPathForward.cpp" />

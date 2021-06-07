@@ -4,10 +4,12 @@
 
 #include "Content/Pipeline/Tasks/BuildCoordinatorSettings.h"
 #include "Renderer/Camera.h"
+#include "Math/MathCollision.h"
 
 using namespace TrioEngine;
 
-namespace TrioEngine {
+namespace TrioEngine
+{
 
 	class Game;
 	class Effect;
@@ -34,6 +36,7 @@ namespace TrioEngine {
 
 	class RenderPathForward;
 	class RenderPath;
+
 }
 
 /*
@@ -52,6 +55,11 @@ extern "C" TRIO_API_EXPORT BlendState* __stdcall BlendState_Additive();
 extern "C" TRIO_API_EXPORT BlendState* __stdcall BlendState_AlphaBlend();
 extern "C" TRIO_API_EXPORT BlendState* __stdcall BlendState_NonPremultiplied();
 extern "C" TRIO_API_EXPORT BlendState* __stdcall BlendState_Opaque();
+
+/*
+BoundingBox
+*/
+extern "C" TRIO_API_EXPORT bool __stdcall BoundingBox_IntersectsRay(BoundingBox * box, Ray * ray, float* fDistance);
 
 /*
 BuildCoordinator
@@ -194,10 +202,16 @@ extern "C" TRIO_API_EXPORT void __stdcall Matrix_Division(Matrix *pMatrix1, Matr
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Invert(Matrix *pMatrix);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Multiply(Matrix *pMatrix1, Matrix *pMatrix2);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_MultiplyScalar(Matrix *pMatrix1, float scalar);
-extern "C" TRIO_API_EXPORT void __stdcall Matrix_Forward(Matrix *pMatrix1, Vector3 *pResult);
-extern "C" TRIO_API_EXPORT void __stdcall Matrix_Right(Matrix *pMatrix1, Vector3 *pResult);
-extern "C" TRIO_API_EXPORT void __stdcall Matrix_Translation(Matrix *pMatrix1, Vector3 *pResult);
-extern "C" TRIO_API_EXPORT void __stdcall Matrix_Up(Matrix *pMatrix1, Vector3 *pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_GetForward(Matrix *pMatrix1, Vector3 *pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_GetRight(Matrix *pMatrix1, Vector3 *pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_GetTranslation(Matrix *pMatrix1, Vector3 *pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_GetUp(Matrix *pMatrix1, Vector3 *pResult);
+
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_SetForward(Matrix * pMatrix1, Vector3 * pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_SetRight(Matrix * pMatrix1, Vector3 * pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_SetTranslation(Matrix * pMatrix1, Vector3 * pResult);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_SetUp(Matrix * pMatrix1, Vector3 * pResult);
+
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Sub(Matrix *pMatrix, Matrix *pMatrix2);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Sum(Matrix *pMatrix1, Matrix *pMatrix2);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Transpose(Matrix *pMatrix);
@@ -250,6 +264,11 @@ extern "C" TRIO_API_EXPORT void __stdcall Renderer_Initialize(GraphicsDevice* de
 extern "C" TRIO_API_EXPORT void __stdcall UpdatePerFrameData();
 
 /*
+Ray
+*/
+extern "C" TRIO_API_EXPORT bool __stdcall Ray_IntersectsPlane(Ray * ray, Plane* plane, float* fDist);
+
+/*
 RenderPath
 */
 extern "C" TRIO_API_EXPORT void __stdcall RenderPath_Render(RenderPath* renderPath);
@@ -275,6 +294,7 @@ extern "C" TRIO_API_EXPORT RasterizerState* __stdcall RasterizerState_CullClockw
 extern "C" TRIO_API_EXPORT RasterizerState* __stdcall RasterizerState_CullCounterClockwise();
 extern "C" TRIO_API_EXPORT RasterizerState* __stdcall RasterizerState_CullNone();
 
+
 /*
 Scene
 */
@@ -293,7 +313,9 @@ extern "C" TRIO_API_EXPORT Camera __stdcall Scene_GetCamera();
 extern "C" TRIO_API_EXPORT void __stdcall Scene_UpdateCamera(Camera camera);
 extern "C" TRIO_API_EXPORT void __stdcall Scene_LoadFromModel(Scene* scene, Model* model);
 extern "C" TRIO_API_EXPORT void __stdcall Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** outHierarchies);
-
+extern "C" TRIO_API_EXPORT void __stdcall Scene_GetTransformMatrixForEntity(Scene* scene, long entity, Matrix *worldMatrix, Vector3 * localPosition, Vector3 * localScale, Quaternion * localRotation);
+extern "C" TRIO_API_EXPORT void __stdcall Scene_SetLocalPositionForEntity(Scene * scene, long entity, Vector3 * localPosition);
+extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformTranslate(Scene * scene, long entity, Vector3 * localPosition);
 /*
 Transform
 */
@@ -377,6 +399,12 @@ extern "C" TRIO_API_EXPORT VertexDeclaration* __stdcall VertexDeclaration_Ctor2(
 extern "C" TRIO_API_EXPORT VertexDeclaration* __stdcall VertexDeclaration_GetP();
 extern "C" TRIO_API_EXPORT VertexDeclaration* __stdcall VertexDeclaration_GetPC();
 extern "C" TRIO_API_EXPORT VertexDeclaration* __stdcall VertexDeclaration_GetPNT();
+
+/*
+Viewport
+*/
+extern "C" TRIO_API_EXPORT void __stdcall Viewport_Project(Viewport* viewport, Vector3* source, Matrix* projection, Matrix* view, Matrix* world);
+extern "C" TRIO_API_EXPORT void __stdcall Viewport_Unproject(Viewport* viewport, Vector3* source, Matrix* projection, Matrix* view, Matrix* world);
 
 /*
 Quaternion

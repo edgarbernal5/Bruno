@@ -1,7 +1,7 @@
 ﻿
 using EsteroFramework.Graphics.Data;
 using EsteroFramework.Graphics.Interop;
-using System;
+using EsteroWindows;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interactivity;
@@ -22,7 +22,7 @@ namespace EsteroFramework.Editor.Game.Interaction
 
         private Vector2 _previousMousePosition;
 
-        public static readonly DependencyProperty CameraNodeProperty = DependencyProperty.Register(
+        public static readonly DependencyProperty CameraProperty = DependencyProperty.Register(
             "Camera",
             typeof(Camera),
             typeof(CameraHandToolHwndHostBehavior),
@@ -30,13 +30,17 @@ namespace EsteroFramework.Editor.Game.Interaction
 
         public Camera Camera
         {
-            get { return (Camera)GetValue(CameraNodeProperty); }
-            set { SetValue(CameraNodeProperty, value); }
+            get { return (Camera)GetValue(CameraProperty); }
+            set { SetValue(CameraProperty, value); }
         }
 
         protected override void OnAttached()
         {
             base.OnAttached();
+
+            if (WindowsPlatform.InDesignMode)
+                return;
+
             AssociatedObject.HwndMButtonDown += OnHwndMButtonDown;
             AssociatedObject.HwndMButtonUp += OnHwndMButtonUp;
         }
@@ -94,26 +98,25 @@ namespace EsteroFramework.Editor.Game.Interaction
 
             m_currentCamera.Position = cameraPosition;
             m_currentCamera.Target = cameraTarget;
-            m_currentCamera.View = Matrix.CreateLookAt(m_currentCamera.Position, m_currentCamera.Target, m_currentCamera.Up);
 
             _previousMousePosition = ConvertToVector2(eventArgs.ScreenPosition);
         }
 
         private void OnHwndMButtonUp(object sender, HwndMouseEventArgs eventArgs)
         {
-            EndOrbit(true);
+            EndPan(true);
         }
 
         private void OnKeyDown(object sender, KeyEventArgs eventArgs)
         {
             if (eventArgs.Key == Key.Escape)
             {
-                EndOrbit(false);
+                EndPan(false);
                 eventArgs.Handled = true;
             }
         }
 
-        private void EndOrbit(bool commit)
+        private void EndPan(bool commit)
         {
             AssociatedObject.HwndMouseMove -= OnHwndMouseMove;
             AssociatedObject.PreviewKeyDown -= OnKeyDown;

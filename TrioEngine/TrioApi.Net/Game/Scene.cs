@@ -3,6 +3,7 @@ using Estero.Interop;
 using System;
 using System.Runtime.InteropServices;
 using TrioApi.Net.Graphics;
+using TrioApi.Net.Maths;
 using static TrioApi.Net.Renderer.Renderer;
 
 namespace TrioApi.Net.Game
@@ -128,6 +129,25 @@ namespace TrioApi.Net.Game
                 return outcome;
             }
             return new HierarchyComponentBridge[0];
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_GetTransformMatrixForEntity", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_GetTransformMatrixForEntity(IntPtr scene, long entity, ref Matrix matrix, ref Vector3 localPosition, ref Vector3 localScale, ref Quaternion localRotation);
+
+        public SceneTransform GetSceneTransformFor(long entity)
+        {
+            SceneTransform sceneTransform = new SceneTransform();
+
+            Internal_GetTransformMatrixForEntity(m_nativePointer, entity, ref sceneTransform.WorldMatrix, ref sceneTransform.LocalPosition, ref sceneTransform.LocalScale, ref sceneTransform.LocalRotation);
+            return sceneTransform;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformTranslate", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformTranslate(IntPtr scene, long entity, ref Vector3 delta);
+
+        public void TransformTranslate(long entity, Vector3 delta)
+        {
+            Internal_TransformTranslate(m_nativePointer, entity, ref delta);
         }
     }
 }

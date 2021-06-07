@@ -67,10 +67,10 @@ namespace EsteroFramework.Editor
         {
             base.OnSourceInitialized(e);
 
-            var hook = new HwndSourceHook(FilterMessage);
-            var hwndSource = (HwndSource)PresentationSource.FromVisual(this);
-            Debug.Assert(hwndSource != null, "Unable to retrieve HWND of main window.");
-            hwndSource.AddHook(hook);
+            //var hook = new HwndSourceHook(FilterMessage);
+            //var hwndSource = (HwndSource)PresentationSource.FromVisual(this);
+            //Debug.Assert(hwndSource != null, "Unable to retrieve HWND of main window.");
+            //hwndSource.AddHook(hook);
         }
 
         private IntPtr FilterMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

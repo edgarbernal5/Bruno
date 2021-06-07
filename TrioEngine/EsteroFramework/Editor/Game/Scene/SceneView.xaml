@@ -7,6 +7,7 @@
              xmlns:game="clr-namespace:EsteroFramework.Graphics.Interop"
              xmlns:local="clr-namespace:EsteroFramework.Editor.Game"
              xmlns:beh="clr-namespace:EsteroFramework.Editor.Game.Interaction"
+             xmlns:beh2="clr-namespace:EsteroFramework.Editor.Game.Gizmos"
              d:DataContext="{d:DesignInstance local:SceneViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              
@@ -17,6 +18,10 @@
                 <beh:CameraArcBallHwndHostBehavior Camera="{Binding Camera}" />
                 <beh:CameraZoomHwndHostBehavior Camera="{Binding Camera}" />
                 <beh:CameraHandToolHwndHostBehavior Camera="{Binding Camera}" />
+                
+                <beh2:GizmosHandlerHwndHostBehavior Camera="{Binding Camera}" 
+                                                    GizmoService="{Binding GizmoService}"
+                                                    Scene="{Binding Scene}"/>
             </i:Interaction.Behaviors>
         </game:GameSurfaceTargetHwndHost>
     </Grid>

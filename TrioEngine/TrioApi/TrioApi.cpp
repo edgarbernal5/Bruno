@@ -29,6 +29,8 @@
 #include "Graphics/Models/ModelMeshPart.h"
 #include "Graphics/Models/Material.h"
 
+//#include "Math/MathCollision.h"
+
 #include "Scene.h"
 #include "Transform.h"
 #include "GameObject.h"
@@ -123,6 +125,14 @@ BlendState* BlendState_NonPremultiplied()
 BlendState* BlendState_Opaque()
 {
 	return BlendState::Opaque;
+}
+
+/*
+BoundingBox
+*/
+bool BoundingBox_IntersectsRay(BoundingBox* box, Ray* ray, float* fDistance)
+{
+	return box->Intersects(*ray, *fDistance);
 }
 
 /*
@@ -660,24 +670,44 @@ void Matrix_MultiplyScalar(Matrix *pMatrix1, float scalar)
 	*pMatrix1 /= scalar;
 }
 
-void Matrix_Forward(Matrix* pMatrix, Vector3* pResult)
+void Matrix_GetForward(Matrix* pMatrix, Vector3* pResult)
 {
 	*pResult = pMatrix->Forward();
 }
 
-void Matrix_Right(Matrix* pMatrix, Vector3* pResult)
+void Matrix_GetRight(Matrix* pMatrix, Vector3* pResult)
 {
 	*pResult = pMatrix->Right();
 }
 
-void Matrix_Translation(Matrix* pMatrix, Vector3* pResult)
+void Matrix_GetTranslation(Matrix* pMatrix, Vector3* pResult)
 {
 	*pResult = pMatrix->Translation();
 }
 
-void Matrix_Up(Matrix* pMatrix, Vector3* pResult)
+void Matrix_GetUp(Matrix* pMatrix, Vector3* pResult)
 {
 	*pResult = pMatrix->Up();
+}
+
+void Matrix_SetForward(Matrix* pMatrix, Vector3* pResult)
+{
+	pMatrix->Forward(*pResult);
+}
+
+void Matrix_SetRight(Matrix* pMatrix, Vector3* pResult)
+{
+	pMatrix->Right(*pResult);
+}
+
+void Matrix_SetTranslation(Matrix* pMatrix, Vector3* pResult)
+{
+	pMatrix->Translation(*pResult);
+}
+
+void Matrix_SetUp(Matrix* pMatrix, Vector3* pResult)
+{
+	pMatrix->Up(*pResult);
 }
 
 void Matrix_Sub(Matrix *pMatrix1, Matrix *pMatrix2)
@@ -858,6 +888,14 @@ void UpdatePerFrameData()
 }
 
 /*
+Ray
+*/
+bool Ray_IntersectsPlane(Ray* ray, Plane* plane, float* fDist)
+{
+	return ray->Intersects(*plane, *fDist);
+}
+
+/*
 RenderPath
 */
 void RenderPath_Render(RenderPath* renderPath)
@@ -920,6 +958,11 @@ RasterizerState* RasterizerState_CullNone()
 }
 
 /*
+Ray
+*/
+
+
+/*
 Scene
 */
 Scene* Scene_Ctor()
@@ -955,6 +998,16 @@ void Scene_UpdateCamera(Camera camera)
 	Scene::UpdateCamera(camera);
 }
 
+void Scene_SetLocalPositionForEntity(Scene* scene, long entity, Vector3* localPosition)
+{
+	scene->GetTransforms().GetComponent(entity)->m_localPosition = *localPosition;
+}
+
+void Scene_TransformTranslate(Scene* scene, long entity, Vector3* localPosition)
+{
+	scene->GetTransforms().GetComponent(entity)->Translate(*localPosition);
+}
+
 void Scene_LoadFromModel(Scene* scene, Model* model)
 {
 	scene->LoadFromModel(model);
@@ -964,8 +1017,8 @@ void Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** ou
 {
 	ComponentManager<HierarchyComponent>& hierarchyComponents = scene->GetHierarchies();
 	ComponentManager<NameComponent>& nameComponents = scene->GetNames();
-	ComponentManager<TransformComponent>& tComponents = scene->GetTransforms();
-	auto n = tComponents.GetCount();
+	ComponentManager<TransformComponent>& transformComponents = scene->GetTransforms();
+	auto n = transformComponents.GetCount();
 
 	*size = n;
 	if (n > 0)
@@ -973,7 +1026,7 @@ void Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** ou
 		HierarchyComponentBridge* newArray = (HierarchyComponentBridge*)CoTaskMemAlloc(sizeof(HierarchyComponentBridge) * n);
 		for (size_t i = 0; i < n; i++)
 		{
-			Entity entity = tComponents.GetEntity(i);
+			Entity entity = transformComponents.GetEntity(i);
 
 			NameComponent& nameComp = *nameComponents.GetComponent(entity);
 
@@ -985,6 +1038,17 @@ void Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** ou
 		}
 		*outHierarchies = newArray;
 	}
+}
+
+void Scene_GetTransformMatrixForEntity(Scene* scene, long entity, Matrix * worldMatrix, Vector3* localPosition, Vector3* localScale, Quaternion* localRotation)
+{
+	ComponentManager<TransformComponent>& transformComponents = scene->GetTransforms();
+	TransformComponent& transform = *transformComponents.GetComponent(entity);
+	*worldMatrix = transform.m_world;
+
+	*localPosition = transform.m_localPosition;
+	*localScale = transform.m_localScale;
+	*localRotation = transform.m_localRotation;
 }
 
 /*
@@ -1281,6 +1345,20 @@ VertexDeclaration* VertexDeclaration_GetPNT()
 {
 	return VertexPositionNormalTexture::GetVertexDeclaration();
 }
+
+/*
+Viewport
+*/
+void Viewport_Project(Viewport* viewport, Vector3* source, Matrix* projection, Matrix* view, Matrix* world)
+{
+	*source = viewport->Project(*source, *projection, *view, *world);
+}
+
+void Viewport_Unproject(Viewport* viewport, Vector3* source, Matrix* projection, Matrix* view, Matrix* world)
+{
+	*source = viewport->Unproject(*source, *projection, *view, *world);
+}
+
 
 /*
 Quaternion
