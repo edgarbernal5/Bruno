@@ -650,6 +650,16 @@ void Matrix_CreateTranslation(Matrix *pMatrix1, Vector3* translation)
 	*pMatrix1 = Matrix::CreateTranslation(*translation);
 }
 
+void Matrix_CreateFromQuaternion(Matrix* pMatrix, Quaternion * rotation)
+{
+	*pMatrix = Matrix::CreateFromQuaternion(*rotation);
+}
+
+void Matrix_Decompose(Matrix* pMatrix, Vector3* scale, Quaternion* rotation, Vector3* translation)
+{
+	pMatrix->Decompose(*scale, *rotation, *translation);
+}
+
 void Matrix_Division(Matrix *pMatrix1, Matrix *pMatrix2)
 {
 	*pMatrix1 /= *pMatrix2;
@@ -1000,12 +1010,14 @@ void Scene_UpdateCamera(Camera camera)
 
 void Scene_SetLocalPositionForEntity(Scene* scene, long entity, Vector3* localPosition)
 {
-	scene->GetTransforms().GetComponent(entity)->m_localPosition = *localPosition;
+	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
+	transform.m_localPosition = *localPosition;
 }
 
 void Scene_TransformTranslate(Scene* scene, long entity, Vector3* localPosition)
 {
-	scene->GetTransforms().GetComponent(entity)->Translate(*localPosition);
+	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
+	transform.Translate(*localPosition);
 }
 
 void Scene_LoadFromModel(Scene* scene, Model* model)

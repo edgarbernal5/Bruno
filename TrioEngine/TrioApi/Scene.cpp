@@ -85,6 +85,7 @@ namespace TrioEngine
 
 	void Scene::LoadFromModel(Model* model)
 	{
+		ResetEntities();
 		m_names.Clear();
 		m_transforms.Clear();
 		m_hierarchies.Clear();
@@ -106,8 +107,8 @@ namespace TrioEngine
 
 			boneIndexes[modelBone] = boneEntity;
 
-			Vector3 scale, position;
-			Quaternion rotation;
+			Vector3 scale(1.0f), position;
+			Quaternion rotation=Quaternion::Identity;
 
 			bool valid = modelBone->GetTransform().Decompose(scale, rotation, position);
 			if (valid) {
@@ -161,17 +162,13 @@ namespace TrioEngine
 
 			std::stringstream ss;
 			ss << "mesh_" << meshIndex << "_" << modelMesh->GetName();
-			Entity meshEntity = CreateEntityForMesh(ss.str());
 
-			Entity parentId = boneIndexes[modelMesh->GetParentBone()];
+			Entity meshEntity = boneIndexes[modelMesh->GetParentBone()];
 			
-			MeshComponent& mesh = *m_meshes.GetComponent(meshEntity);
-			TransformComponent& transform = *m_transforms.GetComponent(meshEntity);
+			MeshComponent& mesh = m_meshes.Create(meshEntity);
+			NameComponent& name = *m_names.GetComponent(meshEntity);
+			name.m_name = ss.str();
 			
-			transform.m_world = modelMesh->GetTransform();
-			transform.ApplyTransform();
-			ComponentAttach(meshEntity, parentId, false);
-
 			for (auto meshPart : modelMesh->GetModelMeshParts()) {
 				mesh.m_subMeshes.push_back(MeshComponent::SubMesh());
 

@@ -41,7 +41,7 @@ namespace EsteroFramework.Graphics.Editor
         {
             var device = renderContext.GraphicsDevice;
 
-            device.DepthStencilState = DepthStencilState.Default;
+            device.DepthStencilState = DepthStencilState.None;
             ////device->SetBlendState(BlendState::Opaque);
             device.RasterizerState = RasterizerState.CullNone;
 

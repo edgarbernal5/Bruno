@@ -15,4 +15,8 @@ namespace TrioEngine
 	{
 		return ++g_currentEntityIndex;
 	}
+
+	inline void ResetEntities() {
+		g_currentEntityIndex = 0;
+	}
 }

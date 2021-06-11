@@ -23,6 +23,15 @@ namespace TrioEngine
 			return m_name.c_str();
 		}
 
+
+		inline Matrix GetAbsoluteTransform()
+		{
+			if (m_parent){
+				return m_transform * m_parent->GetAbsoluteTransform();
+			}
+			return m_transform;
+		}
+
 		inline Matrix& GetTransform()
 		{
 			return m_transform;

@@ -182,22 +182,22 @@ namespace TrioApi.Net.Maths
 
         public unsafe Matrix(float* val)
         {
-            this.M11 = val[0];
-            this.M12 = val[1];
-            this.M13 = val[2];
-            this.M14 = val[3];
-            this.M21 = val[4];
-            this.M22 = val[5];
-            this.M23 = val[6];
-            this.M24 = val[7];
-            this.M31 = val[8];
-            this.M32 = val[9];
-            this.M33 = val[10];
-            this.M34 = val[11];
-            this.M41 = val[12];
-            this.M42 = val[13];
-            this.M43 = val[14];
-            this.M44 = val[15];
+            M11 = val[0];
+            M12 = val[1];
+            M13 = val[2];
+            M14 = val[3];
+            M21 = val[4];
+            M22 = val[5];
+            M23 = val[6];
+            M24 = val[7];
+            M31 = val[8];
+            M32 = val[9];
+            M33 = val[10];
+            M34 = val[11];
+            M41 = val[12];
+            M42 = val[13];
+            M43 = val[14];
+            M44 = val[15];
         }
 
         static Matrix()
@@ -393,11 +393,27 @@ namespace TrioApi.Net.Maths
             return eulerAngles;
         }
 
-        /// <summary>Determines whether the specified Object is equal to the Matrix.</summary>
-        /// <param name="other">The Object to compare with the current Matrix.</param>
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateFromQuaternion", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateFromQuaternion(ref Matrix mat, ref Quaternion rotation);
+
+        public static Matrix CreateFromQuaternion(Quaternion rotation)
+        {
+            Matrix result = Matrix.Identity;
+            Internal_CreateFromQuaternion(ref result, ref rotation);
+            return result;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Decompose", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Decompose(ref Matrix mat, out Vector3 scale, out Quaternion rotation, out Vector3 translation);
+
+        public void Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
+        {
+            Internal_Decompose(ref this, out scale, out rotation, out translation);
+        }
+
         public bool Equals(Matrix other)
         {
-            return this.M11 == other.M11 && this.M22 == other.M22 && this.M33 == other.M33 && this.M44 == other.M44 && this.M12 == other.M12 && this.M13 == other.M13 && this.M14 == other.M14 && this.M21 == other.M21 && this.M23 == other.M23 && this.M24 == other.M24 && this.M31 == other.M31 && this.M32 == other.M32 && this.M34 == other.M34 && this.M41 == other.M41 && this.M42 == other.M42 && this.M43 == other.M43;
+            return M11 == other.M11 && M22 == other.M22 && M33 == other.M33 && M44 == other.M44 && M12 == other.M12 && M13 == other.M13 && M14 == other.M14 && M21 == other.M21 && M23 == other.M23 && M24 == other.M24 && M31 == other.M31 && M32 == other.M32 && M34 == other.M34 && M41 == other.M41 && M42 == other.M42 && M43 == other.M43;
         }
 
         /// <summary>Returns a value that indicates whether the current instance is equal to a specified object.</summary>
@@ -407,7 +423,7 @@ namespace TrioApi.Net.Maths
             bool result = false;
             if (obj is Matrix)
             {
-                result = this.Equals((Matrix)obj);
+                result = Equals((Matrix)obj);
             }
             return result;
         }
@@ -415,7 +431,7 @@ namespace TrioApi.Net.Maths
         /// <summary>Gets the hash code of this object.</summary>
         public override int GetHashCode()
         {
-            return this.M11.GetHashCode() + this.M12.GetHashCode() + this.M13.GetHashCode() + this.M14.GetHashCode() + this.M21.GetHashCode() + this.M22.GetHashCode() + this.M23.GetHashCode() + this.M24.GetHashCode() + this.M31.GetHashCode() + this.M32.GetHashCode() + this.M33.GetHashCode() + this.M34.GetHashCode() + this.M41.GetHashCode() + this.M42.GetHashCode() + this.M43.GetHashCode() + this.M44.GetHashCode();
+            return M11.GetHashCode() + M12.GetHashCode() + M13.GetHashCode() + M14.GetHashCode() + M21.GetHashCode() + M22.GetHashCode() + M23.GetHashCode() + M24.GetHashCode() + M31.GetHashCode() + M32.GetHashCode() + M33.GetHashCode() + M34.GetHashCode() + M41.GetHashCode() + M42.GetHashCode() + M43.GetHashCode() + M44.GetHashCode();
         }
     }
 }

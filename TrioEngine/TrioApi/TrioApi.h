@@ -198,6 +198,8 @@ extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateRotationY(Matrix *pMatrix
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateRotationZ(Matrix *pMatrix1, float radians);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateScale(Matrix *pMatrix1, Vector3* scale);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateTranslation(Matrix *pMatrix1, Vector3* translation);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_CreateFromQuaternion(Matrix * pMatrix, Quaternion * rotation);
+extern "C" TRIO_API_EXPORT void __stdcall Matrix_Decompose(Matrix *pMatrix, Vector3* scale, Quaternion* rotation, Vector3* translation);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Division(Matrix *pMatrix1, Matrix *pMatrix2);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Invert(Matrix *pMatrix);
 extern "C" TRIO_API_EXPORT void __stdcall Matrix_Multiply(Matrix *pMatrix1, Matrix *pMatrix2);

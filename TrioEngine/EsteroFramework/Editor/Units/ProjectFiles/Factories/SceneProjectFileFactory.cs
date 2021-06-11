@@ -13,7 +13,7 @@ namespace EsteroFramework.Editor.Units
         {
             Editor = editor;
 
-            SupportedFileTypes.Add(new ProjectFileType("Scene", new string[] { ".x", ".fbx" }, this) );
+            SupportedFileTypes.Add(new ProjectFileType("Scene", new string[] { ".x", ".fbx", ".obj" }, this) );
         }
 
         protected override ProjectFile OnCreate(ProjectFileType projectFileType)

@@ -66,7 +66,7 @@ namespace EsteroFramework.Editor.Graphics
 
             //Camera.Recalculate();
 
-            m_gridMesh.Render(renderContext);
+            //m_gridMesh.Render(renderContext);
 
             TrioApi.Net.Game.Scene.UpdateCamera(ConvertToCamera(Camera));
             m_renderPath.Render();

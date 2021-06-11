@@ -12,12 +12,24 @@ namespace TrioEngine
 		NodeContent();
 		virtual ~NodeContent() {}
 
-		inline NodeContent* GetParent() {
+		inline const NodeContent* GetParent() const {
+			return m_parent;
+		}
+
+		inline NodeContent*& GetParent() {
 			return m_parent;
 		}
 
 		inline Matrix& GetTransform()
 		{
+			return m_transform;
+		}
+
+		inline Matrix GetAbsoluteTransform()
+		{
+			if (m_parent) {
+				return m_transform * m_parent->GetAbsoluteTransform();
+			}
 			return m_transform;
 		}
 		inline std::vector<NodeContent*>& GetChildren()

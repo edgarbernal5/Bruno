@@ -171,12 +171,18 @@ namespace TrioEngine
 	{
 		m_identity = ContentIdentity(filename, GetImporterName());
 		Assimp::Importer importer;
-
-		uint32_t flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_FlipWindingOrder;
-		//if (loadParams.flipUVs)
-		//{
-			flags |= aiProcess_FlipUVs;
-		//}
+		
+		uint32_t flags = aiProcess_Triangulate |
+			aiProcess_OptimizeMeshes |
+			aiProcess_ImproveCacheLocality |
+			aiProcess_JoinIdenticalVertices |
+			//aiProcess_SortByPType | 
+			aiProcess_FindInvalidData | 
+			aiProcess_FindDegenerates | 
+			aiProcess_FlipWindingOrder |
+			aiProcess_FlipUVs;
+		
+		importer.SetPropertyInteger(AI_CONFIG_PP_FD_REMOVE, true);
 
 		const aiScene* scene = importer.ReadFile(filename, flags);
 		if (scene == nullptr)
@@ -187,6 +193,24 @@ namespace TrioEngine
 		if (scene->HasMaterials())
 		{
 			ImportMaterials(scene, TrioIO::Path::GetDirectoryFromFilePath(filename));
+		}
+
+		std::map<std::string, Matrix> deformationBones;
+		if (scene->HasMeshes()) {
+			for (size_t i = 0; i < scene->mNumMeshes; i++)
+			{
+				aiMesh* mesh = scene->mMeshes[i];
+				if (mesh->HasBones()) {
+					for (size_t j = 0; j < mesh->mNumBones; j++)
+					{
+						aiBone* bone = mesh->mBones[j];
+						std::string boneName(bone->mName.C_Str());
+						if (deformationBones.find(boneName) == deformationBones.end()) {
+							deformationBones[boneName] = ToMatrix(bone->mOffsetMatrix);
+						}
+					}
+				}
+			}
 		}
 
 		NodeContent* rootNode = ImportNode(scene, scene->mRootNode, nullptr, nullptr);
@@ -303,6 +327,7 @@ namespace TrioEngine
 		
 		if (nodeContent)
 		{
+			nodeContent->GetParent() = parentContent;
 			if (parentContent)
 			{
 				parentContent->GetChildren().push_back(nodeContent);

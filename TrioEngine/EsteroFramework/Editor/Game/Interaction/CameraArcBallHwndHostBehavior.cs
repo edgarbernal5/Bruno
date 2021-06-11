@@ -195,7 +195,7 @@ namespace EsteroFramework.Editor.Game.Interaction
 
         private void OnKeyDown(object sender, KeyEventArgs eventArgs)
         {
-            if (eventArgs.Key == Key.Escape)
+            if (eventArgs.Key == Key.Escape && m_currentCamera != null)
             {
                 EndOrbit(false);
                 eventArgs.Handled = true;

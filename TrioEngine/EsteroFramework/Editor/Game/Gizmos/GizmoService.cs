@@ -148,6 +148,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
             public Matrix m_rotationMatrix;
 
             public Vector3 m_intersectionPosition, m_prevIntersectionPosition;
+            public Matrix m_sceneWorld;
             //public Vector3 m_delta;
         }
         private SelectionState m_selectionState;
@@ -172,6 +173,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
             m_selectionState.m_gizmoWorld = Matrix.Identity;
             m_selectionState.m_axisAlignedWorld = Matrix.Identity;
             m_selectionState.m_screenScaleMatrix = Matrix.Identity;
+            m_selectionState.m_sceneWorld = Matrix.Identity;
         }
 
         public bool Begin(Vector2 mousePosition)
@@ -367,6 +369,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
             delta = Vector3.Transform(delta, m_selectionState.m_rotationMatrix);
             translationDelta = delta;
 
+            SetGizmoPosition(translationDelta);
 
             if (translationDelta != Vector3.Zero)
             {
@@ -374,17 +377,13 @@ namespace EsteroFramework.Editor.Game.Gizmos
                 {
                     OnTranslationChanged(m_selectionState.m_gizmoTransformable, translationDelta);
                 }
-            SetGizmoPosition(translationDelta);
-            }
-            else
-            {
-                Console.WriteLine("no delta");
             }
         }
 
         private void SetGizmoPosition(Vector3 translationDelta)
         {
             Vector3 selectionPosition = Vector3.Zero;
+
             switch (m_pivotType)
             {
                 case PivotType.ObjectCenter:
@@ -397,7 +396,8 @@ namespace EsteroFramework.Editor.Game.Gizmos
                 default:
                     break;
             }
-            selectionPosition = selectionPosition + translationDelta;
+
+            selectionPosition += translationDelta;
 
             m_selectionState.m_gizmoPosition = selectionPosition;
             m_selectionState.m_gizmoTransformable.Transform.WorldMatrix.Translation = selectionPosition;
@@ -443,6 +443,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
             m_selectionState.m_screenScaleFactor = vLength.Length() * GIZMO_SCREEN_SCALE;
             m_selectionState.m_screenScaleMatrix = Matrix.CreateScale(new Vector3(m_selectionState.m_screenScaleFactor));
 
+            //Matrix sceneWorld = m_selectionState.m_sceneWorld;
             Matrix sceneWorld = Matrix.Identity;
             m_selectionState.m_axisAlignedWorld = m_selectionState.m_screenScaleMatrix * Matrix.CreateWorld(m_selectionState.m_gizmoPosition, sceneWorld.Forward, sceneWorld.Up);
 
@@ -465,6 +466,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
         {
             m_selectionState.m_gizmoTransformable = gizmoTransformable;
 
+            m_selectionState.m_sceneWorld = gizmoTransformable.Transform.WorldMatrix;
             m_selectionState.m_gizmoPosition = gizmoTransformable.Transform.WorldMatrix.Translation;
 
             Update();
