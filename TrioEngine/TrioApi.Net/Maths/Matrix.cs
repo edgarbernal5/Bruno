@@ -16,9 +16,6 @@ namespace TrioApi.Net.Maths
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateRotationX", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_CreateRotationX(ref Matrix mat, float radians);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateRotationY", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_CreateRotationY(ref Matrix mat, float radians);
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateTranslation", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_CreateTranslation(ref Matrix mat, ref Vector3 position);
 
@@ -234,7 +231,7 @@ namespace TrioApi.Net.Maths
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateFromAxisAngle", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_CreateFromAxisAngle(ref Matrix matrix, ref Vector3 axis, float angle);
         //
-        public static Matrix CreateCreateFromAxisAngle(Vector3 axis, float angle)
+        public static Matrix CreateFromAxisAngle(Vector3 axis, float angle)
         {
             Matrix result = Matrix.Identity;
             Internal_CreateFromAxisAngle(ref result, ref axis, angle);
@@ -264,6 +261,9 @@ namespace TrioApi.Net.Maths
 
             return matrix;
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateRotationY", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateRotationY(ref Matrix mat, float radians);
 
         public static Matrix CreateRotationY(float radians)
         {
@@ -416,8 +416,6 @@ namespace TrioApi.Net.Maths
             return M11 == other.M11 && M22 == other.M22 && M33 == other.M33 && M44 == other.M44 && M12 == other.M12 && M13 == other.M13 && M14 == other.M14 && M21 == other.M21 && M23 == other.M23 && M24 == other.M24 && M31 == other.M31 && M32 == other.M32 && M34 == other.M34 && M41 == other.M41 && M42 == other.M42 && M43 == other.M43;
         }
 
-        /// <summary>Returns a value that indicates whether the current instance is equal to a specified object.</summary>
-        /// <param name="obj">Object with which to make the comparison.</param>
         public override bool Equals(object obj)
         {
             bool result = false;
@@ -428,7 +426,16 @@ namespace TrioApi.Net.Maths
             return result;
         }
 
-        /// <summary>Gets the hash code of this object.</summary>
+        public static bool operator ==(Matrix matrix1, Matrix matrix2)
+        {
+            return matrix1.M11 == matrix2.M11 && matrix1.M22 == matrix2.M22 && matrix1.M33 == matrix2.M33 && matrix1.M44 == matrix2.M44 && matrix1.M12 == matrix2.M12 && matrix1.M13 == matrix2.M13 && matrix1.M14 == matrix2.M14 && matrix1.M21 == matrix2.M21 && matrix1.M23 == matrix2.M23 && matrix1.M24 == matrix2.M24 && matrix1.M31 == matrix2.M31 && matrix1.M32 == matrix2.M32 && matrix1.M34 == matrix2.M34 && matrix1.M41 == matrix2.M41 && matrix1.M42 == matrix2.M42 && matrix1.M43 == matrix2.M43;
+        }
+
+        public static bool operator !=(Matrix matrix1, Matrix matrix2)
+        {
+            return matrix1.M11 != matrix2.M11 || matrix1.M12 != matrix2.M12 || matrix1.M13 != matrix2.M13 || matrix1.M14 != matrix2.M14 || matrix1.M21 != matrix2.M21 || matrix1.M22 != matrix2.M22 || matrix1.M23 != matrix2.M23 || matrix1.M24 != matrix2.M24 || matrix1.M31 != matrix2.M31 || matrix1.M32 != matrix2.M32 || matrix1.M33 != matrix2.M33 || matrix1.M34 != matrix2.M34 || matrix1.M41 != matrix2.M41 || matrix1.M42 != matrix2.M42 || matrix1.M43 != matrix2.M43 || matrix1.M44 != matrix2.M44;
+        }
+
         public override int GetHashCode()
         {
             return M11.GetHashCode() + M12.GetHashCode() + M13.GetHashCode() + M14.GetHashCode() + M21.GetHashCode() + M22.GetHashCode() + M23.GetHashCode() + M24.GetHashCode() + M31.GetHashCode() + M32.GetHashCode() + M33.GetHashCode() + M34.GetHashCode() + M41.GetHashCode() + M42.GetHashCode() + M43.GetHashCode() + M44.GetHashCode();

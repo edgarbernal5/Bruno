@@ -10,6 +10,7 @@ using System.Linq;
 using System.Collections.Specialized;
 using EsteroFramework.Editor.Game.Gizmos;
 using TrioApi.Net.Maths;
+using System;
 
 namespace EsteroFramework.Editor.Game
 {
@@ -66,6 +67,8 @@ namespace EsteroFramework.Editor.Game
             m_worldOutline.SelectedItems.CollectionChanged += OnWorldOutlineSelectionChanged;
 
             m_gizmoService.OnTranslationChanged += OnGizmoTranslationChanged;
+            m_gizmoService.OnScaleChanged += OnGizmoScaleChanged;
+            m_gizmoService.OnRotateChanged += OnGizmoRotateChanged;
 
             //TODO: hacer esto si y solo si es el documento activo (pestaña)
             m_outlineService.WorldOutline = m_worldOutline;
@@ -93,8 +96,26 @@ namespace EsteroFramework.Editor.Game
         {
             m_scene.TransformTranslate(gizmoTransformable.Id, delta);
 
-            //var sceneTransform = m_scene.GetSceneTransformFor(gizmoTransformable.Id);
-            //m_gizmoService.SetObjectSelected(new GizmoTransformable(gizmoTransformable.Id, sceneTransform));
+            Console.WriteLine("translate delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+        }
+
+        private void OnGizmoScaleChanged(GizmoTransformable gizmoTransformable, Vector3 delta, bool isUniformScale)
+        {
+            delta *= 0.1f;
+            if (isUniformScale)
+            {
+                float uniform = 1.0f + (delta.X + delta.Y + delta.Z) / 3.0f;
+                Console.WriteLine("Uniform scale delta = " + uniform + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+                m_scene.TransformScaleUniform(gizmoTransformable.Id, uniform);
+                return;
+            }
+            Console.WriteLine("NU scale delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+            m_scene.TransformScale(gizmoTransformable.Id, delta);
+        }
+
+        private void OnGizmoRotateChanged(GizmoTransformable gizmoTransformable, Matrix delta)
+        {
+            m_scene.TransformRotate(gizmoTransformable.Id, Quaternion.CreateFromMatrix(delta));
         }
 
         private WorldOutlineItem CreateOutlineItem(long entity, long parentId, string name)

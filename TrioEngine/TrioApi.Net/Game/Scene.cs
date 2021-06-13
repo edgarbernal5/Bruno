@@ -149,5 +149,30 @@ namespace TrioApi.Net.Game
         {
             Internal_TransformTranslate(m_nativePointer, entity, ref delta);
         }
+
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformScale", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformScale(IntPtr scene, long entity, ref Vector3 delta);
+
+        public void TransformScale(long entity, Vector3 delta)
+        {
+            Internal_TransformScale(m_nativePointer, entity, ref delta);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformScaleUniform", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformScaleUniform(IntPtr scene, long entity, float scale);
+
+        public void TransformScaleUniform(long entity, float scaleFactor)
+        {
+            Internal_TransformScaleUniform(m_nativePointer, entity, scaleFactor);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformRotate", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformRotate(IntPtr scene, long entity, ref Quaternion rotate);
+
+        public void TransformRotate(long entity, Quaternion rotate)
+        {
+            Internal_TransformRotate(m_nativePointer, entity, ref rotate);
+        }
     }
 }

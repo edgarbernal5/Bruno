@@ -7,7 +7,7 @@ using TrioApi.Net.Maths;
 
 namespace EsteroFramework.Graphics.Editor
 {
-    public class AxisGizmo : DisposableBase
+    public class AxisGizmoTranslation : DisposableBase
     {
         public VertexBuffer VertexBuffer
         {
@@ -28,10 +28,9 @@ namespace EsteroFramework.Graphics.Editor
             get { return m_primitiveCount; }
         }
         private uint m_primitiveCount;
-        private uint m_coneVerticesTotal;
         private uint m_coneIndicesTotal;
 
-        public AxisGizmo(GraphicsDevice device, ColorRGBA8 color, float coneHeight, float coneRadius, float lineLength)
+        public AxisGizmoTranslation(GraphicsDevice device, ColorRGBA8 color, float coneHeight, float coneRadius, float lineLength)
         {
             m_color = color;
 
@@ -42,7 +41,8 @@ namespace EsteroFramework.Graphics.Editor
         {
             if (disposing)
             {
-
+                m_indexBuffer.Dispose();
+                m_vertexBuffer.Dispose();
             }
         }
 
@@ -53,7 +53,6 @@ namespace EsteroFramework.Graphics.Editor
             int coneVertices = subdivisions + 2;
             int lineVertices = 2;
             int totalVertices = coneVertices + lineVertices;
-            m_coneVerticesTotal = (uint)coneVertices;
 
             int coneIndices = (subdivisions * 2) * 3;
             int lineIndices = 2;

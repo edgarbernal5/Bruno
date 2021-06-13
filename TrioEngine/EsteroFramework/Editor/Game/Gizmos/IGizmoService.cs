@@ -12,7 +12,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
     {
         event Action<GizmoTransformable, Vector3> OnTranslationChanged;
 
-        IAxisGizmoRenderer AxisGizmoRenderer { get; }
+        IAxisGizmoRenderer AxisGizmoTranslationRenderer { get; }
         Camera Camera { get; set; }
 
         bool IsActive { get; set; }
@@ -43,7 +43,9 @@ namespace EsteroFramework.Editor.Game.Gizmos
         Z,
         XY,
         ZX,
-        YZ
+        YZ,
+
+        XYZ
     }
 
     public enum PivotType

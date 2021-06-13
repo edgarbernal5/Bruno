@@ -118,10 +118,13 @@
     <Compile Include="Editor\Units\ProjectFiles\ProjectFileViewModel.cs" />
     <Compile Include="Editor\Units\WorldOutline\WorldOutlineUnit.cs" />
     <Compile Include="Graphics\Data\Cameras\Camera.cs" />
-    <Compile Include="Graphics\Editor\AxisGizmo.cs" />
-    <Compile Include="Graphics\Editor\AxisGizmoRenderer.cs" />
+    <Compile Include="Graphics\Editor\Gizmos\AxisGizmoScale.cs" />
+    <Compile Include="Graphics\Editor\Gizmos\AxisGizmoTranslation.cs" />
+    <Compile Include="Graphics\Editor\Gizmos\AxisGizmoScaleRenderer.cs" />
+    <Compile Include="Graphics\Editor\Gizmos\AxisGizmoTranslationRenderer.cs" />
     <Compile Include="Graphics\Editor\EditorPrimitivesService.cs" />
     <Compile Include="Graphics\Editor\GridMesh.cs" />
+    <Compile Include="Graphics\Editor\Gizmos\IAxisGizmoRenderer.cs" />
     <Compile Include="Graphics\Editor\IEditorPrimitivesService.cs" />
     <Compile Include="Graphics\GraphicsDeviceService.cs" />
     <Compile Include="Graphics\GraphicsService.cs" />

@@ -1020,6 +1020,24 @@ void Scene_TransformTranslate(Scene* scene, long entity, Vector3* localPosition)
 	transform.Translate(*localPosition);
 }
 
+void Scene_TransformScale(Scene* scene, long entity, Vector3* deltaScale)
+{
+	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
+	transform.Scale(*deltaScale);
+}
+
+void Scene_TransformScaleUniform(Scene* scene, long entity, float scalarFactor)
+{
+	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
+	transform.ScaleUniform(scalarFactor);
+}
+
+void Scene_TransformRotate(Scene* scene, long entity, Quaternion* rotation)
+{
+	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
+	transform.Rotate(*rotation);
+}
+
 void Scene_LoadFromModel(Scene* scene, Model* model)
 {
 	scene->LoadFromModel(model);

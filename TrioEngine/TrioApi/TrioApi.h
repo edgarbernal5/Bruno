@@ -318,6 +318,10 @@ extern "C" TRIO_API_EXPORT void __stdcall Scene_GetHierarchies(Scene* scene, int
 extern "C" TRIO_API_EXPORT void __stdcall Scene_GetTransformMatrixForEntity(Scene* scene, long entity, Matrix *worldMatrix, Vector3 * localPosition, Vector3 * localScale, Quaternion * localRotation);
 extern "C" TRIO_API_EXPORT void __stdcall Scene_SetLocalPositionForEntity(Scene * scene, long entity, Vector3 * localPosition);
 extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformTranslate(Scene * scene, long entity, Vector3 * localPosition);
+extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformScale(Scene* scene, long entity, Vector3* deltaScale);
+extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformScaleUniform(Scene* scene, long entity, float scalarFactor);
+extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformRotate(Scene* scene, long entity, Quaternion* rotation);
+
 /*
 Transform
 */

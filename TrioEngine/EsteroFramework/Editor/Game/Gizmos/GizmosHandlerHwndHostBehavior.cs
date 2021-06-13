@@ -74,6 +74,12 @@ namespace EsteroFramework.Editor.Game.Gizmos
             //scene.TransformTranslate(gizmoTransformable.Id, delta);
         }
 
+        private void OnGizmoScaleChanged(GizmoTransformable gizmoTransformable, Vector3 delta, bool isUniformScale)
+        {
+            //var scene = Scene;
+            //scene.TransformScale(gizmoTransformable.Id, delta);
+        }
+
         protected override void OnAttached()
         {
             base.OnAttached();

@@ -89,6 +89,21 @@ namespace TrioEngine
 			SetDirty(true);
 		}
 
+		void Scale(const Vector3& delta) {
+			m_localScale += delta;
+			SetDirty(true);
+		}
+
+		void ScaleUniform(float scaleFactor) {
+			m_localScale *= scaleFactor;
+			SetDirty(true);
+		}
+
+		void Rotate(const Quaternion& delta) {
+			m_localRotation *= delta;
+			SetDirty(true);
+		}
+
 	private:
 		Matrix GetLocalMatrix() const
 		{

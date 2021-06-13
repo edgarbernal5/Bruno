@@ -1,40 +1,36 @@
 ﻿
 using EsteroFramework.Editor.Game.Gizmos;
+using System;
 using TrioApi.Net.Graphics;
 using TrioApi.Net.Graphics.Core;
 using TrioApi.Net.Maths;
 
 namespace EsteroFramework.Graphics.Editor
 {
-    public class AxisGizmoRenderer : IAxisGizmoRenderer
+    public class AxisGizmoScaleRenderer : IAxisGizmoRenderer
     {
-        private AxisGizmo[] m_gizmos;
+        private AxisGizmoScale[] m_gizmos;
         private ColorRGBA8[] m_colors = new ColorRGBA8[] { ColorRGBA8.Red, ColorRGBA8.Green, ColorRGBA8.Blue };
         private Matrix[] m_gizmoLocalWorlds;
 
         private Effect m_effect;
         private Matrix m_gizmoWorld;
 
-        public AxisGizmoRenderer(GraphicsDevice device)
+        public AxisGizmoScaleRenderer(GraphicsDevice device)
         {
             m_gizmoLocalWorlds = new Matrix[3];
             m_gizmoLocalWorlds[0] = Matrix.CreateRotationZ(MathHelper.ToRadians(-90.0f)) * Matrix.CreateTranslation(Vector3.Right * (GizmoService.CONE_HEIGHT + GizmoService.LINE_LENGTH) * 0.5f);
-            m_gizmoLocalWorlds[1] = Matrix.CreateTranslation(Vector3.Up * (GizmoService.CONE_HEIGHT + GizmoService.LINE_LENGTH)* 0.5f);
+            m_gizmoLocalWorlds[1] = Matrix.CreateTranslation(Vector3.Up * (GizmoService.CONE_HEIGHT + GizmoService.LINE_LENGTH) * 0.5f);
             m_gizmoLocalWorlds[2] = Matrix.CreateRotationX(MathHelper.ToRadians(90.0f)) * Matrix.CreateTranslation(Vector3.Backward * (GizmoService.CONE_HEIGHT + GizmoService.LINE_LENGTH) * 0.5f);
 
-            m_gizmos = new AxisGizmo[3];
+            m_gizmos = new AxisGizmoScale[3];
             for (int i = 0; i < 3; i++)
             {
-                m_gizmos[i] = new AxisGizmo(device, m_colors[i], GizmoService.CONE_HEIGHT, GizmoService.CONE_RADIUS, GizmoService.LINE_LENGTH);
+                m_gizmos[i] = new AxisGizmoScale(device, m_colors[i], GizmoService.CONE_HEIGHT, GizmoService.LINE_LENGTH);
             }
 
             m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\LineEffect.fx");
             m_gizmoWorld = Matrix.Identity;
-        }
-
-        public void SetWorld(Matrix gizmoWorld)
-        {
-            m_gizmoWorld = gizmoWorld;
         }
 
         public void Render(RenderContext renderContext)
@@ -43,7 +39,7 @@ namespace EsteroFramework.Graphics.Editor
 
             device.DepthStencilState = DepthStencilState.None;
             ////device->SetBlendState(BlendState::Opaque);
-            device.RasterizerState = RasterizerState.CullNone;
+            device.RasterizerState = RasterizerState.CullCounterClockwise;
 
             for (int i = 0; i < 3; i++)
             {
@@ -58,11 +54,10 @@ namespace EsteroFramework.Graphics.Editor
                 m_gizmos[i].Draw(device);
             }
         }
-    }
 
-    public interface IAxisGizmoRenderer
-    {
-        void Render(RenderContext context);
-        void SetWorld(Matrix gizmoWorld);
+        public void SetWorld(Matrix gizmoWorld)
+        {
+            m_gizmoWorld = gizmoWorld;
+        }
     }
 }

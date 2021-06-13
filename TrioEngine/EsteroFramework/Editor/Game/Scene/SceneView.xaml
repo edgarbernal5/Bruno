@@ -8,13 +8,36 @@
              xmlns:local="clr-namespace:EsteroFramework.Editor.Game"
              xmlns:beh="clr-namespace:EsteroFramework.Editor.Game.Interaction"
              xmlns:beh2="clr-namespace:EsteroFramework.Editor.Game.Gizmos"
+             xmlns:win="clr-namespace:EsteroWindows;assembly=EsteroWindows"
              d:DataContext="{d:DesignInstance local:SceneViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              
              d:DesignHeight="450" d:DesignWidth="800">
+
+
     <Grid>
-        <game:GameSurfaceTargetHwndHost x:Name="gameSurfaceTarget" GameGraphicsScreens ="{Binding Path=GameGraphicsScreens}">
-            <i:Interaction.Behaviors>
+        <DockPanel LastChildFill = "True">
+            <StackPanel DockPanel.Dock = "Top" Orientation="Horizontal">
+                <ComboBox Width="80"
+                          IsEditable="False"
+                          ItemsSource="{Binding GizmoMode, Converter={x:Static win:EnumToArrayConverter.Instance}}"
+                          SelectedValue="{Binding GizmoMode}">
+                    <ComboBox.Resources>
+                        <Style x:Key="ComboBoxItem" TargetType="{x:Type ComboBoxItem}">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderBrush" Value="Transparent" />
+                            <Setter Property="BorderThickness" Value="1" />
+                            <!--<Setter Property="FocusVisualStyle" Value="{StaticResource Modern.Control.FocusVisual}" />-->
+                            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+                            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+
+                        </Style>
+                    </ComboBox.Resources>
+                    
+                </ComboBox>
+            </StackPanel>
+            <game:GameSurfaceTargetHwndHost x:Name="gameSurfaceTarget" GameGraphicsScreens ="{Binding Path=GameGraphicsScreens}">
+                <i:Interaction.Behaviors>
                 <beh:CameraArcBallHwndHostBehavior Camera="{Binding Camera}" />
                 <beh:CameraZoomHwndHostBehavior Camera="{Binding Camera}" />
                 <beh:CameraHandToolHwndHostBehavior Camera="{Binding Camera}" />
@@ -23,10 +46,9 @@
                                                     GizmoService="{Binding GizmoService}"
                                                     Scene="{Binding Scene}"/>
             </i:Interaction.Behaviors>
-        </game:GameSurfaceTargetHwndHost>
+            </game:GameSurfaceTargetHwndHost>
+        </DockPanel>
     </Grid>
 </UserControl>
-<!--d:DataContext="EsteroFramework.Editor.Game.SceneViewModel"-->
 
-<!--d:DataContext="{d:DesignInstance local:SceneViewModel, IsDesignTimeCreatable=False}"-->
 

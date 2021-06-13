@@ -5,6 +5,7 @@ using EsteroFramework.Editor.Units;
 using EsteroFramework.Graphics;
 using EsteroFramework.Graphics.Data;
 using EsteroFramework.Graphics.Editor;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using TrioApi.Net.Game;
@@ -55,6 +56,23 @@ namespace EsteroFramework.Editor.Game
                 //NotifyOfPropertyChange();
             }
         }
+
+        public GizmoType GizmoMode
+        {
+            get
+            {
+                return m_gizmoType;
+            }
+            set
+            {
+                //m_sceneProjectFile.GizmoService.CurrentGizmo = value;
+                if (Set(ref m_gizmoType, value))
+                {
+                    m_sceneProjectFile.GizmoService.CurrentGizmo = m_gizmoType;
+                }
+            }
+        }
+        private GizmoType m_gizmoType = GizmoType.Translation;
 
         public IList<GameGraphicsScreen> GameGraphicsScreens
         {
@@ -128,10 +146,10 @@ namespace EsteroFramework.Editor.Game
 
         private void InitializeCamera()
         {
-            Camera = new Camera(new Vector3(5.0f, 8.5f, 8.5f), Vector3.Zero, Vector3.Up);
-            //Camera = new Camera(new Vector3(40.0f, 60.5f, 60.5f), Vector3.Zero, Vector3.Up);
+            //Camera = new Camera(new Vector3(2.0f, 4.5f, 4.5f), Vector3.Zero, Vector3.Up);
+            Camera = new Camera(new Vector3(40.0f, 60.5f, 60.5f), Vector3.Zero, Vector3.Up);
             Camera.FieldOfView = 60.0f * 3.1416f / 180.0f;
-            Camera.NearPlane = 0.1f;
+            Camera.NearPlane = 1.0f;
             Camera.FarPlane = 1000.0f;
 
             GizmoService.Camera = Camera;
