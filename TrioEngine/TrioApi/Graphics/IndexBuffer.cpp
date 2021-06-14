@@ -73,4 +73,16 @@ namespace TrioEngine
 		);
 	}
 #endif
+
+	////////////////////////////////////////////////////////////////
+	DynamicIndexBuffer::DynamicIndexBuffer(GraphicsDevice* device, IndexElementSize elementSize, int indexCount) :
+		IndexBuffer(device, elementSize, indexCount, ResourceUsage::Dynamic),
+		m_userOffset(0)
+	{
+
+	}
+
+	DynamicIndexBuffer::~DynamicIndexBuffer()
+	{
+	}
 }

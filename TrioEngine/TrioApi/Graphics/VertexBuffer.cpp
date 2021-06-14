@@ -54,6 +54,7 @@ namespace TrioEngine
 		D3D11_BUFFER_DESC vbd = {};
 
 		ResourceUsage usage = ResourceUsage::Default;
+		CpuAccessFlags cpuAccessFlags = CpuAccessFlags::None;
 		//ResourceUsage usage = m_eUsage;
 
 		uint64_t sizeInBytes = uint64_t(m_vertexCount) * m_vertexDeclaration->GetVertexStride();
@@ -61,10 +62,14 @@ namespace TrioEngine
 		if (sizeInBytes > uint64_t(D3D11_REQ_RESOURCE_SIZE_IN_MEGABYTES_EXPRESSION_A_TERM * 1024u * 1024u))
 			throw std::exception("Buffer too large for DirectX 11");
 
+		if (m_usage == ResourceUsage::Dynamic) {
+			usage = ResourceUsage::Dynamic;
+			cpuAccessFlags = CpuAccessFlags::Write;
+		}
 		vbd.Usage = (D3D11_USAGE)usage;
 		vbd.ByteWidth = sizeInBytes;
 		vbd.BindFlags = (uint32_t)BindFlags::VertexBuffer;
-		vbd.CPUAccessFlags = 0;
+		vbd.CPUAccessFlags = (uint32_t)cpuAccessFlags;
 		vbd.MiscFlags = 0;
 		vbd.StructureByteStride = 0;
 

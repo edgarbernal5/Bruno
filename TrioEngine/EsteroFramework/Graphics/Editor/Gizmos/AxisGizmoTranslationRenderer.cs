@@ -14,9 +14,13 @@ namespace EsteroFramework.Graphics.Editor
 
         private Effect m_effect;
         private Matrix m_gizmoWorld;
+        private AxisGizmoGraphics m_axisGizmoGraphics;
 
         public AxisGizmoTranslationRenderer(GraphicsDevice device)
         {
+            m_axisGizmoGraphics = new AxisGizmoGraphics(GizmoService.LINE_OFFSET);
+            m_axisGizmoGraphics.InitializeTranslation(GizmoService.LINE_LENGTH);
+
             m_gizmoLocalWorlds = new Matrix[3];
             m_gizmoLocalWorlds[0] = Matrix.CreateRotationZ(MathHelper.ToRadians(-90.0f)) * Matrix.CreateTranslation(Vector3.Right * (GizmoService.CONE_HEIGHT + GizmoService.LINE_LENGTH) * 0.5f);
             m_gizmoLocalWorlds[1] = Matrix.CreateTranslation(Vector3.Up * (GizmoService.CONE_HEIGHT + GizmoService.LINE_LENGTH)* 0.5f);
@@ -42,21 +46,29 @@ namespace EsteroFramework.Graphics.Editor
             var device = renderContext.GraphicsDevice;
 
             device.DepthStencilState = DepthStencilState.None;
-            ////device->SetBlendState(BlendState::Opaque);
+            //device->SetBlendState(BlendState::Opaque);
             device.RasterizerState = RasterizerState.CullNone;
 
+            Matrix worldViewProjection = m_gizmoWorld * renderContext.Camera.ViewProjection;
             for (int i = 0; i < 3; i++)
             {
                 device.SetIndexBuffer(m_gizmos[i].IndexBuffer);
                 device.SetVertexBuffer(m_gizmos[i].VertexBuffer);
 
-                Matrix viewProjection = m_gizmoLocalWorlds[i] * m_gizmoWorld * renderContext.Camera.ViewProjection;
+                Matrix viewProjection = m_gizmoLocalWorlds[i] * worldViewProjection;
 
                 m_effect.Parameters["gWorldViewProj"].SetValue(viewProjection);
                 m_effect.Techniques[0].Passes[0].Apply();
 
                 m_gizmos[i].Draw(device);
             }
+
+
+            m_effect.Parameters["gWorldViewProj"].SetValue(worldViewProjection);
+            m_effect.Techniques[0].Passes[0].Apply();
+
+            device.DrawUserPrimitives(PrimitiveType.LineList, m_axisGizmoGraphics.translationLinesVtx, 0,
+                m_axisGizmoGraphics.translationLinesVtx.Length / 2);
         }
     }
 }

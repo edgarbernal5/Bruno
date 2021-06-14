@@ -110,6 +110,7 @@
     <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
+    <Compile Include="Graphics\VertexDeclarationFactory.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="ImportConfiguration.cs" />

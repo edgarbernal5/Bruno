@@ -588,6 +588,41 @@ namespace TrioEngine
 #endif
 	}
 
+	void GraphicsDevice::DrawUserPrimitives(PrimitiveType primitiveType, const uint8_t* vertexData, int vertexSizeArray, int vertexOffset, int primitiveCount, VertexDeclaration* vertexDeclaration)
+	{
+#ifdef TRIO_DIRECTX
+		int vertexCount = FormatHelper::GetElementCountArray(primitiveType, primitiveCount);
+		int startVertex = SetUserVertexBuffer(vertexData, vertexSizeArray, vertexOffset, vertexSizeArray, vertexDeclaration);
+
+		ApplyState(true);
+
+		m_d3dContext->IASetPrimitiveTopology(FormatHelper::FormatToPrimitive(primitiveType));
+
+		m_textureCollection->BindAllTextures(this);
+		m_samplerCollection->BindAllSamplers(this);
+
+		m_d3dContext->Draw(vertexCount, startVertex);
+#endif
+	}
+
+	void GraphicsDevice::DrawUserIndexedPrimitives(PrimitiveType primitiveType, const uint8_t* vertexData, int vertexSizeArray, int vertexOffset, int numVertices, uint16_t* indexData, int indexLength, IndexElementSize indexSize, int indexOffset, int primitiveCount, VertexDeclaration* declaration)
+	{
+#ifdef TRIO_DIRECTX
+		int indexSizeBytes = indexSize == IndexElementSize::SixteenBits ? 2 : 4;
+		int indexCount = FormatHelper::GetElementCountArray(primitiveType, primitiveCount);
+		int startVertex = SetUserVertexBuffer(vertexData, vertexSizeArray, vertexOffset, numVertices, declaration);
+		int startIndex = SetUserIndexBuffer(indexSizeBytes, (uint8_t*)indexData, indexLength * indexSizeBytes, indexOffset, indexCount);
+
+		ApplyState(true);
+		m_d3dContext->IASetPrimitiveTopology(FormatHelper::FormatToPrimitive(primitiveType));
+
+		m_textureCollection->BindAllTextures(this);
+		m_samplerCollection->BindAllSamplers(this);
+
+		m_d3dContext->DrawIndexed(indexCount, startIndex, startVertex);
+#endif
+	}
+
 	void GraphicsDevice::Reset(PresentationParameters presentationParameters)
 	{
 		m_presentationParameters = presentationParameters;
@@ -895,4 +930,66 @@ namespace TrioEngine
 		m_d3dContext->RSSetViewports(1, m_viewport.Get11());
 #endif
 	}
+
+	int GraphicsDevice::SetUserVertexBuffer(const uint8_t* vertexData, int length, int vertexOffset, int vertexCount, VertexDeclaration* vertexDecl)
+	{
+		DynamicVertexBuffer* buffer = nullptr;
+
+		auto it = m_userVertexBuffers.find(vertexDecl->m_iHashKey);
+		if (it == m_userVertexBuffers.end() || ((buffer = it->second) && buffer->m_vertexCount < vertexCount))
+		{
+			if (buffer != nullptr)
+				delete buffer;
+
+			buffer = new DynamicVertexBuffer(this, vertexDecl, std::max(vertexCount, 2048));
+			m_userVertexBuffers[vertexDecl->m_iHashKey] = buffer;
+		}
+
+		int startVertex = buffer->m_userOffset;
+		if ((vertexCount + buffer->m_userOffset) < buffer->m_vertexCount)
+		{
+			buffer->m_userOffset += vertexCount;
+			buffer->SetData<uint8_t>(startVertex * vertexDecl->m_vertexStride, vertexData, length, vertexOffset, vertexCount, vertexDecl->GetVertexStride(), SetDataOptions::NoOverwrite);
+		}
+		else
+		{
+			buffer->m_userOffset = vertexCount;
+			buffer->SetData<uint8_t>(0, vertexData, length, vertexOffset, vertexCount, vertexDecl->GetVertexStride(), SetDataOptions::Discard);
+			startVertex = 0;
+		}
+		SetVertexBuffer(buffer);
+		return startVertex;
+	}
+
+	int GraphicsDevice::SetUserIndexBuffer(int baseSizeInBytes, const uint8_t* indexData, int length, int indexOffset, int indexCount)
+	{
+		DynamicIndexBuffer* buffer = nullptr;
+
+		auto it = m_userIndexBuffers.find(baseSizeInBytes);
+		if (it == m_userIndexBuffers.end() || ((buffer = it->second) && buffer->m_indexCount < indexCount))
+		{
+			if (buffer != nullptr)
+				delete buffer;
+
+			buffer = new DynamicIndexBuffer(this, baseSizeInBytes == 2 ? IndexElementSize::SixteenBits : IndexElementSize::ThirtyTwoBits, std::max(indexCount, 6000));
+			m_userIndexBuffers[baseSizeInBytes] = buffer;
+		}
+
+		int startIndex = buffer->m_userOffset;
+		if ((indexCount + buffer->m_userOffset) < buffer->m_indexCount)
+		{
+			buffer->m_userOffset += indexCount;
+			buffer->SetData<uint8_t>(startIndex * baseSizeInBytes, indexData, length, indexOffset, indexCount, SetDataOptions::NoOverwrite);
+		}
+		else
+		{
+			buffer->m_userOffset = indexCount;
+			buffer->SetData<uint8_t>(0, indexData, length, indexOffset, indexCount, SetDataOptions::Discard);
+			startIndex = 0;
+		}
+
+		SetIndexBuffer(buffer);
+		return startIndex;
+	}
+
 }

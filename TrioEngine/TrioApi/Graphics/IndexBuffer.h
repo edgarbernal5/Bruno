@@ -239,5 +239,16 @@ namespace TrioEngine
 		SetData<T>(0, data, length, startIndex, elementCount, SetDataOptions::None);
 	}
 
+	///////////////////////////////////////////////////////////////////////
+	class TRIO_API_EXPORT DynamicIndexBuffer : public IndexBuffer
+	{
+	public:
+		DynamicIndexBuffer(GraphicsDevice* device, IndexElementSize elementSize, int indexCount);
+		~DynamicIndexBuffer();
+
+		friend class GraphicsDevice;
+	private:
+		int m_userOffset;
+	};
 }
 

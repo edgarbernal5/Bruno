@@ -10,9 +10,12 @@
 #include "ShaderStage.h"
 #include "VertexBufferBinding.h"
 #include "RenderTargetBinding.h"
+#include "IndexElementSize.h"
 
 #include "DeviceErrorStatus.h"
 #include "..\Math\MathVector.h"
+
+#include <map>
 
 namespace TrioEngine
 {
@@ -31,6 +34,9 @@ namespace TrioEngine
 	class VertexBuffer;
 	class SwapChain;
 	class RenderTarget2D;
+	class VertexDeclaration;
+	class DynamicVertexBuffer;
+	class DynamicIndexBuffer;
 	
 	class TRIO_API_EXPORT GraphicsDevice
 	{
@@ -43,6 +49,9 @@ namespace TrioEngine
 		void Clear(ClearOptions options, const float* color, float depth, uint8_t stencil);
 
 		void DrawIndexedPrimitives(PrimitiveType primitiveType, uint32_t baseVertex, uint32_t startIndex, uint32_t primitiveCount);
+		
+		void DrawUserPrimitives(PrimitiveType primitiveType, const uint8_t* vertexData, int vertexSizeArray, int vertexOffset, int primitiveCount, VertexDeclaration* declaration);
+		void DrawUserIndexedPrimitives(PrimitiveType primitiveType, const uint8_t* vertexData, int vertexSizeArray, int vertexOffset, int numVertices, uint16_t* indexData, int indexLength, IndexElementSize indexSize, int indexOffset, int primitiveCount, VertexDeclaration* declaration);
 
 		GraphicsAdapter*           GetAdapter() const { return m_adapter; }
 
@@ -96,6 +105,8 @@ namespace TrioEngine
 		SamplerStateCollection*						m_samplerCollection;
 		PresentationParameters						m_presentationParameters;
 		GraphicsAdapter*							m_adapter;
+		std::map<uint64_t, DynamicVertexBuffer*>	m_userVertexBuffers;
+		std::map<int, DynamicIndexBuffer*>			m_userIndexBuffers;
 
 		std::unique_ptr<DepthStencilBuffer> m_depthStencilBuffer;
 		DepthStencilBuffer* m_currentDepthStencilBuffer;
@@ -165,6 +176,9 @@ namespace TrioEngine
 		void SetConstantBuffer(ShaderStage stage, int slot, ConstantBuffer* buffer);
 
 		void SetRenderTargets(RenderTargetBindings& bindings);
+
+		int SetUserIndexBuffer(int baseSizeInBytes, const uint8_t* indexData, int length, int indexOffset, int indexCount);
+		int SetUserVertexBuffer(const uint8_t* vertexData, int length, int vertexOffset, int vertexCount, VertexDeclaration* vertexDecl);
 	};
 
 }

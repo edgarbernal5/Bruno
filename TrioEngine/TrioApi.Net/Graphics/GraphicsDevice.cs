@@ -132,13 +132,89 @@ namespace TrioApi.Net.Graphics
         {
             Internal_ClearRGBA8(m_nativePointer, color.PackedColor);
         }
-        
+
+        public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
+        {
+            DrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, primitiveCount, VertexDeclarationFactory<T>.VertexDeclaration);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_DrawUserPrimitives", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_DrawUserPrimitives(IntPtr device, PrimitiveType primitiveType, IntPtr bytes, int length, int vertexOffset, uint primitiveCount, IntPtr vertexDeclaration);
+
+        public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
+        {
+            int elementSize = Marshal.SizeOf(typeof(T));
+            var dataHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+
+            try
+            {
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
+
+                Internal_DrawUserPrimitives(m_nativePointer, primitiveType, dataPtr, vertexData.Length, vertexOffset, (uint)(primitiveCount), vertexDeclaration.NativePointer);
+            }
+            finally
+            {
+                dataHandle.Free();
+            }
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_DrawUserIndexedPrimitives", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_DrawUserIndexedPrimitives(IntPtr device, PrimitiveType primitiveType, IntPtr vertexData, int vertexSize, int vertexOffset, int numVertices, IntPtr indexData, int indexLength, IndexElementSize indexElementSize, int indexOffset, int primitiveCount, IntPtr vertexDeclaration);
+
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
+        {
+            var vertexDataHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+            var indexDataHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
+
+            try
+            {
+                var vertexDataPtr = (IntPtr)(vertexDataHandle.AddrOfPinnedObject().ToInt64());
+                var indexDataPtr = (IntPtr)(indexDataHandle.AddrOfPinnedObject().ToInt64());
+
+                Internal_DrawUserIndexedPrimitives(m_nativePointer, primitiveType, vertexDataPtr, vertexData.Length, vertexOffset, numVertices, 
+                    indexDataPtr, indexData.Length, IndexElementSize.SixteenBits, indexOffset, primitiveCount, vertexDeclaration.NativePointer);
+            }
+            finally
+            {
+                vertexDataHandle.Free();
+                indexDataHandle.Free();
+            }
+        }
+
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
+        {
+            var vertexDataHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+            var indexDataHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
+
+            try
+            {
+                var vertexDataPtr = (IntPtr)(vertexDataHandle.AddrOfPinnedObject().ToInt64());
+                var indexDataPtr = (IntPtr)(indexDataHandle.AddrOfPinnedObject().ToInt64());
+
+                Internal_DrawUserIndexedPrimitives(m_nativePointer, primitiveType, vertexDataPtr, vertexData.Length, vertexOffset, numVertices,
+                    indexDataPtr, indexData.Length, IndexElementSize.ThirtyTwoBits, indexOffset, primitiveCount, vertexDeclaration.NativePointer);
+            }
+            finally
+            {
+                vertexDataHandle.Free();
+                indexDataHandle.Free();
+            }
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_DrawIndexedPrimitives", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_DrawIndexedPrimitives(IntPtr device, PrimitiveType primitiveType, uint baseVertex, uint startIndex, uint primitiveCount);
 
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, uint baseVertex, uint startIndex, uint primitiveCount)
         {
             Internal_DrawIndexedPrimitives(m_nativePointer, primitiveType, baseVertex, startIndex, primitiveCount);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_DrawIndexedPrimitives", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_DrawUserIndexedPrimitives(IntPtr device, PrimitiveType primitiveType, uint baseVertex, uint startIndex, uint primitiveCount);
+
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        {
+
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Flush", CallingConvention = CallingConvention.StdCall)]

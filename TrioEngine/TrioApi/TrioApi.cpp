@@ -489,6 +489,16 @@ void GraphicsDevice_DrawIndexedPrimitives(GraphicsDevice* device, PrimitiveType 
 	device->DrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
 }
 
+void GraphicsDevice_DrawUserPrimitives(GraphicsDevice* device, PrimitiveType primitiveType, uint8_t* data, int dataLength, int vertexOffset, uint32_t primitiveCount, VertexDeclaration* vertexDeclaration)
+{
+	device->DrawUserPrimitives(primitiveType, data, dataLength, vertexOffset, primitiveCount, vertexDeclaration);
+}
+
+void GraphicsDevice_DrawUserIndexedPrimitives(GraphicsDevice* device, PrimitiveType primitiveType, const uint8_t* vertexData, int vertexSizeArray, int vertexOffset, int numVertices, uint16_t* indexData, int indexLength, IndexElementSize indexElementSize, int indexOffset, int primitiveCount, VertexDeclaration* declaration)
+{
+	device->DrawUserIndexedPrimitives(primitiveType, vertexData, vertexSizeArray, vertexOffset, numVertices, indexData, indexLength, indexElementSize, vertexOffset, primitiveCount, declaration);
+}
+
 BlendState* GraphicsDevice_GetBlendState(GraphicsDevice* device)
 {
 	return device->GetBlendState();

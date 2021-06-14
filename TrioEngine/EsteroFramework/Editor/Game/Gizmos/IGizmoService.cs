@@ -12,7 +12,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
     {
         event Action<GizmoTransformable, Vector3> OnTranslationChanged;
 
-        IAxisGizmoRenderer AxisGizmoTranslationRenderer { get; }
+        AxisGizmoTranslationRenderer AxisGizmoTranslationRenderer { get; }
         Camera Camera { get; set; }
 
         bool IsActive { get; set; }

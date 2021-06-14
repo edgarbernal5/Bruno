@@ -12,7 +12,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public VertexBuffer(GraphicsDevice device, VertexDeclaration vertexDeclaration, int vertexCount, ResourceUsage usage)
         {
-            m_nativePointer = Internal_Ctor(device.NativePointer, vertexDeclaration.m_nativePtr, vertexCount, (int)usage);
+            m_nativePointer = Internal_Ctor(device.NativePointer, vertexDeclaration.NativePointer, vertexCount, (int)usage);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "VertexBuffer_Ctor2", CallingConvention = CallingConvention.StdCall)]
@@ -20,7 +20,7 @@ namespace TrioApi.Net.Graphics.Core
 
         public VertexBuffer(GraphicsDevice device, VertexDeclaration vertexDeclaration, int vertexCount)
         {
-            m_nativePointer = Internal_Ctor2(device.NativePointer, vertexDeclaration.m_nativePtr, vertexCount);
+            m_nativePointer = Internal_Ctor2(device.NativePointer, vertexDeclaration.NativePointer, vertexCount);
         }
 
         internal VertexBuffer(IntPtr nativePtr)

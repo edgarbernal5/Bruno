@@ -155,6 +155,8 @@ extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Dtor(GraphicsDevice* de
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_Clear(GraphicsDevice * device, float* colorAsFloat);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_ClearAsRGBA8(GraphicsDevice * device, uint32_t packedColor);
 extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_DrawIndexedPrimitives(GraphicsDevice * device, PrimitiveType primitiveType, uint32_t baseVertex, uint32_t startIndex, uint32_t primitiveCount);
+extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_DrawUserPrimitives(GraphicsDevice * device, PrimitiveType primitiveType, uint8_t* data, int dataLength, int vertexOffset, uint32_t primitiveCount, VertexDeclaration* vertexDeclaration);
+extern "C" TRIO_API_EXPORT void __stdcall GraphicsDevice_DrawUserIndexedPrimitives(GraphicsDevice * device, PrimitiveType primitiveType, const uint8_t * vertexData, int vertexSizeArray, int vertexOffset, int numVertices, uint16_t * indexData, int indexLength, IndexElementSize indexElementSize, int indexOffset, int primitiveCount, VertexDeclaration * declaration);
 extern "C" TRIO_API_EXPORT BlendState* __stdcall GraphicsDevice_GetBlendState(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT DepthStencilState* __stdcall GraphicsDevice_GetDepthStencilState(GraphicsDevice* device);
 extern "C" TRIO_API_EXPORT RasterizerState* __stdcall GraphicsDevice_GetRasterizerState(GraphicsDevice* device);

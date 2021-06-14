@@ -51,12 +51,10 @@ namespace EsteroFramework.Graphics.Editor
             const int subdivisions = 10;
 
             int coneVertices = subdivisions + 2;
-            int lineVertices = 2;
-            int totalVertices = coneVertices + lineVertices;
+            int totalVertices = coneVertices;
 
             int coneIndices = (subdivisions * 2) * 3;
-            int lineIndices = 2;
-            int totalIndices = coneIndices + lineIndices;
+            int totalIndices = coneIndices;
             m_coneIndicesTotal = (uint)coneIndices;
 
             VertexPositionColor[] vertices = new VertexPositionColor[totalVertices];
@@ -65,8 +63,7 @@ namespace EsteroFramework.Graphics.Editor
             m_vertexBuffer = new VertexBuffer(device, VertexPositionColor.VertexDeclaration, totalVertices);
             m_indexBuffer = new IndexBuffer(device, IndexElementSize.ThirtyTwoBits, totalIndices);
 
-            CreateLine(vertices, triangles, lineLength, coneHeight, 0, 0);
-            CreateCone(vertices, triangles, subdivisions, coneRadius, coneHeight, lineLength, 2, 2);
+            CreateCone(vertices, triangles, subdivisions, coneRadius, coneHeight, lineLength, 0, 0);
 
             m_primitiveCount = m_coneIndicesTotal / 3;
 
@@ -74,20 +71,9 @@ namespace EsteroFramework.Graphics.Editor
             m_indexBuffer.SetData(triangles);
         }
 
-        private void CreateLine(VertexPositionColor[] vertices, int[] triangles, float lineLength, float coneHeight, int verticesOffset, int indicesOffset)
-        {
-            float heightOffset = -(coneHeight + lineLength) * 0.5f;
-
-            vertices[verticesOffset] = new VertexPositionColor(new Vector3(0.0f, -heightOffset, 0.0f), m_color);
-            vertices[verticesOffset + 1] = new VertexPositionColor(new Vector3(0.0f, heightOffset, 0.0f), m_color);
-
-            triangles[indicesOffset] = verticesOffset;
-            triangles[indicesOffset + 1] = verticesOffset + 1;
-        }
-
         private void CreateCone(VertexPositionColor[] vertices, int[] triangles, int subdivisions, float radius, float height, float lineLength, int verticesOffset, int indicesOffset)
         {
-            float heightOffset = (height + lineLength) * 0.5f;
+            float heightOffset = (lineLength - height) * 0.5f;
             vertices[verticesOffset] = new VertexPositionColor(new Vector3(0, heightOffset, 0), m_color);
             for (int i = 0, n = subdivisions - 1; i < subdivisions; i++)
             {
@@ -119,8 +105,7 @@ namespace EsteroFramework.Graphics.Editor
 
         public void Draw(GraphicsDevice device)
         {
-            device.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, 1);
-            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 2, 2, PrimitiveCount);
+            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, PrimitiveCount);
         }
     }
 }

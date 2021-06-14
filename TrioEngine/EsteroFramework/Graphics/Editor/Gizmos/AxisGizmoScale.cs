@@ -1,5 +1,6 @@
 ﻿using Estero.Interop;
-using System;
+using EsteroFramework.Editor.Game.Gizmos;
+using System.Collections.Generic;
 using TrioApi.Net.Graphics;
 using TrioApi.Net.Graphics.Core;
 using TrioApi.Net.Maths;
@@ -8,31 +9,24 @@ namespace EsteroFramework.Graphics.Editor
 {
     public class AxisGizmoScale : DisposableBase
     {
-        public VertexBuffer VertexBuffer
-        {
-            get { return m_vertexBuffer; }
-        }
-        private VertexBuffer m_vertexBuffer;
+        private ColorRGBA8[] m_colors;
+        private readonly float m_boxSize;
+        private readonly float m_lineLength;
 
-        public IndexBuffer IndexBuffer
-        {
-            get { return m_indexBuffer; }
-        }
-        private IndexBuffer m_indexBuffer;
-
-        private ColorRGBA8 m_color;
-
-        public uint PrimitiveCount
+        public int PrimitiveCount
         {
             get { return m_primitiveCount; }
         }
-        private uint m_primitiveCount;
-        private uint m_boxIndicesTotal;
+        private int m_primitiveCount;
 
-        public AxisGizmoScale(GraphicsDevice device, ColorRGBA8 color, float boxSize, float lineLength)
+        private VertexPositionColor[] m_positionColorVertex;
+        private short[] m_boxIndices;
+
+        public AxisGizmoScale(GraphicsDevice device, ColorRGBA8[] colors, float boxSize, float lineLength)
         {
-            m_color = color;
-
+            m_colors = colors;
+            m_boxSize = boxSize;
+            m_lineLength = lineLength;
             CreateMeshes(device, boxSize, lineLength);
         }
 
@@ -40,135 +34,154 @@ namespace EsteroFramework.Graphics.Editor
         {
             if (disposing)
             {
-                m_indexBuffer.Dispose();
-                m_vertexBuffer.Dispose();
+
             }
         }
 
         private void CreateMeshes(GraphicsDevice device, float boxSize, float lineLength)
         {
-            int boxVertices = 8;
-            int lineVertices = 2;
-            int totalVertices = boxVertices + lineVertices;
+            m_boxIndices = CreateBoxIndices();
 
-            int boxIndices = 36;
-            int lineIndices = 2;
-            int totalIndices = boxIndices + lineIndices;
-            m_boxIndicesTotal = (uint)boxIndices;
+            var list = CreateBox(boxSize, lineLength);
+            m_positionColorVertex = list.ToArray();
 
-            VertexPositionColor[] vertices = new VertexPositionColor[totalVertices];
-            int[] triangles = new int[totalIndices];
-
-            m_vertexBuffer = new VertexBuffer(device, VertexPositionColor.VertexDeclaration, totalVertices);
-            m_indexBuffer = new IndexBuffer(device, IndexElementSize.ThirtyTwoBits, totalIndices);
-
-            CreateLine(vertices, triangles, lineLength, boxSize, 0, 0);
-            CreateBox(vertices, triangles, boxSize, lineLength, 2, 2);
-
-            m_primitiveCount = m_boxIndicesTotal / 3;
-
-            m_vertexBuffer.SetData(vertices);
-            m_indexBuffer.SetData(triangles);
+            m_primitiveCount = m_boxIndices.Length / 3;
         }
 
-        private void CreateLine(VertexPositionColor[] vertices, int[] triangles, float lineLength, float coneHeight, int verticesOffset, int indicesOffset)
+        public void PutOffsetInVertices(Vector3 deltaOffset, GizmoAxis gizmoAxis)
         {
-            float heightOffset = -(coneHeight + lineLength) * 0.5f;
+            var axisIndex = gizmoAxis == GizmoAxis.X ? 0 : (gizmoAxis == GizmoAxis.Y ? 8 : 16);
 
-            vertices[verticesOffset] = new VertexPositionColor(new Vector3(0.0f, -heightOffset, 0.0f), m_color);
-            vertices[verticesOffset + 1] = new VertexPositionColor(new Vector3(0.0f, heightOffset, 0.0f), m_color);
-
-            triangles[indicesOffset] = verticesOffset;
-            triangles[indicesOffset + 1] = verticesOffset + 1;
-        }
-
-        private void CreateBox(VertexPositionColor[] vertices, int[] triangles, float boxSize, float lineLength, int verticesOffset, int indicesOffset)
-        {
-            float heightOffset = (boxSize + lineLength) * 0.5f;
-            var offset = new Vector3(0.0f, heightOffset, 0.0f);
-
-            var verticesOffsets = new Vector3[8]
+            for (int i = axisIndex; i < axisIndex + 8; i++)
             {
-                new Vector3(boxSize * 0.5f, boxSize * 0.5f, boxSize * 0.5f),
-                new Vector3(-boxSize * 0.5f,  boxSize * 0.5f, boxSize * 0.5f),
-                new Vector3(-boxSize * 0.5f,  boxSize * 0.5f, -boxSize * 0.5f),
-                new Vector3(boxSize * 0.5f,  boxSize * 0.5f, -boxSize * 0.5f),
-
-                new Vector3(boxSize * 0.5f, -boxSize * 0.5f, boxSize * 0.5f),
-                new Vector3(-boxSize * 0.5f, -boxSize * 0.5f, boxSize * 0.5f),
-                new Vector3(-boxSize * 0.5f, -boxSize * 0.5f, -boxSize * 0.5f),
-                new Vector3(boxSize * 0.5f, -boxSize * 0.5f, -boxSize * 0.5f),
-            };
-
-            for (int i = 0; i < 8; i++)
-            {
-                vertices[verticesOffset + i] = new VertexPositionColor(offset + verticesOffsets[i], m_color);
+                m_positionColorVertex[i].Position += deltaOffset;
             }
+        }
 
+        public void PutBackBox(GizmoAxis gizmoAxis)
+        {
+            var axisIndex = gizmoAxis == GizmoAxis.X ? 0 : (gizmoAxis == GizmoAxis.Y ? 8 : 16);
+            var axisDirection = gizmoAxis == GizmoAxis.X ? Vector3.UnitX : (gizmoAxis == GizmoAxis.Y ? Vector3.UnitY : Vector3.UnitZ);
+
+            var offset = axisDirection * m_lineLength;
+
+
+            m_positionColorVertex[axisIndex].Position = new Vector3(m_boxSize * 0.5f, m_boxSize * 0.5f, m_boxSize * 0.5f) + offset;
+            m_positionColorVertex[axisIndex + 1].Position = new Vector3(-m_boxSize * 0.5f, m_boxSize * 0.5f, m_boxSize * 0.5f) + offset;
+            m_positionColorVertex[axisIndex + 2].Position = new Vector3(-m_boxSize * 0.5f, m_boxSize * 0.5f, -m_boxSize * 0.5f) + offset;
+            m_positionColorVertex[axisIndex + 3].Position = new Vector3(m_boxSize * 0.5f, m_boxSize * 0.5f, -m_boxSize * 0.5f) + offset;
+            
+            m_positionColorVertex[axisIndex + 4].Position = new Vector3(m_boxSize * 0.5f, -m_boxSize * 0.5f, m_boxSize * 0.5f) + offset;
+            m_positionColorVertex[axisIndex + 5].Position = new Vector3(-m_boxSize * 0.5f, -m_boxSize * 0.5f, m_boxSize * 0.5f) + offset;
+            m_positionColorVertex[axisIndex + 6].Position = new Vector3(-m_boxSize * 0.5f, -m_boxSize * 0.5f, -m_boxSize * 0.5f) + offset;
+            m_positionColorVertex[axisIndex + 7].Position = new Vector3(m_boxSize * 0.5f, -m_boxSize * 0.5f, -m_boxSize * 0.5f) + offset;
+
+        }
+
+        private void FillVerticesBox(List<VertexPositionColor> list, ColorRGBA8 color, float boxSize, float lineLength, Vector3 offset)
+        {
+            list.Add(new VertexPositionColor(new Vector3(boxSize * 0.5f, boxSize * 0.5f, boxSize * 0.5f) + offset, color));
+            list.Add(new VertexPositionColor(new Vector3(-boxSize * 0.5f, boxSize * 0.5f, boxSize * 0.5f) + offset, color));
+            list.Add(new VertexPositionColor(new Vector3(-boxSize * 0.5f, boxSize * 0.5f, -boxSize * 0.5f) + offset, color));
+            list.Add(new VertexPositionColor(new Vector3(boxSize * 0.5f, boxSize * 0.5f, -boxSize * 0.5f) + offset, color));
+
+            list.Add(new VertexPositionColor(new Vector3(boxSize * 0.5f, -boxSize * 0.5f, boxSize * 0.5f) + offset, color));
+            list.Add(new VertexPositionColor(new Vector3(-boxSize * 0.5f, -boxSize * 0.5f, boxSize * 0.5f) + offset, color));
+            list.Add(new VertexPositionColor(new Vector3(-boxSize * 0.5f, -boxSize * 0.5f, -boxSize * 0.5f) + offset, color));
+            list.Add(new VertexPositionColor(new Vector3(boxSize * 0.5f, -boxSize * 0.5f, -boxSize * 0.5f) + offset, color));
+        }
+
+        private List<VertexPositionColor> CreateBox(float boxSize, float lineLength)
+        {
+            var list = new List<VertexPositionColor>();
+
+            var heightOffset = lineLength;
+
+            FillVerticesBox(list, m_colors[0], boxSize, lineLength, Vector3.UnitX * heightOffset);
+            FillVerticesBox(list, m_colors[1], boxSize, lineLength, Vector3.UnitY * heightOffset);
+            FillVerticesBox(list, m_colors[2], boxSize, lineLength, Vector3.UnitZ * heightOffset);
+
+            return list;
+        }
+
+        private short[] CreateBoxIndices()
+        {
+            var array = new short[36*3];
+            FillBoxIndices(array, 0, 0);
+            FillBoxIndices(array, 36, 8);
+            FillBoxIndices(array, 36 * 2, 16);
+
+            return array;
+        }
+
+        private void FillBoxIndices(short[] triangles, int indicesOffset, int boxOffset)
+        {
             //h tope
-            triangles[indicesOffset] = 0;
-            triangles[indicesOffset + 1] = 1;
-            triangles[indicesOffset + 2] = 2;
+            triangles[indicesOffset] = (short)(0 + boxOffset);
+            triangles[indicesOffset + 1] = (short)(1 + boxOffset);
+            triangles[indicesOffset + 2] = (short)(2 + boxOffset);
 
-            triangles[indicesOffset + 3] = 3;
-            triangles[indicesOffset + 4] = 0;
-            triangles[indicesOffset + 5] = 2;
+            triangles[indicesOffset + 3] = (short)(3 + boxOffset);
+            triangles[indicesOffset + 4] = (short)(0 + boxOffset);
+            triangles[indicesOffset + 5] = (short)(2 + boxOffset);
 
             //h fondo
             indicesOffset += 6;
-            triangles[indicesOffset] = 6;
-            triangles[indicesOffset + 1] = 5;
-            triangles[indicesOffset + 2] = 4;
+            triangles[indicesOffset] = (short)(6 + boxOffset);
+            triangles[indicesOffset + 1] = (short)(5 + boxOffset);
+            triangles[indicesOffset + 2] = (short)(4 + boxOffset);
 
-            triangles[indicesOffset + 3] = 6;
-            triangles[indicesOffset + 4] = 4;
-            triangles[indicesOffset + 5] = 7;
+            triangles[indicesOffset + 3] = (short)(6 + boxOffset);
+            triangles[indicesOffset + 4] = (short)(4 + boxOffset);
+            triangles[indicesOffset + 5] = (short)(7 + boxOffset);
 
             //F
             indicesOffset += 6;
-            triangles[indicesOffset] = 7;
-            triangles[indicesOffset + 1] = 3;
-            triangles[indicesOffset + 2] = 2;
+            triangles[indicesOffset] = (short)(7 + boxOffset);
+            triangles[indicesOffset + 1] = (short)(3 + boxOffset);
+            triangles[indicesOffset + 2] = (short)(2 + boxOffset);
 
-            triangles[indicesOffset + 3] = 2;
-            triangles[indicesOffset + 4] = 6;
-            triangles[indicesOffset + 5] = 7;
+            triangles[indicesOffset + 3] = (short)(2 + boxOffset);
+            triangles[indicesOffset + 4] = (short)(6 + boxOffset);
+            triangles[indicesOffset + 5] = (short)(7 + boxOffset);
 
             //lf
             indicesOffset += 6;
-            triangles[indicesOffset] = 5;
-            triangles[indicesOffset + 1] = 6;
-            triangles[indicesOffset + 2] = 2;
+            triangles[indicesOffset] = (short)(5 + boxOffset);
+            triangles[indicesOffset + 1] = (short)(6 + boxOffset);
+            triangles[indicesOffset + 2] = (short)(2 + boxOffset);
 
-            triangles[indicesOffset + 3] = 2;
-            triangles[indicesOffset + 4] = 1;
-            triangles[indicesOffset + 5] = 5;
+            triangles[indicesOffset + 3] = (short)(2 + boxOffset);
+            triangles[indicesOffset + 4] = (short)(1 + boxOffset);
+            triangles[indicesOffset + 5] = (short)(5 + boxOffset);
 
             //rb
             indicesOffset += 6;
-            triangles[indicesOffset] = 7;
-            triangles[indicesOffset + 1] = 4;
-            triangles[indicesOffset + 2] = 0;
+            triangles[indicesOffset] = (short)(7 + boxOffset);
+            triangles[indicesOffset + 1] = (short)(4 + boxOffset);
+            triangles[indicesOffset + 2] = (short)(0 + boxOffset);
 
-            triangles[indicesOffset + 3] = 0;
-            triangles[indicesOffset + 4] = 3;
-            triangles[indicesOffset + 5] = 7;
+            triangles[indicesOffset + 3] = (short)(0 + boxOffset);
+            triangles[indicesOffset + 4] = (short)(3 + boxOffset);
+            triangles[indicesOffset + 5] = (short)(7 + boxOffset);
 
             //B
             indicesOffset += 6;
-            triangles[indicesOffset] = 1;
-            triangles[indicesOffset + 1] = 0;
-            triangles[indicesOffset + 2] = 4;
+            triangles[indicesOffset] = (short)(1 + boxOffset);
+            triangles[indicesOffset + 1] = (short)(0 + boxOffset);
+            triangles[indicesOffset + 2] = (short)(4 + boxOffset);
 
-            triangles[indicesOffset + 3] = 4;
-            triangles[indicesOffset + 4] = 5;
-            triangles[indicesOffset + 5] = 1;
+            triangles[indicesOffset + 3] = (short)(4 + boxOffset);
+            triangles[indicesOffset + 4] = (short)(5 + boxOffset);
+            triangles[indicesOffset + 5] = (short)(1 + boxOffset);
         }
 
         public void Draw(GraphicsDevice device)
         {
-            device.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, 1);
-            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 2, 2, PrimitiveCount);
+            device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, 
+                m_positionColorVertex, 0, m_positionColorVertex.Length, 
+                m_boxIndices, 0, m_primitiveCount, VertexPositionColor.VertexDeclaration);
         }
     }
 }
+

@@ -12,28 +12,28 @@ namespace EsteroFramework.Editor.Game.Gizmos
     public class GizmoService : IGizmoService
     {
         public const float GIZMO_SCREEN_SCALE = 0.1f;
-        public const float LINE_LENGTH = 2.0f;
+        public const float LINE_LENGTH = 3.0f;
         public const float CONE_HEIGHT = 0.5f;
         public const float CONE_RADIUS = 0.25f;
         public const float LINE_OFFSET = 1.0f;
-        public const float GIZMO_LENGTH = LINE_OFFSET + LINE_LENGTH + CONE_HEIGHT;
+        public const float GIZMO_LENGTH = LINE_LENGTH + CONE_HEIGHT;
 
         private const float MULTI_AXIS_THICKNESS = 0.05f;
         private const float SINGLE_AXIS_THICKNESS = 0.35f;
 
-        public IAxisGizmoRenderer AxisGizmoTranslationRenderer
+        public AxisGizmoTranslationRenderer AxisGizmoTranslationRenderer
         {
             get => m_axisGizmoTranslationRenderer;
             set => m_axisGizmoTranslationRenderer = value;
         }
-        private IAxisGizmoRenderer m_axisGizmoTranslationRenderer;
+        private AxisGizmoTranslationRenderer m_axisGizmoTranslationRenderer;
 
-        public IAxisGizmoRenderer AxisGizmoScaleRenderer
+        public AxisGizmoScaleRenderer AxisGizmoScaleRenderer
         {
             get => m_axisGizmoScaleRenderer;
             set => m_axisGizmoScaleRenderer = value;
         }
-        private IAxisGizmoRenderer m_axisGizmoScaleRenderer;
+        private AxisGizmoScaleRenderer m_axisGizmoScaleRenderer;
 
         public Camera Camera
         {
@@ -76,7 +76,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
         {
             get
             {
-                var min = new Vector3(LINE_OFFSET, 0.0f, 0.0f);
+                var min = Vector3.Zero;
                 var max = new Vector3(GIZMO_LENGTH, SINGLE_AXIS_THICKNESS, SINGLE_AXIS_THICKNESS);
 
                 return new BoundingBox((max + min) * 0.5f,
@@ -88,7 +88,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
         {
             get
             {
-                var min = new Vector3(0.0f, LINE_OFFSET, 0.0f);
+                var min = Vector3.Zero;
                 var max = new Vector3(SINGLE_AXIS_THICKNESS, GIZMO_LENGTH, SINGLE_AXIS_THICKNESS);
 
                 return new BoundingBox((max + min) * 0.5f,
@@ -100,7 +100,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
         {
             get
             {
-                var min = new Vector3(0.0f, 0.0f, LINE_OFFSET);
+                var min = Vector3.Zero;
                 var max = new Vector3(SINGLE_AXIS_THICKNESS, SINGLE_AXIS_THICKNESS, GIZMO_LENGTH);
 
                 return new BoundingBox((max + min) * 0.5f,
@@ -338,8 +338,13 @@ namespace EsteroFramework.Editor.Game.Gizmos
                     {
                         var scaleDelta = GetDeltaMovement(mousePosition);
 
+
                         if (scaleDelta != Vector3.Zero)
                         {
+                            if (m_currentGizmoAxis != GizmoAxis.XYZ)
+                            {
+                                m_axisGizmoScaleRenderer.AxisGizmoScale.PutOffsetInVertices(scaleDelta, m_currentGizmoAxis);
+                            }
                             if (OnScaleChanged != null)
                             {
                                 OnScaleChanged(m_selectionState.m_gizmoTransformable, scaleDelta, m_currentGizmoAxis == GizmoAxis.XYZ);
@@ -514,6 +519,11 @@ namespace EsteroFramework.Editor.Game.Gizmos
             m_selectionState.m_prevIntersectionPosition = Vector3.Zero;
             m_selectionState.m_intersectionPosition = Vector3.Zero;
             m_currentDelta = Vector3.Zero;
+
+            if (m_currentGizmoType == GizmoType.Scale && m_currentGizmoAxis != GizmoAxis.XYZ)
+            {
+                m_axisGizmoScaleRenderer.AxisGizmoScale.PutBackBox(m_currentGizmoAxis);
+            }
             Update();
         }
 
