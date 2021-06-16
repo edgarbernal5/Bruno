@@ -37,6 +37,9 @@ namespace EsteroFramework.Editor.Units
 
             var graphicsDeviceService = new WpfGraphicsDeviceService(graphicsDevice);
             Editor.Services.RegisterInstance(typeof(IHwndHostRef), null, graphicsDeviceService);
+
+            m_gameStepTimer = new GameStepTimer();
+            Editor.Services.RegisterInstance(typeof(GameStepTimer), null, m_gameStepTimer);
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
@@ -75,7 +78,6 @@ namespace EsteroFramework.Editor.Units
 
         protected override void OnStartup()
         {
-            m_gameStepTimer = new GameStepTimer();
             m_gameStepTimer.OnTimeChanged += GameStepTimer_OnTick;
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;

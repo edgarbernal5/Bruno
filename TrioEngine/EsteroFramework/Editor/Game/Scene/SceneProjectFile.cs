@@ -11,6 +11,7 @@ using System.Collections.Specialized;
 using EsteroFramework.Editor.Game.Gizmos;
 using TrioApi.Net.Maths;
 using System;
+using EsteroFramework.Editor.Timing;
 
 namespace EsteroFramework.Editor.Game
 {
@@ -47,7 +48,7 @@ namespace EsteroFramework.Editor.Game
             m_outlineService = Editor.Services.GetInstance<IWorldOutlineService>();
 
             var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
-            GizmoService = new GizmoService(graphicsDevice);
+            GizmoService = new GizmoService(graphicsDevice, Editor.Services.GetInstance<GameStepTimer>());
         }
 
         protected override void Dispose(bool disposing)

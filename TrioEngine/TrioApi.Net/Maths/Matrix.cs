@@ -22,9 +22,6 @@ namespace TrioApi.Net.Maths
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Division", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Division(ref Matrix mat, ref Matrix mat2);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Multiply", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Multiply(ref Matrix mat, ref Matrix mat2);
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_MultiplyScalar", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_MultiplyScalar(ref Matrix mat, float scalar);
 
@@ -318,6 +315,9 @@ namespace TrioApi.Net.Maths
 
             return matrix;
         }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Multiply", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Multiply(ref Matrix mat, ref Matrix mat2);
 
         public static Matrix operator *(Matrix matrix1, Matrix matrix2)
         {

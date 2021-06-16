@@ -38,13 +38,13 @@
             </StackPanel>
             <game:GameSurfaceTargetHwndHost x:Name="gameSurfaceTarget" GameGraphicsScreens ="{Binding Path=GameGraphicsScreens}">
                 <i:Interaction.Behaviors>
-                <beh:CameraArcBallHwndHostBehavior Camera="{Binding Camera}" />
-                <beh:CameraZoomHwndHostBehavior Camera="{Binding Camera}" />
-                <beh:CameraHandToolHwndHostBehavior Camera="{Binding Camera}" />
+                    <beh:CameraArcBallHwndHostBehavior Camera="{Binding Camera}" />
+                    <beh:CameraZoomHwndHostBehavior Camera="{Binding Camera}" />
+                    <beh:CameraHandToolHwndHostBehavior Camera="{Binding Camera}" />
                 
-                <beh2:GizmosHandlerHwndHostBehavior Camera="{Binding Camera}" 
-                                                    GizmoService="{Binding GizmoService}"
-                                                    Scene="{Binding Scene}"/>
+                    <beh2:GizmosHandlerHwndHostBehavior Camera="{Binding Camera}" 
+                                                        GizmoService="{Binding GizmoService}"
+                                                        Scene="{Binding Scene}"/>
             </i:Interaction.Behaviors>
             </game:GameSurfaceTargetHwndHost>
         </DockPanel>

@@ -1,4 +1,5 @@
 ﻿
+using EsteroFramework.Editor.Timing;
 using EsteroFramework.Graphics;
 using EsteroFramework.Graphics.Data;
 using EsteroFramework.Graphics.Editor;
@@ -71,6 +72,9 @@ namespace EsteroFramework.Editor.Game.Gizmos
 
         private GraphicsDevice m_graphicsService;
         private Vector3 m_currentDelta;
+
+
+        private GameStepTimer m_gameTimer;
 
         private static BoundingBox XAxisBox
         {
@@ -161,7 +165,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
             public GizmoTransformable m_gizmoTransformable;
             public Vector3 m_gizmoPosition;
 
-            public float m_screenScaleFactor;
+            public float m_screenScaleFactor, m_invScreenScaleFactor;
             public Matrix m_screenScaleMatrix;
 
             public Matrix m_axisAlignedWorld;
@@ -179,9 +183,10 @@ namespace EsteroFramework.Editor.Game.Gizmos
         public event Action<GizmoTransformable, Vector3, bool> OnScaleChanged;
         public event Action<GizmoTransformable, Matrix> OnRotateChanged;
 
-        public GizmoService(GraphicsDevice graphicsService)
+        public GizmoService(GraphicsDevice graphicsService, GameStepTimer gameStepTimer)
         {
             m_graphicsService = graphicsService;
+            m_gameTimer = gameStepTimer;
 
             InitializeGizmos();
         }
@@ -338,12 +343,11 @@ namespace EsteroFramework.Editor.Game.Gizmos
                     {
                         var scaleDelta = GetDeltaMovement(mousePosition);
 
-
                         if (scaleDelta != Vector3.Zero)
                         {
                             if (m_currentGizmoAxis != GizmoAxis.XYZ)
                             {
-                                m_axisGizmoScaleRenderer.AxisGizmoScale.PutOffsetInVertices(scaleDelta, m_currentGizmoAxis);
+                                m_axisGizmoScaleRenderer.AxisGizmoScale.PutOffsetInVertices(scaleDelta * m_selectionState.m_invScreenScaleFactor, m_currentGizmoAxis);
                             }
                             if (OnScaleChanged != null)
                             {
@@ -360,27 +364,35 @@ namespace EsteroFramework.Editor.Game.Gizmos
 
         private Matrix GetRotationDelta(Vector2 mousePosition)
         {
-            float delta = mousePosition.X - m_selectionState.m_prevMousePosition.X;
-            delta *= 0.15f;
+            if (m_selectionState.m_prevMousePosition == Vector2.Zero)
+            {
+                return Matrix.Identity;
+            }
 
-            Matrix rot = Matrix.Identity;
-            rot.Forward = m_selectionState.m_sceneWorld.Forward;
-            rot.Up = m_selectionState.m_sceneWorld.Up;
-            rot.Right = m_selectionState.m_sceneWorld.Right;
+            float delta = mousePosition.X - m_selectionState.m_prevMousePosition.X;
+            delta *= (float)m_gameTimer.ElapsedTime.TotalSeconds;
+            //delta = MathHelper.ToRadians(delta);
+            delta *= m_selectionState.m_invScreenScaleFactor;
+
+            Matrix rotationDelta = Matrix.Identity;
+            rotationDelta.Forward = m_selectionState.m_sceneWorld.Forward;
+            rotationDelta.Up = m_selectionState.m_sceneWorld.Up;
+            rotationDelta.Right = m_selectionState.m_sceneWorld.Right;
 
             switch (m_currentGizmoAxis)
             {
                 case GizmoAxis.X:
-                    rot *= Matrix.CreateFromAxisAngle(m_selectionState.m_rotationMatrix.Right, delta);
+                    rotationDelta *= Matrix.CreateFromAxisAngle(m_selectionState.m_rotationMatrix.Right, delta);
                     break;
                 case GizmoAxis.Y:
-                    rot *= Matrix.CreateFromAxisAngle(m_selectionState.m_rotationMatrix.Up, delta);
+                    rotationDelta *= Matrix.CreateFromAxisAngle(m_selectionState.m_rotationMatrix.Up, delta);
                     break;
                 case GizmoAxis.Z:
-                    rot *= Matrix.CreateFromAxisAngle(m_selectionState.m_rotationMatrix.Forward, delta);
+                    rotationDelta *= Matrix.CreateFromAxisAngle(m_selectionState.m_rotationMatrix.Forward, delta);
                     break;
             }
-            return rot;
+
+            return rotationDelta;
         }
 
         private Vector3 GetDeltaMovement(Vector2 mousePosition)
@@ -392,6 +404,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
             ray.Position = Vector3.Transform(ray.Position, transformRotation);
             ray.Direction = Vector3.TransformNormal(ray.Direction, transformRotation);
 
+            var gizmoPositionTransformed = Vector3.Transform(m_selectionState.m_gizmoPosition, transformRotation);
             m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
 
             switch (m_currentGizmoAxis)
@@ -399,8 +412,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
                 case GizmoAxis.X:
                 case GizmoAxis.XY:
                     {
-                        Plane plane = new Plane(Vector3.Forward,
-                            Vector3.Transform(m_selectionState.m_gizmoPosition, transformRotation).Z);
+                        Plane plane = new Plane(Vector3.Forward, gizmoPositionTransformed.Z);
 
                         float? intersection = ray.Intersects(plane);
                         if (intersection.HasValue)
@@ -418,10 +430,8 @@ namespace EsteroFramework.Editor.Game.Gizmos
                     break;
                 case GizmoAxis.Y:
                 case GizmoAxis.YZ:
-                case GizmoAxis.Z:
                     {
-                        Plane plane = new Plane(Vector3.Left,
-                            Vector3.Transform(m_selectionState.m_gizmoPosition, transformRotation).X);
+                        Plane plane = new Plane(Vector3.Left, gizmoPositionTransformed.X);
 
                         float? intersection = ray.Intersects(plane);
                         if (intersection.HasValue)
@@ -439,21 +449,30 @@ namespace EsteroFramework.Editor.Game.Gizmos
                                 case GizmoAxis.Z:
                                     delta = new Vector3(0, 0, m_currentDelta.Z);
                                     break;
-                                default:
-                                    delta = new Vector3(0, m_currentDelta.Y, m_currentDelta.Z);
-                                    break;
                             }
                         }
-                        else
+                    }
+
+                    break;
+                case GizmoAxis.Z:
+                    {
+                        Plane plane = new Plane(Vector3.Down, gizmoPositionTransformed.Y);
+
+                        float? intersection = ray.Intersects(plane);
+                        if (intersection.HasValue)
                         {
-                            Console.WriteLine("no hubo inter");
+                            m_selectionState.m_intersectionPosition = ray.Position + (ray.Direction * intersection.Value);
+                            if (m_selectionState.m_prevIntersectionPosition != Vector3.Zero)
+                            {
+                                m_currentDelta = m_selectionState.m_intersectionPosition - m_selectionState.m_prevIntersectionPosition;
+                            }
+                            delta = new Vector3(0, 0, m_currentDelta.Z);
                         }
                     }
                     break;
                 case GizmoAxis.ZX:
                     {
-                        Plane plane = new Plane(Vector3.Down,
-                            Vector3.Transform(m_selectionState.m_gizmoPosition, transformRotation).Y);
+                        Plane plane = new Plane(Vector3.Down, gizmoPositionTransformed.Y);
 
                         float? intersection = ray.Intersects(plane);
                         if (intersection.HasValue)
@@ -469,8 +488,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
                     break;
                 case GizmoAxis.XYZ:
                     {
-                        Plane plane = new Plane(Vector3.Up,
-                            Vector3.Transform(m_selectionState.m_gizmoPosition, transformRotation).Y);
+                        Plane plane = new Plane(Vector3.Up, gizmoPositionTransformed.Y);
 
                         float? intersection = ray.Intersects(plane);
                         if (intersection.HasValue)
@@ -519,6 +537,7 @@ namespace EsteroFramework.Editor.Game.Gizmos
             m_selectionState.m_prevIntersectionPosition = Vector3.Zero;
             m_selectionState.m_intersectionPosition = Vector3.Zero;
             m_currentDelta = Vector3.Zero;
+            m_selectionState.m_prevMousePosition = Vector2.Zero;
 
             if (m_currentGizmoType == GizmoType.Scale && m_currentGizmoAxis != GizmoAxis.XYZ)
             {
@@ -559,6 +578,14 @@ namespace EsteroFramework.Editor.Game.Gizmos
             Vector3 vLength = m_camera.Position - m_selectionState.m_gizmoPosition;
 
             m_selectionState.m_screenScaleFactor = vLength.Length() * GIZMO_SCREEN_SCALE;
+            if (m_selectionState.m_screenScaleFactor < 0.0001f)
+            {
+                m_selectionState.m_invScreenScaleFactor = 1.0f;
+            }
+            else
+            {
+                m_selectionState.m_invScreenScaleFactor = 1.0f / m_selectionState.m_screenScaleFactor;
+            }
             m_selectionState.m_screenScaleMatrix = Matrix.CreateScale(new Vector3(m_selectionState.m_screenScaleFactor));
 
             //Matrix sceneWorld = m_selectionState.m_sceneWorld;

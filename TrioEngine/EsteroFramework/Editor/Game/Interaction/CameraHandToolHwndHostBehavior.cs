@@ -92,7 +92,7 @@ namespace EsteroFramework.Editor.Game.Interaction
             var right = Vector3.Cross(cameraTarget - cameraPosition, m_currentCamera.Up);
             right.Normalize();
 
-            var deltaMovement = right * mouseVelocity.X * 0.01f - m_currentCamera.Up * mouseVelocity.Y * 0.01f;
+            var deltaMovement = right * mouseVelocity.X * 0.1f - m_currentCamera.Up * mouseVelocity.Y * 0.1f;
             cameraPosition += deltaMovement;
             cameraTarget += deltaMovement;
 

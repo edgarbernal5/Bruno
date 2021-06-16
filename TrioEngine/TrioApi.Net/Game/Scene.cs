@@ -170,9 +170,17 @@ namespace TrioApi.Net.Game
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformRotate", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_TransformRotate(IntPtr scene, long entity, ref Quaternion rotate);
 
-        public void TransformRotate(long entity, Quaternion rotate)
+        public void TransformRotate(long entity, Quaternion deltaRotation)
         {
-            Internal_TransformRotate(m_nativePointer, entity, ref rotate);
+            Internal_TransformRotate(m_nativePointer, entity, ref deltaRotation);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformSetLocalRotation", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformSetLocalRotation(IntPtr scene, long entity, ref Quaternion rotate);
+
+        public void TransformSetLocalRotation(long entity, Quaternion rotate)
+        {
+            Internal_TransformSetLocalRotation(m_nativePointer, entity, ref rotate);
         }
     }
 }

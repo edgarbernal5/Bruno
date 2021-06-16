@@ -65,7 +65,6 @@ namespace EsteroFramework.Graphics.Editor
 
             var offset = axisDirection * m_lineLength;
 
-
             m_positionColorVertex[axisIndex].Position = new Vector3(m_boxSize * 0.5f, m_boxSize * 0.5f, m_boxSize * 0.5f) + offset;
             m_positionColorVertex[axisIndex + 1].Position = new Vector3(-m_boxSize * 0.5f, m_boxSize * 0.5f, m_boxSize * 0.5f) + offset;
             m_positionColorVertex[axisIndex + 2].Position = new Vector3(-m_boxSize * 0.5f, m_boxSize * 0.5f, -m_boxSize * 0.5f) + offset;

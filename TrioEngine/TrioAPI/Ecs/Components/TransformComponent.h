@@ -100,7 +100,15 @@ namespace TrioEngine
 		}
 
 		void Rotate(const Quaternion& delta) {
-			m_localRotation *= delta;
+			Quaternion localRot = m_localRotation * delta;
+			localRot.Normalize();
+
+			m_localRotation = localRot;
+			SetDirty(true);
+		}
+
+		void SetLocalRotation(const Quaternion& rotation) {
+			m_localRotation = rotation;
 			SetDirty(true);
 		}
 

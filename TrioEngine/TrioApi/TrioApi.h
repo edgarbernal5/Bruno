@@ -322,7 +322,8 @@ extern "C" TRIO_API_EXPORT void __stdcall Scene_SetLocalPositionForEntity(Scene 
 extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformTranslate(Scene * scene, long entity, Vector3 * localPosition);
 extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformScale(Scene* scene, long entity, Vector3* deltaScale);
 extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformScaleUniform(Scene* scene, long entity, float scalarFactor);
-extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformRotate(Scene* scene, long entity, Quaternion* rotation);
+extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformRotate(Scene* scene, long entity, Quaternion* deltaRotation);
+extern "C" TRIO_API_EXPORT void __stdcall Scene_TransformSetLocalRotation(Scene* scene, long entity, Quaternion* rotation);
 
 /*
 Transform

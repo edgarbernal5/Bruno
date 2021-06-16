@@ -1042,10 +1042,16 @@ void Scene_TransformScaleUniform(Scene* scene, long entity, float scalarFactor)
 	transform.ScaleUniform(scalarFactor);
 }
 
-void Scene_TransformRotate(Scene* scene, long entity, Quaternion* rotation)
+void Scene_TransformRotate(Scene* scene, long entity, Quaternion* deltaRotation)
 {
 	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
-	transform.Rotate(*rotation);
+	transform.Rotate(*deltaRotation);
+}
+
+void Scene_TransformSetLocalRotation(Scene* scene, long entity, Quaternion* rotation)
+{
+	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
+	transform.SetLocalRotation(*rotation);
 }
 
 void Scene_LoadFromModel(Scene* scene, Model* model)
@@ -1398,7 +1404,6 @@ void Viewport_Unproject(Viewport* viewport, Vector3* source, Matrix* projection,
 {
 	*source = viewport->Unproject(*source, *projection, *view, *world);
 }
-
 
 /*
 Quaternion
