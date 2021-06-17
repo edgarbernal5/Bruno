@@ -8,7 +8,7 @@
 #include "Scene.h"
 
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GameHost;
 	class GraphicsDevice;

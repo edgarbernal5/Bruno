@@ -17,7 +17,7 @@
 
 #include "Content/Pipeline/Processors/ContentProcessorContext.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	SceneModelProcessor::SceneModelProcessor()
 	{

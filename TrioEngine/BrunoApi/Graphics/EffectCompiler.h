@@ -7,7 +7,7 @@
 #include "..\FX\HLSLGenerator.h"
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT EffectCompiler
 	{

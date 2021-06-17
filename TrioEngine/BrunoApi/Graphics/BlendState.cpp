@@ -3,7 +3,7 @@
 
 #include "GraphicsDevice.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	BlendState* BlendState::Additive = nullptr;
 	BlendState* BlendState::AlphaBlend = nullptr;

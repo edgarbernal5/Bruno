@@ -2,7 +2,7 @@
 
 #include "TrioApiRequisites.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	// Defines if the previous content in a render target is preserved when it set on the graphics device.
 	enum class RenderTargetUsage

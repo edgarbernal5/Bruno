@@ -12,7 +12,7 @@
 #include "CpuAccessFlags.h"
 #include "ResourceOptionFlags.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class VertexDeclaration;
 

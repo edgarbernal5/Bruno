@@ -4,7 +4,7 @@
 
 #include "IO/Path.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct BRUNO_API_EXPORT BuildCoordinatorSettings
 	{

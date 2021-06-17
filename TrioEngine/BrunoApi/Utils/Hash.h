@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	int ComputeHash(const char * data, int size);
 	int ComputeHash(uint8_t * data, int size);

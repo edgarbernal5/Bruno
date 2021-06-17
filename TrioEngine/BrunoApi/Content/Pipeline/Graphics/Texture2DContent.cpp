@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Texture2DContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	Texture2DContent::Texture2DContent() 
 		: TextureContent(MipmapChainCollection(1))

@@ -6,7 +6,7 @@
 #include <Windows.h>
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class ContentPipelineException : public std::exception
 	{

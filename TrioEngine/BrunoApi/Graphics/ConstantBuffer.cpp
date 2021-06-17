@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ConstantBuffer.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 #if OPENGL
 	GLuint ConstantBuffer::m_indexTest = 0;

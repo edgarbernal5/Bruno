@@ -5,7 +5,7 @@
 #include "..\FX\HLSLParser.h"
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 	class Effect;

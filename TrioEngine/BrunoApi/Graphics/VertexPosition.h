@@ -5,7 +5,7 @@
 #include "../Math/MathVector.h"
 #include "VertexElement.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	// Vertex struct holding position information.
 	struct VertexPosition

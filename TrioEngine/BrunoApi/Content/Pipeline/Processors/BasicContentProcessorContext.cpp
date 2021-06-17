@@ -7,7 +7,7 @@
 #include "Content/Pipeline/Processors/ProcessorManager.h"
 #include "Content/Pipeline/Processors/IContentProcessor.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	BasicContentProcessorContext::BasicContentProcessorContext(BuildCoordinator *buildCoordinator, BuildItem *buildItem, std::string buildConfiguration) :
 		m_buildCoordinator(buildCoordinator),

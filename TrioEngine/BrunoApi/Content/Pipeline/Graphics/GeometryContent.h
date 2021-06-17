@@ -4,7 +4,7 @@
 
 #include "Content/Pipeline/ContentItem.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class MaterialContent;
 	class MeshContent;

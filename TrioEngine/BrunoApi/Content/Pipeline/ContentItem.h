@@ -4,7 +4,7 @@
 #include "Content/Pipeline/OpaqueData.h"
 #include "ContentIdentity.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT ContentItem
 	{

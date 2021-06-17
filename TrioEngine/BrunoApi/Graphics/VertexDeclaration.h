@@ -9,7 +9,7 @@
 #include <vector>
 #include <map>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	//class VertexElement;
 	class GraphicsDevice;

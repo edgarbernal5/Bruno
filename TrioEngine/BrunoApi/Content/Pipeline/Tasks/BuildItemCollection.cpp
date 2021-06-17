@@ -4,7 +4,7 @@
 #include "BuildItem.h"
 #include "IO/File.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	BuildItemCollection::BuildItemCollection()
 	{

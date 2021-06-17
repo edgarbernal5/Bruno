@@ -3,7 +3,7 @@
 #include "TrioApiRequisites.h"
 #include "RenderPath.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class EffectPass;
 	class EffectParameter;

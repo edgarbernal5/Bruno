@@ -9,7 +9,7 @@
 #include "VertexDeclarationContent.h"
 #include "VectorConverter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexContent::VertexContent(GeometryContent* geometry)
 	{

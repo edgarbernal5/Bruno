@@ -7,7 +7,7 @@
 #include <vector>
 #include "Transform.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GameObject : public Object
 	{

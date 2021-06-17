@@ -6,7 +6,7 @@
 #include "GraphicsDevice.h"
 #include "Screen.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	int GraphicsDeviceInformationComparer::SurfaceFormatBitDepth(SurfaceFormat format)
 	{

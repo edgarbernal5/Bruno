@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ContentItem.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ContentItem::ContentItem()
 	{

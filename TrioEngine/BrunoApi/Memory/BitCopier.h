@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BitCopier
 	{

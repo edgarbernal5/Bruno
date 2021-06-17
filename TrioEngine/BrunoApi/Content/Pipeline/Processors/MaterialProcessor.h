@@ -7,7 +7,7 @@
 #include "Content/Pipeline/ExternalReference.h"
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class MaterialContent;
 

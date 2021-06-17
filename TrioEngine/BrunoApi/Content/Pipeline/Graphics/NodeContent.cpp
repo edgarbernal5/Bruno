@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "NodeContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	NodeContent::NodeContent() : m_parent(nullptr)//, m_transform(Matrix::Identity)
 	{

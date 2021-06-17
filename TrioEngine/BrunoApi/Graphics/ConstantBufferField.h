@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct BRUNO_API_EXPORT ConstantBufferField
 	{

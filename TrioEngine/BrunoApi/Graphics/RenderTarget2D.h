@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 	class DepthStencilBuffer;

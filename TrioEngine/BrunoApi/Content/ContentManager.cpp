@@ -8,7 +8,7 @@
 
 #include "IO/Path.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ContentManager::ContentManager(IServiceProvider* serviceProvider) 
 		: m_serviceProvider(serviceProvider), m_device(nullptr)
@@ -78,7 +78,7 @@ namespace TrioEngine
 		if (rootDirectory.size() == 0) rootDirectory = ".";
 
 		std::string fullDirectory = TrioIO::Path::GetFullDirectory(rootDirectory + TrioIO::Path::DirectorySeparator);
-		std::string path = TrioIO::Path::Combine(fullDirectory, assetName + ".estero");
+		std::string path = TrioIO::Path::Combine(fullDirectory, assetName + ".bruno");
 		
 		TrioIO::FileStream* fileStream = new TrioIO::FileStream(path, TrioIO::FileAccess::Read);
 

@@ -13,7 +13,7 @@
 
 #endif
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Game;
 

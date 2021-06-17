@@ -11,7 +11,7 @@
 
 #include "Content/Pipeline/Serialization/ContentWriter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ModelWriter::ModelWriter()
 	{

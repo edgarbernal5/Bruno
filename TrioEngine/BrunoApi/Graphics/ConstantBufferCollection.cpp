@@ -3,7 +3,7 @@
 
 #include "GraphicsDevice.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ConstantBufferCollection::ConstantBufferCollection() : 
 		m_count(0),

@@ -4,7 +4,7 @@
 
 #include "Math/MathVector.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT Camera
 	{

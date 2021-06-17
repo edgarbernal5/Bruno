@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "VectorConverter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	std::map<std::string, VertexElementFormat> VectorConverter::m_typeToVertexElementFormat;
 	std::map<std::string, SurfaceFormat> VectorConverter::m_typeToSurfaceFormat;

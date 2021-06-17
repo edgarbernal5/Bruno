@@ -2,7 +2,7 @@
 #include "VertexChannelNames.h"
 #include <sstream>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexElementUsage VertexChannelNames::TryDecodeUsage(const char* name)
 	{

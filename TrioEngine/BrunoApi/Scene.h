@@ -11,7 +11,7 @@
 #include <string>
 #include <map>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Model;
 

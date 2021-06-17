@@ -2,7 +2,7 @@
 
 #include "TrioApiRequisites.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT IServiceBase
 	{

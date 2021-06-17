@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SwapChain.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	SwapChain::SwapChain(GraphicsDevice* graphicsDevice, int width, int height, HWND window, SurfaceFormat backBufferformat, uint32_t bufferCount)
 		: m_graphicsDevice(graphicsDevice)

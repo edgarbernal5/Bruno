@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PresentationParameters.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	PresentationParameters::PresentationParameters()
 	{

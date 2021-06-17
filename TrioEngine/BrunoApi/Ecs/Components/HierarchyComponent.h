@@ -2,7 +2,7 @@
 
 #include "Ecs/Entity.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct HierarchyComponent
 	{

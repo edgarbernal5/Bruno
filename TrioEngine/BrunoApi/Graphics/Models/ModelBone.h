@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT ModelBone
 	{

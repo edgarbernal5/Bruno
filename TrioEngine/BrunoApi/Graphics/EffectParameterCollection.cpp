@@ -3,7 +3,7 @@
 
 #include "EffectParameter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	EffectParameterCollection::EffectParameterCollection(std::vector<EffectParameter*> parameters) :
 		m_array(parameters)

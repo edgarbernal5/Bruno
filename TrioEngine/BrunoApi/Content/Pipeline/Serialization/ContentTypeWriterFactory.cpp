@@ -11,7 +11,7 @@
 #include "MaterialWriter.h"
 #include "ExternalReferenceWriter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ContentTypeWriterFactory::ContentTypeWriterFactory()
 	{

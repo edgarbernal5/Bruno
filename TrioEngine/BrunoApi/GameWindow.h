@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GameWindow
 	{

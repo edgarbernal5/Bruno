@@ -2,7 +2,7 @@
 #include "BuildItem.h"
 
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	BuildItem::BuildItem() :
 		m_isBuilt(false), m_isWanted(false), m_buildRequest(nullptr)

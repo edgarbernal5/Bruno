@@ -4,7 +4,7 @@
 #include "VertexDeclaration.h"
 #include "GraphicsDevice.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 #ifdef BRUNO_DIRECTX
 	InputLayoutCache::InputLayoutCache(GraphicsDevice* device, std::vector<uint8_t>& byteCode) :

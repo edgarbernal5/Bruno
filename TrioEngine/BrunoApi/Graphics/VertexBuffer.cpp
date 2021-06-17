@@ -4,7 +4,7 @@
 #include "GraphicsDevice.h"
 #include "VertexDeclaration.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexBuffer::VertexBuffer() :
 		m_vertexDeclaration(nullptr),

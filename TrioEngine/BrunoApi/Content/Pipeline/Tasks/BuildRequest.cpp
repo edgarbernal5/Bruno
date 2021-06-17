@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "BuildRequest.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	BuildRequest::BuildRequest() : m_opaqueData(nullptr)
 	{

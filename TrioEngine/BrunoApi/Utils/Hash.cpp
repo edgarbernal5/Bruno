@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Hash.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	int ComputeHash(const char * data, int size)
 	{

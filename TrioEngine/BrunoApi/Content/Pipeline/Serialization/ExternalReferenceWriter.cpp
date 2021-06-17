@@ -4,7 +4,7 @@
 #include "ContentWriter.h"
 //#include "Content/Pipeline/Graphics/CompiledEffectContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ExternalReferenceWriter::ExternalReferenceWriter()
 	{

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Screen.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	std::vector<Screen> Screen::g_screens;
 	bool Screen::g_multiMonitorSupport;

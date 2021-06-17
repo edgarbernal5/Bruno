@@ -8,7 +8,7 @@
 #include <mutex>
 #include <future>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	template <typename... Args>
 	class EventHandler

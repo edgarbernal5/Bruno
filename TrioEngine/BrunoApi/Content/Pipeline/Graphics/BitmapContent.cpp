@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "BitmapContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	BitmapContent::BitmapContent() 
 		: ContentItem(), m_width(0), m_height(0)

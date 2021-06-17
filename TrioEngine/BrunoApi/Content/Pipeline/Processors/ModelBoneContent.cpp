@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ModelBoneContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ModelBoneContent::ModelBoneContent()
 	{

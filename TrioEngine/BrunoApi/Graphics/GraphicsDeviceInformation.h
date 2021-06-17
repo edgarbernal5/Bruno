@@ -4,7 +4,7 @@
 
 #include "PresentationParameters.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsAdapter;
 	class GraphicsDeviceManager;

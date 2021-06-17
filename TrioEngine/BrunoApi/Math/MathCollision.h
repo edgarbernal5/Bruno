@@ -7,7 +7,7 @@
 #endif
 #include <Math/MathVector.h>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 
 #ifdef BRUNO_DIRECTX

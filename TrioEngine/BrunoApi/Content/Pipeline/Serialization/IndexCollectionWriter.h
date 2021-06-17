@@ -5,7 +5,7 @@
 #include "ContentTypeWriter.h"
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class IndexCollectionWriter : public ContentTypeWriter
 	{

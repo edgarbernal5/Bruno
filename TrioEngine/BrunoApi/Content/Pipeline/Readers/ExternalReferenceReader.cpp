@@ -4,7 +4,7 @@
 #include "Content/ContentReader.h"
 #include "Content/Pipeline/ContentItem.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ExternalReferenceReader::ExternalReferenceReader()
 	{

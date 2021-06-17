@@ -6,7 +6,7 @@
 
 #include "Graphics/Effect.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	EffectReader::EffectReader()
 	{

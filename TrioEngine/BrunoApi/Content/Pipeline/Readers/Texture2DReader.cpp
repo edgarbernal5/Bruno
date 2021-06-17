@@ -6,7 +6,7 @@
 
 #include "Graphics/Texture2D.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	Texture2DReader::Texture2DReader()
 	{

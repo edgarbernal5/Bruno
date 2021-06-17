@@ -2,7 +2,7 @@
 
 #include "MathVector.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	//------------------------------------------------------------------------------
 	// 2D rectangle
@@ -203,9 +203,9 @@ namespace TrioEngine
 // Support for SimpleMath and Standard C++ Library containers
 namespace std
 {
-	template<> struct less<TrioEngine::Rectangle>
+	template<> struct less<BrunoEngine::Rectangle>
 	{
-		bool operator()(const TrioEngine::Rectangle& r1, const TrioEngine::Rectangle& r2) const
+		bool operator()(const BrunoEngine::Rectangle& r1, const BrunoEngine::Rectangle& r2) const
 		{
 			return ((r1.x < r2.x)
 				|| ((r1.x == r2.x) && (r1.y < r2.y))

@@ -11,7 +11,7 @@
 
 #include <filesystem>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ContentWriter::ContentWriter(ContentCompiler *compiler, TrioIO::Stream *_stream, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath) :
 		TrioIO::BinaryWriter(_stream),
@@ -71,11 +71,10 @@ namespace TrioEngine
 	{
 		m_stream = m_finalOutput;
 
-		WriteChar('E');
-		WriteChar('S');
-		WriteChar('T');
-		WriteChar('E');
+		WriteChar('B');
 		WriteChar('R');
+		WriteChar('U');
+		WriteChar('N');
 		WriteChar('O');
 		WriteByte((uint8_t)0); //plataforma: Windows = 0
 
@@ -189,7 +188,7 @@ namespace TrioEngine
 
 			if (TrioIO::Path::GetFileExtension(filename) != FileExtension)
 			{
-				throw ContentPipelineException("external reference is not a .estero file");
+				throw ContentPipelineException("external reference is not a .bruno file");
 			}
 
 			filename = filename.substr(0, filename.size() - strlen(FileExtension) - 1);

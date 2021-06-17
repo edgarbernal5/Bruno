@@ -7,7 +7,7 @@
 #include <vector>
 #include <filesystem>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BuildRequest;
 

@@ -6,9 +6,9 @@
 #include "Renderer/Camera.h"
 #include "Math/MathCollision.h"
 
-using namespace TrioEngine;
+using namespace BrunoEngine;
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 
 	class Game;

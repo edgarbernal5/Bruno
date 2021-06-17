@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ContentPipelineException.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ContentPipelineException::ContentPipelineException(const char* const& message)
 		: exception(message)

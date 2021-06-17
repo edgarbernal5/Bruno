@@ -6,7 +6,7 @@
 #include "DepthWriteMask.h"
 #include "StencilOperation.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 

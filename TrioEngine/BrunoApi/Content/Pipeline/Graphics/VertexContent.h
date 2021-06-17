@@ -4,7 +4,7 @@
 
 #include "Content/Pipeline/ContentItem.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GeometryContent;
 	class VertexChannel;

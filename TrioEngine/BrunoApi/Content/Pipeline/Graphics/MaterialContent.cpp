@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MaterialContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	MaterialContent::MaterialContent()
 	{

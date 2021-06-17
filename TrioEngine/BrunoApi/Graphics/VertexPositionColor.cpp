@@ -3,7 +3,7 @@
 
 #include "VertexDeclarationHelper.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexDeclaration* VertexPositionColor::g_vertexDeclaration = nullptr;
 

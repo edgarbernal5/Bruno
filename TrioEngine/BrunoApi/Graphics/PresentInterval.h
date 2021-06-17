@@ -2,7 +2,7 @@
 
 #include "TrioApiRequisites.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	// Defines how "GraphicsDevice.Present updates the game window.
 	enum class PresentInterval

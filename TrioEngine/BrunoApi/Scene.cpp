@@ -10,7 +10,7 @@
 
 #include <unordered_set>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	Scene* Scene::g_activeScene = nullptr;
 	Camera* Scene::g_mainCamera = nullptr;

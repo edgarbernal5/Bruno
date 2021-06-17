@@ -104,7 +104,7 @@ namespace DX
 		}
 	}
 
-	inline void ThrowIfFailed(TrioEngine::DeviceErrorStatus status)
+	inline void ThrowIfFailed(BrunoEngine::DeviceErrorStatus status)
 	{
 		if (FAILED(status))
 		{

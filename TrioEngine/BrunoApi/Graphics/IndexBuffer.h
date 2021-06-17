@@ -10,7 +10,7 @@
 #include "ResourceOptionFlags.h"
 #include "SetDataOptions.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 

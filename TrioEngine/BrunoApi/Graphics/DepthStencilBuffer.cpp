@@ -4,7 +4,7 @@
 #include "GraphicsDevice.h"
 #include "FormatHelper.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	DepthStencilBuffer::DepthStencilBuffer() :
 #ifdef BRUNO_DIRECTX

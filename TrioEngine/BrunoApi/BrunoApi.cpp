@@ -43,7 +43,7 @@
 #include "Renderer/RenderPaths/RenderPathForward.h"
 #include <strsafe.h>
 
-namespace TrioDLL {
+namespace BrunoDll {
 	char* AllocateMemoryForString(const char* source) {
 		/*
 			https://limbioliong.wordpress.com/2011/06/16/returning-strings-from-a-c-api/
@@ -188,7 +188,7 @@ void BuildCoordinator_Dtor(BuildCoordinator * buildCoordinator)
 }
 char* __stdcall BuildCoordinator_GetRelativePath(BuildCoordinator* coordinator, char* const path)
 {
-	return TrioDLL::AllocateMemoryForString(coordinator->GetRelativePath(path).c_str());
+	return BrunoDll::AllocateMemoryForString(coordinator->GetRelativePath(path).c_str());
 }
 
 void BuildCoordinator_GetSettings(BuildCoordinator * coordinator, char* const intermediateDir, char* const outputDir, char* const rootDir)
@@ -203,9 +203,9 @@ void BuildCoordinator_GetSettings2(BuildCoordinator* coordinator, BuildCoordinat
 {
 	auto& settings = coordinator->GetBuildSettings();
 
-	managedSettings->IntermediateDirectory = TrioDLL::AllocateMemoryForString(settings.GetIntermediateDirectory().c_str());
-	managedSettings->OutputDirectory = TrioDLL::AllocateMemoryForString(settings.GetOutputDirectory().c_str());
-	managedSettings->RootDirectory = TrioDLL::AllocateMemoryForString(settings.GetRootDirectory().c_str());
+	managedSettings->IntermediateDirectory = BrunoDll::AllocateMemoryForString(settings.GetIntermediateDirectory().c_str());
+	managedSettings->OutputDirectory = BrunoDll::AllocateMemoryForString(settings.GetOutputDirectory().c_str());
+	managedSettings->RootDirectory = BrunoDll::AllocateMemoryForString(settings.GetRootDirectory().c_str());
 }
 
 void BuildCoordinator_RequestBuildWithoutOpaqueData(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName)
@@ -234,7 +234,7 @@ void BuildCoordinator_GetOutputFiles(BuildCoordinator * coordinator, char*** out
 		char** newArray = (char**)CoTaskMemAlloc(sizeof(char*) * n);
 		for (size_t i = 0; i < n; i++)
 		{
-			newArray[i] = TrioDLL::AllocateMemoryForString(list[i].c_str());
+			newArray[i] = BrunoDll::AllocateMemoryForString(list[i].c_str());
 		}
 		*outputFilenames = newArray;
 	}
@@ -317,7 +317,7 @@ EffectParameter
 */
 char* EffectParameter_GetName(EffectParameter* parameter)
 {
-	return TrioDLL::AllocateMemoryForString(parameter->GetName());
+	return BrunoDll::AllocateMemoryForString(parameter->GetName());
 }
 
 void EffectParameter_SetValueScalar(EffectParameter* parameter, float scalar)
@@ -356,7 +356,7 @@ EffectPass
 */
 char* EffectPass_GetName(EffectPass* pass)
 {
-	return TrioDLL::AllocateMemoryForString(pass->GetName());
+	return BrunoDll::AllocateMemoryForString(pass->GetName());
 }
 
 void EffectPass_Apply(EffectPass * pass)
@@ -386,7 +386,7 @@ void EffectTechnique_GetPasses(EffectTechnique* technique, EffectPass*** passes,
 
 char* EffectTechnique_GetName(EffectTechnique* technique)
 {
-	return TrioDLL::AllocateMemoryForString(technique->GetName());
+	return BrunoDll::AllocateMemoryForString(technique->GetName());
 }
 
 /*
@@ -803,7 +803,7 @@ void ModelMesh_Dtor(ModelMesh* modelMesh)
 
 char* ModelMesh_GetName(ModelMesh* modelMesh)
 {
-	return TrioDLL::AllocateMemoryForString(modelMesh->GetName());
+	return BrunoDll::AllocateMemoryForString(modelMesh->GetName());
 }
 
 void ModelMesh_GetModelMeshParts(ModelMesh * modelMesh, ModelMeshPart * **modelMeshParts, int* size)
@@ -1080,7 +1080,7 @@ void Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** ou
 
 			newArray[i].id = entity;
 			newArray[i].parentId = hierarchyComp ? hierarchyComp->m_parentId : 0;
-			newArray[i].name = TrioDLL::AllocateMemoryForString(nameComp.m_name.c_str());;
+			newArray[i].name = BrunoDll::AllocateMemoryForString(nameComp.m_name.c_str());;
 		}
 		*outHierarchies = newArray;
 	}

@@ -4,7 +4,7 @@
 #include "Content/Pipeline/Graphics/MaterialContent.h"
 #include "Content/Pipeline/Serialization/ContentWriter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	MaterialWriter::MaterialWriter()
 	{

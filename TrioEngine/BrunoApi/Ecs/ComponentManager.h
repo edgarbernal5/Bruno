@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <bitset>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	/*
 		1) https://www.david-colson.com/2020/02/09/making-a-simple-ecs.html

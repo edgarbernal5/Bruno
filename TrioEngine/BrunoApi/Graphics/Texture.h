@@ -5,7 +5,7 @@
 #include "SurfaceType.h"
 #include "SurfaceFormat.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 

@@ -6,7 +6,7 @@
 #include "Graphics/IGraphicsDeviceService.h"
 #include "IServiceProvider.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	GraphicsDevice* GraphicsContentHelper::GraphicsDeviceFromContentReader(ContentReader* contentReader)
 	{

@@ -9,7 +9,7 @@
 
 #include "EffectLoader.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	Effect::Effect(GraphicsDevice* device) :
 		m_device(device)

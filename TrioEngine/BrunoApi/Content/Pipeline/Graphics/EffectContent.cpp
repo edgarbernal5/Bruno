@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "EffectContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	EffectContent::EffectContent()
 	{

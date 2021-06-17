@@ -3,7 +3,7 @@
 #include "TrioApiRequisites.h"
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct FrameCulling
 	{

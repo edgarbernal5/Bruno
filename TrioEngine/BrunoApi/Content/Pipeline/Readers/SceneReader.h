@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Scene;
 	class Model;

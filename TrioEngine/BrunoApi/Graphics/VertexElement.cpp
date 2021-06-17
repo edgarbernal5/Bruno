@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "VertexElement.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexElement::VertexElement()
 	{

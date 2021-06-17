@@ -11,7 +11,7 @@ namespace TrioIO
 	class Stream;
 }
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class ContentTypeWriter;
 	class ContentItem;

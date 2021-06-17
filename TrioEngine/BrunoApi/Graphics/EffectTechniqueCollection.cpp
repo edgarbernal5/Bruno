@@ -3,7 +3,7 @@
 
 #include "EffectTechnique.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	EffectTechniqueCollection::EffectTechniqueCollection(std::vector<EffectTechnique*> parameters) :
 		m_array(parameters)

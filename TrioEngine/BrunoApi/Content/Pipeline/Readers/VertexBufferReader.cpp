@@ -6,7 +6,7 @@
 
 #include "Graphics/VertexBuffer.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexBufferReader::VertexBufferReader()
 	{

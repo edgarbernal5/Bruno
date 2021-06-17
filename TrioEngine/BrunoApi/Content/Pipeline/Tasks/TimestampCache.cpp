@@ -3,7 +3,7 @@
 
 #include <filesystem>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	std::filesystem::file_time_type TimestampCache::GetTimestamp(std::string filename)
 	{

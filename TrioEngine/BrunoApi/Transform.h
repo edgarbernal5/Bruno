@@ -6,7 +6,7 @@
 #include "Math\MathVector.h"
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Transform : public Component
 	{

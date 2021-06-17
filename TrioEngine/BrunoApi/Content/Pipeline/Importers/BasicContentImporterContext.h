@@ -4,7 +4,7 @@
 
 #include "ContentImporterContext.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BuildItem;
 	class BuildCoordinator;

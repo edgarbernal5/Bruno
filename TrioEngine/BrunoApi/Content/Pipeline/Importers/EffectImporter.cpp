@@ -3,7 +3,7 @@
 
 #include "Content/Pipeline/Graphics/EffectContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	EffectImporter::EffectImporter()
 	{

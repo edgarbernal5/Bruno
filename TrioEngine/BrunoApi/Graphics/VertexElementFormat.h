@@ -2,7 +2,7 @@
 
 #include "TrioApiRequisites.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	enum class VertexElementFormat
 	{

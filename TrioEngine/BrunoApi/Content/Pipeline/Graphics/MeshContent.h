@@ -4,7 +4,7 @@
 
 #include "NodeContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GeometryContent;
 

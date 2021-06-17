@@ -7,7 +7,7 @@
 #include "SurfaceFormat.h"
 #include "VertexElementFormat.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class FormatHelper {
 	public:

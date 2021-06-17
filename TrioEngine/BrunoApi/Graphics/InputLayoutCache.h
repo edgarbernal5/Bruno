@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 #ifdef BRUNO_DIRECTX
 	class GraphicsDevice;

@@ -6,7 +6,7 @@
 #include "MeshContent.h"
 #include "GeometryContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	IndirectPositionCollection::IndirectPositionCollection(GeometryContent* geometryContent, VertexChannel* positionIndices) :
 		m_geometry(geometryContent),

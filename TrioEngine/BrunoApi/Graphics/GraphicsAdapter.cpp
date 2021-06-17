@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GraphicsAdapter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	std::vector<GraphicsAdapter*> GraphicsAdapter::g_Adapters;
 

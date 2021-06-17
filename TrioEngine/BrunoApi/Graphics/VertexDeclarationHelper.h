@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class VertexDeclaration;
 

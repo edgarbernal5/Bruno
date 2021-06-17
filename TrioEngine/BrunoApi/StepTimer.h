@@ -8,7 +8,7 @@
 #include <exception>
 #include <stdint.h>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	// Helper class for animation and simulation timing.
 	class StepTimer

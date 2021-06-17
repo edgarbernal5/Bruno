@@ -11,7 +11,7 @@
 #include "Graphics/Models/ModelMesh.h"
 #include "Graphics/Models/ModelMeshPart.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	SceneReader::SceneReader()
 	{

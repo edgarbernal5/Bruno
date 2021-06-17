@@ -7,7 +7,7 @@
 #include <chrono>
 #include <filesystem>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class TimestampCache
 	{

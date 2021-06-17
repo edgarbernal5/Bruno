@@ -4,7 +4,7 @@
 #include "WindowsGameHost.h"
 #include <iostream>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	WindowsGameWindow::WindowsGameWindow(WindowsGameHost* host) : 
 		m_host(host),
@@ -48,7 +48,7 @@ namespace TrioEngine
 		wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
 		wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		wcex.lpszMenuName = nullptr;
-		wcex.lpszClassName = L"TrioEngine";
+		wcex.lpszClassName = L"BrunoEngine";
 		wcex.hIconSm = LoadIcon(wcex.hInstance, L"IDI_ICON");
 		if (!RegisterClassEx(&wcex))
 			return FALSE;
@@ -61,7 +61,7 @@ namespace TrioEngine
 
 		std::wstring m_MainWndCaption(L"Game");
 
-		m_hwnd = CreateWindowEx(0, L"TrioEngine", m_MainWndCaption.c_str(), WS_OVERLAPPEDWINDOW,
+		m_hwnd = CreateWindowEx(0, L"BrunoEngine", m_MainWndCaption.c_str(), WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
 			nullptr);
 

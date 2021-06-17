@@ -3,7 +3,7 @@
 
 #include "GraphicsDevice.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	RasterizerState* RasterizerState::CullClockwise = nullptr;
 	RasterizerState* RasterizerState::CullCounterClockwise = nullptr;

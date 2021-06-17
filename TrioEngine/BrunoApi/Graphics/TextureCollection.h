@@ -4,7 +4,7 @@
 
 #include "ShaderStage.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Texture;
 	class GraphicsDevice;

@@ -12,7 +12,7 @@
 
 #include "Errors/GameException.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	Model::Model(GraphicsDevice* device) : 
 		m_device(device), 

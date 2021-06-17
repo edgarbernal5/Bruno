@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ModelMeshContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ModelMeshContent::ModelMeshContent()
 	{

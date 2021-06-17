@@ -6,7 +6,7 @@
 #include "ResourceOptionFlags.h"
 #include "CpuAccessFlags.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 
 	Texture2D::Texture2D(GraphicsDevice* graphicsDevice, int width, int height, SurfaceFormat format) :

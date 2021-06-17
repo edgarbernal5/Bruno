@@ -5,7 +5,7 @@
 #include "CullMode.h"
 #include "FillMode.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 

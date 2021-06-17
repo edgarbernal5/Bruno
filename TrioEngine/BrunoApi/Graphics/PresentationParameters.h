@@ -7,7 +7,7 @@
 #include "RenderTargetUsage.h"
 #include "SurfaceFormat.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct BRUNO_API_EXPORT PresentationParameters
 	{

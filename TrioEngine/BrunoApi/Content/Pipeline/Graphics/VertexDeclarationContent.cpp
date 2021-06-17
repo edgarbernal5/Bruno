@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "VertexDeclarationContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexDeclarationContent::VertexDeclarationContent()
 	{

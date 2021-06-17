@@ -5,7 +5,7 @@
 #include "ContentTypeWriterFactory.h"
 #include "ContentWriter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ContentCompiler::ContentCompiler() : m_factory(nullptr)
 	{

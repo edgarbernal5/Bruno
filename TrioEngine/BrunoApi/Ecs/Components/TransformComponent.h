@@ -2,7 +2,7 @@
 
 #include "Math/MathVector.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct TransformComponent
 	{

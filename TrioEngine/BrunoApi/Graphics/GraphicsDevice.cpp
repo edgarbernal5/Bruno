@@ -18,7 +18,7 @@
 #include "SwapChain.h"
 #include "RenderTarget2D.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 #if defined(_DEBUG) && defined(BRUNO_DIRECTX)
 	// Check for SDK Layer support.

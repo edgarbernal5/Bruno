@@ -5,7 +5,7 @@
 #include "Content/Pipeline/Graphics/VertexDeclarationContent.h"
 #include "Content/Pipeline/Graphics/VertexBufferContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexBufferWriter::VertexBufferWriter()
 	{

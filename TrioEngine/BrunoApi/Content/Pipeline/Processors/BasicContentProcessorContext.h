@@ -4,7 +4,7 @@
 
 #include "ContentProcessorContext.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BuildItem;
 	class BuildCoordinator;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SceneContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	SceneContent::SceneContent() :
 		m_root(nullptr)

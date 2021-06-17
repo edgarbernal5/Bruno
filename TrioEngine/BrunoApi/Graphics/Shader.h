@@ -5,7 +5,7 @@
 #include "ShaderStage.h"
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 #if BRUNO_DIRECTX

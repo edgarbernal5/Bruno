@@ -3,7 +3,7 @@
 #include "Math/MathVector.h"
 #include "Graphics/Texture2D.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	//class Texture2D;
 

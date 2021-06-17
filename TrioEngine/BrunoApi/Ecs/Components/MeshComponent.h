@@ -5,7 +5,7 @@
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/VertexBuffer.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct MeshComponent
 	{

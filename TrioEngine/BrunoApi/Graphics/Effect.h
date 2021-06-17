@@ -17,7 +17,7 @@
 
 #include "FX\HLSLTree.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 	class Shader;

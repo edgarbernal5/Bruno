@@ -4,7 +4,7 @@
 
 #include "TextureContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT Texture2DContent : public TextureContent
 	{

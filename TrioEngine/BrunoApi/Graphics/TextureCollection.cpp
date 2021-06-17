@@ -4,7 +4,7 @@
 #include "GraphicsDevice.h"
 #include "Texture.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	TextureCollection::TextureCollection(ShaderStage stage) :
 		m_stage(stage)

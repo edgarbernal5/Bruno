@@ -18,7 +18,7 @@ namespace TrioIO
 	class Stream;
 }
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	//class ContentTypeReader;
 	class ContentManager;
@@ -53,7 +53,7 @@ namespace TrioEngine
 
 		ContentManager* GetContentManager();
 	private:
-		static const int HeaderSize = 7;
+		static const int HeaderSize = 6;
 
 		ContentManager* m_contentManager;
 		std::string m_assetName;

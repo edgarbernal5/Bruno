@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct NameComponent
 	{

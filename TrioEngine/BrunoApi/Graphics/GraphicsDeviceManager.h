@@ -10,7 +10,7 @@
 #include "DepthFormat.h"
 #include "DisplayMode.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Game;
 	class GraphicsAdapter;

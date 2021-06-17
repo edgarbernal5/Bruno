@@ -6,7 +6,7 @@
 #include "DepthStencilViewFlags.h"
 #include "DepthStencilViewDimension.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 

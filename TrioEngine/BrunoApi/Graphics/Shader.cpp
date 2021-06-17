@@ -6,7 +6,7 @@
 
 #include "..\Utils\Hash.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	Shader::Shader(GraphicsDevice* device, ShaderStage stage, const std::vector<uint8_t>& bytes) :
 #if BRUNO_DIRECTX

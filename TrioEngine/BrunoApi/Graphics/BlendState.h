@@ -8,7 +8,7 @@
 
 #include "Math\MathVector.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 

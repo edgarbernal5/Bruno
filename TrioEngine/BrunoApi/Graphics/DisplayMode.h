@@ -3,7 +3,7 @@
 #include "TrioApiRequisites.h"
 #include "SurfaceFormat.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct BRUNO_API_EXPORT DisplayMode
 	{

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ModelBone.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ModelBone::ModelBone() : m_parent(nullptr), m_index(-1)
 	{

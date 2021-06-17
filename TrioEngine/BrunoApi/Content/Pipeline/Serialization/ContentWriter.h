@@ -15,7 +15,7 @@ namespace TrioIO
 	class MemoryStream;
 }
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class ContentCompiler;
 	class ContentItem;
@@ -41,8 +41,8 @@ namespace TrioEngine
 		void BeginWrite();
 		void FlushOutput();
 	private:
-		const int HeaderSize = 7;
-		const char* FileExtension = "estero";
+		const int HeaderSize = 6;
+		const char* FileExtension = "bruno";
 
 		std::string m_rootDirectory;
 		std::string m_referenceRelocationPath;

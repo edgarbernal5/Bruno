@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "DepthStencilState.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	DepthStencilState * DepthStencilState::Default = nullptr;
 	DepthStencilState * DepthStencilState::DepthRead = nullptr;

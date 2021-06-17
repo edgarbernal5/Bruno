@@ -6,7 +6,7 @@
 #include <map>
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class ContentReader;
 	class ContentTypeReader;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MathVector.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	const Vector2 Vector2::Zero = { 0.f, 0.f };
 	const Vector2 Vector2::One = { 1.f, 1.f };
@@ -43,23 +43,23 @@ namespace TrioEngine
 	 ****************************************************************************/
 
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-	static_assert(sizeof(TrioEngine::Viewport) == sizeof(D3D11_VIEWPORT), "Size mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, x) == offsetof(D3D11_VIEWPORT, TopLeftX), "Layout mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, y) == offsetof(D3D11_VIEWPORT, TopLeftY), "Layout mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, width) == offsetof(D3D11_VIEWPORT, Width), "Layout mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, height) == offsetof(D3D11_VIEWPORT, Height), "Layout mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, minDepth) == offsetof(D3D11_VIEWPORT, MinDepth), "Layout mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, maxDepth) == offsetof(D3D11_VIEWPORT, MaxDepth), "Layout mismatch");
+	static_assert(sizeof(BrunoEngine::Viewport) == sizeof(D3D11_VIEWPORT), "Size mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, x) == offsetof(D3D11_VIEWPORT, TopLeftX), "Layout mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, y) == offsetof(D3D11_VIEWPORT, TopLeftY), "Layout mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, width) == offsetof(D3D11_VIEWPORT, Width), "Layout mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, height) == offsetof(D3D11_VIEWPORT, Height), "Layout mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, minDepth) == offsetof(D3D11_VIEWPORT, MinDepth), "Layout mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, maxDepth) == offsetof(D3D11_VIEWPORT, MaxDepth), "Layout mismatch");
 #endif
 
 #if defined(__d3d12_h__) || defined(__d3d12_x_h__)
-	static_assert(sizeof(TrioEngine::Viewport) == sizeof(D3D12_VIEWPORT), "Size mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, x) == offsetof(D3D12_VIEWPORT, TopLeftX), "Layout mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, y) == offsetof(D3D12_VIEWPORT, TopLeftY), "Layout mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, width) == offsetof(D3D12_VIEWPORT, Width), "Layout mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, height) == offsetof(D3D12_VIEWPORT, Height), "Layout mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, minDepth) == offsetof(D3D12_VIEWPORT, MinDepth), "Layout mismatch");
-	static_assert(offsetof(TrioEngine::Viewport, maxDepth) == offsetof(D3D12_VIEWPORT, MaxDepth), "Layout mismatch");
+	static_assert(sizeof(BrunoEngine::Viewport) == sizeof(D3D12_VIEWPORT), "Size mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, x) == offsetof(D3D12_VIEWPORT, TopLeftX), "Layout mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, y) == offsetof(D3D12_VIEWPORT, TopLeftY), "Layout mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, width) == offsetof(D3D12_VIEWPORT, Width), "Layout mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, height) == offsetof(D3D12_VIEWPORT, Height), "Layout mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, minDepth) == offsetof(D3D12_VIEWPORT, MinDepth), "Layout mismatch");
+	static_assert(offsetof(BrunoEngine::Viewport, maxDepth) == offsetof(D3D12_VIEWPORT, MaxDepth), "Layout mismatch");
 #endif
 
 #endif

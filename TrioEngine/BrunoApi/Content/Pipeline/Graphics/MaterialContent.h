@@ -5,7 +5,7 @@
 #include "Content/Pipeline/ContentItem.h"
 #include "Content/Pipeline/ExternalReference.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT MaterialContent : public ContentItem
 	{

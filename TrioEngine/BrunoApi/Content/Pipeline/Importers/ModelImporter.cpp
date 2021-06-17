@@ -12,7 +12,7 @@
 
 #include "Errors/ContentPipelineException.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	std::map<ModelImporter::TextureType, std::pair<uint32_t, std::string>> ModelImporter::g_textureTypeMappings;
 

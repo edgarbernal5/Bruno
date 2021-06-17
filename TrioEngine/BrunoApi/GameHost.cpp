@@ -4,7 +4,7 @@
 #include "Game.h"
 #include "WindowsGameHost.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	GameHost* GameHost::Create(Game* game)
 	{

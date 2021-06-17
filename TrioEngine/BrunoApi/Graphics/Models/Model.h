@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class ModelBone;
 	class ModelMesh;

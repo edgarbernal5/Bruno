@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ModelMeshPart.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ModelMeshPart::ModelMeshPart() : m_diffuseTexture(nullptr), 
 		m_vertexBuffer(nullptr), m_indexBuffer(nullptr), 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SceneSubMeshContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	SceneSubMeshContent::SceneSubMeshContent()
 	{

@@ -3,7 +3,7 @@
 
 #include "GraphicsDevice.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	SamplerState* SamplerState::AnisotropicClamp = nullptr;
 	SamplerState* SamplerState::AnisotropicWrap = nullptr;

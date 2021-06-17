@@ -5,7 +5,7 @@
 #include "Content/Pipeline/Graphics/BitmapContent.h"
 #include "Content/Pipeline/Graphics/Texture2DContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	Texture2DWriter::Texture2DWriter()
 	{

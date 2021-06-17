@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ModelMesh.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ModelMesh::ModelMesh() : m_parentBone(nullptr)
 	{

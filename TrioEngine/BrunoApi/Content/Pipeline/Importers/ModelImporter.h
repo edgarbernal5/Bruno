@@ -13,7 +13,7 @@
 #include <utility>
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class NodeContent;
 	class MeshContent;

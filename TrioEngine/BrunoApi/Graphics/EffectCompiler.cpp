@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "EffectCompiler.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 #if BRUNO_DIRECTX
 	ID3DBlob* EffectCompiler::CompileShader(std::string path, const char* entryFunctionName, const char* profile, const D3D_SHADER_MACRO* defines, bool forceOptimization)

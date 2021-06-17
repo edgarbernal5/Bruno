@@ -5,7 +5,7 @@
 #include "Content/Pipeline/ContentItem.h"
 #include "MipmapChain.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT TextureContent : public ContentItem
 	{

@@ -5,7 +5,7 @@
 #include "Content/Pipeline/ContentItem.h"
 #include "Memory/BitCopier.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class VertexDeclarationContent;
 

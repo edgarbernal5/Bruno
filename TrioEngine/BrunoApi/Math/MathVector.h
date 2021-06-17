@@ -26,7 +26,7 @@
 
 #endif //  BRUNO_DIRECTX
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct Vector2;
 	struct Vector4;
@@ -4514,17 +4514,17 @@ namespace TrioEngine
 namespace std
 {
 
-	template<> struct less<TrioEngine::Vector2>
+	template<> struct less<BrunoEngine::Vector2>
 	{
-		bool operator()(const TrioEngine::Vector2& V1, const TrioEngine::Vector2& V2) const
+		bool operator()(const BrunoEngine::Vector2& V1, const BrunoEngine::Vector2& V2) const
 		{
 			return ((V1.x < V2.x) || ((V1.x == V2.x) && (V1.y < V2.y)));
 		}
 	};
 
-	template<> struct less<TrioEngine::Vector3>
+	template<> struct less<BrunoEngine::Vector3>
 	{
-		bool operator()(const TrioEngine::Vector3& V1, const TrioEngine::Vector3& V2) const
+		bool operator()(const BrunoEngine::Vector3& V1, const BrunoEngine::Vector3& V2) const
 		{
 			return ((V1.x < V2.x)
 				|| ((V1.x == V2.x) && (V1.y < V2.y))
@@ -4532,9 +4532,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<TrioEngine::Vector4>
+	template<> struct less<BrunoEngine::Vector4>
 	{
-		bool operator()(const TrioEngine::Vector4& V1, const TrioEngine::Vector4& V2) const
+		bool operator()(const BrunoEngine::Vector4& V1, const BrunoEngine::Vector4& V2) const
 		{
 			return ((V1.x < V2.x)
 				|| ((V1.x == V2.x) && (V1.y < V2.y))
@@ -4543,9 +4543,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<TrioEngine::Matrix>
+	template<> struct less<BrunoEngine::Matrix>
 	{
-		bool operator()(const TrioEngine::Matrix& M1, const TrioEngine::Matrix& M2) const
+		bool operator()(const BrunoEngine::Matrix& M1, const BrunoEngine::Matrix& M2) const
 		{
 			if (M1._11 != M2._11) return M1._11 < M2._11;
 			if (M1._12 != M2._12) return M1._12 < M2._12;
@@ -4568,9 +4568,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<TrioEngine::Plane>
+	template<> struct less<BrunoEngine::Plane>
 	{
-		bool operator()(const TrioEngine::Plane& P1, const TrioEngine::Plane& P2) const
+		bool operator()(const BrunoEngine::Plane& P1, const BrunoEngine::Plane& P2) const
 		{
 			return ((P1.x < P2.x)
 				|| ((P1.x == P2.x) && (P1.y < P2.y))
@@ -4579,9 +4579,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<TrioEngine::Quaternion>
+	template<> struct less<BrunoEngine::Quaternion>
 	{
-		bool operator()(const TrioEngine::Quaternion& Q1, const TrioEngine::Quaternion& Q2) const
+		bool operator()(const BrunoEngine::Quaternion& Q1, const BrunoEngine::Quaternion& Q2) const
 		{
 			return ((Q1.x < Q2.x)
 				|| ((Q1.x == Q2.x) && (Q1.y < Q2.y))
@@ -4590,9 +4590,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<TrioEngine::Color>
+	template<> struct less<BrunoEngine::Color>
 	{
-		bool operator()(const TrioEngine::Color& C1, const TrioEngine::Color& C2) const
+		bool operator()(const BrunoEngine::Color& C1, const BrunoEngine::Color& C2) const
 		{
 			return ((C1.x < C2.x)
 				|| ((C1.x == C2.x) && (C1.y < C2.y))
@@ -4601,9 +4601,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<TrioEngine::Ray>
+	template<> struct less<BrunoEngine::Ray>
 	{
-		bool operator()(const TrioEngine::Ray& R1, const TrioEngine::Ray& R2) const
+		bool operator()(const BrunoEngine::Ray& R1, const BrunoEngine::Ray& R2) const
 		{
 			if (R1.position.x != R2.position.x) return R1.position.x < R2.position.x;
 			if (R1.position.y != R2.position.y) return R1.position.y < R2.position.y;
@@ -4617,9 +4617,9 @@ namespace std
 		}
 	};
 
-	template<> struct less<TrioEngine::Viewport>
+	template<> struct less<BrunoEngine::Viewport>
 	{
-		bool operator()(const TrioEngine::Viewport& vp1, const TrioEngine::Viewport& vp2) const
+		bool operator()(const BrunoEngine::Viewport& vp1, const BrunoEngine::Viewport& vp2) const
 		{
 			if (vp1.x != vp2.x) return (vp1.x < vp2.x);
 			if (vp1.y != vp2.y) return (vp1.y < vp2.y);

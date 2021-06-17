@@ -3,7 +3,7 @@
 #include "TrioApiRequisites.h"
 #include "Errors/ContentPipelineException.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT VertexChannel
 	{

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Object
 	{

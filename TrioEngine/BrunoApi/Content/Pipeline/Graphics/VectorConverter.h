@@ -8,7 +8,7 @@
 #include "Graphics/SurfaceFormat.h"
 #include "Graphics/VertexElementFormat.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class VectorConverter
 	{

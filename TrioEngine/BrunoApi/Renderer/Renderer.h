@@ -6,7 +6,7 @@
 
 #include <unordered_map>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	//enum class RenderPassFlags
 	//{

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "OpaqueData.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	OpaqueData::OpaqueData()
 	{

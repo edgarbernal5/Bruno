@@ -9,7 +9,7 @@
 #include "Renderer\Renderer.h"
 #include "Scene.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	Game::Game() :
 		m_doneFirstUpdate(false),

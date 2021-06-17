@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GameException.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	GameException::GameException(const char* const& message, HRESULT hr)
 		: exception(message), mHR(hr)

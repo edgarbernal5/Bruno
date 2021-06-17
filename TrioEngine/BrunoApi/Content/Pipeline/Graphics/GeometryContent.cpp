@@ -3,7 +3,7 @@
 
 #include "VertexContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	GeometryContent::GeometryContent() : m_parent(nullptr), m_vertices(nullptr), m_materialContent(nullptr)
 	{

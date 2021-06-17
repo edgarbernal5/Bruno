@@ -3,7 +3,7 @@
 
 #include "WindowsGameWindow.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	WindowsGameHost::WindowsGameHost(Game* game) :
 		m_game(game),

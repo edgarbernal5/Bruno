@@ -6,7 +6,7 @@
 #include <string>
 #include "Content/Pipeline/OpaqueData.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class IContentProcessor;
 

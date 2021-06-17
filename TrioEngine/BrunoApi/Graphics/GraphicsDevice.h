@@ -17,7 +17,7 @@
 
 #include <map>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class ConstantBuffer;
 	class ConstantBufferCollection;

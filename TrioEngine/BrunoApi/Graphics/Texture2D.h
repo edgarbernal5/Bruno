@@ -12,7 +12,7 @@
 
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 
@@ -111,8 +111,8 @@ namespace TrioEngine
 #ifdef BRUNO_DIRECTX
 		switch (m_usage)
 		{
-		case TrioEngine::ResourceUsage::Dynamic:
-		case TrioEngine::ResourceUsage::Default:
+		case BrunoEngine::ResourceUsage::Dynamic:
+		case BrunoEngine::ResourceUsage::Default:
 			if (m_texture == nullptr)
 			{
 				CreateTexture(nullptr);
@@ -132,7 +132,7 @@ namespace TrioEngine
 			m_device->GetD3DDeviceContext()->UpdateSubresource(m_texture, level, &region, data + startIndex, GetPitch(w), 0);
 
 			break;
-		case TrioEngine::ResourceUsage::Immutable:
+		case BrunoEngine::ResourceUsage::Immutable:
 
 			if (m_texture == nullptr)
 			{
@@ -157,7 +157,7 @@ namespace TrioEngine
 				m_device->GetD3DDeviceContext()->UpdateSubresource(m_texture, level, &region, data + startIndex, GetPitch(w), 0);
 			}
 			break;
-		case TrioEngine::ResourceUsage::Staging:
+		case BrunoEngine::ResourceUsage::Staging:
 			break;
 		default:
 			break;

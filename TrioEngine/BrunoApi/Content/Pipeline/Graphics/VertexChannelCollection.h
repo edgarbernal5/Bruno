@@ -3,7 +3,7 @@
 #include "TrioApiRequisites.h"
 
 #include "VertexChannel.h"
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class VertexChannel;
 	class VertexContent;

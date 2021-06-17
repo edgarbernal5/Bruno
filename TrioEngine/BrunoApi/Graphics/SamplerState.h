@@ -6,7 +6,7 @@
 #include "TextureFilter.h"
 #include "Math\MathVector.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	struct BRUNO_API_EXPORT SamplerState
 	{

@@ -5,7 +5,7 @@
 #include "ModelImporter.h"
 #include "EffectImporter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ImporterManager::ImporterManager()
 	{

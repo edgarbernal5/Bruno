@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT TextureLoader
 	{

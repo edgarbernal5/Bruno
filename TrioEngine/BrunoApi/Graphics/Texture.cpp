@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Texture.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	Texture::Texture() :
 #ifdef BRUNO_DIRECTX

@@ -4,7 +4,7 @@
 #include "VertexDeclaration.h"
 #include "VertexElement.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	std::map<std::string, VertexDeclaration*> VertexDeclarationHelper::g_declarationByClass;
 

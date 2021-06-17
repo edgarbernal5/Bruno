@@ -4,7 +4,7 @@
 #include "ContentItem.h"
 #include "IO/Path.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class ExternalReference : public ContentItem
 	{

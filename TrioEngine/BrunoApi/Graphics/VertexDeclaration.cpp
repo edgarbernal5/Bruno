@@ -4,7 +4,7 @@
 #include "Shader.h"
 #include "GraphicsDevice.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	//Usar glVertexAttribPointer
 

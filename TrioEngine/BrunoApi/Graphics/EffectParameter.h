@@ -9,7 +9,7 @@
 #include "TextureAddressMode.h"
 #include "TextureFilter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Texture;
 	class Effect;

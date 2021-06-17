@@ -5,7 +5,7 @@
 #include "Content/Pipeline/Processors/ContentProcessorContext.h"
 #include "Content/Pipeline/Graphics/MaterialContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	MaterialProcessor::MaterialProcessor()
 	{

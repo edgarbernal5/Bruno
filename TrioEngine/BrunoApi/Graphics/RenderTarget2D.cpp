@@ -7,7 +7,7 @@
 #include "CpuAccessFlags.h"
 #include "DepthStencilBuffer.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	RenderTarget2D::RenderTarget2D(GraphicsDevice* graphicsDevice, int width, int height)
 		: Texture2D(graphicsDevice, width, height, 1, SurfaceFormat::Color, SurfaceType::RenderTarget, 1, 0, false), m_initialized(false), m_depthFormat(DepthFormat::None), m_renderTargetUsage(RenderTargetUsage::DiscardContents),

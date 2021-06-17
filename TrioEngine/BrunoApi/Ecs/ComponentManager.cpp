@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ComponentManager.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	//ComponentManager::ComponentManager(size_t elementsize)
 	//{

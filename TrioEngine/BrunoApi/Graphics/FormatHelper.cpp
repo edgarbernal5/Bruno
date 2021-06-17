@@ -2,7 +2,7 @@
 #include "FormatHelper.h"
 
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	//TO-DO: Faltan formatos...
 	DXGI_FORMAT FormatHelper::ToFormat(SurfaceFormat format)

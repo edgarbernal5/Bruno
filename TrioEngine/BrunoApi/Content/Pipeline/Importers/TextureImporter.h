@@ -4,7 +4,7 @@
 
 #include "IContentImporter.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BitmapContent;
 	class TextureContent;

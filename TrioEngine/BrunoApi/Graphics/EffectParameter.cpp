@@ -3,7 +3,7 @@
 
 #include "ConstantBuffer.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	EffectParameter::EffectParameter(ConstantBufferField fieldDesc, ConstantBuffer* constantBuffer, Effect* effect) :
 		m_effect(effect),

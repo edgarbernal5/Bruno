@@ -11,7 +11,7 @@
 #include "Graphics/BlendState.h"
 #include "Graphics/Models/Model.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	GraphicsDevice* Renderer::g_device = nullptr;
 	std::unordered_map<const Camera*, FrameCulling> Renderer::g_frameCullings;

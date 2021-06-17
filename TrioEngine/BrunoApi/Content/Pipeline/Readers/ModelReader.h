@@ -7,7 +7,7 @@
 #include "Math/MathVector.h"
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Model;
 	class ModelMeshPart;

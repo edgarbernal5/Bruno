@@ -6,7 +6,7 @@
 
 #include "Graphics/Models/Material.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	MaterialReader::MaterialReader()
 	{

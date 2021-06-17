@@ -7,7 +7,7 @@
 #include "BuildCoordinatorSettings.h"
 #include "Content/Pipeline/Tasks/TimestampCache.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BuildItem;
 	class BuildItemCollection;

@@ -4,7 +4,7 @@
 
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BitmapContent;
 

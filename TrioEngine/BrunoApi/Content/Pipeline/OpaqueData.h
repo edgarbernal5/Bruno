@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class OpaqueData
 	{

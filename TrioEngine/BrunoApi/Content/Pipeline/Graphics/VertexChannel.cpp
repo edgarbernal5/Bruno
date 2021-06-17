@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "VertexChannel.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexChannel::VertexChannel(std::string name) :
 		m_name(name),

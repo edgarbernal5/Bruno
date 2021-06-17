@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ModelContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ModelContent::ModelContent() :
 		m_root(nullptr)

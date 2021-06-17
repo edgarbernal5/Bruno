@@ -3,7 +3,7 @@
 #include "TrioApiRequisites.h"
 
 #include "BuildRequest.h"
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BuildItem;
 	class BuildRequest;

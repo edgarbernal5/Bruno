@@ -4,7 +4,7 @@
 #include "ContentWriter.h"
 #include "Content/Pipeline/Graphics/IndexCollection.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	IndexCollectionWriter::IndexCollectionWriter()
 	{

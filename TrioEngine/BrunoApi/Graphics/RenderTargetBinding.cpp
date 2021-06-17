@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RenderTargetBinding.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	RenderTargetBindings::RenderTargetBindings() :
 		m_n(0),

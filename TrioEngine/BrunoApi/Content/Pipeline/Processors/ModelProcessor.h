@@ -5,7 +5,7 @@
 #include "IContentProcessor.h"
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class NodeContent;
 	class MaterialContent;

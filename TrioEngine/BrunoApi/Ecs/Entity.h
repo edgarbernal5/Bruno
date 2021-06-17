@@ -3,7 +3,7 @@
 #include "TrioApiRequisites.h"
 #include <stdint.h>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	typedef uint64_t Entity;
 

@@ -16,7 +16,7 @@
 
 #include "Errors/ContentPipelineException.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	BuildCoordinator::BuildCoordinator(BuildCoordinatorSettings* settings, TimestampCache* timestampCache) :
 		m_importerManager(nullptr), m_processorManager(nullptr), m_buildItems(nullptr), m_buildItemsChanged(false),
@@ -282,7 +282,7 @@ namespace TrioEngine
 	std::string BuildCoordinator::ChooseOutputFilename(BuildRequest *request)
 	{
 		std::string intermediateDirectory = m_settings->GetOutputDirectory();
-		std::string outputExtension = ".estero";
+		std::string outputExtension = ".bruno";
 		std::string outputFilename;
 
 		if (request->m_assetName.size() == 0)

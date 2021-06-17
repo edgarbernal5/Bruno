@@ -6,7 +6,7 @@
 
 #include "Graphics/IndexBuffer.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	IndexCollectionReader::IndexCollectionReader()
 	{

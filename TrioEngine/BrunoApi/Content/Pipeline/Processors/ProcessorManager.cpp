@@ -9,7 +9,7 @@
 #include "Content/Pipeline/Processors/MaterialProcessor.h"
 #include "Content/Pipeline/Processors/EffectProcessor.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ProcessorManager::ProcessorManager()
 	{

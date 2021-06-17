@@ -12,7 +12,7 @@
 #include "Pipeline/Readers/MaterialReader.h"
 #include "Pipeline/Readers/EffectReader.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	std::map<std::string, ContentTypeReader*>* ContentTypeReaderManager::m_nameToReader = new std::map<std::string, ContentTypeReader*>();
 	std::vector<ContentTypeReader*> ContentTypeReaderManager::m_typeReaders2;

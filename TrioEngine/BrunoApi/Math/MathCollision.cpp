@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MathCollision.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
     inline bool XMVector3AnyTrue(_In_ DirectX::FXMVECTOR V)
     {

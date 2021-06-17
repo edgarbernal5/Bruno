@@ -5,7 +5,7 @@
 #include "IServiceBase.h"
 #include "Event.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 

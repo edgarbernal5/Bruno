@@ -3,7 +3,7 @@
 #include "Event.h"
 #include "GameWindow.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Game;
 

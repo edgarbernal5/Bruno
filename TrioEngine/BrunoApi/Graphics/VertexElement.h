@@ -9,7 +9,7 @@
 
 #include <sstream>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class VertexDeclaration;
 

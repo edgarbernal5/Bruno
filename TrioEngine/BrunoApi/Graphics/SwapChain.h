@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class SwapChain 
 	{

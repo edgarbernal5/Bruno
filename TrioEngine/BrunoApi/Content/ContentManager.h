@@ -8,7 +8,7 @@
 #include "IO/FileStream.h"
 //#include "ContentReader.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GraphicsDevice;
 	class IServiceProvider;

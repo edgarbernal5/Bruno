@@ -4,7 +4,7 @@
 
 #include "IServiceBase.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT IGraphicsDeviceManager : public IServiceBase
 	{

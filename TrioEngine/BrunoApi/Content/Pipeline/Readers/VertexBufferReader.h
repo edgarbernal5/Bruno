@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT VertexBufferReader : public ContentTypeReader
 	{

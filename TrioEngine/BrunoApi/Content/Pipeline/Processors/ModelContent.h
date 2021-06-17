@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class ModelMeshContent;
 	class ModelBoneContent;

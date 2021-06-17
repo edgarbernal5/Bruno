@@ -4,7 +4,7 @@
 
 #include "Content/Pipeline/ExternalReference.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class ContentItem;
 

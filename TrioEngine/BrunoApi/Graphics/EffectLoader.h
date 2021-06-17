@@ -13,7 +13,7 @@
 
 #include "..\FX\HLSLTree.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class Effect;
 

@@ -4,7 +4,7 @@
 #include "Object.h"
 #include <string>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class GameObject;
 	class Transform;

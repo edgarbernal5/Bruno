@@ -3,7 +3,7 @@
 
 #include "VertexDeclarationContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexBufferContent::VertexBufferContent()
 	{

@@ -10,7 +10,7 @@
 
 #include <queue>
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	EffectLoader::EffectLoader(Effect* effect) :
 		m_effect(*effect)

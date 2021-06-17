@@ -4,7 +4,7 @@
 
 #include "IContentProcessor.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class BRUNO_API_EXPORT EffectProcessor : public IContentProcessor
 	{

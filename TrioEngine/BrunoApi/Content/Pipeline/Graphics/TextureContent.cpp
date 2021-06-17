@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "TextureContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	TextureContent::TextureContent(MipmapChainCollection faces) : m_faces(faces)
 	{

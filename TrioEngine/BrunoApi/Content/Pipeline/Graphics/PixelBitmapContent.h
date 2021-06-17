@@ -4,7 +4,7 @@
 
 #include "BitmapContent.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	template <class T>
 	class BRUNO_API_EXPORT PixelBitmapContent : public BitmapContent

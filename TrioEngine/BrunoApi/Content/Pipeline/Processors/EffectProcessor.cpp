@@ -5,7 +5,7 @@
 #include "Content/Pipeline/Graphics/EffectContent.h"
 #include "Graphics/EffectCompiler.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	EffectProcessor::EffectProcessor()
 	{

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "VertexBufferBinding.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexBufferBindings::VertexBufferBindings() :
 		

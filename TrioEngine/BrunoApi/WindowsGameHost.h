@@ -2,7 +2,7 @@
 
 #include "GameHost.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	class WindowsGameWindow;
 

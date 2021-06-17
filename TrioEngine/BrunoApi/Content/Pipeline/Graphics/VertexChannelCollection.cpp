@@ -4,7 +4,7 @@
 #include "VertexContent.h"
 #include "VertexChannel.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	VertexChannelCollection::VertexChannelCollection(VertexContent* parent) :
 		m_parent(parent)

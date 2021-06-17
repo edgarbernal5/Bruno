@@ -9,7 +9,7 @@
 
 #include "Errors/ContentPipelineException.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	ContentReader::ContentReader(ContentManager* contentManager, TrioIO::Stream *stream, std::string assetName) :
 		BinaryReader(stream), m_contentManager(contentManager), m_stream(stream), m_assetName(assetName)
@@ -36,11 +36,10 @@ namespace TrioEngine
 	{
 		BinaryReader reader(input);
 
-		if (reader.ReadChar() != 'E' || 
-			reader.ReadChar() != 'S' || 
-			reader.ReadChar() != 'T' || 
-			reader.ReadChar() != 'E' ||
-			reader.ReadChar() != 'R' ||
+		if (reader.ReadChar() != 'B' || 
+			reader.ReadChar() != 'R' || 
+			reader.ReadChar() != 'U' || 
+			reader.ReadChar() != 'N' ||
 			reader.ReadChar() != 'O')
 		{
 			throw ContentPipelineException("bad file header");

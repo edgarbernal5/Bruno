@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GameServiceContainer.h"
 
-namespace TrioEngine
+namespace BrunoEngine
 {
 	GameServiceContainer::GameServiceContainer()
 	{
