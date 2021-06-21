@@ -10,7 +10,7 @@
 #define M4_PRINTF_ATTR(string_index, first_to_check)
 #endif
 
-namespace TrioFX
+namespace BrunoFX
 {
 	class BRUNO_API_EXPORT CodeWriter
 	{

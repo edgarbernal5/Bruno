@@ -12,7 +12,7 @@
 
 #pragma warning(disable : 4996)
 
-namespace TrioFX
+namespace BrunoFX
 {
 
 	// The order here must match the order in the Token enum.

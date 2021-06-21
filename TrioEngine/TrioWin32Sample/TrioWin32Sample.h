@@ -19,7 +19,7 @@
 
 //#pragma comment(lib,"TrioApi.lib")
 
-using namespace TrioEngine;
+using namespace BrunoEngine;
 
 namespace TrioWin32
 {

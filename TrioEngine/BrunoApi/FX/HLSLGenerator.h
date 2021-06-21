@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace TrioFX
+namespace BrunoFX
 {
 	class  HLSLTree;
 	struct HLSLFunction;

@@ -51,14 +51,14 @@ namespace BrunoFramework.Editor.Game
 
         public bool IsExpanded
         {
-            get => m_isExpandedd;
+            get => m_isExpanded;
             set
             {
-                m_isExpandedd = value;
+                m_isExpanded = value;
                 NotifyOfPropertyChange();
             }
         }
-        private bool m_isExpandedd;
+        private bool m_isExpanded;
 
         public WorldOutlineItem Parent
         {
@@ -92,5 +92,15 @@ namespace BrunoFramework.Editor.Game
         }
         private WorldOutlineItemCollection m_children;
 
+        public object CustomData
+        {
+            get => m_customData;
+            set
+            {
+                m_customData = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        private object m_customData;
     }
 }

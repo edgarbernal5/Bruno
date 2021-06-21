@@ -83,6 +83,31 @@
     <Compile Include="Editor\Game\Gizmos\GizmoService.cs" />
     <Compile Include="Editor\Game\Gizmos\GizmosHandlerHwndHostBehavior.cs" />
     <Compile Include="Editor\Game\Gizmos\IGizmoService.cs" />
+    <Compile Include="Editor\Game\Inspectors\BoundPropertyDescriptor.cs" />
+    <Compile Include="Editor\Game\Inspectors\Controls\InspectorItemTemplateSelector.cs" />
+    <Compile Include="Editor\Game\Inspectors\Conventions\DefaultPropertyInspectors.cs" />
+    <Compile Include="Editor\Game\Inspectors\Conventions\PropertyEditorBuilder.cs" />
+    <Compile Include="Editor\Game\Inspectors\Conventions\StandardPropertyEditorBuilder.cs" />
+    <Compile Include="Editor\Game\Inspectors\EditorBase.cs" />
+    <Compile Include="Editor\Game\Inspectors\ExpressionUtility.cs" />
+    <Compile Include="Editor\Game\Inspectors\IEditor.cs" />
+    <Compile Include="Editor\Game\Inspectors\IInspectableObject.cs" />
+    <Compile Include="Editor\Game\Inspectors\IInspector.cs" />
+    <Compile Include="Editor\Game\Inspectors\ILabelledInspector.cs" />
+    <Compile Include="Editor\Game\Inspectors\InspectorBase.cs" />
+    <Compile Include="Editor\Game\Inspectors\InspectorBuilder.cs" />
+    <Compile Include="Editor\Game\Inspectors\InspectorView.xaml.cs">
+      <DependentUpon>InspectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Game\Inspectors\InspectorViewModel.cs" />
+    <Compile Include="Editor\Game\Inspectors\TextBoxEditorView.xaml.cs">
+      <DependentUpon>TextBoxEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Game\Inspectors\TextBoxEditorViewModel.cs" />
+    <Compile Include="Editor\Game\Inspectors\Vector3EditorView.xaml.cs">
+      <DependentUpon>Vector3EditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Game\Inspectors\Vector3EditorViewModel.cs" />
     <Compile Include="Editor\Game\Interaction\CameraArcBallHwndHostBehavior.cs" />
     <Compile Include="Editor\Game\Interaction\CameraHandToolHwndHostBehavior.cs" />
     <Compile Include="Editor\Game\Interaction\CameraZoomHwndHostBehavior.cs" />
@@ -94,6 +119,7 @@
     <Compile Include="Editor\Game\Screens\EmptyGameGraphicsScreen.cs" />
     <Compile Include="Editor\Game\World\IWorldOutlineService.cs" />
     <Compile Include="Editor\Game\World\WorldOutline.cs" />
+    <Compile Include="Editor\Game\World\WorldOutlineData.cs" />
     <Compile Include="Editor\Game\World\WorldOutlineItem.cs" />
     <Compile Include="Editor\Game\World\WorldOutlineItemCollection.cs" />
     <Compile Include="Editor\Game\World\WorldOutlineView.xaml.cs">
@@ -105,6 +131,8 @@
     <Compile Include="Editor\Timing\GameTime.cs" />
     <Compile Include="Editor\Units\Builder\BuilderUnit.cs" />
     <Compile Include="Editor\Units\Game\GameUnit.cs" />
+    <Compile Include="Editor\Units\Inspectors\IInspectorService.cs" />
+    <Compile Include="Editor\Units\Inspectors\InspectorUnit.cs" />
     <Compile Include="Editor\Units\Menus\MenuUnit.cs" />
     <Compile Include="Editor\Game\Screens\EditorGameGraphicsScreen.cs" />
     <Compile Include="Editor\Game\Screens\GameGraphicsScreen.cs" />
@@ -119,12 +147,14 @@
     <Compile Include="Editor\Units\WorldOutline\WorldOutlineUnit.cs" />
     <Compile Include="Graphics\Data\Cameras\Camera.cs" />
     <Compile Include="Graphics\Editor\Gizmos\AxisGizmoGraphics.cs" />
+    <Compile Include="Graphics\Editor\Gizmos\AxisGizmoRotationRenderer.cs" />
     <Compile Include="Graphics\Editor\Gizmos\AxisGizmoScale.cs" />
     <Compile Include="Graphics\Editor\Gizmos\AxisGizmoScaleDummy.cs" />
     <Compile Include="Graphics\Editor\Gizmos\AxisGizmoTranslation.cs" />
     <Compile Include="Graphics\Editor\Gizmos\AxisGizmoScaleRenderer.cs" />
     <Compile Include="Graphics\Editor\Gizmos\AxisGizmoTranslationRenderer.cs" />
     <Compile Include="Graphics\Editor\EditorPrimitivesService.cs" />
+    <Compile Include="Graphics\Editor\Gizmos\GizmoRotationGraphics.cs" />
     <Compile Include="Graphics\Editor\GridMesh.cs" />
     <Compile Include="Graphics\Editor\Gizmos\IAxisGizmoRenderer.cs" />
     <Compile Include="Graphics\Editor\IEditorPrimitivesService.cs" />
@@ -193,6 +223,18 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Editor\EditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Game\Inspectors\InspectorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Game\Inspectors\TextBoxEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Game\Inspectors\Vector3EditorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -5,7 +5,7 @@
 #include "CodeWriter.h"
 #include "HLSLTree.h"
 
-namespace TrioFX
+namespace BrunoFX
 {
 
 	class BRUNO_API_EXPORT GLSLGenerator

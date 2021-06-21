@@ -9,6 +9,8 @@
 #include "Graphics/Models/ModelMesh.h"
 #include "Graphics/Models/ModelMeshPart.h"
 
+#include "Math/MathCollision.h"
+
 namespace BrunoEngine
 {
 	ModelReader::ModelReader()
@@ -87,17 +89,17 @@ namespace BrunoEngine
 			std::string name = input->ReadString();
 			ModelBone* parentBone = ReadBoneReference(model, input);
 
-			/*BoundingSphere boundingSphere;
+			BoundingSphere boundingSphere;
 			boundingSphere.Center = input->ReadVector3();
 			boundingSphere.Radius = input->ReadSingle();
 
 			BoundingBox boundingBox;
-			boundingBox.Min = input->ReadVector3();
-			boundingBox.Max = input->ReadVector3();*/
+			boundingBox.Center = input->ReadVector3();
+			boundingBox.Extents = input->ReadVector3();
 
 			Matrix absoluteTransform = parentBone->GetAbsoluteTransform();
 			std::vector<ModelMeshPart*> meshParts = ReadMeshParts(input);
-			meshes[i] = new ModelMesh(name, parentBone, absoluteTransform, /*boundingSphere, boundingBox,*/ meshParts);
+			meshes[i] = new ModelMesh(name, parentBone, absoluteTransform, boundingSphere, boundingBox, meshParts);
 		}
 		model->m_modelMeshes = meshes;
 	}

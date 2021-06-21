@@ -2,7 +2,7 @@
 
 #include "TrioApiRequisites.h"
 
-namespace TrioFX
+namespace BrunoFX
 {
 	void BRUNO_API_EXPORT Log_Error(const char* format, ...);
 }

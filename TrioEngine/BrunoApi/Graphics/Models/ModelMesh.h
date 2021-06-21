@@ -3,6 +3,7 @@
 #include "TrioApiRequisites.h"
 
 #include <string>
+#include "Math/MathCollision.h"
 
 namespace BrunoEngine
 {
@@ -13,12 +14,12 @@ namespace BrunoEngine
 	{
 	public:
 		ModelMesh();
-		ModelMesh(std::string name, ModelBone* parentBone, Matrix& transform /*, BoundingSphere boundingSphere, BoundingBox boundingBox*/, std::vector<ModelMeshPart*>& meshParts);
+		ModelMesh(std::string name, ModelBone* parentBone, Matrix& transform, BoundingSphere boundingSphere, BoundingBox boundingBox, std::vector<ModelMeshPart*>& meshParts);
 		~ModelMesh();
 
 		inline const std::vector<ModelMeshPart*>& GetModelMeshParts()
 		{
-			return m_ModelMeshParts;
+			return m_modelMeshParts;
 		}
 
 		inline ModelBone* GetParentBone()
@@ -34,22 +35,22 @@ namespace BrunoEngine
 			return m_transform;
 		}
 
-		/*inline const BoundingSphere& GetBoundingSphere()
+		inline const BoundingSphere& GetBoundingSphere()
 		{
 			return m_boundingSphere;
 		}
 		inline const BoundingBox& GetBoundingBox()
 		{
 			return m_boundingBox;
-		}*/
+		}
 
 	private:
 		std::string m_name;
-		std::vector<ModelMeshPart*> m_ModelMeshParts;
+		std::vector<ModelMeshPart*> m_modelMeshParts;
 		ModelBone* m_parentBone;
 		Matrix m_transform;
 
-		/*BoundingSphere m_boundingSphere;
-		BoundingBox m_boundingBox;*/
+		BoundingSphere m_boundingSphere;
+		BoundingBox m_boundingBox;
 	};
 }

@@ -122,17 +122,17 @@ namespace BrunoEngine
 			std::string name = input->ReadString();
 			ModelBone* parentBone = ReadBoneReference(scene, input);
 
-			/*BoundingSphere boundingSphere;
+			BoundingSphere boundingSphere;
 			boundingSphere.Center = input->ReadVector3();
 			boundingSphere.Radius = input->ReadSingle();
 
 			BoundingBox boundingBox;
-			boundingBox.Min = input->ReadVector3();
-			boundingBox.Max = input->ReadVector3();*/
+			boundingBox.Center = input->ReadVector3();
+			boundingBox.Extents = input->ReadVector3();
 
 			Matrix transform = parentBone->m_transform;
 			std::vector<ModelMeshPart*> meshParts = ReadMeshParts(input);
-			meshes[i] = new ModelMesh(name, parentBone, transform, /*boundingSphere, boundingBox,*/ meshParts);
+			meshes[i] = new ModelMesh(name, parentBone, transform, boundingSphere, boundingBox, meshParts);
 		}
 		//model->m_modelMeshes = meshes;
 	}

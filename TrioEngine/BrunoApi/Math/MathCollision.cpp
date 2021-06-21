@@ -3,6 +3,7 @@
 
 namespace BrunoEngine
 {
+#ifdef BRUNO_DIRECTX
     inline bool XMVector3AnyTrue(_In_ DirectX::FXMVECTOR V)
     {
         using namespace DirectX;
@@ -71,4 +72,136 @@ namespace BrunoEngine
         fDist = 0.f;
         return false;
     }
+
+    _Use_decl_annotations_
+        inline void BoundingBox::CreateFromPoints(BoundingBox& Out, size_t Count, const Vector3* pPoints, size_t Stride)
+    {
+        assert(Count > 0);
+        assert(pPoints);
+        using namespace DirectX;
+
+        // Find the minimum and maximum x, y, and z
+        XMVECTOR vMin, vMax;
+
+        vMin = vMax = XMLoadFloat3(pPoints);
+
+        for (size_t i = 1; i < Count; ++i)
+        {
+            XMVECTOR Point = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(reinterpret_cast<const uint8_t*>(pPoints) + i * Stride));
+
+            vMin = XMVectorMin(vMin, Point);
+            vMax = XMVectorMax(vMax, Point);
+        }
+
+        // Store center and extents.
+        XMStoreFloat3(&Out.Center, XMVectorScale(XMVectorAdd(vMin, vMax), 0.5f));
+        XMStoreFloat3(&Out.Extents, XMVectorScale(XMVectorSubtract(vMax, vMin), 0.5f));
+    }
+
+    _Use_decl_annotations_
+    inline void BoundingSphere::CreateFromPoints(BoundingSphere& Out, size_t Count, const Vector3* pPoints, size_t Stride)
+    {
+        assert(Count > 0);
+        assert(pPoints);
+
+        using namespace DirectX;
+
+        // Find the points with minimum and maximum x, y, and z
+        XMVECTOR MinX, MaxX, MinY, MaxY, MinZ, MaxZ;
+
+        MinX = MaxX = MinY = MaxY = MinZ = MaxZ = XMLoadFloat3(pPoints);
+
+        for (size_t i = 1; i < Count; ++i)
+        {
+            XMVECTOR Point = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(reinterpret_cast<const uint8_t*>(pPoints) + i * Stride));
+
+            float px = XMVectorGetX(Point);
+            float py = XMVectorGetY(Point);
+            float pz = XMVectorGetZ(Point);
+
+            if (px < XMVectorGetX(MinX))
+                MinX = Point;
+
+            if (px > XMVectorGetX(MaxX))
+                MaxX = Point;
+
+            if (py < XMVectorGetY(MinY))
+                MinY = Point;
+
+            if (py > XMVectorGetY(MaxY))
+                MaxY = Point;
+
+            if (pz < XMVectorGetZ(MinZ))
+                MinZ = Point;
+
+            if (pz > XMVectorGetZ(MaxZ))
+                MaxZ = Point;
+        }
+
+        // Use the min/max pair that are farthest apart to form the initial sphere.
+        XMVECTOR DeltaX = XMVectorSubtract(MaxX, MinX);
+        XMVECTOR DistX = XMVector3Length(DeltaX);
+
+        XMVECTOR DeltaY = XMVectorSubtract(MaxY, MinY);
+        XMVECTOR DistY = XMVector3Length(DeltaY);
+
+        XMVECTOR DeltaZ = XMVectorSubtract(MaxZ, MinZ);
+        XMVECTOR DistZ = XMVector3Length(DeltaZ);
+
+        XMVECTOR vCenter;
+        XMVECTOR vRadius;
+
+        if (XMVector3Greater(DistX, DistY))
+        {
+            if (XMVector3Greater(DistX, DistZ))
+            {
+                // Use min/max x.
+                vCenter = XMVectorLerp(MaxX, MinX, 0.5f);
+                vRadius = XMVectorScale(DistX, 0.5f);
+            }
+            else
+            {
+                // Use min/max z.
+                vCenter = XMVectorLerp(MaxZ, MinZ, 0.5f);
+                vRadius = XMVectorScale(DistZ, 0.5f);
+            }
+        }
+        else // Y >= X
+        {
+            if (XMVector3Greater(DistY, DistZ))
+            {
+                // Use min/max y.
+                vCenter = XMVectorLerp(MaxY, MinY, 0.5f);
+                vRadius = XMVectorScale(DistY, 0.5f);
+            }
+            else
+            {
+                // Use min/max z.
+                vCenter = XMVectorLerp(MaxZ, MinZ, 0.5f);
+                vRadius = XMVectorScale(DistZ, 0.5f);
+            }
+        }
+
+        // Add any points not inside the sphere.
+        for (size_t i = 0; i < Count; ++i)
+        {
+            XMVECTOR Point = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(reinterpret_cast<const uint8_t*>(pPoints) + i * Stride));
+
+            XMVECTOR Delta = XMVectorSubtract(Point, vCenter);
+
+            XMVECTOR Dist = XMVector3Length(Delta);
+
+            if (XMVector3Greater(Dist, vRadius))
+            {
+                // Adjust sphere to include the new point.
+                vRadius = XMVectorScale(XMVectorAdd(vRadius, Dist), 0.5f);
+                vCenter = XMVectorAdd(vCenter, XMVectorMultiply(XMVectorSubtract(XMVectorReplicate(1.0f), XMVectorDivide(vRadius, Dist)), Delta));
+            }
+        }
+
+        XMStoreFloat3(&Out.Center, vCenter);
+        XMStoreFloat(&Out.Radius, vRadius);
+    }
+
+#endif
 }

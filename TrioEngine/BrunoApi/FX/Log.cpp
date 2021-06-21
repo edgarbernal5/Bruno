@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-namespace TrioFX
+namespace BrunoFX
 {
 	void Log_Error(const char* format, ...)
 	{

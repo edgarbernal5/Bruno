@@ -10,10 +10,10 @@
 
 namespace BrunoEngine
 {
-	EffectPass::EffectPass(TrioFX::HLSLPass11* pass11, TrioFX::HLSLTree& tree, std::vector<TrioFX::HLSLBuffer*> &buffers, std::vector<TrioFX::HLSLDeclaration*> &samplers, GraphicsDevice* device, Effect* effect) :
+	EffectPass::EffectPass(BrunoFX::HLSLPass11* pass11, BrunoFX::HLSLTree& tree, std::vector<BrunoFX::HLSLBuffer*> &buffers, std::vector<BrunoFX::HLSLDeclaration*> &samplers, GraphicsDevice* device, Effect* effect) :
 		m_vertexShader(nullptr), m_pixelShader(nullptr), m_effect(effect), m_device(device)
 	{
-		TrioFX::HLSLPassShader* passShader = pass11->shader;
+		BrunoFX::HLSLPassShader* passShader = pass11->shader;
 		m_name = pass11->name;
 
 		std::vector<bool> buffersUsed(buffers.size(), false);
@@ -38,8 +38,8 @@ namespace BrunoEngine
 				auto itm = m_effect->m_shadersByName.find(passShader->options->functionCallName);
 				if (itm == m_effect->m_shadersByName.end())
 				{
-					TrioFX::HLSLFunctionVisitor visitor;
-					TrioFX::HLSLFunction* functionDef = tree.FindFunction(passShader->options->functionCallName);
+					BrunoFX::HLSLFunctionVisitor visitor;
+					BrunoFX::HLSLFunction* functionDef = tree.FindFunction(passShader->options->functionCallName);
 
 					visitor.VisitFunction(functionDef);
 
@@ -49,8 +49,8 @@ namespace BrunoEngine
 						bool bFound = false;
 						for (size_t w = 0; w < buffers.size(); w++)
 						{
-							TrioFX::HLSLBuffer* buffer = buffers[w];
-							TrioFX::HLSLDeclaration* field = buffer->field;
+							BrunoFX::HLSLBuffer* buffer = buffers[w];
+							BrunoFX::HLSLDeclaration* field = buffer->field;
 
 							while (field != nullptr)
 							{
@@ -60,7 +60,7 @@ namespace BrunoEngine
 									buffersUsed[w] = true;
 									break;
 								}
-								field = (TrioFX::HLSLDeclaration*)field->nextStatement;
+								field = (BrunoFX::HLSLDeclaration*)field->nextStatement;
 							}
 							if (bFound) break;
 						}
@@ -69,7 +69,7 @@ namespace BrunoEngine
 						{
 							for (size_t w = 0; w < samplers.size(); w++)
 							{
-								TrioFX::HLSLDeclaration* sampler = samplers[w];
+								BrunoFX::HLSLDeclaration* sampler = samplers[w];
 								if (strcmp(sampler->name, *it) == 0)
 								{
 									bFound = true;
@@ -85,7 +85,7 @@ namespace BrunoEngine
 						if (buffersUsed[t])
 						{
 							size_t cbBindingIndex = t;
-							TrioFX::HLSLBuffer* buffer = buffers[t];
+							BrunoFX::HLSLBuffer* buffer = buffers[t];
 							if (buffer->registerName != nullptr)
 							{
 								std::string registerName = buffer->registerName;
@@ -104,7 +104,7 @@ namespace BrunoEngine
 						if (samplersUsed[t])
 						{
 							size_t cbBindingIndex = t;
-							TrioFX::HLSLDeclaration* sampler = samplers[t];
+							BrunoFX::HLSLDeclaration* sampler = samplers[t];
 							if (sampler->registerName != nullptr)
 							{
 								std::string registerName = sampler->registerName;

@@ -36,6 +36,13 @@ namespace BrunoFramework.Editor.Game.Gizmos
         }
         private AxisGizmoScaleRenderer m_axisGizmoScaleRenderer;
 
+        public AxisGizmoRotationRenderer AxisGizmoRotationRenderer
+        {
+            get => m_axisGizmoRotationRenderer;
+            set => m_axisGizmoRotationRenderer = value;
+        }
+        private AxisGizmoRotationRenderer m_axisGizmoRotationRenderer;
+
         public Camera Camera
         {
             get => m_camera;
@@ -197,6 +204,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
             m_axisGizmoTranslationRenderer = new AxisGizmoTranslationRenderer(m_graphicsService);
             m_axisGizmoScaleRenderer = new AxisGizmoScaleRenderer(m_graphicsService);
+            m_axisGizmoRotationRenderer = new AxisGizmoRotationRenderer(m_graphicsService, GIZMO_LENGTH);
 
             m_selectionState = new SelectionState();
             m_selectionState.m_rotationMatrix = Matrix.Identity;
@@ -222,79 +230,121 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 ray.Position = Vector3.Transform(ray.Position, gizmoWorldInverse);
             }
 
-            float? intersection = XAxisBox.Intersects(ray);
-            if (intersection.HasValue)
+            if (m_currentGizmoType == GizmoType.Translation || m_currentGizmoType == GizmoType.Scale)
             {
-                if (intersection.Value < closestintersection)
-                {
-                    m_currentGizmoAxis = GizmoAxis.X;
-                    closestintersection = intersection.Value;
-                }
-            }
-            intersection = YAxisBox.Intersects(ray);
-            if (intersection.HasValue)
-            {
-                if (intersection.Value < closestintersection)
-                {
-                    m_currentGizmoAxis = GizmoAxis.Y;
-                    closestintersection = intersection.Value;
-                }
-            }
-
-            intersection = ZAxisBox.Intersects(ray);
-            if (intersection.HasValue)
-            {
-                if (intersection.Value < closestintersection)
-                {
-                    m_currentGizmoAxis = GizmoAxis.Z;
-                    closestintersection = intersection.Value;
-                }
-            }
-
-            if (m_currentGizmoType == GizmoType.Translation)
-            {
-                if (closestintersection >= float.MaxValue)
-                    closestintersection = float.MinValue;
-
-                intersection = XYBox.Intersects(ray);
-                if (intersection.HasValue)
-                {
-                    if (intersection.Value > closestintersection)
-                    {
-                        m_currentGizmoAxis = GizmoAxis.XY;
-                        closestintersection = intersection.Value;
-                    }
-                }
-
-                intersection = XZAxisBox.Intersects(ray);
-                if (intersection.HasValue)
-                {
-                    if (intersection.Value > closestintersection)
-                    {
-                        m_currentGizmoAxis = GizmoAxis.ZX;
-                        closestintersection = intersection.Value;
-                    }
-                }
-                intersection = YZBox.Intersects(ray);
-                if (intersection.HasValue)
-                {
-                    if (intersection.Value > closestintersection)
-                    {
-                        m_currentGizmoAxis = GizmoAxis.YZ;
-                        closestintersection = intersection.Value;
-                    }
-                }
-            }
-            else if (m_currentGizmoType == GizmoType.Scale)
-            {
-                intersection = XYZBox.Intersects(ray);
+                float? intersection = XAxisBox.Intersects(ray);
                 if (intersection.HasValue)
                 {
                     if (intersection.Value < closestintersection)
                     {
-                        m_currentGizmoAxis = GizmoAxis.XYZ;
+                        m_currentGizmoAxis = GizmoAxis.X;
                         closestintersection = intersection.Value;
                     }
+                }
+                intersection = YAxisBox.Intersects(ray);
+                if (intersection.HasValue)
+                {
+                    if (intersection.Value < closestintersection)
+                    {
+                        m_currentGizmoAxis = GizmoAxis.Y;
+                        closestintersection = intersection.Value;
+                    }
+                }
+
+                intersection = ZAxisBox.Intersects(ray);
+                if (intersection.HasValue)
+                {
+                    if (intersection.Value < closestintersection)
+                    {
+                        m_currentGizmoAxis = GizmoAxis.Z;
+                        closestintersection = intersection.Value;
+                    }
+                }
+
+                if (m_currentGizmoType == GizmoType.Translation)
+                {
+                    if (closestintersection >= float.MaxValue)
+                        closestintersection = float.MinValue;
+
+                    intersection = XYBox.Intersects(ray);
+                    if (intersection.HasValue)
+                    {
+                        if (intersection.Value > closestintersection)
+                        {
+                            m_currentGizmoAxis = GizmoAxis.XY;
+                            closestintersection = intersection.Value;
+                        }
+                    }
+
+                    intersection = XZAxisBox.Intersects(ray);
+                    if (intersection.HasValue)
+                    {
+                        if (intersection.Value > closestintersection)
+                        {
+                            m_currentGizmoAxis = GizmoAxis.ZX;
+                            closestintersection = intersection.Value;
+                        }
+                    }
+                    intersection = YZBox.Intersects(ray);
+                    if (intersection.HasValue)
+                    {
+                        if (intersection.Value > closestintersection)
+                        {
+                            m_currentGizmoAxis = GizmoAxis.YZ;
+                            closestintersection = intersection.Value;
+                        }
+                    }
+                }
+                else if (m_currentGizmoType == GizmoType.Scale)
+                {
+                    intersection = XYZBox.Intersects(ray);
+                    if (intersection.HasValue)
+                    {
+                        if (intersection.Value < closestintersection)
+                        {
+                            m_currentGizmoAxis = GizmoAxis.XYZ;
+                            closestintersection = intersection.Value;
+                        }
+                    }
+                }
+            }
+            else if (m_currentGizmoType == GizmoType.Rotation)
+            {
+                var planeNormals = new Vector3[] { Vector3.Right, Vector3.Up, Vector3.Forward };
+
+                GizmoAxis axis = GizmoAxis.None;
+                for (int i = 0; i < 3; i++)
+                {
+                    var plane = new Plane(planeNormals[i], 0);
+                    var intersection = ray.Intersects(plane);
+                    if (intersection.HasValue)
+                    {
+                        var positionOnPlane = ray.Position + (ray.Direction * intersection.Value);
+                        if (positionOnPlane.Length() > GIZMO_LENGTH)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            //var point = GIZMO_LENGTH * Vector3.Normalize(positionOnPlane);
+                            //var norm = (positionOnPlane - point).Length();
+                            //Console.WriteLine("point = " + point + "; GIZMO_LENGTH = " + GIZMO_LENGTH + "; norm = " + norm)
+                            m_selectionState.m_intersectionPosition = GIZMO_LENGTH * Vector3.Normalize(positionOnPlane);
+
+                            //Console.WriteLine("candidate = " + ((GizmoAxis)(i + 1)).ToString());
+                            if (intersection.Value < closestintersection)
+                            {
+                                axis = ((GizmoAxis)(i + 1));
+                                //Console.WriteLine("selected = " + m_currentGizmoAxis);
+                                closestintersection = intersection.Value;
+                            }
+                        }
+                    }
+                }
+                if (axis != GizmoAxis.None)
+                {
+                    m_currentGizmoAxis = axis;
+                    Console.WriteLine("selected = " + m_currentGizmoAxis);
                 }
             }
 
@@ -347,7 +397,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
                         {
                             if (m_currentGizmoAxis != GizmoAxis.XYZ)
                             {
-                                m_axisGizmoScaleRenderer.AxisGizmoScale.PutOffsetInVertices(scaleDelta * m_selectionState.m_invScreenScaleFactor, m_currentGizmoAxis);
+                                m_axisGizmoScaleRenderer.UpdateGizmoLength(m_currentGizmoAxis, scaleDelta * m_selectionState.m_invScreenScaleFactor);
                             }
                             if (OnScaleChanged != null)
                             {
@@ -364,15 +414,51 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         private Matrix GetRotationDelta(Vector2 mousePosition)
         {
+            m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
             if (m_selectionState.m_prevMousePosition == Vector2.Zero)
             {
                 return Matrix.Identity;
             }
 
-            float delta = mousePosition.X - m_selectionState.m_prevMousePosition.X;
-            delta *= (float)m_gameTimer.ElapsedTime.TotalSeconds;
-            //delta = MathHelper.ToRadians(delta);
-            delta *= m_selectionState.m_invScreenScaleFactor;
+            var planeNormals = new Vector3[] { Vector3.Right, Vector3.Up, Vector3.Forward };
+            var upNormals = new Vector3[] { Vector3.Right, Vector3.Up, Vector3.Forward };
+            int planeIndex = ((int)m_currentGizmoAxis) - 1;
+
+            Ray ray = ConvertMouseToRay(mousePosition);
+
+            var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoWorld);
+
+            ray.Direction = Vector3.TransformNormal(ray.Direction, gizmoWorldInverse);
+            ray.Position = Vector3.Transform(ray.Position, gizmoWorldInverse);
+
+            var plane = new Plane(planeNormals[planeIndex], 0);
+            var intersection = ray.Intersects(plane);
+
+            float delta = 0.0f;
+            if (intersection.HasValue)
+            {
+                var positionOnPlane = ray.Position + (ray.Direction * intersection.Value);
+
+                var point = GIZMO_LENGTH * Vector3.Normalize(positionOnPlane);
+                m_selectionState.m_intersectionPosition = point;
+                //var norm = (positionOnPlane - point).Length();
+
+                float acosAngle = MathHelper.Clamp(Vector3.Dot(point, m_selectionState.m_prevIntersectionPosition), -1.0f, 1.0f);
+                float angle = MathHelper.Acos(MathHelper.ToRadians(acosAngle));
+
+                var perpendicularVector = Vector3.Cross(m_selectionState.m_prevIntersectionPosition, point);
+                perpendicularVector.Normalize();
+
+                //var sign = Vector3.Dot(perpendicularVector, upNormals[planeIndex]) < 0.0f ? 1.0f : -1.0f;
+                var pUpDot = Vector3.Dot(perpendicularVector, upNormals[planeIndex]);
+                var sign = pUpDot / Math.Abs(pUpDot);
+
+                delta = sign * angle;
+                delta *= (float)m_gameTimer.ElapsedTime.TotalSeconds;
+                delta *= m_selectionState.m_invScreenScaleFactor;
+                Console.WriteLine("delta = " + delta);
+
+            }
 
             Matrix rotationDelta = Matrix.Identity;
             rotationDelta.Forward = m_selectionState.m_sceneWorld.Forward;
@@ -446,8 +532,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
                                 case GizmoAxis.Y:
                                     delta = new Vector3(0, m_currentDelta.Y, 0);
                                     break;
-                                case GizmoAxis.Z:
-                                    delta = new Vector3(0, 0, m_currentDelta.Z);
+                                case GizmoAxis.YZ:
+                                    delta = new Vector3(0, m_currentDelta.Y, m_currentDelta.Z);
                                     break;
                             }
                         }
@@ -536,12 +622,12 @@ namespace BrunoFramework.Editor.Game.Gizmos
         {
             m_selectionState.m_prevIntersectionPosition = Vector3.Zero;
             m_selectionState.m_intersectionPosition = Vector3.Zero;
-            m_currentDelta = Vector3.Zero;
             m_selectionState.m_prevMousePosition = Vector2.Zero;
+            m_currentDelta = Vector3.Zero;
 
             if (m_currentGizmoType == GizmoType.Scale && m_currentGizmoAxis != GizmoAxis.XYZ)
             {
-                m_axisGizmoScaleRenderer.AxisGizmoScale.PutBackBox(m_currentGizmoAxis);
+                m_axisGizmoScaleRenderer.RestoreGizmo(m_currentGizmoAxis, LINE_LENGTH);
             }
             Update();
         }
@@ -575,7 +661,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         private void Update()
         {
-            Vector3 vLength = m_camera.Position - m_selectionState.m_gizmoPosition;
+            var vLength = m_camera.Position - m_selectionState.m_gizmoPosition;
 
             m_selectionState.m_screenScaleFactor = vLength.Length() * GIZMO_SCREEN_SCALE;
             if (m_selectionState.m_screenScaleFactor < 0.0001f)
@@ -611,8 +697,13 @@ namespace BrunoFramework.Editor.Game.Gizmos
                     m_axisGizmoTranslationRenderer.Render(renderContext);
                     break;
                 case GizmoType.Rotation:
-                    m_axisGizmoScaleRenderer.SetWorld(m_selectionState.m_gizmoWorld);
-                    m_axisGizmoScaleRenderer.Render(renderContext);
+                    {
+                        //var rotationCam = Quaternion.CreateFromMatrix((Camera.View));
+                        //var world = Matrix.CreateFromQuaternion(rotationCam) * m_selectionState.m_gizmoWorld;
+                        var world = m_selectionState.m_gizmoWorld;
+                        AxisGizmoRotationRenderer.SetWorld(world);
+                        AxisGizmoRotationRenderer.Render(renderContext);
+                    }
                     break;
                 case GizmoType.Scale:
                     m_axisGizmoScaleRenderer.SetWorld(m_selectionState.m_gizmoWorld);

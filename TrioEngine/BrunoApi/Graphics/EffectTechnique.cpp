@@ -5,12 +5,12 @@
 
 namespace BrunoEngine
 {
-	EffectTechnique::EffectTechnique(TrioFX::HLSLTechnique11* technique, TrioFX::HLSLTree& tree, std::vector<TrioFX::HLSLBuffer*> &buffers, std::vector<TrioFX::HLSLDeclaration*> &samplers, GraphicsDevice* device, Effect* effect)
+	EffectTechnique::EffectTechnique(BrunoFX::HLSLTechnique11* technique, BrunoFX::HLSLTree& tree, std::vector<BrunoFX::HLSLBuffer*> &buffers, std::vector<BrunoFX::HLSLDeclaration*> &samplers, GraphicsDevice* device, Effect* effect)
 	{
 		m_name = technique->name;
 
 		m_passes = std::vector<EffectPass *>(technique->numPasses, nullptr);
-		TrioFX::HLSLPass11* ppass = technique->passes;
+		BrunoFX::HLSLPass11* ppass = technique->passes;
 		for (int i = 0; i < technique->numPasses; i++)
 		{
 			m_passes[i] = new EffectPass(ppass, tree, buffers, samplers, device, effect);

@@ -12,6 +12,7 @@ using BrunoFramework.Editor.Game.Gizmos;
 using BrunoApi.Net.Maths;
 using System;
 using BrunoFramework.Editor.Timing;
+using BrunoFramework.Editor.Game.Inspectors;
 
 namespace BrunoFramework.Editor.Game
 {
@@ -41,11 +42,13 @@ namespace BrunoFramework.Editor.Game
 
         private WorldOutline m_worldOutline;
         private IWorldOutlineService m_outlineService;
+        private IInspectorService m_inspectorService;
 
         public SceneProjectFile(IEditorService editor) :
             base(editor)
         {
             m_outlineService = Editor.Services.GetInstance<IWorldOutlineService>();
+            m_inspectorService = Editor.Services.GetInstance<IInspectorService>();
 
             var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
             GizmoService = new GizmoService(graphicsDevice, Editor.Services.GetInstance<GameStepTimer>());
@@ -90,6 +93,13 @@ namespace BrunoFramework.Editor.Game
                 var sceneTransform = m_scene.GetSceneTransformFor(id);
 
                 m_gizmoService.SetObjectSelected(new GizmoTransformable(id, sceneTransform));
+
+                var customData = m_worldOutline.SelectedItems[0].CustomData as WorldOutlineData;
+                customData.Position = sceneTransform.LocalPosition;
+
+                m_inspectorService.SelectedObject = new InspectableObjectBuilder()
+                    .WithObjectProperties(customData, x => true)
+                    .ToInspectableObject();
             }
         }
 
@@ -141,7 +151,12 @@ namespace BrunoFramework.Editor.Game
                 {
                     foreach (var entityName in item.Items)
                     {
-                        m_worldOutline.RootItems.Add(CreateOutlineItem(entityName.id, item.Parent, entityName.name));
+                        var outlineItem = CreateOutlineItem(entityName.id, item.Parent, entityName.name);
+                        var customData = new WorldOutlineData();
+                        customData.Name = entityName.name;
+                        outlineItem.CustomData = customData;
+
+                        m_worldOutline.RootItems.Add(outlineItem);
                     }
                 }
                 else
@@ -153,7 +168,12 @@ namespace BrunoFramework.Editor.Game
                             var container = FindParent(m_worldOutline.RootItems[i], item.Parent);
                             if (container != null)
                             {
-                                container.Children.Add(CreateOutlineItem(entityName.id, item.Parent, entityName.name));
+                                var outlineItem = CreateOutlineItem(entityName.id, item.Parent, entityName.name);
+                                var customData = new WorldOutlineData();
+                                customData.Name = entityName.name;
+                                outlineItem.CustomData = customData;
+
+                                container.Children.Add(outlineItem);
                                 break;
                             }
                             else

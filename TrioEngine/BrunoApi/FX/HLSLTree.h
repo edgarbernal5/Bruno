@@ -7,7 +7,7 @@
 #include <map>
 #include <set>
 
-namespace TrioFX
+namespace BrunoFX
 {
 	class Allocator;
 
@@ -1008,7 +1008,7 @@ namespace TrioFX
 		HLSLBuffer * FindBuffer(const char * name);
 		HLSLTechnique11 * FindFirstTechnique11();
 
-		void PopulateEffectCollections(HLSLTree* root, std::vector<HLSLTechnique11*> &techniques, std::vector<HLSLBuffer*> &buffers, std::vector<HLSLStruct*> &structures, std::vector<TrioFX::HLSLDeclaration*> &textures, std::vector<TrioFX::HLSLDeclaration*> &samplers);
+		void PopulateEffectCollections(HLSLTree* root, std::vector<HLSLTechnique11*> &techniques, std::vector<HLSLBuffer*> &buffers, std::vector<HLSLStruct*> &structures, std::vector<BrunoFX::HLSLDeclaration*> &textures, std::vector<BrunoFX::HLSLDeclaration*> &samplers);
 
 		bool GetExpressionValue(HLSLExpression * expression, int & value);
 		int GetExpressionValue(HLSLExpression * expression, float values[4]);
@@ -1096,11 +1096,11 @@ namespace TrioFX
 		
 	};
 
-	class BRUNO_API_EXPORT HLSLFunctionVisitor : public TrioFX::HLSLTreeVisitor
+	class BRUNO_API_EXPORT HLSLFunctionVisitor : public BrunoFX::HLSLTreeVisitor
 	{
 	public:
 		HLSLFunctionVisitor();
-		void VisitIdentifierExpression(TrioFX::HLSLIdentifierExpression * node);
+		void VisitIdentifierExpression(BrunoFX::HLSLIdentifierExpression * node);
 
 		std::set<const char*> m_sParameterVisited;
 	};

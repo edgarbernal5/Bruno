@@ -7,7 +7,6 @@
              xmlns:game="clr-namespace:BrunoFramework.Graphics.Interop"
              xmlns:local="clr-namespace:BrunoFramework.Editor.Game"
              xmlns:beh="clr-namespace:BrunoFramework.Editor.Game.Interaction"
-             xmlns:beh2="clr-namespace:BrunoFramework.Editor.Game.Gizmos"
              xmlns:win="clr-namespace:BrunoWindows;assembly=BrunoWindows"
              d:DataContext="{d:DesignInstance local:SceneViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
@@ -18,7 +17,7 @@
     <Grid>
         <DockPanel LastChildFill = "True">
             <StackPanel DockPanel.Dock = "Top" Orientation="Horizontal">
-                <ComboBox Width="80"
+                <ComboBox Width="100"
                           IsEditable="False"
                           ItemsSource="{Binding GizmoMode, Converter={x:Static win:EnumToArrayConverter.Instance}}"
                           SelectedValue="{Binding GizmoMode}">
@@ -41,8 +40,8 @@
                     <beh:CameraArcBallHwndHostBehavior Camera="{Binding Camera}" />
                     <beh:CameraZoomHwndHostBehavior Camera="{Binding Camera}" />
                     <beh:CameraHandToolHwndHostBehavior Camera="{Binding Camera}" />
-                
-                    <beh2:GizmosHandlerHwndHostBehavior Camera="{Binding Camera}" 
+
+                    <beh:GizmosHandlerHwndHostBehavior Camera="{Binding Camera}" 
                                                         GizmoService="{Binding GizmoService}"
                                                         Scene="{Binding Scene}"/>
             </i:Interaction.Behaviors>

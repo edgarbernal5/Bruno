@@ -4,7 +4,7 @@
 
 #include "Containers/Array.h"
 
-namespace TrioFX
+namespace BrunoFX
 {
 	class StringPool
 	{

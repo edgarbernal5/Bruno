@@ -9,7 +9,7 @@
 
 #pragma warning (disable : 4996)
 
-namespace TrioFX
+namespace BrunoFX
 {
 
 	static const char* GetTypeName(const HLSLType& type)

@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace BrunoApi.Net.Maths
 {
     public static class MathHelper
@@ -14,6 +16,21 @@ namespace BrunoApi.Net.Maths
         public static float ToDegrees(float radians)
         {
             return radians * 57.2957764f;
+        }
+
+        public static float Clamp(float v, float min, float max)
+        {
+            if (v < min)
+                return min;
+            if (v > max)
+                return max;
+
+            return v;
+        }
+
+        public static float Acos(float v)
+        {
+            return (float)Math.Acos(v);
         }
     }
 }

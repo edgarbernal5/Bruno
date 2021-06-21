@@ -28,8 +28,11 @@ namespace BrunoEngine
 		ModelMeshPart* modelMeshPart = new ModelMeshPart(0, vertexBuffer->GetVertexCount(), 0, indexBuffer->GetIndexCount(), vertexBuffer, indexBuffer, material);
 		modelMeshParts.push_back(modelMeshPart);
 		
+		BoundingBox bBox;
+		BoundingSphere bSphere;
+
 		Matrix transform = Matrix::Identity;
-		ModelMesh* modelMesh = new ModelMesh("modelo", nullptr, transform, modelMeshParts);
+		ModelMesh* modelMesh = new ModelMesh("modelo", nullptr, transform, bSphere, bBox, modelMeshParts);
 		m_modelMeshes.push_back(modelMesh);
 	}
 

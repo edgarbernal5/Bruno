@@ -12,7 +12,7 @@
 
 #pragma warning(disable : 4996)
 
-namespace TrioFX
+namespace BrunoFX
 {
 	static const HLSLType kFloatType(HLSLBaseType_Float);
 	static const HLSLType kUintType(HLSLBaseType_Uint);

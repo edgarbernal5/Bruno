@@ -2,6 +2,7 @@
 using Bruno.Logging;
 using Bruno.ServiceLocation;
 using BrunoFramework.Editor.Game;
+using BrunoFramework.Editor.Game.Inspectors;
 using BrunoFramework.Editor.Units;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,17 @@ namespace BrunoFramework.Editor
             }
         }
         private WorldOutlineViewModel m_worldOutlineDetail;
+
+        public InspectorViewModel InspectorDetail
+        {
+            get => m_inspectorDetail;
+            set
+            {
+                m_inspectorDetail = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        private InspectorViewModel m_inspectorDetail;
 
         public string ApplicationName
         {
@@ -147,6 +159,9 @@ namespace BrunoFramework.Editor
         {
             var worldOutlineService = Services.GetInstance<IWorldOutlineService>();
             WorldOutlineDetail = worldOutlineService.ViewModel;
+
+            var inspectorService = Services.GetInstance<IInspectorService>();
+            InspectorDetail = inspectorService.ViewModel;
         }
 
         private void CreateEmptyScene()

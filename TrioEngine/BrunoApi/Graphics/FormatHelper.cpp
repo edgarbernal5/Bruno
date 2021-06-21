@@ -167,7 +167,7 @@ namespace BrunoEngine
 		case PrimitiveType::TriangleList:
 			return 3 * primitiveCount;
 		case PrimitiveType::TriangleStrip:
-			return 3 + (primitiveCount - 1); // ???
+			return primitiveCount + 2;
 		case PrimitiveType::LineList:
 			return primitiveCount * 2;
 		case PrimitiveType::LineStrip:

@@ -6,7 +6,7 @@
 
 #include <stdarg.h>
 
-namespace TrioFX
+namespace BrunoFX
 {
 	static const int _maxLineLength = 2048;
 

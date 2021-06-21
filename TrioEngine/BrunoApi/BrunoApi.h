@@ -10,7 +10,6 @@ using namespace BrunoEngine;
 
 namespace BrunoEngine
 {
-
 	class Game;
 	class Effect;
 	class EffectTechnique;

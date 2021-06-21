@@ -9,7 +9,7 @@ namespace BrunoEngine
 
 	struct MaterialComponent
 	{
-		Vector4 baseColor = Vector4(1);
+		Vector4 baseColor = Vector4(1.0f);
 
 		Texture2D* diffuseTexture;
 	};

@@ -16,7 +16,6 @@ namespace BrunoFramework.Editor.Units
 
         public WorldOutlineUnit()
         {
-
         }
 
         protected override void OnInitialize()

@@ -10,7 +10,7 @@
 #include <vector>
 
 
-namespace TrioFX
+namespace BrunoFX
 {
 	struct EffectState;
 

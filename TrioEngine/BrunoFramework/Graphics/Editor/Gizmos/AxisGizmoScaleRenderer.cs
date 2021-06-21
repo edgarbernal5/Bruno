@@ -20,6 +20,8 @@ namespace BrunoFramework.Graphics.Editor
         private Effect m_effect;
         private Matrix m_gizmoWorld;
 
+        private float m_currentLineLength;
+
         public AxisGizmoScaleRenderer(GraphicsDevice device)
         {
             m_axisGizmoGraphics = new AxisGizmoGraphics(GizmoService.LINE_OFFSET);
@@ -29,6 +31,7 @@ namespace BrunoFramework.Graphics.Editor
 
             m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\LineEffect.fx");
             m_gizmoWorld = Matrix.Identity;
+            m_currentLineLength = GizmoService.LINE_LENGTH;
         }
 
         public void Render(RenderContext renderContext)
@@ -55,9 +58,21 @@ namespace BrunoFramework.Graphics.Editor
             m_gizmoWorld = gizmoWorld;
         }
 
-        public void ChangeLineLength(GizmoAxis gizmoAxis, float lineLength)
+        public void RestoreGizmo(GizmoAxis gizmoAxis, float length)
         {
-            m_axisGizmoGraphics.UpdateLinesFor(gizmoAxis, lineLength);
+            m_currentLineLength = length;
+            m_axisGizmoGraphics.UpdateLinesFor(gizmoAxis, m_currentLineLength);
+
+            m_gizmoScale.PutBackBox(gizmoAxis);
+        }
+
+        public void UpdateGizmoLength(GizmoAxis gizmoAxis, Vector3 delta)
+        {
+            var scalar = gizmoAxis == GizmoAxis.X ? delta.X : (gizmoAxis == GizmoAxis.Y ? delta.Y : delta.Z);
+            m_currentLineLength += scalar;
+            m_axisGizmoGraphics.UpdateLinesFor(gizmoAxis, m_currentLineLength);
+
+            AxisGizmoScale.PutOffsetInVertices(delta, gizmoAxis);
         }
     }
 }

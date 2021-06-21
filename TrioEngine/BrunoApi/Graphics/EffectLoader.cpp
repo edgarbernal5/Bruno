@@ -36,25 +36,25 @@ namespace BrunoEngine
 		//ID3DBlob* blob = EffectCompiler::CompileShader(filename, "PS", "ps_5_0", nullptr, false);
 
 		TrioMem::Allocator allocator;
-		TrioFX::HLSLParser parser(&allocator, filename.c_str(), inputFileContent.data(), inputFileContent.size());
-		TrioFX::HLSLTree tree(&allocator);
+		BrunoFX::HLSLParser parser(&allocator, filename.c_str(), inputFileContent.data(), inputFileContent.size());
+		BrunoFX::HLSLTree tree(&allocator);
 		if (!parser.Parse(&tree))
 		{
 			return false;
 		}
 		m_effect.ClearData();
 
-		std::vector<TrioFX::HLSLTechnique11*> techniques;
-		std::vector<TrioFX::HLSLBuffer*> buffers;
-		std::vector<TrioFX::HLSLStruct*> structures;
-		std::vector<TrioFX::HLSLDeclaration*> textures;
-		std::vector<TrioFX::HLSLDeclaration*> samplers;
+		std::vector<BrunoFX::HLSLTechnique11*> techniques;
+		std::vector<BrunoFX::HLSLBuffer*> buffers;
+		std::vector<BrunoFX::HLSLStruct*> structures;
+		std::vector<BrunoFX::HLSLDeclaration*> textures;
+		std::vector<BrunoFX::HLSLDeclaration*> samplers;
 
 		tree.PopulateEffectCollections(&tree, techniques, buffers, structures, textures, samplers);
 
 		for (size_t i = 0; i < techniques.size(); i++)
 		{
-			TrioFX::HLSLTechnique11* tech11 = techniques[i];
+			BrunoFX::HLSLTechnique11* tech11 = techniques[i];
 
 			EffectTechnique* technique = new EffectTechnique(tech11, tree, buffers, samplers, m_effect.m_device, &m_effect);
 
@@ -63,8 +63,8 @@ namespace BrunoEngine
 
 		for (size_t i = 0; i < buffers.size(); i++)
 		{
-			TrioFX::HLSLBuffer* buffer = buffers[i];
-			TrioFX::HLSLDeclaration* field = buffer->field;
+			BrunoFX::HLSLBuffer* buffer = buffers[i];
+			BrunoFX::HLSLDeclaration* field = buffer->field;
 
 			std::vector<ConstantBufferField> constantFields;
 			while (field != nullptr)
@@ -72,7 +72,7 @@ namespace BrunoEngine
 				ConstantBufferField cbf(field->name, field->offsetInBytes, field->sizeInBytes, field->typeName);
 				constantFields.push_back(cbf);
 
-				field = (TrioFX::HLSLDeclaration*)field->nextStatement;
+				field = (BrunoFX::HLSLDeclaration*)field->nextStatement;
 			}
 
 			ConstantBuffer* nConstantBuffer = new ConstantBuffer(m_effect.m_device, buffer->name, buffer->sizeInBytes, constantFields);
@@ -84,14 +84,14 @@ namespace BrunoEngine
 
 		std::vector<EffectParameter*> parameters;
 		ConstantBuffer* orphanConstantBuffer = nullptr;
-		TrioData::Array<TrioFX::HLSLParser::Variable>& globalVars = parser.GetGlobalVariables();
+		TrioData::Array<BrunoFX::HLSLParser::Variable>& globalVars = parser.GetGlobalVariables();
 
 		std::queue<EffectParameter*> lazyAppend;
 		std::queue<EffectParameter*> lazyAppend2;
 
 		for (size_t i = 0; i < globalVars.GetSize(); i++)
 		{
-			TrioFX::HLSLDeclaration* field = (TrioFX::HLSLDeclaration*)globalVars[i].statement;
+			BrunoFX::HLSLDeclaration* field = (BrunoFX::HLSLDeclaration*)globalVars[i].statement;
 			if (field->buffer != nullptr)
 			{
 				ConstantBuffer* constantBuffer = nullptr;
@@ -115,7 +115,7 @@ namespace BrunoEngine
 			}
 			else
 			{
-				if (field->type.baseType >= TrioFX::HLSLBaseType_FirstNumeric && field->type.baseType <= TrioFX::HLSLBaseType_LastNumeric)
+				if (field->type.baseType >= BrunoFX::HLSLBaseType_FirstNumeric && field->type.baseType <= BrunoFX::HLSLBaseType_LastNumeric)
 				{
 					if (orphanConstantBuffer == nullptr)
 					{
@@ -128,7 +128,7 @@ namespace BrunoEngine
 				}
 				else
 				{
-					if (field->type.baseType == TrioFX::HLSLBaseType_Texture2D)
+					if (field->type.baseType == BrunoFX::HLSLBaseType_Texture2D)
 					{
 						EffectParameter::STexture sTexture;
 						sTexture.m_texture = nullptr;
@@ -144,7 +144,7 @@ namespace BrunoEngine
 						}
 						lazyAppend2.push(new EffectParameter(sTexture, field->name, &m_effect));
 					}
-					else if (field->type.baseType == TrioFX::HLSLBaseType_SamplerState)
+					else if (field->type.baseType == BrunoFX::HLSLBaseType_SamplerState)
 					{
 						EffectParameter::SSamplerState sSamplerState;
 						sSamplerState.m_samplerState = nullptr;

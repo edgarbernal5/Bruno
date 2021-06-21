@@ -7,8 +7,9 @@ using System.Windows.Input;
 using System.Windows.Interactivity;
 using BrunoApi.Net.Game;
 using BrunoApi.Net.Maths;
+using BrunoFramework.Editor.Game.Gizmos;
 
-namespace BrunoFramework.Editor.Game.Gizmos
+namespace BrunoFramework.Editor.Game.Interaction
 {
     public class GizmosHandlerHwndHostBehavior : Behavior<GameSurfaceTargetHwndHost>
     {

@@ -592,7 +592,7 @@ namespace BrunoEngine
 	{
 #ifdef BRUNO_DIRECTX
 		int vertexCount = FormatHelper::GetElementCountArray(primitiveType, primitiveCount);
-		int startVertex = SetUserVertexBuffer(vertexData, vertexSizeArray, vertexOffset, vertexSizeArray, vertexDeclaration);
+		int startVertex = SetUserVertexBuffer(vertexData, vertexSizeArray, vertexOffset, vertexCount, vertexDeclaration);
 
 		ApplyState(true);
 

@@ -8,7 +8,7 @@
 
 #include <algorithm>
 
-namespace TrioFX
+namespace BrunoFX
 {
 	enum CompareFunctionsResult
 	{
@@ -4187,7 +4187,7 @@ namespace TrioFX
 			Variable& var = m_variables[i];
 			HLSLDeclaration* declaration = (HLSLDeclaration*)var.statement;
 
-			if (declaration->buffer == nullptr && declaration->type.baseType >= TrioFX::HLSLBaseType_FirstNumeric && declaration->type.baseType <= TrioFX::HLSLBaseType_LastNumeric)
+			if (declaration->buffer == nullptr && declaration->type.baseType >= BrunoFX::HLSLBaseType_FirstNumeric && declaration->type.baseType <= BrunoFX::HLSLBaseType_LastNumeric)
 			{
 				CalculateDeclarationAlignment(declaration, offset);
 			}

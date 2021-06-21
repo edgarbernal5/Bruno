@@ -69,19 +69,19 @@ namespace BrunoEngine
 		return shader;
 	}
 #endif
-	void EffectCompiler::GenerateShaderFile(TrioFX::HLSLTree* tree, ShaderStage stage, std::string entryFunction, std::string &outputContent)
+	void EffectCompiler::GenerateShaderFile(BrunoFX::HLSLTree* tree, ShaderStage stage, std::string entryFunction, std::string &outputContent)
 	{
 		//std::string outSourceCode;
 
 #if BRUNO_DIRECTX
-		TrioFX::HLSLGenerator generator;
+		BrunoFX::HLSLGenerator generator;
 		switch (stage)
 		{
 		case ShaderStage::Vertex:
-			generator.Generate(tree, TrioFX::HLSLGenerator::Target_VertexShader, entryFunction.c_str(), false);
+			generator.Generate(tree, BrunoFX::HLSLGenerator::Target_VertexShader, entryFunction.c_str(), false);
 			break;
 		case ShaderStage::Pixel:
-			generator.Generate(tree, TrioFX::HLSLGenerator::Target_PixelShader, entryFunction.c_str(), false);
+			generator.Generate(tree, BrunoFX::HLSLGenerator::Target_PixelShader, entryFunction.c_str(), false);
 			break;
 		default:
 			break;

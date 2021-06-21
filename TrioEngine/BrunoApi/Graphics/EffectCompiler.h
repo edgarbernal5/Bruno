@@ -30,6 +30,6 @@ namespace BrunoEngine
 			const D3D_SHADER_MACRO* defines,
 			bool forceOptimization = false);
 #endif
-		static void GenerateShaderFile(TrioFX::HLSLTree* tree, ShaderStage stage, std::string entryFunction, std::string &outputContent);
+		static void GenerateShaderFile(BrunoFX::HLSLTree* tree, ShaderStage stage, std::string entryFunction, std::string &outputContent);
 	};
 }

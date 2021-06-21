@@ -3,7 +3,7 @@
 
 #include "../Utils/StringUtility.h"
 
-namespace TrioFX
+namespace BrunoFX
 {
 	StringPool::StringPool(TrioMem::Allocator * allocator) : stringArray(allocator)
 	{

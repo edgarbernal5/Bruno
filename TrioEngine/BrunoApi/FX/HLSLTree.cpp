@@ -5,7 +5,7 @@
 
 #include "AssertFX.h"
 
-namespace TrioFX
+namespace BrunoFX
 {
 	/*
 	TODO: actualizar código con el repositorio
@@ -428,7 +428,7 @@ namespace TrioFX
 		return false;
 	}
 
-	void HLSLTree::PopulateEffectCollections(HLSLTree* root, std::vector<HLSLTechnique11*> &techniques, std::vector<HLSLBuffer*> &buffers, std::vector<HLSLStruct*> &structures, std::vector<TrioFX::HLSLDeclaration*> &textures, std::vector<TrioFX::HLSLDeclaration*> &samplers)
+	void HLSLTree::PopulateEffectCollections(HLSLTree* root, std::vector<HLSLTechnique11*> &techniques, std::vector<HLSLBuffer*> &buffers, std::vector<HLSLStruct*> &structures, std::vector<BrunoFX::HLSLDeclaration*> &textures, std::vector<BrunoFX::HLSLDeclaration*> &samplers)
 	{
 		HLSLStatement* statement = m_root->statement;
 		while (statement != nullptr)
@@ -1149,7 +1149,7 @@ namespace TrioFX
 
 	}
 
-	void HLSLFunctionVisitor::VisitIdentifierExpression(TrioFX::HLSLIdentifierExpression * node)
+	void HLSLFunctionVisitor::VisitIdentifierExpression(BrunoFX::HLSLIdentifierExpression * node)
 	{
 		if (node->global)
 		{

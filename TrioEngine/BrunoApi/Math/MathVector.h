@@ -34,6 +34,7 @@ namespace BrunoEngine
 	struct Quaternion;
 	struct Plane;
 	struct BoundingBox;
+	struct BoundingSphere;
 
 #ifdef BRUNO_DIRECTX
 	//using namespace DirectX;

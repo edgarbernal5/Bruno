@@ -5,7 +5,7 @@
 
 #include <string>
 
-namespace TrioFX
+namespace BrunoFX
 {
 
 	class BRUNO_API_EXPORT HLSLPreprocessor

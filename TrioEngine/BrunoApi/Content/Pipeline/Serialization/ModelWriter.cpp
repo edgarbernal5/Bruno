@@ -77,11 +77,11 @@ namespace BrunoEngine
 			output->WriteString(meshes[i]->GetName());
 			WriteBoneIndex(output, content->m_bones, meshes[i]->GetParentBone());
 
-			/*output->Write(m_meshes[i]->GetBoundingSphere().Center);
-			output->WriteSingle(m_meshes[i]->GetBoundingSphere().Radius);*/
+			output->Write(meshes[i]->GetBoundingSphere().Center);
+			output->WriteSingle(meshes[i]->GetBoundingSphere().Radius);
 
-			//output->Write(m_meshes[i]->GetBoundingBox().Min);
-			//output->Write(m_meshes[i]->GetBoundingBox().Max);
+			output->Write(meshes[i]->GetBoundingBox().Center);
+			output->Write(meshes[i]->GetBoundingBox().Extents);
 
 			WriteMeshParts(output, meshes[i]->GetMeshParts());
 		}

@@ -16,6 +16,7 @@
 #include "Content/Pipeline/Graphics/VertexChannelCollection.h"
 
 #include "Content/Pipeline/Processors/ContentProcessorContext.h"
+#include "Math/MathCollision.h"
 
 namespace BrunoEngine
 {
@@ -140,6 +141,12 @@ namespace BrunoEngine
 			parts.push_back(partContent);
 		}
 
-		return new ModelMeshContent(mesh->GetName(), mesh, parent, parts);
+		BoundingSphere bSphere;
+		BoundingSphere::CreateFromPoints(bSphere, mesh->GetPositions().size(), mesh->GetPositions().data(), sizeof(Vector3));
+
+		BoundingBox bBox;
+		BoundingBox::CreateFromPoints(bBox, mesh->GetPositions().size(), mesh->GetPositions().data(), sizeof(Vector3));
+
+		return new ModelMeshContent(mesh->GetName(), mesh, parent, bSphere, bBox, parts);
 	}
 }

@@ -2,7 +2,7 @@
 
 #include "TrioApiRequisites.h"
 
-namespace TrioFX
+namespace BrunoFX
 {
 
 	/** In addition to the values in this enum, all of the ASCII characters are

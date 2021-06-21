@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "HLSLPreprocessor.h"
 
-namespace TrioFX
+namespace BrunoFX
 {
 
 	HLSLPreprocessor::HLSLPreprocessor(const char* buffer, size_t length) : m_buffer(buffer)

@@ -58,6 +58,7 @@
     <Compile Include="Boxed.cs" />
     <Compile Include="Categories.cs" />
     <Compile Include="Converters\EnumToArrayConverter.cs" />
+    <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="INotifyPropertyChangedEx.cs" />
     <Compile Include="Interop\GetWindowLongIndex.cs" />

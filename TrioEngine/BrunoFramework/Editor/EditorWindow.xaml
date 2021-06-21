@@ -25,12 +25,17 @@
         </Grid>
         <Grid>
             <StackPanel>
-                <local:SceneView DataContext="{Binding SceneDetail}" Height="400">
+                <StackPanel Orientation="Horizontal">
+                    <local:SceneView DataContext="{Binding SceneDetail}" Width="300" Height="300">
 
-                </local:SceneView>
-                <local:WorldOutlineView DataContext="{Binding WorldOutlineDetail}" Height="200">
+                    </local:SceneView>
+                    <local:InspectorView DataContext="{Binding InspectorDetail}" Width="300" Height="300"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <local:WorldOutlineView DataContext="{Binding WorldOutlineDetail}" Height="346">
 
-                </local:WorldOutlineView>
+                    </local:WorldOutlineView>
+                </StackPanel>
             </StackPanel>
             
         </Grid>
