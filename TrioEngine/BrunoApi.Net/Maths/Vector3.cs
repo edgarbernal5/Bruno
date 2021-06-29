@@ -294,7 +294,7 @@ namespace BrunoApi.Net.Maths
 
 		public bool Equals(Vector3 other)
         {
-            return this.X == other.X && this.Y == other.Y && this.Z == other.Z;
+            return X == other.X && Y == other.Y && Z == other.Z;
         }
 
         public override bool Equals(object obj)
@@ -302,7 +302,7 @@ namespace BrunoApi.Net.Maths
             bool result = false;
             if (obj is Vector3)
             {
-                result = this.Equals((Vector3)obj);
+                result = Equals((Vector3)obj);
             }
             return result;
         }

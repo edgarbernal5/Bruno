@@ -36,7 +36,7 @@ namespace BrunoFramework.Editor.Game.Inspectors.Conventions
             };
         }
 
-        public static IEditor CreateEditor(PropertyDescriptor propertyDescriptor)
+        public static IInspectorEditor CreateEditor(PropertyDescriptor propertyDescriptor)
         {
             foreach (var inspectorBuilder in _inspectorBuilders)
             {

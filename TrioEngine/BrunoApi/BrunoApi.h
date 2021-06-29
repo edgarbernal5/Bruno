@@ -322,7 +322,9 @@ extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformTranslate(Scene * scen
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformScale(Scene* scene, long entity, Vector3* deltaScale);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformScaleUniform(Scene* scene, long entity, float scalarFactor);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformRotate(Scene* scene, long entity, Quaternion* deltaRotation);
+extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformRotatePitchYawRoll(Scene* scene, long entity, Vector3* pitchYawRoll);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformSetLocalRotation(Scene* scene, long entity, Quaternion* rotation);
+extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformSetLocalScale(Scene * scene, long entity, Vector3 * scale);
 
 /*
 Transform
@@ -369,6 +371,7 @@ extern "C" BRUNO_API_EXPORT void __stdcall Vector2_MultiplyTwoVectors(Vector2 * 
 extern "C" BRUNO_API_EXPORT void __stdcall Vector2_SubTwoVectors(Vector2 * pVector1, Vector2 * pVector2);
 extern "C" BRUNO_API_EXPORT void __stdcall Vector2_SumTwoVectors(Vector2 * pVector1, Vector2 * pVector2);
 extern "C" BRUNO_API_EXPORT void __stdcall Vector2_UnaryNegation(Vector2 * pVector);
+extern "C" BRUNO_API_EXPORT void __stdcall Vector2_Normalize(Vector2 * pVector);
 
 
 /*
@@ -421,4 +424,5 @@ extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_CreateFromAxisAngle(Quater
 extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_CreateFromMatrix(Quaternion * quaternion, Matrix * pMatrix);
 extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_CreateFromYawPitchRoll(Quaternion * quaternion, float yaw, float pitch, float roll);
 extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_Inverse(Quaternion * quaternion);
+extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_Normalize(Quaternion * quaternion);
 extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_MultiplyTwoQuats(Quaternion * quaternion1, Quaternion * quaternion2);

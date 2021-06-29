@@ -82,54 +82,69 @@ namespace BrunoApi.Net.Maths
             return quaternion1;
         }
 
-        /// <summary>Determines whether the specified Object is equal to the Quaternion.</summary>
-        /// <param name="other">The Quaternion to compare with the current Quaternion.</param>
-        public bool Equals(Quaternion other)
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Quaternion_Normalize", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Normalize(ref Quaternion quaternion);
+
+        public void Normalize()
         {
-            return this.X == other.X && this.Y == other.Y && this.Z == other.Z && this.W == other.W;
+            Internal_Normalize(ref this);
         }
 
-        /// <summary>Returns a value that indicates whether the current instance is equal to a specified object.</summary>
-        /// <param name="obj">Object to make the comparison with.</param>
+        public static Quaternion CreateFromYawPitchRoll(Vector3 pitchYawRoll)
+        {
+            Quaternion result = Quaternion.Identity;
+            Internal_CreateFromYawPitchRoll(ref result, pitchYawRoll.Y, pitchYawRoll.X, pitchYawRoll.Z);
+            return result;
+        }
+
+        public static Vector3 EulerAngles(Quaternion quaternion)
+        {
+            var angles = new Vector3();
+            angles.Y = (float)Math.Atan2(2.0f * (quaternion.Y * quaternion.W + quaternion.X * quaternion.Z), 1.0f - 2.0f * (quaternion.X * quaternion.X + quaternion.Y * quaternion.Y));
+            angles.X = (float)Math.Asin(2.0f * (quaternion.X * quaternion.W - quaternion.Y * quaternion.Z));
+            angles.Z = (float)Math.Atan2(2.0f * (quaternion.X * quaternion.Y + quaternion.Z * quaternion.W), 1.0f - 2.0f * (quaternion.X * quaternion.X + quaternion.Z * quaternion.Z));
+
+            return angles;
+        }
+
+        public bool Equals(Quaternion other)
+        {
+            return X == other.X && Y == other.Y && Z == other.Z && W == other.W;
+        }
+
         public override bool Equals(object obj)
         {
             bool result = false;
             if (obj is Quaternion)
             {
-                result = this.Equals((Quaternion)obj);
+                result = Equals((Quaternion)obj);
             }
             return result;
         }
 
-        /// <summary>Get the hash code of this object.</summary>
-        public override int GetHashCode()
+        public static bool operator ==(Quaternion value1, Quaternion value2)
         {
-            return this.X.GetHashCode() + this.Y.GetHashCode() + this.Z.GetHashCode() + this.W.GetHashCode();
+            return value1.X == value2.X && value1.Y == value2.Y && value1.Z == value2.Z && value1.W == value2.W;
         }
 
-        public static Vector3 EulerAngles(Quaternion q)
+        public static bool operator !=(Quaternion value1, Quaternion value2)
         {
-            Vector3 angles = new Vector3();
-            //WIP
+            return value1.X != value2.X || value1.Y != value2.Y || value1.Z != value2.Z || value1.W != value2.W;
+        }
 
-            // roll (x-axis rotation)
-            double sinr_cosp = 2.0 * (q.W * q.X + q.Y * q.Z);
-            double cosr_cosp = 1.0 - 2.0 * (q.X * q.X + q.Y * q.Y);
-            angles.Y = (float)Math.Atan2(sinr_cosp, cosr_cosp);
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode() + W.GetHashCode();
+        }
 
-            // pitch (y-axis rotation)
-            double sinp = 2 * (q.W * q.Y - q.Z * q.X);
-            if (Math.Abs(sinp) >= 1)
-                angles.X = (float)(Math.PI / 2) * Math.Sign(sinp); // use 90 degrees if out of range
-            else
-                angles.X = (float)Math.Asin(sinp);
-
-            // yaw (z-axis rotation)
-            double siny_cosp = 2.0 * (q.W * q.Z + q.X * q.Y);
-            double cosy_cosp = 1.0 - 2.0 * (q.Y * q.Y + q.Z * q.Z);
-            angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
-
-            return angles;
+        public override string ToString()
+        {
+            return string.Format("{{X:{0} Y:{1} Z:{2} W:{3}}}", 
+                X.ToString(),
+                Y.ToString(),
+                Z.ToString(),
+                W.ToString()
+            );
         }
 
         /*

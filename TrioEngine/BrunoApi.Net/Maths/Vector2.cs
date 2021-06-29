@@ -86,31 +86,35 @@ namespace BrunoApi.Net.Maths
             return vector1;
         }
 
-        /// <summary>Tests vectors for equality.</summary>
-        /// <param name="value1">Source vector.</param>
-        /// <param name="value2">Source vector.</param>
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector2_Normalize", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Normalize(ref Vector2 vector);
+
+        public static Vector2 Normalize(Vector2 vector)
+        {
+            Internal_Normalize(ref vector);
+            return vector;
+        }
+
+        public void Normalize()
+        {
+            Internal_Normalize(ref this);
+        }
+
         public static bool operator ==(Vector2 value1, Vector2 value2)
         {
             return value1.X == value2.X && value1.Y == value2.Y;
         }
 
-        /// <summary>Tests vectors for inequality.</summary>
-        /// <param name="value1">Vector to compare.</param>
-        /// <param name="value2">Vector to compare.</param>
         public static bool operator !=(Vector2 value1, Vector2 value2)
         {
             return value1.X != value2.X || value1.Y != value2.Y;
         }
 
-        /// <summary>Determines whether the specified Object is equal to the Vector2.</summary>
-		/// <param name="other">The Vector2 to compare with the current Vector2.</param>
 		public bool Equals(Vector2 other)
         {
             return this.X == other.X && this.Y == other.Y;
         }
 
-        /// <summary>Returns a value that indicates whether the current instance is equal to a specified object.</summary>
-        /// <param name="obj">Object to make the comparison with.</param>
         public override bool Equals(object obj)
         {
             bool result = false;
@@ -121,7 +125,6 @@ namespace BrunoApi.Net.Maths
             return result;
         }
 
-        /// <summary>Gets the hash code of the vector object.</summary>
         public override int GetHashCode()
         {
             return this.X.GetHashCode() + this.Y.GetHashCode();

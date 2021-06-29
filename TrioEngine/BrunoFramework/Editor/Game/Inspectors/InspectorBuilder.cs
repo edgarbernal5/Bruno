@@ -30,13 +30,13 @@ namespace BrunoFramework.Editor.Game.Inspectors
         }
 
         public TBuilder WithEditor<T, TProperty, TEditor>(T instance, Expression<Func<T, TProperty>> propertyExpression)
-            where TEditor : IEditor, new()
+            where TEditor : IInspectorEditor, new()
         {
             return WithEditor(instance, propertyExpression, new TEditor());
         }
 
         public TBuilder WithEditor<T, TProperty, TEditor>(T instance, Expression<Func<T, TProperty>> propertyExpression, TEditor editor)
-            where TEditor : IEditor
+            where TEditor : IInspectorEditor
         {
             var propertyName = ExpressionUtility.GetPropertyName(propertyExpression);
             editor.BoundPropertyDescriptor = BoundPropertyDescriptor.FromProperty(instance, propertyName);

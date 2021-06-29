@@ -9,7 +9,7 @@ using BrunoApi.Net.Maths;
 
 namespace BrunoFramework.Editor.Game.Interaction
 {
-    public class CameraHandToolHwndHostBehavior : Behavior<GameSurfaceTargetHwndHost>
+    public class CameraHandToolBehavior : Behavior<GameSurfaceTargetHwndHost>
     {
         struct CameraState
         {
@@ -25,7 +25,7 @@ namespace BrunoFramework.Editor.Game.Interaction
         public static readonly DependencyProperty CameraProperty = DependencyProperty.Register(
             "Camera",
             typeof(Camera),
-            typeof(CameraHandToolHwndHostBehavior),
+            typeof(CameraHandToolBehavior),
             new FrameworkPropertyMetadata(null));
 
         public Camera Camera

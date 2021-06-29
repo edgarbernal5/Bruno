@@ -146,8 +146,8 @@ namespace BrunoFramework.Editor.Game
 
         private void InitializeCamera()
         {
-            //Camera = new Camera(new Vector3(2.0f, 4.5f, 4.5f), Vector3.Zero, Vector3.Up);
-            Camera = new Camera(new Vector3(40.0f, 60.5f, 60.5f), Vector3.Zero, Vector3.Up);
+            Camera = new Camera(new Vector3(2.0f, 4.5f, 4.5f), Vector3.Zero, Vector3.Up);
+            //Camera = new Camera(new Vector3(40.0f, 60.5f, 60.5f), Vector3.Zero, Vector3.Up);
             Camera.FieldOfView = 60.0f * 3.1416f / 180.0f;
             Camera.NearPlane = 1.0f;
             Camera.FarPlane = 1000.0f;

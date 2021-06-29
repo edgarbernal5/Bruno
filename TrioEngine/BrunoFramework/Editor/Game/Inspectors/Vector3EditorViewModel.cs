@@ -3,7 +3,7 @@ using BrunoApi.Net.Maths;
 
 namespace BrunoFramework.Editor.Game.Inspectors
 {
-    public class Vector3EditorViewModel : EditorBase<Vector3>, ILabelledInspector
+    public class Vector3EditorViewModel : InspectorEditorBase<Vector3>, ILabelledInspector
     {
         public float X
         {

@@ -10,7 +10,9 @@ namespace BrunoFramework.Editor.Game.Gizmos
 {
     public interface IGizmoService
     {
-        event Action<GizmoTransformable, Vector3> OnTranslationChanged;
+        event Action<ITransformable, Vector3> OnTranslationChanged;
+        event Action<ITransformable, Vector3, bool> OnScaleChanged;
+        event Action<ITransformable, Quaternion> OnRotateChanged;
 
         AxisGizmoTranslationRenderer AxisGizmoTranslationRenderer { get; }
         Camera Camera { get; set; }
@@ -18,11 +20,13 @@ namespace BrunoFramework.Editor.Game.Gizmos
         bool IsActive { get; set; }
         GizmoType CurrentGizmo { get; set; }
 
-        void SetObjectSelected(GizmoTransformable transform);
+        void SetTransformableSelected(ITransformable transformable);
 
         bool Begin(Vector2 mousePosition);
         void UpdateGizmo(Vector2 mousePosition);
+        void SetGizmoAxis(Vector2 mousePosition);
 
+        void SetSceneWorld(Matrix world);
         void Render(RenderContext renderContext);
         void End();
     }
@@ -53,6 +57,14 @@ namespace BrunoFramework.Editor.Game.Gizmos
         ObjectCenter,
         SelectionCenter,
         WorldOrigin
+    }
+
+    public interface ITransformable
+    {
+        Vector3 LocalPosition { get; set; }
+        Vector3 LocalRotation { get; set; }
+        Vector3 LocalScale { get; set; }
+        Matrix WorldMatrix { get; set; }
     }
 
     public class GizmoTransformable

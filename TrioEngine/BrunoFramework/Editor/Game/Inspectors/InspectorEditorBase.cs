@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace BrunoFramework.Editor.Game.Inspectors
 {
-    public abstract class EditorBase<TValue> : InspectorBase, IEditor, IDisposable
+    public abstract class InspectorEditorBase<TValue> : InspectorBase, IInspectorEditor, IDisposable
     {
         public BoundPropertyDescriptor BoundPropertyDescriptor
         { 
@@ -38,7 +38,10 @@ namespace BrunoFramework.Editor.Game.Inspectors
                     return;
 
                 object newValue = value;
+
+                IsNotifying = false;
                 RawValue = newValue;
+                IsNotifying = true;
 
                 OnValueChanged();
             }
@@ -60,7 +63,7 @@ namespace BrunoFramework.Editor.Game.Inspectors
             get { return BoundPropertyDescriptor.PropertyDescriptor.IsReadOnly; }
         }
 
-        public EditorBase()
+        public InspectorEditorBase()
         {
 
         }

@@ -9,12 +9,12 @@ using BrunoApi.Net.Maths;
 
 namespace BrunoFramework.Editor.Game.Interaction
 {
-    public class CameraZoomHwndHostBehavior : Behavior<GameSurfaceTargetHwndHost>
+    public class CameraZoomBehavior : Behavior<GameSurfaceTargetHwndHost>
     {
         public static readonly DependencyProperty CameraProperty = DependencyProperty.Register(
             "Camera",
             typeof(Camera),
-            typeof(CameraZoomHwndHostBehavior),
+            typeof(CameraZoomBehavior),
             new FrameworkPropertyMetadata(null));
 
         public Camera Camera

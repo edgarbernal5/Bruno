@@ -150,7 +150,6 @@ namespace BrunoApi.Net.Game
             Internal_TransformTranslate(m_nativePointer, entity, ref delta);
         }
 
-
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformScale", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_TransformScale(IntPtr scene, long entity, ref Vector3 delta);
 
@@ -175,12 +174,36 @@ namespace BrunoApi.Net.Game
             Internal_TransformRotate(m_nativePointer, entity, ref deltaRotation);
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformRotatePitchYawRoll", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformRotatePitchYawRoll(IntPtr scene, long entity, ref Vector3 pitchYawRoll);
+
+        public void TransformRotatePitchYawRoll(long entity, Vector3 pitchYawRoll)
+        {
+            Internal_TransformRotatePitchYawRoll(m_nativePointer, entity, ref pitchYawRoll);
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformSetLocalRotation", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_TransformSetLocalRotation(IntPtr scene, long entity, ref Quaternion rotate);
 
         public void TransformSetLocalRotation(long entity, Quaternion rotate)
         {
             Internal_TransformSetLocalRotation(m_nativePointer, entity, ref rotate);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformSetLocalScale", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformSetLocalScale(IntPtr scene, long entity, ref Vector3 scale);
+
+        public void TransformSetLocalScale(long entity, Vector3 scale)
+        {
+            Internal_TransformSetLocalScale(m_nativePointer, entity, ref scale);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_SetLocalPositionForEntity", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetLocalPositionForEntity(IntPtr scene, long entity, ref Vector3 localPosition);
+
+        public void TransformSetLocalPosition(long entity, Vector3 localPosition)
+        {
+            Internal_SetLocalPositionForEntity(m_nativePointer, entity, ref localPosition);
         }
     }
 }

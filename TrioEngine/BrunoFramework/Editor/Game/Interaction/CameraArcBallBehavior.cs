@@ -13,7 +13,7 @@ namespace BrunoFramework.Editor.Game.Interaction
     /*
      * https://asliceofrendering.com/camera/2019/11/30/ArcballCamera/
      */
-    public class CameraArcBallHwndHostBehavior : Behavior<GameSurfaceTargetHwndHost>
+    public class CameraArcBallBehavior : Behavior<GameSurfaceTargetHwndHost>
     {
         struct CameraState
         {
@@ -33,7 +33,7 @@ namespace BrunoFramework.Editor.Game.Interaction
         public static readonly DependencyProperty CameraProperty = DependencyProperty.Register(
             "Camera",
             typeof(Camera),
-            typeof(CameraArcBallHwndHostBehavior),
+            typeof(CameraArcBallBehavior),
             new PropertyMetadata(null, OnCameraChanged));
 
         public Camera Camera
@@ -44,7 +44,7 @@ namespace BrunoFramework.Editor.Game.Interaction
 
         private static void OnCameraChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
-            var target = (CameraArcBallHwndHostBehavior)dependencyObject;
+            var target = (CameraArcBallBehavior)dependencyObject;
 
             var newValue = (Camera)eventArgs.NewValue;
             if (newValue == null) return;

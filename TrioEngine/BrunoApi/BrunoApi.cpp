@@ -1021,7 +1021,7 @@ void Scene_UpdateCamera(Camera camera)
 void Scene_SetLocalPositionForEntity(Scene* scene, long entity, Vector3* localPosition)
 {
 	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
-	transform.m_localPosition = *localPosition;
+	transform.SetLocalPosition(*localPosition);
 }
 
 void Scene_TransformTranslate(Scene* scene, long entity, Vector3* localPosition)
@@ -1048,10 +1048,22 @@ void Scene_TransformRotate(Scene* scene, long entity, Quaternion* deltaRotation)
 	transform.Rotate(*deltaRotation);
 }
 
+void Scene_TransformRotatePitchYawRoll(Scene* scene, long entity, Vector3* pitchYawRoll)
+{
+	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
+	transform.RotatePitchYawRoll(*pitchYawRoll);
+}
+
 void Scene_TransformSetLocalRotation(Scene* scene, long entity, Quaternion* rotation)
 {
 	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
 	transform.SetLocalRotation(*rotation);
+}
+
+void Scene_TransformSetLocalScale(Scene* scene, long entity, Vector3* scale)
+{
+	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
+	transform.SetLocalScale(*scale);
 }
 
 void Scene_LoadFromModel(Scene* scene, Model* model)
@@ -1096,79 +1108,6 @@ void Scene_GetTransformMatrixForEntity(Scene* scene, long entity, Matrix * world
 	*localScale = transform.m_localScale;
 	*localRotation = transform.m_localRotation;
 }
-
-/*
-Transform
-*/
-//Transform* Transform_GetParent(Transform* transform)
-//{
-//	return transform->GetParent().get();
-//}
-//
-//void Transform_GetPosition(Transform* transform, Vector3 *position)
-//{
-//	*position = transform->GetPosition();
-//}
-//
-//void Transform_GetRotation(Transform* transform, Quaternion *rotation)
-//{
-//	*rotation = transform->GetRotation();
-//}
-//
-//void Transform_GetScale(Transform* transform, Vector3 *scale)
-//{
-//	*scale = transform->GetScale();
-//}
-//
-//void Transform_SetPosition(Transform* transform, Vector3 *position)
-//{
-//	transform->SetPosition(*position);
-//}
-//
-//void Transform_SetRotation(Transform* transform, Quaternion *rotation)
-//{
-//	transform->SetRotation(*rotation);
-//}
-//
-//void Transform_SetScale(Transform* transform, Vector3 *scale)
-//{
-//	transform->SetScale(*scale);
-//}
-//
-//void Transform_GetLocalPosition(Transform* transform, Vector3 *position)
-//{
-//	*position = transform->GetLocalPosition();
-//}
-//
-//void Transform_GetLocalRotation(Transform* transform, Quaternion *rotation)
-//{
-//	*rotation = transform->GetRotation();
-//}
-//
-//void Transform_GetLocalScale(Transform* transform, Vector3 *scale)
-//{
-//	*scale = transform->GetLocalScale();
-//}
-//
-//void Transform_SetLocalPosition(Transform* transform, Vector3 *position)
-//{
-//	transform->SetLocalPosition(*position);
-//}
-//
-//void Transform_SetLocalRotation(Transform* transform, Quaternion *rotation)
-//{
-//	transform->SetLocalRotation(*rotation);
-//}
-//
-//void Transform_SetLocalScale(Transform* transform, Vector3 *scale)
-//{
-//	transform->SetLocalScale(*scale);
-//}
-//
-//void Transform_SetParent(Transform* transform, Transform* parent)
-//{
-//	transform->SetParent(std::shared_ptr<Transform>(parent));
-//}
 
 /*
 Texture2D
@@ -1254,6 +1193,11 @@ void Vector2_SumTwoVectors(Vector2* pVector1, Vector2* pVector2)
 void Vector2_UnaryNegation(Vector2* pVector)
 {
 	*pVector = -*pVector;
+}
+
+void Vector2_Normalize(Vector2* pVector)
+{
+	pVector->Normalize();
 }
 
 /*
@@ -1426,6 +1370,11 @@ void Quaternion_CreateFromYawPitchRoll(Quaternion * quaternion, float yaw, float
 void Quaternion_Inverse(Quaternion* quaternion)
 {
 	quaternion->Inverse(*quaternion);
+}
+
+void Quaternion_Normalize(Quaternion* quaternion)
+{
+	quaternion->Normalize();
 }
 
 void Quaternion_MultiplyTwoQuats(Quaternion * quaternion1, Quaternion * quaternion2)

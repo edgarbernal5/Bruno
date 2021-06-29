@@ -81,16 +81,16 @@
     </Compile>
     <Compile Include="Editor\ExitCode.cs" />
     <Compile Include="Editor\Game\Gizmos\GizmoService.cs" />
-    <Compile Include="Editor\Game\Gizmos\GizmosHandlerHwndHostBehavior.cs" />
+    <Compile Include="Editor\Game\Gizmos\GizmosHandlerBehavior.cs" />
     <Compile Include="Editor\Game\Gizmos\IGizmoService.cs" />
     <Compile Include="Editor\Game\Inspectors\BoundPropertyDescriptor.cs" />
     <Compile Include="Editor\Game\Inspectors\Controls\InspectorItemTemplateSelector.cs" />
     <Compile Include="Editor\Game\Inspectors\Conventions\DefaultPropertyInspectors.cs" />
     <Compile Include="Editor\Game\Inspectors\Conventions\PropertyEditorBuilder.cs" />
     <Compile Include="Editor\Game\Inspectors\Conventions\StandardPropertyEditorBuilder.cs" />
-    <Compile Include="Editor\Game\Inspectors\EditorBase.cs" />
+    <Compile Include="Editor\Game\Inspectors\InspectorEditorBase.cs" />
     <Compile Include="Editor\Game\Inspectors\ExpressionUtility.cs" />
-    <Compile Include="Editor\Game\Inspectors\IEditor.cs" />
+    <Compile Include="Editor\Game\Inspectors\IInspectorEditor.cs" />
     <Compile Include="Editor\Game\Inspectors\IInspectableObject.cs" />
     <Compile Include="Editor\Game\Inspectors\IInspector.cs" />
     <Compile Include="Editor\Game\Inspectors\ILabelledInspector.cs" />
@@ -108,9 +108,9 @@
       <DependentUpon>Vector3EditorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Editor\Game\Inspectors\Vector3EditorViewModel.cs" />
-    <Compile Include="Editor\Game\Interaction\CameraArcBallHwndHostBehavior.cs" />
-    <Compile Include="Editor\Game\Interaction\CameraHandToolHwndHostBehavior.cs" />
-    <Compile Include="Editor\Game\Interaction\CameraZoomHwndHostBehavior.cs" />
+    <Compile Include="Editor\Game\Interaction\CameraArcBallBehavior.cs" />
+    <Compile Include="Editor\Game\Interaction\CameraHandToolBehavior.cs" />
+    <Compile Include="Editor\Game\Interaction\CameraZoomBehavior.cs" />
     <Compile Include="Editor\Game\Scene\SceneProjectFile.cs" />
     <Compile Include="Editor\Game\Scene\SceneView.xaml.cs">
       <DependentUpon>SceneView.xaml</DependentUpon>

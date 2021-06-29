@@ -11,7 +11,7 @@ using BrunoFramework.Editor.Game.Gizmos;
 
 namespace BrunoFramework.Editor.Game.Interaction
 {
-    public class GizmosHandlerHwndHostBehavior : Behavior<GameSurfaceTargetHwndHost>
+    public class GizmosHandlerBehavior : Behavior<GameSurfaceTargetHwndHost>
     {
         private IGizmoService m_gizmoService;
         private bool m_gizmoSelected;
@@ -20,7 +20,7 @@ namespace BrunoFramework.Editor.Game.Interaction
         public static readonly DependencyProperty CameraProperty = DependencyProperty.Register(
            "Camera",
            typeof(Camera),
-           typeof(GizmosHandlerHwndHostBehavior),
+           typeof(GizmosHandlerBehavior),
            new FrameworkPropertyMetadata(null));
 
         public Camera Camera
@@ -32,7 +32,7 @@ namespace BrunoFramework.Editor.Game.Interaction
         public static readonly DependencyProperty GizmoServiceProperty = DependencyProperty.Register(
            "GizmoService",
            typeof(GizmoService),
-           typeof(GizmosHandlerHwndHostBehavior),
+           typeof(GizmosHandlerBehavior),
            new PropertyMetadata(null, OnGizmoServiceChanged));
 
         public GizmoService GizmoService
@@ -44,7 +44,7 @@ namespace BrunoFramework.Editor.Game.Interaction
         public static readonly DependencyProperty SceneProperty = DependencyProperty.Register(
            "Scene",
            typeof(Scene),
-           typeof(GizmosHandlerHwndHostBehavior),
+           typeof(GizmosHandlerBehavior),
            new FrameworkPropertyMetadata(null));
 
         public Scene Scene
@@ -55,7 +55,7 @@ namespace BrunoFramework.Editor.Game.Interaction
 
         private static void OnGizmoServiceChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
-            var target = (GizmosHandlerHwndHostBehavior)dependencyObject;
+            var target = (GizmosHandlerBehavior)dependencyObject;
 
             var oldValue = (GizmoService)eventArgs.OldValue;
             var newValue = (GizmoService)eventArgs.NewValue;
@@ -69,13 +69,13 @@ namespace BrunoFramework.Editor.Game.Interaction
             newValue.OnTranslationChanged += target.OnGizmoTranslationChanged;
         }
 
-        private void OnGizmoTranslationChanged(GizmoTransformable gizmoTransformable, Vector3 delta)
+        private void OnGizmoTranslationChanged(ITransformable gizmoTransformable, Vector3 delta)
         {
             //var scene = Scene;
             //scene.TransformTranslate(gizmoTransformable.Id, delta);
         }
 
-        private void OnGizmoScaleChanged(GizmoTransformable gizmoTransformable, Vector3 delta, bool isUniformScale)
+        private void OnGizmoScaleChanged(ITransformable gizmoTransformable, Vector3 delta, bool isUniformScale)
         {
             //var scene = Scene;
             //scene.TransformScale(gizmoTransformable.Id, delta);
@@ -89,11 +89,13 @@ namespace BrunoFramework.Editor.Game.Interaction
                 return;
             
             AssociatedObject.HwndLButtonDown += OnHwndLButtonDown;
+            AssociatedObject.HwndMouseMove += OnHwndMouseMoveSelector;
         }
 
         protected override void OnDetaching()
         {
             AssociatedObject.HwndLButtonDown -= OnHwndLButtonDown;
+            AssociatedObject.HwndMouseMove -= OnHwndMouseMoveSelector;
             base.OnDetaching();
         }
 
@@ -142,6 +144,16 @@ namespace BrunoFramework.Editor.Game.Interaction
             EndHandler(true);
         }
 
+        private void OnHwndMouseMoveSelector(object sender, HwndMouseEventArgs eventArgs)
+        {
+            m_gizmoService = GizmoService;
+            if (m_gizmoSelected || m_gizmoService == null) return;
+
+            if (!m_gizmoService.IsActive) return;
+
+            m_gizmoService.SetGizmoAxis(ConvertToVector2(eventArgs.GetPosition(AssociatedObject)));
+        }
+
         private void OnKeyDown(object sender, KeyEventArgs eventArgs)
         {
             if (eventArgs.Key == Key.Escape)
@@ -165,6 +177,7 @@ namespace BrunoFramework.Editor.Game.Interaction
             {
 
             }
+            
             m_gizmoSelected = false;
             m_gizmoService = null;
             m_currentCamera = null;

@@ -8,37 +8,54 @@ namespace BrunoFramework.Graphics.Editor.Gizmos
 {
     public class GizmoRotationGraphics
     {
-        private ColorRGBA8[] m_colors = new ColorRGBA8[] { ColorRGBA8.Red, ColorRGBA8.Green, ColorRGBA8.Blue };
+        private ColorRGBA8[] m_axisColors = new ColorRGBA8[] { ColorRGBA8.Red, ColorRGBA8.Green, ColorRGBA8.Blue };
         public const int RING_SEGMENTS = 32;
 
         public VertexPositionColor[] RedRingVertices
         {
-            get => m_redRingVertices;
+            get => m_yRingVertices;
         }
-        private VertexPositionColor[] m_redRingVertices;
+        private VertexPositionColor[] m_yRingVertices;
 
         public VertexPositionColor[] GreenRingVertices
         {
-            get => m_greenRingVertices;
+            get => m_zRingVertices;
         }
-        private VertexPositionColor[] m_greenRingVertices;
+        private VertexPositionColor[] m_zRingVertices;
 
         public VertexPositionColor[] BlueRingVertices
         {
-            get => m_blueRingVertices;
+            get => m_xRingVertices;
         }
-        private VertexPositionColor[] m_blueRingVertices;
+        private VertexPositionColor[] m_xRingVertices;
 
-        public GizmoRotationGraphics(float radius)
+        public GizmoRotationGraphics(float radius, ColorRGBA8[] axisColors)
         {
+            m_axisColors = axisColors;
             CreateMesh(radius);
+        }
+
+        public void SetColors(ColorRGBA8[] axisColors)
+        {
+            for (int i = 0; i < m_yRingVertices.Length; i++)
+            {
+                m_yRingVertices[i].Color = axisColors[0];
+            }
+            for (int i = 0; i < m_zRingVertices.Length; i++)
+            {
+                m_zRingVertices[i].Color = axisColors[2];
+            }
+            for (int i = 0; i < m_xRingVertices.Length; i++)
+            {
+                m_xRingVertices[i].Color = axisColors[1];
+            }
         }
 
         private void CreateMesh(float radius)
         {
-            CreateRingX(radius, m_colors[0]);
-            CreateRingY(radius, m_colors[1]);
-            CreateRingZ(radius, m_colors[2]);
+            CreateRingX(radius, m_axisColors[0]);
+            CreateRingY(radius, m_axisColors[1]);
+            CreateRingZ(radius, m_axisColors[2]);
         }
 
         private float GetCircleAngleFor(float segment)
@@ -64,7 +81,7 @@ namespace BrunoFramework.Graphics.Editor.Gizmos
             }
             vertices.Add(vertices[0]);
 
-            m_redRingVertices = vertices.ToArray();
+            m_yRingVertices = vertices.ToArray();
         }
 
         private void CreateRingY(float radius, ColorRGBA8 color)
@@ -82,7 +99,7 @@ namespace BrunoFramework.Graphics.Editor.Gizmos
             }
             vertices.Add(vertices[0]);
 
-            m_blueRingVertices = vertices.ToArray();
+            m_xRingVertices = vertices.ToArray();
         }
 
         private void CreateRingZ(float radius, ColorRGBA8 color)
@@ -99,7 +116,7 @@ namespace BrunoFramework.Graphics.Editor.Gizmos
             }
             vertices.Add(vertices[0]);
 
-            m_greenRingVertices = vertices.ToArray();
+            m_zRingVertices = vertices.ToArray();
         }
     }
 }

@@ -440,5 +440,11 @@ namespace BrunoApi.Net.Maths
         {
             return M11.GetHashCode() + M12.GetHashCode() + M13.GetHashCode() + M14.GetHashCode() + M21.GetHashCode() + M22.GetHashCode() + M23.GetHashCode() + M24.GetHashCode() + M31.GetHashCode() + M32.GetHashCode() + M33.GetHashCode() + M34.GetHashCode() + M41.GetHashCode() + M42.GetHashCode() + M43.GetHashCode() + M44.GetHashCode();
         }
+
+        public static Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+        {
+            Quaternion quaternion = Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll);
+            return Matrix.CreateFromQuaternion(quaternion);
+        }
     }
 }

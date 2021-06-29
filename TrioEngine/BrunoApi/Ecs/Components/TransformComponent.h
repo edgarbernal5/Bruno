@@ -107,8 +107,36 @@ namespace BrunoEngine
 			SetDirty(true);
 		}
 
+		void RotatePitchYawRoll(const Vector3& delta) {
+			Quaternion localRot = m_localRotation;
+			Quaternion x = Quaternion::CreateFromYawPitchRoll(0, delta.x, 0);
+			Quaternion y = Quaternion::CreateFromYawPitchRoll(delta.y, 0, 0);
+			Quaternion z = Quaternion::CreateFromYawPitchRoll(0, 0, delta.z);
+
+			localRot = x * localRot;
+			localRot = localRot * y;
+			localRot = z * localRot;
+
+			localRot.Normalize();
+
+			m_localRotation = localRot;
+			SetDirty(true);
+		}
+
+		void SetLocalPosition(const Vector3& position) {
+			m_localPosition = position;
+			SetDirty(true);
+		}
+
 		void SetLocalRotation(const Quaternion& rotation) {
 			m_localRotation = rotation;
+			m_localRotation.Normalize();
+
+			SetDirty(true);
+		}
+
+		void SetLocalScale(const Vector3& scale) {
+			m_localScale = scale;
 			SetDirty(true);
 		}
 

@@ -25,10 +25,9 @@
                         <!--ToolTip="{Binding Description}"-->
 
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100" MinWidth="50" />
-                            <ColumnDefinition Width="5" />
-                            <ColumnDefinition Width="100" MinWidth="50" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" MinWidth="100"/>
+                            <ColumnDefinition  Width="5"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         
                         <Label Grid.Column="0" 

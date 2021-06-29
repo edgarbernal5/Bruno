@@ -13,6 +13,7 @@ using BrunoApi.Net.Maths;
 using System;
 using BrunoFramework.Editor.Timing;
 using BrunoFramework.Editor.Game.Inspectors;
+using System.ComponentModel;
 
 namespace BrunoFramework.Editor.Game
 {
@@ -52,6 +53,7 @@ namespace BrunoFramework.Editor.Game
 
             var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
             GizmoService = new GizmoService(graphicsDevice, Editor.Services.GetInstance<GameStepTimer>());
+            GizmoService.CurrentGizmo = GizmoType.Rotation;
         }
 
         protected override void Dispose(bool disposing)
@@ -80,7 +82,7 @@ namespace BrunoFramework.Editor.Game
 
         private void OnWorldOutlineSelectionChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {
-            if (m_worldOutline == null)
+            if (m_worldOutline == null || m_inspectorService == null)
                 return;
 
             if (m_outlineService.WorldOutline != m_worldOutline)
@@ -92,10 +94,18 @@ namespace BrunoFramework.Editor.Game
                 var id = m_worldOutline.SelectedItems[0].Id;
                 var sceneTransform = m_scene.GetSceneTransformFor(id);
 
-                m_gizmoService.SetObjectSelected(new GizmoTransformable(id, sceneTransform));
-
                 var customData = m_worldOutline.SelectedItems[0].CustomData as WorldOutlineData;
-                customData.Position = sceneTransform.LocalPosition;
+
+                //bool savedNotifiying = customData.IsNotifying;
+                //customData.IsNotifying = false;
+                customData.LocalPosition = sceneTransform.LocalPosition;
+                customData.LocalRotation = Quaternion.EulerAngles(sceneTransform.LocalRotation);
+                customData.LocalScale = sceneTransform.LocalScale;
+                customData.WorldMatrix = sceneTransform.WorldMatrix;
+
+                //customData.IsNotifying = savedNotifiying;
+
+                m_gizmoService.SetTransformableSelected(customData);
 
                 m_inspectorService.SelectedObject = new InspectableObjectBuilder()
                     .WithObjectProperties(customData, x => true)
@@ -103,30 +113,39 @@ namespace BrunoFramework.Editor.Game
             }
         }
 
-        private void OnGizmoTranslationChanged(GizmoTransformable gizmoTransformable, Vector3 delta)
+        private void OnGizmoTranslationChanged(ITransformable gizmoTransformable, Vector3 delta)
         {
-            m_scene.TransformTranslate(gizmoTransformable.Id, delta);
-
             Console.WriteLine("translate delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+
+            var customData = gizmoTransformable as WorldOutlineData;
+            customData.LocalPosition += delta;
         }
 
-        private void OnGizmoScaleChanged(GizmoTransformable gizmoTransformable, Vector3 delta, bool isUniformScale)
+        private void OnGizmoScaleChanged(ITransformable gizmoTransformable, Vector3 delta, bool isUniformScale)
         {
+            var customData = gizmoTransformable as WorldOutlineData;
+
             delta *= 0.1f;
             if (isUniformScale)
             {
                 float uniform = 1.0f + (delta.X + delta.Y + delta.Z) / 3.0f;
                 Console.WriteLine("Uniform scale delta = " + uniform + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
-                m_scene.TransformScaleUniform(gizmoTransformable.Id, uniform);
+                customData.LocalScale *= uniform;
                 return;
             }
             Console.WriteLine("NU scale delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
-            m_scene.TransformScale(gizmoTransformable.Id, delta);
+            customData.LocalScale += delta;
         }
 
-        private void OnGizmoRotateChanged(GizmoTransformable gizmoTransformable, Matrix delta)
+        private void OnGizmoRotateChanged(ITransformable gizmoTransformable, Quaternion delta)
         {
-            m_scene.TransformRotate(gizmoTransformable.Id, Quaternion.CreateFromMatrix(delta));
+            var customData = gizmoTransformable as WorldOutlineData;
+
+            var localRot = Quaternion.CreateFromYawPitchRoll(customData.LocalRotation) * delta;
+            localRot.Normalize();
+
+            var deltaEulerAngles = Quaternion.EulerAngles(localRot);
+            customData.LocalRotation = deltaEulerAngles;
         }
 
         private WorldOutlineItem CreateOutlineItem(long entity, long parentId, string name)
@@ -155,6 +174,9 @@ namespace BrunoFramework.Editor.Game
                         var customData = new WorldOutlineData();
                         customData.Name = entityName.name;
                         outlineItem.CustomData = customData;
+                        customData.Owner = outlineItem;
+
+                        customData.PropertyChanged += CustomData_PropertyChanged;
 
                         m_worldOutline.RootItems.Add(outlineItem);
                     }
@@ -171,7 +193,10 @@ namespace BrunoFramework.Editor.Game
                                 var outlineItem = CreateOutlineItem(entityName.id, item.Parent, entityName.name);
                                 var customData = new WorldOutlineData();
                                 customData.Name = entityName.name;
+                                customData.Owner = outlineItem;
                                 outlineItem.CustomData = customData;
+
+                                customData.PropertyChanged += CustomData_PropertyChanged;
 
                                 container.Children.Add(outlineItem);
                                 break;
@@ -184,6 +209,66 @@ namespace BrunoFramework.Editor.Game
                     }
                 }
             }
+        }
+
+        private void CustomData_PropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (eventArgs.PropertyName == nameof(WorldOutlineData.LocalPosition))
+            {
+                var customData = sender as WorldOutlineData;
+
+                m_scene.TransformSetLocalPosition(customData.Owner.Id, customData.LocalPosition);
+                m_scene.Update();//hacer un update de solo los componentes involucrados?
+
+                if (m_worldOutline.SelectedItems.Count > 0)
+                {
+                    var id = m_worldOutline.SelectedItems[0].Id;
+                    var sceneTransform = m_scene.GetSceneTransformFor(id);
+
+                    customData.WorldMatrix = sceneTransform.WorldMatrix;
+                    m_gizmoService.SetTransformableSelected(customData);
+                }
+            }
+            else if (eventArgs.PropertyName == nameof(WorldOutlineData.LocalScale))
+            {
+                var customData = sender as WorldOutlineData;
+                m_scene.TransformSetLocalScale(customData.Owner.Id, customData.LocalScale);
+            }
+            else if (eventArgs.PropertyName == nameof(WorldOutlineData.LocalRotation))
+            {
+                var customData = sender as WorldOutlineData;
+
+                m_scene.TransformSetLocalRotation(customData.Owner.Id, Quaternion.CreateFromYawPitchRoll(customData.LocalRotation));
+                //m_scene.TransformSetLocalRotation(customData.Owner.Id, customData.LocalQuatRotation);
+                m_scene.Update();
+
+                var sceneTransform = m_scene.GetSceneTransformFor(customData.Owner.Id);
+                customData.WorldMatrix = sceneTransform.WorldMatrix;
+                //m_gizmoService.SetWorld(customData.WorldMatrix);
+            }
+        }
+
+        Vector3 GetRotation(Matrix rotation)
+        {
+            Vector3 angles = Vector3.Zero;
+            if (rotation.M11 == 1.0f)
+            {
+                angles.Y = (float)Math.Atan2(rotation.M13, rotation.M34);
+                angles.X = 0;
+                angles.Z = 0;
+
+            } else if (rotation.M11 == -1.0f)
+            {
+                angles.Y = (float)Math.Atan2(rotation.M13, rotation.M34);
+                angles.X = 0;
+                angles.Z = 0;
+            } else
+            {
+                angles.Y = (float)Math.Atan2(-rotation.M31, rotation.M11);
+                angles.X = (float)Math.Asin(rotation.M21);
+                angles.Z = (float)Math.Atan2(-rotation.M23, rotation.M22);
+            }
+            return angles;
         }
 
         private WorldOutlineItem FindParent(WorldOutlineItem currentContainer, long parentId)

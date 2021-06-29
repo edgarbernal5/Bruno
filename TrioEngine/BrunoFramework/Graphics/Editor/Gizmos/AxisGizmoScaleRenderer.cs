@@ -15,19 +15,20 @@ namespace BrunoFramework.Graphics.Editor
         }
         private AxisGizmoScale m_gizmoScale;
         private AxisGizmoGraphics m_axisGizmoGraphics;
-        private ColorRGBA8[] m_colors = new ColorRGBA8[] { ColorRGBA8.Red, ColorRGBA8.Green, ColorRGBA8.Blue };
+        private ColorRGBA8[] m_axisColors = new ColorRGBA8[] { ColorRGBA8.Red, ColorRGBA8.Green, ColorRGBA8.Blue };
 
         private Effect m_effect;
         private Matrix m_gizmoWorld;
 
         private float m_currentLineLength;
 
-        public AxisGizmoScaleRenderer(GraphicsDevice device)
+        public AxisGizmoScaleRenderer(GraphicsDevice device, ColorRGBA8[] axisColors)
         {
             m_axisGizmoGraphics = new AxisGizmoGraphics(GizmoService.LINE_OFFSET);
             m_axisGizmoGraphics.InitializeTranslation(GizmoService.LINE_LENGTH);
+            m_axisColors = axisColors;
 
-            m_gizmoScale = new AxisGizmoScale(device, m_colors, GizmoService.CONE_HEIGHT, GizmoService.LINE_LENGTH);
+            m_gizmoScale = new AxisGizmoScale(device, this.m_axisColors, GizmoService.CONE_HEIGHT, GizmoService.LINE_LENGTH);
 
             m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\LineEffect.fx");
             m_gizmoWorld = Matrix.Identity;
@@ -47,8 +48,8 @@ namespace BrunoFramework.Graphics.Editor
             m_effect.Parameters["gWorldViewProj"].SetValue(viewProjection);
             m_effect.Techniques[0].Passes[0].Apply();
 
-            device.DrawUserPrimitives(PrimitiveType.LineList, m_axisGizmoGraphics.translationLinesVtx, 0,
-                m_axisGizmoGraphics.translationLinesVtx.Length / 2);
+            device.DrawUserPrimitives(PrimitiveType.LineList, m_axisGizmoGraphics.TranslationLines, 0,
+                m_axisGizmoGraphics.TranslationLines.Length / 2);
 
             m_gizmoScale.Draw(device);
         }
@@ -72,7 +73,12 @@ namespace BrunoFramework.Graphics.Editor
             m_currentLineLength += scalar;
             m_axisGizmoGraphics.UpdateLinesFor(gizmoAxis, m_currentLineLength);
 
-            AxisGizmoScale.PutOffsetInVertices(delta, gizmoAxis);
+            m_gizmoScale.PutOffsetInVertices(delta, gizmoAxis);
+        }
+
+        public void SetColor(ColorRGBA8[] axisColors)
+        {
+            m_axisGizmoGraphics.ChangeColors(axisColors);
         }
     }
 }
