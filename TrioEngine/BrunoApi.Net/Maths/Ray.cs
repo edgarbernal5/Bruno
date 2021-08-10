@@ -29,6 +29,11 @@ namespace BrunoApi.Net.Maths
             return result ? new float?(distance) : null;
         }
 
+        public float? Intersects(BoundingBox boundingBox)
+        {
+            return boundingBox.Intersects(this);
+        }
+
         public bool Equals(Ray other)
         {
             return Position == other.Position && Direction == other.Direction;

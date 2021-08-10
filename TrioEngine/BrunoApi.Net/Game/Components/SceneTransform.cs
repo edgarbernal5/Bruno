@@ -1,7 +1,7 @@
 ﻿
 using BrunoApi.Net.Maths;
 
-namespace BrunoApi.Net.Game
+namespace BrunoApi.Net.Game.Components
 {
     public struct SceneTransform
     {

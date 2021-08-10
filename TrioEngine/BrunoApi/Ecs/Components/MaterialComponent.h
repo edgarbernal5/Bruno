@@ -5,8 +5,6 @@
 
 namespace BrunoEngine
 {
-	//class Texture2D;
-
 	struct MaterialComponent
 	{
 		Vector4 baseColor = Vector4(1.0f);

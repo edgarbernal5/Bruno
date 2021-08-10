@@ -9,7 +9,6 @@
 
 namespace BrunoEngine
 {
-
 #ifdef BRUNO_DIRECTX
 	struct BRUNO_API_EXPORT BoundingBox
 	{
@@ -31,6 +30,8 @@ namespace BrunoEngine
 			: Center(center), Extents(extents) {}
 
 		bool Intersects(_In_ const Ray& ray, _Out_ float& fDist) const;
+
+		static void CreateMerged(_Out_ BoundingBox& Out, _In_ const BoundingBox& b1, _In_ const BoundingBox& b2);
 
 		static void CreateFromPoints(_Out_ BoundingBox& Out, _In_ size_t Count,
 			_In_reads_bytes_(sizeof(Vector3) + Stride * (Count - 1)) const Vector3* pPoints, _In_ size_t Stride);

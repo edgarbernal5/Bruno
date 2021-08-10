@@ -91,6 +91,7 @@ namespace BrunoEngine
 		m_hierarchies.Clear();
 		m_meshes.Clear();
 		m_materials.Clear();
+		m_boundingBoxes.Clear();
 
 		std::unordered_set<Material*> allMaterials;
 		std::unordered_map<Material*, Entity> materialIndexes;
@@ -108,7 +109,7 @@ namespace BrunoEngine
 			boneIndexes[modelBone] = boneEntity;
 
 			Vector3 scale(1.0f), position;
-			Quaternion rotation=Quaternion::Identity;
+			Quaternion rotation = Quaternion::Identity;
 
 			bool valid = modelBone->GetTransform().Decompose(scale, rotation, position);
 			if (valid) {
@@ -168,7 +169,9 @@ namespace BrunoEngine
 			MeshComponent& mesh = m_meshes.Create(meshEntity);
 			NameComponent& name = *m_names.GetComponent(meshEntity);
 			name.m_name = ss.str();
-			
+
+			BoundingBoxComponent& box = m_boundingBoxes.Create(meshEntity);
+			BoundingBox bbox;
 			for (auto meshPart : modelMesh->GetModelMeshParts()) {
 				mesh.m_subMeshes.push_back(MeshComponent::SubMesh());
 
@@ -182,7 +185,12 @@ namespace BrunoEngine
 				mesh.m_indexBuffer = *meshPart->GetIndexBuffer();
 
 				subMesh.m_materialId = materialIndexes[meshPart->GetMaterial()];
+
+				BoundingBox::CreateMerged(bbox, bbox, modelMesh->GetBoundingBox());
 			}
+
+			box.m_center = bbox.Center;
+			box.m_extents = bbox.Extents;
 		}
 	}
 
@@ -247,6 +255,19 @@ namespace BrunoEngine
 			}
 			m_hierarchies.RemoveKeepSorted(entity);
 		}
+	}
+
+	uint32_t Scene::GetComponentsMask(long entity)
+	{
+		uint32_t mask = 0;
+		if (m_names.Contains(entity)) mask |= 1;
+		if (m_transforms.Contains(entity)) mask |= 2;
+		if (m_hierarchies.Contains(entity)) mask |= 4;
+		if (m_meshes.Contains(entity)) mask |= 8;
+		if (m_boundingBoxes.Contains(entity)) mask |= 16;
+		if (m_materials.Contains(entity)) mask |= 32;
+
+		return mask;
 	}
 
 	void Scene::OnWindowSizeChanged(int width, int height) {

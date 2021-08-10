@@ -307,6 +307,7 @@
     <ClInclude Include="Ecs\ComponentManager.h" />
     <ClInclude Include="Containers\Array.h" />
     <ClInclude Include="Ecs\Components.h" />
+    <ClInclude Include="Ecs\Components\BoundingBoxComponent.h" />
     <ClInclude Include="Ecs\Components\HierarchyComponent.h" />
     <ClInclude Include="Ecs\Components\MaterialComponent.h" />
     <ClInclude Include="Ecs\Components\MeshComponent.h" />

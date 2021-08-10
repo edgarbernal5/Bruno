@@ -1092,6 +1092,7 @@ void Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** ou
 
 			newArray[i].id = entity;
 			newArray[i].parentId = hierarchyComp ? hierarchyComp->m_parentId : 0;
+			newArray[i].componentsMask = scene->GetComponentsMask(entity);
 			newArray[i].name = BrunoDll::AllocateMemoryForString(nameComp.m_name.c_str());;
 		}
 		*outHierarchies = newArray;
@@ -1101,12 +1102,22 @@ void Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** ou
 void Scene_GetTransformMatrixForEntity(Scene* scene, long entity, Matrix * worldMatrix, Vector3* localPosition, Vector3* localScale, Quaternion* localRotation)
 {
 	ComponentManager<TransformComponent>& transformComponents = scene->GetTransforms();
+	ComponentManager<HierarchyComponent>& hierarchyComponents = scene->GetHierarchies();
+
 	TransformComponent& transform = *transformComponents.GetComponent(entity);
 	*worldMatrix = transform.m_world;
 
 	*localPosition = transform.m_localPosition;
 	*localScale = transform.m_localScale;
 	*localRotation = transform.m_localRotation;
+}
+
+void Scene_GetBoundingBoxForEntity(Scene* scene, long entity, Vector3* center, Vector3* extents)
+{
+	ComponentManager<BoundingBoxComponent>& boundingBoxComponents = scene->GetBoundingBoxes();
+	BoundingBoxComponent& bbox = *boundingBoxComponents.GetComponent(entity);
+	*center = bbox.m_center;
+	*extents = bbox.m_extents;
 }
 
 /*

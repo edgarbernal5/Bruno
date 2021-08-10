@@ -5,3 +5,4 @@
 #include "Components/HierarchyComponent.h"
 #include "Components/MeshComponent.h"
 #include "Components/MaterialComponent.h"
+#include "Components/BoundingBoxComponent.h"

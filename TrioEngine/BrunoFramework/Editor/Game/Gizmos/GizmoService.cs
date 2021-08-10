@@ -79,6 +79,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
         private GizmoAxis m_currentGizmoAxis;
 
         private GraphicsDevice m_graphicsDevice;
+        private readonly ObjectSelector m_objectSelector;
         private Vector3 m_currentDelta;
 
         private ColorRGBA8[] m_activeAxisColors;
@@ -186,7 +187,6 @@ namespace BrunoFramework.Editor.Game.Gizmos
             public Vector3 m_intersectionPosition, m_prevIntersectionPosition;
             public Matrix m_sceneWorld;
             public Vector2 m_prevMousePosition;
-            internal Matrix m_localRotation;
         }
         private SelectionState m_selectionState;
 
@@ -194,9 +194,10 @@ namespace BrunoFramework.Editor.Game.Gizmos
         public event Action<ITransformable, Vector3, bool> OnScaleChanged;
         public event Action<ITransformable, Quaternion> OnRotateChanged;
 
-        public GizmoService(GraphicsDevice graphicsService, GameStepTimer gameStepTimer)
+        public GizmoService(GraphicsDevice graphicsService, ObjectSelector objectSelector, GameStepTimer gameStepTimer)
         {
             m_graphicsDevice = graphicsService;
+            m_objectSelector = objectSelector;
             m_gameTimer = gameStepTimer;
 
             InitializeGizmos();
@@ -362,6 +363,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
             var selectedAxis = GetAxis(mousePosition);
             m_currentGizmoAxis = selectedAxis;
             m_currentDelta = Vector3.Zero;
+            m_selectionState.m_prevIntersectionPosition = Vector3.Zero;
 
             return m_currentGizmoAxis != GizmoAxis.None;
         }
@@ -373,7 +375,6 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 case GizmoType.Translation:
                     {
                         var translationDelta = GetDeltaMovement(mousePosition);
-
                         translationDelta = Vector3.Transform(translationDelta, m_selectionState.m_rotationMatrix);
 
                         SetGizmoPosition(translationDelta);
@@ -505,10 +506,10 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 {
                     var gizmoScreenPosition = GetScreenPosition(m_selectionState.m_gizmoPosition);
                     var gizmoScreenPosition2 = GetScreenPosition(m_selectionState.m_gizmoPosition + Vector3.Right * GIZMO_LENGTH);
-                    var length = (gizmoScreenPosition2 - gizmoScreenPosition).Length() / MathHelper.TwoPi;
+                    var length = 2.0f * (gizmoScreenPosition2 - gizmoScreenPosition).Length() / MathHelper.TwoPi;
                     var deltaAngles = new Vector2(1.0f / length);
 
-                    var mouseVelocity = mousePosition - m_selectionState.m_prevMousePosition;
+                    var mouseVelocity = new Vector2(mousePosition.X - m_selectionState.m_prevMousePosition.X, mousePosition.Y - m_selectionState.m_prevMousePosition.Y);
                     
                     var angles = mouseVelocity * deltaAngles;
 
@@ -585,7 +586,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
             ray.Direction = Vector3.TransformNormal(ray.Direction, transformRotation);
 
             var gizmoPositionTransformed = Vector3.Transform(m_selectionState.m_gizmoPosition, transformRotation);
-            m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
+            //m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
 
             switch (m_currentGizmoAxis)
             {
@@ -690,6 +691,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
                     break;
             }
 
+            m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
+
             return delta;
         }
 
@@ -713,9 +716,9 @@ namespace BrunoFramework.Editor.Game.Gizmos
             selectionPosition += translationDelta;
 
             m_selectionState.m_gizmoPosition = selectionPosition;
-            var transformableWorldMatrix = m_selectionState.m_gizmoTransformable.WorldMatrix;
-            transformableWorldMatrix.Translation = selectionPosition;
-            m_selectionState.m_gizmoTransformable.WorldMatrix = transformableWorldMatrix;
+            //var transformableWorldMatrix = m_selectionState.m_gizmoTransformable.WorldMatrix;
+            //transformableWorldMatrix.Translation = selectionPosition;
+            //m_selectionState.m_gizmoTransformable.WorldMatrix = transformableWorldMatrix;
         }
 
         public void End()
@@ -787,7 +790,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
             m_selectionState.m_screenScaleMatrix = Matrix.CreateScale(new Vector3(m_selectionState.m_screenScaleFactor));
 
             //Matrix sceneWorld = Matrix.Identity;
-            m_selectionState.m_axisAlignedWorld = m_selectionState.m_screenScaleMatrix * Matrix.CreateWorld(m_selectionState.m_gizmoPosition, m_selectionState.m_sceneWorld.Forward, m_selectionState.m_sceneWorld.Up);
+            m_selectionState.m_axisAlignedWorld = m_selectionState.m_screenScaleMatrix * 
+                Matrix.CreateWorld(m_selectionState.m_gizmoPosition, m_selectionState.m_sceneWorld.Forward, m_selectionState.m_sceneWorld.Up);
 
             m_selectionState.m_gizmoWorld = m_selectionState.m_axisAlignedWorld;
             m_selectionState.m_rotationMatrix.Forward = m_selectionState.m_sceneWorld.Forward;
@@ -830,14 +834,24 @@ namespace BrunoFramework.Editor.Game.Gizmos
             m_selectionState.m_gizmoTransformable = gizmoTransformable;
 
             m_selectionState.m_gizmoPosition = gizmoTransformable.WorldMatrix.Translation;
-            var rotation = gizmoTransformable.LocalRotation;
-            m_selectionState.m_localRotation = Matrix.CreateFromYawPitchRoll(rotation.Y, rotation.X, rotation.Z);
+            
             Update();
         }
 
         public void SetSceneWorld(Matrix world)
         {
             m_selectionState.m_sceneWorld = world;
+        }
+
+        public void SelectObjects(Vector2 mousePosition)
+        {
+            var selectionRay = ConvertMouseToRay(mousePosition);
+
+            m_objectSelector.Select(selectionRay);
+            if (m_objectSelector.SelectedObjects.Count > 0)
+            {
+
+            }
         }
     }
 }

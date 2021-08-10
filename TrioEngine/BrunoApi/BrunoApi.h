@@ -304,6 +304,7 @@ Scene
 struct HierarchyComponentBridge {
 	uint64_t id;
 	uint64_t parentId;
+	uint32_t componentsMask;
 	char* name;
 };
 
@@ -317,6 +318,7 @@ extern "C" BRUNO_API_EXPORT void __stdcall Scene_UpdateCamera(Camera camera);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_LoadFromModel(Scene* scene, Model* model);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** outHierarchies);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_GetTransformMatrixForEntity(Scene* scene, long entity, Matrix *worldMatrix, Vector3 * localPosition, Vector3 * localScale, Quaternion * localRotation);
+extern "C" BRUNO_API_EXPORT void __stdcall Scene_GetBoundingBoxForEntity(Scene * scene, long entity, Vector3 * center, Vector3 * extents);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_SetLocalPositionForEntity(Scene * scene, long entity, Vector3 * localPosition);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformTranslate(Scene * scene, long entity, Vector3 * localPosition);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformScale(Scene* scene, long entity, Vector3* deltaScale);

@@ -3,8 +3,8 @@ using BrunoFramework.Graphics;
 using BrunoFramework.Graphics.Data;
 using BrunoFramework.Graphics.Editor;
 using System;
-using BrunoApi.Net.Game;
 using BrunoApi.Net.Maths;
+using BrunoApi.Net.Game.Components;
 
 namespace BrunoFramework.Editor.Game.Gizmos
 {
@@ -19,6 +19,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         bool IsActive { get; set; }
         GizmoType CurrentGizmo { get; set; }
+        GizmoAxis CurrentGizmoAxis { get; }
 
         void SetTransformableSelected(ITransformable transformable);
 
@@ -29,6 +30,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
         void SetSceneWorld(Matrix world);
         void Render(RenderContext renderContext);
         void End();
+
+        void SelectObjects(Vector2 mousePosition);
     }
 
     public enum GizmoType
@@ -65,6 +68,14 @@ namespace BrunoFramework.Editor.Game.Gizmos
         Vector3 LocalRotation { get; set; }
         Vector3 LocalScale { get; set; }
         Matrix WorldMatrix { get; set; }
+        Matrix ParentWorldMatrix { get; set; }
+    }
+
+    public interface ISelectableObject
+    {
+        BoundingBox BoundingBox { get; }
+        bool IsSelectable { get; }
+        void SetObjectExtents(Vector3 center, Vector3 extents);
     }
 
     public class GizmoTransformable

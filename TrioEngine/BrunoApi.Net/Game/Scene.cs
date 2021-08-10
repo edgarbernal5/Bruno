@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using BrunoApi.Net.Graphics;
 using BrunoApi.Net.Maths;
 using static BrunoApi.Net.Renderer.Renderer;
+using BrunoApi.Net.Game.Components;
 
 namespace BrunoApi.Net.Game
 {
@@ -98,8 +99,11 @@ namespace BrunoApi.Net.Game
         {
             public long id;
             public long parentId;
+            public uint componentsMask;
+
             [MarshalAs(UnmanagedType.LPStr)]
             public string name;
+
         };
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_GetHierarchies", CallingConvention = CallingConvention.StdCall)]
@@ -119,7 +123,8 @@ namespace BrunoApi.Net.Game
                     IntPtr unmanagedItemPtr = unmanagedArray + Marshal.SizeOf<HierarchyComponentBridge>() * i;
                     outcome[i] = Marshal.PtrToStructure<HierarchyComponentBridge>(unmanagedItemPtr);
 
-                    IntPtr unmanagedNameFieldPtr = unmanagedItemPtr + Marshal.SizeOf<long>() * 2;
+                    int vava = Marshal.SizeOf<HierarchyComponentBridge>();
+                    IntPtr unmanagedNameFieldPtr = unmanagedItemPtr + Marshal.OffsetOf<HierarchyComponentBridge>("name").ToInt32();
                     IntPtr namePtr = Marshal.ReadIntPtr(unmanagedNameFieldPtr);
                     Marshal.FreeCoTaskMem(namePtr);
                 }
@@ -132,7 +137,7 @@ namespace BrunoApi.Net.Game
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_GetTransformMatrixForEntity", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_GetTransformMatrixForEntity(IntPtr scene, long entity, ref Matrix matrix, ref Vector3 localPosition, ref Vector3 localScale, ref Quaternion localRotation);
+        private static extern void Internal_GetTransformMatrixForEntity(IntPtr scene, long entity, ref Matrix worldMatrix, ref Vector3 localPosition, ref Vector3 localScale, ref Quaternion localRotation);
 
         public SceneTransform GetSceneTransformFor(long entity)
         {
@@ -140,6 +145,17 @@ namespace BrunoApi.Net.Game
 
             Internal_GetTransformMatrixForEntity(m_nativePointer, entity, ref sceneTransform.WorldMatrix, ref sceneTransform.LocalPosition, ref sceneTransform.LocalScale, ref sceneTransform.LocalRotation);
             return sceneTransform;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_GetBoundingBoxForEntity", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_GetBoundingBoxForEntity(IntPtr scene, long entity, ref Vector3 center, ref Vector3 extents);
+
+        public SceneBoundingBox GetBoundingBoxForEntity(long entity)
+        {
+            Vector3 center = Vector3.Zero;
+            Vector3 extents = Vector3.Zero;
+            Internal_GetBoundingBoxForEntity(m_nativePointer, entity, ref center, ref extents);
+            return new SceneBoundingBox(center, extents);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformTranslate", CallingConvention = CallingConvention.StdCall)]

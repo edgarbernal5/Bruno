@@ -446,5 +446,11 @@ namespace BrunoApi.Net.Maths
             Quaternion quaternion = Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll);
             return Matrix.CreateFromQuaternion(quaternion);
         }
+
+        public static Matrix CreateFromYawPitchRoll(Vector3 pitchYawRoll)
+        {
+            Quaternion quaternion = Quaternion.CreateFromYawPitchRoll(pitchYawRoll.Y, pitchYawRoll.X, pitchYawRoll.Z);
+            return Matrix.CreateFromQuaternion(quaternion);
+        }
     }
 }

@@ -8,6 +8,7 @@ using System.Windows.Interactivity;
 using BrunoApi.Net.Game;
 using BrunoApi.Net.Maths;
 using BrunoFramework.Editor.Game.Gizmos;
+using System;
 
 namespace BrunoFramework.Editor.Game.Interaction
 {
@@ -63,22 +64,41 @@ namespace BrunoFramework.Editor.Game.Interaction
             if (oldValue != null)
             {
                 oldValue.OnTranslationChanged -= target.OnGizmoTranslationChanged;
+                oldValue.OnRotateChanged -= target.OnGizmoRotateChanged;
             }
             if (newValue == null) return;
 
             newValue.OnTranslationChanged += target.OnGizmoTranslationChanged;
+            newValue.OnRotateChanged += target.OnGizmoRotateChanged;
         }
 
         private void OnGizmoTranslationChanged(ITransformable gizmoTransformable, Vector3 delta)
         {
-            //var scene = Scene;
-            //scene.TransformTranslate(gizmoTransformable.Id, delta);
+            Console.WriteLine("translate delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+
+            var localWorld = Matrix.CreateScale(gizmoTransformable.LocalScale) *
+                Matrix.CreateFromYawPitchRoll(gizmoTransformable.LocalRotation) *
+                Matrix.CreateTranslation(gizmoTransformable.LocalPosition);
+
+            var toLocal = Matrix.Invert(gizmoTransformable.WorldMatrix) * localWorld;
+            var localPosition = Vector3.TransformNormal(delta, toLocal);
+
+            gizmoTransformable.LocalPosition += localPosition;
         }
 
         private void OnGizmoScaleChanged(ITransformable gizmoTransformable, Vector3 delta, bool isUniformScale)
         {
             //var scene = Scene;
             //scene.TransformScale(gizmoTransformable.Id, delta);
+        }
+
+        private void OnGizmoRotateChanged(ITransformable gizmoTransformable, Quaternion delta)
+        {
+            var localRot = Quaternion.CreateFromYawPitchRoll(gizmoTransformable.LocalRotation) * delta;
+            localRot.Normalize();
+
+            var deltaEulerAngles = Quaternion.EulerAngles(localRot);
+            gizmoTransformable.LocalRotation = deltaEulerAngles;
         }
 
         protected override void OnAttached()
@@ -90,12 +110,14 @@ namespace BrunoFramework.Editor.Game.Interaction
             
             AssociatedObject.HwndLButtonDown += OnHwndLButtonDown;
             AssociatedObject.HwndMouseMove += OnHwndMouseMoveSelector;
+            AssociatedObject.HwndLButtonDown += OnHwndMouseDownSelector;
         }
 
         protected override void OnDetaching()
         {
             AssociatedObject.HwndLButtonDown -= OnHwndLButtonDown;
             AssociatedObject.HwndMouseMove -= OnHwndMouseMoveSelector;
+            AssociatedObject.HwndLButtonDown -= OnHwndMouseDownSelector;
             base.OnDetaching();
         }
 
@@ -154,6 +176,14 @@ namespace BrunoFramework.Editor.Game.Interaction
             m_gizmoService.SetGizmoAxis(ConvertToVector2(eventArgs.GetPosition(AssociatedObject)));
         }
 
+        private void OnHwndMouseDownSelector(object sender, HwndMouseEventArgs eventArgs)
+        {
+            m_gizmoService = GizmoService;
+            if (m_gizmoSelected || m_gizmoService == null) return;
+
+            m_gizmoService.SelectObjects(ConvertToVector2(eventArgs.GetPosition(AssociatedObject)));
+        }
+
         private void OnKeyDown(object sender, KeyEventArgs eventArgs)
         {
             if (eventArgs.Key == Key.Escape)
@@ -166,7 +196,7 @@ namespace BrunoFramework.Editor.Game.Interaction
         private void EndHandler(bool commit)
         {
             m_gizmoService.End();
-
+            
             AssociatedObject.HwndMouseMove -= OnHwndMouseMove;
             AssociatedObject.HwndLButtonUp -= OnHwndLButtonUp;
             AssociatedObject.PreviewKeyDown -= OnKeyDown;

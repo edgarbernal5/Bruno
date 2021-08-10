@@ -203,5 +203,27 @@ namespace BrunoEngine
         XMStoreFloat(&Out.Radius, vRadius);
     }
 
+    _Use_decl_annotations_
+     inline void BoundingBox::CreateMerged(BoundingBox& Out, const BoundingBox& b1, const BoundingBox& b2)
+    {
+        using namespace DirectX;
+
+        XMVECTOR b1Center = XMLoadFloat3(&b1.Center);
+        XMVECTOR b1Extents = XMLoadFloat3(&b1.Extents);
+
+        XMVECTOR b2Center = XMLoadFloat3(&b2.Center);
+        XMVECTOR b2Extents = XMLoadFloat3(&b2.Extents);
+
+        XMVECTOR Min = XMVectorSubtract(b1Center, b1Extents);
+        Min = XMVectorMin(Min, XMVectorSubtract(b2Center, b2Extents));
+
+        XMVECTOR Max = XMVectorAdd(b1Center, b1Extents);
+        Max = XMVectorMax(Max, XMVectorAdd(b2Center, b2Extents));
+
+        assert(XMVector3LessOrEqual(Min, Max));
+
+        XMStoreFloat3(&Out.Center, XMVectorScale(XMVectorAdd(Min, Max), 0.5f));
+        XMStoreFloat3(&Out.Extents, XMVectorScale(XMVectorSubtract(Max, Min), 0.5f));
+    }
 #endif
 }

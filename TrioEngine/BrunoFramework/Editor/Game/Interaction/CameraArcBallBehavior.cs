@@ -124,8 +124,8 @@ namespace BrunoFramework.Editor.Game.Interaction
         {
             var yawPitchRoll = Quaternion.EulerAngles(Quaternion.Inverse(Quaternion.CreateFromMatrix(camera.View)));
 
-            m_currentYawPitch.X = yawPitchRoll.X;
-            m_currentYawPitch.Y = yawPitchRoll.Y;
+            m_currentYawPitch.X = yawPitchRoll.Y;
+            m_currentYawPitch.Y = yawPitchRoll.X;
         }
 
         private void OnHwndLButtonUp(object sender, HwndMouseEventArgs eventArgs)

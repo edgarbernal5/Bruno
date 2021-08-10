@@ -65,7 +65,8 @@
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\Tasks\BuildCoordinator.cs" />
     <Compile Include="Content\Tasks\BuildCoordinatorSettings.cs" />
-    <Compile Include="Game\SceneTransform.cs" />
+    <Compile Include="Game\Components\SceneBoundingBox.cs" />
+    <Compile Include="Game\Components\SceneTransform.cs" />
     <Compile Include="Graphics\Core\BlendState.cs" />
     <Compile Include="Graphics\Core\Color.cs" />
     <Compile Include="Graphics\Core\ColorRGBA8.cs" />

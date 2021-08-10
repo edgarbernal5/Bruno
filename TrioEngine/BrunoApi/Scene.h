@@ -38,6 +38,11 @@ namespace BrunoEngine
 		inline ComponentManager<HierarchyComponent>& GetHierarchies() {
 			return m_hierarchies;
 		}
+		inline ComponentManager<BoundingBoxComponent>& GetBoundingBoxes() {
+			return m_boundingBoxes;
+		}
+
+		uint32_t GetComponentsMask(long entity);
 
 		void OnWindowSizeChanged(int width, int height);
 		void Update();
@@ -63,7 +68,7 @@ namespace BrunoEngine
 		ComponentManager<TransformComponent> m_transforms;
 		ComponentManager<HierarchyComponent> m_hierarchies;
 		ComponentManager<MeshComponent> m_meshes;
+		ComponentManager<BoundingBoxComponent> m_boundingBoxes;
 		ComponentManager<MaterialComponent> m_materials;
 	};
-
 }

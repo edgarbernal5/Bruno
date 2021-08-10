@@ -798,6 +798,9 @@
     <ClInclude Include="Math\MathCollision.h">
       <Filter>Header Files\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Ecs\Components\BoundingBoxComponent.h">
+      <Filter>Header Files\ECS\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

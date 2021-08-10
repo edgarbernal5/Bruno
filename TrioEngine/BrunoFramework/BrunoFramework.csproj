@@ -83,6 +83,7 @@
     <Compile Include="Editor\Game\Gizmos\GizmoService.cs" />
     <Compile Include="Editor\Game\Gizmos\GizmosHandlerBehavior.cs" />
     <Compile Include="Editor\Game\Gizmos\IGizmoService.cs" />
+    <Compile Include="Editor\Game\Gizmos\ObjectSelector.cs" />
     <Compile Include="Editor\Game\Inspectors\BoundPropertyDescriptor.cs" />
     <Compile Include="Editor\Game\Inspectors\Controls\InspectorItemTemplateSelector.cs" />
     <Compile Include="Editor\Game\Inspectors\Conventions\DefaultPropertyInspectors.cs" />
