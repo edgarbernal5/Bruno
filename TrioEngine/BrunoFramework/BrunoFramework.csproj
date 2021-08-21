@@ -89,6 +89,7 @@
     <Compile Include="Editor\Game\Inspectors\Conventions\DefaultPropertyInspectors.cs" />
     <Compile Include="Editor\Game\Inspectors\Conventions\PropertyEditorBuilder.cs" />
     <Compile Include="Editor\Game\Inspectors\Conventions\StandardPropertyEditorBuilder.cs" />
+    <Compile Include="Editor\Game\Inspectors\Converters\QuaternionToEulerAngles.cs" />
     <Compile Include="Editor\Game\Inspectors\InspectorEditorBase.cs" />
     <Compile Include="Editor\Game\Inspectors\ExpressionUtility.cs" />
     <Compile Include="Editor\Game\Inspectors\IInspectorEditor.cs" />
@@ -101,6 +102,7 @@
       <DependentUpon>InspectorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Editor\Game\Inspectors\InspectorViewModel.cs" />
+    <Compile Include="Editor\Game\Inspectors\QuaternionEditorViewModel.cs" />
     <Compile Include="Editor\Game\Inspectors\TextBoxEditorView.xaml.cs">
       <DependentUpon>TextBoxEditorView.xaml</DependentUpon>
     </Compile>

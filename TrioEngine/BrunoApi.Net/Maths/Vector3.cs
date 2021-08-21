@@ -282,6 +282,16 @@ namespace BrunoApi.Net.Maths
             return vector;
         }
 
+        public Vector3 ToDegrees()
+        {
+            return new Vector3(MathHelper.ToDegrees(X), MathHelper.ToDegrees(Y), MathHelper.ToDegrees(Z));
+        }
+
+        public Vector3 ToRadians()
+        {
+            return new Vector3(MathHelper.ToRadians(X), MathHelper.ToRadians(Y), MathHelper.ToRadians(Z));
+        }
+
         public static bool operator ==(Vector3 value1, Vector3 value2)
         {
             return value1.X == value2.X && value1.Y == value2.Y && value1.Z == value2.Z;

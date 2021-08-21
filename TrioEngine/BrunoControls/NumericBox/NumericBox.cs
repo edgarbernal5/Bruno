@@ -63,27 +63,27 @@ namespace BrunoControls
         {
             _textBlock = (TextBlock)Template.FindName("TextBlock", this);
 
-            var originalPosition = new Point();
-            double originalValue = 0;
             var mouseMoved = false;
+            var previousPosition = new Point();
 
-            _textBlock.MouseDown += (sender, e) =>
+            _textBlock.MouseDown += (sender, eventArgs) =>
             {
-                originalPosition = e.GetPosition(_textBlock);
-                originalValue = Value;
+                previousPosition = eventArgs.GetPosition(_textBlock);
                 _textBlock.CaptureMouse();
                 mouseMoved = false;
             };
 
-            _textBlock.MouseMove += (sender, e) =>
+            _textBlock.MouseMove += (sender, eventArgs) =>
             {
                 if (!_textBlock.IsMouseCaptured)
                     return;
 
                 mouseMoved = true;
 
-                var newPosition = e.GetPosition(_textBlock);
-                Value = CoerceValue(originalValue + (newPosition.X - originalPosition.X) / 50.0);
+                var newPosition = eventArgs.GetPosition(_textBlock);
+                Value = CoerceValue(Value + (newPosition.X - previousPosition.X) / 50.0);
+
+                previousPosition = newPosition;
             };
 
             _textBlock.MouseUp += (sender, e) =>

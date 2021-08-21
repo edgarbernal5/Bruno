@@ -100,9 +100,24 @@ namespace BrunoApi.Net.Maths
         public static Vector3 EulerAngles(Quaternion quaternion)
         {
             var angles = new Vector3();
-            angles.Y = (float)Math.Atan2(2.0f * (quaternion.Y * quaternion.W + quaternion.X * quaternion.Z), 1.0f - 2.0f * (quaternion.X * quaternion.X + quaternion.Y * quaternion.Y));
-            angles.X = (float)Math.Asin(2.0f * (quaternion.X * quaternion.W - quaternion.Y * quaternion.Z));
-            angles.Z = (float)Math.Atan2(2.0f * (quaternion.X * quaternion.Y + quaternion.Z * quaternion.W), 1.0f - 2.0f * (quaternion.X * quaternion.X + quaternion.Z * quaternion.Z));
+
+            var matrix = Matrix.CreateFromQuaternion(quaternion);
+
+            angles.X = (float)Math.Atan2(matrix.M23, matrix.M33);
+            angles.Y = (float)Math.Atan2(-matrix.M13, Math.Sqrt(matrix.M23 * matrix.M23 + matrix.M33 * matrix.M33));
+            angles.Z = (float)Math.Atan2(matrix.M12, matrix.M11);
+
+            /*
+            ***ImGuizmo.cpp
+            void DecomposeMatrixToComponents(const float* matrix, float* translation, float* rotation, float* scale)
+            rotation[0] = RAD2DEG * atan2f(mat.m[1][2], mat.m[2][2]);
+            rotation[1] = RAD2DEG * atan2f(-mat.m[0][2], sqrtf(mat.m[1][2] * mat.m[1][2] + mat.m[2][2] * mat.m[2][2]));
+            rotation[2] = RAD2DEG * atan2f(mat.m[0][1], mat.m[0][0]);
+            */
+
+            //angles.Y = (float)Math.Atan2(2.0f * (quaternion.Y * quaternion.W + quaternion.X * quaternion.Z), 1.0f - 2.0f * (quaternion.X * quaternion.X + quaternion.Y * quaternion.Y));
+            //angles.X = (float)Math.Asin(2.0f * (quaternion.X * quaternion.W - quaternion.Y * quaternion.Z));
+            //angles.Z = (float)Math.Atan2(2.0f * (quaternion.X * quaternion.Y + quaternion.Z * quaternion.W), 1.0f - 2.0f * (quaternion.X * quaternion.X + quaternion.Z * quaternion.Z));
 
             return angles;
         }

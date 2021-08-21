@@ -490,7 +490,6 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
                 return Quaternion.Identity;
             }
-
             m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
 
             Matrix matrixRotationDelta = Matrix.Identity;
@@ -571,6 +570,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
                         break;
                 }
             }
+
 
             m_selectionState.m_prevMousePosition = mousePosition;
             return rotationDelta;

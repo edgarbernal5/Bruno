@@ -65,11 +65,13 @@ namespace BrunoFramework.Editor.Game.Interaction
             {
                 oldValue.OnTranslationChanged -= target.OnGizmoTranslationChanged;
                 oldValue.OnRotateChanged -= target.OnGizmoRotateChanged;
+                newValue.OnScaleChanged -= target.OnGizmoScaleChanged;
             }
             if (newValue == null) return;
 
             newValue.OnTranslationChanged += target.OnGizmoTranslationChanged;
             newValue.OnRotateChanged += target.OnGizmoRotateChanged;
+            newValue.OnScaleChanged += target.OnGizmoScaleChanged;
         }
 
         private void OnGizmoTranslationChanged(ITransformable gizmoTransformable, Vector3 delta)
@@ -77,7 +79,7 @@ namespace BrunoFramework.Editor.Game.Interaction
             Console.WriteLine("translate delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
 
             var localWorld = Matrix.CreateScale(gizmoTransformable.LocalScale) *
-                Matrix.CreateFromYawPitchRoll(gizmoTransformable.LocalRotation) *
+                Matrix.CreateFromQuaternion(gizmoTransformable.LocalRotation) *
                 Matrix.CreateTranslation(gizmoTransformable.LocalPosition);
 
             var toLocal = Matrix.Invert(gizmoTransformable.WorldMatrix) * localWorld;
@@ -88,17 +90,24 @@ namespace BrunoFramework.Editor.Game.Interaction
 
         private void OnGizmoScaleChanged(ITransformable gizmoTransformable, Vector3 delta, bool isUniformScale)
         {
-            //var scene = Scene;
-            //scene.TransformScale(gizmoTransformable.Id, delta);
+            delta *= 0.1f;
+            if (isUniformScale)
+            {
+                float uniform = 1.0f + (delta.X + delta.Y + delta.Z) / 3.0f;
+                Console.WriteLine("Uniform scale delta = " + uniform + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+                gizmoTransformable.LocalScale *= uniform;
+                return;
+            }
+            Console.WriteLine("NU scale delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+            gizmoTransformable.LocalScale += delta;
         }
 
         private void OnGizmoRotateChanged(ITransformable gizmoTransformable, Quaternion delta)
         {
-            var localRot = Quaternion.CreateFromYawPitchRoll(gizmoTransformable.LocalRotation) * delta;
-            localRot.Normalize();
+            var localRotation = gizmoTransformable.LocalRotation * delta;
+            localRotation.Normalize();
 
-            var deltaEulerAngles = Quaternion.EulerAngles(localRot);
-            gizmoTransformable.LocalRotation = deltaEulerAngles;
+            gizmoTransformable.LocalRotation = localRotation;
         }
 
         protected override void OnAttached()

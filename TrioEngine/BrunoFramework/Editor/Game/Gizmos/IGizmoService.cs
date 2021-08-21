@@ -65,7 +65,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
     public interface ITransformable
     {
         Vector3 LocalPosition { get; set; }
-        Vector3 LocalRotation { get; set; }
+        Quaternion LocalRotation { get; set; }
         Vector3 LocalScale { get; set; }
         Matrix WorldMatrix { get; set; }
         Matrix ParentWorldMatrix { get; set; }

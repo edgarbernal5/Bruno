@@ -79,8 +79,6 @@ namespace BrunoFramework.Editor.Game
             PopulateHierarchyFromScene();
             m_worldOutline.SelectedItems.CollectionChanged += OnWorldOutlineSelectionChanged;
 
-            m_gizmoService.OnScaleChanged += OnGizmoScaleChanged;
-
             //TODO: hacer esto si y solo si es el documento activo (pestaña)
             m_outlineService.WorldOutline = m_worldOutline;
         }
@@ -111,20 +109,6 @@ namespace BrunoFramework.Editor.Game
                     .WithObjectProperties(customData, x => true)
                     .ToInspectableObject();
             }
-        }
-
-        private void OnGizmoScaleChanged(ITransformable gizmoTransformable, Vector3 delta, bool isUniformScale)
-        {
-            delta *= 0.1f;
-            if (isUniformScale)
-            {
-                float uniform = 1.0f + (delta.X + delta.Y + delta.Z) / 3.0f;
-                Console.WriteLine("Uniform scale delta = " + uniform + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
-                gizmoTransformable.LocalScale *= uniform;
-                return;
-            }
-            Console.WriteLine("NU scale delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
-            gizmoTransformable.LocalScale += delta;
         }
 
         private WorldOutlineItem CreateOutlineItem(long entity, long parentId, string name)
@@ -184,7 +168,7 @@ namespace BrunoFramework.Editor.Game
         {
             var sceneTransform = m_scene.GetSceneTransformFor(entityId);
             customData.LocalPosition = sceneTransform.LocalPosition;
-            customData.LocalRotation = Quaternion.EulerAngles(sceneTransform.LocalRotation);
+            customData.LocalRotation = sceneTransform.LocalRotation;
             customData.LocalScale = sceneTransform.LocalScale;
             customData.WorldMatrix = sceneTransform.WorldMatrix;
         }
@@ -235,7 +219,7 @@ namespace BrunoFramework.Editor.Game
             {
                 var customData = sender as WorldOutlineData;
 
-                m_scene.TransformSetLocalRotation(customData.Owner.Id, Quaternion.CreateFromYawPitchRoll(customData.LocalRotation));
+                m_scene.TransformSetLocalRotation(customData.Owner.Id, customData.LocalRotation);
                 m_scene.Update();
 
                 var sceneTransform = m_scene.GetSceneTransformFor(customData.Owner.Id);

@@ -30,7 +30,7 @@ namespace BrunoFramework.Editor.Game
         }
         private Vector3 m_localPosition;
 
-        public Vector3 LocalRotation
+        public Quaternion LocalRotation
         {
             get
             {
@@ -42,7 +42,7 @@ namespace BrunoFramework.Editor.Game
                 NotifyOfPropertyChange();
             }
         }
-        private Vector3 m_localRotation;
+        private Quaternion m_localRotation;
 
         public Vector3 LocalScale
         {

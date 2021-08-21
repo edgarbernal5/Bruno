@@ -29,6 +29,7 @@ namespace BrunoFramework.Editor.Game.Inspectors.Conventions
                 //new StandardPropertyEditorBuilder<float?, TextBoxEditorViewModel<float?>>(),
                 //new StandardPropertyEditorBuilder<int?, TextBoxEditorViewModel<int?>>(),
                 new StandardPropertyEditorBuilder<Vector3, Vector3EditorViewModel>(),
+                new StandardPropertyEditorBuilder<Quaternion, QuaternionEditorViewModel>(),
                 new StandardPropertyEditorBuilder<string, TextBoxEditorViewModel>(),
                 //new StandardPropertyEditorBuilder<string, TextBoxEditorViewModel<string>>(),
 

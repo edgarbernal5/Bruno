@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
+using System.Windows.Data;
 
 namespace BrunoFramework.Editor.Game.Inspectors
 {
@@ -23,13 +25,25 @@ namespace BrunoFramework.Editor.Game.Inspectors
                 }
             }
         }
-
         private BoundPropertyDescriptor _boundPropertyDescriptor;
+
+        public IValueConverter Converter
+        {
+            get;
+            set;
+        }
 
         public TValue Value
         {
             get
             {
+                if (!typeof(TValue).IsAssignableFrom(BoundPropertyDescriptor.PropertyDescriptor.PropertyType))
+                {
+                    if (Converter == null)
+                        throw new InvalidCastException("No converter was specified for Inspector Editor");
+
+                    return (TValue)Converter.Convert(RawValue, typeof(TValue), null, CultureInfo.CurrentCulture);
+                }
                 return (TValue)RawValue;
             }
             set
@@ -38,6 +52,13 @@ namespace BrunoFramework.Editor.Game.Inspectors
                     return;
 
                 object newValue = value;
+                if (!typeof(TValue).IsAssignableFrom(BoundPropertyDescriptor.PropertyDescriptor.PropertyType))
+                {
+                    if (Converter == null)
+                        throw new InvalidCastException("No converter was specified for Inspector Editor");
+
+                    newValue = Converter.ConvertBack(value, BoundPropertyDescriptor.PropertyDescriptor.PropertyType, null, CultureInfo.CurrentCulture);
+                }
 
                 IsNotifying = false;
                 RawValue = newValue;

@@ -14,6 +14,9 @@
         <DataTemplate DataType="{x:Type local:Vector3EditorViewModel}">
             <local:Vector3EditorView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type local:QuaternionEditorViewModel}">
+            <local:Vector3EditorView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type local:TextBoxEditorViewModel}">
             <local:TextBoxEditorView />
         </DataTemplate>
