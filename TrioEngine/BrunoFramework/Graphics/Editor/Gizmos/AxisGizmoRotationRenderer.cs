@@ -2,6 +2,7 @@
 using BrunoApi.Net.Graphics;
 using BrunoApi.Net.Graphics.Core;
 using BrunoApi.Net.Maths;
+using BrunoFramework.Editor.Game.Gizmos;
 using BrunoFramework.Graphics.Editor.Gizmos;
 using System;
 
@@ -14,9 +15,9 @@ namespace BrunoFramework.Graphics.Editor
         private Matrix m_gizmoWorld;
         private Effect m_effect;
 
-        public AxisGizmoRotationRenderer(GraphicsDevice device, ColorRGBA8[] axisColors, float radius)
+        public AxisGizmoRotationRenderer(GraphicsDevice device, ColorRGBA8[] axisColors, GizmoConfig gizmoConfig)
         {
-            m_gizmoRotationGraphics = new GizmoRotationGraphics(radius, axisColors);
+            m_gizmoRotationGraphics = new GizmoRotationGraphics(gizmoConfig.GIZMO_LENGTH, axisColors);
             m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\LineEffect.fx");
         }
 
@@ -43,7 +44,7 @@ namespace BrunoFramework.Graphics.Editor
                m_gizmoRotationGraphics.BlueRingVertices.Length - 1);
         }
 
-        public void SetColor(ColorRGBA8[] axisColors)
+        public void SetColors(ColorRGBA8[] axisColors)
         {
             m_gizmoRotationGraphics.SetColors(axisColors);
         }

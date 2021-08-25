@@ -6,7 +6,8 @@ namespace BrunoApi.Net.Maths
     public static class MathHelper
     {
         public const float PI = 3.14159274f;
-        public const float TwoPi = 6.28318548f;
+        public const float TwoPi = 6.28318548f; 
+        public const float TwoPiInDegrees = 360.0f;
 
         public static float ToRadians(float degrees)
         {
@@ -31,6 +32,48 @@ namespace BrunoApi.Net.Maths
         public static float Acos(float v)
         {
             return (float)Math.Acos(v);
+        }
+
+        public static Vector3 ToRadians(Vector3 degrees)
+        {
+            return new Vector3(ToRadians(degrees.X), ToRadians(degrees.Y), ToRadians(degrees.Z));
+        }
+
+        public static Vector3 ToDegrees(Vector3 radians)
+        {
+            return new Vector3(ToDegrees(radians.X), ToDegrees(radians.Y), ToDegrees(radians.Z));
+        }
+
+        public static Vector3 NormalizeAngles(Vector3 degrees)
+        {
+            while (degrees.X <= -TwoPiInDegrees)
+            {
+                degrees.X += TwoPiInDegrees;
+            }
+            while (degrees.X >= TwoPiInDegrees)
+            {
+                degrees.X -= TwoPiInDegrees;
+            }
+
+            while (degrees.Y <= -TwoPiInDegrees)
+            {
+                degrees.Y += TwoPiInDegrees;
+            }
+            while (degrees.Y >= TwoPiInDegrees)
+            {
+                degrees.Y -= TwoPiInDegrees;
+            }
+
+            while (degrees.Z <= -TwoPiInDegrees)
+            {
+                degrees.Z += TwoPiInDegrees;
+            }
+            while (degrees.Z >= TwoPiInDegrees)
+            {
+                degrees.Z -= TwoPiInDegrees;
+            }
+
+            return degrees;
         }
     }
 }

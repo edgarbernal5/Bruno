@@ -18,6 +18,10 @@ namespace BrunoFramework.Editor.Game.Interaction
         private bool m_gizmoSelected;
         private Camera m_currentCamera;
 
+        private Vector3 m_savedPosition, m_savedScale;
+        private Quaternion m_savedRotation;
+        private Matrix m_savedWorldMatrix;
+
         public static readonly DependencyProperty CameraProperty = DependencyProperty.Register(
            "Camera",
            typeof(Camera),
@@ -65,7 +69,7 @@ namespace BrunoFramework.Editor.Game.Interaction
             {
                 oldValue.OnTranslationChanged -= target.OnGizmoTranslationChanged;
                 oldValue.OnRotateChanged -= target.OnGizmoRotateChanged;
-                newValue.OnScaleChanged -= target.OnGizmoScaleChanged;
+                oldValue.OnScaleChanged -= target.OnGizmoScaleChanged;
             }
             if (newValue == null) return;
 
@@ -74,40 +78,38 @@ namespace BrunoFramework.Editor.Game.Interaction
             newValue.OnScaleChanged += target.OnGizmoScaleChanged;
         }
 
-        private void OnGizmoTranslationChanged(ITransformable gizmoTransformable, Vector3 delta)
+        private void OnGizmoTranslationChanged(ITransformableObject transformableObject, Vector3 delta)
         {
-            Console.WriteLine("translate delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+            var localWorld = Matrix.CreateScale(transformableObject.LocalScale) *
+                Matrix.CreateFromQuaternion(transformableObject.LocalRotation) *
+                Matrix.CreateTranslation(transformableObject.LocalPosition);
 
-            var localWorld = Matrix.CreateScale(gizmoTransformable.LocalScale) *
-                Matrix.CreateFromQuaternion(gizmoTransformable.LocalRotation) *
-                Matrix.CreateTranslation(gizmoTransformable.LocalPosition);
-
-            var toLocal = Matrix.Invert(gizmoTransformable.WorldMatrix) * localWorld;
+            var toLocal = Matrix.Invert(transformableObject.WorldMatrix) * localWorld;
             var localPosition = Vector3.TransformNormal(delta, toLocal);
 
-            gizmoTransformable.LocalPosition += localPosition;
+            transformableObject.LocalPosition += localPosition;
         }
 
-        private void OnGizmoScaleChanged(ITransformable gizmoTransformable, Vector3 delta, bool isUniformScale)
+        private void OnGizmoScaleChanged(ITransformableObject transformableObject, Vector3 delta, bool isUniformScale)
         {
             delta *= 0.1f;
             if (isUniformScale)
             {
                 float uniform = 1.0f + (delta.X + delta.Y + delta.Z) / 3.0f;
-                Console.WriteLine("Uniform scale delta = " + uniform + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
-                gizmoTransformable.LocalScale *= uniform;
+                //Console.WriteLine("Uniform scale delta = " + uniform + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+                transformableObject.LocalScale *= uniform;
                 return;
             }
-            Console.WriteLine("NU scale delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
-            gizmoTransformable.LocalScale += delta;
+            //Console.WriteLine("NU scale delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+            transformableObject.LocalScale += delta;
         }
 
-        private void OnGizmoRotateChanged(ITransformable gizmoTransformable, Quaternion delta)
+        private void OnGizmoRotateChanged(ITransformableObject transformableObject, Quaternion delta)
         {
-            var localRotation = gizmoTransformable.LocalRotation * delta;
+            var localRotation = transformableObject.LocalRotation * delta;
             localRotation.Normalize();
 
-            gizmoTransformable.LocalRotation = localRotation;
+            transformableObject.LocalRotation = localRotation;
         }
 
         protected override void OnAttached()
@@ -139,7 +141,7 @@ namespace BrunoFramework.Editor.Game.Interaction
             m_currentCamera = Camera;
             if (m_currentCamera == null) return;
 
-            if (!GizmoService.IsActive)
+            if (IsKeyAltPressed() || !GizmoService.IsActive)
                 return;
 
             var mousePosition = ConvertToVector2(eventArgs.GetPosition(AssociatedObject));
@@ -152,6 +154,13 @@ namespace BrunoFramework.Editor.Game.Interaction
                 return;
             }
 
+            var selectedObject = m_gizmoService.GetSelectedObject();
+            m_savedPosition = selectedObject.LocalPosition;
+            m_savedRotation = selectedObject.LocalRotation;
+            m_savedScale = selectedObject.LocalScale;
+            m_savedWorldMatrix = selectedObject.WorldMatrix;
+
+            AssociatedObject.LostMouseCapture += OnLostMouseCapture;
             AssociatedObject.HwndMouseMove += OnHwndMouseMove;
             AssociatedObject.HwndLButtonUp += OnHwndLButtonUp;
             AssociatedObject.PreviewKeyDown += OnKeyDown;
@@ -180,15 +189,15 @@ namespace BrunoFramework.Editor.Game.Interaction
             m_gizmoService = GizmoService;
             if (m_gizmoSelected || m_gizmoService == null) return;
 
-            if (!m_gizmoService.IsActive) return;
+            if (IsKeyAltPressed() || !m_gizmoService.IsActive) return;
 
-            m_gizmoService.SetGizmoAxis(ConvertToVector2(eventArgs.GetPosition(AssociatedObject)));
+            m_gizmoService.SetGizmoAxisOverMousePosition(ConvertToVector2(eventArgs.GetPosition(AssociatedObject)));
         }
 
         private void OnHwndMouseDownSelector(object sender, HwndMouseEventArgs eventArgs)
         {
             m_gizmoService = GizmoService;
-            if (m_gizmoSelected || m_gizmoService == null) return;
+            if (IsKeyAltPressed() || m_gizmoSelected || m_gizmoService == null) return;
 
             m_gizmoService.SelectObjects(ConvertToVector2(eventArgs.GetPosition(AssociatedObject)));
         }
@@ -202,10 +211,17 @@ namespace BrunoFramework.Editor.Game.Interaction
             }
         }
 
+        private void OnLostMouseCapture(object sender, MouseEventArgs eventArgs)
+        {
+            EndHandler(false);
+            eventArgs.Handled = true;
+        }
+
         private void EndHandler(bool commit)
         {
             m_gizmoService.End();
-            
+
+            AssociatedObject.LostMouseCapture -= OnLostMouseCapture;
             AssociatedObject.HwndMouseMove -= OnHwndMouseMove;
             AssociatedObject.HwndLButtonUp -= OnHwndLButtonUp;
             AssociatedObject.PreviewKeyDown -= OnKeyDown;
@@ -214,7 +230,11 @@ namespace BrunoFramework.Editor.Game.Interaction
 
             if (!commit)
             {
-
+                var selectedObject = m_gizmoService.GetSelectedObject();
+                selectedObject.LocalPosition = m_savedPosition;
+                selectedObject.LocalRotation = m_savedRotation;
+                selectedObject.LocalScale = m_savedScale;
+                selectedObject.WorldMatrix = m_savedWorldMatrix;
             }
             
             m_gizmoSelected = false;
@@ -225,6 +245,11 @@ namespace BrunoFramework.Editor.Game.Interaction
         private Vector2 ConvertToVector2(Point point)
         {
             return new Vector2(point.X, point.Y);
+        }
+
+        private bool IsKeyAltPressed()
+        {
+            return (Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt;
         }
     }
 }

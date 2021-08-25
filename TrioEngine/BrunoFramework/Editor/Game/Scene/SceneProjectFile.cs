@@ -5,13 +5,10 @@ using System.IO;
 using BrunoApi.Net.Content;
 using BrunoApi.Net.Content.Tasks;
 using BrunoApi.Net.Game;
-using BrunoApi.Net.Game.Components;
 using BrunoApi.Net.Graphics;
 using System.Linq;
 using System.Collections.Specialized;
 using BrunoFramework.Editor.Game.Gizmos;
-using BrunoApi.Net.Maths;
-using System;
 using BrunoFramework.Editor.Timing;
 using BrunoFramework.Editor.Game.Inspectors;
 using System.ComponentModel;
@@ -46,8 +43,8 @@ namespace BrunoFramework.Editor.Game
         private IWorldOutlineService m_outlineService;
         private IInspectorService m_inspectorService;
 
-        public SceneProjectFile(IEditorService editor) :
-            base(editor)
+        public SceneProjectFile(IEditorService editor) 
+            : base(editor)
         {
             m_outlineService = Editor.Services.GetInstance<IWorldOutlineService>();
             m_inspectorService = Editor.Services.GetInstance<IInspectorService>();
@@ -95,18 +92,18 @@ namespace BrunoFramework.Editor.Game
             if (m_worldOutline.SelectedItems.Count > 0)
             {
                 var entityId = m_worldOutline.SelectedItems[0].Id;
-                var customData = m_worldOutline.SelectedItems[0].CustomData as WorldOutlineData;
+                var editorObject = m_worldOutline.SelectedItems[0].CustomData as IEditorObject;
 
                 //bool savedNotifiying = customData.IsNotifying;
                 //customData.IsNotifying = false;
-                SetSceneTransformFor(entityId, customData);
+                SetSceneTransformFor(entityId, editorObject);
 
                 //customData.IsNotifying = savedNotifiying;
 
-                m_gizmoService.SetTransformableSelected(customData);
+                m_gizmoService.SetTransformableAsSelected(editorObject);
 
                 m_inspectorService.SelectedObject = new InspectableObjectBuilder()
-                    .WithObjectProperties(customData, x => true)
+                    .WithObjectProperties(editorObject, x => true)
                     .ToInspectableObject();
             }
         }
@@ -164,13 +161,13 @@ namespace BrunoFramework.Editor.Game
             }
         }
 
-        private void SetSceneTransformFor(long entityId, WorldOutlineData customData)
+        private void SetSceneTransformFor(long entityId, IEditorObject editorObject)
         {
             var sceneTransform = m_scene.GetSceneTransformFor(entityId);
-            customData.LocalPosition = sceneTransform.LocalPosition;
-            customData.LocalRotation = sceneTransform.LocalRotation;
-            customData.LocalScale = sceneTransform.LocalScale;
-            customData.WorldMatrix = sceneTransform.WorldMatrix;
+            editorObject.LocalPosition = sceneTransform.LocalPosition;
+            editorObject.LocalRotation = sceneTransform.LocalRotation;
+            editorObject.LocalScale = sceneTransform.LocalScale;
+            editorObject.WorldMatrix = sceneTransform.WorldMatrix;
         }
 
         private void CreateAndSetCustomData(string name, WorldOutlineItem outlineItem, Scene.HierarchyComponentBridge entity)
@@ -207,7 +204,7 @@ namespace BrunoFramework.Editor.Game
                     var sceneTransform = m_scene.GetSceneTransformFor(id);
 
                     customData.WorldMatrix = sceneTransform.WorldMatrix;
-                    m_gizmoService.SetTransformableSelected(customData);
+                    m_gizmoService.SetTransformableAsSelected(customData);
                 }
             }
             else if (eventArgs.PropertyName == nameof(WorldOutlineData.LocalScale))
@@ -224,7 +221,6 @@ namespace BrunoFramework.Editor.Game
 
                 var sceneTransform = m_scene.GetSceneTransformFor(customData.Owner.Id);
                 customData.WorldMatrix = sceneTransform.WorldMatrix;
-                //m_gizmoService.SetWorld(customData.WorldMatrix);
             }
         }
 

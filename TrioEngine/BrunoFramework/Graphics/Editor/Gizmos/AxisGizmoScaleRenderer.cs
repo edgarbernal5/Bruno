@@ -1,6 +1,5 @@
 ﻿
 using BrunoFramework.Editor.Game.Gizmos;
-using System;
 using BrunoApi.Net.Graphics;
 using BrunoApi.Net.Graphics.Core;
 using BrunoApi.Net.Maths;
@@ -22,17 +21,17 @@ namespace BrunoFramework.Graphics.Editor
 
         private float m_currentLineLength;
 
-        public AxisGizmoScaleRenderer(GraphicsDevice device, ColorRGBA8[] axisColors)
+        public AxisGizmoScaleRenderer(GraphicsDevice device, ColorRGBA8[] axisColors, GizmoConfig gizmoConfig)
         {
-            m_axisGizmoGraphics = new AxisGizmoGraphics(GizmoService.LINE_OFFSET);
-            m_axisGizmoGraphics.InitializeTranslation(GizmoService.LINE_LENGTH);
+            m_axisGizmoGraphics = new AxisGizmoGraphics(gizmoConfig.LINE_OFFSET);
+            m_axisGizmoGraphics.InitializeTranslation(gizmoConfig.LINE_LENGTH);
             m_axisColors = axisColors;
 
-            m_gizmoScale = new AxisGizmoScale(device, this.m_axisColors, GizmoService.CONE_HEIGHT, GizmoService.LINE_LENGTH);
+            m_gizmoScale = new AxisGizmoScale(device, m_axisColors, gizmoConfig.CONE_HEIGHT, gizmoConfig.LINE_LENGTH);
 
             m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\LineEffect.fx");
             m_gizmoWorld = Matrix.Identity;
-            m_currentLineLength = GizmoService.LINE_LENGTH;
+            m_currentLineLength = gizmoConfig.LINE_LENGTH;
         }
 
         public void Render(RenderContext renderContext)
@@ -76,7 +75,7 @@ namespace BrunoFramework.Graphics.Editor
             m_gizmoScale.PutOffsetInVertices(delta, gizmoAxis);
         }
 
-        public void SetColor(ColorRGBA8[] axisColors)
+        public void SetColors(ColorRGBA8[] axisColors)
         {
             m_axisGizmoGraphics.ChangeColors(axisColors);
         }

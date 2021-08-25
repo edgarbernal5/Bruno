@@ -192,13 +192,15 @@ extern "C" BRUNO_API_EXPORT void __stdcall Material_InsertTexture(Material* mate
 Matrix
 */
 extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateFromAxisAngle(Matrix * pMatrix, Vector3* axis, float angle);
-extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateLookAt(Matrix *pMatrix1, Vector3* eye, Vector3* target, Vector3* up);
-extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreatePerspectiveFieldOfView(Matrix *pMatrix1, float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance);
-extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateRotationX(Matrix *pMatrix1, float radians);
-extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateRotationY(Matrix *pMatrix1, float radians);
-extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateRotationZ(Matrix *pMatrix1, float radians);
-extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateScale(Matrix *pMatrix1, Vector3* scale);
-extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateTranslation(Matrix *pMatrix1, Vector3* translation);
+extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateLookAt(Matrix *pMatrix, Vector3* eye, Vector3* target, Vector3* up);
+extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreatePerspectiveFieldOfView(Matrix *pMatrix, float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance);
+extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateOrthographicOffCenter(Matrix * pMatrix, float left, float right, float bottom, float top, float zNearPlane, float zFarPlane);
+extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateOrthographic(Matrix * pMatrix, float width, float height, float zNearPlane, float zFarPlane);
+extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateRotationX(Matrix *pMatrix, float radians);
+extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateRotationY(Matrix *pMatrix, float radians);
+extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateRotationZ(Matrix *pMatrix, float radians);
+extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateScale(Matrix *pMatrix, Vector3* scale);
+extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateTranslation(Matrix *pMatrix, Vector3* translation);
 extern "C" BRUNO_API_EXPORT void __stdcall Matrix_CreateFromQuaternion(Matrix * pMatrix, Quaternion * rotation);
 extern "C" BRUNO_API_EXPORT void __stdcall Matrix_Decompose(Matrix *pMatrix, Vector3* scale, Quaternion* rotation, Vector3* translation);
 extern "C" BRUNO_API_EXPORT void __stdcall Matrix_Division(Matrix *pMatrix1, Matrix *pMatrix2);

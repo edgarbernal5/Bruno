@@ -80,6 +80,7 @@
       <DependentUpon>EditorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Editor\ExitCode.cs" />
+    <Compile Include="Editor\Game\Gizmos\GizmoConfig.cs" />
     <Compile Include="Editor\Game\Gizmos\GizmoService.cs" />
     <Compile Include="Editor\Game\Gizmos\GizmosHandlerBehavior.cs" />
     <Compile Include="Editor\Game\Gizmos\IGizmoService.cs" />

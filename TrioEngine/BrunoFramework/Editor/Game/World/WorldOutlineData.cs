@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace BrunoFramework.Editor.Game
 {
-    public class WorldOutlineData : PropertyChangedBase, ITransformable, ISelectableObject
+    public class WorldOutlineData : PropertyChangedBase, IEditorObject
     {
         public string Name
         {
@@ -16,6 +16,7 @@ namespace BrunoFramework.Editor.Game
         [Browsable(false)]
         public WorldOutlineItem Owner { get; internal set; }
 
+        [DisplayName("Position")]
         public Vector3 LocalPosition
         {
             get
@@ -30,6 +31,7 @@ namespace BrunoFramework.Editor.Game
         }
         private Vector3 m_localPosition;
 
+        [DisplayName("Rotation")]
         public Quaternion LocalRotation
         {
             get
@@ -44,6 +46,7 @@ namespace BrunoFramework.Editor.Game
         }
         private Quaternion m_localRotation;
 
+        [DisplayName("Scale")]
         public Vector3 LocalScale
         {
             get

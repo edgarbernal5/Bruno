@@ -58,10 +58,10 @@ namespace BrunoFramework.Graphics.Editor
             m_coneIndicesTotal = (uint)coneIndices;
 
             VertexPositionColor[] vertices = new VertexPositionColor[totalVertices];
-            int[] triangles = new int[totalIndices];
+            var triangles = new short[totalIndices];
 
             m_vertexBuffer = new VertexBuffer(device, VertexPositionColor.VertexDeclaration, totalVertices);
-            m_indexBuffer = new IndexBuffer(device, IndexElementSize.ThirtyTwoBits, totalIndices);
+            m_indexBuffer = new IndexBuffer(device, IndexElementSize.SixteenBits, totalIndices);
 
             CreateCone(vertices, triangles, subdivisions, coneRadius, coneHeight, lineLength, 0, 0);
 
@@ -71,7 +71,7 @@ namespace BrunoFramework.Graphics.Editor
             m_indexBuffer.SetData(triangles);
         }
 
-        private void CreateCone(VertexPositionColor[] vertices, int[] triangles, int subdivisions, float radius, float height, float lineLength, int verticesOffset, int indicesOffset)
+        private void CreateCone(VertexPositionColor[] vertices, short[] triangles, int subdivisions, float radius, float height, float lineLength, int verticesOffset, int indicesOffset)
         {
             float heightOffset = (lineLength - height) * 0.5f;
             vertices[verticesOffset] = new VertexPositionColor(new Vector3(0, heightOffset, 0), m_color);
@@ -89,17 +89,17 @@ namespace BrunoFramework.Graphics.Editor
             {
                 int offset = i * 3;
                 triangles[indicesOffset + offset] = 0;
-                triangles[indicesOffset + offset + 1] = i + 1;
-                triangles[indicesOffset + offset + 2] = i + 2;
+                triangles[indicesOffset + offset + 1] = (short)(i + 1);
+                triangles[indicesOffset + offset + 2] = (short)(i + 2);
             }
 
             int bottomOffset = subdivisions * 3;
             for (int i = 0, n = subdivisions - 1; i < n; i++)
             {
                 int offset = i * 3 + bottomOffset;
-                triangles[indicesOffset + offset] = i + 1;
-                triangles[indicesOffset + offset + 1] = subdivisions + 1;
-                triangles[indicesOffset + offset + 2] = i + 2;
+                triangles[indicesOffset + offset] = (short)(i + 1);
+                triangles[indicesOffset + offset + 1] = (short)(subdivisions + 1);
+                triangles[indicesOffset + offset + 2] = (short)(i + 2);
             }
         }
 

@@ -18,36 +18,13 @@ namespace BrunoFramework.Editor.Game.Inspectors.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var eulerAngles = (Vector3)value;
-            while(eulerAngles.X <= -360f)
-            {
-                eulerAngles.X += 360.0f;
-            }
-            while (eulerAngles.X >= 360f)
-            {
-                eulerAngles.X -= 360.0f;
-            }
 
-            while (eulerAngles.Y <= -360f)
-            {
-                eulerAngles.Y += 360.0f;
-            }
-            while (eulerAngles.Y >= 360f)
-            {
-                eulerAngles.Y -= 360.0f;
-            }
+            var normalizedAngles = MathHelper.NormalizeAngles(eulerAngles);
+            normalizedAngles = normalizedAngles.ToRadians();
 
-            while (eulerAngles.Z <= -360f)
-            {
-                eulerAngles.Z += 360.0f;
-            }
-            while (eulerAngles.Z >= 360f)
-            {
-                eulerAngles.Z -= 360.0f;
-            }
-            eulerAngles = eulerAngles.ToRadians();
-            var result = Quaternion.CreateFromAxisAngle(Vector3.UnitX, eulerAngles.X) *
-                Quaternion.CreateFromAxisAngle(Vector3.UnitY, eulerAngles.Y) *
-                Quaternion.CreateFromAxisAngle(Vector3.UnitZ, eulerAngles.Z);
+            var result = Quaternion.CreateFromAxisAngle(Vector3.UnitX, normalizedAngles.X) *
+                Quaternion.CreateFromAxisAngle(Vector3.UnitY, normalizedAngles.Y) *
+                Quaternion.CreateFromAxisAngle(Vector3.UnitZ, normalizedAngles.Z);
 
             return result;
         }

@@ -16,21 +16,21 @@ namespace BrunoFramework.Graphics.Editor
         private Matrix m_gizmoWorld;
         private AxisGizmoGraphics m_axisGizmoGraphics;
 
-        public AxisGizmoTranslationRenderer(GraphicsDevice device, ColorRGBA8[] axisColors)
+        public AxisGizmoTranslationRenderer(GraphicsDevice device, ColorRGBA8[] axisColors, GizmoConfig gizmoConfig)
         {
-            m_axisGizmoGraphics = new AxisGizmoGraphics(GizmoService.LINE_OFFSET);
-            m_axisGizmoGraphics.InitializeTranslation(GizmoService.LINE_LENGTH);
+            m_axisGizmoGraphics = new AxisGizmoGraphics(gizmoConfig.LINE_OFFSET);
+            m_axisGizmoGraphics.InitializeTranslation(gizmoConfig.LINE_LENGTH);
             m_axisColors = axisColors;
 
             m_gizmoLocalWorlds = new Matrix[3];
-            m_gizmoLocalWorlds[0] = Matrix.CreateRotationZ(MathHelper.ToRadians(-90.0f)) * Matrix.CreateTranslation(Vector3.Right * (GizmoService.CONE_HEIGHT + GizmoService.LINE_LENGTH) * 0.5f);
-            m_gizmoLocalWorlds[1] = Matrix.CreateTranslation(Vector3.Up * (GizmoService.CONE_HEIGHT + GizmoService.LINE_LENGTH)* 0.5f);
-            m_gizmoLocalWorlds[2] = Matrix.CreateRotationX(MathHelper.ToRadians(90.0f)) * Matrix.CreateTranslation(Vector3.Backward * (GizmoService.CONE_HEIGHT + GizmoService.LINE_LENGTH) * 0.5f);
+            m_gizmoLocalWorlds[0] = Matrix.CreateRotationZ(MathHelper.ToRadians(-90.0f)) * Matrix.CreateTranslation(Vector3.Right * (gizmoConfig.CONE_HEIGHT + gizmoConfig.LINE_LENGTH) * 0.5f);
+            m_gizmoLocalWorlds[1] = Matrix.CreateTranslation(Vector3.Up * (gizmoConfig.CONE_HEIGHT + gizmoConfig.LINE_LENGTH)* 0.5f);
+            m_gizmoLocalWorlds[2] = Matrix.CreateRotationX(MathHelper.ToRadians(90.0f)) * Matrix.CreateTranslation(Vector3.Backward * (gizmoConfig.CONE_HEIGHT + gizmoConfig.LINE_LENGTH) * 0.5f);
 
             m_gizmos = new AxisGizmoTranslation[3];
             for (int i = 0; i < 3; i++)
             {
-                m_gizmos[i] = new AxisGizmoTranslation(device, m_axisColors[i], GizmoService.CONE_HEIGHT, GizmoService.CONE_RADIUS, GizmoService.LINE_LENGTH);
+                m_gizmos[i] = new AxisGizmoTranslation(device, m_axisColors[i], gizmoConfig.CONE_HEIGHT, gizmoConfig.CONE_RADIUS, gizmoConfig.LINE_LENGTH);
             }
 
             m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\LineEffect.fx");
@@ -41,8 +41,6 @@ namespace BrunoFramework.Graphics.Editor
         {
             m_gizmoWorld = gizmoWorld;
         }
-
-
 
         public void Render(RenderContext renderContext)
         {
@@ -73,7 +71,7 @@ namespace BrunoFramework.Graphics.Editor
                 m_axisGizmoGraphics.TranslationLines.Length / 2);
         }
 
-        public void SetColor(ColorRGBA8[] axisColors)
+        public void SetColors(ColorRGBA8[] axisColors)
         {
             m_axisGizmoGraphics.ChangeColors(axisColors);
         }

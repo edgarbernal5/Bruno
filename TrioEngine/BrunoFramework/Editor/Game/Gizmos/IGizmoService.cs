@@ -10,9 +10,9 @@ namespace BrunoFramework.Editor.Game.Gizmos
 {
     public interface IGizmoService
     {
-        event Action<ITransformable, Vector3> OnTranslationChanged;
-        event Action<ITransformable, Vector3, bool> OnScaleChanged;
-        event Action<ITransformable, Quaternion> OnRotateChanged;
+        event Action<ITransformableObject, Vector3> OnTranslationChanged;
+        event Action<ITransformableObject, Vector3, bool> OnScaleChanged;
+        event Action<ITransformableObject, Quaternion> OnRotateChanged;
 
         AxisGizmoTranslationRenderer AxisGizmoTranslationRenderer { get; }
         Camera Camera { get; set; }
@@ -21,17 +21,17 @@ namespace BrunoFramework.Editor.Game.Gizmos
         GizmoType CurrentGizmo { get; set; }
         GizmoAxis CurrentGizmoAxis { get; }
 
-        void SetTransformableSelected(ITransformable transformable);
+        void SetTransformableAsSelected(IEditorObject editorObject);
 
         bool Begin(Vector2 mousePosition);
         void UpdateGizmo(Vector2 mousePosition);
-        void SetGizmoAxis(Vector2 mousePosition);
+        void SetGizmoAxisOverMousePosition(Vector2 mousePosition);
 
-        void SetSceneWorld(Matrix world);
         void Render(RenderContext renderContext);
         void End();
 
         void SelectObjects(Vector2 mousePosition);
+        ITransformableObject GetSelectedObject();
     }
 
     public enum GizmoType
@@ -49,7 +49,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
         Y,
         Z,
         XY,
-        ZX,
+        XZ,
         YZ,
 
         XYZ
@@ -62,7 +62,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
         WorldOrigin
     }
 
-    public interface ITransformable
+    public interface ITransformableObject
     {
         Vector3 LocalPosition { get; set; }
         Quaternion LocalRotation { get; set; }
@@ -76,6 +76,10 @@ namespace BrunoFramework.Editor.Game.Gizmos
         BoundingBox BoundingBox { get; }
         bool IsSelectable { get; }
         void SetObjectExtents(Vector3 center, Vector3 extents);
+    }
+
+    public interface IEditorObject : ITransformableObject, ISelectableObject
+    {
     }
 
     public class GizmoTransformable

@@ -31,9 +31,6 @@ namespace BrunoApi.Net.Maths
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Sum", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Sum(ref Matrix mat, ref Matrix mat2);
 
-        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Transpose", CallingConvention = CallingConvention.StdCall)]
-        private static extern void Internal_Transpose(ref Matrix mat);
-
         public float M11;
         public float M12;
         public float M13;
@@ -349,6 +346,9 @@ namespace BrunoApi.Net.Maths
             return matrix1;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_Transpose", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Transpose(ref Matrix mat);
+
         public static Matrix Transpose(Matrix matrix)
         {
             Internal_Transpose(ref matrix);
@@ -373,6 +373,26 @@ namespace BrunoApi.Net.Maths
             var matrix = new Matrix();
             Internal_CreateWorld(ref matrix, ref position, ref forward, ref up);
             return matrix;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateOrthographicOffCenter", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateOrthographicOffCenter(ref Matrix mat, float left, float right, float bottom, float top, float zNearPlane, float zFarPlane);
+
+        public static Matrix CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
+        {
+            Matrix result = Matrix.Identity;
+            Internal_CreateOrthographicOffCenter(ref result, left, right, bottom, top, zNearPlane, zFarPlane);
+            return result;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Matrix_CreateOrthographic", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_CreateOrthographic(ref Matrix mat, float width, float height, float zNearPlane, float zFarPlane);
+
+        public static Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane)
+        {
+            Matrix result = Matrix.Identity;
+            Internal_CreateOrthographic(ref result, width, height, zNearPlane, zFarPlane);
+            return result;
         }
 
         public static Vector3 CreateEulerAnglesFromRotation(Matrix matrix)

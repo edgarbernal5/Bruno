@@ -130,7 +130,7 @@ namespace BrunoFramework.Graphics.Data
             set
             {
                 m_view = value;
-                m_state |= State.Projection;
+                m_viewDirty = false;
                 m_viewProjectionDirty = true;
             }
         }
@@ -150,7 +150,7 @@ namespace BrunoFramework.Graphics.Data
             set
             {
                 m_projection = value;
-                m_state |= State.Projection;
+                m_projectionDirty = false;
                 m_viewProjectionDirty = true;
             }
         }
@@ -170,7 +170,6 @@ namespace BrunoFramework.Graphics.Data
         }
         private Matrix m_viewProjection;
 
-        private State m_state;
         private bool m_viewDirty, m_projectionDirty, m_viewProjectionDirty;
 
         public Camera(Vector3 position, Vector3 target, Vector3 up)
@@ -179,10 +178,19 @@ namespace BrunoFramework.Graphics.Data
             Target = target;
             Up = up;
 
-            m_state = State.View | State.Projection;
             m_viewDirty = true;
             m_projectionDirty = true;
             m_viewProjectionDirty = true;
+        }
+
+        public Camera Clone()
+        {
+            var clone = new Camera(Position, Target, Up);
+            clone.AspectRatio = AspectRatio;
+            clone.FieldOfView = FieldOfView;
+            clone.NearPlane = NearPlane;
+            clone.FarPlane = FarPlane;
+            return clone;
         }
     }
 }

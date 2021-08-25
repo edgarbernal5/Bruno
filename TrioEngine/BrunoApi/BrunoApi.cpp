@@ -625,39 +625,49 @@ void Matrix_CreateFromAxisAngle(Matrix* pMatrix, Vector3* axis, float angle)
 	*pMatrix = Matrix::CreateFromAxisAngle(*axis, angle);
 }
 
-void Matrix_CreateLookAt(Matrix *pMatrix1, Vector3* eye, Vector3* target, Vector3* up)
+void Matrix_CreateLookAt(Matrix *pMatrix, Vector3* eye, Vector3* target, Vector3* up)
 {
-	*pMatrix1 = Matrix::CreateLookAt(*eye, *target, *up);
+	*pMatrix = Matrix::CreateLookAt(*eye, *target, *up);
 }
 
-void Matrix_CreatePerspectiveFieldOfView(Matrix *pMatrix1, float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
+void Matrix_CreatePerspectiveFieldOfView(Matrix *pMatrix, float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
 {
-	*pMatrix1 = Matrix::CreatePerspectiveFieldOfView(fieldOfView, aspectRatio, nearPlaneDistance, farPlaneDistance);
+	*pMatrix = Matrix::CreatePerspectiveFieldOfView(fieldOfView, aspectRatio, nearPlaneDistance, farPlaneDistance);
 }
 
-void Matrix_CreateRotationX(Matrix *pMatrix1, float radians)
+void Matrix_CreateOrthographicOffCenter(Matrix* pMatrix, float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
 {
-	*pMatrix1 = Matrix::CreateRotationX(radians);
+	*pMatrix = Matrix::CreateOrthographicOffCenter(left, right, bottom, top, zNearPlane, zFarPlane);
 }
 
-void Matrix_CreateRotationY(Matrix *pMatrix1, float radians)
+void Matrix_CreateOrthographic(Matrix* pMatrix, float width, float height, float zNearPlane, float zFarPlane)
 {
-	*pMatrix1 = Matrix::CreateRotationY(radians);
+	*pMatrix = Matrix::CreateOrthographic(width, height, zNearPlane, zFarPlane);
 }
 
-void Matrix_CreateRotationZ(Matrix *pMatrix1, float radians)
+void Matrix_CreateRotationX(Matrix *pMatrix, float radians)
 {
-	*pMatrix1 = Matrix::CreateRotationZ(radians);
+	*pMatrix = Matrix::CreateRotationX(radians);
 }
 
-void Matrix_CreateScale(Matrix *pMatrix1, Vector3* scale)
+void Matrix_CreateRotationY(Matrix *pMatrix, float radians)
 {
-	*pMatrix1 = Matrix::CreateScale(*scale);
+	*pMatrix = Matrix::CreateRotationY(radians);
 }
 
-void Matrix_CreateTranslation(Matrix *pMatrix1, Vector3* translation)
+void Matrix_CreateRotationZ(Matrix *pMatrix, float radians)
 {
-	*pMatrix1 = Matrix::CreateTranslation(*translation);
+	*pMatrix = Matrix::CreateRotationZ(radians);
+}
+
+void Matrix_CreateScale(Matrix *pMatrix, Vector3* scale)
+{
+	*pMatrix = Matrix::CreateScale(*scale);
+}
+
+void Matrix_CreateTranslation(Matrix *pMatrix, Vector3* translation)
+{
+	*pMatrix = Matrix::CreateTranslation(*translation);
 }
 
 void Matrix_CreateFromQuaternion(Matrix* pMatrix, Quaternion * rotation)
@@ -741,7 +751,7 @@ void Matrix_Sum(Matrix *pMatrix1, Matrix *pMatrix2)
 
 void Matrix_Transpose(Matrix *pMatrix)
 {
-	pMatrix->Transpose();
+	pMatrix->Transpose(*pMatrix);
 }
 
 void Matrix_CreateTRS(Matrix *pMatrix1, Vector3* position, Quaternion* rotation, Vector3* scale)

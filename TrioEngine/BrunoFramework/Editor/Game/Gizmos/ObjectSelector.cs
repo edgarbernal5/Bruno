@@ -3,27 +3,25 @@ using BrunoApi.Net.Maths;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
 
 namespace BrunoFramework.Editor.Game.Gizmos
 {
     public class ObjectSelector
     {
         private readonly WorldOutline m_worldOutline;
-        private List<ISelectableObject> m_selectableObjects;
+        private List<IEditorObject> m_selectableObjects;
 
-        public List<ISelectableObject> SelectedObjects
+        public List<IEditorObject> SelectedObjects
         {
             get { return m_selectedObjects; }
         }
-        private List<ISelectableObject> m_selectedObjects;
+        private List<IEditorObject> m_selectedObjects;
 
         public ObjectSelector(WorldOutline worldOutline)
         {
             m_worldOutline = worldOutline;
-            m_selectedObjects = new List<ISelectableObject>();
-            m_selectableObjects = new List<ISelectableObject>();
+            m_selectedObjects = new List<IEditorObject>();
+            m_selectableObjects = new List<IEditorObject>();
 
             //m_worldOutline.RootItems.CollectionChanged += OnRootCollectionChanged;
         }
@@ -36,12 +34,18 @@ namespace BrunoFramework.Editor.Game.Gizmos
             for (int i = 0; i < collection.Count; i++)
             {
                 var item = collection[i];
-                var selectableObject = item.CustomData as ISelectableObject;
+                var selectableObject = item.CustomData as IEditorObject;
                 if (selectableObject != null && selectableObject.IsSelectable)
                     m_selectableObjects.Add(selectableObject);
 
                 Traverse(item.Children);
             }
+        }
+
+        public void Select(IEditorObject editorObject)
+        {
+            m_selectedObjects.Clear();
+            m_selectedObjects.Add(editorObject);
         }
 
         public void Select(Ray selectionRay)
@@ -72,7 +76,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
             }
             else
             {
-                var selectableObject = m_worldOutline.SelectedItems[0].CustomData as ISelectableObject;
+                var selectableObject = m_worldOutline.SelectedItems[0].CustomData as IEditorObject;
                 m_worldOutline.SelectedItems.Clear();
 
                 int index = Math.Max(0, m_selectableObjects.IndexOf(selectableObject));
