@@ -1305,6 +1305,20 @@ void Vector3_UnaryNegation(Vector3 *pVector)
 }
 
 /*
+Vector4
+*/
+
+void Vector4_TransformMatrixPosition(Vector4* pPosition, Matrix* pMatrix)
+{
+	*pPosition = Vector4::Transform(*pPosition, *pMatrix);
+}
+
+void Vector4_SubTwoVectors(Vector4* pVector1, Vector4* pVector2)
+{
+	*pVector1 -= *pVector2;
+}
+
+/*
 VertexBuffer
 */
 VertexBuffer* VertexBuffer_Ctor(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount, int usage)

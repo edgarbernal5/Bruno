@@ -67,6 +67,8 @@ namespace BrunoFramework.Graphics.Data
             }
             set
             {
+                if (m_nearPlane == value) return;
+
                 m_nearPlane = value;
                 m_projectionDirty = true;
                 m_viewProjectionDirty = true;
@@ -81,13 +83,16 @@ namespace BrunoFramework.Graphics.Data
             }
             set
             {
+                if (m_farPlane == value) return;
+
                 m_farPlane = value;
                 m_projectionDirty = true;
                 m_viewProjectionDirty = true;
             }
         }
         private float m_farPlane;
-
+        
+        //Radians
         public float FieldOfView {
             get
             {
@@ -95,6 +100,8 @@ namespace BrunoFramework.Graphics.Data
             }
             set
             {
+                if (m_fov == value) return;
+
                 m_fov = value;
                 m_projectionDirty = true;
                 m_viewProjectionDirty = true;
@@ -109,6 +116,8 @@ namespace BrunoFramework.Graphics.Data
             }
             set
             {
+                if (m_aspectRatio == value) return;
+
                 m_aspectRatio = value;
                 m_projectionDirty = true;
                 m_viewProjectionDirty = true;
@@ -172,6 +181,11 @@ namespace BrunoFramework.Graphics.Data
 
         private bool m_viewDirty, m_projectionDirty, m_viewProjectionDirty;
 
+        private Camera()
+        {
+
+        }
+
         public Camera(Vector3 position, Vector3 target, Vector3 up)
         {
             Position = position;
@@ -191,6 +205,11 @@ namespace BrunoFramework.Graphics.Data
             clone.NearPlane = NearPlane;
             clone.FarPlane = FarPlane;
             return clone;
+        }
+
+        public static Camera Empty()
+        {
+            return new Camera();
         }
     }
 }

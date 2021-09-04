@@ -13,6 +13,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
     public class GizmoService : IGizmoService
     {
         public const float GIZMO_SCREEN_SCALE = 0.1f;
+        public const float GIZMO_SIZE_CLIP_SPACE = 2.3f;
+        public const float CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS = 60.0f;
 
         private const float MULTI_AXIS_THICKNESS = 0.05f;
         private const float SINGLE_AXIS_THICKNESS = 0.35f;
@@ -53,8 +55,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
         }
         private bool m_isActive;
 
-        public GizmoType CurrentGizmo 
-        { 
+        public GizmoType CurrentGizmo
+        {
             get => m_currentGizmoType;
             set => m_currentGizmoType = value;
         }
@@ -81,6 +83,9 @@ namespace BrunoFramework.Editor.Game.Gizmos
         private ColorRGBA8[] m_axisColors;
         private ColorRGBA8 m_selectedAxisColor;
         private GameStepTimer m_gameTimer;
+        private Camera m_sceneGizmoCamera;
+
+        private Vector3[] unaryDirections = new Vector3[] { Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ };
 
         private BoundingBox XAxisBox
         {
@@ -195,6 +200,9 @@ namespace BrunoFramework.Editor.Game.Gizmos
             m_gameTimer = gameStepTimer;
 
             InitializeGizmos();
+            m_sceneGizmoCamera = Camera.Empty();
+            m_sceneGizmoCamera.FarPlane = 10.0f;
+            m_sceneGizmoCamera.NearPlane = 1.0f;
         }
 
         private void InitializeGizmos()
@@ -223,12 +231,12 @@ namespace BrunoFramework.Editor.Game.Gizmos
             var ray = ConvertMousePositionToRay(mousePosition);
 
             var selectedAxis = GizmoAxis.None;
-            
+
             var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoWorld);
 
             ray.Direction = Vector3.TransformNormal(ray.Direction, gizmoWorldInverse);
             ray.Position = Vector3.Transform(ray.Position, gizmoWorldInverse);
-            
+
             if (m_currentGizmoType == GizmoType.Translation || m_currentGizmoType == GizmoType.Scale)
             {
                 float? intersection = XAxisBox.Intersects(ray);
@@ -376,8 +384,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
             var gizmoPositionInLocal = Vector3.Transform(m_selectionState.m_gizmoPosition, toLocal);
             var plane = new Plane();
 
-            var axisDirections = new Vector3[] { Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ};
-            var axisRightDirections = new Vector3[] { Vector3.UnitZ, Vector3.UnitX, Vector3.UnitY};
+            //var axisRightDirections = new Vector3[] { Vector3.UnitZ, Vector3.UnitX, Vector3.UnitY };
             switch (selectedAxis)
             {
                 case GizmoAxis.XY:
@@ -395,11 +402,12 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 case GizmoAxis.Z:
                     {
                         int axisIndex = (int)selectedAxis - 1;
-                        var perpendicularRayVector = Vector3.Cross(axisDirections[axisIndex], ray.Direction);
-                        perpendicularRayVector = Vector3.Cross(axisDirections[axisIndex], perpendicularRayVector);
+                        var perpendicularRayVector = Vector3.Cross(unaryDirections[axisIndex], ray.Direction);
+                        perpendicularRayVector = Vector3.Cross(unaryDirections[axisIndex], perpendicularRayVector);
                         perpendicularRayVector.Normalize();
-                        var newD = (axisRightDirections[axisIndex] * gizmoPositionInLocal);
-                        plane = new Plane(perpendicularRayVector, newD.Length());
+                        var newD = (unaryDirections[(axisIndex + 1)%3] * gizmoPositionInLocal).Length();
+                        //Console.WriteLine($"perpendicularRayVector = {perpendicularRayVector}; axisIndex={axisIndex}");
+                        plane = new Plane(perpendicularRayVector, newD);
                     }
                     break;
 
@@ -493,13 +501,13 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 m_activeAxisColors[0] = m_axisColors[0];
                 m_activeAxisColors[1] = m_axisColors[1];
                 m_activeAxisColors[2] = m_axisColors[2];
-            } 
+            }
             else if (selectedAxis == GizmoAxis.XYZ)
             {
                 m_activeAxisColors[0] = m_selectedAxisColor;
                 m_activeAxisColors[1] = m_selectedAxisColor;
                 m_activeAxisColors[2] = m_selectedAxisColor;
-            } 
+            }
             else if (selectedAxis == GizmoAxis.X || selectedAxis == GizmoAxis.Y || selectedAxis == GizmoAxis.Z)
             {
                 int axisIndex = ((int)selectedAxis) - 1;
@@ -507,22 +515,22 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 m_activeAxisColors[(axisIndex + 1) % 3] = m_axisColors[(axisIndex + 1) % 3];
                 m_activeAxisColors[(axisIndex + 2) % 3] = m_axisColors[(axisIndex + 2) % 3];
             }
-            else if(selectedAxis == GizmoAxis.XY)
+            else if (selectedAxis == GizmoAxis.XY)
             {
                 m_activeAxisColors[0] = m_selectedAxisColor;
                 m_activeAxisColors[1] = m_selectedAxisColor;
                 m_activeAxisColors[2] = m_axisColors[2];
             }
-            else if(selectedAxis == GizmoAxis.YZ)
+            else if (selectedAxis == GizmoAxis.YZ)
             {
                 m_activeAxisColors[0] = m_axisColors[0];
                 m_activeAxisColors[1] = m_selectedAxisColor;
                 m_activeAxisColors[2] = m_selectedAxisColor;
             }
-            else if(selectedAxis == GizmoAxis.XZ)
+            else if (selectedAxis == GizmoAxis.XZ)
             {
                 m_activeAxisColors[0] = m_selectedAxisColor;
-                m_activeAxisColors[1] = m_axisColors[1]; 
+                m_activeAxisColors[1] = m_axisColors[1];
                 m_activeAxisColors[2] = m_selectedAxisColor;
             }
             switch (m_currentGizmoType)
@@ -565,7 +573,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
                     var deltaAngles = new Vector2(1.0f / length);
 
                     var mouseVelocity = new Vector2(mousePosition.X - m_selectionState.m_prevMousePosition.X, mousePosition.Y - m_selectionState.m_prevMousePosition.Y);
-                    
+
                     var angles = mouseVelocity * deltaAngles;
 
                     rotationDelta = Quaternion.CreateFromYawPitchRoll(angles.X, 0, 0) * Quaternion.CreateFromYawPitchRoll(0, angles.Y, 0);
@@ -602,7 +610,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
                     perpendicularVector.Normalize();
 
                     var sign = Vector3.Dot(perpendicularVector, upNormals[planeIndex]) < 0.0f ? -1.0f : 1.0f;
-                    
+
                     delta = sign * angle;
                     //delta *= (float)m_gameTimer.ElapsedTime.TotalSeconds;
                     //delta *= m_selectionState.m_invScreenScaleFactor;
@@ -649,8 +657,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 {
                     m_currentDelta = m_selectionState.m_intersectionPosition - m_selectionState.m_prevIntersectionPosition;
                 }
-                
-                if (m_currentGizmoAxis ==  GizmoAxis.X || m_currentGizmoAxis ==  GizmoAxis.XY || m_currentGizmoAxis == GizmoAxis.XZ || m_currentGizmoAxis == GizmoAxis.XYZ)
+
+                if (m_currentGizmoAxis == GizmoAxis.X || m_currentGizmoAxis == GizmoAxis.XY || m_currentGizmoAxis == GizmoAxis.XZ || m_currentGizmoAxis == GizmoAxis.XYZ)
                 {
                     delta.X = m_currentDelta.X;
                 }
@@ -755,13 +763,53 @@ namespace BrunoFramework.Editor.Game.Gizmos
             return new Vector2(point.X, point.Y);
         }
 
+        private float GetSegmentLengthClipSpace(Vector3 start, Vector3 end)
+        {
+            var viewport = m_graphicsDevice.Viewport;
+
+            var startOfSegment = start;
+            var mvp = m_selectionState.m_gizmoWorld * m_camera.ViewProjection;
+
+            startOfSegment=viewport.Project(startOfSegment, m_camera.Projection, m_camera.View, m_selectionState.m_gizmoWorld);
+            //startOfSegment = Vector3.Transform(startOfSegment, mvp);
+            //if ((float)Math.Abs(startOfSegment.W) > 0.0001f) // check for axis aligned with camera direction
+            //{
+            //    startOfSegment.X *= 1.0f / startOfSegment.W;
+            //    startOfSegment.Y *= 1.0f / startOfSegment.W;
+            //    startOfSegment.Z *= 1.0f / startOfSegment.W;
+            //    startOfSegment.W *= 1.0f / startOfSegment.W;
+            //}
+
+            var endOfSegment = end;
+            //endOfSegment = Vector3.Transform(endOfSegment, mvp);
+            endOfSegment = viewport.Project(endOfSegment, m_camera.Projection, m_camera.View, m_selectionState.m_gizmoWorld);
+            //if ((float)Math.Abs(endOfSegment.W) > 0.0001f) // check for axis aligned with camera direction
+            //{
+            //    endOfSegment.X *= 1.0f / endOfSegment.W;
+            //    endOfSegment.Y *= 1.0f / endOfSegment.W;
+            //    endOfSegment.Z *= 1.0f / endOfSegment.W;
+            //    endOfSegment.W *= 1.0f / endOfSegment.W;
+            //}
+
+            var clipSpaceAxis = endOfSegment - startOfSegment;
+            clipSpaceAxis.X = (clipSpaceAxis.X - viewport.X) * 2.0f / viewport.Width-1.0f;
+            clipSpaceAxis.Y = (clipSpaceAxis.Y - viewport.Y) * 2.0f / viewport.Height - 1.0f;
+            //vector.X = (vector.X + 1f) * 0.5f * (float)this.Width + (float)this.X;
+            //vector.Y = (-vector.Y + 1f) * 0.5f * (float)this.Height + (float)this.Y;
+
+            clipSpaceAxis.Y /= m_camera.AspectRatio;
+
+            return (float)Math.Sqrt(clipSpaceAxis.X * clipSpaceAxis.X + clipSpaceAxis.Y * clipSpaceAxis.Y);
+        }
+
         private void Update()
         {
             if (m_camera == null) return;
 
-            var vLength = m_camera.Position - m_selectionState.m_gizmoPosition;
-
-            m_selectionState.m_screenScaleFactor = vLength.Length() * GIZMO_SCREEN_SCALE;
+            //var gizmoPositionViewSpace = Vector3.Transform(m_selectionState.m_gizmoPosition, Matrix.Invert(m_camera.View));
+            var distance = (m_camera.Position - m_selectionState.m_gizmoPosition).Length();
+            //Console.WriteLine($"distance = {distance}; z = {gizmoPositionViewSpace} ; mag = {gizmoPositionViewSpace.Length()}");
+            m_selectionState.m_screenScaleFactor = distance * GIZMO_SCREEN_SCALE;
             if (m_selectionState.m_screenScaleFactor < 0.0001f)
             {
                 m_selectionState.m_invScreenScaleFactor = 1.0f;
@@ -770,8 +818,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
             {
                 m_selectionState.m_invScreenScaleFactor = 1.0f / m_selectionState.m_screenScaleFactor;
             }
-            m_selectionState.m_screenScaleMatrix = Matrix.CreateScale(new Vector3(m_selectionState.m_screenScaleFactor));
             //m_selectionState.m_screenScaleMatrix = Matrix.Identity;
+            m_selectionState.m_screenScaleMatrix = Matrix.CreateScale(new Vector3(m_selectionState.m_screenScaleFactor));
 
             if (m_objectSelector.SelectedObjects.Count < 1)
             {
@@ -810,11 +858,50 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 m_selectionState.m_rotationMatrix.Up = localUp;
                 m_selectionState.m_rotationMatrix.Right = localRight;
             }
+
+
+            //var viewInverse = Matrix.Invert(m_camera.View);
+            //var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoWorld);
+
+            //var positions = new Vector3[6];
+            //for (int i = 0; i < 3; i++)
+            //{
+            //    var rightInverseNormalized = (i==0 ? viewInverse.Right : (i ==1?viewInverse.Up:viewInverse.Forward));
+            //    rightInverseNormalized.Normalize();
+            //    var rightViewInverse = Vector3.TransformNormal(rightInverseNormalized, gizmoWorldInverse);
+
+            //    //var rightViewInverse = Vector4.Transform(new Vector4(rightInverseNormalized, viewInverse.M14), gizmoWorldInverse);
+            //    //rightViewInverse = Vector4.Transform(rightViewInverse, gizmoWorldInverse);
+
+            //    float rightLength = GetSegmentLengthClipSpace(Vector3.Zero, rightViewInverse);
+            //    float screenFactor = GIZMO_SIZE_CLIP_SPACE / rightLength;
+
+            //    var axis = unaryDirections[i];
+            //    Vector3 p1 = GetPositionInClipSpace(axis * 0.1f * screenFactor);
+            //    Vector3 p2 = GetPositionInClipSpace(axis * screenFactor);
+
+            //    positions[i * 2] = p1;
+            //    positions[i * 2 + 1] = p2;
+            //}
+            //m_axisGizmoTranslationRenderer.SetLinePositions(positions);
+
+            //var gizmoPositionViewSpace = Vector3.Transform(m_selectionState.m_gizmoPosition, Matrix.Invert(m_camera.View));
+            //https://es.wikipedia.org/wiki/Tangente_(trigonometr%C3%ADa)
+            //m_selectionState.m_screenScaleFactor = Math.Abs( gizmoPositionViewSpace.Z) * (float)Math.Tan(m_camera.FieldOfView*0.5f) * (GIZMO_SCREEN_SCALE );
+            //m_selectionState.m_screenScaleFactor = distance * (float)Math.Tan(1) * (GIZMO_SCREEN_SCALE / m_graphicsDevice.Viewport.Height);
+            //m_selectionState.m_screenScaleFactor = distance * GIZMO_SCREEN_SCALE;
+            //m_selectionState.m_screenScaleFactor = 1.0f;
+        }
+
+        private Vector3 GetPositionInClipSpace(Vector3 position)
+        {
+            var inClip = Vector3.Transform(position, m_selectionState.m_gizmoWorld * m_camera.ViewProjection);
+            return inClip;
         }
 
         public void Render(RenderContext renderContext)
         {
-            //RenderCameraGizmo(renderContext);
+            RenderCameraGizmo(renderContext);
             if (m_currentGizmoType == GizmoType.None || !m_isActive)
                 return;
 
@@ -840,27 +927,27 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         private void RenderCameraGizmo(RenderContext renderContext)
         {
-
-            m_axisGizmoTranslationRenderer.SetColors(m_axisColors);
+            var savedViewport = renderContext.Viewport;
             var sceneCamera = renderContext.Camera;
 
-            var gizmoCamera = sceneCamera.Clone();
-            //gizmoCamera.View = Matrix.CreateLookAt(new Vector3(0,10.5f, 0.5f), Vector3.Zero, Vector3.Up);
+            var viewport = new Viewport(renderContext.GameSurfaceTarget.Width - CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS, 0, CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS, CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS);
+            renderContext.Viewport = viewport;
+            renderContext.GraphicsDevice.Viewport = viewport;
+            m_sceneGizmoCamera.AspectRatio = viewport.AspectRatio;
+            m_sceneGizmoCamera.FieldOfView = m_camera.FieldOfView;
 
-            Vector2 center = new Vector2();
-            center.X = renderContext.Viewport.Width * 0.5f;
-            center.Y = renderContext.Viewport.Height * 0.5f;
-            gizmoCamera.View = Matrix.CreateLookAt(new Vector3(center, 0), new Vector3(center, 1), Vector3.Down);
-
-            gizmoCamera.Projection = Matrix.CreateOrthographic(center.X*2f, center.Y*2f, -0.5f, 1.0f);
-            renderContext.Camera = gizmoCamera;
-
-            var cameraOrientation = Quaternion.CreateFromMatrix(sceneCamera.View);
+            var cameraOrientation = Matrix.CreateFromQuaternion(Quaternion.CreateFromMatrix(sceneCamera.View));
+            m_sceneGizmoCamera.View = cameraOrientation * Matrix.CreateLookAt(new Vector3(0, 0, m_gizmoConfig.GIZMO_LENGTH + 3.0f), Vector3.Zero, Vector3.Up);
+            renderContext.Camera = m_sceneGizmoCamera;
+            
+            m_axisGizmoTranslationRenderer.SetColors(m_axisColors);
             m_axisGizmoTranslationRenderer.SetWorld(Matrix.Identity);
             m_axisGizmoTranslationRenderer.Render(renderContext);
 
-            renderContext.Camera = sceneCamera;
             m_axisGizmoTranslationRenderer.SetColors(m_activeAxisColors);
+            renderContext.Camera = sceneCamera;
+            renderContext.Viewport = savedViewport;
+            renderContext.GraphicsDevice.Viewport = savedViewport;
         }
 
         public void SetTransformableAsSelected(IEditorObject editorObject)

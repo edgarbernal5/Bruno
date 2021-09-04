@@ -399,6 +399,12 @@ extern "C" BRUNO_API_EXPORT void __stdcall Vector3_SumTwoVectors(Vector3 *pVecto
 extern "C" BRUNO_API_EXPORT void __stdcall Vector3_UnaryNegation(Vector3 *pVector);
 
 /*
+Vector4
+*/
+extern "C" BRUNO_API_EXPORT void __stdcall Vector4_TransformMatrixPosition(Vector4 * pPosition, Matrix * pMatrix);
+extern "C" BRUNO_API_EXPORT void __stdcall Vector4_SubTwoVectors(Vector4 * pVector1, Vector4 * pVector2);
+
+/*
 VertexBuffer
 */
 extern "C" BRUNO_API_EXPORT VertexBuffer* __stdcall VertexBuffer_Ctor(GraphicsDevice* device, VertexDeclaration* vertexDeclaration, int vertexCount, int usage);
