@@ -802,14 +802,22 @@ namespace BrunoFramework.Editor.Game.Gizmos
             return (float)Math.Sqrt(clipSpaceAxis.X * clipSpaceAxis.X + clipSpaceAxis.Y * clipSpaceAxis.Y);
         }
 
+        private Vector3 ToClipSpace(Vector2 screenPosition, Viewport viewport)
+        {
+            Vector3 result = Vector3.Zero;
+
+            result.X = (screenPosition.X - viewport.X) * 2.0f / viewport.Width - 1.0f;
+            result.Y = -((screenPosition.Y - viewport.Y) * 2.0f / viewport.Height - 1.0f);
+            return result;
+        }
+
         private void Update()
         {
             if (m_camera == null) return;
 
-            //var gizmoPositionViewSpace = Vector3.Transform(m_selectionState.m_gizmoPosition, Matrix.Invert(m_camera.View));
-            var distance = (m_camera.Position - m_selectionState.m_gizmoPosition).Length();
-            //Console.WriteLine($"distance = {distance}; z = {gizmoPositionViewSpace} ; mag = {gizmoPositionViewSpace.Length()}");
-            m_selectionState.m_screenScaleFactor = distance * GIZMO_SCREEN_SCALE;
+            var gizmoPositionViewSpace = Vector3.Transform(m_selectionState.m_gizmoPosition, m_camera.View);
+
+            m_selectionState.m_screenScaleFactor = Math.Abs(gizmoPositionViewSpace.Z) * GIZMO_SCREEN_SCALE;
             if (m_selectionState.m_screenScaleFactor < 0.0001f)
             {
                 m_selectionState.m_invScreenScaleFactor = 1.0f;
@@ -858,12 +866,46 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 m_selectionState.m_rotationMatrix.Up = localUp;
                 m_selectionState.m_rotationMatrix.Right = localRight;
             }
+            //const float GIZMO_SIZE_IN_PIXELS = 60.0f;
+            //var originWS = m_selectionState.m_gizmoPosition;
+            //var viewport = m_graphicsDevice.Viewport;
 
+            //var originSS = viewport.Project(originWS, m_camera.Projection, m_camera.View, Matrix.Identity);
 
-            //var viewInverse = Matrix.Invert(m_camera.View);
-            //var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoWorld);
+            ////var viewInverse = Matrix.Invert(m_camera.View);
+            ////var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoWorld);
+            ////var rightInverseNormalized = viewInverse.Right;
+            ////rightInverseNormalized.Normalize();
+            ////var rightViewInverse = Vector3.TransformNormal(rightInverseNormalized, gizmoWorldInverse);
 
+            //var targetRightSS = viewport.Project(originWS + Vector3.UnitX, m_camera.Projection, m_camera.View, Matrix.Identity);
+
+            //var directionRight = (targetRightSS - originSS).ToVector2();
+            //directionRight.Normalize();
             //var positions = new Vector3[6];
+
+            //var originClip = ToClipSpace(originSS.ToVector2(), viewport);
+            //var rightClip = ToClipSpace(originSS.ToVector2() + (directionRight * GIZMO_SIZE_IN_PIXELS), viewport);
+            //positions[0] = originClip;
+            //positions[1] = rightClip;
+            //var targetUpSS = viewport.Project(originWS + Vector3.UnitY, m_camera.Projection, m_camera.View, Matrix.Identity);
+
+            //var directionUp = (targetUpSS - originSS).ToVector2();
+            //directionUp.Normalize();
+            //var upClip = ToClipSpace(originSS.ToVector2() + (directionUp * GIZMO_SIZE_IN_PIXELS), viewport);
+            //positions[2] = originClip;
+            //positions[3] = upClip;
+
+
+            //var targetForwardSS = viewport.Project(originWS + Vector3.UnitZ, m_camera.Projection, m_camera.View, Matrix.Identity);
+            //var directionForward = (targetForwardSS - originSS).ToVector2();
+            //directionForward.Normalize();
+
+            //var forwardClip = ToClipSpace(originSS.ToVector2() + (directionForward * GIZMO_SIZE_IN_PIXELS), viewport);
+            //positions[4] = originClip;
+            //positions[5] = forwardClip;
+
+            //m_axisGizmoTranslationRenderer.SetLinePositions(positions);
             //for (int i = 0; i < 3; i++)
             //{
             //    var rightInverseNormalized = (i==0 ? viewInverse.Right : (i ==1?viewInverse.Up:viewInverse.Forward));

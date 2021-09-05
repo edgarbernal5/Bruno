@@ -61,6 +61,9 @@ namespace BrunoEngine
 		m_vertexShader(nullptr),
 		m_vertexShaderDirty(false),
 
+		m_indexBuffer(nullptr),
+		m_vertexBuffer(nullptr),
+
 		m_vertexConstantBuffers(nullptr),
 		m_pixelConstantBuffers(nullptr),
 

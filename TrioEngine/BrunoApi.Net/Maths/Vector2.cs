@@ -64,7 +64,7 @@ namespace BrunoApi.Net.Maths
 
         public static Vector2 operator +(Vector2 vector1, Vector2 vector2)
         {
-            Internal_SubTwoVectors(ref vector1, ref vector2);
+            Internal_SumTwoVectors(ref vector1, ref vector2);
             return vector1;
         }
 
@@ -127,7 +127,7 @@ namespace BrunoApi.Net.Maths
 
         public override int GetHashCode()
         {
-            return this.X.GetHashCode() + this.Y.GetHashCode();
+            return X.GetHashCode() + Y.GetHashCode();
         }
 
         public override string ToString()
