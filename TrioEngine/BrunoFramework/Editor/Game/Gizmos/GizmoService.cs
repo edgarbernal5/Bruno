@@ -384,7 +384,6 @@ namespace BrunoFramework.Editor.Game.Gizmos
             var gizmoPositionInLocal = Vector3.Transform(m_selectionState.m_gizmoPosition, toLocal);
             var plane = new Plane();
 
-            //var axisRightDirections = new Vector3[] { Vector3.UnitZ, Vector3.UnitX, Vector3.UnitY };
             switch (selectedAxis)
             {
                 case GizmoAxis.XY:
@@ -401,24 +400,30 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 case GizmoAxis.Y:
                 case GizmoAxis.Z:
                     {
+                        var cameraToGizmo = m_selectionState.m_gizmoPosition - m_camera.Position;
+                        cameraToGizmo.Normalize();
+                        cameraToGizmo = Vector3.TransformNormal(cameraToGizmo, toLocal);
+
                         int axisIndex = (int)selectedAxis - 1;
-                        var perpendicularRayVector = Vector3.Cross(unaryDirections[axisIndex], ray.Direction);
+                        var perpendicularRayVector = Vector3.Cross(unaryDirections[axisIndex], cameraToGizmo);
                         perpendicularRayVector = Vector3.Cross(unaryDirections[axisIndex], perpendicularRayVector);
                         perpendicularRayVector.Normalize();
-                        var newD = (unaryDirections[(axisIndex + 1)%3] * gizmoPositionInLocal).Length();
-                        //Console.WriteLine($"perpendicularRayVector = {perpendicularRayVector}; axisIndex={axisIndex}");
+                        var gizmoPositionToLocal = Vector3.Transform(m_selectionState.m_gizmoPosition, toLocal);
+                        var newD = Vector3.Dot(perpendicularRayVector, gizmoPositionToLocal);
+
                         plane = new Plane(perpendicularRayVector, newD);
                     }
                     break;
 
                 case GizmoAxis.XYZ:
                     {
-                        var cameraDirection = m_camera.Position - m_selectionState.m_gizmoPosition;
-                        cameraDirection = Vector3.TransformNormal(cameraDirection, toLocal);
-                        float zCamera = cameraDirection.Length();
-                        cameraDirection.Normalize();
+                        var cameraToGizmo = m_camera.Position - m_selectionState.m_gizmoPosition;
+                        cameraToGizmo = Vector3.TransformNormal(cameraToGizmo, toLocal);
 
-                        plane = new Plane(cameraDirection, zCamera);
+                        float zCamera = cameraToGizmo.Length();
+                        cameraToGizmo.Normalize();
+
+                        plane = new Plane(cameraToGizmo, zCamera);
                     }
                     break;
             }
@@ -637,6 +642,18 @@ namespace BrunoFramework.Editor.Game.Gizmos
             return rotationDelta;
         }
 
+        float? IntersectRayPlane(Ray ray, Plane plane)
+        {
+            float numer = Vector3.Dot(plane.Normal, ray.Position) + plane.D;
+            float denom = Vector3.Dot(plane.Normal, ray.Direction);
+
+            if (Math.Abs(denom) < float.Epsilon)
+            {
+                return null;
+            }
+            return new float?(-(numer / denom));
+        }
+
         private Vector3 GetDeltaMovement(Vector2 mousePosition)
         {
             Vector3 delta = Vector3.Zero;
@@ -649,10 +666,12 @@ namespace BrunoFramework.Editor.Game.Gizmos
             SetGizmoHandlePlaneFor(m_currentGizmoAxis, mousePosition);
 
             var plane = m_selectionState.m_currentGizmoPlane;
-            float? intersection = ray.Intersects(plane);
+            //var intersection = ray.Intersects(plane);
+            var intersection = IntersectRayPlane(ray, plane);
+
             if (intersection.HasValue)
             {
-                m_selectionState.m_intersectionPosition = ray.Position + (ray.Direction * intersection.Value);
+                m_selectionState.m_intersectionPosition = ray.Position + (ray.Direction * Math.Abs(intersection.Value));
                 if (m_selectionState.m_prevIntersectionPosition != Vector3.Zero)
                 {
                     m_currentDelta = m_selectionState.m_intersectionPosition - m_selectionState.m_prevIntersectionPosition;
