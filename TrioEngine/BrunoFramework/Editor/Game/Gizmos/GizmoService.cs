@@ -373,10 +373,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
             return m_currentGizmoAxis != GizmoAxis.None;
         }
 
-        private void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, Vector2 mousePosition)
+        private void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, Ray ray)
         {
-            var ray = ConvertMousePositionToRay(mousePosition);
-
             var toLocal = Matrix.Transpose(m_selectionState.m_rotationMatrix);
             ray.Position = Vector3.Transform(ray.Position, toLocal);
             ray.Direction = Vector3.TransformNormal(ray.Direction, toLocal);
@@ -430,6 +428,12 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
             //Console.WriteLine(string.Format("selected plane normal = {0}; Axis = {1}", plane.Normal, selectedAxis.ToString()));
             m_selectionState.m_currentGizmoPlane = plane;
+        }
+        private void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, Vector2 mousePosition)
+        {
+            var ray = ConvertMousePositionToRay(mousePosition);
+
+            SetGizmoHandlePlaneFor(selectedAxis, ray);
         }
 
         public void UpdateGizmo(Vector2 mousePosition)
@@ -663,7 +667,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
             ray.Position = Vector3.Transform(ray.Position, toLocal);
             ray.Direction = Vector3.TransformNormal(ray.Direction, toLocal);
 
-            SetGizmoHandlePlaneFor(m_currentGizmoAxis, mousePosition);
+            SetGizmoHandlePlaneFor(m_currentGizmoAxis, ray);
 
             var plane = m_selectionState.m_currentGizmoPlane;
             //var intersection = ray.Intersects(plane);
