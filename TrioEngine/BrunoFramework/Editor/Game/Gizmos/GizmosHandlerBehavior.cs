@@ -176,7 +176,10 @@ namespace BrunoFramework.Editor.Game.Interaction
         private void OnHwndMouseMove(object sender, HwndMouseEventArgs eventArgs)
         {
             var mousePosition = ConvertToVector2(eventArgs.GetPosition(AssociatedObject));
-            GizmoService.UpdateGizmo(mousePosition);
+            var gizmoService = GizmoService;
+            gizmoService.SnapEnabled = IsShiftKeyPressed();
+            gizmoService.PrecisionModeEnabled = IsControlKeyPressed();
+            gizmoService.UpdateGizmo(mousePosition);
         }
 
         private void OnHwndLButtonUp(object sender, HwndMouseEventArgs e)
@@ -251,5 +254,15 @@ namespace BrunoFramework.Editor.Game.Interaction
         {
             return (Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt;
         }
+
+        private bool IsShiftKeyPressed()
+        {
+            return (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift;
+        }
+        private bool IsControlKeyPressed()
+        {
+            return (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+        }
+
     }
 }

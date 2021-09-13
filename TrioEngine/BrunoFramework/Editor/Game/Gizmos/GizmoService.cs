@@ -18,7 +18,10 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         private const float MULTI_AXIS_THICKNESS = 0.05f;
         private const float SINGLE_AXIS_THICKNESS = 0.35f;
-        public GizmoConfig m_gizmoConfig;
+        private GizmoConfig m_gizmoConfig;
+        private GizmoSnappingConfig m_gizmoSnappingConfig;
+
+        private Vector3 m_translationScaleSnapDelta;
 
         public AxisGizmoTranslationRenderer AxisGizmoTranslationRenderer
         {
@@ -171,6 +174,12 @@ namespace BrunoFramework.Editor.Game.Gizmos
             }
         }
 
+        public bool SnapEnabled { get => m_snapEnabled; set => m_snapEnabled = value; }
+        private bool m_snapEnabled;
+
+        public bool PrecisionModeEnabled { get => m_precisionModeEnabled; set => m_precisionModeEnabled = value; }
+        private bool m_precisionModeEnabled;
+
         private class SelectionState
         {
             public Vector3 m_gizmoPosition;
@@ -218,6 +227,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
             m_axisGizmoTranslationRenderer = new AxisGizmoTranslationRenderer(m_graphicsDevice, m_axisColors, gizmoConfig);
             m_axisGizmoScaleRenderer = new AxisGizmoScaleRenderer(m_graphicsDevice, m_axisColors, gizmoConfig);
             m_axisGizmoRotationRenderer = new AxisGizmoRotationRenderer(m_graphicsDevice, m_axisColors, gizmoConfig);
+
+            m_gizmoSnappingConfig = new GizmoSnappingConfig();
 
             m_selectionState = new SelectionState();
             m_selectionState.m_rotationMatrix = Matrix.Identity;
@@ -443,6 +454,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 case GizmoType.Translation:
                     {
                         var translationDelta = GetDeltaMovement(mousePosition);
+                        translationDelta = ApplySnapAndPrecisionMode(translationDelta);
+
                         translationDelta = Vector3.Transform(translationDelta, m_selectionState.m_rotationMatrix);
 
                         SetGizmoPosition(translationDelta);
@@ -478,6 +491,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 case GizmoType.Scale:
                     {
                         var scaleDelta = GetDeltaMovement(mousePosition);
+                        scaleDelta  = ApplySnapAndPrecisionMode(scaleDelta);
 
                         if (scaleDelta != Vector3.Zero)
                         {
@@ -500,6 +514,35 @@ namespace BrunoFramework.Editor.Game.Gizmos
             }
 
             Update();
+        }
+
+        private Vector3 ApplySnapAndPrecisionMode(Vector3 delta)
+        {
+            if (SnapEnabled)
+            {
+                var snapValue = m_currentGizmoType == GizmoType.Scale ?
+                    m_gizmoSnappingConfig.SCALE_SNAP : 
+                    m_gizmoSnappingConfig.TRANSLATION_SNAP;
+                
+                if (PrecisionModeEnabled)
+                {
+                    delta *= m_gizmoSnappingConfig.PRECISION_SCALE;
+                    snapValue *= m_gizmoSnappingConfig.PRECISION_SCALE;
+                }
+                m_translationScaleSnapDelta += delta;
+
+                delta = new Vector3((int)(m_translationScaleSnapDelta.X / snapValue) * snapValue,
+                    (int)(m_translationScaleSnapDelta.Y / snapValue) * snapValue,
+                    (int)(m_translationScaleSnapDelta.Z / snapValue) * snapValue);
+
+                m_translationScaleSnapDelta -= delta;
+            }
+            else if (PrecisionModeEnabled)
+            {
+                delta *= m_gizmoSnappingConfig.PRECISION_SCALE;
+            }
+
+            return delta;
         }
 
         public void SetGizmoAxisOverMousePosition(Vector2 mousePosition)

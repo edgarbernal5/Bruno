@@ -10,4 +10,11 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         public float GIZMO_LENGTH => LINE_LENGTH + CONE_HEIGHT;
     }
+
+    public class GizmoSnappingConfig
+    {
+        public float TRANSLATION_SNAP = 1.0f;
+        public float SCALE_SNAP = 0.5f;
+        public float PRECISION_SCALE = 0.1f;
+    }
 }

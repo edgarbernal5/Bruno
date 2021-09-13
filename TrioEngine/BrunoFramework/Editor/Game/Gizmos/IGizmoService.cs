@@ -32,6 +32,9 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         void SelectObjects(Vector2 mousePosition);
         ITransformableObject GetSelectedObject();
+
+        bool SnapEnabled { get; set; }
+        bool PrecisionModeEnabled { get; set; }
     }
 
     public enum GizmoType
