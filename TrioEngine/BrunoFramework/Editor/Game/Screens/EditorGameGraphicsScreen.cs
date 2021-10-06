@@ -66,10 +66,10 @@ namespace BrunoFramework.Editor.Graphics
 
             //Camera.Recalculate();
 
-            //m_gridMesh.Render(renderContext);
-
             BrunoApi.Net.Game.Scene.UpdateCamera(ConvertToCamera(Camera));
             m_renderPath.Render();
+
+            m_gridMesh.Render(renderContext);
 
             m_gizmoService.Render(renderContext);
         }

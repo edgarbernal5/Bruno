@@ -64,9 +64,6 @@ namespace BrunoFramework.Editor.Game
         public Matrix WorldMatrix { get => m_worldMatrix; set => m_worldMatrix = value; }
         private Matrix m_worldMatrix;
 
-        public Matrix ParentWorldMatrix { get => m_parentWorldMatrix; set => m_parentWorldMatrix = value; }
-        private Matrix m_parentWorldMatrix;
-
         public BoundingBox BoundingBox
         {
             get

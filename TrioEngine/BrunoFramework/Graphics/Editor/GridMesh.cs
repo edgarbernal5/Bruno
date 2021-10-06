@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BrunoApi.Net.Graphics;
 using BrunoApi.Net.Graphics.Core;
 using BrunoApi.Net.Maths;
+using System;
 
 namespace BrunoFramework.Graphics.Editor
 {
@@ -37,13 +38,13 @@ namespace BrunoFramework.Graphics.Editor
             CreateIndexBuffer(device);
             CreateVertexBuffer(device);
 
-            m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\LineEffect.fx");
+            m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\GridEffect.fx");
         }
 
         private void CreateVertexBuffer(GraphicsDevice device)
         {            
             List<VertexPositionColor> vertices = new List<VertexPositionColor>();
-            var colorWhiteVector4 = ColorRGBA8.White;
+            var colorWhiteVector4 = new ColorRGBA8(80,80,80);
             int halfSize = m_gridSize / 2;
 
             for (int i = 0; i < m_gridSize; i++)
@@ -123,7 +124,7 @@ namespace BrunoFramework.Graphics.Editor
             var device = renderContext.GraphicsDevice;
 
             device.DepthStencilState = DepthStencilState.None;
-            ////device->SetBlendState(BlendState::Opaque);
+            device.BlendState = BlendState.NonPremultiplied;
             device.RasterizerState = RasterizerState.CullNone;
             //device.SetSamplerState(0, SamplerState::LinearWrap);
 
@@ -131,6 +132,10 @@ namespace BrunoFramework.Graphics.Editor
             device.SetIndexBuffer(m_indexBuffer);
 
             m_effect.Parameters["gWorldViewProj"].SetValue(renderContext.Camera.ViewProjection);
+            m_effect.Parameters["gWorldView"].SetValue(renderContext.Camera.View);
+            m_effect.Parameters["gFarPlane"].SetValue((float)m_gridSize);
+            m_effect.Parameters["gNearPlane"].SetValue(renderContext.Camera.NearPlane);
+            //kaka += 0.001f;
             m_effect.Techniques[0].Passes[0].Apply();
 
             device.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, (uint)(m_totalIndices / 2));

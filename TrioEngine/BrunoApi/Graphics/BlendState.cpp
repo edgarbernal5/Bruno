@@ -30,6 +30,27 @@ namespace BrunoEngine
 		MultiSampleMask = INT_MAX;
 	}
 
+	BlendState::BlendState(Blend sourceBlend, Blend destinationBlend)
+#ifdef BRUNO_DIRECTX
+		:
+	m_pState(nullptr)
+#endif
+	{
+		AlphaBlendFunction = BlendFunction::Add;
+		BlendFactor = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+		ColorBlendFunction = BlendFunction::Add;
+		ColorWriteChannels0 = ColorWriteChannels::All;
+		ColorWriteChannels1 = ColorWriteChannels::All;
+		ColorWriteChannels2 = ColorWriteChannels::All;
+		ColorWriteChannels3 = ColorWriteChannels::All;
+		MultiSampleMask = INT_MAX;
+
+		ColorSourceBlend = sourceBlend;
+		AlphaSourceBlend = sourceBlend;
+		ColorDestinationBlend = destinationBlend;
+		AlphaDestinationBlend = destinationBlend;
+	}
+
 	BlendState::~BlendState()
 	{
 	}
@@ -53,8 +74,8 @@ namespace BrunoEngine
 			targetDesc.DestBlend = GetBlendOption(ColorDestinationBlend, false);
 
 			targetDesc.BlendOpAlpha = GetBlendOperation(AlphaBlendFunction);
-			targetDesc.SrcBlendAlpha = GetBlendOption(AlphaSourceBlend, false);
-			targetDesc.DestBlendAlpha = GetBlendOption(AlphaDestinationBlend, false);
+			targetDesc.SrcBlendAlpha = GetBlendOption(AlphaSourceBlend, true);
+			targetDesc.DestBlendAlpha = GetBlendOption(AlphaDestinationBlend, true);
 
 			desc.RenderTarget[0] = targetDesc;
 			desc.RenderTarget[1] = targetDesc;
@@ -103,44 +124,44 @@ namespace BrunoEngine
 	{
 		switch (blend)
 		{
-		case Blend::One:
-			return D3D11_BLEND_ONE;
-
-		case Blend::Zero:
-			return D3D11_BLEND_ZERO;
-
-		case Blend::SourceColor:
-			return alpha ? D3D11_BLEND_SRC_ALPHA : D3D11_BLEND_SRC_COLOR;
-
-		case Blend::InverseSourceColor:
-			return alpha ? D3D11_BLEND_INV_SRC_ALPHA : D3D11_BLEND_INV_SRC_COLOR;
-
-		case Blend::SourceAlpha:
-			return D3D11_BLEND_SRC_ALPHA;
-
-		case Blend::InverseSourceAlpha:
-			return D3D11_BLEND_INV_SRC_ALPHA;
-
-		case Blend::DestinationColor:
-			return alpha ? D3D11_BLEND_DEST_ALPHA : D3D11_BLEND_DEST_COLOR;
-
-		case Blend::InverseDestinationColor:
-			return alpha ? D3D11_BLEND_INV_DEST_ALPHA : D3D11_BLEND_INV_DEST_COLOR;
+		case Blend::BlendFactor:
+			return D3D11_BLEND_BLEND_FACTOR;
 
 		case Blend::DestinationAlpha:
 			return D3D11_BLEND_DEST_ALPHA;
 
-		case Blend::InverseDestinationAlpha:
-			return D3D11_BLEND_INV_DEST_ALPHA;
-
-		case Blend::BlendFactor:
-			return D3D11_BLEND_BLEND_FACTOR;
+		case Blend::DestinationColor:
+			return alpha ? D3D11_BLEND_DEST_ALPHA : D3D11_BLEND_DEST_COLOR;
 
 		case Blend::InverseBlendFactor:
 			return D3D11_BLEND_INV_BLEND_FACTOR;
 
+		case Blend::InverseDestinationAlpha:
+			return D3D11_BLEND_INV_DEST_ALPHA;
+
+		case Blend::InverseDestinationColor:
+			return alpha ? D3D11_BLEND_INV_DEST_ALPHA : D3D11_BLEND_INV_DEST_COLOR;
+
+		case Blend::InverseSourceAlpha:
+			return D3D11_BLEND_INV_SRC_ALPHA;
+
+		case Blend::InverseSourceColor:
+			return alpha ? D3D11_BLEND_INV_SRC_ALPHA : D3D11_BLEND_INV_SRC_COLOR;
+
+		case Blend::One:
+			return D3D11_BLEND_ONE;
+
+		case Blend::SourceAlpha:
+			return D3D11_BLEND_SRC_ALPHA;
+
 		case Blend::SourceAlphaSaturation:
 			return D3D11_BLEND_SRC_ALPHA_SAT;
+
+		case Blend::SourceColor:
+			return alpha ? D3D11_BLEND_SRC_ALPHA : D3D11_BLEND_SRC_COLOR;
+
+		case Blend::Zero:
+			return D3D11_BLEND_ZERO;
 
 		default:
 			return D3D11_BLEND_ZERO;

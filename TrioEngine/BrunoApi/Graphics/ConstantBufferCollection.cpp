@@ -45,7 +45,6 @@ namespace BrunoEngine
 			m_arrayBuffers[m_count] = item;
 			m_count++;
 		}
-
 	}
 
 

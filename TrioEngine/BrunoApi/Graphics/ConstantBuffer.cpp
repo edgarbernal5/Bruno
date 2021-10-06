@@ -21,6 +21,7 @@ namespace BrunoEngine
 	{
 
 		m_bufferBytes = new uint8_t[sizeInBytes];
+		memset(m_bufferBytes, 0x00, sizeInBytes);
 	}
 
 	ConstantBuffer::ConstantBuffer(GraphicsDevice* device, const std::string& name) :
@@ -33,7 +34,7 @@ namespace BrunoEngine
 #endif
 		m_name(name)
 	{
-
+		m_bufferBytes = nullptr;
 	}
 
 	ConstantBuffer::~ConstantBuffer()
@@ -61,14 +62,17 @@ namespace BrunoEngine
 	void ConstantBuffer::Initialize()
 	{
 #if BRUNO_DIRECTX
+		m_bufferDesc = { 0 };
 		m_bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		m_bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		m_bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		m_bufferDesc.MiscFlags = 0;
-		m_bufferDesc.ByteWidth = static_cast<uint32_t>(m_sizeInBytes + (16 - (m_sizeInBytes % 16))); //multiplo de 16 bytes, que es el tamaño del registro ( c_RegisterSize = c_ScalarsPerRegister * c_ScalarSize )
+		m_bufferDesc.ByteWidth = m_sizeInBytes;
+		//m_bufferDesc.ByteWidth = static_cast<uint32_t>(m_sizeInBytes + (16 - (m_sizeInBytes % 16))); //multiplo de 16 bytes, que es el tamaño del registro ( c_RegisterSize = c_ScalarsPerRegister * c_ScalarSize )
 		//_declspec(align(16))
 		//https://docs.microsoft.com/es-es/windows/desktop/direct3dhlsl/dx-graphics-hlsl-packing-rules
 		//m_bufferDesc.ByteWidth = m_sizeInBytes;
+		//m_sizeInBytes = m_bufferDesc.ByteWidth;
 
 		DX::ThrowIfFailed(m_device->GetD3DDevice()->CreateBuffer(&m_bufferDesc, nullptr, &m_buffer));
 #elif BRUNO_OPENGL
@@ -90,6 +94,7 @@ namespace BrunoEngine
 		}
 		//Mejorar esto.
 		uint32_t elementSizeInBytes = m_sizeInBytes;
+		//uint32_t elementSizeInBytes = static_cast<uint32_t>(m_sizeInBytes + (16 - (m_sizeInBytes % 16)));;
 		D3D11_MAPPED_SUBRESOURCE resource;
 
 		m_device->GetD3DDeviceContext()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
@@ -99,6 +104,8 @@ namespace BrunoEngine
 		memcpy(pDataResource, m_bufferBytes, elementSizeInBytes);
 
 		m_device->GetD3DDeviceContext()->Unmap(m_buffer, 0);
+
+		//m_device->GetD3DDeviceContext()->UpdateSubresource(m_buffer, 0, nullptr, m_bufferBytes, 0, 0);
 #endif
 	}
 

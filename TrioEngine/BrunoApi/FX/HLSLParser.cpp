@@ -4177,6 +4177,12 @@ namespace BrunoFX
 			declaration->offsetInBytes = aligned;
 			offset = aligned + declaration->sizeInBytes;
 		}
+
+		//else {
+		//	declaration->offsetInBytes = offset;
+		//	offset += declaration->sizeInBytes;
+		//}
+
 	}
 
 	void HLSLParser::CalculateGlobalVariableOffsets()

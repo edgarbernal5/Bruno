@@ -37,12 +37,28 @@ namespace BrunoApi.Net.Graphics.Core
             Internal_SetValueMatrix(m_nativePtr, ref matrix);
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "EffectParameter_SetValueVector2", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetValueVector2(IntPtr parameter, ref Vector2 vector);
+
+        public void SetValue(Vector2 vector)
+        {
+            Internal_SetValueVector2(m_nativePtr, ref vector);
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "EffectParameter_SetValueVector3", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_SetValueVector3(IntPtr parameter, ref Vector3 vector);
 
         public void SetValue(Vector3 vector)
         {
             Internal_SetValueVector3(m_nativePtr, ref vector);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "EffectParameter_SetValueVector4", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SetValueVector4(IntPtr parameter, ref Vector4 vector);
+
+        public void SetValue(Vector4 vector)
+        {
+            Internal_SetValueVector4(m_nativePtr, ref vector);
         }
     }
 }

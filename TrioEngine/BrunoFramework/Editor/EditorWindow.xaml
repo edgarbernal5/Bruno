@@ -9,7 +9,7 @@
         UseLayoutRounding="True"
         d:DataContext="{x:Static editor:EditorViewModel.DesignInstance}"
         
-        Height="600" Width="800">
+        Height="900" Width="1200">
 
     <DockPanel LastChildFill="True">
         <Grid DockPanel.Dock="Top">
@@ -24,27 +24,23 @@
 
         </Grid>
         <Grid>
-            <StackPanel>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="10px"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <local:SceneView Grid.Column="0" DataContext="{Binding SceneDetail}"  Height="300">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="10px"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
 
-                    </local:SceneView>
-                    <local:InspectorView Grid.Column="1" DataContext="{Binding InspectorDetail}"  Height="300" Grid.ColumnSpan="3" Margin="10,0,0,0"/>
-                </Grid>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <local:WorldOutlineView Grid.Row="0" DataContext="{Binding WorldOutlineDetail}" Height="346">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <local:SceneView Grid.Row="0"  Grid.Column="0" DataContext="{Binding SceneDetail}"  >
 
-                    </local:WorldOutlineView>
-                </Grid>
-            </StackPanel>
+            </local:SceneView>
+            <local:InspectorView Grid.Row="0" Grid.Column="1" DataContext="{Binding InspectorDetail}" Grid.ColumnSpan="3" Margin="10,0,0,0"/>
+
+            <local:WorldOutlineView Grid.Row="1" Grid.ColumnSpan="3" DataContext="{Binding WorldOutlineDetail}" >
+            </local:WorldOutlineView>
 
         </Grid>
     </DockPanel>

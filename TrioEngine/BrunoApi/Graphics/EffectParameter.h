@@ -44,10 +44,10 @@ namespace BrunoEngine
 		void SetValue(Color& value);
 		void SetValue(float value);
 		void SetValue(Texture* value);
-		void SetValue(Matrix& value);
-		void SetValue(Vector2 value);
-		void SetValue(Vector3 value);
-		void SetValue(Vector4 value);
+		void SetValue(const Matrix& value);
+		void SetValue(const Vector2& value);
+		void SetValue(const Vector3& value);
+		void SetValue(const Vector4& value);
 
 		inline const char* GetName() { return m_name.c_str(); }
 

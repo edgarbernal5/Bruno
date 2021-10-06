@@ -51,7 +51,9 @@ namespace BrunoEngine
 
 	void EffectParameter::SetValue(float value)
 	{
-
+		m_internalParameter.m_constantBuffer.m_constantBuffer->SetInternalData(
+			(uint8_t*)&value, sizeof(value), m_internalParameter.m_constantBuffer.m_offset
+		);
 	}
 
 	void EffectParameter::SetValue(Texture* value)
@@ -59,7 +61,7 @@ namespace BrunoEngine
 
 	}
 
-	void EffectParameter::SetValue(Matrix& value)
+	void EffectParameter::SetValue(const Matrix& value)
 	{
 		Matrix transposed = value;
 		transposed = transposed.Transpose();
@@ -69,18 +71,23 @@ namespace BrunoEngine
 		);
 	}
 
-	void EffectParameter::SetValue(Vector2 value)
+	void EffectParameter::SetValue(const Vector2& value)
+	{
+		m_internalParameter.m_constantBuffer.m_constantBuffer->SetInternalData(
+			(uint8_t*)&value, sizeof(value), m_internalParameter.m_constantBuffer.m_offset
+		);
+	}
+
+	void EffectParameter::SetValue(const Vector3& value)
 	{
 
 	}
 
-	void EffectParameter::SetValue(Vector3 value)
+	void EffectParameter::SetValue(const Vector4& value)
 	{
-
-	}
-
-	void EffectParameter::SetValue(Vector4 value)
-	{
-
+		//memcpy(m_data, (uint8_t*)&value, sizeof(value));
+		m_internalParameter.m_constantBuffer.m_constantBuffer->SetInternalData(
+			(uint8_t*)&value, sizeof(value), m_internalParameter.m_constantBuffer.m_offset
+		);
 	}
 }

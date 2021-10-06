@@ -16,9 +16,6 @@ namespace BrunoEngine
 		BrunoFX::HLSLPassShader* passShader = pass11->shader;
 		m_name = pass11->name;
 
-		std::vector<bool> buffersUsed(buffers.size(), false);
-		std::vector<bool> samplersUsed(samplers.size(), false);
-
 		Shader* pixelShader = nullptr;
 		Shader* vertexShader = nullptr;
 		Shader* geometryShader = nullptr;
@@ -32,12 +29,16 @@ namespace BrunoEngine
 				if (strcmp(passShader->name, "PixelShader") == 0)
 					stage = ShaderStage::Pixel;
 
-				std::vector<std::pair<size_t, size_t>> buffersUsedIndexes;
-				std::vector<std::pair<size_t, size_t>> samplersUsedIndexes;
 
 				auto itm = m_effect->m_shadersByName.find(passShader->options->functionCallName);
 				if (itm == m_effect->m_shadersByName.end())
 				{
+					std::vector<bool> buffersUsed(buffers.size(), false);
+					std::vector<bool> samplersUsed(samplers.size(), false);
+
+					std::vector<std::pair<size_t, size_t>> buffersUsedIndexes;
+					std::vector<std::pair<size_t, size_t>> samplersUsedIndexes;
+
 					BrunoFX::HLSLFunctionVisitor visitor;
 					BrunoFX::HLSLFunction* functionDef = tree.FindFunction(passShader->options->functionCallName);
 
@@ -213,6 +214,7 @@ namespace BrunoEngine
 	void EffectPass::Apply()
 	{
 #if defined(BRUNO_OPENGL) || defined(BRUNO_DIRECTX)
+		//TODO: falta setear los samplers de las texturas
 		if (m_vertexShader)
 		{
 			m_device->SetVertexShader(m_vertexShader);

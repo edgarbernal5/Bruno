@@ -16,6 +16,7 @@ namespace BrunoEngine
 	{
 	public:
 		BlendState();
+		BlendState(Blend sourceBlend, Blend destinationBlend);
 		~BlendState();
 
 		BlendFunction AlphaBlendFunction;

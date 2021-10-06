@@ -71,7 +71,6 @@ namespace BrunoFramework.Editor.Game.Gizmos
         Quaternion LocalRotation { get; set; }
         Vector3 LocalScale { get; set; }
         Matrix WorldMatrix { get; set; }
-        Matrix ParentWorldMatrix { get; set; }
     }
 
     public interface ISelectableObject

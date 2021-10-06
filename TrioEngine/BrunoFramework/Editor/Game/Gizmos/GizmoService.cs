@@ -1009,7 +1009,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         public void Render(RenderContext renderContext)
         {
-            RenderCameraGizmo(renderContext);
+            //RenderCameraGizmo(renderContext);
             if (m_currentGizmoType == GizmoType.None || !m_isActive)
                 return;
 
