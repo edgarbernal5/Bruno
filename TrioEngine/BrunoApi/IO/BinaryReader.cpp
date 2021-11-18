@@ -6,7 +6,7 @@
 namespace TrioIO
 {
 	BinaryReader::BinaryReader(Stream* stream) :
-		m_Stream(stream),
+		m_stream(stream),
 		m_buffer(nullptr)
 	{
 		m_buffer = new uint8_t[0x10];
@@ -23,13 +23,13 @@ namespace TrioIO
 		int num = 0;
 		int byteCount = 0;
 		uint8_t numbyte;
-		if (m_Stream->CanSeek())
-			position = m_Stream->GetPosition();
+		if (m_stream->CanSeek())
+			position = m_stream->GetPosition();
 
 		while (num == 0)
 		{
 			byteCount = 1; //1 byte porque estamos usando ascii ext, unicode usaríamos 2
-			int num4 = m_Stream->ReadByte();
+			int num4 = m_stream->ReadByte();
 			if (num4 == -1)
 			{
 				byteCount = 0;
@@ -48,12 +48,12 @@ namespace TrioIO
 
 	int BinaryReader::Read(uint8_t* buffer, int index, int count)
 	{
-		return m_Stream->Read(buffer, index, count);
+		return m_stream->Read(buffer, index, count);
 	}
 
 	uint8_t BinaryReader::ReadByte()
 	{
-		int num = m_Stream->ReadByte();
+		int num = m_stream->ReadByte();
 		if (num == -1)
 		{
 			throw std::exception();
@@ -68,7 +68,7 @@ namespace TrioIO
 		int offset = 0;
 		do
 		{
-			int num2 = m_Stream->Read(&buffer[0], offset, count);
+			int num2 = m_stream->Read(&buffer[0], offset, count);
 			if (num2 == 0)
 			{
 				break;
@@ -94,7 +94,7 @@ namespace TrioIO
 		int num2 = 0;
 		if (numBytes == 1)
 		{
-			num2 = m_Stream->ReadByte();
+			num2 = m_stream->ReadByte();
 			if (num2 == -1)
 			{
 				throw std::exception();
@@ -105,7 +105,7 @@ namespace TrioIO
 		{
 			do
 			{
-				num2 = m_Stream->Read(m_buffer, offset, numBytes - offset);
+				num2 = m_stream->Read(m_buffer, offset, numBytes - offset);
 				if (num2 == 0)
 				{
 					throw std::exception();
@@ -213,7 +213,7 @@ namespace TrioIO
 		do
 		{
 			int count = ((capacity - num) > 0x80) ? 0x80 : (capacity - num);
-			int byteCount = m_Stream->Read(strBuffer.data(), 0, count);
+			int byteCount = m_stream->Read(strBuffer.data(), 0, count);
 			if (byteCount == 0)
 			{
 				//error. End of file

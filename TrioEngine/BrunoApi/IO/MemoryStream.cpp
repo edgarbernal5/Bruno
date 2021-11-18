@@ -133,7 +133,7 @@ namespace TrioIO
 		int num = m_position + count;
 		if (num < 0)
 		{
-			int aaa = 3;
+			throw std::exception("stream too long");
 		}
 		if (num > m_length)
 		{

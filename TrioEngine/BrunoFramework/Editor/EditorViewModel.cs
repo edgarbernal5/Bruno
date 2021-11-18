@@ -6,10 +6,7 @@ using BrunoFramework.Editor.Game.Inspectors;
 using BrunoFramework.Editor.Units;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace BrunoFramework.Editor
@@ -63,6 +60,17 @@ namespace BrunoFramework.Editor
             }
         }
         private InspectorViewModel m_inspectorDetail;
+
+        public ContentBrowserViewModel ContentBrowserDetail
+        {
+            get => m_contentBrowserDetail;
+            set
+            {
+                m_contentBrowserDetail = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        private ContentBrowserViewModel m_contentBrowserDetail;
 
         public string ApplicationName
         {
@@ -162,6 +170,9 @@ namespace BrunoFramework.Editor
 
             var inspectorService = Services.GetInstance<IInspectorService>();
             InspectorDetail = inspectorService.ViewModel;
+
+            var contentBrowserService = Services.GetInstance<IContentBrowserService>();
+            ContentBrowserDetail = contentBrowserService.ViewModel;
         }
 
         private void CreateEmptyScene()

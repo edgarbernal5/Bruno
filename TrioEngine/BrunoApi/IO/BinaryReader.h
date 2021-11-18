@@ -45,7 +45,7 @@ namespace TrioIO
 		int Read();
 		virtual int Read(uint8_t* buffer, int index, int count);
 	protected:
-		Stream* m_Stream;
+		Stream* m_stream;
 		void FillBuffer(int numBytes);
 	private:
 		int InternalReadOneChar();

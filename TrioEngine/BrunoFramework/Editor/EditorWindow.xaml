@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrunoFramework.Editor.Game"
+        xmlns:content="clr-namespace:BrunoFramework.Editor.Units"
         xmlns:editor="clr-namespace:BrunoFramework.Editor"
         mc:Ignorable="d"
         UseLayoutRounding="True"
@@ -39,9 +40,10 @@
             </local:SceneView>
             <local:InspectorView Grid.Row="0" Grid.Column="1" DataContext="{Binding InspectorDetail}" Grid.ColumnSpan="3" Margin="10,0,0,0"/>
 
-            <local:WorldOutlineView Grid.Row="1" Grid.ColumnSpan="3" DataContext="{Binding WorldOutlineDetail}" >
+            <content:ContentBrowserView Grid.Row="1" Grid.Column="0" DataContext="{Binding ContentBrowserDetail}" >
+            </content:ContentBrowserView>
+            <local:WorldOutlineView Grid.Row="1" Grid.Column="2" DataContext="{Binding WorldOutlineDetail}" >
             </local:WorldOutlineView>
-
         </Grid>
     </DockPanel>
 </Window>

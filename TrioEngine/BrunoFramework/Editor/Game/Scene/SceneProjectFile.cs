@@ -40,17 +40,22 @@ namespace BrunoFramework.Editor.Game
         private GizmoService m_gizmoService;
 
         private WorldOutline m_worldOutline;
+        private ContentBrowser m_contentBrowser;
         private IWorldOutlineService m_outlineService;
         private IInspectorService m_inspectorService;
+        private IContentBrowserService m_contentBrowserService;
 
         public SceneProjectFile(IEditorService editor) 
             : base(editor)
         {
             m_outlineService = Editor.Services.GetInstance<IWorldOutlineService>();
             m_inspectorService = Editor.Services.GetInstance<IInspectorService>();
+            m_contentBrowserService = Editor.Services.GetInstance<IContentBrowserService>();
 
             m_worldOutline = new WorldOutline();
             var objectSelector = new ObjectSelector(m_worldOutline);
+
+            m_contentBrowser = new ContentBrowser();
 
             var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
             GizmoService = new GizmoService(graphicsDevice, objectSelector, Editor.Services.GetInstance<GameStepTimer>());
@@ -78,6 +83,29 @@ namespace BrunoFramework.Editor.Game
 
             //TODO: hacer esto si y solo si es el documento activo (pestaña)
             m_outlineService.WorldOutline = m_worldOutline;
+        }
+
+        private void UpdateContentBrowser(string rootDirectory)
+        {
+            if (m_contentBrowser != null)
+            {
+                m_contentBrowser.Dispose();
+            }
+            m_contentBrowser.Clear();
+            PopulateContentBrowser(rootDirectory);
+
+            //TODO: hacer esto si y solo si es el documento activo (pestaña)
+            m_contentBrowserService.ContentBrowser = m_contentBrowser;
+        }
+
+        private void PopulateContentBrowser(string rootDirectory)
+        {
+            if (string.IsNullOrEmpty(rootDirectory))
+            {
+                return;
+            }
+
+
         }
 
         private void OnWorldOutlineSelectionChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
@@ -246,6 +274,7 @@ namespace BrunoFramework.Editor.Game
         {
             Scene = new Scene();
             UpdateWorldOutline();
+            UpdateContentBrowser(string.Empty);
         }
 
         protected override void OnLoad(string filename)
@@ -272,6 +301,7 @@ namespace BrunoFramework.Editor.Game
             m_scene.LoadFromModel(model);
 
             UpdateWorldOutline();
+            UpdateContentBrowser(settings.RootDirectory);
         }
 
         protected override void OnSave()

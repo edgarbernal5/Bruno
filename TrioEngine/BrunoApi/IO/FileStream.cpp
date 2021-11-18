@@ -108,7 +108,7 @@ namespace TrioIO
 		{
 			if (!CanRead())
 			{
-				throw std::exception("");
+				throw std::exception("unreadable stream");
 			}
 			if (m_writePos > 0)
 			{

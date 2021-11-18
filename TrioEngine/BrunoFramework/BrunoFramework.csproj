@@ -134,6 +134,18 @@
     <Compile Include="Editor\Timing\GameStepTimer.cs" />
     <Compile Include="Editor\Timing\GameTime.cs" />
     <Compile Include="Editor\Units\Builder\BuilderUnit.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowser.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserFileList.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserFileListItem.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserUnit.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserView.xaml.cs">
+      <DependentUpon>ContentBrowserView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserViewModel.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\FileSystemStorage.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\IContentBrowserService.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\IStorage.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\Storage.cs" />
     <Compile Include="Editor\Units\Game\GameUnit.cs" />
     <Compile Include="Editor\Units\Inspectors\IInspectorService.cs" />
     <Compile Include="Editor\Units\Inspectors\InspectorUnit.cs" />
@@ -247,6 +259,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Editor\Game\World\WorldOutlineView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Units\ContentBrowser\ContentBrowserView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

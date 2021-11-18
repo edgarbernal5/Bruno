@@ -43,6 +43,7 @@ namespace BrunoWpfEditor
             _editor.Units.Add(new WorldOutlineUnit());
             _editor.Units.Add(new ProjectFileUnit());
             _editor.Units.Add(new InspectorUnit());
+            _editor.Units.Add(new ContentBrowserUnit());
 
             _editor.Configure();
         }
