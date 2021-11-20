@@ -4,7 +4,7 @@ using BrunoWindows;
 using System;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Interactivity;
+using Microsoft.Xaml.Behaviors;
 using BrunoApi.Net.Maths;
 
 namespace BrunoFramework.Editor.Game.Interaction

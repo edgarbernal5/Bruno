@@ -4,7 +4,7 @@ using BrunoFramework.Graphics.Interop;
 using BrunoWindows;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Interactivity;
+using Microsoft.Xaml.Behaviors;
 using BrunoApi.Net.Game;
 using BrunoApi.Net.Maths;
 using BrunoFramework.Editor.Game.Gizmos;
