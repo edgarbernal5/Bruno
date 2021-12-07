@@ -28,7 +28,7 @@ namespace BrunoFramework.Editor
             }
         }
 
-        public SceneViewModel SceneDetail
+        public SceneDocumentViewModel SceneDetail
         {
             get => m_sceneDetail;
             set
@@ -37,7 +37,7 @@ namespace BrunoFramework.Editor
                 NotifyOfPropertyChange();
             }
         }
-        private SceneViewModel m_sceneDetail;
+        private SceneDocumentViewModel m_sceneDetail;
 
         public WorldOutlineViewModel WorldOutlineDetail
         {
@@ -177,7 +177,7 @@ namespace BrunoFramework.Editor
 
         private void CreateEmptyScene()
         {
-            var projectFileService = Services.GetInstance<IProjectFileService>();
+            var projectFileService = Services.GetInstance<IDocumentService>();
 
             var sceneFileType = projectFileService.Factories.SelectMany(factory => factory.SupportedFileTypes)
                 .Where(fileType => fileType.Name == "Scene").FirstOrDefault();
@@ -220,9 +220,9 @@ namespace BrunoFramework.Editor
 
         public void ActivateItem(object item)
         {
-            if (item is SceneViewModel)
+            if (item is SceneDocumentViewModel)
             {
-                SceneDetail = item as SceneViewModel;
+                SceneDetail = item as SceneDocumentViewModel;
             }
 
             var activate = item as IActivate;

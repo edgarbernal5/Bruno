@@ -41,7 +41,7 @@ namespace BrunoWpfEditor
             _editor.Units.Add(new GameUnit());
             _editor.Units.Add(new PrimitivesUnit());
             _editor.Units.Add(new WorldOutlineUnit());
-            _editor.Units.Add(new ProjectFileUnit());
+            _editor.Units.Add(new DocumentUnit());
             _editor.Units.Add(new InspectorUnit());
             _editor.Units.Add(new ContentBrowserUnit());
 

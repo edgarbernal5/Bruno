@@ -1,6 +1,7 @@
 ﻿
 using BrunoWindows;
 using System;
+using System.Collections.ObjectModel;
 
 namespace BrunoFramework.Editor.Units
 {
@@ -12,6 +13,7 @@ namespace BrunoFramework.Editor.Units
         //https://www.codeproject.com/Questions/432800/Images-in-listview-WPF
 
         public ContentBrowserFileList FileListItems { get; } = new ContentBrowserFileList();
+        public ObservableCollection<ContentBrowserItem> SelectedItems { get; } = new ObservableCollection<ContentBrowserItem>();
 
         public void Dispose()
         {

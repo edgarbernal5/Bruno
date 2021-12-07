@@ -29,7 +29,7 @@ namespace BrunoFramework.Graphics.Editor
 
             m_gizmoScale = new AxisGizmoScale(device, m_axisColors, gizmoConfig.CONE_HEIGHT, gizmoConfig.LINE_LENGTH);
 
-            m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\LineEffect.fx");
+            m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\BrunoEngineGit\Shaders\LineEffect.fx");
             m_gizmoWorld = Matrix.Identity;
             m_currentLineLength = gizmoConfig.LINE_LENGTH;
         }

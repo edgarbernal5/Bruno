@@ -7,7 +7,7 @@ namespace BrunoApi.Net
         private const string baseDirectory = @"";
 #else
         private const string baseDirectory = @"";
-        //private const string baseDirectory = @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\TrioEngine\BrunoWpfEditor\bin\x64\Release\";
+        //private const string baseDirectory = @"D:\Edgar\Documentos\Proyectos\CG\BrunoEngineGit\TrioEngine\BrunoWpfEditor\bin\x64\Release\";
 #endif
 
 #if BRUNO_DIRECTX

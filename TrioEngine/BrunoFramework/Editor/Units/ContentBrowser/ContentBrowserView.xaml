@@ -4,27 +4,33 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BrunoFramework.Editor.Units"
+             xmlns:controls="clr-namespace:BrunoControls;assembly=BrunoControls"
              d:DataContext="{d:DesignInstance local:ContentBrowserViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ListView x:Name="lvItems" ItemsSource="{Binding Content.FileListItems.Items}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn>
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Image Source="{Binding ImageFilename}" 
-                                       HorizontalAlignment="Left" 
-                                       Stretch="Fill" 
-                                       Height="100"
-                                       Width="100"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <ListView x:Name="lvItems" ItemsSource="{Binding Content.FileListItems.Items}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  controls:ListViewExtentions.SelectedItems="{Binding Content.SelectedItems}">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
 
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical" Width="72" Height="108">
+                        <Grid>
+                            <Image Source="{Binding Icon}" Height="64" Width="64" Margin="0,8,0,0" />
+                            <Grid.Effect>
+                                <DropShadowEffect BlurRadius="15" Direction="-90" RenderingBias="Quality" ShadowDepth="2"/>
+                            </Grid.Effect>
+                        </Grid>
+                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </UserControl>

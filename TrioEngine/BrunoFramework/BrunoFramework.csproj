@@ -114,11 +114,11 @@
     <Compile Include="Editor\Game\Interaction\CameraArcBallBehavior.cs" />
     <Compile Include="Editor\Game\Interaction\CameraHandToolBehavior.cs" />
     <Compile Include="Editor\Game\Interaction\CameraZoomBehavior.cs" />
-    <Compile Include="Editor\Game\Scene\SceneProjectFile.cs" />
+    <Compile Include="Editor\Game\Scene\SceneDocument.cs" />
     <Compile Include="Editor\Game\Scene\SceneView.xaml.cs">
       <DependentUpon>SceneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Game\Scene\SceneViewModel.cs" />
+    <Compile Include="Editor\Game\Scene\SceneDocumentViewModel.cs" />
     <Compile Include="Editor\Game\Screens\EmptyGameGraphicsScreen.cs" />
     <Compile Include="Editor\Game\World\IWorldOutlineService.cs" />
     <Compile Include="Editor\Game\World\WorldOutline.cs" />
@@ -135,7 +135,8 @@
     <Compile Include="Editor\Units\Builder\BuilderUnit.cs" />
     <Compile Include="Editor\Units\ContentBrowser\ContentBrowser.cs" />
     <Compile Include="Editor\Units\ContentBrowser\ContentBrowserFileList.cs" />
-    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserFileListItem.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserItem.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserPopulate.cs" />
     <Compile Include="Editor\Units\ContentBrowser\ContentBrowserUnit.cs" />
     <Compile Include="Editor\Units\ContentBrowser\ContentBrowserView.xaml.cs">
       <DependentUpon>ContentBrowserView.xaml</DependentUpon>
@@ -144,7 +145,7 @@
     <Compile Include="Editor\Units\ContentBrowser\FileSystemStorage.cs" />
     <Compile Include="Editor\Units\ContentBrowser\IContentBrowserService.cs" />
     <Compile Include="Editor\Units\ContentBrowser\IStorage.cs" />
-    <Compile Include="Editor\Units\ContentBrowser\Storage.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\StorageBase.cs" />
     <Compile Include="Editor\Units\Game\GameUnit.cs" />
     <Compile Include="Editor\Units\Inspectors\IInspectorService.cs" />
     <Compile Include="Editor\Units\Inspectors\InspectorUnit.cs" />
@@ -152,13 +153,13 @@
     <Compile Include="Editor\Game\Screens\EditorGameGraphicsScreen.cs" />
     <Compile Include="Editor\Game\Screens\GameGraphicsScreen.cs" />
     <Compile Include="Editor\Units\Primitives\PrimitivesUnit.cs" />
-    <Compile Include="Editor\Units\ProjectFiles\IProjectFileService.cs" />
-    <Compile Include="Editor\Units\ProjectFiles\ProjectFile.cs" />
-    <Compile Include="Editor\Units\ProjectFiles\ProjectFileFactory.cs" />
-    <Compile Include="Editor\Units\ProjectFiles\ProjectFileType.cs" />
-    <Compile Include="Editor\Units\ProjectFiles\ProjectFileUnit.cs" />
-    <Compile Include="Editor\Units\ProjectFiles\Factories\SceneProjectFileFactory.cs" />
-    <Compile Include="Editor\Units\ProjectFiles\ProjectFileViewModel.cs" />
+    <Compile Include="Editor\Units\Documents\IDocumentService.cs" />
+    <Compile Include="Editor\Units\Documents\Document.cs" />
+    <Compile Include="Editor\Units\Documents\DocumentFactory.cs" />
+    <Compile Include="Editor\Units\Documents\DocumentFileType.cs" />
+    <Compile Include="Editor\Units\Documents\DocumentUnit.cs" />
+    <Compile Include="Editor\Units\Documents\Factories\SceneDocumentFactory.cs" />
+    <Compile Include="Editor\Units\Documents\DocumentViewModel.cs" />
     <Compile Include="Editor\Units\WorldOutline\WorldOutlineUnit.cs" />
     <Compile Include="Graphics\Data\Cameras\Camera.cs" />
     <Compile Include="Graphics\Editor\Gizmos\AxisGizmoGraphics.cs" />
@@ -279,6 +280,15 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Icons\folder.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\file.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

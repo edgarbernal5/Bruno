@@ -1167,8 +1167,8 @@ Texture2D* Texture2D_CtorFromFile(GraphicsDevice* device, const char* filename)
 	TextureLoader::ImageInfo imgInfo = texLoader.GetTextureFromFile(filename);
 
 	Texture2D* texture = new Texture2D(device, imgInfo.Width, imgInfo.Height);
-
 	texture->SetData<uint8_t>(imgInfo.Data, imgInfo.SizeOfData);
+
 	return texture;
 }
 

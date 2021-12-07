@@ -18,7 +18,7 @@ namespace BrunoEngine
 		Effect* effect = new Effect(Renderer::GetDevice());
 		EffectLoader effectLoader(effect);
 
-		effectLoader.LoadFromFile("D:/Edgar/Documentos/Proyectos/CG/TrioEngineGit/Shaders/SceneTest.fx");
+		effectLoader.LoadFromFile("D:/Edgar/Documentos/Proyectos/CG/BrunoEngineGit/Shaders/SceneTest.fx");
 
 		m_mainParameter = effect->GetParameters()["gWorldViewProj"];
 		m_mainPass = effect->GetTechniques()[0]->GetPasses()[0];

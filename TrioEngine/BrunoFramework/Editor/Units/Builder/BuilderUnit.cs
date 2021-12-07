@@ -83,7 +83,7 @@ namespace BrunoFramework.Editor.Units
             indexBuffer.SetData(indices);
 
             Material material = new Material("material");
-            Texture2D texture = new Texture2D(graphicsDevice, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Models\Car\RacerCar.png");
+            Texture2D texture = new Texture2D(graphicsDevice, @"D:\Edgar\Documentos\Proyectos\CG\BrunoEngineGit\Models\Car\RacerCar.png");
             material.InsertTexture("Texture", texture);
 
             Model model = new Model(graphicsDevice, vertexBuffer, indexBuffer, material);

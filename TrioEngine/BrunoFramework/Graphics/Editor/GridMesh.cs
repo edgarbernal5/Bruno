@@ -38,7 +38,7 @@ namespace BrunoFramework.Graphics.Editor
             CreateIndexBuffer(device);
             CreateVertexBuffer(device);
 
-            m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\GridEffect.fx");
+            m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\BrunoEngineGit\Shaders\GridEffect.fx");
         }
 
         private void CreateVertexBuffer(GraphicsDevice device)

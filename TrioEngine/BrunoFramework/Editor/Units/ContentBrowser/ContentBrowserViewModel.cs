@@ -13,12 +13,12 @@ namespace BrunoFramework.Editor.Units
             }
         }
         private ContentBrowser m_content;
+
         private IEditorService m_editor;
 
         public ContentBrowserViewModel(IEditorService editor)
         {
             m_editor = editor;
-
         }
     }
 }

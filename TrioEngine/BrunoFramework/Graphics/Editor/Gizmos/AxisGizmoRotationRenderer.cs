@@ -18,7 +18,7 @@ namespace BrunoFramework.Graphics.Editor
         public AxisGizmoRotationRenderer(GraphicsDevice device, ColorRGBA8[] axisColors, GizmoConfig gizmoConfig)
         {
             m_gizmoRotationGraphics = new GizmoRotationGraphics(gizmoConfig.GIZMO_LENGTH, axisColors);
-            m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\TrioEngineGit\Shaders\LineEffect.fx");
+            m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\BrunoEngineGit\Shaders\LineEffect.fx");
         }
 
         public void Render(RenderContext renderContext)

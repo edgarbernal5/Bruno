@@ -3,7 +3,7 @@
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                     xmlns:local="clr-namespace:BrunoFramework.Editor.Game">
 
-    <ItemContainerTemplate DataType="{x:Type local:SceneViewModel}">
+    <ItemContainerTemplate DataType="{x:Type local:SceneDocumentViewModel}">
         <local:SceneView />
     </ItemContainerTemplate>
 

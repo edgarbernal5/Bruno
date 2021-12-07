@@ -440,6 +440,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
             //Console.WriteLine(string.Format("selected plane normal = {0}; Axis = {1}", plane.Normal, selectedAxis.ToString()));
             m_selectionState.m_currentGizmoPlane = plane;
         }
+
         private void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, Vector2 mousePosition)
         {
             var ray = ConvertMousePositionToRay(mousePosition);
@@ -491,7 +492,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 case GizmoType.Scale:
                     {
                         var scaleDelta = GetDeltaMovement(mousePosition);
-                        scaleDelta  = ApplySnapAndPrecisionMode(scaleDelta);
+                        scaleDelta = ApplySnapAndPrecisionMode(scaleDelta);
 
                         if (scaleDelta != Vector3.Zero)
                         {
