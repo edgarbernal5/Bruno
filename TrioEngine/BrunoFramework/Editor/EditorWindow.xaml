@@ -25,7 +25,63 @@
 
         </Grid>
         <Grid>
-            <Grid.ColumnDefinitions>
+            <DockingManager x:Name="DockManager"
+                 DocumentsSource="{Binding Tabs}"
+                 AllowMixedOrientation ="True">
+
+                <DockingManager.LayoutItemTemplateSelector>
+                    <editor:PanesTemplateSelector>
+                        <editor:PanesTemplateSelector.SceneDocumentViewModelTemplate>
+                            <DataTemplate>
+                                <local:SceneView />
+                            </DataTemplate>
+                        </editor:PanesTemplateSelector.SceneDocumentViewModelTemplate>
+
+                        <editor:PanesTemplateSelector.WorldOutlineViewModelTemplate>
+                            <DataTemplate>
+                                <local:WorldOutlineView />
+                            </DataTemplate>
+                        </editor:PanesTemplateSelector.WorldOutlineViewModelTemplate>
+
+                        <editor:PanesTemplateSelector.InspectorViewModelTemplate>
+                            <DataTemplate>
+                                <local:InspectorView />
+                            </DataTemplate>
+                        </editor:PanesTemplateSelector.InspectorViewModelTemplate>
+
+                        <editor:PanesTemplateSelector.ContentBrowserViewModelTemplate>
+                            <DataTemplate>
+                                <content:ContentBrowserView />
+                            </DataTemplate>
+                        </editor:PanesTemplateSelector.ContentBrowserViewModelTemplate>
+
+                    </editor:PanesTemplateSelector>
+                </DockingManager.LayoutItemTemplateSelector>
+
+                <DockingManager.LayoutItemContainerStyleSelector>
+                    <editor:PanesStyleSelector>
+
+                        <editor:PanesStyleSelector.EditorDockableTabStyle>
+                            <Style TargetType="{x:Type LayoutItem}">
+                                <Setter Property="Title" Value="{Binding Model.Title}" />
+                                <Setter Property="ContentId" Value="{Binding Model.DockId}" />
+                            </Style>
+                        </editor:PanesStyleSelector.EditorDockableTabStyle>
+                    </editor:PanesStyleSelector>
+                </DockingManager.LayoutItemContainerStyleSelector>
+
+                <DockingManager.LayoutUpdateStrategy>
+                    <editor:LayoutInitializer />
+                </DockingManager.LayoutUpdateStrategy>
+
+                <LayoutRoot>
+                    <LayoutPanel Orientation="Vertical">
+                        <LayoutDocumentPane />
+                        <LayoutAnchorablePane Name="ToolsPane" DockHeight="150" />
+                    </LayoutPanel>
+                </LayoutRoot>
+            </DockingManager>
+            <!--<Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="10px"/>
                 <ColumnDefinition Width="1*"/>
@@ -43,7 +99,7 @@
             <content:ContentBrowserView Grid.Row="1" Grid.Column="0" DataContext="{Binding ContentBrowserDetail}" >
             </content:ContentBrowserView>
             <local:WorldOutlineView Grid.Row="1" Grid.Column="2" DataContext="{Binding WorldOutlineDetail}" >
-            </local:WorldOutlineView>
+            </local:WorldOutlineView>-->
         </Grid>
     </DockPanel>
 </Window>

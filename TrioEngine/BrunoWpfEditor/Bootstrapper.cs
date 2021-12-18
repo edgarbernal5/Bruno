@@ -37,6 +37,7 @@ namespace BrunoWpfEditor
 
             //Core units
             _editor.Units.Add(new MenuUnit());
+            _editor.Units.Add(new LayoutUnit());
             _editor.Units.Add(new BuilderUnit());
             _editor.Units.Add(new GameUnit());
             _editor.Units.Add(new PrimitivesUnit());

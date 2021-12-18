@@ -1,4 +1,5 @@
-﻿using Bruno.Logging;
+﻿
+using Bruno.Logging;
 using BrunoWindows;
 using System;
 using System.Threading;

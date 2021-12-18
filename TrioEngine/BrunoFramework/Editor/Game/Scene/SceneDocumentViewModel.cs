@@ -5,9 +5,7 @@ using BrunoFramework.Editor.Units;
 using BrunoFramework.Graphics;
 using BrunoFramework.Graphics.Data;
 using BrunoFramework.Graphics.Editor;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using BrunoApi.Net.Game;
 using BrunoApi.Net.Maths;
 using BrunoApi.Net.Renderer;
@@ -16,6 +14,8 @@ namespace BrunoFramework.Editor.Game
 {
     public class SceneDocumentViewModel : DocumentViewModel
     {
+        internal const string DockIdString = "Scene";
+
         public new SceneDocument ProjectFile
         {
             get
@@ -30,8 +30,8 @@ namespace BrunoFramework.Editor.Game
             get => m_camera; 
             set
             {
-                m_camera = value; 
-                NotifyOfPropertyChange(); 
+                m_camera = value;
+                NotifyOfPropertyChange();
             }
         }
         private Camera m_camera;
@@ -103,9 +103,11 @@ namespace BrunoFramework.Editor.Game
         private EditorGameGraphicsScreen m_editorGameGraphicsScreen;
         private readonly IEditorService m_editor;
 
+
         public SceneDocumentViewModel(SceneDocument sceneProjectFile)
             : base(sceneProjectFile)
         {
+            DockId = DockIdString;
             m_editor = sceneProjectFile.Editor;
             m_gameGraphicsScreens = new List<GameGraphicsScreen>();
 

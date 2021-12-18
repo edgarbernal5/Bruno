@@ -110,23 +110,23 @@ namespace BrunoFramework.Editor.Units
             Editor.Services.UnregisterHandler(typeof(IDocumentService));
         }
 
-        public Document New(DocumentFileType projectFileType)
+        public Document New(DocumentType documentType)
         {
-            var selectedFactory = m_factories.FirstOrDefault(factory => factory.SupportedFileTypes.Contains(projectFileType));
+            var selectedFactory = m_factories.FirstOrDefault(factory => factory.SupportedFileTypes.Contains(documentType));
             if (selectedFactory == default(DocumentFactory))
             {
 
             }
 
-            var projectFile = selectedFactory.Create(projectFileType);
-            if (projectFile != null)
+            var document = selectedFactory.Create(documentType);
+            if (document != null)
             {
-                projectFile.New();
-                var viewModel = projectFile.CreateViewModel();
+                document.New();
+                var viewModel = document.CreateViewModel();
                 Editor.ActivateItem(viewModel);
             }
 
-            return projectFile;
+            return document;
         }
 
         public Document Open(string filename)
@@ -143,6 +143,11 @@ namespace BrunoFramework.Editor.Units
             Editor.ActivateItem(viewModel);
 
             return projectFile;
+        }
+
+        public override EditorDockableTabViewModel GetDockTabViewModel(string dockId)
+        {
+            return null;
         }
     }
 }

@@ -8,17 +8,17 @@ namespace BrunoFramework.Editor.Units
     {
         private IEditorService Editor { get; }
 
-        public SceneDocumentFactory(IEditorService editor) 
+        public SceneDocumentFactory(IEditorService editor)
             : base()
         {
             Editor = editor;
 
-            SupportedFileTypes.Add(new DocumentFileType("Scene", new string[] { ".x", ".fbx", ".obj" }, this) );
+            SupportedFileTypes.Add(new DocumentType("Scene", new string[] { ".x", ".fbx", ".obj" }, this) );
         }
 
-        protected override Document OnCreate(DocumentFileType projectFileType)
+        protected override Document OnCreate(DocumentType documentFileType)
         {
-            return new SceneDocument(Editor);
+            return new SceneDocument(Editor, documentFileType);
         }
     }
 }

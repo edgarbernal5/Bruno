@@ -121,6 +121,7 @@ namespace BrunoFramework.Graphics.Interop
             Unloaded += GameSurfaceTargetHost_Unloaded;
             SizeChanged += GameSurfaceTargetHwndHost_SizeChanged;
         }
+        private IEditorService m_editorService;
 
         private void Initialize()
         {
@@ -185,6 +186,8 @@ namespace BrunoFramework.Graphics.Interop
         private void GameSurfaceTargetHost_Loaded(object sender, RoutedEventArgs e)
         {
             var editor = this.GetEditor();
+            m_editorService = editor; //HACK: REMOVE THIS!!
+
             var graphicsService = editor.Services.GetInstance<IGraphicsService>();
             if (graphicsService == null) return;
             var graphicsDeviceService = editor.Services.GetInstance<IHwndHostRef>();
@@ -195,7 +198,8 @@ namespace BrunoFramework.Graphics.Interop
 
         private void GameSurfaceTargetHost_Unloaded(object sender, RoutedEventArgs e)
         {
-            var editor = this.GetEditor();
+            var editor = this.GetEditor() ?? m_editorService; //HACK: REMOVE THIS!!
+            
             var graphicsService = editor.Services.GetInstance<IGraphicsService>();
             var graphicsDeviceService = editor.Services.GetInstance<IHwndHostRef>();
 

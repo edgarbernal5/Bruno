@@ -45,8 +45,8 @@ namespace BrunoFramework.Editor.Game
         private IInspectorService m_inspectorService;
         private IContentBrowserService m_contentBrowserService;
 
-        public SceneDocument(IEditorService editor) 
-            : base(editor)
+        public SceneDocument(IEditorService editor, DocumentType documentFileType) 
+            : base(editor, documentFileType)
         {
             m_outlineService = Editor.Services.GetInstance<IWorldOutlineService>();
             m_inspectorService = Editor.Services.GetInstance<IInspectorService>();
@@ -297,7 +297,7 @@ namespace BrunoFramework.Editor.Game
             var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
             ContentManager contentManager = new ContentManager(graphicsDevice, settings.OutputDirectory);
 
-            Model model = contentManager.Load<Model>(assetNamePath);
+            var model = contentManager.Load<Model>(assetNamePath);
 
             Scene = new Scene();
             m_scene.LoadFromModel(model);

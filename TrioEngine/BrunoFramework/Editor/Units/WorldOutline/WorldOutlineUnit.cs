@@ -38,5 +38,12 @@ namespace BrunoFramework.Editor.Units
             m_worldOutlineViewModel = null;
         }
 
+        public override EditorDockableTabViewModel GetDockTabViewModel(string dockId)
+        {
+            if (dockId == WorldOutlineViewModel.DockIdString)
+                return m_worldOutlineViewModel;
+
+            return null;
+        }
     }
 }

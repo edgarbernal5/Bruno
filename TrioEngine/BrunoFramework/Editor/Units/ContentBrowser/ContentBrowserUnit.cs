@@ -37,5 +37,13 @@ namespace BrunoFramework.Editor.Units
         {
             m_contentBrowserViewModel = null;
         }
+
+        public override EditorDockableTabViewModel GetDockTabViewModel(string dockId)
+        {
+            if (dockId == ContentBrowserViewModel.DockIdString)
+                return m_contentBrowserViewModel;
+
+            return null;
+        }
     }
 }

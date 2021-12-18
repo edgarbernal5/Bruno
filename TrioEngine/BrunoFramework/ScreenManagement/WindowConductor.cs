@@ -9,37 +9,37 @@ namespace BrunoFramework
 {
     public class WindowConductor
     {
-        private bool deactivatingFromView;
-        private bool deactivateFromViewModel;
-        private bool actuallyClosing;
-        private readonly Window view;
-        private readonly object viewModel;
+        private bool m_deactivatingFromView;
+        private bool m_deactivateFromViewModel;
+        private bool m_actuallyClosing;
+        private readonly Window m_view;
+        private readonly object m_viewModel;
 
         public WindowConductor(object viewModel, Window view)
         {
-            this.viewModel = viewModel;
-            this.view = view;
+            m_viewModel = viewModel;
+            m_view = view;
         }
 
         public void Initialize()
         {
-            var activator = viewModel as IActivate;
+            var activator = m_viewModel as IActivate;
             if (activator != null)
             {
                 activator.Activate();
             }
 
-            var deactivatable = viewModel as IDeactivate;
+            var deactivatable = m_viewModel as IDeactivate;
             if (deactivatable != null)
             {
-                view.Closed += OnClosed;
+                m_view.Closed += OnClosed;
                 deactivatable.Deactivated += OnDeactivated;
             }
 
-            var guard = viewModel as IGuardClose;
+            var guard = m_viewModel as IGuardClose;
             if (guard != null)
             {
-                view.Closing += OnClosing;
+                m_view.Closing += OnClosing;
             }
         }
 
@@ -50,35 +50,35 @@ namespace BrunoFramework
                 return;
             }
 
-            ((IDeactivate)viewModel).Deactivated -= OnDeactivated;
+            ((IDeactivate)m_viewModel).Deactivated -= OnDeactivated;
 
-            if (deactivatingFromView)
+            if (m_deactivatingFromView)
             {
                 return;
             }
 
-            deactivateFromViewModel = true;
-            actuallyClosing = true;
-            view.Close();
-            actuallyClosing = false;
-            deactivateFromViewModel = false;
+            m_deactivateFromViewModel = true;
+            m_actuallyClosing = true;
+            m_view.Close();
+            m_actuallyClosing = false;
+            m_deactivateFromViewModel = false;
         }
 
         private void OnClosed(object sender, EventArgs e)
         {
-            view.Closed -= OnClosed;
-            view.Closing -= OnClosing;
+            m_view.Closed -= OnClosed;
+            m_view.Closing -= OnClosing;
 
-            if (deactivateFromViewModel)
+            if (m_deactivateFromViewModel)
             {
                 return;
             }
 
-            var deactivatable = viewModel as IDeactivate;
+            var deactivatable = m_viewModel as IDeactivate;
 
-            deactivatingFromView = true;
+            m_deactivatingFromView = true;
             deactivatable.Deactivate(true);
-            deactivatingFromView = false;
+            m_deactivatingFromView = false;
         }
 
         private async void OnClosing(object sender, CancelEventArgs eventArgs)
@@ -88,33 +88,33 @@ namespace BrunoFramework
                 return;
             }
 
-            if (actuallyClosing)
+            if (m_actuallyClosing)
             {
-                actuallyClosing = false;
+                m_actuallyClosing = false;
                 return;
             }
 
-            var cachedDialogResult = view.DialogResult;
+            var cachedDialogResult = m_view.DialogResult;
 
             eventArgs.Cancel = true;
 
             await Task.Yield();
 
-            var guard = (IGuardClose)viewModel;
+            var guard = (IGuardClose)m_viewModel;
             var canClose = await guard.CanCloseAsync(CancellationToken.None);
             
             if (!canClose)
                 return;
 
-            actuallyClosing = true;
+            m_actuallyClosing = true;
 
             if (cachedDialogResult == null)
             {
-                view.Close();
+                m_view.Close();
             }
-            else if (view.DialogResult != cachedDialogResult)
+            else if (m_view.DialogResult != cachedDialogResult)
             {
-                view.DialogResult = cachedDialogResult;
+                m_view.DialogResult = cachedDialogResult;
             }
         }
     }

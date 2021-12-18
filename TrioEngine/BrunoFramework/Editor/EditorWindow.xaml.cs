@@ -43,6 +43,7 @@ namespace BrunoFramework.Editor
             if (_editorViewModel != null)
             {
                 _editorViewModel.Window = null;
+                _editorViewModel.DockManager = null;
             }
 
             _editorViewModel = editorViewModel;
@@ -50,6 +51,7 @@ namespace BrunoFramework.Editor
             if (editorViewModel != null)
             {
                 _editorViewModel.Window = this;
+                _editorViewModel.DockManager = DockManager;
             }
         }
 
@@ -61,6 +63,7 @@ namespace BrunoFramework.Editor
         private void OnUnloaded(object sender, RoutedEventArgs eventArgs)
         {
             _editorViewModel.Window = null;
+            _editorViewModel.DockManager = null;
         }
 
         protected override void OnSourceInitialized(EventArgs e)

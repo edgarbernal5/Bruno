@@ -69,5 +69,10 @@ namespace BrunoFramework.Editor.Units
         {
             CommandItems.Clear();
         }
+
+        public override EditorDockableTabViewModel GetDockTabViewModel(string dockId)
+        {
+            return null;
+        }
     }
 }

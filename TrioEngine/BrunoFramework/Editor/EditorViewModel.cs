@@ -1,4 +1,5 @@
-﻿using Bruno.Collections;
+﻿using AvalonDock;
+using Bruno.Collections;
 using Bruno.Logging;
 using Bruno.ServiceLocation;
 using BrunoFramework.Editor.Game;
@@ -6,6 +7,8 @@ using BrunoFramework.Editor.Game.Inspectors;
 using BrunoFramework.Editor.Units;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 
@@ -14,8 +17,6 @@ namespace BrunoFramework.Editor
     public class EditorViewModel : Screen, IEditorService
     {
         private static readonly ILog Logger = LogManager.GetLog();
-
-        public event EventHandler<EventArgs> WindowActivated;
 
         internal static EditorViewModel DesignInstance
         {
@@ -27,50 +28,6 @@ namespace BrunoFramework.Editor
                 };
             }
         }
-
-        public SceneDocumentViewModel SceneDetail
-        {
-            get => m_sceneDetail;
-            set
-            {
-                m_sceneDetail = value;
-                NotifyOfPropertyChange();
-            }
-        }
-        private SceneDocumentViewModel m_sceneDetail;
-
-        public WorldOutlineViewModel WorldOutlineDetail
-        {
-            get => m_worldOutlineDetail;
-            set
-            {
-                m_worldOutlineDetail = value;
-                NotifyOfPropertyChange();
-            }
-        }
-        private WorldOutlineViewModel m_worldOutlineDetail;
-
-        public InspectorViewModel InspectorDetail
-        {
-            get => m_inspectorDetail;
-            set
-            {
-                m_inspectorDetail = value;
-                NotifyOfPropertyChange();
-            }
-        }
-        private InspectorViewModel m_inspectorDetail;
-
-        public ContentBrowserViewModel ContentBrowserDetail
-        {
-            get => m_contentBrowserDetail;
-            set
-            {
-                m_contentBrowserDetail = value;
-                NotifyOfPropertyChange();
-            }
-        }
-        private ContentBrowserViewModel m_contentBrowserDetail;
 
         public string ApplicationName
         {
@@ -121,6 +78,27 @@ namespace BrunoFramework.Editor
         private MenuManager _menuManager;
         private ResourceDictionary _resourceDictionary;
 
+        public ReadOnlyObservableCollection<EditorDockableTabViewModel> Tabs
+        {
+            get
+            {
+                if (_readonyTabs == null)
+                    _readonyTabs = new ReadOnlyObservableCollection<EditorDockableTabViewModel>(_tabs);
+
+                return _readonyTabs;
+            }
+        }
+
+        public DockingManager DockManager
+        {
+            get => m_dockManager;
+            set => m_dockManager = value;
+        }
+        private DockingManager m_dockManager;
+
+        private ObservableCollection<EditorDockableTabViewModel> _tabs = new ObservableCollection<EditorDockableTabViewModel>();
+        private ReadOnlyObservableCollection<EditorDockableTabViewModel> _readonyTabs = null;
+
         public EditorViewModel(ServiceContainer serviceContainer)
         {
             Services = serviceContainer;
@@ -133,7 +111,7 @@ namespace BrunoFramework.Editor
         {
             Logger.Info("Configuring editor view model");
 
-            DisplayName = "Estero Editor";
+            DisplayName = "Bruno Editor";
 
             Services.RegisterInstance(typeof(IEditorService), null, this);
             Services.RegisterPerRequest(typeof(IViewLocator), null, typeof(EditorViewLocator));
@@ -157,32 +135,62 @@ namespace BrunoFramework.Editor
                 unit.Startup();
             }
 
-            LoadLayout();
             CreateEmptyScene();
 
             RecreateUI();
         }
 
-        private void LoadLayout()
+        protected override void OnActivate()
         {
-            var worldOutlineService = Services.GetInstance<IWorldOutlineService>();
-            WorldOutlineDetail = worldOutlineService.ViewModel;
 
-            var inspectorService = Services.GetInstance<IInspectorService>();
-            InspectorDetail = inspectorService.ViewModel;
+        }
+        public void LoadLayout()
+        {
+            var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(m_dockManager);
+            serializer.LayoutSerializationCallback += (sender, args) =>
+            {
+                var dockId = args.Model.ContentId;
+                var viewModel = Units.Select(unit => unit.GetDockTabViewModel(dockId))
+                                    .Where(vm => vm != null)
+                                    .FirstOrDefault();
 
-            var contentBrowserService = Services.GetInstance<IContentBrowserService>();
-            ContentBrowserDetail = contentBrowserService.ViewModel;
+                if (viewModel == null)
+                {
+                    args.Cancel = true;
+                }
+                else
+                {
+                    args.Content = viewModel;
+                }
+            };
+
+            if (File.Exists(@".\AvalonDock.config"))
+                serializer.Deserialize(@".\AvalonDock.config");
+
+            //var worldOutlineService = Services.GetInstance<IWorldOutlineService>();
+            //_tabs.Add(worldOutlineService.ViewModel);
+
+            //var inspectorService = Services.GetInstance<IInspectorService>();
+            //_tabs.Add(inspectorService.ViewModel);
+
+            //var contentBrowserService = Services.GetInstance<IContentBrowserService>();
+            //_tabs.Add(contentBrowserService.ViewModel);
+        }
+
+        public void SaveLayout()
+        {
+            var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(m_dockManager);
+            serializer.Serialize(@".\AvalonDock.config");
         }
 
         private void CreateEmptyScene()
         {
-            var projectFileService = Services.GetInstance<IDocumentService>();
+            var documentService = Services.GetInstance<IDocumentService>();
 
-            var sceneFileType = projectFileService.Factories.SelectMany(factory => factory.SupportedFileTypes)
+            var documentType = documentService.Factories.SelectMany(factory => factory.SupportedFileTypes)
                 .Where(fileType => fileType.Name == "Scene").FirstOrDefault();
 
-            projectFileService.New(sceneFileType);
+            //documentService.New(documentType);
         }
 
         private void RecreateUI()
@@ -220,9 +228,9 @@ namespace BrunoFramework.Editor
 
         public void ActivateItem(object item)
         {
-            if (item is SceneDocumentViewModel)
+            if (item is EditorDockableTabViewModel)
             {
-                SceneDetail = item as SceneDocumentViewModel;
+                _tabs.Add(item as EditorDockableTabViewModel);
             }
 
             var activate = item as IActivate;
@@ -231,5 +239,6 @@ namespace BrunoFramework.Editor
                 activate.Activate();
             }
         }
+
     }
 }

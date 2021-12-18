@@ -109,5 +109,10 @@ namespace BrunoFramework.Editor.Units
             Editor.Services.UnregisterHandler(typeof(IGraphicsService));
             Editor.Services.UnregisterHandler(typeof(IHwndHostRef));
         }
+
+        public override EditorDockableTabViewModel GetDockTabViewModel(string dockId)
+        {
+            return null;
+        }
     }
 }

@@ -67,5 +67,7 @@ namespace BrunoFramework.Editor
         }
 
         protected abstract void OnUninitialize();
+
+        public abstract EditorDockableTabViewModel GetDockTabViewModel(string dockId);
     }
 }

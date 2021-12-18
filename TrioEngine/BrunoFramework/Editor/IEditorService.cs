@@ -1,14 +1,13 @@
-﻿using Bruno.Collections;
+﻿using AvalonDock;
+using Bruno.Collections;
 using Bruno.ServiceLocation;
 using System;
 using System.Collections.Generic;
 
 namespace BrunoFramework.Editor
 {
-    public interface IEditorService
+    public interface IEditorService : IActivate
     {
-        event EventHandler<EventArgs> WindowActivated;
-
         string ApplicationName { get; set; }
 
         ServiceContainer Services { get; }
@@ -24,6 +23,11 @@ namespace BrunoFramework.Editor
         MenuItemViewModelCollection Menu { get; }
 
         List<TreeNodeCollection<ICommandItem>> MenuNodes { get; }
+
+        DockingManager DockManager { get; set; }
+
+        void LoadLayout();
+        void SaveLayout();
 
         void ActivateItem(object item);
     }

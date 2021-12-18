@@ -6,14 +6,14 @@ namespace BrunoFramework.Editor.Units
 {
     public abstract class DocumentFactory
     {
-        public List<DocumentFileType> SupportedFileTypes { get; protected set; }
+        public List<DocumentType> SupportedFileTypes { get; protected set; }
 
         protected DocumentFactory()
         {
-            SupportedFileTypes = new List<DocumentFileType>();
+            SupportedFileTypes = new List<DocumentType>();
         }
 
-        public Document Create(DocumentFileType projectFileType)
+        public Document Create(DocumentType projectFileType)
         {
             if (!SupportedFileTypes.Exists(fileType => fileType.Name == projectFileType.Name))
                 throw new InvalidOperationException();
@@ -21,6 +21,6 @@ namespace BrunoFramework.Editor.Units
             return OnCreate(projectFileType);
         }
 
-        protected abstract Document OnCreate(DocumentFileType projectFileType);
+        protected abstract Document OnCreate(DocumentType projectFileType);
     }
 }

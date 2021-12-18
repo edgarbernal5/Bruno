@@ -1,8 +1,10 @@
 ﻿
 namespace BrunoFramework.Editor.Units
 {
-    public class ContentBrowserViewModel : Screen
+    public class ContentBrowserViewModel : EditorDockableTabViewModel
     {
+        internal const string DockIdString = "ContentBrowser";
+
         public ContentBrowser Content
         {
             get => m_content;
@@ -16,8 +18,10 @@ namespace BrunoFramework.Editor.Units
 
         private IEditorService m_editor;
 
-        public ContentBrowserViewModel(IEditorService editor)
+        public ContentBrowserViewModel(IEditorService editor) : base()
         {
+            DisplayName = "Content Browser";
+            DockId = DockIdString;
             m_editor = editor;
         }
     }

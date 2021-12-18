@@ -1,8 +1,10 @@
 ﻿
 namespace BrunoFramework.Editor.Game
 {
-    public class WorldOutlineViewModel : Screen
+    public class WorldOutlineViewModel : EditorDockableTabViewModel
     {
+        internal const string DockIdString = "WorldOutline";
+
         public WorldOutline Outline
         {
             get => m_outline;
@@ -46,6 +48,8 @@ namespace BrunoFramework.Editor.Game
 
         public WorldOutlineViewModel(IEditorService editor)
         {
+            DisplayName = "World outline";
+            DockId = DockIdString;
             m_editor = editor;
 
         }

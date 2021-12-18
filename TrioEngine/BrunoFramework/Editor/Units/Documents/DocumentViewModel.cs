@@ -1,13 +1,15 @@
 ﻿
 namespace BrunoFramework.Editor.Units
 {
-    public class DocumentViewModel : Screen
+    public abstract class DocumentViewModel : EditorDockableTabViewModel
     {
-        public Document ProjectFile { get; }
+        public Document Document { get; }
 
-        protected DocumentViewModel(Document projectFile)
+        protected DocumentViewModel(Document document)
         {
-            ProjectFile = projectFile;
+            Document = document;
+
+            DisplayName = document.GetDisplayName();
         }
 
     }

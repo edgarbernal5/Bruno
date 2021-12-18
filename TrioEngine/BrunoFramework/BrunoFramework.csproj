@@ -38,6 +38,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AvalonDock, Version=4.60.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dirkster.AvalonDock.4.60.0\lib\net40\AvalonDock.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
@@ -69,6 +72,7 @@
     <Compile Include="Editor\CommandsItems\Menu Items\MenuItemViewModelCollection.cs" />
     <Compile Include="Editor\CommandsItems\Menu Items\MenuSeparatorViewModel.cs" />
     <Compile Include="Editor\CommandsItems\MenuManager.cs" />
+    <Compile Include="Editor\EditorDockableTabViewModel.cs" />
     <Compile Include="Editor\EditorUnit.cs" />
     <Compile Include="Editor\EditorUnitCollection.cs" />
     <Compile Include="Editor\EditorException.cs" />
@@ -130,6 +134,9 @@
     </Compile>
     <Compile Include="Editor\Game\World\WorldOutlineViewModel.cs" />
     <Compile Include="Editor\IEditorService.cs" />
+    <Compile Include="Editor\LayoutInitializer.cs" />
+    <Compile Include="Editor\PanesStyleSelector.cs" />
+    <Compile Include="Editor\PanesTemplateSelector.cs" />
     <Compile Include="Editor\Timing\GameStepTimer.cs" />
     <Compile Include="Editor\Timing\GameTime.cs" />
     <Compile Include="Editor\Units\Builder\BuilderUnit.cs" />
@@ -149,6 +156,7 @@
     <Compile Include="Editor\Units\Game\GameUnit.cs" />
     <Compile Include="Editor\Units\Inspectors\IInspectorService.cs" />
     <Compile Include="Editor\Units\Inspectors\InspectorUnit.cs" />
+    <Compile Include="Editor\Units\Layouts\LayoutUnit.cs" />
     <Compile Include="Editor\Units\Menus\MenuUnit.cs" />
     <Compile Include="Editor\Game\Screens\EditorGameGraphicsScreen.cs" />
     <Compile Include="Editor\Game\Screens\GameGraphicsScreen.cs" />
@@ -156,7 +164,7 @@
     <Compile Include="Editor\Units\Documents\IDocumentService.cs" />
     <Compile Include="Editor\Units\Documents\Document.cs" />
     <Compile Include="Editor\Units\Documents\DocumentFactory.cs" />
-    <Compile Include="Editor\Units\Documents\DocumentFileType.cs" />
+    <Compile Include="Editor\Units\Documents\DocumentType.cs" />
     <Compile Include="Editor\Units\Documents\DocumentUnit.cs" />
     <Compile Include="Editor\Units\Documents\Factories\SceneDocumentFactory.cs" />
     <Compile Include="Editor\Units\Documents\DocumentViewModel.cs" />

@@ -7,7 +7,7 @@ namespace BrunoFramework.Editor.Units
     {
         List<DocumentFactory> Factories { get; }
 
-        Document New(DocumentFileType projectFileType);
+        Document New(DocumentType projectFileType);
         Document Open(string filename);
     }
 }
