@@ -132,17 +132,17 @@ namespace BrunoFramework.Editor.Units
         public Document Open(string filename)
         {
             var fileExtension = Path.GetExtension(filename).ToLower();
-            var selectedFileType = m_factories.SelectMany(factory => factory.SupportedFileTypes)
+            var selectedDocumentType = m_factories.SelectMany(factory => factory.SupportedFileTypes)
                 .FirstOrDefault(fileType => fileType.FileExtensions.Contains(fileExtension));
-            var selectedFactory = selectedFileType.Factory;
+            var selectedFactory = selectedDocumentType.Factory;
 
-            var projectFile = selectedFactory.Create(selectedFileType);
+            var document = selectedFactory.Create(selectedDocumentType);
 
-            projectFile.Load(filename);
-            var viewModel = projectFile.CreateViewModel();
+            document.Load(filename);
+            var viewModel = document.CreateViewModel();
             Editor.ActivateItem(viewModel);
 
-            return projectFile;
+            return document;
         }
 
         public override EditorDockableTabViewModel GetDockTabViewModel(string dockId)
