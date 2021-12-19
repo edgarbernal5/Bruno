@@ -14,9 +14,12 @@ namespace BrunoFramework.Editor.Units
         public List<DocumentFactory> Factories { get => m_factories; }
         private List<DocumentFactory> m_factories;
 
+        private List<Document> m_documents;
+
         public DocumentUnit()
         {
             m_factories = new List<DocumentFactory>();
+            m_documents = new List<Document>();
         }
 
         protected override void OnInitialize()
@@ -35,25 +38,25 @@ namespace BrunoFramework.Editor.Units
         private void AddCommands()
         {
             CommandItems.Add(
-                new CommandItem("Scene", new DelegateCommand(() => NewProjectFile()))
+                new CommandItem("Scene", new DelegateCommand(() => NewSceneDocument()))
                 {
                     Text = "Scene",
                 }
             );
             CommandItems.Add(
-                new CommandItem("Open", new DelegateCommand(() => OpenProjectFile()))
+                new CommandItem("Open", new DelegateCommand(() => OpenSceneDocument()))
                 {
                     Text = "Open",
                 }
             );
         }
 
-        private void NewProjectFile()
+        private void NewSceneDocument()
         {
 
         }
 
-        private void OpenProjectFile()
+        private void OpenSceneDocument()
         {
             var openFileDialog = new OpenFileDialog()
             {
@@ -131,6 +134,17 @@ namespace BrunoFramework.Editor.Units
 
         public Document Open(string filename)
         {
+            for (int i = 0; i < m_documents.Count; i++)
+            {
+                var existingDocument = m_documents[i];
+                if (existingDocument.FilenamePath == filename)
+                {
+
+                    return existingDocument;
+                }
+
+            }
+
             var fileExtension = Path.GetExtension(filename).ToLower();
             var selectedDocumentType = m_factories.SelectMany(factory => factory.SupportedFileTypes)
                 .FirstOrDefault(fileType => fileType.FileExtensions.Contains(fileExtension));
@@ -141,6 +155,8 @@ namespace BrunoFramework.Editor.Units
             document.Load(filename);
             var viewModel = document.CreateViewModel();
             Editor.ActivateItem(viewModel);
+
+            m_documents.Add(document);
 
             return document;
         }

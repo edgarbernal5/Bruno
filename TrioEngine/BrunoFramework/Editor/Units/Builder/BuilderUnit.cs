@@ -112,9 +112,9 @@ namespace BrunoFramework.Editor.Units
             buildCoordinator.RunTheBuild();
 
             var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
-            ContentManager contentManager = new ContentManager(graphicsDevice, settings.OutputDirectory);
+            var contentManager = new ContentManager(graphicsDevice, settings.OutputDirectory);
 
-            Model model = contentManager.Load<Model>(assetNamePath);
+            var model = contentManager.Load<Model>(assetNamePath);
 
             Scene.ActiveScene.LoadFromModel(model);
 
@@ -122,17 +122,6 @@ namespace BrunoFramework.Editor.Units
             buildCoordinator.Dispose();
         }
 
-        public string GetRelativePath(string basePath, string path)
-        {
-            Uri uri;
-            if (!Uri.TryCreate(path, UriKind.Absolute, out uri))
-                return path;
-
-            uri = new Uri(basePath).MakeRelativeUri(uri);
-            var str = Uri.UnescapeDataString(uri.ToString());
-
-            return Normalize(str);
-        }
         public string Normalize(string path)
         {
             return path.Replace('\\', '/');

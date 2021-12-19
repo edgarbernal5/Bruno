@@ -281,10 +281,10 @@ namespace BrunoFramework.Editor.Game
 
         protected override void OnLoad(string filename)
         {
-            BuildCoordinatorSettings settings = new BuildCoordinatorSettings();
+            var settings = new BuildCoordinatorSettings();
             settings.RootDirectory = Path.GetDirectoryName(filename);
 
-            BuildCoordinator buildCoordinator = new BuildCoordinator(settings);
+            var buildCoordinator = new BuildCoordinator(settings);
 
             settings = buildCoordinator.Settings;
 

@@ -28,7 +28,7 @@ namespace BrunoFramework.Editor.Units
                 if (!IsUntitled)
                     return string.Empty;
 
-                var documentService = Editor.Services.GetInstance<IDocumentService>();
+                //var documentService = Editor.Services.GetInstance<IDocumentService>();
 
                 string extension = DocumentType.FileExtensions.FirstOrDefault() ?? string.Empty;
 

@@ -168,6 +168,7 @@ namespace BrunoFramework.Editor.Timing
             {
                 m_framesPerSecond = m_framesThisSecond;
                 m_framesThisSecond = 0;
+                //Console.WriteLine($"ticks = {m_qpcSecondCounter.Ticks}; stopwatch freq = {Stopwatch.Frequency}; remaining = {(m_qpcSecondCounter.Ticks % Stopwatch.Frequency)}");
 
                 var secondCounterTicks = m_qpcSecondCounter.Ticks;
                 secondCounterTicks %= Stopwatch.Frequency;
