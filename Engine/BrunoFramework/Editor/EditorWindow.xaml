@@ -1,0 +1,112 @@
+﻿<Window x:Class="BrunoFramework.Editor.EditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BrunoFramework.Editor.Game"
+        xmlns:content="clr-namespace:BrunoFramework.Editor.Units"
+        xmlns:editor="clr-namespace:BrunoFramework.Editor"
+        mc:Ignorable="d"
+        UseLayoutRounding="True"
+        d:DataContext="{x:Static editor:EditorViewModel.DesignInstance}"
+        
+        Height="900" Width="1200">
+    <Window.Resources>
+        <editor:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+    </Window.Resources>
+    <DockPanel LastChildFill="True">
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Menu Name="Menu"
+                  ItemsSource="{Binding Menu}"
+                  PreviewGotKeyboardFocus="OnPreviewMenuGotKeyboardFocus"
+                  UsesItemContainerTemplate="True" />
+
+        </Grid>
+        <Grid>
+            <DockingManager x:Name="DockManager"
+                 DocumentsSource="{Binding Tabs}"
+                 ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
+                 AllowMixedOrientation ="True">
+
+                <DockingManager.LayoutItemTemplateSelector>
+                    <editor:PanesTemplateSelector>
+                        <editor:PanesTemplateSelector.SceneDocumentViewModelTemplate>
+                            <DataTemplate>
+                                <local:SceneView />
+                            </DataTemplate>
+                        </editor:PanesTemplateSelector.SceneDocumentViewModelTemplate>
+
+                        <editor:PanesTemplateSelector.WorldOutlineViewModelTemplate>
+                            <DataTemplate>
+                                <local:WorldOutlineView />
+                            </DataTemplate>
+                        </editor:PanesTemplateSelector.WorldOutlineViewModelTemplate>
+
+                        <editor:PanesTemplateSelector.InspectorViewModelTemplate>
+                            <DataTemplate>
+                                <local:InspectorView />
+                            </DataTemplate>
+                        </editor:PanesTemplateSelector.InspectorViewModelTemplate>
+
+                        <editor:PanesTemplateSelector.ContentBrowserViewModelTemplate>
+                            <DataTemplate>
+                                <content:ContentBrowserView />
+                            </DataTemplate>
+                        </editor:PanesTemplateSelector.ContentBrowserViewModelTemplate>
+
+                    </editor:PanesTemplateSelector>
+                </DockingManager.LayoutItemTemplateSelector>
+
+                <DockingManager.LayoutItemContainerStyleSelector>
+                    <editor:PanesStyleSelector>
+
+                        <editor:PanesStyleSelector.EditorDockableTabStyle>
+                            <Style TargetType="{x:Type LayoutItem}">
+                                <Setter Property="Title" Value="{Binding Model.Title}" />
+                                <Setter Property="ContentId" Value="{Binding Model.DockId}" />
+                                <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+                            </Style>
+                        </editor:PanesStyleSelector.EditorDockableTabStyle>
+                    </editor:PanesStyleSelector>
+                </DockingManager.LayoutItemContainerStyleSelector>
+
+                <DockingManager.LayoutUpdateStrategy>
+                    <editor:LayoutInitializer />
+                </DockingManager.LayoutUpdateStrategy>
+
+                <LayoutRoot>
+                    <LayoutPanel Orientation="Vertical">
+                        <LayoutDocumentPane />
+                        <LayoutAnchorablePane Name="ToolsPane" DockHeight="150" />
+                    </LayoutPanel>
+                </LayoutRoot>
+            </DockingManager>
+            <!--<Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="10px"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <local:SceneView Grid.Row="0"  Grid.Column="0" DataContext="{Binding SceneDetail}"  >
+
+            </local:SceneView>
+            <local:InspectorView Grid.Row="0" Grid.Column="1" DataContext="{Binding InspectorDetail}" Grid.ColumnSpan="3" Margin="10,0,0,0"/>
+
+            <content:ContentBrowserView Grid.Row="1" Grid.Column="0" DataContext="{Binding ContentBrowserDetail}" >
+            </content:ContentBrowserView>
+            <local:WorldOutlineView Grid.Row="1" Grid.Column="2" DataContext="{Binding WorldOutlineDetail}" >
+            </local:WorldOutlineView>-->
+        </Grid>
+    </DockPanel>
+</Window>
+
+<!--d:DataContext="{x:Static editor:EditorViewModel.DesignInstance}"-->
+<!--Height="450" Width="800">-->
