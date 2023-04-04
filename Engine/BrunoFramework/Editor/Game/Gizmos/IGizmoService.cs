@@ -10,9 +10,9 @@ namespace BrunoFramework.Editor.Game.Gizmos
 {
     public interface IGizmoService
     {
-        event Action<ITransformableObject, Vector3> OnTranslationChanged;
-        event Action<ITransformableObject, Vector3, bool> OnScaleChanged;
-        event Action<ITransformableObject, Quaternion> OnRotateChanged;
+        event Action<ITransformableObject, Vector3> TranslationChanged;
+        event Action<ITransformableObject, Vector3, bool> ScaleChanged;
+        event Action<ITransformableObject, Quaternion> RotateChanged;
 
         AxisGizmoTranslationRenderer AxisGizmoTranslationRenderer { get; }
         Camera Camera { get; set; }
@@ -20,15 +20,20 @@ namespace BrunoFramework.Editor.Game.Gizmos
         bool IsActive { get; set; }
         GizmoType CurrentGizmo { get; set; }
         GizmoAxis CurrentGizmoAxis { get; }
+        TransformSpace TransformSpace { get; set; }
 
-        void SetTransformableAsSelected(IEditorObject editorObject);
+        GizmoSnappingConfig SnappingConfig { get; }
 
-        bool Begin(Vector2 mousePosition);
-        void UpdateGizmo(Vector2 mousePosition);
-        void SetGizmoAxisOverMousePosition(Vector2 mousePosition);
+        void SetEditorObjectAsSelected(IEditorObject editorObject);
+
+        void UpdateSelectedObject(IEditorObject editorObject);
+
+        bool BeginDrag(Vector2 mousePosition);
+        void Drag(Vector2 mousePosition);
+        void OnMouseMove(Vector2 mousePosition);
 
         void Render(RenderContext renderContext);
-        void End();
+        void EndDrag();
 
         void SelectObjects(Vector2 mousePosition);
         ITransformableObject GetSelectedObject();
@@ -63,6 +68,12 @@ namespace BrunoFramework.Editor.Game.Gizmos
         ObjectCenter,
         SelectionCenter,
         WorldOrigin
+    }
+
+    public enum TransformSpace
+    {
+        Local,
+        World
     }
 
     public interface ITransformableObject

@@ -14,7 +14,7 @@ namespace BrunoEngine
 
 		ContentItem* Process(ContentItem* input, ContentProcessorContext *context);
 
-		friend class BuildCoordinator;
+		friend class GameContentBuilder;
 
 		std::string GetProcessorName() const { return "EffectProcessor"; }
 		std::string GetOutputWriterName() const { return "Texture2DWriter"; }

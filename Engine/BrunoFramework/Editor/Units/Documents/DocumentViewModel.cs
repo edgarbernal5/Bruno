@@ -1,10 +1,12 @@
 ﻿
+using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrunoFramework.Editor.Units
 {
-    public abstract class DocumentViewModel : EditorDockableTabViewModel
+    public abstract class DocumentViewModel : EditorDockTabViewModel
     {
         public Document Document { get; }
 
@@ -14,25 +16,37 @@ namespace BrunoFramework.Editor.Units
             DisplayName = document.GetDisplayName();
         }
 
-        protected override void OnActivate()
+        protected override Task OnInitializeAsync(CancellationToken cancellationToken)
         {
-            Document.RegisterViewModel(this);
+            Document.RecordViewModel(this);
+            Document.PropertyChanged += OnDocumentPropertyChanged;
 
-            base.OnActivate();
+            return base.OnInitializeAsync(cancellationToken);
         }
 
-        protected override void OnDeactivate(bool close)
+        private void OnDocumentPropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (eventArgs.PropertyName == nameof(Document.IsModified) ||
+                eventArgs.PropertyName == nameof(Document.IsUntitled) ||
+                eventArgs.PropertyName == nameof(Document.FilePath))
+            {
+                DisplayName = Document.GetDisplayName();
+            }
+        }
+
+        protected override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
             if (close)
             {
-                Document.UnregisterViewModel(this);
+                Document.PropertyChanged -= OnDocumentPropertyChanged;
 
                 if (!Document.IsDisposed)
                 {
                     Document.DocumentService.Close(Document, true);
                 }
+                Document.UnrecordViewModel(this);
             }
-            base.OnDeactivate(close);
+            return base.OnDeactivateAsync(close, cancellationToken);
         }
 
         public override Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
@@ -42,7 +56,7 @@ namespace BrunoFramework.Editor.Units
                 return Task.FromResult(true);
             }
 
-            bool canClose = Document.DocumentService.CanClose(Document);
+            bool canClose = Document.DocumentService.ShowSaveChangesDialog(Document);
             return Task.FromResult(canClose);
         }
     }

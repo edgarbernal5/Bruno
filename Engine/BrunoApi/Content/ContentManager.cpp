@@ -7,42 +7,52 @@
 #include "ContentReader.h"
 
 #include "IO/Path.h"
+#include "Vfs/IStorage.h"
+#include "Vfs/FileSystemStorage.h"
 
 namespace BrunoEngine
 {
-	ContentManager::ContentManager(IServiceProvider* serviceProvider) 
-		: m_serviceProvider(serviceProvider), m_device(nullptr)
+	ContentManager::ContentManager(IServiceProvider* serviceProvider) :
+		m_serviceProvider(serviceProvider), 
+		m_device(nullptr),
+		m_storage(nullptr)
+	{
+		ContentTypeReaderManager::RegisterStandardTypes();
+
+		m_storage = new BrunoIO::FileSystemStorage("");
+	}
+
+	ContentManager::ContentManager(GraphicsDevice* device) :
+		m_serviceProvider(nullptr), 
+		m_device(device),
+		m_storage(nullptr)
+	{
+		ContentTypeReaderManager::RegisterStandardTypes();
+		m_storage = new BrunoIO::FileSystemStorage("");
+	}
+
+	ContentManager::ContentManager(GraphicsDevice* device, BrunoIO::IStorage* storage) :
+		m_serviceProvider(nullptr), 
+		m_device(device),
+		m_storage(storage)
 	{
 		ContentTypeReaderManager::RegisterStandardTypes();
 	}
 
-	ContentManager::ContentManager(GraphicsDevice* device) 
-		: m_serviceProvider(nullptr), m_device(device)
+	ContentManager::ContentManager(GraphicsDevice* device, std::string rootDirectory) :
+		m_serviceProvider(nullptr), m_device(device),
+		m_storage(nullptr)
 	{
 		ContentTypeReaderManager::RegisterStandardTypes();
-	}
-
-	ContentManager::ContentManager(GraphicsDevice* device, std::string rootDirectory)
-		: m_serviceProvider(nullptr), m_device(device), m_rootDirectory(rootDirectory)
-	{
-		ContentTypeReaderManager::RegisterStandardTypes();
+		m_storage = new BrunoIO::FileSystemStorage(rootDirectory);
 	}
 
 	ContentManager::~ContentManager()
 	{
 	}
 
-	std::string ContentManager::GetRootDirectory()
+	void* ContentManager::LoadInternal(std::string assetName)
 	{
-		return m_rootDirectory;
-	}
-
-	void ContentManager::SetRootDirectory(std::string directory)
-	{
-		m_rootDirectory = directory;
-	}
-
-	void* ContentManager::LoadInternal(std::string assetName) {
 		auto it = m_loadedAssets.find(assetName);
 		if (it != m_loadedAssets.end())
 		{
@@ -71,18 +81,17 @@ namespace BrunoEngine
 		return local;
 	}
 
-	TrioIO::Stream* ContentManager::OpenStream(std::string assetName)
+	BrunoIO::Stream* ContentManager::OpenStream(std::string assetName)
 	{
-		//ou = TrioIO::Path::GetFullDirectory(m_rootDirectory + TrioIO::Path::DirectorySeparator);
-		std::string rootDirectory = m_rootDirectory;
+		/*std::string rootDirectory = m_rootDirectory;
 		if (rootDirectory.size() == 0) rootDirectory = ".";
 
-		std::string fullDirectory = TrioIO::Path::GetFullDirectory(rootDirectory + TrioIO::Path::DirectorySeparator);
-		std::string path = TrioIO::Path::Combine(fullDirectory, assetName + ".bruno");
+		std::string fullDirectory = BrunoIO::Path::GetFullDirectory(rootDirectory + BrunoIO::Path::DirectorySeparator);*/
+		std::string path = assetName + ".bruno";
 		
-		TrioIO::FileStream* fileStream = new TrioIO::FileStream(path, TrioIO::FileAccess::Read);
-
-		return fileStream;
+		//BrunoIO::FileStream* fileStream = new BrunoIO::FileStream(path, BrunoIO::FileAccess::Read);
+		
+		return m_storage->OpenFile(path);
 	}
 
 	/*

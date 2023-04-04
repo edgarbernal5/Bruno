@@ -1,7 +1,7 @@
 ﻿
 using AvalonDock.Layout;
 using BrunoFramework.Editor.Game;
-using BrunoFramework.Editor.Game.Inspectors;
+using BrunoFramework.Editor.Game.Properties;
 using BrunoFramework.Editor.Units;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,12 +28,17 @@ namespace BrunoFramework.Editor
             set;
 		}
 
-		public DataTemplate InspectorViewModelTemplate
+		public DataTemplate PropertiesViewModelTemplate
 		{
 			get;
 			set;
 		}
 		public DataTemplate ContentBrowserViewModelTemplate
+		{
+			get;
+			set;
+		}
+		public DataTemplate ConsoleViewModelTemplate
 		{
 			get;
 			set;
@@ -49,11 +54,14 @@ namespace BrunoFramework.Editor
 			if (item is WorldOutlineViewModel)
 				return WorldOutlineViewModelTemplate;
 
-			if (item is InspectorViewModel)
-				return InspectorViewModelTemplate;
+			if (item is PropertiesViewModel)
+				return PropertiesViewModelTemplate;
 
 			if (item is ContentBrowserViewModel)
 				return ContentBrowserViewModelTemplate;
+
+			if (item is ConsoleViewModel)
+				return ConsoleViewModelTemplate;
 
 			return base.SelectTemplate(item, container);
 		}

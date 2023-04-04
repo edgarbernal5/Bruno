@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace TrioIO
+namespace BrunoIO
 {
 	class File
 	{

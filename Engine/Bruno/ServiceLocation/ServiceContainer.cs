@@ -1,4 +1,4 @@
-﻿using Bruno.Interop;
+﻿using Bruno;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,9 +33,19 @@ namespace Bruno.ServiceLocation
             }
         }
 
+        public void RegisterInstance(Type service, object implementation)
+        {
+            RegisterHandler(service, null, container => implementation, DisposalPolicy.Manual);
+        }
+
         public void RegisterInstance(Type service, string key, object implementation)
         {
             RegisterHandler(service, key, container => implementation, DisposalPolicy.Manual);
+        }
+
+        public void RegisterPerRequest(Type service, Type implementation)
+        {
+            RegisterHandler(service, null, container => container.BuildInstance(implementation), DisposalPolicy.Automatic);
         }
 
         public void RegisterPerRequest(Type service, string key, Type implementation)

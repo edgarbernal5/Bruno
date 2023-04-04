@@ -85,7 +85,7 @@ namespace BrunoEngine
 #endif
 	}
 
-	void ConstantBuffer::SetData()
+	void ConstantBuffer::SetInternalData()
 	{
 #if BRUNO_DIRECTX
 		if (m_buffer == nullptr)
@@ -119,7 +119,7 @@ namespace BrunoEngine
 
 		if (m_dirty)
 		{
-			SetData();
+			SetInternalData();
 			m_dirty = false;
 		}
 

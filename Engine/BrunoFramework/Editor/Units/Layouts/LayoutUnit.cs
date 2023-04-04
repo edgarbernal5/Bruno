@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace BrunoFramework.Editor.Units
 {
     public class LayoutUnit : EditorUnit
@@ -8,47 +7,40 @@ namespace BrunoFramework.Editor.Units
         {
         }
 
-        private void Editor_Activated(object sender, ActivationEventArgs eventArgs)
+        private void OnEditorActivated(object sender, ActivationEventArgs eventArgs)
         {
             if (eventArgs.WasInitialized)
             {
-                Editor.Activated -= Editor_Activated;
+                Editor.Activated -= OnEditorActivated;
 
                 Editor.LoadLayout();
 
-                Editor.Window.Closing += Window_Closing;
+                Editor.Window.Closing += OnWindowClosing;
             }
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Editor.Window.Closing -= Window_Closing;
+            //Editor.Window.Closing -= OnWindowClosing;
             Editor.SaveLayout();
         }
 
         protected override void OnInitialize()
         {
-
         }
 
         protected override void OnStartup()
         {
-            Editor.Activated += Editor_Activated;
+            Editor.Activated += OnEditorActivated;
         }
 
         protected override void OnUninitialize()
         {
-
         }
 
         protected override void OnShutdown()
         {
-            Editor.Activated -= Editor_Activated;
-        }
-
-        public override EditorDockableTabViewModel GetDockTabViewModel(string dockId)
-        {
-            return null;
+            Editor.Activated -= OnEditorActivated;
         }
     }
 }

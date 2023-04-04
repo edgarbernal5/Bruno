@@ -13,15 +13,15 @@
 
 namespace BrunoEngine
 {
-	ContentWriter::ContentWriter(ContentCompiler *compiler, TrioIO::Stream *_stream, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath) :
-		TrioIO::BinaryWriter(_stream),
+	ContentWriter::ContentWriter(ContentCompiler *compiler, BrunoIO::Stream *_stream, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath) :
+		BrunoIO::BinaryWriter(_stream),
 		m_compiler(compiler),
 		m_rootDirectory(rootDirectory),
 		m_referenceRelocationPath(referenceRelocationPath),
 		m_finalOutput(_stream)
 	{
-		m_headerData = new TrioIO::MemoryStream();
-		m_contentData = new TrioIO::MemoryStream();
+		m_headerData = new BrunoIO::MemoryStream();
+		m_contentData = new BrunoIO::MemoryStream();
 
 		m_stream = m_contentData;
 	}
@@ -141,10 +141,10 @@ namespace BrunoEngine
 		{
 			throw ContentPipelineException("found cyclic reference");
 		}
+
 		m_recurseDetector[value] = true;
 		typeWriter->Write(this, value);
 		m_recurseDetector.erase(value);
-
 	}
 
 	void ContentWriter::WriteHeader()
@@ -186,7 +186,7 @@ namespace BrunoEngine
 				return;
 			}
 
-			if (TrioIO::Path::GetFileExtension(filename) != FileExtension)
+			if (BrunoIO::Path::GetFileExtension(filename) != FileExtension)
 			{
 				throw ContentPipelineException("external reference is not a .bruno file");
 			}

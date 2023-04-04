@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BrunoFramework
 {
@@ -7,16 +9,13 @@ namespace BrunoFramework
     {
         event EventHandler<DeactivationEventArgs> Deactivating;
 
-        void Deactivate(bool close);
+        Task DeactivateAsync(bool close, CancellationToken cancellationToken = default);
 
         event EventHandler<DeactivationEventArgs> Deactivated;
     }
 
     public class DeactivationEventArgs : EventArgs
     {
-        /// <summary>
-        /// Indicates whether the sender was closed in addition to being deactivated.
-        /// </summary>
         public bool WasClosed { get; set; }
     }
 }

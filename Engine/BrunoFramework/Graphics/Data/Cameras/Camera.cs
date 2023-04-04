@@ -1,5 +1,6 @@
 ﻿
 using System;
+using BrunoApi.Net.Graphics;
 using BrunoApi.Net.Maths;
 
 namespace BrunoFramework.Graphics.Data
@@ -76,7 +77,8 @@ namespace BrunoFramework.Graphics.Data
         }
         private float m_nearPlane;
 
-        public float FarPlane {
+        public float FarPlane
+        {
             get
             {
                 return m_farPlane;
@@ -93,7 +95,8 @@ namespace BrunoFramework.Graphics.Data
         private float m_farPlane;
         
         //Radians
-        public float FieldOfView {
+        public float FieldOfView
+        {
             get
             {
                 return m_fov;
@@ -109,21 +112,13 @@ namespace BrunoFramework.Graphics.Data
         }
         private float m_fov;
 
-        public float AspectRatio {
+        public float AspectRatio
+        {
             get
             {
-                return m_aspectRatio;
-            }
-            set
-            {
-                if (m_aspectRatio == value) return;
-
-                m_aspectRatio = value;
-                m_projectionDirty = true;
-                m_viewProjectionDirty = true;
+                return m_viewport.AspectRatio;
             }
         }
-        private float m_aspectRatio;
 
         public Matrix View 
         {
@@ -151,7 +146,7 @@ namespace BrunoFramework.Graphics.Data
             {
                 if (m_projectionDirty)
                 {
-                    m_projection = Matrix.CreatePerspectiveFieldOfView(m_fov, m_aspectRatio, m_nearPlane, m_farPlane);
+                    m_projection = Matrix.CreatePerspectiveFieldOfView(m_fov, m_viewport.AspectRatio, m_nearPlane, m_farPlane);
                     m_projectionDirty = false;
                 }
                 return m_projection;
@@ -179,11 +174,26 @@ namespace BrunoFramework.Graphics.Data
         }
         private Matrix m_viewProjection;
 
+        public Viewport Viewport
+        {
+            get => m_viewport;
+            set
+            {
+                if (m_viewport == value)
+                    return;
+
+                m_viewport = value;
+
+                m_projectionDirty = true;
+                m_viewProjectionDirty = true;
+            }
+        }
+        private Viewport m_viewport;
+
         private bool m_viewDirty, m_projectionDirty, m_viewProjectionDirty;
 
         private Camera()
         {
-
         }
 
         public Camera(Vector3 position, Vector3 target, Vector3 up)
@@ -200,7 +210,7 @@ namespace BrunoFramework.Graphics.Data
         public Camera Clone()
         {
             var clone = new Camera(Position, Target, Up);
-            clone.AspectRatio = AspectRatio;
+            clone.Viewport = Viewport;
             clone.FieldOfView = FieldOfView;
             clone.NearPlane = NearPlane;
             clone.FarPlane = FarPlane;

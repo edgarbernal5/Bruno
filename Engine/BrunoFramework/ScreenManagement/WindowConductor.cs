@@ -21,12 +21,12 @@ namespace BrunoFramework
             m_view = view;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync()
         {
             var activator = m_viewModel as IActivate;
             if (activator != null)
             {
-                activator.Activate();
+                await activator.ActivateAsync();
             }
 
             var deactivatable = m_viewModel as IDeactivate;
@@ -64,7 +64,7 @@ namespace BrunoFramework
             m_deactivateFromViewModel = false;
         }
 
-        private void OnClosed(object sender, EventArgs e)
+        private async void OnClosed(object sender, EventArgs e)
         {
             m_view.Closed -= OnClosed;
             m_view.Closing -= OnClosing;
@@ -77,7 +77,7 @@ namespace BrunoFramework
             var deactivatable = m_viewModel as IDeactivate;
 
             m_deactivatingFromView = true;
-            deactivatable.Deactivate(true);
+            await deactivatable.DeactivateAsync(true);
             m_deactivatingFromView = false;
         }
 
@@ -102,9 +102,11 @@ namespace BrunoFramework
 
             var guard = (IGuardClose)m_viewModel;
             var canClose = await guard.CanCloseAsync(CancellationToken.None);
-            
+
             if (!canClose)
+            {
                 return;
+            }
 
             m_actuallyClosing = true;
 

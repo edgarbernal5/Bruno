@@ -50,7 +50,7 @@ namespace BrunoEngine
 		return writer;
 	}
 
-	void ContentCompiler::Compile(TrioIO::Stream *stream, ContentItem *object, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath)
+	void ContentCompiler::Compile(BrunoIO::Stream *stream, ContentItem *object, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath)
 	{
 		ContentWriter *writer = new ContentWriter(this, stream, compressContent, rootDirectory, referenceRelocationPath);
 

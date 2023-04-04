@@ -481,7 +481,8 @@ namespace BrunoEngine
 		m_currentD3dRenderTargets = std::vector<ID3D11RenderTargetView*>(4, nullptr);
 
 		auto it = m_windowResources.find(parameters.GetHostHWND());
-		if (it != m_windowResources.end()) {
+		if (it != m_windowResources.end())
+		{
 			ReleaseWindowResources(it->second);
 		}
 
@@ -829,6 +830,19 @@ namespace BrunoEngine
 #endif
 	}
 
+	void GraphicsDevice::RemoveHwnd(HWND hostHwnd)
+	{
+		auto it = m_windowResources.find(hostHwnd);
+		if (it != m_windowResources.end())
+		{
+			if (m_currentDepthStencilBuffer == it->second.m_depthStencilBuffer) {
+				m_currentDepthStencilBuffer = nullptr;
+			}
+			ReleaseWindowResources(it->second);
+			m_windowResources.erase(it);
+		}
+	}
+
 	void GraphicsDevice::SetBlendState(BlendState* state)
 	{
 		if (m_blendState == state)
@@ -897,6 +911,13 @@ namespace BrunoEngine
 		m_currentD3dDepthStencilView = m_defaultD3dDepthStencilView;
 		m_d3dContext->OMSetRenderTargets(1, m_currentD3dRenderTargets.data(), m_currentD3dDepthStencilView);
 		m_currentPresentationParameters = windowResources.m_presentationParameters;
+
+		m_viewport = CD3D11_VIEWPORT(
+			0.0f,
+			0.0f,
+			static_cast<float>(windowResources.m_presentationParameters.GetBackBufferWidth()),
+			static_cast<float>(windowResources.m_presentationParameters.GetBackBufferHeight())
+		);
 	}
 
 	void GraphicsDevice::SetRenderTarget(RenderTarget2D* renderTarget)

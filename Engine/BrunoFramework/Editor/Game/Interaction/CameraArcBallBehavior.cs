@@ -21,35 +21,23 @@ namespace BrunoFramework.Editor.Game.Interaction
             public Vector3 m_target;
             public Vector3 m_position;
             public Vector3 m_up;
-            public Vector2 m_yawPitch;
         }
         private CameraState m_cameraState;
         private Camera m_currentCamera;
         private bool m_canRotate;
 
-        private Vector2 _previousMousePosition;
-        private Vector2 m_currentYawPitch;
+        private Vector2 m_previousMousePosition;
 
         public static readonly DependencyProperty CameraProperty = DependencyProperty.Register(
             "Camera",
             typeof(Camera),
             typeof(CameraArcBallBehavior),
-            new PropertyMetadata(null, OnCameraChanged));
+            new FrameworkPropertyMetadata(null));
 
         public Camera Camera
         {
             get { return (Camera)GetValue(CameraProperty); }
             set { SetValue(CameraProperty, value); }
-        }
-
-        private static void OnCameraChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
-        {
-            var target = (CameraArcBallBehavior)dependencyObject;
-
-            var newValue = (Camera)eventArgs.NewValue;
-            if (newValue == null) return;
-
-            target.GetInitialYawPitch(newValue);
         }
 
         protected override void OnAttached()
@@ -93,8 +81,8 @@ namespace BrunoFramework.Editor.Game.Interaction
 
             if (!m_canRotate) return;
 
-            var cameraNode = Camera;
-            if (cameraNode == null)
+            var camera = Camera;
+            if (camera == null)
             {
                 return;
             }
@@ -105,14 +93,13 @@ namespace BrunoFramework.Editor.Game.Interaction
             //    return;
             //}
 
-            _previousMousePosition = ConvertToVector2(eventArgs.GetPosition(AssociatedObject));
+            m_previousMousePosition = ConvertToVector2(eventArgs.GetPosition(AssociatedObject));
 
-            m_currentCamera = cameraNode;
+            m_currentCamera = camera;
             m_cameraState.m_view = m_currentCamera.View;
             m_cameraState.m_target = m_currentCamera.Target;
             m_cameraState.m_position = m_currentCamera.Position;
             m_cameraState.m_up = m_currentCamera.Up;
-            m_cameraState.m_yawPitch = m_currentYawPitch;
 
             AssociatedObject.HwndMouseMove += OnHwndMouseMove;
             AssociatedObject.HwndLButtonUp += OnHwndLButtonUp;
@@ -120,28 +107,9 @@ namespace BrunoFramework.Editor.Game.Interaction
             AssociatedObject.LostMouseCapture += OnLostMouseCapture;
         }
 
-        private void GetInitialYawPitch(Camera camera)
-        {
-            var yawPitchRoll = Quaternion.EulerAngles(Quaternion.Inverse(Quaternion.CreateFromMatrix(camera.View)));
-
-            m_currentYawPitch.X = yawPitchRoll.Y;
-            m_currentYawPitch.Y = yawPitchRoll.X;
-        }
-
         private void OnHwndLButtonUp(object sender, HwndMouseEventArgs eventArgs)
         {
             EndOrbit(true);
-        }
-
-        private void CalculateViewMatrix(Quaternion rotation)
-        {
-            float distance = (m_currentCamera.Position - m_currentCamera.Target).Length();
-            Vector3 translation = new Vector3(0.0f, 0.0f, distance);
-            translation = Vector3.Transform(translation, rotation);
-
-            m_currentCamera.Position = m_currentCamera.Target + translation;
-
-            m_currentCamera.Up = Vector3.Transform(Vector3.Up, rotation);
         }
 
         private void OnHwndMouseMove(object sender, HwndMouseEventArgs eventArgs)
@@ -152,17 +120,31 @@ namespace BrunoFramework.Editor.Game.Interaction
 
                 var viewportWidth = (float)AssociatedObject.ActualWidth;
                 var viewportHeight = (float)AssociatedObject.ActualHeight;
-                
+
                 var deltaAngles = new Vector2(2.0f * MathHelper.PI / viewportWidth, MathHelper.PI / viewportHeight);
 
                 var mouseVelocity = GetMouseVelocity(currentMousePosition);
                 var angles = mouseVelocity * deltaAngles;
 
-                m_currentYawPitch += angles;
-                Quaternion rotation = Quaternion.CreateFromYawPitchRoll(m_currentYawPitch.X, m_currentYawPitch.Y, 0);
+                var directionToTarget = Vector3.Normalize(m_currentCamera.Target - m_currentCamera.Position);
 
-                CalculateViewMatrix(rotation);
-                _previousMousePosition = currentMousePosition;
+                var upPerpendicular = Vector3.Cross(m_currentCamera.Up, directionToTarget);
+                upPerpendicular = Vector3.Cross(directionToTarget, upPerpendicular);
+
+                var rightWorld = Vector3.TransformNormal(Vector3.Right, Matrix.Invert(m_currentCamera.View));
+                var rotationMatrixX = Matrix.CreateFromAxisAngle(rightWorld, angles.Y);
+                var position = Vector3.Transform(m_currentCamera.Position - m_currentCamera.Target, rotationMatrixX) + m_currentCamera.Target;
+
+                var rotationMatrixY = Matrix.CreateFromAxisAngle(Vector3.Up, angles.X);
+                var finalPosition = Vector3.Transform(position - m_currentCamera.Target, rotationMatrixY) + m_currentCamera.Target;
+
+                upPerpendicular = Vector3.TransformNormal(upPerpendicular, rotationMatrixX);
+                upPerpendicular = Vector3.TransformNormal(upPerpendicular, rotationMatrixY);
+                
+                m_currentCamera.Position = finalPosition;
+                m_currentCamera.Up = upPerpendicular;
+
+                m_previousMousePosition = currentMousePosition;
             }
         }
 
@@ -186,7 +168,6 @@ namespace BrunoFramework.Editor.Game.Interaction
                 m_currentCamera.Target = m_cameraState.m_target;
                 m_currentCamera.Position = m_cameraState.m_position;
                 m_currentCamera.Up = m_cameraState.m_up;
-                m_currentYawPitch = m_cameraState.m_yawPitch;
             }
 
             m_currentCamera = null;
@@ -223,9 +204,6 @@ namespace BrunoFramework.Editor.Game.Interaction
             m_canRotate = false;
         }
 
-        private Vector2 GetMouseVelocity(Vector2 currentMousePosition)
-        {
-            return (_previousMousePosition - currentMousePosition);
-        }
+        private Vector2 GetMouseVelocity(Vector2 currentMousePosition) => m_previousMousePosition - currentMousePosition;
     }
 }

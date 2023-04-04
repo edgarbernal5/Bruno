@@ -5,7 +5,7 @@ namespace BrunoFramework.Editor.Units
 {
     public class MenuUnit : EditorUnit
     {
-        private TreeNodeCollection<ICommandItem> _menuNodes;
+        private TreeNodeCollection<ICommandItem> m_menuNodes;
 
         public MenuUnit()
         {
@@ -14,7 +14,6 @@ namespace BrunoFramework.Editor.Units
 
         protected override void OnInitialize()
         {
-
         }
 
         protected override void OnStartup()
@@ -35,18 +34,23 @@ namespace BrunoFramework.Editor.Units
 
         private void AddMenus()
         {
-            _menuNodes = new TreeNodeCollection<ICommandItem>()
+            m_menuNodes = new TreeNodeCollection<ICommandItem>()
             {
-                new TreeNode<ICommandItem>(new CommandGroup("FileGroup", "File"),
-                    new TreeNode<ICommandItem>(CommandItems["Exit"]))
+                //File
+                    new TreeNode<ICommandItem>(new CommandGroup("FileGroup", "File"),
+                    new TreeNode<ICommandItem>(new CommandSeparator("CloseSeparator")),
+                    new TreeNode<ICommandItem>(new CommandSeparator("SaveSeparator")),
+                        new TreeNode<ICommandItem>(CommandItems["Exit"])),
+
+                //Windows
+                 new TreeNode<ICommandItem>(new CommandGroup("WindowsGroup", "Windows"))
             };
 
-            Editor.MenuNodes.Add(_menuNodes);
+            Editor.MenuNodes.Add(m_menuNodes);
         }
 
         protected override void OnUninitialize()
         {
-
         }
 
         protected override void OnShutdown()
@@ -57,18 +61,13 @@ namespace BrunoFramework.Editor.Units
 
         private void RemoveMenus()
         {
-            Editor.MenuNodes.Remove(_menuNodes);
-            _menuNodes.Clear();
+            Editor.MenuNodes.Remove(m_menuNodes);
+            m_menuNodes.Clear();
         }
 
         private void RemoveCommands()
         {
             CommandItems.Clear();
-        }
-
-        public override EditorDockableTabViewModel GetDockTabViewModel(string dockId)
-        {
-            return null;
         }
     }
 }

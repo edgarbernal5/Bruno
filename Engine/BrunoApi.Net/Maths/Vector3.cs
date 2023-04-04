@@ -222,6 +222,24 @@ namespace BrunoApi.Net.Maths
             return normal;
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Min", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Min(ref Vector3 vector1, ref Vector3 vector2);
+
+        public static Vector3 Min(Vector3 vector1, Vector3 vector2)
+        {
+            Internal_Min(ref vector1, ref vector2);
+            return vector1;
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_Max", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_Max(ref Vector3 vector1, ref Vector3 vector2);
+
+        public static Vector3 Max(Vector3 vector1, Vector3 vector2)
+        {
+            Internal_Max(ref vector1, ref vector2);
+            return vector1;
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Vector3_UnaryNegation", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_UnaryNegation(ref Vector3 vector);
 

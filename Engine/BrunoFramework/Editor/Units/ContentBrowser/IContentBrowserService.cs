@@ -5,5 +5,8 @@ namespace BrunoFramework.Editor.Units
     {
         ContentBrowser ContentBrowser { get; set; }
         ContentBrowserViewModel ViewModel { get; }
+
+        void Load(string rootDirectory);
+        void Search(string keyword);
     }
 }

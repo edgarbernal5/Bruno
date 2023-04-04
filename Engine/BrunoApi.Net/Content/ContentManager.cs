@@ -1,9 +1,10 @@
 ﻿
-using Bruno.Interop;
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using BrunoApi.Net.Graphics;
+using BrunoApi.Net.IO;
+using Bruno.Interop;
 
 namespace BrunoApi.Net.Content
 {
@@ -25,6 +26,16 @@ namespace BrunoApi.Net.Content
             : base()
         {
             m_nativePointer = Internal_Ctor2(device.NativePointer, rootDirectory);
+        }
+
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "ContentManager_Ctor3", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        private static extern IntPtr Internal_Ctor3(IntPtr device, IntPtr storage);
+
+        public ContentManager(GraphicsDevice device, IStorage storage)
+            : base()
+        {
+            m_nativePointer = Internal_Ctor3(device.NativePointer, storage.NativePointer);
         }
 
 
@@ -50,7 +61,6 @@ namespace BrunoApi.Net.Content
         {
             if (disposing)
             {
-
             }
         }
     }

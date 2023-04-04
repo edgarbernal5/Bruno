@@ -61,7 +61,7 @@ namespace BrunoEngine
 		void WantItem(BuildItem* item);
 		void ReverseWantedItems(int fromIndex);
 		BuildItem* PopWantedItem();
-		friend class BuildCoordinator;
+		friend class GameContentBuilder;
 
 
 	private:
@@ -78,8 +78,6 @@ namespace BrunoEngine
 
 		std::map<BuildRequest*, BuildItem*, Compare_P> m_requestTable;
 		std::map<std::string, BuildItem*> m_outputFilenameTable;
-
-
 	};
 
 }

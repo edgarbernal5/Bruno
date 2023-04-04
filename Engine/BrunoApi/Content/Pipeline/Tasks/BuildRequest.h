@@ -33,7 +33,7 @@ namespace BrunoEngine
 
 		BuildRequest& operator= (const BuildRequest&) = default;
 
-		friend class BuildCoordinator;
+		friend class GameContentBuilder;
 		friend class BuildItemCollection;
 		friend class BasicContentProcessorContext;
 

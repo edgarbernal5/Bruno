@@ -55,6 +55,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BindableCollection.cs" />
     <Compile Include="Boxed.cs" />
     <Compile Include="Categories.cs" />
     <Compile Include="Converters\EnumToArrayConverter.cs" />

@@ -4,7 +4,7 @@
 
 #include "Stream.h"
 
-namespace TrioIO
+namespace BrunoIO
 {
 	class BRUNO_API_EXPORT MemoryStream : public Stream
 	{

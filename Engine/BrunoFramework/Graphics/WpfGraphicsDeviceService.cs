@@ -43,7 +43,10 @@ namespace BrunoFramework.Graphics
 
         public void RemoveRef(IntPtr windowHandle)
         {
+            if (!m_isReadyByHwnd.ContainsKey(windowHandle)) return;
 
+            m_graphicsDevice.RemoveHwnd(windowHandle);
+            m_isReadyByHwnd.Remove(windowHandle);
         }
     }
 }

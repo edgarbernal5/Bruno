@@ -7,16 +7,19 @@ using BrunoApi.Net.Content.Tasks;
 using BrunoApi.Net.Game;
 using BrunoApi.Net.Graphics;
 using System.Linq;
-using System.Collections.Specialized;
 using BrunoFramework.Editor.Game.Gizmos;
 using BrunoFramework.Editor.Timing;
-using BrunoFramework.Editor.Game.Inspectors;
+using BrunoFramework.Editor.Game.Properties;
 using System.ComponentModel;
 using System;
+using BrunoApi.Net.IO;
+using BrunoFramework.Graphics.Data;
+using System.Collections.Generic;
+using Bruno.Linq;
 
 namespace BrunoFramework.Editor.Game
 {
-    public class SceneDocument : Document
+    public class SceneDocument : Document, IWorldOutlineHandler
     {
         public Scene Scene
         {
@@ -29,7 +32,7 @@ namespace BrunoFramework.Editor.Game
         }
         private Scene m_scene;
 
-        public GizmoService GizmoService
+        public IGizmoService GizmoService
         {
             get => m_gizmoService;
             set
@@ -38,114 +41,168 @@ namespace BrunoFramework.Editor.Game
                 NotifyOfPropertyChange();
             }
         }
-        private GizmoService m_gizmoService;
+        private IGizmoService m_gizmoService;
 
+        public Camera Camera
+        {
+            get => m_camera;
+            set
+            {
+                m_camera = value;
+                m_gizmoService.Camera = m_camera;
+                NotifyOfPropertyChange();
+            }
+        }
+        private Camera m_camera;
+
+        public WorldOutline WorldOutline => m_worldOutline;
         private WorldOutline m_worldOutline;
-        private ContentBrowser m_contentBrowser;
-        private IWorldOutlineService m_outlineService;
-        private IInspectorService m_inspectorService;
-        private IContentBrowserService m_contentBrowserService;
 
-        public SceneDocument(IEditorService editor, DocumentType documentFileType) 
+        private IWorldOutlineService m_outlineService;
+        private IPropertiesService m_propertiesService;
+        private IDocumentService m_documentService;
+
+        public SceneDocument(IEditorService editor, DocumentType documentFileType)
             : base(editor, documentFileType)
         {
             m_outlineService = Editor.Services.GetInstance<IWorldOutlineService>();
-            m_inspectorService = Editor.Services.GetInstance<IInspectorService>();
-            m_contentBrowserService = Editor.Services.GetInstance<IContentBrowserService>();
+            m_propertiesService = Editor.Services.GetInstance<IPropertiesService>();
+            m_documentService = Editor.Services.GetInstance<IDocumentService>();
 
-            m_worldOutline = new WorldOutline();
-            var objectSelector = new ObjectSelector(m_worldOutline);
-
-            m_contentBrowser = new ContentBrowser();
+            m_worldOutline = new WorldOutline(this);
 
             var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
+            var objectSelector = new ObjectSelector(m_worldOutline);
             var gizmoService = new GizmoService(graphicsDevice, objectSelector, Editor.Services.GetInstance<GameStepTimer>());
             gizmoService.CurrentGizmo = GizmoType.Translation;
             GizmoService = gizmoService;
 
-            editor.ActiveDocumentChanged += Editor_ActiveDocumentChanged;
+            editor.ActiveItemChanged += OnEditorActiveItemChanged;
         }
 
-        private void Editor_ActiveDocumentChanged(object sender, EventArgs eventArgs)
+        private void OnEditorActiveItemChanged(object sender, EventArgs eventArgs)
         {
+            if (m_documentService.ActiveDocument == this)
+            {
+                if (m_outlineService != null)
+                {
+                    m_outlineService.WorldOutline = m_worldOutline;
 
+                    UpdateProperties();
+                }
+            }
+        }
+
+
+        public void DeleteObjects(List<long> entities)
+        {
+            if (entities.Count == 0) return;
+
+            var items = m_worldOutline.RootItems.Concat(m_worldOutline.RootItems.SelectMany(x => x.GetDescendants((y) => y.Children, true)))
+                .Where(item => entities.Contains(item.Id)).ToList();
+
+            foreach (var item in items)
+            {
+                m_worldOutline.RemoveItem(item);
+                m_scene.RemoveEntity(item.Id);
+            }
+
+            IsModified = true;
         }
 
         protected override void OnDisposing(bool disposing)
         {
             if (disposing)
             {
-                Editor.ActiveDocumentChanged -= Editor_ActiveDocumentChanged;
+                m_worldOutline.RootItems.Clear();
+                m_worldOutline.SelectedItems.Clear();
+
+                m_worldOutline.Dispose();
+
+                Editor.ActiveItemChanged -= OnEditorActiveItemChanged;
             }
+            base.OnDisposing(disposing);
         }
 
         private void UpdateWorldOutline()
         {
+            DisposeWorldOutline();
+
+            PopulateHierarchyFromScene();
+
+            if (m_documentService.ActiveDocument == this)
+            {
+                m_outlineService.WorldOutline = m_worldOutline;
+            }
+        }
+
+        private void DisposeWorldOutline()
+        {
             if (m_worldOutline != null)
             {
-                m_worldOutline.SelectedItems.CollectionChanged -= OnWorldOutlineSelectionChanged;
-                m_worldOutline.Dispose();
-
+                //m_worldOutline.SelectedItems.Clear();
                 m_worldOutline.RootItems.Clear();
-                m_worldOutline.SelectedItems.Clear();
             }
-            
-            PopulateHierarchyFromScene();
-            m_worldOutline.SelectedItems.CollectionChanged += OnWorldOutlineSelectionChanged;
-
-            //TODO: hacer esto si y solo si es el documento activo (pestaña)
-            m_outlineService.WorldOutline = m_worldOutline;
         }
 
-        private void UpdateContentBrowser(string rootDirectory)
+        public void SelectionChanged()
         {
-            if (m_contentBrowser != null)
-            {
-                m_contentBrowser.Dispose();
-                m_contentBrowser.Clear();
-            }
-            PopulateContentBrowser(rootDirectory);
-
-            //TODO: hacer esto si y solo si es el documento activo (pestaña) (ver si aplica)
-            m_contentBrowserService.ContentBrowser = m_contentBrowser;
-        }
-
-        private void PopulateContentBrowser(string rootDirectory)
-        {
-            if (string.IsNullOrEmpty(rootDirectory))
-            {
-                return;
-            }
-
-            var populate = new ContentBrowserPopulate(m_contentBrowser, new FileSystemStorage(rootDirectory));
-            populate.Execute();
-        }
-
-        private void OnWorldOutlineSelectionChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
-        {
-            if (m_worldOutline == null || m_inspectorService == null)
+            if (m_worldOutline == null || m_propertiesService == null)
                 return;
 
             if (m_outlineService.WorldOutline != m_worldOutline)
                 return;
 
             m_gizmoService.IsActive = m_worldOutline.SelectedItems.Count > 0;
-            if (m_worldOutline.SelectedItems.Count > 0)
+            if (m_worldOutline.SelectedItems.Count == 0)
+            {
+                m_propertiesService.SelectedObject = PropertiesObjectBuilder.Empty;
+            }
+            else
             {
                 var entityId = m_worldOutline.SelectedItems[0].Id;
                 var editorObject = m_worldOutline.SelectedItems[0].CustomData as IEditorObject;
 
-                //bool savedNotifiying = customData.IsNotifying;
-                //customData.IsNotifying = false;
+                var customData = m_worldOutline.SelectedItems[0].CustomData as WorldOutlineData;
+                bool savedNotifiying = customData.IsNotifying;
+                customData.IsNotifying = false;
                 SetSceneTransformFor(entityId, editorObject);
 
-                //customData.IsNotifying = savedNotifiying;
+                customData.IsNotifying = savedNotifiying;
 
-                m_gizmoService.SetTransformableAsSelected(editorObject);
+                m_gizmoService.SetEditorObjectAsSelected(editorObject);
 
-                m_inspectorService.SelectedObject = new InspectableObjectBuilder()
+                m_propertiesService.SelectedObject = new PropertiesObjectBuilder()
                     .WithObjectProperties(editorObject, x => true)
-                    .ToInspectableObject();
+                    .ToPropertiesObject();
+            }
+        }
+
+        public void AddEmptyObject(string name)
+        {
+            var entity = Scene.AddEmptyObject(name);
+            var itemInHierarchy = Scene.GetHierarchyForEntity(entity);
+
+            var outlineItem = CreateOutlineItem(entity, itemInHierarchy.parentId, name);
+            CreateAndSetCustomData(name, outlineItem, itemInHierarchy);
+
+            m_worldOutline.RootItems.Add(outlineItem);
+            IsModified = true;
+        }
+
+        private void UpdateProperties()
+        {
+            if (m_worldOutline.SelectedItems.Count == 0)
+            {
+                m_propertiesService.SelectedObject = PropertiesObjectBuilder.Empty;
+            }
+            else
+            {
+                var editorObject = m_worldOutline.SelectedItems[0].CustomData as IEditorObject;
+
+                m_propertiesService.SelectedObject = new PropertiesObjectBuilder()
+                    .WithObjectProperties(editorObject, x => true)
+                    .ToPropertiesObject();
             }
         }
 
@@ -213,55 +270,79 @@ namespace BrunoFramework.Editor.Game
 
         private void CreateAndSetCustomData(string name, WorldOutlineItem outlineItem, Scene.HierarchyComponentBridge entity)
         {
-            var customData = new WorldOutlineData();
+            var customData = new WorldOutlineData(outlineItem);
             customData.Name = name;
-            customData.Owner = outlineItem;
 
             SetSceneTransformFor(entity.id, customData);
 
-            customData.PropertyChanged += CustomData_PropertyChanged;
+            customData.PropertyChanged += OnCustomDataPropertyChanged;
 
             if ((entity.componentsMask & 16) != 0)
             {
-                var boundingBoxExtents = m_scene.GetBoundingBoxForEntity(entity.id);
-                customData.SetObjectExtents(boundingBoxExtents.Center, boundingBoxExtents.Extents);
+                var boundingBox = m_scene.GetBoundingBoxForEntity(entity.id);
+
+                customData.SetObjectExtents(boundingBox.Center, boundingBox.Extents);
             }
 
             outlineItem.CustomData = customData;
         }
 
-        private void CustomData_PropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
+        private void OnCustomDataPropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
         {
             if (eventArgs.PropertyName == nameof(WorldOutlineData.LocalPosition))
             {
                 var customData = sender as WorldOutlineData;
 
                 m_scene.TransformSetLocalPosition(customData.Owner.Id, customData.LocalPosition);
-                m_scene.Update(); //hacer un update de solo los componentes involucrados?
+                m_scene.TransformUpdate(customData.Owner.Id);
+                //m_scene.Update();
 
+                IsModified = true;
                 if (m_worldOutline.SelectedItems.Count > 0)
                 {
-                    var id = m_worldOutline.SelectedItems[0].Id;
-                    var sceneTransform = m_scene.GetSceneTransformFor(id);
+                    var sceneTransform = m_scene.GetSceneTransformFor(customData.Owner.Id);
 
                     customData.WorldMatrix = sceneTransform.WorldMatrix;
-                    m_gizmoService.SetTransformableAsSelected(customData);
+                    m_gizmoService.UpdateSelectedObject(customData);
                 }
             }
             else if (eventArgs.PropertyName == nameof(WorldOutlineData.LocalScale))
             {
                 var customData = sender as WorldOutlineData;
                 m_scene.TransformSetLocalScale(customData.Owner.Id, customData.LocalScale);
+                m_scene.TransformUpdate(customData.Owner.Id);
+
+                IsModified = true;
+                if (m_worldOutline.SelectedItems.Count > 0)
+                {
+                    var sceneTransform = m_scene.GetSceneTransformFor(customData.Owner.Id);
+
+                    customData.WorldMatrix = sceneTransform.WorldMatrix;
+                    m_gizmoService.UpdateSelectedObject(customData);
+                }
             }
             else if (eventArgs.PropertyName == nameof(WorldOutlineData.LocalRotation))
             {
                 var customData = sender as WorldOutlineData;
 
                 m_scene.TransformSetLocalRotation(customData.Owner.Id, customData.LocalRotation);
-                m_scene.Update();
+                m_scene.TransformUpdate(customData.Owner.Id);
 
-                var sceneTransform = m_scene.GetSceneTransformFor(customData.Owner.Id);
-                customData.WorldMatrix = sceneTransform.WorldMatrix;
+                IsModified = true;
+                if (m_worldOutline.SelectedItems.Count > 0)
+                {
+                    var sceneTransform = m_scene.GetSceneTransformFor(customData.Owner.Id);
+                    customData.WorldMatrix = sceneTransform.WorldMatrix;
+
+                    m_gizmoService.UpdateSelectedObject(customData);
+                }
+            }
+            else if (eventArgs.PropertyName == nameof(WorldOutlineData.Name))
+            {
+                var customData = sender as WorldOutlineData;
+                m_scene.NameForEntity(customData.Owner.Id, customData.Name);
+
+                IsModified = true;
             }
         }
 
@@ -286,27 +367,29 @@ namespace BrunoFramework.Editor.Game
         protected override void OnNew()
         {
             Scene = new Scene();
+
             UpdateWorldOutline();
-            UpdateContentBrowser(string.Empty);
+            UpdateProperties();
         }
 
         protected override void OnLoad(string filename)
         {
-            var settings = new BuildCoordinatorSettings();
-            settings.RootDirectory = Path.GetDirectoryName(filename);
+            var settings = new GameContentBuilderSettings();
+            settings.RootDirectory = Path.GetDirectoryName(filename);//HACK: TODO
 
-            var buildCoordinator = new BuildCoordinator(settings);
+            var gameContentBuilder = new GameContentBuilder(settings);
 
-            settings = buildCoordinator.Settings;
+            settings = gameContentBuilder.Settings;
 
-            var assetNamePath = buildCoordinator.GetRelativePath(filename);
+            var fileSystemStorage = new FileSystemStorage(settings.OutputDirectory);
+            var assetNamePath = gameContentBuilder.GetRelativePath(filename);
 
-            buildCoordinator.RequestBuild(filename, assetNamePath, "ModelImporter", "ModelProcessor");
-            buildCoordinator.RunTheBuild();
-            buildCoordinator.Dispose();
+            gameContentBuilder.RequestBuild(filename, assetNamePath, "ModelImporter", "ModelProcessor");
+            gameContentBuilder.RunTheBuild();
+            gameContentBuilder.Dispose();
 
             var graphicsDevice = Editor.Services.GetInstance<IGraphicsService>().GraphicsDevice;
-            ContentManager contentManager = new ContentManager(graphicsDevice, settings.OutputDirectory);
+            var contentManager = new ContentManager(graphicsDevice, fileSystemStorage);
 
             var model = contentManager.Load<Model>(assetNamePath);
 
@@ -314,12 +397,11 @@ namespace BrunoFramework.Editor.Game
             m_scene.LoadFromModel(model);
 
             UpdateWorldOutline();
-            UpdateContentBrowser(settings.RootDirectory);
+            UpdateProperties();
         }
 
         protected override void OnSave()
         {
-
         }
 
         public override DocumentViewModel CreateViewModel()

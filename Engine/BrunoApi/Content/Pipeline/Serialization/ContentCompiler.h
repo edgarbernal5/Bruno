@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace TrioIO
+namespace BrunoIO
 {
 	class Stream;
 }
@@ -23,7 +23,7 @@ namespace BrunoEngine
 		ContentCompiler();
 		~ContentCompiler();
 
-		void Compile(TrioIO::Stream *stream, ContentItem *object, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath);
+		void Compile(BrunoIO::Stream *stream, ContentItem *object, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath);
 
 		ContentTypeWriter* GetTypeWriter(std::string name, std::vector<std::string> &dependencies);
 	private:

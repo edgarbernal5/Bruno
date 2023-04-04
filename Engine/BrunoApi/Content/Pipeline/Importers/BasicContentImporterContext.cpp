@@ -2,14 +2,14 @@
 #include "BasicContentImporterContext.h"
 
 #include "Content/Pipeline/Tasks/BuildItem.h"
-#include "Content/Pipeline/Tasks/BuildCoordinator.h"
+#include "Content/Pipeline/Tasks/GameContentBuilder.h"
 #include "Content/Pipeline/Tasks/BuildRequest.h"
 //#include "Content/Pipeline/Processors/ProcessorManager.h"
 //#include "Content/Pipeline/Processors/IContentProcessor.h"
 
 namespace BrunoEngine
 {
-	BasicContentImporterContext::BasicContentImporterContext(BuildCoordinator *buildCoordinator, BuildItem *buildItem) :
+	BasicContentImporterContext::BasicContentImporterContext(GameContentBuilder *buildCoordinator, BuildItem *buildItem) :
 		m_buildCoordinator(buildCoordinator),
 		m_buildItem(buildItem)
 	{

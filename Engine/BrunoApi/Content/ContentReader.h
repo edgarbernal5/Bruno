@@ -13,7 +13,7 @@
 #include "Content/ContentTypeReader.h"
 //#include "Content/ContentTypeReaderManager.h"
 
-namespace TrioIO
+namespace BrunoIO
 {
 	class Stream;
 }
@@ -23,13 +23,13 @@ namespace BrunoEngine
 	//class ContentTypeReader;
 	class ContentManager;
 
-	class BRUNO_API_EXPORT ContentReader : public TrioIO::BinaryReader
+	class BRUNO_API_EXPORT ContentReader : public BrunoIO::BinaryReader
 	{
 	public:
-		ContentReader(ContentManager* contentManager, TrioIO::Stream *stream, std::string assetName);
+		ContentReader(ContentManager* contentManager, BrunoIO::Stream *stream, std::string assetName);
 		~ContentReader();
 
-		static ContentReader* Create(ContentManager* contentManager, TrioIO::Stream *stream, std::string assetName);
+		static ContentReader* Create(ContentManager* contentManager, BrunoIO::Stream *stream, std::string assetName);
 
 		Vector2 ReadVector2();
 		Vector3 ReadVector3();
@@ -58,11 +58,11 @@ namespace BrunoEngine
 		ContentManager* m_contentManager;
 		std::string m_assetName;
 
-		TrioIO::Stream* m_stream;
+		BrunoIO::Stream* m_stream;
 		std::vector<class ContentTypeReader*> m_typeReaders;
 		std::vector<std::vector<std::function<void(ContentItem*)> > > m_sharedResourceFixups;
 
-		static void PrepareStream(TrioIO::Stream *input);
+		static void PrepareStream(BrunoIO::Stream *input);
 		uint32_t ReadHeader();
 
 		template <class T>

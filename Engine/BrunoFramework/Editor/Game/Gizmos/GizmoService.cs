@@ -7,19 +7,21 @@ using System;
 using BrunoApi.Net.Graphics;
 using BrunoApi.Net.Maths;
 using BrunoApi.Net.Graphics.Core;
+using Bruno.Logging;
 
 namespace BrunoFramework.Editor.Game.Gizmos
 {
     public class GizmoService : IGizmoService
     {
-        public const float GIZMO_SCREEN_SCALE = 0.1f;
+        private static readonly ILog Logger = Bruno.Logging.Logger.GetLog();
+
+        public const float GIZMO_SCREEN_SCALE = 0.075f;
         public const float GIZMO_SIZE_CLIP_SPACE = 2.3f;
         public const float CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS = 60.0f;
 
         private const float MULTI_AXIS_THICKNESS = 0.05f;
         private const float SINGLE_AXIS_THICKNESS = 0.35f;
         private GizmoConfig m_gizmoConfig;
-        private GizmoSnappingConfig m_gizmoSnappingConfig;
 
         private Vector3 m_translationScaleSnapDelta;
 
@@ -94,8 +96,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
         {
             get
             {
-                var min = Vector3.Zero;
-                var max = new Vector3(m_gizmoConfig.GIZMO_LENGTH, SINGLE_AXIS_THICKNESS, SINGLE_AXIS_THICKNESS);
+                var min = new Vector3(m_gizmoConfig.LINE_OFFSET, -SINGLE_AXIS_THICKNESS * 0.5f, -SINGLE_AXIS_THICKNESS * 0.5f);
+                var max = new Vector3(m_gizmoConfig.GIZMO_LENGTH, SINGLE_AXIS_THICKNESS * 0.5f, SINGLE_AXIS_THICKNESS * 0.5f);
 
                 return new BoundingBox((max + min) * 0.5f,
                                        (max - min) * 0.5f);
@@ -106,8 +108,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
         {
             get
             {
-                var min = Vector3.Zero;
-                var max = new Vector3(SINGLE_AXIS_THICKNESS, m_gizmoConfig.GIZMO_LENGTH, SINGLE_AXIS_THICKNESS);
+                var min = new Vector3(-SINGLE_AXIS_THICKNESS * 0.5f, m_gizmoConfig.LINE_OFFSET, -SINGLE_AXIS_THICKNESS * 0.5f);
+                var max = new Vector3(SINGLE_AXIS_THICKNESS * 0.5f, m_gizmoConfig.GIZMO_LENGTH, SINGLE_AXIS_THICKNESS * 0.5f);
 
                 return new BoundingBox((max + min) * 0.5f,
                                        (max - min) * 0.5f);
@@ -118,7 +120,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
         {
             get
             {
-                var min = Vector3.Zero;
+                var min = new Vector3(-SINGLE_AXIS_THICKNESS * 0.5f, -SINGLE_AXIS_THICKNESS * 0.5f, m_gizmoConfig.LINE_OFFSET);
                 var max = new Vector3(SINGLE_AXIS_THICKNESS, SINGLE_AXIS_THICKNESS, m_gizmoConfig.GIZMO_LENGTH);
 
                 return new BoundingBox((max + min) * 0.5f,
@@ -177,8 +179,23 @@ namespace BrunoFramework.Editor.Game.Gizmos
         public bool SnapEnabled { get => m_snapEnabled; set => m_snapEnabled = value; }
         private bool m_snapEnabled;
 
-        public bool PrecisionModeEnabled { get => m_precisionModeEnabled; set => m_precisionModeEnabled = value; }
+        public bool PrecisionModeEnabled
+        {
+            get => m_precisionModeEnabled;
+            set => m_precisionModeEnabled = value;
+        }
         private bool m_precisionModeEnabled;
+
+        public TransformSpace TransformSpace
+        {
+            get => m_transformSpace;
+            set => m_transformSpace = value;
+        }
+
+        public GizmoSnappingConfig SnappingConfig => m_gizmoSnappingConfig;
+        private GizmoSnappingConfig m_gizmoSnappingConfig;
+
+        private TransformSpace m_transformSpace = TransformSpace.World;
 
         private class SelectionState
         {
@@ -187,7 +204,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
             public float m_screenScaleFactor, m_invScreenScaleFactor;
             public Matrix m_screenScaleMatrix;
 
-            public Matrix m_gizmoWorld;
+            public Matrix m_gizmoObjectOrientedWorld;
+            public Matrix m_gizmoAxisAlignedWorld;
 
             public Matrix m_rotationMatrix;
 
@@ -195,12 +213,13 @@ namespace BrunoFramework.Editor.Game.Gizmos
             public Vector2 m_prevMousePosition;
 
             public Plane m_currentGizmoPlane;
+            public Matrix m_objectRotation;
         }
         private SelectionState m_selectionState;
 
-        public event Action<ITransformableObject, Vector3> OnTranslationChanged;
-        public event Action<ITransformableObject, Vector3, bool> OnScaleChanged;
-        public event Action<ITransformableObject, Quaternion> OnRotateChanged;
+        public event Action<ITransformableObject, Vector3> TranslationChanged;
+        public event Action<ITransformableObject, Vector3, bool> ScaleChanged;
+        public event Action<ITransformableObject, Quaternion> RotateChanged;
 
         public GizmoService(GraphicsDevice graphicsService, ObjectSelector objectSelector, GameStepTimer gameStepTimer)
         {
@@ -232,19 +251,19 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
             m_selectionState = new SelectionState();
             m_selectionState.m_rotationMatrix = Matrix.Identity;
-            m_selectionState.m_gizmoWorld = Matrix.Identity;
+            m_selectionState.m_gizmoObjectOrientedWorld = Matrix.Identity;
+            m_selectionState.m_gizmoAxisAlignedWorld = Matrix.Identity;
             m_selectionState.m_screenScaleMatrix = Matrix.Identity;
         }
 
         private GizmoAxis GetAxis(Vector2 mousePosition)
         {
-            var closestintersection = float.MaxValue;
-            var ray = ConvertMousePositionToRay(mousePosition);
-
+            var closestIntersection = float.MaxValue;
             var selectedAxis = GizmoAxis.None;
 
-            var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoWorld);
+            var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoObjectOrientedWorld);
 
+            var ray = ConvertMousePositionToRay(mousePosition);
             ray.Direction = Vector3.TransformNormal(ray.Direction, gizmoWorldInverse);
             ray.Position = Vector3.Transform(ray.Position, gizmoWorldInverse);
 
@@ -253,63 +272,63 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 float? intersection = XAxisBox.Intersects(ray);
                 if (intersection.HasValue)
                 {
-                    if (intersection.Value < closestintersection)
+                    if (intersection.Value < closestIntersection)
                     {
                         selectedAxis = GizmoAxis.X;
-                        closestintersection = intersection.Value;
+                        closestIntersection = intersection.Value;
                     }
                 }
                 intersection = YAxisBox.Intersects(ray);
                 if (intersection.HasValue)
                 {
-                    if (intersection.Value < closestintersection)
+                    if (intersection.Value < closestIntersection)
                     {
                         selectedAxis = GizmoAxis.Y;
-                        closestintersection = intersection.Value;
+                        closestIntersection = intersection.Value;
                     }
                 }
 
                 intersection = ZAxisBox.Intersects(ray);
                 if (intersection.HasValue)
                 {
-                    if (intersection.Value < closestintersection)
+                    if (intersection.Value < closestIntersection)
                     {
                         selectedAxis = GizmoAxis.Z;
-                        closestintersection = intersection.Value;
+                        closestIntersection = intersection.Value;
                     }
                 }
 
                 if (m_currentGizmoType == GizmoType.Translation)
                 {
-                    if (closestintersection >= float.MaxValue)
-                        closestintersection = float.MinValue;
+                    if (closestIntersection >= float.MaxValue)
+                        closestIntersection = float.MinValue;
 
                     intersection = XYBox.Intersects(ray);
                     if (intersection.HasValue)
                     {
-                        if (intersection.Value > closestintersection)
+                        if (intersection.Value > closestIntersection)
                         {
                             selectedAxis = GizmoAxis.XY;
-                            closestintersection = intersection.Value;
+                            closestIntersection = intersection.Value;
                         }
                     }
 
                     intersection = XZAxisBox.Intersects(ray);
                     if (intersection.HasValue)
                     {
-                        if (intersection.Value > closestintersection)
+                        if (intersection.Value > closestIntersection)
                         {
                             selectedAxis = GizmoAxis.XZ;
-                            closestintersection = intersection.Value;
+                            closestIntersection = intersection.Value;
                         }
                     }
                     intersection = YZBox.Intersects(ray);
                     if (intersection.HasValue)
                     {
-                        if (intersection.Value > closestintersection)
+                        if (intersection.Value > closestIntersection)
                         {
                             selectedAxis = GizmoAxis.YZ;
-                            closestintersection = intersection.Value;
+                            closestIntersection = intersection.Value;
                         }
                     }
                 }
@@ -318,10 +337,10 @@ namespace BrunoFramework.Editor.Game.Gizmos
                     intersection = XYZBox.Intersects(ray);
                     if (intersection.HasValue)
                     {
-                        if (intersection.Value < closestintersection)
+                        if (intersection.Value < closestIntersection)
                         {
                             selectedAxis = GizmoAxis.XYZ;
-                            closestintersection = intersection.Value;
+                            closestIntersection = intersection.Value;
                         }
                     }
                 }
@@ -344,51 +363,113 @@ namespace BrunoFramework.Editor.Game.Gizmos
                         }
                         else
                         {
-                            if (intersection.Value < closestintersection)
+                            if (intersection.Value < closestIntersection)
                             {
-                                m_selectionState.m_intersectionPosition = Vector3.Normalize(positionOnPlane);
-                                m_selectionState.m_prevIntersectionPosition = Vector3.Zero;
                                 currentPointOnPlane = positionOnPlane;
-                                selectedAxis = ((GizmoAxis)(i + 1));
-                                //Console.WriteLine("selected = " + selectedAxis);
-                                closestintersection = intersection.Value;
+                                closestIntersection = intersection.Value;
+
+                                selectedAxis = (GizmoAxis)(i + 1);
                             }
                         }
                     }
                 }
+
                 if (selectedAxis != GizmoAxis.None)
                 {
-                    if (currentPointOnPlane.Length() < m_gizmoConfig.GIZMO_LENGTH * 0.8f) selectedAxis = GizmoAxis.XYZ;
+                    if (currentPointOnPlane.Length() < m_gizmoConfig.GIZMO_LENGTH * 0.8f)
+                    {
+                        selectedAxis = GizmoAxis.XYZ;
+                    }
                 }
             }
 
-            if (closestintersection >= float.MaxValue || closestintersection <= float.MinValue)
+            if (closestIntersection >= float.MaxValue || closestIntersection <= float.MinValue)
                 selectedAxis = GizmoAxis.None;
 
             return selectedAxis;
         }
 
-        public bool Begin(Vector2 mousePosition)
+        public bool BeginDrag(Vector2 mousePosition)
         {
             if (m_currentGizmoType == GizmoType.None || !m_isActive)
                 return false;
 
             var selectedAxis = GetAxis(mousePosition);
             m_currentGizmoAxis = selectedAxis;
-
-            SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
-
             m_currentDelta = Vector3.Zero;
-            m_selectionState.m_prevIntersectionPosition = Vector3.Zero;
 
-            return m_currentGizmoAxis != GizmoAxis.None;
+            if (m_currentGizmoAxis == GizmoAxis.None)
+                return false;
+
+            if (m_currentGizmoType == GizmoType.Translation || m_currentGizmoType == GizmoType.Scale)
+                SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
+
+            if (GetAxisIntersectionPoint(mousePosition, out Vector3 intersectionPoint))
+            {
+                m_selectionState.m_prevMousePosition = mousePosition;
+                m_selectionState.m_prevIntersectionPosition = intersectionPoint;
+            }
+
+            return true;
+        }
+
+        private bool GetAxisIntersectionPoint(Vector2 mousePosition, out Vector3 intersectionPoint)
+        {
+            intersectionPoint = Vector3.Zero;
+            if (m_currentGizmoType == GizmoType.None || !m_isActive)
+                return false;
+
+            if (m_currentGizmoType == GizmoType.Translation || m_currentGizmoType == GizmoType.Scale)
+            {
+                var gizmoWorldInverse = Matrix.Transpose(m_selectionState.m_rotationMatrix);
+
+                var ray = ConvertMousePositionToRay(mousePosition);
+                ray.Direction = Vector3.TransformNormal(ray.Direction, gizmoWorldInverse);
+                ray.Position = Vector3.Transform(ray.Position, gizmoWorldInverse);
+
+                SetGizmoHandlePlaneFor(m_currentGizmoAxis, ray);
+
+                var intersection = ray.Intersects(m_selectionState.m_currentGizmoPlane);
+                if (intersection.HasValue)
+                {
+                    intersectionPoint = ray.Position + (ray.Direction * intersection.Value);
+                    return true;
+                }
+            }
+            else
+            {
+                if (m_currentGizmoAxis == GizmoAxis.XYZ)
+                {
+                    return true;
+                }
+
+                var planeNormals = new Vector3[] { m_selectionState.m_rotationMatrix.Right, m_selectionState.m_rotationMatrix.Up, m_selectionState.m_rotationMatrix.Forward };
+                
+                int planeIndex = ((int)m_currentGizmoAxis) - 1;
+                var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoAxisAlignedWorld);
+
+                var ray = ConvertMousePositionToRay(mousePosition);
+                ray.Direction = Vector3.TransformNormal(ray.Direction, gizmoWorldInverse);
+                ray.Position = Vector3.Transform(ray.Position, gizmoWorldInverse);
+
+                var plane = new Plane(planeNormals[planeIndex], 0);
+
+                var intersection = ray.Intersects(plane);
+
+                if (intersection.HasValue)
+                {
+                    intersectionPoint = Vector3.Normalize(ray.Position + (ray.Direction * intersection.Value));
+                    return true;
+                }
+
+            }
+
+            return false;
         }
 
         private void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, Ray ray)
         {
             var toLocal = Matrix.Transpose(m_selectionState.m_rotationMatrix);
-            ray.Position = Vector3.Transform(ray.Position, toLocal);
-            ray.Direction = Vector3.TransformNormal(ray.Direction, toLocal);
 
             var gizmoPositionInLocal = Vector3.Transform(m_selectionState.m_gizmoPosition, toLocal);
             var plane = new Plane();
@@ -414,11 +495,12 @@ namespace BrunoFramework.Editor.Game.Gizmos
                         cameraToGizmo = Vector3.TransformNormal(cameraToGizmo, toLocal);
 
                         int axisIndex = (int)selectedAxis - 1;
+
                         var perpendicularRayVector = Vector3.Cross(unaryDirections[axisIndex], cameraToGizmo);
                         perpendicularRayVector = Vector3.Cross(unaryDirections[axisIndex], perpendicularRayVector);
                         perpendicularRayVector.Normalize();
-                        var gizmoPositionToLocal = Vector3.Transform(m_selectionState.m_gizmoPosition, toLocal);
-                        var newD = Vector3.Dot(perpendicularRayVector, gizmoPositionToLocal);
+
+                        var newD = -Vector3.Dot(perpendicularRayVector, gizmoPositionInLocal);
 
                         plane = new Plane(perpendicularRayVector, newD);
                     }
@@ -437,18 +519,21 @@ namespace BrunoFramework.Editor.Game.Gizmos
                     break;
             }
 
-            //Console.WriteLine(string.Format("selected plane normal = {0}; Axis = {1}", plane.Normal, selectedAxis.ToString()));
+            //Logger.Debug(string.Format("selected plane normal = {0}; Axis = {1}", plane.Normal, selectedAxis.ToString()));
             m_selectionState.m_currentGizmoPlane = plane;
         }
 
         private void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, Vector2 mousePosition)
         {
             var ray = ConvertMousePositionToRay(mousePosition);
+            var toLocal = Matrix.Invert(m_selectionState.m_rotationMatrix);
+            ray.Position = Vector3.Transform(ray.Position, toLocal);
+            ray.Direction = Vector3.TransformNormal(ray.Direction, toLocal);
 
             SetGizmoHandlePlaneFor(selectedAxis, ray);
         }
 
-        public void UpdateGizmo(Vector2 mousePosition)
+        public void Drag(Vector2 mousePosition)
         {
             switch (m_currentGizmoType)
             {
@@ -459,15 +544,15 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
                         translationDelta = Vector3.Transform(translationDelta, m_selectionState.m_rotationMatrix);
 
-                        SetGizmoPosition(translationDelta);
+                        //SetGizmoPosition(translationDelta);
 
                         if (translationDelta != Vector3.Zero)
                         {
-                            if (OnTranslationChanged != null)
+                            if (TranslationChanged != null)
                             {
                                 for (int i = 0; i < m_objectSelector.SelectedObjects.Count; i++)
                                 {
-                                    OnTranslationChanged(m_objectSelector.SelectedObjects[i], translationDelta);
+                                    TranslationChanged(m_objectSelector.SelectedObjects[i], translationDelta);
                                 }
                             }
                         }
@@ -479,11 +564,11 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
                         if (rotationDelta != Quaternion.Identity)
                         {
-                            if (OnRotateChanged != null)
+                            if (RotateChanged != null)
                             {
                                 for (int i = 0; i < m_objectSelector.SelectedObjects.Count; i++)
                                 {
-                                    OnRotateChanged(m_objectSelector.SelectedObjects[i], rotationDelta);
+                                    RotateChanged(m_objectSelector.SelectedObjects[i], rotationDelta);
                                 }
                             }
                         }
@@ -500,11 +585,11 @@ namespace BrunoFramework.Editor.Game.Gizmos
                             {
                                 m_axisGizmoScaleRenderer.UpdateGizmoLength(m_currentGizmoAxis, scaleDelta);
                             }
-                            if (OnScaleChanged != null)
+                            if (ScaleChanged != null)
                             {
                                 for (int i = 0; i < m_objectSelector.SelectedObjects.Count; i++)
                                 {
-                                    OnScaleChanged(m_objectSelector.SelectedObjects[i], scaleDelta, m_currentGizmoAxis == GizmoAxis.XYZ);
+                                    ScaleChanged(m_objectSelector.SelectedObjects[i], scaleDelta, m_currentGizmoAxis == GizmoAxis.XYZ);
                                 }
                             }
                         }
@@ -522,13 +607,13 @@ namespace BrunoFramework.Editor.Game.Gizmos
             if (SnapEnabled)
             {
                 var snapValue = m_currentGizmoType == GizmoType.Scale ?
-                    m_gizmoSnappingConfig.SCALE_SNAP : 
-                    m_gizmoSnappingConfig.TRANSLATION_SNAP;
+                    m_gizmoSnappingConfig.Scale : 
+                    m_gizmoSnappingConfig.Translation;
                 
                 if (PrecisionModeEnabled)
                 {
-                    delta *= m_gizmoSnappingConfig.PRECISION_SCALE;
-                    snapValue *= m_gizmoSnappingConfig.PRECISION_SCALE;
+                    delta *= m_gizmoSnappingConfig.PrecisionScale;
+                    snapValue *= m_gizmoSnappingConfig.PrecisionScale;
                 }
                 m_translationScaleSnapDelta += delta;
 
@@ -540,13 +625,13 @@ namespace BrunoFramework.Editor.Game.Gizmos
             }
             else if (PrecisionModeEnabled)
             {
-                delta *= m_gizmoSnappingConfig.PRECISION_SCALE;
+                delta *= m_gizmoSnappingConfig.PrecisionScale;
             }
 
             return delta;
         }
 
-        public void SetGizmoAxisOverMousePosition(Vector2 mousePosition)
+        public void OnMouseMove(Vector2 mousePosition)
         {
             var selectedAxis = GetAxis(mousePosition);
             if (selectedAxis == GizmoAxis.None)
@@ -608,43 +693,33 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         private Quaternion GetRotationDelta(Vector2 mousePosition)
         {
-            if (m_selectionState.m_prevIntersectionPosition == Vector3.Zero)
-            {
-                m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
-                return Quaternion.Identity;
-            }
-            m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
-
-            Quaternion rotationDelta = Quaternion.Identity;
+            var rotationDelta = Quaternion.Identity;
             if (m_currentGizmoAxis == GizmoAxis.XYZ)
             {
-                if (m_selectionState.m_prevMousePosition != Vector2.Zero)
-                {
-                    var gizmoScreenPosition = GetScreenPosition(m_selectionState.m_gizmoPosition);
-                    var gizmoScreenPosition2 = GetScreenPosition(m_selectionState.m_gizmoPosition + Vector3.Right * m_gizmoConfig.GIZMO_LENGTH);
-                    var length = 3.0f * (gizmoScreenPosition2 - gizmoScreenPosition).Length() / MathHelper.TwoPi;
-                    var deltaAngles = new Vector2(1.0f / length);
+                var gizmoScreenPosition = GetScreenPosition(m_selectionState.m_gizmoPosition);
+                var gizmoScreenPosition2 = GetScreenPosition(m_selectionState.m_gizmoPosition + m_camera.View.Right * m_gizmoConfig.GIZMO_LENGTH);
+                var length = 3.0f * (gizmoScreenPosition2 - gizmoScreenPosition).Length() / MathHelper.TwoPi;
+                var deltaAngles = new Vector2(1.0f / length);
 
-                    var mouseVelocity = new Vector2(mousePosition.X - m_selectionState.m_prevMousePosition.X, mousePosition.Y - m_selectionState.m_prevMousePosition.Y);
+                var mouseVelocity = new Vector2(mousePosition.X - m_selectionState.m_prevMousePosition.X, mousePosition.Y - m_selectionState.m_prevMousePosition.Y);
 
-                    var angles = mouseVelocity * deltaAngles;
+                var angles = mouseVelocity * deltaAngles;
 
-                    rotationDelta = Quaternion.CreateFromYawPitchRoll(angles.X, 0, 0) * Quaternion.CreateFromYawPitchRoll(0, angles.Y, 0);
-                }
+                rotationDelta = Quaternion.CreateFromYawPitchRoll(angles.X, 0, 0) * Quaternion.CreateFromYawPitchRoll(0, angles.Y, 0);
             }
             else
             {
-                var planeNormals = new Vector3[] { Vector3.Right, Vector3.Up, Vector3.Forward };
-                var upNormals = new Vector3[] { Vector3.Right, Vector3.Up, Vector3.Forward };
+                var planeNormals = new Vector3[] { m_selectionState.m_rotationMatrix.Right, m_selectionState.m_rotationMatrix.Up, m_selectionState.m_rotationMatrix.Forward };
                 int planeIndex = ((int)m_currentGizmoAxis) - 1;
 
-                var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoWorld);
+                var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoAxisAlignedWorld);
 
-                Ray ray = ConvertMousePositionToRay(mousePosition);
+                var ray = ConvertMousePositionToRay(mousePosition);
                 ray.Direction = Vector3.TransformNormal(ray.Direction, gizmoWorldInverse);
                 ray.Position = Vector3.Transform(ray.Position, gizmoWorldInverse);
 
                 var plane = new Plane(planeNormals[planeIndex], 0);
+
                 var intersection = ray.Intersects(plane);
 
                 float delta = 0.0f;
@@ -662,14 +737,11 @@ namespace BrunoFramework.Editor.Game.Gizmos
                     var perpendicularVector = Vector3.Cross(m_selectionState.m_prevIntersectionPosition, newIntersectionPoint);
                     perpendicularVector.Normalize();
 
-                    var sign = Vector3.Dot(perpendicularVector, upNormals[planeIndex]) < 0.0f ? -1.0f : 1.0f;
+                    var sign = Vector3.Dot(perpendicularVector, planeNormals[planeIndex]) < 0.0f ? -1.0f : 1.0f;
 
+                    //Logger.Debug("positionOnPlane = {0}, sign = {1}, angle = {2}, ray.position = {3}", positionOnPlane, sign, angle, ray.Position);
                     delta = sign * angle;
                     //delta *= (float)m_gameTimer.ElapsedTime.TotalSeconds;
-                    //delta *= m_selectionState.m_invScreenScaleFactor;
-                    //delta = NaN; acosAngle = 0.9999999; dotP = 0.9999999; point= {X = 0; Y = 0.4902804; Z = 0.8715647}
-
-                    Console.WriteLine("delta = " + delta + "; acosAngle = " + acosAngle + "; dotP = " + dotP + "; point= " + newIntersectionPoint);
                 }
 
                 switch (m_currentGizmoAxis)
@@ -687,43 +759,17 @@ namespace BrunoFramework.Editor.Game.Gizmos
             }
 
             m_selectionState.m_prevMousePosition = mousePosition;
+            m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
             return rotationDelta;
-        }
-
-        float? IntersectRayPlane(Ray ray, Plane plane)
-        {
-            float numer = Vector3.Dot(plane.Normal, ray.Position) + plane.D;
-            float denom = Vector3.Dot(plane.Normal, ray.Direction);
-
-            if (Math.Abs(denom) < float.Epsilon)
-            {
-                return null;
-            }
-            return new float?(-(numer / denom));
         }
 
         private Vector3 GetDeltaMovement(Vector2 mousePosition)
         {
             Vector3 delta = Vector3.Zero;
-            var ray = ConvertMousePositionToRay(mousePosition);
-
-            var toLocal = Matrix.Transpose(m_selectionState.m_rotationMatrix);
-            ray.Position = Vector3.Transform(ray.Position, toLocal);
-            ray.Direction = Vector3.TransformNormal(ray.Direction, toLocal);
-
-            SetGizmoHandlePlaneFor(m_currentGizmoAxis, ray);
-
-            var plane = m_selectionState.m_currentGizmoPlane;
-            //var intersection = ray.Intersects(plane);
-            var intersection = IntersectRayPlane(ray, plane);
-
-            if (intersection.HasValue)
+            if (GetAxisIntersectionPoint(mousePosition, out Vector3 intersectionPoint))
             {
-                m_selectionState.m_intersectionPosition = ray.Position + (ray.Direction * Math.Abs(intersection.Value));
-                if (m_selectionState.m_prevIntersectionPosition != Vector3.Zero)
-                {
-                    m_currentDelta = m_selectionState.m_intersectionPosition - m_selectionState.m_prevIntersectionPosition;
-                }
+                m_selectionState.m_intersectionPosition = intersectionPoint;
+                m_currentDelta = intersectionPoint - m_selectionState.m_prevIntersectionPosition;
 
                 if (m_currentGizmoAxis == GizmoAxis.X || m_currentGizmoAxis == GizmoAxis.XY || m_currentGizmoAxis == GizmoAxis.XZ || m_currentGizmoAxis == GizmoAxis.XYZ)
                 {
@@ -746,7 +792,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         private void SetGizmoPosition(Vector3 translationDelta)
         {
-            Vector3 selectionPosition = Vector3.Zero;
+            var selectionPosition = Vector3.Zero;
 
             switch (m_pivotType)
             {
@@ -766,8 +812,10 @@ namespace BrunoFramework.Editor.Game.Gizmos
             m_selectionState.m_gizmoPosition = selectionPosition;
         }
 
-        public void End()
+        public void EndDrag()
         {
+            OnMouseMove(m_selectionState.m_prevMousePosition);
+
             m_selectionState.m_prevIntersectionPosition = Vector3.Zero;
             m_selectionState.m_intersectionPosition = Vector3.Zero;
             m_selectionState.m_prevMousePosition = Vector2.Zero;
@@ -777,6 +825,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
             {
                 m_axisGizmoScaleRenderer.RestoreGizmo(m_currentGizmoAxis, m_gizmoConfig.LINE_LENGTH);
             }
+
             Update();
         }
 
@@ -801,13 +850,12 @@ namespace BrunoFramework.Editor.Game.Gizmos
             Vector3 nearPoint = new Vector3(mousePosition, 0.0f);
             Vector3 farPoint = new Vector3(mousePosition, 1.0f);
 
-            var viewport = m_graphicsDevice.Viewport;
-            nearPoint = viewport.Unproject(nearPoint,
+            nearPoint = m_camera.Viewport.Unproject(nearPoint,
                                                 m_camera.Projection,
                                                 m_camera.View,
                                                 Matrix.Identity);
 
-            farPoint = viewport.Unproject(farPoint,
+            farPoint = m_camera.Viewport.Unproject(farPoint,
                                             m_camera.Projection,
                                             m_camera.View,
                                             Matrix.Identity);
@@ -820,9 +868,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
         private Vector2 GetScreenPosition(Vector3 worldPosition)
         {
-            var viewport = m_graphicsDevice.Viewport;
-
-            var point = viewport.Project(worldPosition,
+            var point = m_camera.Viewport.Project(worldPosition,
                                                 m_camera.Projection,
                                                 m_camera.View,
                                                 Matrix.Identity);
@@ -830,61 +876,17 @@ namespace BrunoFramework.Editor.Game.Gizmos
             return new Vector2(point.X, point.Y);
         }
 
-        private float GetSegmentLengthClipSpace(Vector3 start, Vector3 end)
-        {
-            var viewport = m_graphicsDevice.Viewport;
-
-            var startOfSegment = start;
-            var mvp = m_selectionState.m_gizmoWorld * m_camera.ViewProjection;
-
-            startOfSegment=viewport.Project(startOfSegment, m_camera.Projection, m_camera.View, m_selectionState.m_gizmoWorld);
-            //startOfSegment = Vector3.Transform(startOfSegment, mvp);
-            //if ((float)Math.Abs(startOfSegment.W) > 0.0001f) // check for axis aligned with camera direction
-            //{
-            //    startOfSegment.X *= 1.0f / startOfSegment.W;
-            //    startOfSegment.Y *= 1.0f / startOfSegment.W;
-            //    startOfSegment.Z *= 1.0f / startOfSegment.W;
-            //    startOfSegment.W *= 1.0f / startOfSegment.W;
-            //}
-
-            var endOfSegment = end;
-            //endOfSegment = Vector3.Transform(endOfSegment, mvp);
-            endOfSegment = viewport.Project(endOfSegment, m_camera.Projection, m_camera.View, m_selectionState.m_gizmoWorld);
-            //if ((float)Math.Abs(endOfSegment.W) > 0.0001f) // check for axis aligned with camera direction
-            //{
-            //    endOfSegment.X *= 1.0f / endOfSegment.W;
-            //    endOfSegment.Y *= 1.0f / endOfSegment.W;
-            //    endOfSegment.Z *= 1.0f / endOfSegment.W;
-            //    endOfSegment.W *= 1.0f / endOfSegment.W;
-            //}
-
-            var clipSpaceAxis = endOfSegment - startOfSegment;
-            clipSpaceAxis.X = (clipSpaceAxis.X - viewport.X) * 2.0f / viewport.Width-1.0f;
-            clipSpaceAxis.Y = (clipSpaceAxis.Y - viewport.Y) * 2.0f / viewport.Height - 1.0f;
-            //vector.X = (vector.X + 1f) * 0.5f * (float)this.Width + (float)this.X;
-            //vector.Y = (-vector.Y + 1f) * 0.5f * (float)this.Height + (float)this.Y;
-
-            clipSpaceAxis.Y /= m_camera.AspectRatio;
-
-            return (float)Math.Sqrt(clipSpaceAxis.X * clipSpaceAxis.X + clipSpaceAxis.Y * clipSpaceAxis.Y);
-        }
-
-        private Vector3 ToClipSpace(Vector2 screenPosition, Viewport viewport)
-        {
-            Vector3 result = Vector3.Zero;
-
-            result.X = (screenPosition.X - viewport.X) * 2.0f / viewport.Width - 1.0f;
-            result.Y = -((screenPosition.Y - viewport.Y) * 2.0f / viewport.Height - 1.0f);
-            return result;
-        }
-
         private void Update()
         {
             if (m_camera == null) return;
 
             var gizmoPositionViewSpace = Vector3.Transform(m_selectionState.m_gizmoPosition, m_camera.View);
-
             m_selectionState.m_screenScaleFactor = Math.Abs(gizmoPositionViewSpace.Z) * GIZMO_SCREEN_SCALE;
+            
+            //m_selectionState.m_screenScaleFactor = gizmoPositionViewSpace.Length() * GIZMO_SCREEN_SCALE;
+            //float scale = (float)Math.Tan(m_camera.FieldOfView * 0.5f) * (m_camera.Position - m_selectionState.m_gizmoPosition).Length() * 2.0f;
+            //m_selectionState.m_screenScaleFactor = scale * GIZMO_SCREEN_SCALE;
+
             if (m_selectionState.m_screenScaleFactor < 0.0001f)
             {
                 m_selectionState.m_invScreenScaleFactor = 1.0f;
@@ -893,10 +895,10 @@ namespace BrunoFramework.Editor.Game.Gizmos
             {
                 m_selectionState.m_invScreenScaleFactor = 1.0f / m_selectionState.m_screenScaleFactor;
             }
-            //m_selectionState.m_screenScaleMatrix = Matrix.Identity;
+
             m_selectionState.m_screenScaleMatrix = Matrix.CreateScale(new Vector3(m_selectionState.m_screenScaleFactor));
 
-            if (m_objectSelector.SelectedObjects.Count < 1)
+            if (m_objectSelector.SelectedObjects.Count == 0)
             {
                 return;
             }
@@ -906,8 +908,17 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 m_currentGizmoType == GizmoType.Rotation)
             {
                 var world = Matrix.Identity;
-                m_selectionState.m_gizmoWorld = m_selectionState.m_screenScaleMatrix *
+
+                if (m_transformSpace == TransformSpace.Local)
+                {
+                    world = m_selectionState.m_objectRotation;
+                }
+
+                m_selectionState.m_gizmoObjectOrientedWorld = m_selectionState.m_screenScaleMatrix *
                                                         Matrix.CreateWorld(m_selectionState.m_gizmoPosition, world.Forward, world.Up);
+
+                m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_screenScaleMatrix *
+                                                        Matrix.CreateWorld(m_selectionState.m_gizmoPosition, Vector3.Forward, Vector3.Up);
 
                 m_selectionState.m_rotationMatrix.Forward = world.Forward;
                 m_selectionState.m_rotationMatrix.Up = world.Up;
@@ -926,73 +937,15 @@ namespace BrunoFramework.Editor.Game.Gizmos
                 localRight.Normalize();
                 localUp.Normalize();
 
-                m_selectionState.m_gizmoWorld = m_selectionState.m_screenScaleMatrix *
+                m_selectionState.m_gizmoObjectOrientedWorld = m_selectionState.m_screenScaleMatrix *
                                                         Matrix.CreateWorld(m_selectionState.m_gizmoPosition, localForward, localUp);
+
+                m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_gizmoObjectOrientedWorld;
 
                 m_selectionState.m_rotationMatrix.Forward = localForward;
                 m_selectionState.m_rotationMatrix.Up = localUp;
                 m_selectionState.m_rotationMatrix.Right = localRight;
             }
-            //const float GIZMO_SIZE_IN_PIXELS = 60.0f;
-            //var originWS = m_selectionState.m_gizmoPosition;
-            //var viewport = m_graphicsDevice.Viewport;
-
-            //var originSS = viewport.Project(originWS, m_camera.Projection, m_camera.View, Matrix.Identity);
-
-            ////var viewInverse = Matrix.Invert(m_camera.View);
-            ////var gizmoWorldInverse = Matrix.Invert(m_selectionState.m_gizmoWorld);
-            ////var rightInverseNormalized = viewInverse.Right;
-            ////rightInverseNormalized.Normalize();
-            ////var rightViewInverse = Vector3.TransformNormal(rightInverseNormalized, gizmoWorldInverse);
-
-            //var targetRightSS = viewport.Project(originWS + Vector3.UnitX, m_camera.Projection, m_camera.View, Matrix.Identity);
-
-            //var directionRight = (targetRightSS - originSS).ToVector2();
-            //directionRight.Normalize();
-            //var positions = new Vector3[6];
-
-            //var originClip = ToClipSpace(originSS.ToVector2(), viewport);
-            //var rightClip = ToClipSpace(originSS.ToVector2() + (directionRight * GIZMO_SIZE_IN_PIXELS), viewport);
-            //positions[0] = originClip;
-            //positions[1] = rightClip;
-            //var targetUpSS = viewport.Project(originWS + Vector3.UnitY, m_camera.Projection, m_camera.View, Matrix.Identity);
-
-            //var directionUp = (targetUpSS - originSS).ToVector2();
-            //directionUp.Normalize();
-            //var upClip = ToClipSpace(originSS.ToVector2() + (directionUp * GIZMO_SIZE_IN_PIXELS), viewport);
-            //positions[2] = originClip;
-            //positions[3] = upClip;
-
-
-            //var targetForwardSS = viewport.Project(originWS + Vector3.UnitZ, m_camera.Projection, m_camera.View, Matrix.Identity);
-            //var directionForward = (targetForwardSS - originSS).ToVector2();
-            //directionForward.Normalize();
-
-            //var forwardClip = ToClipSpace(originSS.ToVector2() + (directionForward * GIZMO_SIZE_IN_PIXELS), viewport);
-            //positions[4] = originClip;
-            //positions[5] = forwardClip;
-
-            //m_axisGizmoTranslationRenderer.SetLinePositions(positions);
-            //for (int i = 0; i < 3; i++)
-            //{
-            //    var rightInverseNormalized = (i==0 ? viewInverse.Right : (i ==1?viewInverse.Up:viewInverse.Forward));
-            //    rightInverseNormalized.Normalize();
-            //    var rightViewInverse = Vector3.TransformNormal(rightInverseNormalized, gizmoWorldInverse);
-
-            //    //var rightViewInverse = Vector4.Transform(new Vector4(rightInverseNormalized, viewInverse.M14), gizmoWorldInverse);
-            //    //rightViewInverse = Vector4.Transform(rightViewInverse, gizmoWorldInverse);
-
-            //    float rightLength = GetSegmentLengthClipSpace(Vector3.Zero, rightViewInverse);
-            //    float screenFactor = GIZMO_SIZE_CLIP_SPACE / rightLength;
-
-            //    var axis = unaryDirections[i];
-            //    Vector3 p1 = GetPositionInClipSpace(axis * 0.1f * screenFactor);
-            //    Vector3 p2 = GetPositionInClipSpace(axis * screenFactor);
-
-            //    positions[i * 2] = p1;
-            //    positions[i * 2 + 1] = p2;
-            //}
-            //m_axisGizmoTranslationRenderer.SetLinePositions(positions);
 
             //var gizmoPositionViewSpace = Vector3.Transform(m_selectionState.m_gizmoPosition, Matrix.Invert(m_camera.View));
             //https://es.wikipedia.org/wiki/Tangente_(trigonometr%C3%ADa)
@@ -1002,15 +955,9 @@ namespace BrunoFramework.Editor.Game.Gizmos
             //m_selectionState.m_screenScaleFactor = 1.0f;
         }
 
-        private Vector3 GetPositionInClipSpace(Vector3 position)
-        {
-            var inClip = Vector3.Transform(position, m_selectionState.m_gizmoWorld * m_camera.ViewProjection);
-            return inClip;
-        }
-
         public void Render(RenderContext renderContext)
         {
-            //RenderCameraGizmo(renderContext);
+            RenderCameraGizmo(renderContext);
             if (m_currentGizmoType == GizmoType.None || !m_isActive)
                 return;
 
@@ -1018,15 +965,15 @@ namespace BrunoFramework.Editor.Game.Gizmos
             switch (m_currentGizmoType)
             {
                 case GizmoType.Translation:
-                    m_axisGizmoTranslationRenderer.SetWorld(m_selectionState.m_gizmoWorld);
+                    m_axisGizmoTranslationRenderer.SetWorld(m_selectionState.m_gizmoObjectOrientedWorld);
                     m_axisGizmoTranslationRenderer.Render(renderContext);
                     break;
                 case GizmoType.Rotation:
-                    AxisGizmoRotationRenderer.SetWorld(m_selectionState.m_gizmoWorld);
+                    AxisGizmoRotationRenderer.SetWorld(m_selectionState.m_gizmoObjectOrientedWorld);
                     AxisGizmoRotationRenderer.Render(renderContext);
                     break;
                 case GizmoType.Scale:
-                    m_axisGizmoScaleRenderer.SetWorld(m_selectionState.m_gizmoWorld);
+                    m_axisGizmoScaleRenderer.SetWorld(m_selectionState.m_gizmoObjectOrientedWorld);
                     m_axisGizmoScaleRenderer.Render(renderContext);
                     break;
                 default:
@@ -1042,7 +989,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
             var viewport = new Viewport(renderContext.GameSurfaceTarget.Width - CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS, 0, CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS, CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS);
             renderContext.Viewport = viewport;
             renderContext.GraphicsDevice.Viewport = viewport;
-            m_sceneGizmoCamera.AspectRatio = viewport.AspectRatio;
+            m_sceneGizmoCamera.Viewport = viewport;
             m_sceneGizmoCamera.FieldOfView = m_camera.FieldOfView;
 
             var cameraOrientation = Matrix.CreateFromQuaternion(Quaternion.CreateFromMatrix(sceneCamera.View));
@@ -1059,11 +1006,20 @@ namespace BrunoFramework.Editor.Game.Gizmos
             renderContext.GraphicsDevice.Viewport = savedViewport;
         }
 
-        public void SetTransformableAsSelected(IEditorObject editorObject)
+        public void SetEditorObjectAsSelected(IEditorObject editorObject)
         {
             m_selectionState.m_gizmoPosition = editorObject.WorldMatrix.Translation;
+            m_selectionState.m_objectRotation = Matrix.CreateFromQuaternion(editorObject.LocalRotation);
 
             m_objectSelector.Select(editorObject);
+            Update();
+        }
+
+        public void UpdateSelectedObject(IEditorObject editorObject)
+        {
+            m_selectionState.m_gizmoPosition = editorObject.WorldMatrix.Translation; //TODO: hay que ver si esto eaplica cuando se seleccionen mas de un objeto
+            m_selectionState.m_objectRotation = Matrix.CreateFromQuaternion(editorObject.LocalRotation);
+
             Update();
         }
 
@@ -1074,13 +1030,12 @@ namespace BrunoFramework.Editor.Game.Gizmos
             m_objectSelector.Select(selectionRay);
             if (m_objectSelector.SelectedObjects.Count > 0)
             {
-
             }
         }
 
         public ITransformableObject GetSelectedObject()
         {
-            if (m_objectSelector.SelectedObjects.Count == 0) return null;
+            if (m_objectSelector.SelectedObjects.Count == 0) return default;
 
             return m_objectSelector.SelectedObjects[0];
         }

@@ -3,7 +3,7 @@
 
 #include "Stream.h"
 
-namespace TrioIO
+namespace BrunoIO
 {
 	BinaryReader::BinaryReader(Stream* stream) :
 		m_stream(stream),

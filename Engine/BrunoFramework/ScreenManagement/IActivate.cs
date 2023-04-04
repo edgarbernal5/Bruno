@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BrunoFramework
 {
@@ -7,7 +9,7 @@ namespace BrunoFramework
     {
         bool IsActive { get; }
 
-        void Activate();
+        Task ActivateAsync(CancellationToken cancellationToken = default);
 
         event EventHandler<ActivationEventArgs> Activated;
     }

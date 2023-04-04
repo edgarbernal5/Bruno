@@ -250,6 +250,14 @@ namespace BrunoApi.Net.Graphics
             Internal_PresentHWND(m_nativePointer, hwndHost);
         }
 
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_RemoveHwnd", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_RemoveHwnd(IntPtr device, IntPtr hwnd);
+
+        public void RemoveHwnd(IntPtr hwnd)
+        {
+            Internal_RemoveHwnd(m_nativePointer, hwnd);
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "GraphicsDevice_Reset", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Reset(IntPtr device, PresentationParameters parameters);
 

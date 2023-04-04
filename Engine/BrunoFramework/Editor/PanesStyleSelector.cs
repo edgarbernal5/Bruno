@@ -14,7 +14,7 @@ namespace BrunoFramework.Editor
 
 		public override System.Windows.Style SelectStyle(object item, System.Windows.DependencyObject container)
 		{
-			if (item is EditorDockableTabViewModel)
+			if (item is EditorDockTabViewModel)
 				return EditorDockableTabStyle;
 
 			return base.SelectStyle(item, container);

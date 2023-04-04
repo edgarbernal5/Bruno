@@ -82,6 +82,16 @@ namespace BrunoApi.Net.Maths
             return quaternion1;
         }
 
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Quaternion_SumTwoQuats", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_SumTwoQuats(ref Quaternion quaternion1, ref Quaternion quaternion2);
+
+        public static Quaternion operator +(Quaternion quaternion1, Quaternion quaternion2)
+        {
+            Internal_SumTwoQuats(ref quaternion1, ref quaternion2);
+            return quaternion1;
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Quaternion_Normalize", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_Normalize(ref Quaternion quaternion);
 

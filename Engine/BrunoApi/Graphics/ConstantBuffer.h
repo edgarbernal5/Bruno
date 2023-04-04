@@ -28,7 +28,8 @@ namespace BrunoEngine
 		template <typename T>
 		void SetData(const T& data, int offsetInBytes);
 
-		void SetData();
+		template <typename T>
+		void SetData(const T& data);
 
 #ifdef BRUNO_DIRECTX
 		void Apply(ShaderStage stage, int slot);
@@ -46,6 +47,7 @@ namespace BrunoEngine
 
 	private:
 		void Initialize();
+		void SetInternalData();
 
 		std::vector<ConstantBufferField> m_bufferFields;
 		GraphicsDevice* m_device;
@@ -105,5 +107,33 @@ namespace BrunoEngine
 #endif
 	}
 
-	
+	template <typename T>
+	void ConstantBuffer::SetData(const T& data)
+	{
+#if BRUNO_DIRECTX
+		if (m_buffer == nullptr)
+		{
+			Initialize();
+		}
+		//Mejorar esto.
+		uint32_t elementSizeInBytes = sizeof(T);
+		D3D11_MAPPED_SUBRESOURCE resource;
+
+		m_device->GetD3DDeviceContext()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+
+		memcpy(resource.pData, &data, elementSizeInBytes);
+
+		m_device->GetD3DDeviceContext()->Unmap(m_buffer, 0);
+#elif BRUNO_OPENGL
+		//if (m_buffer == 0)
+		//{
+		//	Initialize();
+		//}
+
+		//glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
+		//glBufferSubData(GL_UNIFORM_BUFFER, offsetInBytes, sizeof(T), (&data));
+		//
+		//glBindBuffer(GL_UNIFORM_BUFFER, 0);
+#endif
+	}
 }

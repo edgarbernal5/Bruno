@@ -38,14 +38,15 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AvalonDock, Version=4.60.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dirkster.AvalonDock.4.60.0\lib\net40\AvalonDock.dll</HintPath>
+    <Reference Include="AvalonDock, Version=4.60.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dirkster.AvalonDock.4.60.1\lib\net40\AvalonDock.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -61,7 +62,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BootstrapperBase.cs" />
+    <Compile Include="Commands\AsyncCommand.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
+    <Compile Include="Commands\IAsyncCommand.cs" />
     <Compile Include="Commands\IDelegateCommand.cs" />
     <Compile Include="Editor\ActiveDocumentConverter.cs" />
     <Compile Include="Editor\CommandsItems\CommandGroup.cs" />
@@ -73,7 +76,7 @@
     <Compile Include="Editor\CommandsItems\Menu Items\MenuItemViewModelCollection.cs" />
     <Compile Include="Editor\CommandsItems\Menu Items\MenuSeparatorViewModel.cs" />
     <Compile Include="Editor\CommandsItems\MenuManager.cs" />
-    <Compile Include="Editor\EditorDockableTabViewModel.cs" />
+    <Compile Include="Editor\EditorDockTabViewModel.cs" />
     <Compile Include="Editor\EditorUnit.cs" />
     <Compile Include="Editor\EditorUnitCollection.cs" />
     <Compile Include="Editor\EditorException.cs" />
@@ -89,33 +92,33 @@
     <Compile Include="Editor\Game\Gizmos\GizmosHandlerBehavior.cs" />
     <Compile Include="Editor\Game\Gizmos\IGizmoService.cs" />
     <Compile Include="Editor\Game\Gizmos\ObjectSelector.cs" />
-    <Compile Include="Editor\Game\Inspectors\BoundPropertyDescriptor.cs" />
-    <Compile Include="Editor\Game\Inspectors\Controls\InspectorItemTemplateSelector.cs" />
-    <Compile Include="Editor\Game\Inspectors\Conventions\DefaultPropertyInspectors.cs" />
-    <Compile Include="Editor\Game\Inspectors\Conventions\PropertyEditorBuilder.cs" />
-    <Compile Include="Editor\Game\Inspectors\Conventions\StandardPropertyEditorBuilder.cs" />
-    <Compile Include="Editor\Game\Inspectors\Converters\QuaternionToEulerAngles.cs" />
-    <Compile Include="Editor\Game\Inspectors\InspectorEditorBase.cs" />
-    <Compile Include="Editor\Game\Inspectors\ExpressionUtility.cs" />
-    <Compile Include="Editor\Game\Inspectors\IInspectorEditor.cs" />
-    <Compile Include="Editor\Game\Inspectors\IInspectableObject.cs" />
-    <Compile Include="Editor\Game\Inspectors\IInspector.cs" />
-    <Compile Include="Editor\Game\Inspectors\ILabelledInspector.cs" />
-    <Compile Include="Editor\Game\Inspectors\InspectorBase.cs" />
-    <Compile Include="Editor\Game\Inspectors\InspectorBuilder.cs" />
-    <Compile Include="Editor\Game\Inspectors\InspectorView.xaml.cs">
-      <DependentUpon>InspectorView.xaml</DependentUpon>
+    <Compile Include="Editor\Game\Properties\BoundPropertyDescriptor.cs" />
+    <Compile Include="Editor\Game\Properties\Controls\PropertiesItemTemplateSelector.cs" />
+    <Compile Include="Editor\Game\Properties\Conventions\DefaultPropertyInspectors.cs" />
+    <Compile Include="Editor\Game\Properties\Conventions\PropertyEditorBuilder.cs" />
+    <Compile Include="Editor\Game\Properties\Conventions\StandardPropertyEditorBuilder.cs" />
+    <Compile Include="Editor\Game\Properties\Converters\QuaternionToEulerAngles.cs" />
+    <Compile Include="Editor\Game\Properties\PropertiesEditorBase.cs" />
+    <Compile Include="Editor\Game\Properties\ExpressionUtility.cs" />
+    <Compile Include="Editor\Game\Properties\IPropertiesEditor.cs" />
+    <Compile Include="Editor\Game\Properties\IPropertiesObject.cs" />
+    <Compile Include="Editor\Game\Properties\IProperties.cs" />
+    <Compile Include="Editor\Game\Properties\ILabelledProperties.cs" />
+    <Compile Include="Editor\Game\Properties\PropertiesBase.cs" />
+    <Compile Include="Editor\Game\Properties\PropertiesBuilder.cs" />
+    <Compile Include="Editor\Game\Properties\PropertiesView.xaml.cs">
+      <DependentUpon>PropertiesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Game\Inspectors\InspectorViewModel.cs" />
-    <Compile Include="Editor\Game\Inspectors\QuaternionEditorViewModel.cs" />
-    <Compile Include="Editor\Game\Inspectors\TextBoxEditorView.xaml.cs">
+    <Compile Include="Editor\Game\Properties\PropertiesViewModel.cs" />
+    <Compile Include="Editor\Game\Properties\QuaternionEditorViewModel.cs" />
+    <Compile Include="Editor\Game\Properties\TextBoxEditorView.xaml.cs">
       <DependentUpon>TextBoxEditorView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Game\Inspectors\TextBoxEditorViewModel.cs" />
-    <Compile Include="Editor\Game\Inspectors\Vector3EditorView.xaml.cs">
+    <Compile Include="Editor\Game\Properties\TextBoxEditorViewModel.cs" />
+    <Compile Include="Editor\Game\Properties\Vector3EditorView.xaml.cs">
       <DependentUpon>Vector3EditorView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Game\Inspectors\Vector3EditorViewModel.cs" />
+    <Compile Include="Editor\Game\Properties\Vector3EditorViewModel.cs" />
     <Compile Include="Editor\Game\Interaction\CameraArcBallBehavior.cs" />
     <Compile Include="Editor\Game\Interaction\CameraHandToolBehavior.cs" />
     <Compile Include="Editor\Game\Interaction\CameraZoomBehavior.cs" />
@@ -125,7 +128,9 @@
     </Compile>
     <Compile Include="Editor\Game\Scene\SceneDocumentViewModel.cs" />
     <Compile Include="Editor\Game\Screens\EmptyGameGraphicsScreen.cs" />
+    <Compile Include="Editor\Game\World\IWorldOutlineHandlers.cs" />
     <Compile Include="Editor\Game\World\IWorldOutlineService.cs" />
+    <Compile Include="Editor\Game\World\IWorldOutlineView.cs" />
     <Compile Include="Editor\Game\World\WorldOutline.cs" />
     <Compile Include="Editor\Game\World\WorldOutlineData.cs" />
     <Compile Include="Editor\Game\World\WorldOutlineItem.cs" />
@@ -134,6 +139,7 @@
       <DependentUpon>WorldOutlineView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Editor\Game\World\WorldOutlineViewModel.cs" />
+    <Compile Include="Editor\IEditorDockTab.cs" />
     <Compile Include="Editor\IEditorService.cs" />
     <Compile Include="Editor\LayoutInitializer.cs" />
     <Compile Include="Editor\PanesStyleSelector.cs" />
@@ -141,22 +147,35 @@
     <Compile Include="Editor\Timing\GameStepTimer.cs" />
     <Compile Include="Editor\Timing\GameTime.cs" />
     <Compile Include="Editor\Units\Builder\BuilderUnit.cs" />
+    <Compile Include="Editor\Units\Console\ConsoleUnit.cs" />
+    <Compile Include="Editor\Units\Console\ConsoleView.xaml.cs">
+      <DependentUpon>ConsoleView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Units\Console\ConsoleViewModel.cs" />
+    <Compile Include="Editor\Units\Console\IConsoleService.cs" />
+    <Compile Include="Editor\Units\Console\IConsoleView.cs" />
     <Compile Include="Editor\Units\ContentBrowser\ContentBrowser.cs" />
     <Compile Include="Editor\Units\ContentBrowser\ContentBrowserFileList.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserFileTree.cs" />
     <Compile Include="Editor\Units\ContentBrowser\ContentBrowserItem.cs" />
-    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserPopulate.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserPopulateService.cs" />
+    <Compile Include="Editor\Units\ContentBrowser\ContentBrowserTreeItem.cs" />
     <Compile Include="Editor\Units\ContentBrowser\ContentBrowserUnit.cs" />
     <Compile Include="Editor\Units\ContentBrowser\ContentBrowserView.xaml.cs">
       <DependentUpon>ContentBrowserView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Editor\Units\ContentBrowser\ContentBrowserViewModel.cs" />
-    <Compile Include="Editor\Units\ContentBrowser\FileSystemStorage.cs" />
     <Compile Include="Editor\Units\ContentBrowser\IContentBrowserService.cs" />
-    <Compile Include="Editor\Units\ContentBrowser\IStorage.cs" />
-    <Compile Include="Editor\Units\ContentBrowser\StorageBase.cs" />
+    <Compile Include="Editor\Units\Documents\Dialogs\SaveChangesDialogResult.cs" />
+    <Compile Include="Editor\Units\Documents\Dialogs\SaveChangesView.xaml.cs">
+      <DependentUpon>SaveChangesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Units\Documents\Dialogs\SaveChangesViewModel.cs" />
+    <Compile Include="Editor\Units\Documents\DocumentToNameConverter.cs" />
     <Compile Include="Editor\Units\Game\GameUnit.cs" />
-    <Compile Include="Editor\Units\Inspectors\IInspectorService.cs" />
-    <Compile Include="Editor\Units\Inspectors\InspectorUnit.cs" />
+    <Compile Include="Editor\Units\Game\IGameUnitService.cs" />
+    <Compile Include="Editor\Units\Properties\IPropertiesService.cs" />
+    <Compile Include="Editor\Units\Properties\PropertiesUnit.cs" />
     <Compile Include="Editor\Units\Layouts\LayoutUnit.cs" />
     <Compile Include="Editor\Units\Menus\MenuUnit.cs" />
     <Compile Include="Editor\Game\Screens\EditorGameGraphicsScreen.cs" />
@@ -169,8 +188,16 @@
     <Compile Include="Editor\Units\Documents\DocumentUnit.cs" />
     <Compile Include="Editor\Units\Documents\Factories\SceneDocumentFactory.cs" />
     <Compile Include="Editor\Units\Documents\DocumentViewModel.cs" />
+    <Compile Include="Editor\Units\Scenes\ISceneService.cs" />
+    <Compile Include="Editor\Units\Scenes\SceneUnit.cs" />
+    <Compile Include="Editor\Units\Scenes\SnapSettingsView.xaml.cs">
+      <DependentUpon>SnapSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Units\Scenes\SnapSettingsViewModel.cs" />
     <Compile Include="Editor\Units\WorldOutline\WorldOutlineUnit.cs" />
     <Compile Include="Graphics\Data\Cameras\Camera.cs" />
+    <Compile Include="Graphics\Editor\Debugging\DebugRenderer.cs" />
+    <Compile Include="Graphics\Editor\Debugging\LineBatcher.cs" />
     <Compile Include="Graphics\Editor\Gizmos\AxisGizmoGraphics.cs" />
     <Compile Include="Graphics\Editor\Gizmos\AxisGizmoRotationRenderer.cs" />
     <Compile Include="Graphics\Editor\Gizmos\AxisGizmoScale.cs" />
@@ -197,8 +224,17 @@
     <Compile Include="Graphics\Interop\IGameSurfaceTarget.cs" />
     <Compile Include="Graphics\RenderContext.cs" />
     <Compile Include="Graphics\WpfGraphicsDeviceService.cs" />
+    <Compile Include="ScreenManagement\ConductorBase.cs" />
+    <Compile Include="ScreenManagement\ConductorBaseWithActiveItem.cs" />
+    <Compile Include="ScreenManagement\DefaultCloseStrategy.cs" />
+    <Compile Include="ScreenManagement\Dialog.cs" />
+    <Compile Include="ScreenManagement\DialogResultBehavior.cs" />
     <Compile Include="ScreenManagement\IActivate.cs" />
+    <Compile Include="ScreenManagement\IClose.cs" />
+    <Compile Include="ScreenManagement\ICloseStrategy.cs" />
+    <Compile Include="ScreenManagement\IConductor.cs" />
     <Compile Include="ScreenManagement\IDeactivate.cs" />
+    <Compile Include="ScreenManagement\IDialogResult.cs" />
     <Compile Include="ScreenManagement\IGuardClose.cs" />
     <Compile Include="ScreenManagement\IHaveDisplayName.cs" />
     <Compile Include="IViewLocator.cs" />
@@ -215,7 +251,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="ScreenManagement\IScreen.cs" />
+    <Compile Include="ScreenManagement\OneActiveConductor.cs" />
     <Compile Include="ScreenManagement\Screen.cs" />
+    <Compile Include="ScreenManagement\ScreenHelper.cs" />
     <Compile Include="ScreenManagement\WindowConductor.cs" />
     <Compile Include="WindowManager\IWindowManager.cs" />
     <Compile Include="WindowManager\WindowManager.cs" />
@@ -252,15 +291,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Editor\Game\Inspectors\InspectorView.xaml">
+    <Page Include="Editor\Game\Properties\PropertiesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Editor\Game\Inspectors\TextBoxEditorView.xaml">
+    <Page Include="Editor\Game\Properties\TextBoxEditorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Editor\Game\Inspectors\Vector3EditorView.xaml">
+    <Page Include="Editor\Game\Properties\Vector3EditorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -272,7 +311,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Editor\Units\Console\ConsoleView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Editor\Units\ContentBrowser\ContentBrowserView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Units\Documents\Dialogs\SaveChangesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Units\Scenes\SnapSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

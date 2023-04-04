@@ -7,13 +7,13 @@
 namespace BrunoEngine
 {
 	class BuildItem;
-	class BuildCoordinator;
+	class GameContentBuilder;
 	class BuildRequest;
 
 	class BRUNO_API_EXPORT BasicContentProcessorContext : public ContentProcessorContext
 	{
 	public:
-		BasicContentProcessorContext(BuildCoordinator *buildCoordinator, BuildItem *buildItem, std::string buildConfiguration);
+		BasicContentProcessorContext(GameContentBuilder *buildCoordinator, BuildItem *buildItem, std::string buildConfiguration);
 
 		void AddDependency(std::string filename);
 		void AddOutputFile(std::string filename);
@@ -28,7 +28,7 @@ namespace BrunoEngine
 	private:
 		OpaqueData* m_opaqueData;
 
-		BuildCoordinator * m_buildCoordinator;
+		GameContentBuilder * m_buildCoordinator;
 		BuildItem * m_buildItem;
 		std::string m_buildConfiguration;
 

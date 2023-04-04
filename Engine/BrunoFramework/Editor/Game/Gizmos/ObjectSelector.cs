@@ -1,4 +1,5 @@
 ﻿
+using Bruno.Logging;
 using BrunoApi.Net.Maths;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,8 @@ namespace BrunoFramework.Editor.Game.Gizmos
 {
     public class ObjectSelector
     {
+        private static readonly ILog Logger = Bruno.Logging.Logger.GetLog();
+
         private readonly WorldOutline m_worldOutline;
         private List<IEditorObject> m_selectableObjects;
 
@@ -22,8 +25,6 @@ namespace BrunoFramework.Editor.Game.Gizmos
             m_worldOutline = worldOutline;
             m_selectedObjects = new List<IEditorObject>();
             m_selectableObjects = new List<IEditorObject>();
-
-            //m_worldOutline.RootItems.CollectionChanged += OnRootCollectionChanged;
         }
 
         private void Traverse(Collection<WorldOutlineItem> collection)
@@ -53,7 +54,9 @@ namespace BrunoFramework.Editor.Game.Gizmos
             m_selectableObjects.Clear();
             Traverse(m_worldOutline.RootItems);
 
-            if (m_worldOutline.SelectedItems.Count == 0)
+            var copiedSelectedItems = new List<WorldOutlineItem>(m_worldOutline.SelectedItems);
+
+            if (copiedSelectedItems.Count == 0)
             {
                 m_selectedObjects.Clear();
 
@@ -71,12 +74,15 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
                 if (m_selectedObjects.Count > 0)
                 {
-                    m_worldOutline.SelectedItems.Add((m_selectedObjects[0] as WorldOutlineData).Owner);
+                    var outlineData = m_selectedObjects[0] as WorldOutlineData;
+                    ExpandItem(outlineData.Owner);
+
+                    m_worldOutline.SelectedItems.Add(outlineData.Owner);
                 }
             }
             else
             {
-                var selectableObject = m_worldOutline.SelectedItems[0].CustomData as IEditorObject;
+                var selectableObject = copiedSelectedItems[0].CustomData as IEditorObject;
                 m_worldOutline.SelectedItems.Clear();
 
                 int index = Math.Max(0, m_selectableObjects.IndexOf(selectableObject));
@@ -90,7 +96,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
                     var intersection = selectionRay.Intersects(m_selectableObjects[i].BoundingBox);
 #if DEBUG
                     var outlineData = (m_selectableObjects[i] as WorldOutlineData);
-                    Console.WriteLine($"object {i} = {outlineData.Name}");
+                    Logger.Debug("object {0} = {1}", i, outlineData.Name);
 #endif
                     if (intersection.HasValue)
                     {
@@ -103,14 +109,24 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
                 if (m_selectedObjects.Count > 0)
                 {
+                    var outlineData = m_selectedObjects[0] as WorldOutlineData;
+                    ExpandItem(outlineData.Owner);
 #if DEBUG
-                    var outlineData = (m_selectedObjects[0] as WorldOutlineData);
-                    Console.WriteLine($"hit {i} = {outlineData.Name}");
+                    Logger.Debug("hit {0} = {1}", i, outlineData.Name);
 #endif
-                    m_worldOutline.SelectedItems.Add((m_selectedObjects[0] as WorldOutlineData).Owner);
+                    m_worldOutline.SelectedItems.Add(outlineData.Owner);
                 }
 
             }
+        }
+
+        private void ExpandItem(WorldOutlineItem item)
+        {
+            if (item.Parent == null)
+                return;
+
+            item.Parent.IsExpanded = true;
+            ExpandItem(item.Parent);
         }
     }
 }

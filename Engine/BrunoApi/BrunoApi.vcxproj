@@ -149,7 +149,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DevIL\lib;$(SolutionDir)Dependencies\Assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>echo F|xcopy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "$(SolutionDir)BrunoWpfEditor\bin\$(PlatformName)\$(Configuration)\$(TargetName)$(TargetExt)"</Command>
+      <Command>echo F|xcopy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "$(SolutionDir)BrunoEditor\bin\$(PlatformName)\$(Configuration)\$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -206,7 +206,7 @@
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
     <PostBuildEvent>
-      <Command>echo F|xcopy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "$(SolutionDir)BrunoWpfEditor\bin\$(PlatformName)\$(Configuration)\$(TargetName)$(TargetExt)"</Command>
+      <Command>echo F|xcopy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "$(SolutionDir)BrunoEditor\bin\$(PlatformName)\$(Configuration)\$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -298,8 +298,8 @@
     <ClInclude Include="Content\Pipeline\Serialization\SceneWriter.h" />
     <ClInclude Include="Content\Pipeline\Serialization\Texture2DWriter.h" />
     <ClInclude Include="Content\Pipeline\Serialization\VertexBufferWriter.h" />
-    <ClInclude Include="Content\Pipeline\Tasks\BuildCoordinator.h" />
-    <ClInclude Include="Content\Pipeline\Tasks\BuildCoordinatorSettings.h" />
+    <ClInclude Include="Content\Pipeline\Tasks\GameContentBuilder.h" />
+    <ClInclude Include="Content\Pipeline\Tasks\GameContentBuilderSettings.h" />
     <ClInclude Include="Content\Pipeline\Tasks\BuildItem.h" />
     <ClInclude Include="Content\Pipeline\Tasks\BuildItemCollection.h" />
     <ClInclude Include="Content\Pipeline\Tasks\BuildRequest.h" />
@@ -309,6 +309,7 @@
     <ClInclude Include="Ecs\Components.h" />
     <ClInclude Include="Ecs\Components\BoundingBoxComponent.h" />
     <ClInclude Include="Ecs\Components\HierarchyComponent.h" />
+    <ClInclude Include="Ecs\Components\LightComponent.h" />
     <ClInclude Include="Ecs\Components\MaterialComponent.h" />
     <ClInclude Include="Ecs\Components\MeshComponent.h" />
     <ClInclude Include="Ecs\Components\NameComponent.h" />
@@ -317,6 +318,7 @@
     <ClInclude Include="Errors\ContentPipelineException.h" />
     <ClInclude Include="Errors\GameException.h" />
     <ClInclude Include="Event.h" />
+    <ClInclude Include="Vfs\FileSystemStorage.h" />
     <ClInclude Include="FX\AssertFX.h" />
     <ClInclude Include="FX\CodeWriter.h" />
     <ClInclude Include="FX\GLSLGenerator.h" />
@@ -448,6 +450,7 @@
     <ClInclude Include="Utils\Hash.h" />
     <ClInclude Include="Utils\StringUtility.h" />
     <ClInclude Include="Utils\TextureLoader.h" />
+    <ClInclude Include="Vfs\IStorage.h" />
     <ClInclude Include="WindowsGameHost.h" />
     <ClInclude Include="WindowsGameWindow.h" />
   </ItemGroup>
@@ -513,7 +516,7 @@
     <ClCompile Include="Content\Pipeline\Serialization\SceneWriter.cpp" />
     <ClCompile Include="Content\Pipeline\Serialization\Texture2DWriter.cpp" />
     <ClCompile Include="Content\Pipeline\Serialization\VertexBufferWriter.cpp" />
-    <ClCompile Include="Content\Pipeline\Tasks\BuildCoordinator.cpp" />
+    <ClCompile Include="Content\Pipeline\Tasks\GameContentBuilder.cpp" />
     <ClCompile Include="Content\Pipeline\Tasks\BuildItem.cpp" />
     <ClCompile Include="Content\Pipeline\Tasks\BuildItemCollection.cpp" />
     <ClCompile Include="Content\Pipeline\Tasks\BuildRequest.cpp" />
@@ -608,6 +611,9 @@
     <ClCompile Include="Utils\TextureLoader.cpp" />
     <ClCompile Include="WindowsGameHost.cpp" />
     <ClCompile Include="WindowsGameWindow.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Vfs\FileSystemStorage.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,19 +3,22 @@ using AvalonDock;
 using Bruno.Collections;
 using Bruno.Logging;
 using Bruno.ServiceLocation;
+using BrunoFramework.Editor.Game;
 using BrunoFramework.Editor.Units;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace BrunoFramework.Editor
 {
-    public class EditorViewModel : Screen, IEditorService
+    public class EditorViewModel : OneActiveConductor<Screen>, IEditorService
     {
-        private static readonly ILog Logger = LogManager.GetLog();
+        private static readonly ILog Logger = Bruno.Logging.Logger.GetLog();
 
         internal static EditorViewModel DesignInstance
         {
@@ -59,67 +62,47 @@ namespace BrunoFramework.Editor
 
         public EditorWindow Window
         {
-            get => _window;
+            get => m_window;
             internal set
             {
-                _window = value;
+                m_window = value;
             }
         }
-        private EditorWindow _window;
+        private EditorWindow m_window;
 
         public MenuItemViewModelCollection Menu
         {
-            get => _menuManager.Menu;
+            get => m_menuManager.Menu;
         }
+        private MenuManager m_menuManager;
 
         public List<TreeNodeCollection<ICommandItem>> MenuNodes { get; }
 
-        private MenuManager _menuManager;
-        private ResourceDictionary _resourceDictionary;
-
-        public ReadOnlyObservableCollection<EditorDockableTabViewModel> Tabs
-        {
-            get
-            {
-                if (_readonyTabs == null)
-                    _readonyTabs = new ReadOnlyObservableCollection<EditorDockableTabViewModel>(_tabs);
-
-                return _readonyTabs;
-            }
-        }
+        private ResourceDictionary m_resourceDictionary;
 
         public DockingManager DockManager
         {
             get => m_dockManager;
             set => m_dockManager = value;
         }
-
-        public DocumentViewModel ActiveDocument
-        {
-            get => m_activeDocument;
-            set
-            {
-                m_activeDocument = value;
-                NotifyOfPropertyChange();
-                if (ActiveDocumentChanged != null) 
-                    ActiveDocumentChanged(this, EventArgs.Empty);
-            }
-        }
-        private DocumentViewModel m_activeDocument;
-
         private DockingManager m_dockManager;
 
-        private ObservableCollection<EditorDockableTabViewModel> _tabs = new ObservableCollection<EditorDockableTabViewModel>();
-        private ReadOnlyObservableCollection<EditorDockableTabViewModel> _readonyTabs = null;
-
-        public event EventHandler<EventArgs> ActiveDocumentChanged;
+        public event EventHandler<EventArgs> ActiveItemChanged;
 
         public EditorViewModel(ServiceContainer serviceContainer)
         {
             Services = serviceContainer;
             Units = new EditorUnitCollection();
             MenuNodes = new List<TreeNodeCollection<ICommandItem>>();
-            _menuManager = new MenuManager();
+            m_menuManager = new MenuManager();
+        }
+
+        private void OnEditorPropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (eventArgs.PropertyName == nameof(ActiveItem))
+            {
+                ActiveItemChanged?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         public void Configure()
@@ -128,17 +111,19 @@ namespace BrunoFramework.Editor
 
             DisplayName = "Bruno Editor";
 
-            Services.RegisterInstance(typeof(IEditorService), null, this);
-            Services.RegisterPerRequest(typeof(IViewLocator), null, typeof(EditorViewLocator));
+            Services.RegisterInstance(typeof(IEditorService), this);
+            Services.RegisterPerRequest(typeof(IViewLocator), typeof(EditorViewLocator));
             Services.RegisterView(typeof(EditorViewModel), typeof(EditorWindow));
 
-            _resourceDictionary = new ResourceDictionary { Source = new Uri("pack://application:,,,/BrunoFramework;component/Resources/EditorDataTemplates.xaml", UriKind.RelativeOrAbsolute) };
-            EditorHelper.RegisterResources(_resourceDictionary);
+            m_resourceDictionary = new ResourceDictionary { Source = new Uri("pack://application:,,,/BrunoFramework;component/Resources/EditorDataTemplates.xaml", UriKind.RelativeOrAbsolute) };
+            EditorHelper.RegisterResources(m_resourceDictionary);
 
             foreach (var unit in OrderedUnits)
             {
                 unit.Initialize(this);
             }
+
+            PropertyChanged += OnEditorPropertyChanged;
         }
 
         public void Startup()
@@ -150,26 +135,18 @@ namespace BrunoFramework.Editor
                 unit.Startup();
             }
 
-            CreateEmptyScene();
-
             RecreateUI();
         }
 
-        protected override void OnActivate()
-        {
-
-        }
         public void LoadLayout()
         {
-            _tabs.Clear();
-
+            Screen lastTab = null;
             var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(m_dockManager);
-            serializer.LayoutSerializationCallback += (sender, args) =>
+            serializer.LayoutSerializationCallback += async (sender, args) =>
             {
                 var dockId = args.Model.ContentId;
                 var viewModel = Units.Select(unit => unit.GetDockTabViewModel(dockId))
-                                    .Where(vm => vm != null)
-                                    .FirstOrDefault();
+                                    .FirstOrDefault(vm => vm != null);
 
                 if (viewModel == null)
                 {
@@ -178,55 +155,66 @@ namespace BrunoFramework.Editor
                 else
                 {
                     args.Content = viewModel;
-                    viewModel.Deactivated += (senderVM, eventArgs) =>
-                    {
-                        _tabs.Remove(viewModel);
-                    };
 
-                    ((IActivate)viewModel).Activate();
-                    _tabs.Add(viewModel);
+                    viewModel.Conductor = this;
+                    await ActivateItemAsync(viewModel, CancellationToken.None);
+
+                    lastTab = viewModel;
                 }
             };
 
-            if (File.Exists(@".\AvalonDock.config"))
-                serializer.Deserialize(@".\AvalonDock.config");
+            try
+            {
+                if (File.Exists(@".\Layout.config"))
+                {
+                    serializer.Deserialize(@".\Layout.config");
+                }
 
-            //var worldOutlineService = Services.GetInstance<IWorldOutlineService>();
-            //_tabs.Add(worldOutlineService.ViewModel);
+                var sceneView = Items.OfType<SceneDocumentViewModel>().FirstOrDefault();
+                if (sceneView == null)
+                {
+                    var documentService= Services.GetInstance<IDocumentService>();
+                    var selectedDocumentType = documentService.Factories.SelectMany(factory => factory.SupportedFileTypes)
+                        .FirstOrDefault(fileType => fileType.Name == "Scene");
 
-            //var inspectorService = Services.GetInstance<IInspectorService>();
-            //_tabs.Add(inspectorService.ViewModel);
+                    documentService.New(selectedDocumentType);
+                }
 
-            //var contentBrowserService = Services.GetInstance<IContentBrowserService>();
-            //_tabs.Add(contentBrowserService.ViewModel);
+                if (lastTab != null)
+                {
+                    ActiveItem = lastTab;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
         }
 
         public void SaveLayout()
         {
-            var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(m_dockManager);
-            serializer.Serialize(@".\AvalonDock.config");
-        }
-
-        private void CreateEmptyScene()
-        {
-            var documentService = Services.GetInstance<IDocumentService>();
-
-            var documentType = documentService.Factories.SelectMany(factory => factory.SupportedFileTypes)
-                .Where(fileType => fileType.Name == "Scene").FirstOrDefault();
-
-            //documentService.New(documentType);
+            try
+            {
+                var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(m_dockManager);
+                serializer.Serialize(@".\Layout.config");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
         }
 
         private void RecreateUI()
         {
             Logger.Debug("Recreating UI");
 
-            _menuManager.Update(MenuNodes);
+            m_menuManager.Update(MenuNodes);
         }
 
         public void Shutdown()
         {
             Logger.Info("Shutting down editor view model");
+            PropertyChanged -= OnEditorPropertyChanged;
 
             foreach (var unit in OrderedUnits.Reverse())
             {
@@ -238,7 +226,7 @@ namespace BrunoFramework.Editor
                 unit.Uninitialize();
             }
 
-            EditorHelper.UnregisterResources(_resourceDictionary);
+            EditorHelper.UnregisterResources(m_resourceDictionary);
         }
 
         public void Exit(int exitCode = (int)Editor.ExitCode.ERROR_SUCCESS)
@@ -247,33 +235,27 @@ namespace BrunoFramework.Editor
             {
                 _exitCode = exitCode;
             }
-            _window.Close();
+            m_window.Close();
         }
 
-        public void ActivateItem(object item)
+        public void ActivateItem(Screen item)
         {
-            if (item is EditorDockableTabViewModel)
+            item.Conductor = this;
+            Task.Run(() => ActivateItemAsync(item, CancellationToken.None));
+        }
+
+        public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
+        {
+            foreach (var unitGuardClose in OrderedUnits.OfType<IGuardClose>())
             {
-                var editorTab = item as EditorDockableTabViewModel;
-                if (!editorTab.IsActive)
+                var canClose = await unitGuardClose.CanCloseAsync(cancellationToken);
+                if (!canClose)
                 {
-                    editorTab.Deactivated += (senderVM, eventArgs) =>
-                    {
-                        _tabs.Remove(editorTab);
-                    };
-                    _tabs.Add(editorTab);
+                    return false;
                 }
             }
-            if (item is DocumentViewModel)
-            {
-                ActiveDocument = item as DocumentViewModel;
-            }
 
-            var activate = item as IActivate;
-            if (activate != null)
-            {
-                activate.Activate();
-            }
+            return await base.CanCloseAsync();
         }
     }
 }

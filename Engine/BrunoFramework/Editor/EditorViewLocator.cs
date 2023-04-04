@@ -20,14 +20,18 @@ namespace BrunoFramework.Editor
         public FrameworkElement GetView(object viewModel, DependencyObject parent = null, object context = null)
         {
             if (viewModel == null)
+            {
                 throw new ArgumentNullException(nameof(viewModel));
+            }
 
             var type = viewModel.GetType();
             while (type != null)
             {
                 var view = (FrameworkElement)_services.GetInstance(typeof(FrameworkElement), type.FullName);
                 if (view != null)
+                {
                     return view;
+                }
 
                 type = type.BaseType;
             }

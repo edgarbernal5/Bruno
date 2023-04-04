@@ -8,6 +8,7 @@ namespace BrunoFramework.Graphics.Editor
         private readonly IGraphicsService m_graphicsService;
 
         public GridMesh GridMesh { get; set; }
+        public Effect LineEffect { get; set; }
 
         public EditorPrimitivesService(IGraphicsService graphicsService)
         {
@@ -18,6 +19,8 @@ namespace BrunoFramework.Graphics.Editor
         {
             var device = m_graphicsService.GraphicsDevice;
             GridMesh = new GridMesh(device, 64);
+
+            LineEffect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\BrunoEngineGit\Shaders\LineEffect.fx");
         }
     }
 }

@@ -2,8 +2,6 @@
 using Bruno.Collections;
 using BrunoFramework.Graphics;
 using Microsoft.Win32;
-using System;
-using System.IO;
 using BrunoApi.Net.Content;
 using BrunoApi.Net.Content.Tasks;
 using BrunoApi.Net.Game;
@@ -38,7 +36,7 @@ namespace BrunoFramework.Editor.Units
         protected override void OnStartup()
         {
             AddCommands();
-            AddMenus();
+            //AddMenus();
         }
 
         private void AddCommands()
@@ -101,8 +99,8 @@ namespace BrunoFramework.Editor.Units
 
             var filename = m_openFileDialog.FileName;
 
-            BuildCoordinatorSettings settings = new BuildCoordinatorSettings();
-            BuildCoordinator buildCoordinator = new BuildCoordinator(settings);
+            GameContentBuilderSettings settings = new GameContentBuilderSettings();
+            GameContentBuilder buildCoordinator = new GameContentBuilder(settings);
 
             settings = buildCoordinator.Settings;
 
@@ -141,7 +139,7 @@ namespace BrunoFramework.Editor.Units
 
         protected override void OnShutdown()
         {
-            RemoveMenus();
+            //RemoveMenus();
             RemoveCommands();
         }
 
@@ -159,10 +157,6 @@ namespace BrunoFramework.Editor.Units
         protected override void OnUninitialize()
         {
 
-        }
-        public override EditorDockableTabViewModel GetDockTabViewModel(string dockId)
-        {
-            return null;
         }
     }
 }

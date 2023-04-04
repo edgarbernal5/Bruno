@@ -21,9 +21,9 @@
         </MenuItem>
     </ItemContainerTemplate>
 
-    <!--<ItemContainerTemplate DataType="{x:Type local:MenuSeparatorViewModel}">
-        --><!--  Note that the WPF does not automatically apply the correct style for the separator!  --><!--
+    <ItemContainerTemplate DataType="{x:Type local:MenuSeparatorViewModel}">
+        <!--  Note that the WPF does not automatically apply the correct style for the separator!  -->
         <Separator Style="{DynamicResource {x:Static MenuItem.SeparatorStyleKey}}" Visibility="{Binding IsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
-    </ItemContainerTemplate>-->
+    </ItemContainerTemplate>
 
 </ResourceDictionary>

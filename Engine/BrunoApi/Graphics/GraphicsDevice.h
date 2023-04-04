@@ -87,6 +87,7 @@ namespace BrunoEngine
 		void Flush();
 		void Present();
 		void Present(HWND hostHwnd);
+		void RemoveHwnd(HWND hostHwnd);
 		void Reset(PresentationParameters presentationParameters);
 		void Reset(PresentationParameters presentationParameters, GraphicsAdapter* graphicsAdapter);
 

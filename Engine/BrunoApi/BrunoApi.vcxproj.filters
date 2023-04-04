@@ -130,6 +130,12 @@
     <Filter Include="Header Files\ECS\Components">
       <UniqueIdentifier>{e02d5f30-591d-4125-b8ca-c23475e61900}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Vfs">
+      <UniqueIdentifier>{8718a9d6-eebd-4a02-8e7f-c97b6e3fe54d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vfs">
+      <UniqueIdentifier>{e1ad561a-95f5-4c72-988f-3782b30ada9f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -456,7 +462,7 @@
     <ClInclude Include="TrioApiRequisites.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Content\Pipeline\Tasks\BuildCoordinator.h">
+    <ClInclude Include="Content\Pipeline\Tasks\GameContentBuilder.h">
       <Filter>Header Files\Content\Pipeline\Tasks</Filter>
     </ClInclude>
     <ClInclude Include="Content\Pipeline\ContentIdentity.h">
@@ -639,7 +645,7 @@
     <ClInclude Include="Content\Pipeline\Processors\EffectProcessor.h">
       <Filter>Header Files\Content\Pipeline\Processors</Filter>
     </ClInclude>
-    <ClInclude Include="Content\Pipeline\Tasks\BuildCoordinatorSettings.h">
+    <ClInclude Include="Content\Pipeline\Tasks\GameContentBuilderSettings.h">
       <Filter>Header Files\Content\Pipeline\Tasks</Filter>
     </ClInclude>
     <ClInclude Include="Content\Pipeline\Tasks\TimestampCache.h">
@@ -799,6 +805,15 @@
       <Filter>Header Files\Math</Filter>
     </ClInclude>
     <ClInclude Include="Ecs\Components\BoundingBoxComponent.h">
+      <Filter>Header Files\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Vfs\IStorage.h">
+      <Filter>Header Files\Vfs</Filter>
+    </ClInclude>
+    <ClInclude Include="Vfs\FileSystemStorage.h">
+      <Filter>Header Files\Vfs</Filter>
+    </ClInclude>
+    <ClInclude Include="Ecs\Components\LightComponent.h">
       <Filter>Header Files\ECS\Components</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1064,7 +1079,7 @@
     <ClCompile Include="Content\Pipeline\Graphics\VectorConverter.cpp">
       <Filter>Source Files\Content\Pipeline\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Content\Pipeline\Tasks\BuildCoordinator.cpp">
+    <ClCompile Include="Content\Pipeline\Tasks\GameContentBuilder.cpp">
       <Filter>Source Files\Content\Pipeline\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="Content\Pipeline\Tasks\BuildRequest.cpp">
@@ -1249,6 +1264,9 @@
     </ClCompile>
     <ClCompile Include="Math\MathCollision.cpp">
       <Filter>Source Files\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vfs\FileSystemStorage.cpp">
+      <Filter>Source Files\Vfs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

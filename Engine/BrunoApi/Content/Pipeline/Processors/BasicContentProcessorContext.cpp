@@ -2,14 +2,14 @@
 #include "BasicContentProcessorContext.h"
 
 #include "Content/Pipeline/Tasks/BuildItem.h"
-#include "Content/Pipeline/Tasks/BuildCoordinator.h"
+#include "Content/Pipeline/Tasks/GameContentBuilder.h"
 #include "Content/Pipeline/Tasks/BuildRequest.h"
 #include "Content/Pipeline/Processors/ProcessorManager.h"
 #include "Content/Pipeline/Processors/IContentProcessor.h"
 
 namespace BrunoEngine
 {
-	BasicContentProcessorContext::BasicContentProcessorContext(BuildCoordinator *buildCoordinator, BuildItem *buildItem, std::string buildConfiguration) :
+	BasicContentProcessorContext::BasicContentProcessorContext(GameContentBuilder *buildCoordinator, BuildItem *buildItem, std::string buildConfiguration) :
 		m_buildCoordinator(buildCoordinator),
 		m_buildItem(buildItem),
 		m_buildConfiguration(buildConfiguration)

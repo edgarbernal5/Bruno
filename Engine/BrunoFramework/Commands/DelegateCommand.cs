@@ -50,6 +50,7 @@ namespace BrunoFramework
 
         protected virtual void OnCanExecuteChanged()
         {
+            CommandManager.InvalidateRequerySuggested();
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -107,6 +108,7 @@ namespace BrunoFramework
 
         protected virtual void OnCanExecuteChanged()
         {
+            //CommandManager.InvalidateRequerySuggested();
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }

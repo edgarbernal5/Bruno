@@ -1,47 +1,57 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bruno.Logging
 {
     public class CompositeLog : ILog
     {
-        private readonly IEnumerable<ILog> _logs;
+        public IEnumerable<ILog> Logs
+        {
+            get => m_logs;
+        }
+        private readonly IEnumerable<ILog> m_logs;
 
         public CompositeLog(IEnumerable<ILog> logs)
         {
-            _logs = logs;
+            m_logs = logs;
         }
 
-        public void Debug(string format, params object[] args)
+        public virtual void Debug(string message)
         {
-            foreach (var item in _logs)
+            foreach (var item in m_logs)
+            {
+                item.Debug(message);
+            }
+        }
+
+        public virtual void Debug(string format, params object[] args)
+        {
+            foreach (var item in m_logs)
             {
                 item.Debug(format, args);
             }
         }
 
-        public void Info(string format, params object[] args)
+        public virtual void Info(string format, params object[] args)
         {
-            foreach (var item in _logs)
+            foreach (var item in m_logs)
             {
                 item.Info(format, args);
             }
         }
 
-        public void Error(Exception exception)
+        public virtual void Error(Exception exception)
         {
-            foreach (var item in _logs)
+            foreach (var item in m_logs)
             {
                 item.Error(exception);
             }
         }
 
-        public void Warn(string format, params object[] args)
+        public virtual void Warn(string format, params object[] args)
         {
-            foreach (var item in _logs)
+            foreach (var item in m_logs)
             {
                 item.Warn(format, args);
             }

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Xaml.Behaviors;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Navigation;
@@ -14,16 +16,16 @@ namespace BrunoFramework
             _viewLocator = viewLocator;
         }
 
-        public bool? ShowDialog(object viewModel, object context = null)
+        public virtual async Task<bool?> ShowDialog(object viewModel, object context = null)
         {
             if (viewModel == null)
                 throw new ArgumentNullException(nameof(viewModel));
 
-            var window = CreateWindow(viewModel, context, asChildWindow: true, asDialog: true);
+            var window = await CreateWindowAsync(viewModel, context, asChildWindow: true, asDialog: true);
             return window.ShowDialog();
         }
 
-        public void ShowWindow(object viewModel, object context = null, bool asChildWindow = true)
+        public async Task ShowWindow(object viewModel, object context = null, bool asChildWindow = true)
         {
             if (viewModel == null)
                 throw new ArgumentNullException(nameof(viewModel));
@@ -42,14 +44,14 @@ namespace BrunoFramework
             }
             else
             {
-                var window = CreateWindow(viewModel, context, asChildWindow, false);
+                var window = await CreateWindowAsync(viewModel, context, asChildWindow, false);
                 window.Show();
             }
         }
 
-        protected virtual Window CreateWindow(object viewModel, object context, bool asChildWindow, bool asDialog)
+        protected virtual async Task<Window> CreateWindowAsync(object viewModel, object context, bool asChildWindow, bool asDialog)
         {
-            var view = _viewLocator?.GetView(viewModel, null, context);
+            var view = _viewLocator.GetView(viewModel, null, context);
             var window = EnsureWindow(viewModel, view, asChildWindow, asDialog);
             window.DataContext = viewModel;
 
@@ -62,7 +64,7 @@ namespace BrunoFramework
             }
 
             var windowConductor = new WindowConductor(viewModel, window);
-            windowConductor.Initialize();
+            await windowConductor.InitializeAsync();
 
             return window;
         }
@@ -110,6 +112,19 @@ namespace BrunoFramework
                 else
                 {
                     window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                }
+            }
+
+            var hasDialogResult = viewModel as IDialogResult;
+            if (asDialog && hasDialogResult != null)
+            {
+                var behaviors = Interaction.GetBehaviors(window);
+                if (!behaviors.OfType<DialogResultBehavior>().Any())
+                {
+                    var dialogResultBehavior = new DialogResultBehavior();
+                    var binding = new Binding("DialogResult") { Mode = BindingMode.TwoWay };
+                    BindingOperations.SetBinding(dialogResultBehavior, DialogResultBehavior.DialogResultProperty, binding);
+                    behaviors.Add(dialogResultBehavior);
                 }
             }
 

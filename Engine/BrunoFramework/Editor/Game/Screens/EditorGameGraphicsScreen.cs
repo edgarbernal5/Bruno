@@ -20,6 +20,13 @@ namespace BrunoFramework.Editor.Graphics
         }
         private GridMesh m_gridMesh;
 
+        public bool ShowGrid
+        {
+            get => m_showGrid;
+            set => m_showGrid = value;
+        }
+        private bool m_showGrid;
+
         public IGizmoService GizmoService
         {
             get => m_gizmoService;
@@ -34,10 +41,16 @@ namespace BrunoFramework.Editor.Graphics
         }
         private RenderPath m_renderPath;
 
-        public EditorGameGraphicsScreen() 
+        public DebugRenderer DebugRenderer
+        {
+            get => m_debugRenderer;
+            set => m_debugRenderer = value;
+        }
+        private DebugRenderer m_debugRenderer;
+
+        public EditorGameGraphicsScreen()
             : base()
         {
-            
         }
 
         public override void Update(TimeSpan deltaTime)
@@ -47,6 +60,8 @@ namespace BrunoFramework.Editor.Graphics
 
         public override void Render(RenderContext renderContext)
         {
+            if (m_renderPath == null) return;
+
             renderContext.Screen = this;
             DoOnRender(renderContext);
             renderContext.Screen = null;
@@ -60,17 +75,19 @@ namespace BrunoFramework.Editor.Graphics
             renderContext.GraphicsDevice.Clear(ColorRGBA8.CornflowerBlue);
 
             //
+            Camera.Viewport = renderContext.Viewport;
             renderContext.Camera = Camera;
-
-            //float time = (float)GameUnit.m_gameStepTimer.TotalTime.TotalSeconds;
-            //Camera.Rotation = Quaternion.CreateFromYawPitchRoll(time * 0.1f, -0.3f, 0);
-
-            //Camera.Recalculate();
 
             BrunoApi.Net.Game.Scene.UpdateCamera(ConvertToCamera(Camera));
             m_renderPath.Render();
 
-            m_gridMesh.Render(renderContext);
+            if (m_showGrid)
+            {
+                m_gridMesh.Render(renderContext);
+            }
+
+            //draw bounding boxes
+            m_debugRenderer.Render(renderContext);
 
             m_gizmoService.Render(renderContext);
         }

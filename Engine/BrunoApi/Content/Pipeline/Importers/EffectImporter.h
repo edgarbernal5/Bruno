@@ -14,7 +14,7 @@ namespace BrunoEngine
 
 		ContentItem* Import(const std::string& filename);
 
-		friend class BuildCoordinator;
+		friend class GameContentBuilder;
 
 		std::string GetImporterName() const { return "EffectImporter"; }
 		std::string GetFileExtensions() const { return "fx"; }

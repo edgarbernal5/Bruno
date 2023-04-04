@@ -8,12 +8,14 @@ using Microsoft.Xaml.Behaviors;
 using BrunoApi.Net.Game;
 using BrunoApi.Net.Maths;
 using BrunoFramework.Editor.Game.Gizmos;
-using System;
+using Bruno.Logging;
 
 namespace BrunoFramework.Editor.Game.Interaction
 {
     public class GizmosHandlerBehavior : Behavior<GameSurfaceTargetHwndHost>
     {
+        private static readonly ILog Logger = Bruno.Logging.Logger.GetLog();
+
         private IGizmoService m_gizmoService;
         private bool m_gizmoSelected;
         private Camera m_currentCamera;
@@ -67,15 +69,15 @@ namespace BrunoFramework.Editor.Game.Interaction
 
             if (oldValue != null)
             {
-                oldValue.OnTranslationChanged -= target.OnGizmoTranslationChanged;
-                oldValue.OnRotateChanged -= target.OnGizmoRotateChanged;
-                oldValue.OnScaleChanged -= target.OnGizmoScaleChanged;
+                oldValue.TranslationChanged -= target.OnGizmoTranslationChanged;
+                oldValue.RotateChanged -= target.OnGizmoRotateChanged;
+                oldValue.ScaleChanged -= target.OnGizmoScaleChanged;
             }
             if (newValue == null) return;
 
-            newValue.OnTranslationChanged += target.OnGizmoTranslationChanged;
-            newValue.OnRotateChanged += target.OnGizmoRotateChanged;
-            newValue.OnScaleChanged += target.OnGizmoScaleChanged;
+            newValue.TranslationChanged += target.OnGizmoTranslationChanged;
+            newValue.RotateChanged += target.OnGizmoRotateChanged;
+            newValue.ScaleChanged += target.OnGizmoScaleChanged;
         }
 
         private void OnGizmoTranslationChanged(ITransformableObject transformableObject, Vector3 delta)
@@ -85,9 +87,10 @@ namespace BrunoFramework.Editor.Game.Interaction
                 Matrix.CreateTranslation(transformableObject.LocalPosition);
 
             var toLocal = Matrix.Invert(transformableObject.WorldMatrix) * localWorld;
-            var localPosition = Vector3.TransformNormal(delta, toLocal);
+            var localDelta = Vector3.Transform(delta, toLocal);
 
-            transformableObject.LocalPosition += localPosition;
+            //Logger.Debug("Translation delta = {0}; local delta = {1}", delta, localDelta);
+            transformableObject.LocalPosition += localDelta;
         }
 
         private void OnGizmoScaleChanged(ITransformableObject transformableObject, Vector3 delta, bool isUniformScale)
@@ -96,11 +99,11 @@ namespace BrunoFramework.Editor.Game.Interaction
             if (isUniformScale)
             {
                 float uniform = 1.0f + (delta.X + delta.Y + delta.Z) / 3.0f;
-                //Console.WriteLine("Uniform scale delta = " + uniform + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+                Logger.Debug("Uniform scale delta = {0} ; {1}", uniform, m_gizmoService.CurrentGizmoAxis.ToString());
                 transformableObject.LocalScale *= uniform;
                 return;
             }
-            //Console.WriteLine("NU scale delta = " + delta + " ; " + m_gizmoService.CurrentGizmoAxis.ToString());
+            Logger.Debug("NU scale delta = {0} ; {1}", delta, m_gizmoService.CurrentGizmoAxis.ToString());
             transformableObject.LocalScale += delta;
         }
 
@@ -145,7 +148,7 @@ namespace BrunoFramework.Editor.Game.Interaction
                 return;
 
             var mousePosition = ConvertToVector2(eventArgs.GetPosition(AssociatedObject));
-            m_gizmoSelected = m_gizmoService.Begin(mousePosition);
+            m_gizmoSelected = m_gizmoService.BeginDrag(mousePosition);
 
             if (!m_gizmoSelected)
             {
@@ -179,10 +182,10 @@ namespace BrunoFramework.Editor.Game.Interaction
             var gizmoService = GizmoService;
             gizmoService.SnapEnabled = IsShiftKeyPressed();
             gizmoService.PrecisionModeEnabled = IsControlKeyPressed();
-            gizmoService.UpdateGizmo(mousePosition);
+            gizmoService.Drag(mousePosition);
         }
 
-        private void OnHwndLButtonUp(object sender, HwndMouseEventArgs e)
+        private void OnHwndLButtonUp(object sender, HwndMouseEventArgs eventArgs)
         {
             EndHandler(true);
         }
@@ -194,7 +197,7 @@ namespace BrunoFramework.Editor.Game.Interaction
 
             if (IsKeyAltPressed() || !m_gizmoService.IsActive) return;
 
-            m_gizmoService.SetGizmoAxisOverMousePosition(ConvertToVector2(eventArgs.GetPosition(AssociatedObject)));
+            m_gizmoService.OnMouseMove(ConvertToVector2(eventArgs.GetPosition(AssociatedObject)));
         }
 
         private void OnHwndMouseDownSelector(object sender, HwndMouseEventArgs eventArgs)
@@ -222,7 +225,7 @@ namespace BrunoFramework.Editor.Game.Interaction
 
         private void EndHandler(bool commit)
         {
-            m_gizmoService.End();
+            m_gizmoService.EndDrag();
 
             AssociatedObject.LostMouseCapture -= OnLostMouseCapture;
             AssociatedObject.HwndMouseMove -= OnHwndMouseMove;

@@ -1,4 +1,4 @@
-﻿using Bruno.Interop;
+﻿using Bruno;
 using System;
 using BrunoApi.Net.Graphics;
 using BrunoApi.Net.Graphics.Core;

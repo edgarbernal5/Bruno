@@ -146,7 +146,7 @@ namespace BrunoEngine
 
 		BoundingBox bBox;
 		BoundingBox::CreateFromPoints(bBox, mesh->GetPositions().size(), mesh->GetPositions().data(), sizeof(Vector3));
-
+				
 		return new ModelMeshContent(mesh->GetName(), mesh, parent, bSphere, bBox, parts);
 	}
 }

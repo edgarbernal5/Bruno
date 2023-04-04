@@ -26,7 +26,7 @@ namespace BrunoGraphicsHost
         private void GraphicsDeviceHost_OnRender()
         {
             var camera = m_renderContext.Camera;
-            camera.AspectRatio = m_renderContext.GraphicsDevice.Viewport.AspectRatio;
+            //camera.AspectRatio = m_renderContext.GraphicsDevice.Viewport.AspectRatio;
             m_renderContext.Viewport = m_renderContext.GraphicsDevice.Viewport;
 
             GraphicsDeviceService.Service.GraphicsDevice.Clear(Color.Red);

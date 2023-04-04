@@ -28,10 +28,19 @@
         </Grid>
         <Grid>
             <DockingManager x:Name="DockManager"
-                 DocumentsSource="{Binding Tabs}"
-                 ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
-                 AllowMixedOrientation ="True">
-
+                 DocumentsSource="{Binding Items}"
+                 ActiveContent="{Binding ActiveItem, Mode=TwoWay}"
+                 AllowMixedOrientation= "True">
+                
+                <!--<DockingManager.DocumentHeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            --><!--<Image Margin="0,0,4,0" Source="{Binding IconSource}" />--><!--
+                            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </DataTemplate>
+                </DockingManager.DocumentHeaderTemplate>-->
+                
                 <DockingManager.LayoutItemTemplateSelector>
                     <editor:PanesTemplateSelector>
                         <editor:PanesTemplateSelector.SceneDocumentViewModelTemplate>
@@ -46,11 +55,11 @@
                             </DataTemplate>
                         </editor:PanesTemplateSelector.WorldOutlineViewModelTemplate>
 
-                        <editor:PanesTemplateSelector.InspectorViewModelTemplate>
+                        <editor:PanesTemplateSelector.PropertiesViewModelTemplate>
                             <DataTemplate>
-                                <local:InspectorView />
+                                <local:PropertiesView />
                             </DataTemplate>
-                        </editor:PanesTemplateSelector.InspectorViewModelTemplate>
+                        </editor:PanesTemplateSelector.PropertiesViewModelTemplate>
 
                         <editor:PanesTemplateSelector.ContentBrowserViewModelTemplate>
                             <DataTemplate>
@@ -58,52 +67,44 @@
                             </DataTemplate>
                         </editor:PanesTemplateSelector.ContentBrowserViewModelTemplate>
 
+                        <editor:PanesTemplateSelector.ConsoleViewModelTemplate>
+                            <DataTemplate>
+                                <content:ConsoleView />
+                            </DataTemplate>
+                        </editor:PanesTemplateSelector.ConsoleViewModelTemplate>
+
                     </editor:PanesTemplateSelector>
                 </DockingManager.LayoutItemTemplateSelector>
 
-                <DockingManager.LayoutItemContainerStyleSelector>
-                    <editor:PanesStyleSelector>
+                <DockingManager.LayoutItemContainerStyle>
+                    <Style TargetType="{x:Type LayoutItem}">
+                        <Setter Property="Title" Value="{Binding Model.DisplayName, Mode=OneWay}"/>
+                        <Setter Property="ContentId" Value="{Binding Model.DockId}" />
+                        <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}"/>
+                    </Style>
+                </DockingManager.LayoutItemContainerStyle>
 
-                        <editor:PanesStyleSelector.EditorDockableTabStyle>
+                <!--<DockingManager.LayoutItemContainerStyleSelector>
+                    <editor:PanesStyleSelector>
+                        <editor:PanesStyleSelector.EditorDockTabStyle>
                             <Style TargetType="{x:Type LayoutItem}">
-                                <Setter Property="Title" Value="{Binding Model.Title}" />
+                                <Setter Property="Title" Value="{Binding Model.Title, Mode=OneWay}" />
                                 <Setter Property="ContentId" Value="{Binding Model.DockId}" />
                                 <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+                                --><!--<Setter Property="IsSelected" Value="{Binding Model.IsSelected}" />--><!--
                             </Style>
-                        </editor:PanesStyleSelector.EditorDockableTabStyle>
+                        </editor:PanesStyleSelector.EditorDockTabStyle>
                     </editor:PanesStyleSelector>
-                </DockingManager.LayoutItemContainerStyleSelector>
+                </DockingManager.LayoutItemContainerStyleSelector>-->
 
-                <DockingManager.LayoutUpdateStrategy>
+                <!--<DockingManager.LayoutUpdateStrategy>
                     <editor:LayoutInitializer />
-                </DockingManager.LayoutUpdateStrategy>
+                </DockingManager.LayoutUpdateStrategy>-->
 
                 <LayoutRoot>
-                    <LayoutPanel Orientation="Vertical">
-                        <LayoutDocumentPane />
-                        <LayoutAnchorablePane Name="ToolsPane" DockHeight="150" />
-                    </LayoutPanel>
                 </LayoutRoot>
             </DockingManager>
-            <!--<Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="10px"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <local:SceneView Grid.Row="0"  Grid.Column="0" DataContext="{Binding SceneDetail}"  >
-
-            </local:SceneView>
-            <local:InspectorView Grid.Row="0" Grid.Column="1" DataContext="{Binding InspectorDetail}" Grid.ColumnSpan="3" Margin="10,0,0,0"/>
-
-            <content:ContentBrowserView Grid.Row="1" Grid.Column="0" DataContext="{Binding ContentBrowserDetail}" >
-            </content:ContentBrowserView>
-            <local:WorldOutlineView Grid.Row="1" Grid.Column="2" DataContext="{Binding WorldOutlineDetail}" >
-            </local:WorldOutlineView>-->
+            
         </Grid>
     </DockPanel>
 </Window>

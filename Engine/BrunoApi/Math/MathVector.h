@@ -153,7 +153,7 @@ namespace BrunoEngine
 
 	//------------------------------------------------------------------------------
 	// 3D vector
-	struct Vector3 : public DirectX::XMFLOAT3
+	struct BRUNO_API_EXPORT Vector3 : public DirectX::XMFLOAT3
 	{
 		Vector3() noexcept : DirectX::XMFLOAT3(0.f, 0.f, 0.f) {}
 		XM_CONSTEXPR explicit Vector3(float x) : DirectX::XMFLOAT3(x, x, x) {}
@@ -260,7 +260,7 @@ namespace BrunoEngine
 		static const Vector3 Left;
 		static const Vector3 Forward;
 		static const Vector3 Backward;
-	};
+};
 
 	// Binary operators
 	Vector3 operator+ (const Vector3& V1, const Vector3& V2);

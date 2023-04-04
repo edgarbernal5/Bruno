@@ -11,7 +11,7 @@
 
 namespace BrunoEngine
 {
-	ContentReader::ContentReader(ContentManager* contentManager, TrioIO::Stream *stream, std::string assetName) :
+	ContentReader::ContentReader(ContentManager* contentManager, BrunoIO::Stream *stream, std::string assetName) :
 		BinaryReader(stream), m_contentManager(contentManager), m_stream(stream), m_assetName(assetName)
 	{
 	}
@@ -20,7 +20,7 @@ namespace BrunoEngine
 	{
 	}
 
-	ContentReader* ContentReader::Create(ContentManager* contentManager, TrioIO::Stream *stream, std::string assetName)
+	ContentReader* ContentReader::Create(ContentManager* contentManager, BrunoIO::Stream *stream, std::string assetName)
 	{
 		PrepareStream(stream);
 		ContentReader* reader = new ContentReader(contentManager, stream, assetName);
@@ -32,7 +32,7 @@ namespace BrunoEngine
 		return m_contentManager;
 	}
 
-	void ContentReader::PrepareStream(TrioIO::Stream* input)
+	void ContentReader::PrepareStream(BrunoIO::Stream* input)
 	{
 		BinaryReader reader(input);
 
@@ -72,7 +72,7 @@ namespace BrunoEngine
 		if (directorySeparatorIndex != std::string::npos) {
 			path = m_assetName.substr(0, directorySeparatorIndex);
 		}
-		std::string cleanPath = TrioIO::Path::Combine(path, referenceName);
+		std::string cleanPath = BrunoIO::Path::Combine(path, referenceName);
 
 		return m_contentManager->LoadInternal(cleanPath);
 	}

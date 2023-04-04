@@ -59,14 +59,14 @@ namespace BrunoFramework.Editor.Game.Interaction
                 return;
             }
 
-            var cameraNode = Camera;
-            if (cameraNode == null)
+            var camera = Camera;
+            if (camera == null)
             {
                 return;
             }
             AssociatedObject.CaptureMouse();
 
-            m_currentCamera = cameraNode;
+            m_currentCamera = camera;
             m_cameraState.m_view = m_currentCamera.View;
             m_cameraState.m_target = m_currentCamera.Target;
             m_cameraState.m_position = m_currentCamera.Position;

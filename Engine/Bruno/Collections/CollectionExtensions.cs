@@ -1,31 +1,14 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bruno.Collections
 {
-    /// <summary>
-    /// Provides extension methods for working with collections.
-    /// </summary>
     public static class CollectionExtensions
     {
         internal static readonly WeakReference[] EmptyWeakReferenceArray = new WeakReference[0];
 
 
-        /// <summary>
-        /// Adds the specified items to the <see cref="ICollection{T}"/>. 
-        /// </summary>
-        ///<typeparam name="T">The type of items in the collection.</typeparam>
-        ///<param name="collection">The collection to which the items should be added.</param>
-        /// <param name="items">TThe items to be added.</param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="collection"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="items"/> is <see langword="null"/>.
-        /// </exception>
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
         {
             if (collection == null)

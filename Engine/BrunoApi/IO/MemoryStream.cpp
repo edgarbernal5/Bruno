@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MemoryStream.h"
 
-namespace TrioIO
+namespace BrunoIO
 {
 	MemoryStream::MemoryStream() : m_buffer(nullptr)
 	{

@@ -13,7 +13,7 @@ namespace BrunoEngine
 	public:
 		virtual ContentItem* Import(const std::string& filename) = 0;
 
-		friend class BuildCoordinator;
+		friend class GameContentBuilder;
 
 		virtual std::string GetImporterName() const = 0;
 		virtual std::string GetFileExtensions() const = 0;

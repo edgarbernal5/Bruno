@@ -7,9 +7,9 @@ namespace BrunoEngine
 	class BRUNO_API_EXPORT RenderPath
 	{
 	public:
-		virtual void Render() const = 0;
+		virtual void Render() /*const*/ = 0;
 
 	protected:
-		virtual void RenderShadows() const = 0;
+		virtual void RenderShadows() /*const*/ = 0;
 	};
 }

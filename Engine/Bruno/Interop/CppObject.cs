@@ -3,21 +3,16 @@ using System;
 
 namespace Bruno.Interop
 {
-    public abstract class CppObject : DisposableBase
+    public abstract class CppObject : DisposableBase, ICppObject
     {
-        public IntPtr NativePointer
-        {
-            get
-            {
-                return m_nativePointer;
-            }
-        }
+        public IntPtr NativePointer => m_nativePointer;
         protected IntPtr m_nativePointer;
 
         public CppObject(IntPtr nativePointer)
         {
             m_nativePointer = nativePointer;
         }
+
         protected CppObject()
         {
             m_nativePointer = IntPtr.Zero;
@@ -27,5 +22,10 @@ namespace Bruno.Interop
         {
             m_nativePointer = IntPtr.Zero;
         }
+    }
+
+    public interface ICppObject
+    {
+        IntPtr NativePointer { get; }
     }
 }

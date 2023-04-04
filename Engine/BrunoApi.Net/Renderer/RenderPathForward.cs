@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using BrunoApi.Net.Game;
 
 namespace BrunoApi.Net.Renderer
 {

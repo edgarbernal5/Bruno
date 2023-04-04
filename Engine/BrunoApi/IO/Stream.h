@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace TrioIO
+namespace BrunoIO
 {
 	enum class SeekOrigin
 	{

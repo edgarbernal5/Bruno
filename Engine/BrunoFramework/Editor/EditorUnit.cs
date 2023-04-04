@@ -6,7 +6,7 @@ namespace BrunoFramework.Editor
 {
     public abstract class EditorUnit
     {
-        private static readonly ILog Logger = LogManager.GetLog();
+        private static readonly ILog Logger = Bruno.Logging.Logger.GetLog();
 
         public int Priority { get; set; }
 
@@ -14,7 +14,7 @@ namespace BrunoFramework.Editor
 
         public CommandItemCollection CommandItems { get; private set; }
 
-        private bool _initialized;
+        private bool m_initialized;
 
         protected EditorUnit()
         {
@@ -35,25 +35,25 @@ namespace BrunoFramework.Editor
 
         public void Startup()
         {
-            if (_initialized)
+            if (m_initialized)
             {
                 throw new InvalidOperationException("Core unit has already been initialized");
             }
 
             OnStartup();
-            _initialized = true;
+            m_initialized = true;
         }
 
         protected abstract void OnStartup();
 
         public void Shutdown()
         {
-            if (!_initialized)
+            if (!m_initialized)
                 return;
 
             Logger.Debug("Shutting down {0}.", GetType().Name);
             OnShutdown();
-            _initialized = false;
+            m_initialized = false;
         }
 
         protected abstract void OnShutdown();
@@ -68,6 +68,9 @@ namespace BrunoFramework.Editor
 
         protected abstract void OnUninitialize();
 
-        public abstract EditorDockableTabViewModel GetDockTabViewModel(string dockId);
+        public virtual EditorDockTabViewModel GetDockTabViewModel(string dockId)
+        {
+            return default(EditorDockTabViewModel);
+        }
     }
 }

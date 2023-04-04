@@ -11,13 +11,39 @@ namespace BrunoFramework.Editor.Units
     {
         public IEditorService Editor { get; }
 
-        public bool IsUntitled { get; private set; }
-        public bool IsModified { get; private set; }
+        public bool IsUntitled
+        {
+            get => m_isUntitled;
+            protected set
+            {
+                Set(ref m_isUntitled, value);
+            }
+        }
+        private bool m_isUntitled;
 
-        public string FilenamePath { get; protected set; }
+        public bool IsModified
+        {
+            get => m_isModified;
+            protected set
+            {
+                Set(ref m_isModified, value);
+            }
+        }
+        private bool m_isModified;
+
+        public string FilePath
+        {
+            get => m_filenamePath;
+            protected set
+            {
+                Set(ref m_filenamePath, value);
+            }
+        }
+        private string m_filenamePath;
+
         public DocumentType DocumentType { get; private set; }
 
-        public DocumentViewModel ViewModel { get => m_viewModel; }
+        public DocumentViewModel ViewModel => m_viewModel;
         private DocumentViewModel m_viewModel;
 
         public IDocumentService DocumentService
@@ -35,8 +61,6 @@ namespace BrunoFramework.Editor.Units
 
                 if (!IsUntitled)
                     return string.Empty;
-
-                //var documentService = Editor.Services.GetInstance<IDocumentService>();
 
                 string extension = DocumentType.FileExtensions.FirstOrDefault() ?? string.Empty;
 
@@ -58,8 +82,9 @@ namespace BrunoFramework.Editor.Units
             Editor = editor;
             DocumentType = documentType;
             m_documentService = editor.Units.OfType<IDocumentService>().FirstOrDefault();
-
             m_counterByExtension = new Dictionary<string, int>();
+
+            m_documentService.RecordDocument(this);
         }
 
         public string GetDisplayName()
@@ -69,9 +94,14 @@ namespace BrunoFramework.Editor.Units
             {
                 title = UntitledName;
             } 
-            else if (!string.IsNullOrEmpty(FilenamePath))
+            else if (!string.IsNullOrEmpty(FilePath))
             {
-                title = Path.GetFileName(FilenamePath);
+                title = Path.GetFileName(FilePath);
+            }
+
+            if (IsModified)
+            {
+                title += "*";
             }
 
             return title;
@@ -79,10 +109,10 @@ namespace BrunoFramework.Editor.Units
 
         public void New()
         {
-            IsModified = false;
             IsUntitled = true;
+            IsModified = false;
 
-            FilenamePath = string.Empty;
+            FilePath = string.Empty;
 
             OnNew();
         }
@@ -91,10 +121,10 @@ namespace BrunoFramework.Editor.Units
 
         public void Load(string filename)
         {
-            IsModified = false;
             IsUntitled = false;
+            IsModified = false;
 
-            FilenamePath = filename;
+            FilePath = filename;
 
             OnLoad(filename);
         }
@@ -105,22 +135,31 @@ namespace BrunoFramework.Editor.Units
         {
             OnSave();
 
-            IsModified = false;
             IsUntitled = false;
+            IsModified = false;
         }
 
         protected abstract void OnSave();
 
         public abstract DocumentViewModel CreateViewModel();
 
-        internal void RegisterViewModel(DocumentViewModel viewModel)
+        internal void RecordViewModel(DocumentViewModel viewModel)
         {
             m_viewModel = viewModel;
         }
 
-        internal void UnregisterViewModel(DocumentViewModel viewModel)
+        internal void UnrecordViewModel(DocumentViewModel viewModel)
         {
             m_viewModel = null;
+        }
+
+        protected override void OnDisposing(bool disposing)
+        {
+            if (disposing)
+            {
+                m_documentService.UnrecordDocument(this);
+            }
+            base.OnDisposing(disposing);
         }
     }
 }

@@ -6,3 +6,4 @@
 #include "Components/MeshComponent.h"
 #include "Components/MaterialComponent.h"
 #include "Components/BoundingBoxComponent.h"
+#include "Components/LightComponent.h"

@@ -37,13 +37,13 @@ namespace BrunoApi.Net.Game
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_Ctor", CallingConvention = CallingConvention.StdCall)]
         private static extern IntPtr Internal_ctor();
 
-        public Scene() 
+        public Scene()
             : base()
         {
             m_nativePointer = Internal_ctor();
         }
 
-        internal Scene(IntPtr nativePtr) 
+        internal Scene(IntPtr nativePtr)
             : base(nativePtr)
         {
         }
@@ -57,6 +57,14 @@ namespace BrunoApi.Net.Game
             {
             }
             Internal_Dtor(NativePointer);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_AddEmptyObject", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        private static extern long Internal_AddEmptyObject(IntPtr scene, [MarshalAs(UnmanagedType.LPStr)] string name);
+
+        public long AddEmptyObject(string name)
+        {
+            return Internal_AddEmptyObject(m_nativePointer, name);
         }
 
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_GetCamera", CallingConvention = CallingConvention.StdCall)]
@@ -106,26 +114,37 @@ namespace BrunoApi.Net.Game
 
         };
 
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_GetHierarchyForEntity", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_GetHierarchyForEntity(IntPtr scene, long entity, ref HierarchyComponentBridge hierarchyComponentBridge);
+
+        public HierarchyComponentBridge GetHierarchyForEntity(long entity)
+        {
+            HierarchyComponentBridge hierarchyComponentBridge = default(HierarchyComponentBridge);
+            Internal_GetHierarchyForEntity(NativePointer, entity, ref hierarchyComponentBridge);
+
+            return hierarchyComponentBridge;
+        }
+
         [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_GetHierarchies", CallingConvention = CallingConvention.StdCall)]
         private static extern void Internal_GetHierarchies(IntPtr scene, ref int size, ref IntPtr collection);
 
         public HierarchyComponentBridge[] GetHierarchies()
         {
             int size = 0;
-            IntPtr unmanagedArray = IntPtr.Zero;
+            var unmanagedArray = IntPtr.Zero;
             Internal_GetHierarchies(NativePointer, ref size, ref unmanagedArray);
-            
+
             if (size > 0)
             {
-                HierarchyComponentBridge[] outcome = new HierarchyComponentBridge[size];
+                var outcome = new HierarchyComponentBridge[size];
                 for (int i = 0; i < size; i++)
                 {
-                    IntPtr unmanagedItemPtr = unmanagedArray + Marshal.SizeOf<HierarchyComponentBridge>() * i;
+                    var unmanagedItemPtr = unmanagedArray + Marshal.SizeOf<HierarchyComponentBridge>() * i;
                     outcome[i] = Marshal.PtrToStructure<HierarchyComponentBridge>(unmanagedItemPtr);
 
-                    int vava = Marshal.SizeOf<HierarchyComponentBridge>();
-                    IntPtr unmanagedNameFieldPtr = unmanagedItemPtr + Marshal.OffsetOf<HierarchyComponentBridge>("name").ToInt32();
-                    IntPtr namePtr = Marshal.ReadIntPtr(unmanagedNameFieldPtr);
+                    var unmanagedNameFieldPtr = unmanagedItemPtr + Marshal.OffsetOf<HierarchyComponentBridge>("name").ToInt32();
+                    var namePtr = Marshal.ReadIntPtr(unmanagedNameFieldPtr);
                     Marshal.FreeCoTaskMem(namePtr);
                 }
 
@@ -141,7 +160,7 @@ namespace BrunoApi.Net.Game
 
         public SceneTransform GetSceneTransformFor(long entity)
         {
-            SceneTransform sceneTransform = new SceneTransform();
+            var sceneTransform = new SceneTransform();
 
             Internal_GetTransformMatrixForEntity(m_nativePointer, entity, ref sceneTransform.WorldMatrix, ref sceneTransform.LocalPosition, ref sceneTransform.LocalScale, ref sceneTransform.LocalRotation);
             return sceneTransform;
@@ -220,6 +239,30 @@ namespace BrunoApi.Net.Game
         public void TransformSetLocalPosition(long entity, Vector3 localPosition)
         {
             Internal_SetLocalPositionForEntity(m_nativePointer, entity, ref localPosition);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_TransformUpdate", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_TransformUpdate(IntPtr scene, long entity);
+
+        public void TransformUpdate(long entity)
+        {
+            Internal_TransformUpdate(m_nativePointer, entity);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_SetNameForEntity", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        private static extern void Internal_SetNameForEntity(IntPtr scene, long entity, [MarshalAs(UnmanagedType.LPStr)] string name);
+
+        public void NameForEntity(long entity, string name)
+        {
+            Internal_SetNameForEntity(m_nativePointer, entity, name);
+        }
+
+        [DllImport(ImportConfiguration.DllImportFilename, EntryPoint = "Scene_RemoveEntity", CallingConvention = CallingConvention.StdCall)]
+        private static extern void Internal_RemoveEntity(IntPtr scene, long entity);
+
+        public void RemoveEntity(long entity)
+        {
+            Internal_RemoveEntity(m_nativePointer, entity);
         }
     }
 }

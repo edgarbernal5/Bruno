@@ -44,7 +44,7 @@ namespace BrunoEngine
 
 		friend class ContentWriter;
 		friend class ContentCompiler;
-		friend class BuildCoordinator;
+		friend class GameContentBuilder;
 
 	private:
 		//int m_ID;

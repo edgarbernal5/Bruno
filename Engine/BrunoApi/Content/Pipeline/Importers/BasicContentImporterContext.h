@@ -7,19 +7,19 @@
 namespace BrunoEngine
 {
 	class BuildItem;
-	class BuildCoordinator;
+	class GameContentBuilder;
 	class BuildRequest;
 
 	class BRUNO_API_EXPORT BasicContentImporterContext : public ContentImporterContext
 	{
 	public:
-		BasicContentImporterContext(BuildCoordinator *buildCoordinator, BuildItem *buildItem);
+		BasicContentImporterContext(GameContentBuilder *buildCoordinator, BuildItem *buildItem);
 
 		void AddDependency(std::string filename);
 		std::string GetIntermediateDirectory();
 		std::string GetOutputDirectory();
 	private:
-		BuildCoordinator * m_buildCoordinator;
+		GameContentBuilder * m_buildCoordinator;
 		BuildItem * m_buildItem;
 	};
 }

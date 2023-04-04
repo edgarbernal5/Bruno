@@ -16,7 +16,7 @@ namespace BrunoEngine
 
 	void BuildItemCollection::Load(std::string filename)
 	{
-		if (TrioIO::File::Exist(filename))
+		if (BrunoIO::File::Exist(filename))
 		{
 
 		}

@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Bruno.Logging
 {
-    public class FileLog : ILog
+    public class FileLog : LogBase
     {
         private string m_targetFilename;
         public FileLog(string filename)
@@ -13,35 +13,43 @@ namespace Bruno.Logging
             m_targetFilename = Path.Combine(exePath, filename);
         }
 
-        public void Debug(string format, params object[] args)
+        public override void Debug(string format)
         {
             using (StreamWriter writer = File.AppendText(m_targetFilename))
             {
-                LogMessage(CreateLogMessage(format, "DEBUG", args), writer);
+                LogMessage(GetLogMessage(format, LogType.DEBUG), writer);
             }
         }
 
-        public void Info(string format, params object[] args)
+        public override void Debug(string format, params object[] args)
         {
             using (StreamWriter writer = File.AppendText(m_targetFilename))
             {
-                LogMessage(CreateLogMessage(format, "INFO", args), writer);
+                LogMessage(GetLogMessage(format, LogType.DEBUG, args), writer);
             }
         }
 
-        public void Error(Exception exception)
+        public override void Info(string format, params object[] args)
         {
             using (StreamWriter writer = File.AppendText(m_targetFilename))
             {
-                LogMessage(CreateLogMessage(exception.ToString(), "ERROR"), writer);
+                LogMessage(GetLogMessage(format, LogType.INFO, args), writer);
             }
         }
 
-        public void Warn(string format, params object[] args)
+        public override void Error(Exception exception)
         {
             using (StreamWriter writer = File.AppendText(m_targetFilename))
             {
-                LogMessage(CreateLogMessage(format, "WARN", args), writer);
+                LogMessage(GetLogMessage(exception.ToString(), LogType.ERROR), writer);
+            }
+        }
+
+        public override void Warn(string format, params object[] args)
+        {
+            using (StreamWriter writer = File.AppendText(m_targetFilename))
+            {
+                LogMessage(GetLogMessage(format, LogType.WARN, args), writer);
             }
         }
 
@@ -54,13 +62,6 @@ namespace Bruno.Logging
             catch (Exception ex)
             {
             }
-        }
-
-        private string CreateLogMessage(string format, string category, params object[] args)
-        {
-            var className = LogManager.GetClassFullName(4);
-            return string.Format("[{0}] {1} {2}: {3}",
-                DateTime.Now.ToString("o"), category, className, string.Format(format, args));
         }
     }
 }

@@ -21,7 +21,7 @@ namespace BrunoEngine
 
 		template<typename T> static void RegisterContentTypeReader()
 		{
-			m_typeReaders2.push_back(new T());
+			m_typeReaders.push_back(new T());
 		}
 
 		static std::vector<ContentTypeReader*> ReadTypeManifest(uint32_t typeCount, ContentReader* contentReader);
@@ -32,7 +32,7 @@ namespace BrunoEngine
 
 		static ContentTypeReader* GetTypeReaderByName(std::string name);
 
-		static std::vector<ContentTypeReader*> m_typeReaders2;
+		static std::vector<ContentTypeReader*> m_typeReaders;
 
 		static ContentTypeReader* GetTypeReader(std::string readerTypeName, ContentReader* contentReader, std::vector<ContentTypeReader*> &newTypeReaders);
 		static void AddTypeReader(std::string readerTypeName, ContentReader* contentReader, ContentTypeReader* reader);

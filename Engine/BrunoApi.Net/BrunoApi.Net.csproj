@@ -64,8 +64,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Content\ContentManager.cs" />
-    <Compile Include="Content\Tasks\BuildCoordinator.cs" />
-    <Compile Include="Content\Tasks\BuildCoordinatorSettings.cs" />
+    <Compile Include="Content\Tasks\GameContentBuilder.cs" />
+    <Compile Include="Content\Tasks\GameContentBuilderSettings.cs" />
     <Compile Include="Game\Components\SceneBoundingBox.cs" />
     <Compile Include="Game\Components\SceneTransform.cs" />
     <Compile Include="Graphics\Core\BlendState.cs" />
@@ -116,6 +116,8 @@
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="ImportConfiguration.cs" />
+    <Compile Include="IO\FileSystemStorage.cs" />
+    <Compile Include="IO\IStorage.cs" />
     <Compile Include="Maths\BoundingBox.cs" />
     <Compile Include="Maths\MathHelper.cs" />
     <Compile Include="Maths\Matrix.cs" />

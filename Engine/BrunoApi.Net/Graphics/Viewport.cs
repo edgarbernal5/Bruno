@@ -1,11 +1,12 @@
 ﻿
+using System;
 using System.Runtime.InteropServices;
 using BrunoApi.Net.Maths;
 
 namespace BrunoApi.Net.Graphics
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct Viewport
+    public struct Viewport : IEquatable<Viewport>
     {
         public float X;
         public float Y;
@@ -52,6 +53,39 @@ namespace BrunoApi.Net.Graphics
         {
             Internal_Unproject(ref this, ref source, ref projection, ref view, ref world);
             return source;
+        }
+
+        public bool Equals(Viewport other)
+        {
+            return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height
+                && MaxDepth == other.MaxDepth && MinDepth == other.MinDepth;
+        }
+
+        public override bool Equals(object obj)
+        {
+            bool result = false;
+            if (obj is Viewport)
+            {
+                result = Equals((Viewport)obj);
+            }
+            return result;
+        }
+
+        public static bool operator ==(Viewport value1, Viewport value2)
+        {
+            return value1.X == value2.X && value1.Y == value2.Y && value1.Width == value2.Width 
+                && value1.Height == value2.Height && value1.MaxDepth == value2.MaxDepth && value1.MinDepth == value2.MinDepth;
+        }
+
+        public static bool operator !=(Viewport value1, Viewport value2)
+        {
+            return value1.X != value2.X || value1.Y != value2.Y || value1.Width == value2.Width
+                || value1.Height != value2.Height || value1.MaxDepth != value2.MaxDepth || value1.MinDepth != value2.MinDepth;
+        }
+
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() + Y.GetHashCode() + Width.GetHashCode() + Height.GetHashCode() + MaxDepth.GetHashCode() + MinDepth.GetHashCode();
         }
     }
 }

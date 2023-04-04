@@ -1,28 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace BrunoFramework.Editor.Game
 {
-    /// <summary>
-    /// Interaction logic for WorldOutlineView.xaml
-    /// </summary>
-    public partial class WorldOutlineView : UserControl
+    public partial class WorldOutlineView : UserControl, IWorldOutlineView
     {
+        private WorldOutlineViewModel m_worldOutlineView;
         public WorldOutlineView()
         {
             InitializeComponent();
+
+            DataContextChanged += OnDataContextChanged;
         }
+
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var worldOutlineViewModel = DataContext as WorldOutlineViewModel;
+
+            if (m_worldOutlineView != null)
+            {
+                m_worldOutlineView.View = null;
+            }
+
+            m_worldOutlineView = worldOutlineViewModel;
+
+            if (worldOutlineViewModel != null)
+            {
+                m_worldOutlineView.View = this;
+            }
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+        }
+
+        public string SearchText => txtFind.Text;
     }
 }

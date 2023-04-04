@@ -27,7 +27,7 @@ namespace BrunoEngine
 
 		ContentItem* Import(const std::string& filename);
 
-		friend class BuildCoordinator;
+		friend class GameContentBuilder;
 
 		std::string GetImporterName() const { return "ModelImporter"; }
 		std::string GetFileExtensions() const { return "x, obj, fbx"; }

@@ -3,7 +3,7 @@
 
 #include "Stream.h"
 
-namespace TrioIO
+namespace BrunoIO
 {
 	BinaryWriter::BinaryWriter(Stream *_stream) 
 		: m_stream(nullptr)

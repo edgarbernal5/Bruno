@@ -18,7 +18,7 @@ namespace BrunoEngine
 		{
 			if (filename.size() > 0)
 			{
-				m_filename = TrioIO::Path::GetFullDirectory(filename);
+				m_filename = BrunoIO::Path::GetFullDirectory(filename);
 			}
 			m_processorName = "ExternalReferenceWriter";
 		}

@@ -10,26 +10,27 @@ namespace Bruno.Collections
 
         public TreeNodeCollection<T> Children
         {
-            get => _children;
+            get => m_children;
             set
             {
-                if (_children == value)
+                if (m_children == value)
                     return;
 
-                _children = value;
+                m_children = value;
             }
         }
-        private TreeNodeCollection<T> _children;
+        private TreeNodeCollection<T> m_children;
 
-        public MergePoint MergePoint { get => _mergePoint; }
-        private MergePoint _mergePoint;
+        public MergePoint MergePoint { get => m_mergePoint; }
+        private MergePoint m_mergePoint;
+
 
         public TreeNode(T content)
         {
             Content = content;
-            _mergePoint = MergePoint.DefaultMergePoint;
+            m_mergePoint = MergePoint.DefaultMergePoint;
 
-            _children = new TreeNodeCollection<T>();
+            m_children = new TreeNodeCollection<T>();
         }
 
         public TreeNode(T content, params TreeNode<T>[] children)
@@ -38,6 +39,23 @@ namespace Bruno.Collections
             if (children != null)
             {
                 Children.AddRange(children);
+            }
+        }
+
+        public TreeNode(T content, MergePoint mergePoint)
+        {
+            Content = content;
+            m_mergePoint = mergePoint;
+
+            m_children = new TreeNodeCollection<T>();
+        }
+
+        public TreeNode(T content, MergePoint mergePoint, params TreeNode<T>[] children)
+          : this(content, mergePoint)
+        {
+            if (children != null)
+            {
+                m_children.AddRange(children);
             }
         }
     }
@@ -58,7 +76,7 @@ namespace Bruno.Collections
                     return;
 
                 if (base.Parent != null)
-                    throw new InvalidOperationException(".");
+                    throw new InvalidOperationException("Item has already parent");
 
                 base.Parent = value;
             }

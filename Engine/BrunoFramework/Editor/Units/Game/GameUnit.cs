@@ -5,16 +5,22 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using BrunoApi.Net.Graphics;
+using Bruno.Logging;
 
 namespace BrunoFramework.Editor.Units
 {
-    public class GameUnit : EditorUnit
+    public class GameUnit : EditorUnit, IGameUnitService
     {
+        private static readonly ILog Logger = Bruno.Logging.Logger.GetLog();
+
         private GraphicsService m_graphicsService;
         public static GameStepTimer m_gameStepTimer;
         private bool m_idle;
 
+        public event GameUnitEvent OnNewFrame;
+
         public GameUnit()
+            : base()
         {
             Priority = int.MaxValue - 1;
         }
@@ -33,25 +39,28 @@ namespace BrunoFramework.Editor.Units
             var graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, presentationParameters);
 
             m_graphicsService = new GraphicsService(graphicsDevice);
-            Editor.Services.RegisterInstance(typeof(IGraphicsService), null, m_graphicsService);
+            Editor.Services.RegisterInstance(typeof(IGraphicsService), m_graphicsService);
 
             var graphicsDeviceService = new WpfGraphicsDeviceService(graphicsDevice);
-            Editor.Services.RegisterInstance(typeof(IHwndHostRef), null, graphicsDeviceService);
+            Editor.Services.RegisterInstance(typeof(IHwndHostRef), graphicsDeviceService);
 
             m_gameStepTimer = new GameStepTimer();
-            Editor.Services.RegisterInstance(typeof(GameStepTimer), null, m_gameStepTimer);
+            Editor.Services.RegisterInstance(typeof(GameStepTimer), m_gameStepTimer);
+
+            Editor.Services.RegisterInstance(typeof(IGameUnitService), this);
         }
 
-        private void CompositionTarget_Rendering(object sender, EventArgs e)
+        private void OnCompositionTargetRendering(object sender, EventArgs e)
         {
             m_gameStepTimer.Tick();
             Render();
             m_idle = false;
         }
 
-        private void GameStepTimer_OnTick()
+        private void OnGameStepTimerTick()
         {
-            //Console.WriteLine("Ticking elapsed = {0}, total = {1}: FPS = {2}", m_gameStepTimer.ElapsedTime.TotalSeconds, m_gameStepTimer.TotalTime.TotalSeconds, m_gameStepTimer.FramesPerSecond);
+            //Logger.Debug("Ticking elapsed = {0}, total = {1}: FPS = {2}", m_gameStepTimer.ElapsedTime.TotalSeconds, m_gameStepTimer.TotalTime.TotalSeconds, m_gameStepTimer.FramesPerSecond);
+            OnNewFrame?.Invoke();
         }
 
         private void Render()
@@ -78,9 +87,9 @@ namespace BrunoFramework.Editor.Units
 
         protected override void OnStartup()
         {
-            m_gameStepTimer.OnTimeChanged += GameStepTimer_OnTick;
+            m_gameStepTimer.OnTimeChanged += OnGameStepTimerTick;
 
-            CompositionTarget.Rendering += CompositionTarget_Rendering;
+            CompositionTarget.Rendering += OnCompositionTargetRendering;
             ComponentDispatcher.ThreadIdle += OnApplicationIdle;
 
             m_gameStepTimer.Start();
@@ -95,10 +104,10 @@ namespace BrunoFramework.Editor.Units
         {
             m_gameStepTimer.Stop();
 
-            CompositionTarget.Rendering -= CompositionTarget_Rendering;
+            CompositionTarget.Rendering -= OnCompositionTargetRendering;
             ComponentDispatcher.ThreadIdle -= OnApplicationIdle;
 
-            m_gameStepTimer.OnTimeChanged -= GameStepTimer_OnTick;
+            m_gameStepTimer.OnTimeChanged -= OnGameStepTimerTick;
         }
 
         protected override void OnUninitialize()
@@ -108,11 +117,7 @@ namespace BrunoFramework.Editor.Units
 
             Editor.Services.UnregisterHandler(typeof(IGraphicsService));
             Editor.Services.UnregisterHandler(typeof(IHwndHostRef));
-        }
-
-        public override EditorDockableTabViewModel GetDockTabViewModel(string dockId)
-        {
-            return null;
+            Editor.Services.UnregisterHandler(typeof(IGameUnitService));
         }
     }
 }

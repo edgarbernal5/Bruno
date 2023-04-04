@@ -1,21 +1,10 @@
-﻿using BrunoFramework.Graphics;
+﻿
 using BrunoWindows.Interop;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using BrunoApi.Net.Graphics.Core;
 
 namespace BrunoFramework.Editor
 {
@@ -24,8 +13,7 @@ namespace BrunoFramework.Editor
     /// </summary>
     public partial class EditorWindow : Window
     {
-        private bool _menuOrToolBarClicked;
-        private EditorViewModel _editorViewModel;
+        private EditorViewModel m_editorViewModel;
 
         public EditorWindow()
         {
@@ -40,30 +28,29 @@ namespace BrunoFramework.Editor
         {
             var editorViewModel = DataContext as EditorViewModel;
 
-            if (_editorViewModel != null)
+            if (m_editorViewModel != null)
             {
-                _editorViewModel.Window = null;
-                _editorViewModel.DockManager = null;
+                m_editorViewModel.Window = null;
+                m_editorViewModel.DockManager = null;
             }
 
-            _editorViewModel = editorViewModel;
+            m_editorViewModel = editorViewModel;
 
             if (editorViewModel != null)
             {
-                _editorViewModel.Window = this;
-                _editorViewModel.DockManager = DockManager;
+                m_editorViewModel.Window = this;
+                m_editorViewModel.DockManager = DockManager;
             }
         }
 
         private void OnLoaded(object sender, RoutedEventArgs eventArgs)
         {
-
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs eventArgs)
         {
-            _editorViewModel.Window = null;
-            _editorViewModel.DockManager = null;
+            m_editorViewModel.Window = null;
+            m_editorViewModel.DockManager = null;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -74,51 +61,6 @@ namespace BrunoFramework.Editor
             //var hwndSource = (HwndSource)PresentationSource.FromVisual(this);
             //Debug.Assert(hwndSource != null, "Unable to retrieve HWND of main window.");
             //hwndSource.AddHook(hook);
-        }
-
-        private IntPtr FilterMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            // Watch for WM_MOUSEACTIVATE events and return MA_NOACTIVATE to prevent the
-            // main window from getting focus due to mouse clicks on the menu or toolbars.
-            const int MA_NOACTIVATE = 3;
-
-            switch (msg)
-            {
-                case WindowMessages.WM_MOUSEACTIVATE:
-                    if (MenuOrToolBarClicked())
-                    {
-                        handled = true;
-                        return new IntPtr(MA_NOACTIVATE);
-                    }
-                    break;
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private bool MenuOrToolBarClicked()
-        {
-            _menuOrToolBarClicked = false;
-            var mousePosition = Mouse.GetPosition(this);
-            VisualTreeHelper.HitTest(this, null, HitTestCallback, new PointHitTestParameters(mousePosition));
-            return _menuOrToolBarClicked;
-        }
-
-        private HitTestResultBehavior HitTestCallback(HitTestResult result)
-        {
-            var visual = result.VisualHit;
-            while (visual != null)
-            {
-                if (visual == Menu || visual is ToolBar)
-                {
-                    _menuOrToolBarClicked = true;
-                    return HitTestResultBehavior.Stop;
-                }
-
-                visual = VisualTreeHelper.GetParent(visual);
-            }
-
-            return HitTestResultBehavior.Continue;
         }
 
         private void OnPreviewMenuGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs eventArgs)

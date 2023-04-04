@@ -60,6 +60,17 @@ namespace BrunoFramework.Editor.Game
         }
         private bool m_isExpanded;
 
+        public bool IsVisible
+        {
+            get => m_isVisible;
+            set
+            {
+                m_isVisible = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        private bool m_isVisible = true;
+
         public WorldOutlineItem Parent
         {
             get => m_parent;

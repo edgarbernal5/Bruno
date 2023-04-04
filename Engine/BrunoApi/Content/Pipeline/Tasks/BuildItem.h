@@ -22,7 +22,7 @@ namespace BrunoEngine
 		void RemoveDependency(std::string filename);
 		void RemoveRequest(std::string filename);
 
-		friend class BuildCoordinator;
+		friend class GameContentBuilder;
 		friend class BuildItemCollection;
 		friend class BasicContentProcessorContext;
 	private:

@@ -1,6 +1,7 @@
 ﻿using BrunoWindows;
 using System;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace BrunoFramework
 {
@@ -46,6 +47,7 @@ namespace BrunoFramework
             Application = Application.Current;
             Application.Startup += OnStartup;
             Application.Exit += OnExit;
+            Application.DispatcherUnhandledException += OnUnhandledException;
 
             OnConfigure();
         }
@@ -59,6 +61,10 @@ namespace BrunoFramework
         }
 
         protected virtual void OnConfigure()
+        {
+        }
+
+        protected virtual void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
         }
     }

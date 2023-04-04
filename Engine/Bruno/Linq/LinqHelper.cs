@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Bruno.Linq
 {
-    /// <summary>
-    /// Provides new extension methods for LINQ.
-    /// </summary>
     public static class LinqHelper
     {
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
@@ -21,14 +18,6 @@ namespace Bruno.Linq
             }
         }
 
-        /// <summary>
-        /// Returns an <see cref="IEnumerable{T}"/> that returns a single element.
-        /// </summary>
-        /// <typeparam name="T">The type of the element.</typeparam>
-        /// <param name="value">The first and only element in the sequence.</param>
-        /// <returns>
-        /// An <see cref="IEnumerable{T}"/> that returns a single element.
-        /// </returns>
         public static IEnumerable<T> Return<T>(T value)
         {
             yield return value;

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace BrunoFramework.Editor
 {
-    public interface IEditorService : IActivate
+    public interface IEditorService : IActivate, IDeactivate, IGuardClose, IHaveActiveItem<Screen>
     {
         string ApplicationName { get; set; }
 
@@ -28,12 +28,11 @@ namespace BrunoFramework.Editor
         DockingManager DockManager { get; set; }
 
         void LoadLayout();
+
         void SaveLayout();
 
-        void ActivateItem(object item);
+        void ActivateItem(Screen item);
 
-        DocumentViewModel ActiveDocument { get; set; }
-
-        event EventHandler<EventArgs> ActiveDocumentChanged;
+        event EventHandler<EventArgs> ActiveItemChanged;
     }
 }

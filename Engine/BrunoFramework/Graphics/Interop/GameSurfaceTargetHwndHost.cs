@@ -47,22 +47,6 @@ namespace BrunoFramework.Graphics.Interop
 
         int IGameSurfaceTarget.Height => (int)ActualHeight;
 
-        //public new int Width
-        //{
-        //    get
-        //    {
-        //        return (int)ActualWidth;
-        //    }
-        //}
-
-        //public new int Height
-        //{
-        //    get
-        //    {
-        //        return (int)ActualHeight;
-        //    }
-        //}
-
         public event EventHandler<HwndMouseEventArgs> HwndLButtonDown;
 
         public event EventHandler<HwndMouseEventArgs> HwndLButtonUp;
@@ -106,6 +90,8 @@ namespace BrunoFramework.Graphics.Interop
             get { return m_isMouseCaptured; }
         }
 
+        private IEditorService m_editorService;
+
         public GameSurfaceTargetHwndHost()
         {
             Initialize();
@@ -117,11 +103,10 @@ namespace BrunoFramework.Graphics.Interop
             Application.Current.Activated += Current_Activated;
             Application.Current.Deactivated += Current_Deactivated;
 
-            Loaded += GameSurfaceTargetHost_Loaded;
-            Unloaded += GameSurfaceTargetHost_Unloaded;
-            SizeChanged += GameSurfaceTargetHwndHost_SizeChanged;
+            Loaded += OnGameSurfaceTargetHostLoaded;
+            Unloaded += OnGameSurfaceTargetHostUnloaded;
+            SizeChanged += OnGameSurfaceTargetHwndHostSizeChanged;
         }
-        private IEditorService m_editorService;
 
         private void Initialize()
         {
@@ -183,7 +168,7 @@ namespace BrunoFramework.Graphics.Interop
             m_mouseInWindow = false;
         }
 
-        private void GameSurfaceTargetHost_Loaded(object sender, RoutedEventArgs e)
+        private void OnGameSurfaceTargetHostLoaded(object sender, RoutedEventArgs e)
         {
             var editor = this.GetEditor();
             m_editorService = editor; //HACK: REMOVE THIS!!
@@ -192,11 +177,11 @@ namespace BrunoFramework.Graphics.Interop
             if (graphicsService == null) return;
             var graphicsDeviceService = editor.Services.GetInstance<IHwndHostRef>();
 
-            graphicsService.GameSurfaceTargets.Add(this);
             graphicsDeviceService.AddRef(m_hWnd, (int)ActualWidth, (int)ActualHeight);
+            graphicsService.GameSurfaceTargets.Add(this);
         }
 
-        private void GameSurfaceTargetHost_Unloaded(object sender, RoutedEventArgs e)
+        private void OnGameSurfaceTargetHostUnloaded(object sender, RoutedEventArgs e)
         {
             var editor = this.GetEditor() ?? m_editorService; //HACK: REMOVE THIS!!
             
@@ -207,7 +192,7 @@ namespace BrunoFramework.Graphics.Interop
             graphicsDeviceService.RemoveRef(m_hWnd);
         }
 
-        private void GameSurfaceTargetHwndHost_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void OnGameSurfaceTargetHwndHostSizeChanged(object sender, SizeChangedEventArgs e)
         {
             var editor = this.GetEditor();
             var graphicsDeviceService = editor.Services.GetInstance<IHwndHostRef>();
@@ -325,8 +310,28 @@ namespace BrunoFramework.Graphics.Interop
                     }
                     break;
                 case WindowMessages.WM_LBUTTONDOWN:
-                    m_mouseState.LeftButton = MouseButtonState.Pressed;
-                    HwndLButtonDown?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+                    {
+                        m_mouseState.LeftButton = MouseButtonState.Pressed;
+                        HwndLButtonDown?.Invoke(this, new HwndMouseEventArgs(m_mouseState));
+
+                        var eventArgs = new MouseButtonEventArgs(
+                            Mouse.PrimaryDevice,
+                            Environment.TickCount,
+                            MouseButton.Left);
+
+                        eventArgs.RoutedEvent = UIElement.PreviewMouseDownEvent;
+                        eventArgs.Source = this;
+
+                        // Raise the WPF event from the specified WPF event source.
+                        InputManager.Current.ProcessInput(eventArgs);
+
+                        eventArgs.RoutedEvent = UIElement.MouseDownEvent;
+                        InputManager.Current.ProcessInput(eventArgs);
+
+                        CommandManager.InvalidateRequerySuggested();
+
+                        handled = true;
+                    }
                     break;
                 case WindowMessages.WM_LBUTTONUP:
                     m_mouseState.LeftButton = MouseButtonState.Released;

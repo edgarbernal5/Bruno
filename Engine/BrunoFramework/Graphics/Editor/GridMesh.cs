@@ -1,5 +1,5 @@
 ﻿
-using Bruno.Interop;
+using Bruno;
 using System.Collections.Generic;
 using BrunoApi.Net.Graphics;
 using BrunoApi.Net.Graphics.Core;
@@ -20,7 +20,7 @@ namespace BrunoFramework.Graphics.Editor
 
         private int m_totalIndices;
 
-        private Effect m_effect;
+        private Effect Effect { get; set; }
 
         public ColorRGBA8 AxisXColor { get; set; }
         public ColorRGBA8 AxisZColor { get; set; }
@@ -38,7 +38,7 @@ namespace BrunoFramework.Graphics.Editor
             CreateIndexBuffer(device);
             CreateVertexBuffer(device);
 
-            m_effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\BrunoEngineGit\Shaders\GridEffect.fx");
+            Effect = new Effect(device, @"D:\Edgar\Documentos\Proyectos\CG\BrunoEngineGit\Shaders\GridEffect.fx");
         }
 
         private void CreateVertexBuffer(GraphicsDevice device)
@@ -111,12 +111,12 @@ namespace BrunoFramework.Graphics.Editor
             {
                 m_vertexBuffer.Dispose();
                 m_indexBuffer.Dispose();
-                m_effect.Dispose();
+                Effect.Dispose();
             }
 
             m_vertexBuffer = null;
             m_indexBuffer = null;
-            m_effect = null;
+            Effect = null;
         }
 
         public void Render(RenderContext renderContext)
@@ -131,12 +131,12 @@ namespace BrunoFramework.Graphics.Editor
             device.SetVertexBuffer(m_vertexBuffer);
             device.SetIndexBuffer(m_indexBuffer);
 
-            m_effect.Parameters["gWorldViewProj"].SetValue(renderContext.Camera.ViewProjection);
-            m_effect.Parameters["gWorldView"].SetValue(renderContext.Camera.View);
-            m_effect.Parameters["gFarPlane"].SetValue((float)m_gridSize);
-            m_effect.Parameters["gNearPlane"].SetValue(renderContext.Camera.NearPlane);
+            Effect.Parameters["gWorldViewProj"].SetValue(renderContext.Camera.ViewProjection);
+            Effect.Parameters["gWorldView"].SetValue(renderContext.Camera.View);
+            Effect.Parameters["gFarPlane"].SetValue((float)m_gridSize);
+            Effect.Parameters["gNearPlane"].SetValue(renderContext.Camera.NearPlane);
             //kaka += 0.001f;
-            m_effect.Techniques[0].Passes[0].Apply();
+            Effect.Techniques[0].Passes[0].Apply();
 
             device.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, (uint)(m_totalIndices / 2));
         }

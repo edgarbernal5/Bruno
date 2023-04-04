@@ -7,7 +7,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace TrioIO
+namespace BrunoIO
 {
 	enum class FileAccess
 	{

@@ -27,5 +27,35 @@ namespace BrunoFramework.Editor.Units
             }
         }
         private ImageSource m_icon;
+
+        public bool IsFolder
+        {
+            get => m_isFolder;
+            set
+            {
+                m_isFolder = value;
+            }
+        }
+        private bool m_isFolder;
+
+        public string RelativePath
+        {
+            get => m_relativePath;
+            set
+            {
+                m_relativePath = value;
+            }
+        }
+        private string m_relativePath;
+
+        public string AbsolutePath
+        {
+            get => m_absolutePath;
+            set
+            {
+                m_absolutePath = value;
+            }
+        }
+        private string m_absolutePath;
     }
 }

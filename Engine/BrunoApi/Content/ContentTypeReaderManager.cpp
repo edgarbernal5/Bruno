@@ -15,7 +15,7 @@
 namespace BrunoEngine
 {
 	std::map<std::string, ContentTypeReader*>* ContentTypeReaderManager::m_nameToReader = new std::map<std::string, ContentTypeReader*>();
-	std::vector<ContentTypeReader*> ContentTypeReaderManager::m_typeReaders2;
+	std::vector<ContentTypeReader*> ContentTypeReaderManager::m_typeReaders;
 
 	ContentTypeReaderManager::ContentTypeReaderManager(ContentReader* reader)
 		: m_reader(reader)
@@ -28,10 +28,10 @@ namespace BrunoEngine
 
 	ContentTypeReader* ContentTypeReaderManager::GetTypeReaderByName(std::string name)
 	{
-		for (int i = 0; i < m_typeReaders2.size(); i++)
+		for (int i = 0; i < m_typeReaders.size(); i++)
 		{
-			if (m_typeReaders2[i]->GetReaderName() == name)
-				return m_typeReaders2[i];
+			if (m_typeReaders[i]->GetReaderName() == name)
+				return m_typeReaders[i];
 		}
 		return nullptr;
 	}

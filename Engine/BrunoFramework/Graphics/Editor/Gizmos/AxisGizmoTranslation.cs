@@ -1,5 +1,5 @@
 ﻿
-using Bruno.Interop;
+using Bruno;
 using System;
 using BrunoApi.Net.Graphics;
 using BrunoApi.Net.Graphics.Core;
@@ -57,7 +57,7 @@ namespace BrunoFramework.Graphics.Editor
             int totalIndices = coneIndices;
             m_coneIndicesTotal = (uint)coneIndices;
 
-            VertexPositionColor[] vertices = new VertexPositionColor[totalVertices];
+            var vertices = new VertexPositionColor[totalVertices];
             var triangles = new short[totalIndices];
 
             m_vertexBuffer = new VertexBuffer(device, VertexPositionColor.VertexDeclaration, totalVertices);

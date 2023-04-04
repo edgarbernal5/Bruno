@@ -9,6 +9,7 @@
 #include "Utils/TextureLoader.h"
 
 #include <unordered_set>
+#include <queue>
 
 namespace BrunoEngine
 {
@@ -22,7 +23,8 @@ namespace BrunoEngine
 
 	Scene::~Scene()
 	{
-		if (g_mainCamera != nullptr) {
+		if (g_mainCamera != nullptr)
+		{
 			delete g_mainCamera;
 			g_mainCamera = nullptr;
 		}
@@ -43,7 +45,8 @@ namespace BrunoEngine
 		return g_mainCamera;
 	}
 
-	void Scene::UpdateCamera(const Camera& camera) {
+	void Scene::UpdateCamera(const Camera& camera)
+	{
 		*g_mainCamera = camera;
 	}
 
@@ -71,7 +74,7 @@ namespace BrunoEngine
 		return entity;
 	}
 
-	Entity Scene::CreateEntityForBone(std::string name)
+	Entity Scene::CreateEntityForEmptyObject(std::string name)
 	{
 		Entity entity = CreateEntity();
 
@@ -103,7 +106,7 @@ namespace BrunoEngine
 			std::stringstream ss;
 			ss << "bone_" << boneIndex << "_" << modelBone->GetName();
 
-			Entity boneEntity = CreateEntityForBone(ss.str());
+			Entity boneEntity = CreateEntityForEmptyObject(ss.str());
 			TransformComponent& transform = *m_transforms.GetComponent(boneEntity);
 
 			boneIndexes[modelBone] = boneEntity;
@@ -171,7 +174,8 @@ namespace BrunoEngine
 			name.m_name = ss.str();
 
 			BoundingBoxComponent& box = m_boundingBoxes.Create(meshEntity);
-			BoundingBox bbox;
+			BoundingBox bbox = modelMesh->GetBoundingBox();
+
 			for (auto meshPart : modelMesh->GetModelMeshParts()) {
 				mesh.m_subMeshes.push_back(MeshComponent::SubMesh());
 
@@ -185,18 +189,21 @@ namespace BrunoEngine
 				mesh.m_indexBuffer = *meshPart->GetIndexBuffer();
 
 				subMesh.m_materialId = materialIndexes[meshPart->GetMaterial()];
-
-				BoundingBox::CreateMerged(bbox, bbox, modelMesh->GetBoundingBox());
 			}
 
 			box.m_center = bbox.Center;
 			box.m_extents = bbox.Extents;
 		}
+
+		Entity lightEntity = CreateEntityForEmptyObject("Directional light");
+		m_transforms.GetComponent(lightEntity)->RotatePitchYawRoll(Vector3(0.5f, 0.0f, 0.0f));
+		m_lights.Create(lightEntity);
 	}
 
-	void Scene::ComponentAttach(Entity entity, Entity parent, bool child_already_in_local_space)
+	void Scene::ComponentAttach(Entity entity, Entity parent, bool childAlreadyInLocalSpace)
 	{
-		if (m_hierarchies.Contains(entity)) {
+		if (m_hierarchies.Contains(entity))
+		{
 			ComponentDetach(entity);
 		}
 
@@ -233,7 +240,7 @@ namespace BrunoEngine
 			transformChild = &m_transforms.Create(entity);
 			transformParent = m_transforms.GetComponent(parent); // after transforms.Create(), transform_parent pointer could have become invalidated!
 		}
-		if (!child_already_in_local_space)
+		if (!childAlreadyInLocalSpace)
 		{
 			Matrix B = transformParent->m_world.Invert();
 			transformChild->MatrixTransform(B);
@@ -253,11 +260,65 @@ namespace BrunoEngine
 			{
 				transform->ApplyTransform();
 			}
-			m_hierarchies.RemoveKeepSorted(entity);
+			m_hierarchies.Remove(entity);
 		}
 	}
 
-	uint32_t Scene::GetComponentsMask(long entity)
+
+	Entity Scene::AddEmptyObject(std::string name)
+	{
+		return CreateEntityForEmptyObject(name);
+	}
+
+	void Scene::UpdateTransformFor(Entity entity)
+	{
+		ComponentManager<TransformComponent>& transforms = GetTransforms();
+		TransformComponent* transform = transforms.GetComponent(entity);
+		transform->Update();
+
+		ComponentManager<HierarchyComponent>& hierarchies = GetHierarchies();
+
+		HierarchyComponent* parentcomponent = hierarchies.GetComponent(entity);
+
+		if (parentcomponent != nullptr) {
+			TransformComponent* transformChild = transforms.GetComponent(entity);
+			TransformComponent* transformParent = transforms.GetComponent(parentcomponent->m_parentId);
+			transformChild->UpdateTransformParented(*transformParent);
+		}
+		/*
+		
+		std::queue<Entity> queue;
+		std::unordered_set<Entity> visited;
+
+		queue.push(entity);
+		visited.insert(entity);
+		while (!queue.empty()) {
+			Entity ent = queue.front(); queue.pop();
+
+			for (size_t i = 0; i < hierarchies.GetCount(); i++)
+			{
+				HierarchyComponent& parentcomponent = hierarchies[i];
+				Entity hieEntity = m_hierarchies.GetEntity(i);
+
+				if (parentcomponent.m_parentId == ent) {
+
+					TransformComponent* transformChild = transforms.GetComponent(hieEntity);
+					TransformComponent* transformParent = transforms.GetComponent(parentcomponent.m_parentId);
+					if (transformChild != nullptr && transformParent != nullptr)
+					{
+						transformChild->UpdateTransformParented(*transformParent);
+
+						if (visited.find(hieEntity) == visited.end()) {
+							queue.push(hieEntity);
+							visited.insert(hieEntity);
+						}
+					}
+				}
+			}
+		}*/
+	}
+
+	uint32_t Scene::GetComponentsMask(Entity entity)
 	{
 		uint32_t mask = 0;
 		if (m_names.Contains(entity)) mask |= 1;
@@ -266,6 +327,7 @@ namespace BrunoEngine
 		if (m_meshes.Contains(entity)) mask |= 8;
 		if (m_boundingBoxes.Contains(entity)) mask |= 16;
 		if (m_materials.Contains(entity)) mask |= 32;
+		if (m_lights.Contains(entity)) mask |= 64;
 
 		return mask;
 	}
@@ -295,5 +357,47 @@ namespace BrunoEngine
 				transformChild->UpdateTransformParented(*transformParent);
 			}
 		}
+		
+		for (size_t i = 0; i < m_lights.GetCount(); i++)
+		{
+			LightComponent& lightComponent = m_lights[i];
+			Entity entity = m_lights.GetEntity(i);
+
+			Vector3 lightDir = m_transforms.GetComponent(entity)->m_world.Forward();
+			lightComponent.m_lightDirection = lightDir;
+		}
+	}
+
+	void Scene::RemoveEntity(Entity entity)
+	{
+		std::vector<Entity> toErase;
+		RemoveEntity(entity, INVALID_ENTITY, toErase);
+
+		for (auto child : toErase) {
+			ComponentDetach(child);
+
+			m_names.Remove(child);
+			m_transforms.Remove(child);
+			m_meshes.Remove(child);
+			m_boundingBoxes.Remove(child);
+			m_materials.Remove(child);
+			m_lights.Remove(child);
+		}
+	}
+
+
+	void Scene::RemoveEntity(Entity child, Entity parent, std::vector<Entity>& toErase)
+	{
+		for (size_t i = 0; i < m_hierarchies.GetCount(); i++)
+		{
+			const HierarchyComponent& parentcomponent = m_hierarchies[i];
+			Entity entity = m_hierarchies.GetEntity(i);
+
+			if (parentcomponent.m_parentId == child) {
+				RemoveEntity(entity, child, toErase);
+			}
+		}
+
+		toErase.push_back(child);
 	}
 }

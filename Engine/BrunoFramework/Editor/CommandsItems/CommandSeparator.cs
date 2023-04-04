@@ -30,6 +30,11 @@ namespace BrunoFramework.Editor
 
         public bool IsChecked => false;
 
+        public CommandSeparator(string name)
+        {
+            Name = name;
+        }
+
         public MenuItemViewModel CreateMenuItem()
         {
             return new MenuSeparatorViewModel(this);

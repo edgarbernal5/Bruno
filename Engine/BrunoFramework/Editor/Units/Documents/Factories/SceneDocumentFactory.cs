@@ -1,6 +1,5 @@
 ﻿
 using BrunoFramework.Editor.Game;
-using System;
 
 namespace BrunoFramework.Editor.Units
 {
@@ -16,9 +15,13 @@ namespace BrunoFramework.Editor.Units
             SupportedFileTypes.Add(new DocumentType("Scene", new string[] { ".x", ".fbx", ".obj" }, this) );
         }
 
-        protected override Document OnCreate(DocumentType documentFileType)
+        protected override Document OnCreate(DocumentType documentFileType, Document existingDocument)
         {
-            return new SceneDocument(Editor, documentFileType);
+            if (existingDocument == default(Document))
+            {
+                return new SceneDocument(Editor, documentFileType);
+            }
+            return existingDocument;
         }
     }
 }

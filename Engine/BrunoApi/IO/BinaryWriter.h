@@ -5,7 +5,7 @@
 #include <string>
 #include <stdint.h>
 
-namespace TrioIO
+namespace BrunoIO
 {
 	class Stream;
 

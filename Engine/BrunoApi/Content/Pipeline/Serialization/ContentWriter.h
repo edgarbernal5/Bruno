@@ -9,7 +9,7 @@
 #include <vector>
 #include <queue>
 
-namespace TrioIO
+namespace BrunoIO
 {
 	class Stream;
 	class MemoryStream;
@@ -21,10 +21,10 @@ namespace BrunoEngine
 	class ContentItem;
 	class ContentTypeWriter;
 
-	class ContentWriter : public TrioIO::BinaryWriter
+	class ContentWriter : public BrunoIO::BinaryWriter
 	{
 	public:
-		ContentWriter(ContentCompiler* compiler, TrioIO::Stream* _stream, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath);
+		ContentWriter(ContentCompiler* compiler, BrunoIO::Stream* _stream, bool compressContent, std::string rootDirectory, std::string referenceRelocationPath);
 		~ContentWriter();
 
 		void Write(const Matrix& value);
@@ -60,10 +60,10 @@ namespace BrunoEngine
 		void WriteHeader();
 		void WriteSharedResources();
 
-		TrioIO::MemoryStream* m_headerData;
-		TrioIO::MemoryStream* m_contentData;
+		BrunoIO::MemoryStream* m_headerData;
+		BrunoIO::MemoryStream* m_contentData;
 
-		TrioIO::Stream* m_finalOutput;
+		BrunoIO::Stream* m_finalOutput;
 
 		//std::map<int, int> m_SharedResourceNames;
 		std::map<ContentItem*, int> m_sharedResourceNames;

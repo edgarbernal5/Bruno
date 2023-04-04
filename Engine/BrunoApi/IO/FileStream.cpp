@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FileStream.h"
 
-namespace TrioIO
+namespace BrunoIO
 {
 	FileStream::FileStream(std::string filename, FileAccess access) :
 		Stream(),

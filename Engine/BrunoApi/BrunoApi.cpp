@@ -36,8 +36,11 @@
 #include "GameObject.h"
 #include "Utils/TextureLoader.h"
 
-#include "Content/Pipeline/Tasks/BuildCoordinator.h"
+#include "Content/Pipeline/Tasks/GameContentBuilder.h"
 #include "Content/ContentManager.h"
+
+#include "Vfs/IStorage.h"
+#include "Vfs/FileSystemStorage.h"
 
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderPaths/RenderPathForward.h"
@@ -138,9 +141,9 @@ bool BoundingBox_IntersectsRay(BoundingBox* box, Ray* ray, float* fDistance)
 /*
 BuildCoordinator
 */
-BuildCoordinator* BuildCoordinator_Ctor(const char* intermediateDirectory, const char* outputDirectory, const char* rootDirectory)
+GameContentBuilder* GameContentBuilder_Ctor(const char* intermediateDirectory, const char* outputDirectory, const char* rootDirectory)
 {
-	BuildCoordinatorSettings* settings = new BuildCoordinatorSettings();
+	GameContentBuilderSettings* settings = new GameContentBuilderSettings();
 
 	if (intermediateDirectory)
 	{
@@ -157,12 +160,12 @@ BuildCoordinator* BuildCoordinator_Ctor(const char* intermediateDirectory, const
 		settings->SetRootDirectory(rootDirectory);
 	}
 
-	return new BuildCoordinator(settings, nullptr);
+	return new GameContentBuilder(settings, nullptr);
 }
 
-BuildCoordinator * BuildCoordinator_Ctor2(BuildCoordinatorSettingsBridge managedSettings)
+GameContentBuilder * GameContentBuilder_Ctor2(BuildCoordinatorSettingsBridge managedSettings)
 {
-	BuildCoordinatorSettings* settings = new BuildCoordinatorSettings();
+	GameContentBuilderSettings* settings = new GameContentBuilderSettings();
 
 	if (managedSettings.IntermediateDirectory)
 	{
@@ -179,19 +182,19 @@ BuildCoordinator * BuildCoordinator_Ctor2(BuildCoordinatorSettingsBridge managed
 		settings->SetRootDirectory(managedSettings.RootDirectory);
 	}
 
-	return new BuildCoordinator(settings, nullptr);
+	return new GameContentBuilder(settings, nullptr);
 }
 
-void BuildCoordinator_Dtor(BuildCoordinator * buildCoordinator)
+void GameContentBuilder_Dtor(GameContentBuilder * buildCoordinator)
 {
 	delete buildCoordinator;
 }
-char* __stdcall BuildCoordinator_GetRelativePath(BuildCoordinator* coordinator, char* const path)
+char* __stdcall GameContentBuilder_GetRelativePath(GameContentBuilder* coordinator, char* const path)
 {
 	return BrunoDll::AllocateMemoryForString(coordinator->GetRelativePath(path).c_str());
 }
 
-void BuildCoordinator_GetSettings(BuildCoordinator * coordinator, char* const intermediateDir, char* const outputDir, char* const rootDir)
+void GameContentBuilder_GetSettings(GameContentBuilder * coordinator, char* const intermediateDir, char* const outputDir, char* const rootDir)
 {
 	auto& settings = coordinator->GetBuildSettings();
 	strcpy(intermediateDir, settings.GetIntermediateDirectory().c_str());
@@ -199,7 +202,7 @@ void BuildCoordinator_GetSettings(BuildCoordinator * coordinator, char* const in
 	strcpy(rootDir, settings.GetRootDirectory().c_str());*/
 }
 
-void BuildCoordinator_GetSettings2(BuildCoordinator* coordinator, BuildCoordinatorSettingsBridge* managedSettings)
+void GameContentBuilder_GetSettings2(GameContentBuilder* coordinator, BuildCoordinatorSettingsBridge* managedSettings)
 {
 	auto& settings = coordinator->GetBuildSettings();
 
@@ -208,22 +211,22 @@ void BuildCoordinator_GetSettings2(BuildCoordinator* coordinator, BuildCoordinat
 	managedSettings->RootDirectory = BrunoDll::AllocateMemoryForString(settings.GetRootDirectory().c_str());
 }
 
-void BuildCoordinator_RequestBuildWithoutOpaqueData(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName)
+void GameContentBuilder_RequestBuildWithoutOpaqueData(GameContentBuilder* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName)
 {
 	coordinator->RequestBuild(sourceFilename, assetName, importerName, processorName, nullptr);
 }
 
-void BuildCoordinator_RequestBuild(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues)
+void GameContentBuilder_RequestBuild(GameContentBuilder* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues)
 {
 	coordinator->RequestBuild(sourceFilename, assetName, importerName, processorName, nullptr);
 }
 
-void BuildCoordinator_RunTheBuild(BuildCoordinator* coordinator)
+void GameContentBuilder_RunTheBuild(GameContentBuilder* coordinator)
 {
 	coordinator->RunTheBuild();
 }
 
-void BuildCoordinator_GetOutputFiles(BuildCoordinator * coordinator, char*** outputFilenames, int* size)
+void GameContentBuilder_GetOutputFiles(GameContentBuilder * coordinator, char*** outputFilenames, int* size)
 {
 	auto list = coordinator->GetOutputFiles();
 	auto n = list.size();
@@ -258,6 +261,11 @@ ContentManager* ContentManager_Ctor(GraphicsDevice* device)
 ContentManager* ContentManager_Ctor2(GraphicsDevice* device, const char* rootDirectory)
 {
 	return new ContentManager(device, rootDirectory);
+}
+
+ContentManager* ContentManager_Ctor3(GraphicsDevice* device, BrunoIO::IStorage* storage)
+{
+	return new ContentManager(device, storage);
 }
 
 uint8_t* ContentManager_Load(ContentManager* contentManager, const char* assetName)
@@ -387,6 +395,18 @@ void EffectTechnique_GetPasses(EffectTechnique* technique, EffectPass*** passes,
 char* EffectTechnique_GetName(EffectTechnique* technique)
 {
 	return BrunoDll::AllocateMemoryForString(technique->GetName());
+}
+
+/*
+FileSystemStorage
+*/
+BrunoIO::FileSystemStorage* FileSystemStorage_Ctor(const char* rootDirectory)
+{
+	return new BrunoIO::FileSystemStorage(rootDirectory);
+}
+char* FileSystemStorage_GetRootDirectory(BrunoIO::FileSystemStorage* storage)
+{
+	return BrunoDll::AllocateMemoryForString(storage->GetRealPath("").c_str());
 }
 
 /*
@@ -538,6 +558,11 @@ void GraphicsDevice_Present(GraphicsDevice* device)
 void GraphicsDevice_PresentHWND(GraphicsDevice* device, HWND hostHwnd)
 {
 	device->Present(hostHwnd);
+}
+
+void GraphicsDevice_RemoveHwnd(GraphicsDevice * device, HWND hwnd) 
+{
+	device->RemoveHwnd(hwnd);
 }
 
 void GraphicsDevice_Reset(GraphicsDevice* device, PresentationParameters parameters)
@@ -1013,6 +1038,11 @@ void Scene_Dtor(Scene* scene) {
 	delete scene;
 }
 
+Entity Scene_AddEmptyObject(Scene* scene, const char* name)
+{
+	return scene->AddEmptyObject(name);
+}
+
 Scene* Scene_GetActiveScene()
 {
 	return Scene::GetActiveScene();
@@ -1038,10 +1068,21 @@ void Scene_UpdateCamera(Camera camera)
 	Scene::UpdateCamera(camera);
 }
 
+void Scene_RemoveEntity(Scene* scene, long entity)
+{
+	scene->RemoveEntity(entity);
+}
+
 void Scene_SetLocalPositionForEntity(Scene* scene, long entity, Vector3* localPosition)
 {
 	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
-	transform.SetLocalPosition(*localPosition);
+	transform.SetLocalPosition(*localPosition);//
+}
+
+void Scene_SetNameForEntity(Scene* scene, long entity, char* name)
+{
+	NameComponent& nameComponent = *scene->GetNames().GetComponent(entity);
+	nameComponent.m_name = name;
 }
 
 void Scene_TransformTranslate(Scene* scene, long entity, Vector3* localPosition)
@@ -1077,18 +1118,39 @@ void Scene_TransformRotatePitchYawRoll(Scene* scene, long entity, Vector3* pitch
 void Scene_TransformSetLocalRotation(Scene* scene, long entity, Quaternion* rotation)
 {
 	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
-	transform.SetLocalRotation(*rotation);
+	transform.SetLocalRotation(*rotation);//
 }
 
 void Scene_TransformSetLocalScale(Scene* scene, long entity, Vector3* scale)
 {
 	TransformComponent& transform = *scene->GetTransforms().GetComponent(entity);
-	transform.SetLocalScale(*scale);
+	transform.SetLocalScale(*scale);//
+}
+
+void Scene_TransformUpdate(Scene* scene, long entity)
+{
+	scene->UpdateTransformFor(entity);
 }
 
 void Scene_LoadFromModel(Scene* scene, Model* model)
 {
 	scene->LoadFromModel(model);
+}
+
+void Scene_GetHierarchyForEntity(Scene* scene, Entity entity, HierarchyComponentBridge* outHierarchies)
+{
+	ComponentManager<HierarchyComponent>& hierarchyComponents = scene->GetHierarchies();
+	ComponentManager<NameComponent>& nameComponents = scene->GetNames();
+	ComponentManager<TransformComponent>& transformComponents = scene->GetTransforms();
+
+	NameComponent& nameComp = *nameComponents.GetComponent(entity);
+
+	HierarchyComponent* hierarchyComp = hierarchyComponents.GetComponent(entity);
+
+	outHierarchies->id = entity;
+	outHierarchies->parentId = hierarchyComp ? hierarchyComp->m_parentId : 0;
+	outHierarchies->componentsMask = scene->GetComponentsMask(entity);
+	outHierarchies->name = BrunoDll::AllocateMemoryForString(nameComp.m_name.c_str());;
 }
 
 void Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** outHierarchies)
@@ -1113,7 +1175,7 @@ void Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** ou
 			newArray[i].id = entity;
 			newArray[i].parentId = hierarchyComp ? hierarchyComp->m_parentId : 0;
 			newArray[i].componentsMask = scene->GetComponentsMask(entity);
-			newArray[i].name = BrunoDll::AllocateMemoryForString(nameComp.m_name.c_str());;
+			newArray[i].name = BrunoDll::AllocateMemoryForString(nameComp.m_name.c_str());
 		}
 		*outHierarchies = newArray;
 	}
@@ -1262,6 +1324,16 @@ float Vector3_Dot(Vector3 *pVector1, Vector3 *pVector2)
 float Vector3_Length(Vector3 * pVector)
 {
 	return pVector->Length();
+}
+
+void Vector3_Min(Vector3* pVector1, Vector3* pVector2)
+{
+	Vector3::Min(*pVector1, *pVector2, *pVector1);
+}
+
+void Vector3_Max(Vector3* pVector1, Vector3* pVector2)
+{
+	Vector3::Max(*pVector1, *pVector2, *pVector1);
 }
 
 void Vector3_MultiplyDivision(Vector3 *pVector, float scalar)
@@ -1420,6 +1492,11 @@ void Quaternion_Inverse(Quaternion* quaternion)
 void Quaternion_Normalize(Quaternion* quaternion)
 {
 	quaternion->Normalize();
+}
+
+void Quaternion_SumTwoQuats(Quaternion* quaternion1, Quaternion* quaternion2)
+{
+	*quaternion1 += *quaternion2;
 }
 
 void Quaternion_MultiplyTwoQuats(Quaternion * quaternion1, Quaternion * quaternion2)

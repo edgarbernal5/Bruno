@@ -7,53 +7,65 @@ using System.Threading.Tasks;
 
 namespace BrunoFramework
 {
-    public class Screen : PropertyChangedBase, IHaveDisplayName, IActivate, IDeactivate, IGuardClose
+    public class Screen : PropertyChangedBase, IScreen
     {
-        private static readonly ILog Logger = LogManager.GetLog();
+        private static readonly ILog Logger = Bruno.Logging.Logger.GetLog();
 
-        public Screen()
+        public Screen() 
+            : base()
         {
-            _displayName = GetType().FullName;
+            m_displayName = GetType().FullName;
         }
 
         public virtual string DisplayName
         {
-            get => _displayName;
+            get => m_displayName;
             set
             {
-                _displayName = value;
+                m_displayName = value;
                 NotifyOfPropertyChange();
             }
         }
-        private string _displayName;
+        private string m_displayName;
 
         public virtual bool IsActive
         {
-            get => _isActive;
+            get => m_isActive;
             private set
             {
-                _isActive = value;
+                m_isActive = value;
                 NotifyOfPropertyChange();
             }
         }
-        private bool _isActive;
+        private bool m_isActive;
 
         public virtual bool IsInitialized
         {
-            get => _isInitialized;
+            get => m_isInitialized;
             private set
             {
-                _isInitialized = value;
+                m_isInitialized = value;
                 NotifyOfPropertyChange();
             }
         }
-        private bool _isInitialized;
+        private bool m_isInitialized;
+
+        public IConductor Conductor
+        {
+            get => m_conductor;
+            set
+            {
+                m_conductor = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        private IConductor m_conductor;
 
         public event EventHandler<ActivationEventArgs> Activated;
         public event EventHandler<DeactivationEventArgs> Deactivating;
         public event EventHandler<DeactivationEventArgs> Deactivated;
 
-        void IActivate.Activate()
+        async Task IActivate.ActivateAsync(CancellationToken cancellationToken)
         {
             if (IsActive)
                 return;
@@ -62,14 +74,12 @@ namespace BrunoFramework
 
             if (!IsInitialized)
             {
-                //OnInitializeAsync(cancellationToken);
-                OnInitialize();
+                await OnInitializeAsync(cancellationToken);
                 IsInitialized = initialized = true;
             }
 
-            Logger.Info("Activating {0}.", this);
-            //await OnActivateAsync(cancellationToken);
-            OnActivate();
+            //Logger.Info("Activating {0}.", this);
+            await OnActivateAsync(cancellationToken);
             IsActive = true;
 
             Activated?.Invoke(this, new ActivationEventArgs
@@ -78,7 +88,7 @@ namespace BrunoFramework
             });
         }
 
-        void IDeactivate.Deactivate(bool close)
+        async Task IDeactivate.DeactivateAsync(bool close, CancellationToken cancellationToken)
         {
             if (IsActive || (IsInitialized && close))
             {
@@ -87,8 +97,8 @@ namespace BrunoFramework
                     WasClosed = close
                 });
 
-                Logger.Info("Deactivating {0}.", this);
-                OnDeactivate(close);
+                //Logger.Info("Deactivating {0}.", this);
+                await OnDeactivateAsync(close, cancellationToken);
                 IsActive = false;
 
                 Deactivated?.Invoke(this, new DeactivationEventArgs
@@ -104,21 +114,46 @@ namespace BrunoFramework
             }
         }
 
-        protected virtual void OnDeactivate(bool close)
+        protected virtual Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
+            return Task.FromResult(true);
         }
 
-        protected virtual void OnInitialize()
+        protected virtual Task OnInitializeAsync(CancellationToken cancellationToken)
         {
+            return Task.FromResult(true);
         }
 
-        protected virtual void OnActivate()
+        protected virtual Task OnActivateAsync(CancellationToken cancellationToken)
         {
+            return Task.FromResult(true);
         }
 
         public virtual Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
         {
             return Task.FromResult(true);
+        }
+
+        public async Task TryCloseAsync(bool? dialogResult = null)
+        {
+            await m_conductor.DeactivateItemAsync(this, true, CancellationToken.None);
+
+            /*var closeMethod = GetType().GetMethod("Close", new Type[0]);
+            if (closeMethod != null)
+            {
+                var isClosed = false;
+                if (dialogResult != null)
+                {
+                    var resultProperty = GetType().GetProperty("DialogResult");
+                    if (resultProperty != null)
+                    {
+                        resultProperty.SetValue(this, dialogResult, null);
+                        isClosed = true;
+                    }
+                }
+            }*/
+            //Close()??
+            //WindowsPlatform.OnUIThreadAsync
         }
     }
 }

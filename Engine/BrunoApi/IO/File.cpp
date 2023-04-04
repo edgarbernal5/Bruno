@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-namespace TrioIO
+namespace BrunoIO
 {
 	bool File::Delete(const std::string& filename)
 	{

@@ -22,7 +22,7 @@ namespace BrunoEngine
 	class BRUNO_API_EXPORT Renderer
 	{
 	public:
-		static void DrawScene(EffectParameter* parameter, Matrix& viewProjection /*const Camera& camera*/);
+		static void DrawScene(EffectParameter* mvpParameter, EffectParameter* modelParameter, Matrix& viewProjection /*const Camera& camera*/);
 		static GraphicsDevice* GetDevice();
 		static void Initialize(GraphicsDevice* device);
 		static void UpdatePerFrameData();

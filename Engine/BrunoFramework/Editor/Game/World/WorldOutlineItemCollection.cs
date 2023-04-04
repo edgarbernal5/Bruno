@@ -11,7 +11,8 @@ namespace BrunoFramework.Editor.Game
             protected internal set { base.Parent = value; }
         }
 
-        public WorldOutlineItemCollection() : base(null)
+        public WorldOutlineItemCollection()
+            : base(null)
         {
         }
 

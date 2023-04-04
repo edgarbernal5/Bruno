@@ -10,7 +10,15 @@ namespace BrunoFramework.Editor.Game
     {
         public string Name
         {
-            get; set;
+            get
+            {
+                return Owner.Text;
+            }
+            set
+            {
+                Owner.Text = value;
+                NotifyOfPropertyChange();
+            }
         }
 
         [Browsable(false)]
@@ -68,27 +76,54 @@ namespace BrunoFramework.Editor.Game
         {
             get
             {
-                Vector3 scale, translation;
-                Quaternion rotation;
-                m_worldMatrix.Decompose(out scale, out rotation, out translation);
+                var min = Vector3.Transform(m_boxCorners[0], m_worldMatrix);
+                var max = min;
 
-                Vector3 center = translation;// + m_center * scale;
-                return new BoundingBox(center, m_extents * scale);
+                for (int i = 1; i < 8; i++)
+                {
+                    min = Vector3.Min(min, Vector3.Transform(m_boxCorners[i], m_worldMatrix));
+                    max = Vector3.Max(max, Vector3.Transform(m_boxCorners[i], m_worldMatrix));
+                }
+
+                var extents = (max - min) * 0.5f;
+                var center = (max + min) * 0.5f;
+
+                return new BoundingBox(center, extents);
             }
         }
-
-        public bool IsSelectable => m_isSelectable;
-
+        private Vector3[] m_boxCorners;
         private Vector3 m_center;
         private Vector3 m_extents;
 
+        public bool IsSelectable => m_isSelectable;
         private bool m_isSelectable = false;
+
 
         public void SetObjectExtents(Vector3 center, Vector3 extents)
         {
             m_center = center;
             m_extents = extents;
             m_isSelectable = true;
+            m_boxCorners = new Vector3[8];
+
+            Vector3 min = m_center - m_extents;
+            Vector3 max = m_center + m_extents;
+
+            m_boxCorners[0] = min;
+            m_boxCorners[1] = new Vector3(min.X, max.Y, min.Z);
+            m_boxCorners[2] = new Vector3(max.X, min.Y, min.Z);
+            m_boxCorners[3] = new Vector3(max.X, max.Y, min.Z);
+
+            m_boxCorners[4] = max;
+            m_boxCorners[5] = new Vector3(min.X, max.Y, max.Z);
+            m_boxCorners[6] = new Vector3(max.X, min.Y, max.Z);
+            m_boxCorners[7] = new Vector3(max.X, max.Y, max.Z);
+        }
+
+        public WorldOutlineData(WorldOutlineItem owner)
+            : base()
+        {
+            Owner = owner;
         }
     }
 }

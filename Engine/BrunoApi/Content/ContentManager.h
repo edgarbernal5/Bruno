@@ -7,6 +7,10 @@
 
 #include "IO/FileStream.h"
 //#include "ContentReader.h"
+namespace BrunoIO
+{
+	class IStorage;
+}
 
 namespace BrunoEngine
 {
@@ -18,6 +22,7 @@ namespace BrunoEngine
 	{
 	public:
 		ContentManager(GraphicsDevice* device);
+		ContentManager(GraphicsDevice* device, BrunoIO::IStorage *storage);
 		ContentManager(GraphicsDevice* device, std::string rootDirectory);
 		ContentManager(IServiceProvider* serviceProvider);
 		~ContentManager();
@@ -34,14 +39,11 @@ namespace BrunoEngine
 			return m_device;
 		}
 
-		std::string GetRootDirectory();
-		void SetRootDirectory(std::string directory);
-
 		friend class ContentReader;
 	private:
+		BrunoIO::IStorage* m_storage;
 		std::map<std::string, void*> m_loadedAssets;
 
-		std::string m_rootDirectory;
 
 		void* LoadInternal(std::string assetName);
 
@@ -51,7 +53,7 @@ namespace BrunoEngine
 		GraphicsDevice* m_device;
 
 	protected:
-		TrioIO::Stream* OpenStream(std::string assetName);
+		BrunoIO::Stream* OpenStream(std::string assetName);
 	};
 
 	template <class T>
@@ -71,6 +73,4 @@ namespace BrunoEngine
 		m_loadedAssets[assetName] = local;
 		return local;
 	}
-
-	
 }

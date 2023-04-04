@@ -13,8 +13,24 @@ namespace BrunoFramework.Editor.Game.Gizmos
 
     public class GizmoSnappingConfig
     {
-        public float TRANSLATION_SNAP = 1.0f;
-        public float SCALE_SNAP = 0.5f;
-        public float PRECISION_SCALE = 0.1f;
+        public float Translation { get; set; } = 1.0f;
+        public float Scale { get; set; } = 0.5f;
+        public float PrecisionScale { get; set; } = 0.1f;
+
+        public GizmoSnappingConfig Clone()
+        {
+            var clone = new GizmoSnappingConfig();
+            clone.Translation = Translation;
+            clone.Scale = Scale;
+            clone.PrecisionScale = PrecisionScale;
+            return clone;
+        }
+
+        public void CopyFrom(GizmoSnappingConfig other)
+        {
+            Translation = other.Translation;
+            Scale = other.Scale;
+            PrecisionScale = other.PrecisionScale;
+        }
     }
 }

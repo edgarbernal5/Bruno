@@ -21,9 +21,24 @@ namespace Bruno.Collections
         {
             var mergePoint = node.MergePoint;
             var mergeOperation = mergePoint.MergeOperation;
+            var mergeTarget = mergePoint.Target;
 
             int indexOfExistingNode = FindTargetNode(targetNodes, node.Content.Name);
-            bool nodeExists = (indexOfExistingNode >= 0);
+            bool nodeExists = indexOfExistingNode >= 0;
+
+            int indexOfTarget = -1;
+            bool targetFound = false;
+
+            if (!nodeExists && mergeOperation != MergeOperation.Append && mergeOperation != MergeOperation.Prepend)
+            {
+                indexOfTarget = FindTargetNode(targetNodes, mergeTarget);
+                targetFound = indexOfTarget >= 0;
+
+                if (!targetFound)
+                {
+                    return;
+                }
+            }
 
             switch (mergeOperation)
             {
@@ -48,10 +63,66 @@ namespace Bruno.Collections
                     }
                     break;
                 case MergeOperation.Prepend:
+                    if (nodeExists)
+                    {
+                        var targetNode = targetNodes[indexOfExistingNode];
+                        if (node.Children != null && node.Children.Count > 0)
+                        {
+                            Merge(targetNode.Children, node.Children);
+                        }
+                    }
+                    else
+                    {
+                        var newNode = new TreeNode<T>(node.Content);
+                        targetNodes.Insert(0, newNode);
+
+                        if (node.Children != null && node.Children.Count > 0)
+                        {
+                            Merge(newNode.Children, node.Children);
+                        }
+                    }
                     break;
+
                 case MergeOperation.InsertAfter:
+                    if (nodeExists)
+                    {
+                        var targetNode = targetNodes[indexOfExistingNode];
+                        if (node.Children != null && node.Children.Count > 0)
+                        {
+                            Merge(targetNode.Children, node.Children);
+                        }
+                    }
+                    else
+                    {
+                        var newNode = new TreeNode<T>(node.Content);
+                        targetNodes.Insert(indexOfTarget + 1, newNode);
+
+                        if (node.Children != null && node.Children.Count > 0)
+                        {
+                            Merge(newNode.Children, node.Children);
+                        }
+                    }
                     break;
+
                 case MergeOperation.InsertBefore:
+                    if (nodeExists)
+                    {
+                        var targetNode = targetNodes[indexOfExistingNode];
+                        if (node.Children != null && node.Children.Count > 0)
+                        {
+                            Merge(targetNode.Children, node.Children);
+                        }
+                    }
+                    else
+                    {
+                        var newNode = new TreeNode<T>(node.Content);
+                        targetNodes.Insert(indexOfTarget, newNode);
+
+                        if (node.Children != null && node.Children.Count > 0)
+                        {
+                            Merge(newNode.Children, node.Children);
+                        }
+                    }
                     break;
 
                 default:
@@ -90,22 +161,22 @@ namespace Bruno.Collections
         public static readonly MergePoint Prepend = new MergePoint(MergeOperation.Prepend);
         internal static readonly MergePoint DefaultMergePoint = Append;
 
-        public MergeOperation MergeOperation { get => _operation; }
-        private MergeOperation _operation;
+        public MergeOperation MergeOperation { get => m_operation; }
+        private MergeOperation m_operation;
 
-        public string Target { get => _target; }
-        private string _target;
+        public string Target { get => m_target; }
+        private string m_target;
 
         public MergePoint(MergeOperation operation)
         {
-            _operation = operation;
-            _target = null;
+            m_operation = operation;
+            m_target = null;
         }
 
         public MergePoint(MergeOperation operation, string target)
         {
-            _operation = operation;
-            _target = target;
+            m_operation = operation;
+            m_target = target;
         }
     }
 }

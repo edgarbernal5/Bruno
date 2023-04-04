@@ -6,7 +6,7 @@
 #include <vector>
 #include <stdint.h>
 
-namespace TrioIO
+namespace BrunoIO
 {
 	class Stream;
 

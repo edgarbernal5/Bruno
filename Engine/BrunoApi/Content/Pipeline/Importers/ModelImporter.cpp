@@ -121,8 +121,8 @@ namespace BrunoEngine
 
 					if (aiMaterial->GetTexture(mappedTextureType, textureIndex, &textureRelativePath, &mapping, &uvIndex, &blend, &operation, &mapMode) == AI_SUCCESS)
 					{
-						std::string filenameTexture = TrioIO::Path::Combine(directory, textureRelativePath.C_Str());
-						if (TrioIO::File::Exist(filenameTexture))
+						std::string filenameTexture = BrunoIO::Path::Combine(directory, textureRelativePath.C_Str());
+						if (BrunoIO::File::Exist(filenameTexture))
 						{
 							ExternalReference texture(filenameTexture);
 							texture.SetContentIdentity(m_identity);
@@ -192,7 +192,7 @@ namespace BrunoEngine
 
 		if (scene->HasMaterials())
 		{
-			ImportMaterials(scene, TrioIO::Path::GetDirectoryFromFilePath(filename));
+			ImportMaterials(scene, BrunoIO::Path::GetDirectoryFromFilePath(filename));
 		}
 
 		std::map<std::string, Matrix> deformationBones;

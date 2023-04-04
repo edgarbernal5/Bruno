@@ -2,9 +2,10 @@
 
 #include "TrioApiRequisites.h"
 
-#include "Content/Pipeline/Tasks/BuildCoordinatorSettings.h"
+#include "Content/Pipeline/Tasks/GameContentBuilderSettings.h"
 #include "Renderer/Camera.h"
 #include "Math/MathCollision.h"
+#include "Ecs/Entity.h"
 
 using namespace BrunoEngine;
 
@@ -30,12 +31,18 @@ namespace BrunoEngine
 	class ContentManager;
 	//class ContentReader;
 
-	class BuildCoordinator;
+	class GameContentBuilder;
 	class TextureContent;
 
 	class RenderPathForward;
 	class RenderPath;
 
+}
+
+namespace BrunoIO
+{
+	class IStorage;
+	class FileSystemStorage;
 }
 
 /*
@@ -70,16 +77,16 @@ struct BuildCoordinatorSettingsBridge {
 
 };
 
-extern "C" BRUNO_API_EXPORT BuildCoordinator* __stdcall BuildCoordinator_Ctor(const char* intermediateDirectory, const char* outputDirectory, const char* rootDirectory);
-extern "C" BRUNO_API_EXPORT BuildCoordinator* __stdcall BuildCoordinator_Ctor2(BuildCoordinatorSettingsBridge settings);
-extern "C" BRUNO_API_EXPORT void __stdcall BuildCoordinator_Dtor(BuildCoordinator* buildCoordinator);
-extern "C" BRUNO_API_EXPORT char* __stdcall BuildCoordinator_GetRelativePath(BuildCoordinator* coordinator, char* const path);
-extern "C" BRUNO_API_EXPORT void __stdcall BuildCoordinator_GetSettings(BuildCoordinator* coordinator, char* const intermediateDir, char* const outputDir, char* const rootDir);
-extern "C" BRUNO_API_EXPORT void __stdcall BuildCoordinator_GetSettings2(BuildCoordinator* coordinator, BuildCoordinatorSettingsBridge* managedSettings);
-extern "C" BRUNO_API_EXPORT void __stdcall BuildCoordinator_RequestBuildWithoutOpaqueData(BuildCoordinator* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName);
-extern "C" BRUNO_API_EXPORT void __stdcall BuildCoordinator_RequestBuild(BuildCoordinator * coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues);
-extern "C" BRUNO_API_EXPORT void __stdcall BuildCoordinator_RunTheBuild(BuildCoordinator* coordinator);
-extern "C" BRUNO_API_EXPORT void __stdcall BuildCoordinator_GetOutputFiles(BuildCoordinator* coordinator, char*** outputFilenames, int *size);
+extern "C" BRUNO_API_EXPORT GameContentBuilder* __stdcall GameContentBuilder_Ctor(const char* intermediateDirectory, const char* outputDirectory, const char* rootDirectory);
+extern "C" BRUNO_API_EXPORT GameContentBuilder* __stdcall GameContentBuilder_Ctor2(BuildCoordinatorSettingsBridge settings);
+extern "C" BRUNO_API_EXPORT void __stdcall GameContentBuilder_Dtor(GameContentBuilder* buildCoordinator);
+extern "C" BRUNO_API_EXPORT char* __stdcall GameContentBuilder_GetRelativePath(GameContentBuilder* coordinator, char* const path);
+extern "C" BRUNO_API_EXPORT void __stdcall GameContentBuilder_GetSettings(GameContentBuilder* coordinator, char* const intermediateDir, char* const outputDir, char* const rootDir);
+extern "C" BRUNO_API_EXPORT void __stdcall GameContentBuilder_GetSettings2(GameContentBuilder* coordinator, BuildCoordinatorSettingsBridge* managedSettings);
+extern "C" BRUNO_API_EXPORT void __stdcall GameContentBuilder_RequestBuildWithoutOpaqueData(GameContentBuilder* coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName);
+extern "C" BRUNO_API_EXPORT void __stdcall GameContentBuilder_RequestBuild(GameContentBuilder * coordinator, const char* sourceFilename, const char* assetName, const char* importerName, const char* processorName, int opaqueDataSize, const char** opaqueDataKeys, const char** opaqueDataValues);
+extern "C" BRUNO_API_EXPORT void __stdcall GameContentBuilder_RunTheBuild(GameContentBuilder* coordinator);
+extern "C" BRUNO_API_EXPORT void __stdcall GameContentBuilder_GetOutputFiles(GameContentBuilder* coordinator, char*** outputFilenames, int *size);
 
 /*
 Component
@@ -91,6 +98,7 @@ ContentManager
 */
 extern "C" BRUNO_API_EXPORT ContentManager* __stdcall ContentManager_Ctor(GraphicsDevice* device);
 extern "C" BRUNO_API_EXPORT ContentManager* __stdcall ContentManager_Ctor2(GraphicsDevice* device, const char* rootDirectory);
+extern "C" BRUNO_API_EXPORT ContentManager* __stdcall ContentManager_Ctor3(GraphicsDevice* device, BrunoIO::IStorage* storage);
 extern "C" BRUNO_API_EXPORT uint8_t * __stdcall ContentManager_Load(ContentManager* contentManager, const char* assetName);
 
 /*
@@ -123,6 +131,12 @@ EffectTechnique
 */
 extern "C" BRUNO_API_EXPORT void __stdcall EffectTechnique_GetPasses(EffectTechnique* technique, EffectPass*** passes, int *size);
 extern "C" BRUNO_API_EXPORT char* __stdcall EffectTechnique_GetName(EffectTechnique* technique);
+
+/*
+FileSystemStorage
+*/
+extern "C" BRUNO_API_EXPORT BrunoIO::FileSystemStorage* __stdcall FileSystemStorage_Ctor(const char* rootDirectory);
+extern "C" BRUNO_API_EXPORT char* __stdcall FileSystemStorage_GetRootDirectory(BrunoIO::FileSystemStorage* storage);
 
 /*
 Game
@@ -165,6 +179,7 @@ extern "C" BRUNO_API_EXPORT void __stdcall GraphicsDevice_PrepareRenderWindow(Gr
 extern "C" BRUNO_API_EXPORT void __stdcall GraphicsDevice_Present(GraphicsDevice* device);
 extern "C" BRUNO_API_EXPORT void __stdcall GraphicsDevice_PresentHWND(GraphicsDevice* device, HWND hostHwnd);
 extern "C" BRUNO_API_EXPORT void __stdcall GraphicsDevice_Reset(GraphicsDevice* device, PresentationParameters parameters);
+extern "C" BRUNO_API_EXPORT void __stdcall GraphicsDevice_RemoveHwnd(GraphicsDevice* device, HWND hwnd);
 extern "C" BRUNO_API_EXPORT void __stdcall GraphicsDevice_SetBlendState(GraphicsDevice* device, BlendState* state);
 extern "C" BRUNO_API_EXPORT void __stdcall GraphicsDevice_SetDepthStencilState(GraphicsDevice* device, DepthStencilState* state);
 extern "C" BRUNO_API_EXPORT void __stdcall GraphicsDevice_SetRasterizerState(GraphicsDevice* device, RasterizerState* state);
@@ -314,16 +329,21 @@ struct HierarchyComponentBridge {
 
 extern "C" BRUNO_API_EXPORT Scene* __stdcall Scene_Ctor();
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_Dtor(Scene* scene);
+
+extern "C" BRUNO_API_EXPORT Entity __stdcall Scene_AddEmptyObject(Scene * scene, const char* name);
 extern "C" BRUNO_API_EXPORT Scene* __stdcall Scene_GetActiveScene();
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_SetActiveScene(Scene* scene);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_Update(Scene* scene);
 extern "C" BRUNO_API_EXPORT Camera __stdcall Scene_GetCamera();
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_UpdateCamera(Camera camera);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_LoadFromModel(Scene* scene, Model* model);
+extern "C" BRUNO_API_EXPORT void __stdcall Scene_GetHierarchyForEntity(Scene* scene, Entity entity, HierarchyComponentBridge* outHierarchies);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_GetHierarchies(Scene* scene, int* size, HierarchyComponentBridge** outHierarchies);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_GetTransformMatrixForEntity(Scene* scene, long entity, Matrix *worldMatrix, Vector3 * localPosition, Vector3 * localScale, Quaternion * localRotation);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_GetBoundingBoxForEntity(Scene * scene, long entity, Vector3 * center, Vector3 * extents);
+extern "C" BRUNO_API_EXPORT void __stdcall Scene_RemoveEntity(Scene * scene, long entity);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_SetLocalPositionForEntity(Scene * scene, long entity, Vector3 * localPosition);
+extern "C" BRUNO_API_EXPORT void __stdcall Scene_SetNameForEntity(Scene * scene, long entity, char* name);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformTranslate(Scene * scene, long entity, Vector3 * localPosition);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformScale(Scene* scene, long entity, Vector3* deltaScale);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformScaleUniform(Scene* scene, long entity, float scalarFactor);
@@ -331,6 +351,7 @@ extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformRotate(Scene* scene, l
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformRotatePitchYawRoll(Scene* scene, long entity, Vector3* pitchYawRoll);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformSetLocalRotation(Scene* scene, long entity, Quaternion* rotation);
 extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformSetLocalScale(Scene * scene, long entity, Vector3 * scale);
+extern "C" BRUNO_API_EXPORT void __stdcall Scene_TransformUpdate(Scene * scene, long entity);
 
 /*
 Transform
@@ -389,6 +410,8 @@ extern "C" BRUNO_API_EXPORT float __stdcall Vector3_Distance(Vector3 *pVector1, 
 extern "C" BRUNO_API_EXPORT float __stdcall Vector3_DistanceSquared(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" BRUNO_API_EXPORT float __stdcall Vector3_Dot(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" BRUNO_API_EXPORT float __stdcall Vector3_Length(Vector3 *pVector);
+extern "C" BRUNO_API_EXPORT void __stdcall Vector3_Min(Vector3 *pVector1, Vector3 * pVector2);
+extern "C" BRUNO_API_EXPORT void __stdcall Vector3_Max(Vector3 * pVector1, Vector3 * pVector2);
 extern "C" BRUNO_API_EXPORT void __stdcall Vector3_MultiplyDivision(Vector3 *pVector, float scalar);
 extern "C" BRUNO_API_EXPORT void __stdcall Vector3_MultiplyTwoVectors(Vector3 *pVector1, Vector3 *pVector2);
 extern "C" BRUNO_API_EXPORT void __stdcall Vector3_MultiplyScalar(Vector3 *pVector, float scalar);
@@ -437,4 +460,5 @@ extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_CreateFromMatrix(Quaternio
 extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_CreateFromYawPitchRoll(Quaternion * quaternion, float yaw, float pitch, float roll);
 extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_Inverse(Quaternion * quaternion);
 extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_Normalize(Quaternion * quaternion);
+extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_SumTwoQuats(Quaternion * quaternion1, Quaternion * quaternion2);
 extern "C" BRUNO_API_EXPORT void __stdcall Quaternion_MultiplyTwoQuats(Quaternion * quaternion1, Quaternion * quaternion2);

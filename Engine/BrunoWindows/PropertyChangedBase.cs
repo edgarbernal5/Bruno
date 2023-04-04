@@ -1,5 +1,5 @@
 ﻿
-using Bruno.Interop;
+using Bruno;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +12,7 @@ namespace BrunoWindows
     [DataContract]
     public class PropertyChangedBase : DisposableBase, INotifyPropertyChangedEx
     {
-        public PropertyChangedBase() 
+        public PropertyChangedBase()
             : base()
         {
             IsNotifying = true;
@@ -44,9 +44,9 @@ namespace BrunoWindows
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs eventArgs)
         {
-            PropertyChanged?.Invoke(this, e);
+            PropertyChanged?.Invoke(this, eventArgs);
         }
 
         public virtual bool Set<T>(ref T oldValue, T newValue, [CallerMemberName] string propertyName = null)
