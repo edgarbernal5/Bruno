@@ -1,4 +1,4 @@
 [submodule "Code/Engine/Dependencies/nana"]
 	path = Code/Engine/Dependencies/nana
-	url = https://github.com/cnjinhao/nana.git
-	branch = hotfix-1.7.4
+	url = https://github.com/edgarbernal5/nana.git
+	branch = develop-1.8
