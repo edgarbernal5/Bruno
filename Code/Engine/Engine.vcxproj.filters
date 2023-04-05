@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{7934cca9-8ba2-4d09-829d-560b75078cc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Bruno">
+      <UniqueIdentifier>{5450af5c-82ea-485b-b4cd-53db27727179}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Bruno\Core">
+      <UniqueIdentifier>{8cde04c1-82b7-4167-a861-9877714e79b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Bruno\Platform">
+      <UniqueIdentifier>{873b41d4-3e79-4133-925a-4e1b7db03832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Bruno\Platform\Windows">
+      <UniqueIdentifier>{2d25f86e-9679-48be-9e9b-61e54db10ef6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Bruno\Renderer">
+      <UniqueIdentifier>{7e99be4f-71be-4688-af5b-6db1f81d2b95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Bruno\Platform\DirectX">
+      <UniqueIdentifier>{18329f70-4523-498a-aca8-ec3efe1dc4e3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Bruno.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\brpch.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\EntryPoint.h">
+      <Filter>Source\Bruno</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\Game.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h">
+      <Filter>Source\Bruno\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\GameWindow.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\Windows\NanaGameWindow.h">
+      <Filter>Source\Bruno\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCommon.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Resources.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCore.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\ResourceBarrier.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\brpch.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\Game.cpp">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp">
+      <Filter>Source\Bruno\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\GameWindow.cpp">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\Windows\NanaGameWindow.cpp">
+      <Filter>Source\Bruno\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsDevice.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueue.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Resources.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\D3DCore.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\ResourceBarrier.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

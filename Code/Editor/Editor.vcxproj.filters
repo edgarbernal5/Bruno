@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Source\Main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EditorGame.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Panels\ScenePanel.cpp">
+      <Filter>Source\Panels</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{ec32524c-8808-4932-b497-db47e53dff39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Panels">
+      <UniqueIdentifier>{f96ed092-813a-4f60-8ae2-a3aa81445bd2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\EditorGame.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\ScenePanel.h">
+      <Filter>Source\Panels</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{dac3ea76-d07c-4464-b6c7-fee2496aa7e3}</ProjectGuid>
+    <RootNamespace>Engine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\..\Output\$(Configuration)_$(Platform)\$(ProjectName)</OutDir>
+    <IntDir>..\..\Output\$(Configuration)_$(Platform)_tmp\$(ProjectName)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;Dependencies\nana\build\bin\nana_v143_Debug_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\ResourceBarrier.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCore.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCommon.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h" />
+    <ClInclude Include="Source\Bruno\Core\GameWindow.h" />
+    <ClInclude Include="Source\brpch.h" />
+    <ClInclude Include="Source\Bruno.h" />
+    <ClInclude Include="Source\Bruno\Core\Game.h" />
+    <ClInclude Include="Source\Bruno\EntryPoint.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Resources.h" />
+    <ClInclude Include="Source\Bruno\Platform\Windows\NanaGameWindow.h" />
+    <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\ResourceBarrier.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueue.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\D3DCore.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsDevice.cpp" />
+    <ClCompile Include="Source\Bruno\Core\GameWindow.cpp" />
+    <ClCompile Include="Source\brpch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\Game.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Resources.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\Windows\NanaGameWindow.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
