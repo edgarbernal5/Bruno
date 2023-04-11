@@ -18,6 +18,8 @@ namespace Bruno
 		virtual void Initialize() override;
 		virtual void Run() override;
 
+		virtual void Show() override;
+
 		nana::form& GetForm();
 	private:
 		std::unique_ptr<nana::form> m_form;

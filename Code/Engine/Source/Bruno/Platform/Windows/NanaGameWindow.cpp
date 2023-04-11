@@ -33,8 +33,6 @@ namespace Bruno
 				m_data.Width = args.width;
 				//m_game->OnClientSizeChanged();
 			});
-
-		m_form->show();
 	}
 
 	nana::form& NanaGameWindow::GetForm()
@@ -45,5 +43,10 @@ namespace Bruno
 	void NanaGameWindow::Run()
 	{
 		nana::exec();
+	}
+
+	void NanaGameWindow::Show()
+	{
+		m_form->show();
 	}
 }

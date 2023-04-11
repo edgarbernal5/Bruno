@@ -10,7 +10,7 @@ namespace Bruno
 	class GraphicsAdapter
 	{
 	public:
-		GraphicsAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter4> adapter);
+		GraphicsAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter4> dxgiAdapter);
 		~GraphicsAdapter() = default;
 
 		static GraphicsAdapterList GetAdapters(DXGI_GPU_PREFERENCE gpuPreference = DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE);
@@ -18,7 +18,7 @@ namespace Bruno
 
 		IDXGIAdapter4* GetHandle();
 	private:
-		std::string								m_deviceName;
+		std::string								m_devibceName;
 		Microsoft::WRL::ComPtr<IDXGIAdapter4>	m_dxgiAdapter;
 		DXGI_ADAPTER_DESC3						m_adapterDesc;
 	};

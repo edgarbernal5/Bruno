@@ -39,6 +39,8 @@ namespace Bruno
 		D3D_FEATURE_LEVEL                                   m_d3dFeatureLevel;
 
 		DescriptorHeap										m_rtvDescriptorHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_RTV };
+
+		Microsoft::WRL::ComPtr<ID3D12RootSignature>			m_rootSignature;
 	};
 
 }

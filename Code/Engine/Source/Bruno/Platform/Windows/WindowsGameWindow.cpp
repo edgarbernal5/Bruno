@@ -59,13 +59,23 @@ namespace Bruno
 			return;
 
 		// Compute window rectangle dimensions based on requested client area dimensions.
-		RECT rc = { 0, 0, m_parameters.Width, m_parameters.Height };
-		AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+		RECT windowRect = { 0, 0, m_parameters.Width, m_parameters.Height };
+		AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
 		std::wstring m_mainWndTitle(m_parameters.Title.begin(), m_parameters.Title.end());
 
-		m_hwnd = CreateWindowEx(0, L"BrunoEngineClass", m_mainWndTitle.c_str(), WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
+		m_hwnd = CreateWindowEx(
+			0,
+			L"BrunoEngineClass", 
+			m_mainWndTitle.c_str(), 
+			WS_OVERLAPPEDWINDOW,
+			CW_USEDEFAULT, 
+			CW_USEDEFAULT, 
+			windowRect.right - windowRect.left, 
+			windowRect.bottom - windowRect.top,
+			nullptr,			// We have no parent window.
+			nullptr,			// We aren't using menus.
+			hInstance,
 			nullptr);
 
 		if (!m_hwnd)
@@ -74,9 +84,6 @@ namespace Bruno
 			return;
 		}
 		SetWindowLongPtr(m_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-
-		ShowWindow(m_hwnd, SW_SHOW);
-		UpdateWindow(m_hwnd);
 	}
 
 	void WindowsGameWindow::Run()
@@ -90,13 +97,19 @@ namespace Bruno
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
-			else
+			/*else
 			{
 				m_game->Tick();
-			}
+			}*/
 		}
 
 		int returnCode = (int)msg.wParam;
+	}
+
+	void WindowsGameWindow::Show()
+	{
+		ShowWindow(m_hwnd, SW_SHOW);
+		UpdateWindow(m_hwnd);
 	}
 
 	inline RECT WindowsGameWindow::GetClientBounds()
@@ -131,19 +144,21 @@ namespace Bruno
 			std::cout << "Native form Paint" << std::endl;
 			//ver codigo nana (Bedrock_WIN32_WindowProc, bedrock_windows.cpp)
 
-			if (window->m_inSizeMove && window->m_game) {
-				window->m_game->Tick();
-			}
-			else {
-				PAINTSTRUCT ps;
-				std::ignore = BeginPaint(hWnd, &ps);
-				EndPaint(hWnd, &ps);
-			}
+			//if (window->m_inSizeMove && window->m_game) {
+			//	window->m_game->Tick();
+			//}
+			//else {
+			//	PAINTSTRUCT ps;
+			//	std::ignore = BeginPaint(hWnd, &ps);
+			//	EndPaint(hWnd, &ps);
+			//}
 
 			//hdc = BeginPaint(hWnd, &ps);
 			////window->Paint();
 			//EndPaint(hWnd, &ps);
-			break;
+			//break;
+			window->m_game->Tick();
+			return 0;
 		}
 
 		case WM_SIZE:

@@ -31,6 +31,8 @@ namespace Bruno
 		virtual uint32_t GetWidth() const;
 		virtual uint32_t GetHeight() const;
 
+		virtual void Show() = 0;
+
 	protected:
 		struct WindowData
 		{

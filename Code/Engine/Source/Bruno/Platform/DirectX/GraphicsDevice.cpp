@@ -89,7 +89,7 @@ namespace Bruno
 
         D3D12_FEATURE_DATA_FEATURE_LEVELS featLevels =
         {
-            static_cast<UINT>(std::size(s_featureLevels)), s_featureLevels, D3D_FEATURE_LEVEL_11_0
+            static_cast<uint32_t>(std::size(s_featureLevels)), s_featureLevels, D3D_FEATURE_LEVEL_11_0
         };
 
         hr = m_d3dDevice->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &featLevels, sizeof(featLevels));
@@ -107,29 +107,69 @@ namespace Bruno
         bool result = true;
         result &= m_rtvDescriptorHeap.Initialize(this);
 
-        //if (m_depthBufferFormat != DXGI_FORMAT_UNKNOWN)
-        //{
-        //    D3D12_DESCRIPTOR_HEAP_DESC dsvDescriptorHeapDesc = {};
-        //    dsvDescriptorHeapDesc.NumDescriptors = 1;
-        //    dsvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+        D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
 
-        //    ThrowIfFailed(m_d3dDevice->CreateDescriptorHeap(&dsvDescriptorHeapDesc, IID_PPV_ARGS(m_dsvDescriptorHeap.ReleaseAndGetAddressOf())));
+        // This is the highest version the sample supports. If
+        // CheckFeatureSupport succeeds, the HighestVersion returned will not be
+        // greater than this.
+        featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
 
-        //    m_dsvDescriptorHeap->SetName(L"DeviceResources");
-        //}
+        if (FAILED(m_d3dDevice->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE,
+            &featureData,
+            sizeof(featureData))))
+        {
+            featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
+        }
 
-        //// Create a fence for tracking GPU execution progress.
-        //ThrowIfFailed(m_d3dDevice->CreateFence(m_fenceValues[m_backBufferIndex], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_fence.ReleaseAndGetAddressOf())));
-        //m_fenceValues[m_backBufferIndex]++;
+        D3D12_DESCRIPTOR_RANGE1 ranges[1];
+        ranges[0].BaseShaderRegister = 0;
+        ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+        ranges[0].NumDescriptors = 1;
+        ranges[0].RegisterSpace = 0;
+        ranges[0].OffsetInDescriptorsFromTableStart = 0;
+        ranges[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE;
 
-        //m_fence->SetName(L"DeviceResources");
+        D3D12_ROOT_PARAMETER1 rootParameters[1];
+        rootParameters[0].ParameterType =
+            D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 
-        //m_fenceEvent.Attach(CreateEventEx(nullptr, nullptr, 0, EVENT_MODIFY_STATE | SYNCHRONIZE));
-        //if (!m_fenceEvent.IsValid())
-        //{
-        //    throw std::exception();
-        //    //throw std::system_error(std::error_code(static_cast<int>(GetLastError()), std::system_category()), "CreateEventEx");
-        //}
+        rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+        rootParameters[0].DescriptorTable.pDescriptorRanges = ranges;
+
+        D3D12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
+        rootSignatureDesc.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
+        rootSignatureDesc.Desc_1_1.Flags =
+            D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+        rootSignatureDesc.Desc_1_1.NumParameters = 1;
+        rootSignatureDesc.Desc_1_1.pParameters = rootParameters;
+        rootSignatureDesc.Desc_1_1.NumStaticSamplers = 0;
+        rootSignatureDesc.Desc_1_1.pStaticSamplers = nullptr;
+
+        ID3DBlob* signature;
+        ID3DBlob* error;
+        try
+        {
+            ThrowIfFailed(D3D12SerializeVersionedRootSignature(
+                &rootSignatureDesc, &signature, &error));
+            ThrowIfFailed(m_d3dDevice->CreateRootSignature(
+                0, signature->GetBufferPointer(), signature->GetBufferSize(),
+                IID_PPV_ARGS(m_rootSignature.ReleaseAndGetAddressOf())));
+            m_rootSignature->SetName(L"Hello Triangle Root Signature");
+        }
+        catch (std::exception e)
+        {
+            const char* errStr = (const char*)error->GetBufferPointer();
+            std::cout << errStr;
+            error->Release();
+            error = nullptr;
+        }
+
+        if (signature)
+        {
+            signature->Release();
+            signature = nullptr;
+        }
 	}
 
     std::shared_ptr<GraphicsDevice> GraphicsDevice::Create(std::shared_ptr<GraphicsAdapter> adapter)

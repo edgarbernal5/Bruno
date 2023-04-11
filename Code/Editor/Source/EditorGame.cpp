@@ -28,6 +28,8 @@ namespace Bruno
 		m_gameWindow->Initialize();
 
 		InitUI();
+
+		m_gameWindow->Show();
 	}
 
 	void EditorGame::InitUI()

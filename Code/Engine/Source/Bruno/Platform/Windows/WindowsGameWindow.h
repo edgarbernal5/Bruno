@@ -22,6 +22,8 @@ namespace Bruno
 		virtual void Initialize() override;
 		virtual void Run() override;
 
+		virtual void Show() override;
+
 	protected:
 		GameWindowParameters m_parameters;
 		HWND m_hwnd;

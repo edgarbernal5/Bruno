@@ -31,6 +31,8 @@ namespace Bruno
 
 		m_surface = std::make_unique<Surface>(surfaceParameters);
 		m_surface->Initialize();
+
+		m_gameWindow->Show();
 	}
 
 	void PlayerGame::Tick()

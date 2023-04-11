@@ -69,6 +69,15 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\ResourceBarrier.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Shader.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -105,6 +114,15 @@
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\ResourceBarrier.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Shader.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
   </ItemGroup>

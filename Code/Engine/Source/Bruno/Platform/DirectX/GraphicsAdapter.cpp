@@ -80,8 +80,8 @@ namespace Bruno
 		return adapter;
 	}
 
-	GraphicsAdapter::GraphicsAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter4> adapter) :
-		m_dxgiAdapter(adapter)
+	GraphicsAdapter::GraphicsAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter4> dxgiAdapter) :
+		m_dxgiAdapter(dxgiAdapter)
 	{
 		m_dxgiAdapter->GetDesc3(&m_adapterDesc);
 	}

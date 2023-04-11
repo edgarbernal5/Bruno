@@ -79,11 +79,11 @@ namespace Bruno
 		// Presenting swap chain buffers happens in lockstep with frame buffers.
 		surface->Present();
 
-		uint64_t& fenceValue{ m_fenceValue };
-		++fenceValue;
+		uint64_t& currentFenceValue{ m_fenceValue };
+		++currentFenceValue;
 		CommandFrame& frame{ m_commandFrames[m_frameIndex] };
-		frame.FenceValue = fenceValue;
-		m_commandQueue->Signal(m_fence.Get(), fenceValue);
+		frame.FenceValue = currentFenceValue;
+		m_commandQueue->Signal(m_fence.Get(), currentFenceValue);
 
 		m_frameIndex = (m_frameIndex + 1) % Graphics::Core::FRAME_BUFFER_COUNT;
 	}

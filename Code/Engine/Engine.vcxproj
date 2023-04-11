@@ -84,6 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ResourceBarrier.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCore.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
@@ -96,11 +97,14 @@
     <ClInclude Include="Source\Bruno\Core\Game.h" />
     <ClInclude Include="Source\Bruno\EntryPoint.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Resources.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Shader.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\NanaGameWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ResourceBarrier.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueue.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\D3DCore.cpp" />
@@ -112,6 +116,8 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\Game.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Resources.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Shader.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\Windows\NanaGameWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
