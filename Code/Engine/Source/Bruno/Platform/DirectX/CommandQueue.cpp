@@ -52,6 +52,7 @@ namespace Bruno
 
 	CommandQueue::~CommandQueue()
 	{
+		Flush();
 
 		CloseHandle(m_fenceEvent);
 		m_fenceEvent = nullptr;
@@ -60,6 +61,8 @@ namespace Bruno
 		{
 			m_commandFrames[i].Release();
 		}
+
+		m_fenceValue = 0;
 	}
 
 	void CommandQueue::BeginFrame()
@@ -86,6 +89,15 @@ namespace Bruno
 		m_commandQueue->Signal(m_fence.Get(), currentFenceValue);
 
 		m_frameIndex = (m_frameIndex + 1) % Graphics::Core::FRAME_BUFFER_COUNT;
+	}
+
+	void CommandQueue::Flush()
+	{
+		for (uint32_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; ++i)
+		{
+			m_commandFrames[i].Wait(m_fenceEvent, m_fence.Get());
+		}
+		m_frameIndex = 0;
 	}
 
 	ID3D12CommandQueue* CommandQueue::GetQueue()

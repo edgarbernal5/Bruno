@@ -46,8 +46,8 @@ namespace Bruno
             UpdateSubresources(device->GetCommandQueue()->GetCommandList(),
                 m_vertexBuffer.Get(), intermediateVertexBuffer.Get(),
                 0, 0, 1, &subresourceData);
-
         }
+
 		// Create the vertex buffer view.
 		m_vertexBufferView.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();
         m_vertexBufferView.SizeInBytes = vertexStride * numVertices;

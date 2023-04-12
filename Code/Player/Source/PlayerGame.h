@@ -2,9 +2,11 @@
 
 #include <Bruno.h>
 #include <Bruno/Platform/DirectX/Surface.h>
+#include <Bruno/Platform/DirectX/IndexBuffer.h>
+#include <Bruno/Platform/DirectX/VertexBuffer.h>
 
-namespace Bruno {
-
+namespace Bruno
+{
 	class PlayerGame : public Game
 	{
 	public:
@@ -17,6 +19,8 @@ namespace Bruno {
 
 	private:
 		std::unique_ptr<Surface> m_surface;
+		std::unique_ptr<IndexBuffer> m_indexBuffer;
+		std::unique_ptr<VertexBuffer> m_vertexBuffer;
 	};
 
 }

@@ -5,6 +5,7 @@
 
 namespace Bruno
 {
+
     IndexBuffer::IndexBuffer(uint32_t numElements, const void* bufferData, uint32_t elementSize) :
 		m_numElements(numElements),
 		m_elementSize(elementSize),

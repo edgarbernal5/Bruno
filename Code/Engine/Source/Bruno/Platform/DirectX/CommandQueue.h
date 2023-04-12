@@ -15,6 +15,7 @@ namespace Bruno
 
 		void BeginFrame();
 		void EndFrame(Surface* surface);
+		void Flush();
 
 		ID3D12CommandQueue* GetQueue();
 		ID3D12GraphicsCommandList6* GetCommandList();
