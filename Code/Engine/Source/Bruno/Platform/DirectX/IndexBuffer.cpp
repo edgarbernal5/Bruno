@@ -51,7 +51,7 @@ namespace Bruno
         }
 		// Create the index buffer view.
 		m_indexBufferView.BufferLocation = m_indexBuffer->GetGPUVirtualAddress();
-        m_indexBufferView.Format = elementSize < 4 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+        m_indexBufferView.Format = elementSize == sizeof(uint16_t) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
         m_indexBufferView.SizeInBytes = bufferSize;
 	}
 }

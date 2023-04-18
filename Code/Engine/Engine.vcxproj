@@ -52,7 +52,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -98,6 +98,7 @@
     <ClInclude Include="Source\Bruno\EntryPoint.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Resources.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Shader.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadCommand.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\NanaGameWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h" />
@@ -117,6 +118,7 @@
     <ClCompile Include="Source\Bruno\Core\Game.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Resources.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Shader.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadCommand.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\Windows\NanaGameWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp" />

@@ -28,7 +28,7 @@ namespace Bruno
                 80 /* IDXGISwapChain::GetContainingOutput: The swapchain's adapter does not control the output on which the swapchain's window resides. */,
             };
             DXGI_INFO_QUEUE_FILTER filter = {};
-            filter.DenyList.NumIDs = static_cast<UINT>(std::size(hide));
+            filter.DenyList.NumIDs = static_cast<uint32_t>(std::size(hide));
             filter.DenyList.pIDList = hide;
             dxgiInfoQueue->AddStorageFilterEntries(DXGI_DEBUG_DXGI, &filter);
         }
@@ -69,7 +69,7 @@ namespace Bruno
                 D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
             };
             D3D12_INFO_QUEUE_FILTER filter = {};
-            filter.DenyList.NumIDs = static_cast<UINT>(std::size(hide));
+            filter.DenyList.NumIDs = static_cast<uint32_t>(std::size(hide));
             filter.DenyList.pIDList = hide;
             d3dInfoQueue->AddStorageFilterEntries(&filter);
         }
