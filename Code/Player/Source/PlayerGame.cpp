@@ -62,8 +62,8 @@ namespace Bruno
 		m_surface = std::make_unique<Surface>(surfaceParameters);
 		m_surface->Initialize();
 
-		//m_indexBuffer = std::make_unique<IndexBuffer>(_countof(g_Indicies), g_Indicies, sizeof(uint16_t));
-		//m_vertexBuffer = std::make_unique<VertexBuffer>(_countof(g_Vertices), g_Vertices, sizeof(VertexPosColor));
+		m_indexBuffer = std::make_unique<IndexBuffer>(_countof(g_Indicies), g_Indicies, sizeof(uint16_t));
+		m_vertexBuffer = std::make_unique<VertexBuffer>(_countof(g_Vertices), g_Vertices, sizeof(VertexPosColor));
 
 		m_gameWindow->Show();
 	}

@@ -13,7 +13,8 @@ namespace Bruno
 		UploadCommand(GraphicsDevice* device);
 		~UploadCommand();
 
-		void BeginUpload(uint32_t alignedSize);
+		void BeginUpload(uint32_t bufferSize);
+		Microsoft::WRL::ComPtr<ID3D12Resource> Update(const void* bufferData, uint32_t bufferSize);
 		void EndUpload();
 		void Flush();
 

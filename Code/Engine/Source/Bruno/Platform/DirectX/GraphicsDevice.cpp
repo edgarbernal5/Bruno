@@ -3,6 +3,7 @@
 
 #include "GraphicsAdapter.h"
 #include "CommandQueue.h"
+#include "UploadCommand.h"
 
 namespace Bruno
 {
@@ -103,6 +104,7 @@ namespace Bruno
         }
 
         m_commandQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_DIRECT);
+        m_uploadCommand = std::make_unique<UploadCommand>(this);
 
         bool result = true;
         result &= m_rtvDescriptorHeap.Initialize(this);
@@ -190,6 +192,11 @@ namespace Bruno
     CommandQueue* GraphicsDevice::GetCommandQueue()
     {
         return m_commandQueue.get();
+    }
+
+    UploadCommand* GraphicsDevice::GetUploadCommand()
+    {
+        return m_uploadCommand.get();
     }
 
     DescriptorHeap& GraphicsDevice::GetRtvDescriptionHeap()

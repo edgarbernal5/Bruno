@@ -50,12 +50,12 @@ namespace Bruno
 		m_fenceValue = 0;
 	}
 
-	void UploadCommand::BeginUpload(uint32_t aligned_size)
+	void UploadCommand::BeginUpload(uint32_t bufferSize)
 	{
 		UploadFrame& frame{ m_uploadFrames[m_frameIndex] };
 
 		{//D3D12_RESOURCE_FLAG_NONE
-			auto desc = CD3DX12_RESOURCE_DESC::Buffer(aligned_size);
+			auto desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize);
 			ID3D12Resource* intermediateBuffer;
 			m_device->GetD3DDevice()->CreateCommittedResource(
 				&UploadHeap,
@@ -67,9 +67,33 @@ namespace Bruno
 
 			frame.UploadBuffer = intermediateBuffer;
 		}
-		//UpdateSubresources
+
 		ThrowIfFailed(frame.CommandAllocator->Reset());
 		ThrowIfFailed(frame.CommandList->Reset(frame.CommandAllocator, nullptr));
+	}
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> UploadCommand::Update(const void* bufferData, uint32_t bufferSize)
+	{
+		UploadFrame& frame{ m_uploadFrames[m_frameIndex] };
+		Microsoft::WRL::ComPtr<ID3D12Resource> d3d12Resource;
+
+		ThrowIfFailed(m_device->GetD3DDevice()->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer(bufferSize,
+			D3D12_RESOURCE_FLAG_NONE), 
+			D3D12_RESOURCE_STATE_COMMON, nullptr,
+			IID_PPV_ARGS(&d3d12Resource)));
+
+		D3D12_SUBRESOURCE_DATA subresourceData = {};
+		subresourceData.pData = bufferData;
+		subresourceData.RowPitch = bufferSize;
+		subresourceData.SlicePitch = subresourceData.RowPitch;
+
+		UpdateSubresources(frame.CommandList, d3d12Resource.Get(), frame.UploadBuffer, 0, 0, 1,
+			&subresourceData);
+
+		return d3d12Resource;
 	}
 
 	void UploadCommand::EndUpload()

@@ -10,6 +10,7 @@ namespace Bruno
 {
 	class GraphicsAdapter;
 	class CommandQueue;
+	class UploadCommand;
 
 	class GraphicsDevice
 	{
@@ -20,6 +21,7 @@ namespace Bruno
 		IDXGIFactory4* GetFactory();
 		ID3D12Device* GetD3DDevice();
 		CommandQueue* GetCommandQueue();
+		UploadCommand* GetUploadCommand();
 		DescriptorHeap& GetRtvDescriptionHeap();
 
 		static std::shared_ptr<GraphicsDevice> Create(std::shared_ptr<GraphicsAdapter> adapter = nullptr);
@@ -32,6 +34,7 @@ namespace Bruno
 		Microsoft::WRL::ComPtr<ID3D12Device>                m_d3dDevice;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator>      m_commandAllocators[Graphics::Core::FRAME_BUFFER_COUNT];
 		std::unique_ptr<CommandQueue>						m_commandQueue;
+		std::unique_ptr<UploadCommand>						m_uploadCommand;
 
 		D3D_FEATURE_LEVEL									m_d3dMinFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };
 		Microsoft::WRL::ComPtr<IDXGIFactory4>               m_dxgiFactory;
