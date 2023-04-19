@@ -30,7 +30,7 @@ namespace Bruno
 			break;
 		}
 
-		for (size_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; i++)
+		for (uint32_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; i++)
 		{
 			CommandFrame& frame = m_commandFrames[i];
 			ThrowIfFailed(m_device->GetD3DDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(&frame.CommandAllocator)));

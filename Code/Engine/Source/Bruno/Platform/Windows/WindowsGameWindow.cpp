@@ -59,7 +59,7 @@ namespace Bruno
 			return;
 
 		// Compute window rectangle dimensions based on requested client area dimensions.
-		RECT windowRect = { 0, 0, m_parameters.Width, m_parameters.Height };
+		RECT windowRect = { 0, 0, (LONG)m_parameters.Width, (LONG)m_parameters.Height };
 		AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
 		std::wstring m_mainWndTitle(m_parameters.Title.begin(), m_parameters.Title.end());
