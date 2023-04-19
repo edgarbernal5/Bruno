@@ -2,8 +2,8 @@
 
 #include "D3DCommon.h"
 
-namespace Bruno {
-
+namespace Bruno
+{
 	class ResourceBarrier
 	{
 	public:

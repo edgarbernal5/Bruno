@@ -52,6 +52,7 @@ namespace Bruno
 					ThrowIfFailed(uploadFence->SetEventOnCompletion(FenceValue, fenceEvent));
 					WaitForSingleObject(fenceEvent, INFINITE);
 				}
+
 				if (UploadBuffer)
 				{
 					UploadBuffer->Release();

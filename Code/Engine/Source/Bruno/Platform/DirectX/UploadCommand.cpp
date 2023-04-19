@@ -37,14 +37,15 @@ namespace Bruno
 
 	UploadCommand::~UploadCommand()
 	{
-		Flush();
-
-		CloseHandle(m_fenceEvent);
-		m_fenceEvent = nullptr;
-
 		for (uint32_t i = 0; i < Graphics::Core::UPLOAD_FRAME_COUNT; ++i)
 		{
 			m_uploadFrames[i].Release(m_fence.Get(), m_fenceEvent);
+		}
+
+		if (m_fenceEvent)
+		{
+			CloseHandle(m_fenceEvent);
+			m_fenceEvent = nullptr;
 		}
 
 		m_fenceValue = 0;
@@ -109,6 +110,9 @@ namespace Bruno
 		frame.FenceValue = currentFenceValue;
 		m_uploadCommand->Signal(m_fence.Get(), currentFenceValue);
 
+		// Wait for copy queue to finish. Then release the upload buffer.
+		frame.WaitAndReset(m_fence.Get(), m_fenceEvent);
+
 		m_frameIndex = (m_frameIndex + 1) % Graphics::Core::UPLOAD_FRAME_COUNT;
 	}
 
@@ -116,7 +120,7 @@ namespace Bruno
 	{
 		for (uint32_t i = 0; i < Graphics::Core::UPLOAD_FRAME_COUNT; ++i)
 		{
-			//m_uploadFrames[i].WaitAndReset(m_fenceEvent, m_fence.Get());
+			m_uploadFrames[i].WaitAndReset(m_fence.Get(), m_fenceEvent);
 		}
 		m_frameIndex = 0;
 	}

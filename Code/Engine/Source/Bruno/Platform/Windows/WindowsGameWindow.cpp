@@ -188,7 +188,7 @@ namespace Bruno
 			else if (!window->m_inSizeMove)
 			{
 				std::cout << "ClientSizeChanged" << std::endl;
-				//window->ClientSizeChanged();
+				window->m_game->OnClientSizeChanged();
 			}
 			break;
 
@@ -215,7 +215,6 @@ namespace Bruno
 				window->m_data.Width = clientWidth;
 
 				window->m_game->OnClientSizeChanged();
-				//window->ClientSizeChanged();
 			}
 			break;
 		}

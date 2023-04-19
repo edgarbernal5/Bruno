@@ -48,7 +48,7 @@ namespace Bruno
 				currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 			float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; //Yellow
-			if (idxx == 2)clearColor[0] = 0.0f;
+			if (idxx == 2) clearColor[0] = 0.0f;
 
 			commandQueue->GetCommandList()->RSSetViewports(1, &m_surface->GetViewport());
 			commandQueue->GetCommandList()->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
