@@ -97,6 +97,7 @@
     <ClInclude Include="Source\Bruno\Core\Game.h" />
     <ClInclude Include="Source\Bruno\EntryPoint.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Resources.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Shader.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadCommand.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\NanaGameWindow.h" />
@@ -117,6 +118,7 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\Game.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Resources.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignature.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Shader.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadCommand.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />

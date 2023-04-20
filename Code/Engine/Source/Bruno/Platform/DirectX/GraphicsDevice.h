@@ -22,7 +22,12 @@ namespace Bruno
 		ID3D12Device* GetD3DDevice();
 		CommandQueue* GetCommandQueue();
 		UploadCommand* GetUploadCommand();
-		DescriptorHeap& GetRtvDescriptionHeap();
+		DescriptorHeap& GetRtvDescriptionHeap(); 
+		
+		D3D_ROOT_SIGNATURE_VERSION GetHighestRootSignatureVersion() const
+		{
+			return m_highestRootSignatureVersion;
+		}
 
 		static std::shared_ptr<GraphicsDevice> Create(std::shared_ptr<GraphicsAdapter> adapter = nullptr);
 
@@ -44,6 +49,7 @@ namespace Bruno
 		DescriptorHeap										m_rtvDescriptorHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_RTV };
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature>			m_rootSignature;
+		D3D_ROOT_SIGNATURE_VERSION							m_highestRootSignatureVersion;
 	};
 
 }

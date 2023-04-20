@@ -122,8 +122,9 @@ namespace Bruno
         {
             featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
         }
+        m_highestRootSignatureVersion = featureData.HighestVersion;
 
-        D3D12_DESCRIPTOR_RANGE1 ranges[1];
+        /*D3D12_DESCRIPTOR_RANGE1 ranges[1];
         ranges[0].BaseShaderRegister = 0;
         ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
         ranges[0].NumDescriptors = 1;
@@ -171,7 +172,7 @@ namespace Bruno
         {
             signature->Release();
             signature = nullptr;
-        }
+        }*/
 	}
 
     std::shared_ptr<GraphicsDevice> GraphicsDevice::Create(std::shared_ptr<GraphicsAdapter> adapter)
