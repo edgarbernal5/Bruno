@@ -26,7 +26,7 @@ namespace Bruno
 
 		virtual WindowHandle GetHandle() = 0;
 		virtual void Initialize() = 0;
-		virtual void Run() = 0;
+		virtual int Run() = 0;
 
 		virtual uint32_t GetWidth() const;
 		virtual uint32_t GetHeight() const;

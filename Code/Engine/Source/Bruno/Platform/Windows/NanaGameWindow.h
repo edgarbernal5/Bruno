@@ -16,7 +16,7 @@ namespace Bruno
 
 		virtual WindowHandle GetHandle() override;
 		virtual void Initialize() override;
-		virtual void Run() override;
+		virtual int Run() override;
 
 		virtual void Show() override;
 

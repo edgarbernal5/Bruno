@@ -86,7 +86,7 @@ namespace Bruno
 		SetWindowLongPtr(m_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 	}
 
-	void WindowsGameWindow::Run()
+	int WindowsGameWindow::Run()
 	{
 		MSG msg = { 0 };
 
@@ -97,13 +97,10 @@ namespace Bruno
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
-			/*else
-			{
-				m_game->Tick();
-			}*/
 		}
 
 		int returnCode = (int)msg.wParam;
+		return returnCode;
 	}
 
 	void WindowsGameWindow::Show()

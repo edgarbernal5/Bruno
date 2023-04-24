@@ -40,9 +40,10 @@ namespace Bruno
 		return *m_form;
 	}
 
-	void NanaGameWindow::Run()
+	int NanaGameWindow::Run()
 	{
 		nana::exec();
+		return 0;
 	}
 
 	void NanaGameWindow::Show()
