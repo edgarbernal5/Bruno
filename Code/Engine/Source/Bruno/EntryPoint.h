@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Bruno/Core/Game.h"
+
 #ifdef BR_PLATFORM_WINDOWS
 
 extern Bruno::Game* Bruno::CreateGame(int argc, char** argv);
@@ -8,9 +10,14 @@ namespace Bruno
 {
 	int Main(int argc, char** argv)
 	{
-		Bruno::Game* game = Bruno::CreateGame(argc, argv);
-		game->Run();
-		delete game;
+		InitializeCore();
+		{
+			Bruno::Game* game = Bruno::CreateGame(argc, argv);
+			game->Run();
+			delete game;
+		}
+		ShutdownCore();
+
 		return 0;
 	}
 }

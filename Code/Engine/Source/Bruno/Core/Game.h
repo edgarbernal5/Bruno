@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Bruno/Core/Base.h"
+
 #include <cstdint>
 #include <string>
 #include <memory>

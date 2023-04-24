@@ -84,6 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Bruno\Core\Base.h" />
     <ClInclude Include="Source\Bruno\Core\Log.h" />
     <ClInclude Include="Source\Bruno\Core\Logger.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
@@ -108,6 +109,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Bruno\Core\Base.cpp" />
     <ClCompile Include="Source\Bruno\Core\Log.cpp" />
     <ClCompile Include="Source\Bruno\Core\Logger.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />

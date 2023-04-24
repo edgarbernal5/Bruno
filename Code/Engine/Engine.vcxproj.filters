@@ -90,6 +90,9 @@
     <ClInclude Include="Source\Bruno\Core\Log.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\Base.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -147,6 +150,9 @@
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\Log.cpp">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\Base.cpp">
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
   </ItemGroup>
