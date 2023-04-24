@@ -141,7 +141,7 @@ namespace Bruno
 		{
 		case WM_PAINT:
 		{
-			std::cout << "Native form Paint" << std::endl;
+			//std::cout << "Native form Paint" << std::endl;
 			//ver codigo nana (Bedrock_WIN32_WindowProc, bedrock_windows.cpp)
 
 			//if (window->m_inSizeMove && window->m_game) {
@@ -169,7 +169,7 @@ namespace Bruno
 					window->m_minimized = true;
 					if (!window->m_inSuspend)
 					{
-						std::cout << "OnSuspending" << std::endl;
+						BR_CORE_INFO << "OnSuspending" << std::endl;
 						//window->Suspend();
 					}
 					window->m_inSuspend = true;
@@ -180,14 +180,14 @@ namespace Bruno
 				window->m_minimized = false;
 				if (window->m_inSuspend)
 				{
-					std::cout << "OnResuming" << std::endl;
+					BR_CORE_INFO << "OnResuming" << std::endl;
 					//window->Resume();
 				}
 				window->m_inSuspend = false;
 			}
 			else if (!window->m_inSizeMove)
 			{
-				std::cout << "ClientSizeChanged" << std::endl;
+				BR_CORE_INFO << "ClientSizeChanged" << std::endl;
 				window->m_game->OnClientSizeChanged();
 			}
 			break;
@@ -210,7 +210,7 @@ namespace Bruno
 
 			if (window->m_prevClientWidth != clientWidth || window->m_prevClientHeight != clientHeight)
 			{
-				std::cout << "ClientSizeChanged" << std::endl;
+				BR_CORE_INFO << "ClientSizeChanged" << std::endl;
 				window->m_data.Height = clientHeight;
 				window->m_data.Width = clientWidth;
 
@@ -232,12 +232,12 @@ namespace Bruno
 			{
 				if (wParam)
 				{
-					std::cout << "Activated" << std::endl;
+					BR_CORE_INFO << "Activated" << std::endl;
 					//window->Activated();
 				}
 				else
 				{
-					std::cout << "Deactivated" << std::endl;
+					BR_CORE_INFO << "Deactivated" << std::endl;
 					//window->Deactivated();
 				}
 			}
@@ -249,7 +249,7 @@ namespace Bruno
 			case PBT_APMQUERYSUSPEND:
 				if (!window->m_inSuspend)
 				{
-					std::cout << "OnSuspending" << std::endl;
+					BR_CORE_INFO << "OnSuspending" << std::endl;
 					//window->Suspend();
 				}
 
@@ -261,7 +261,7 @@ namespace Bruno
 				{
 					if (window->m_inSuspend)
 					{
-						std::cout << "OnResuming" << std::endl;
+						BR_CORE_INFO << "OnResuming" << std::endl;
 						//window->Resume();
 					}
 					window->m_inSuspend = false;

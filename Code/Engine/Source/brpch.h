@@ -13,3 +13,6 @@
 #include <mutex>
 #include <stdio.h>
 #include <iostream>
+
+#include <Bruno/Core/Game.h>
+#include <Bruno/Core/Log.h>

@@ -84,6 +84,12 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\Logger.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\Log.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -136,6 +142,12 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignature.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\Logger.cpp">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\Log.cpp">
+      <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
