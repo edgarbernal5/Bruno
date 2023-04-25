@@ -9,13 +9,13 @@ namespace Bruno
 	{
 		Log::Initialize();
 
-		BR_CORE_INFO << "Bruno Engine " << BRUNO_BUILD_ID << std::endl;
-		BR_CORE_INFO << "Initializing..." << std::endl;
+		BR_CORE_TRACE << "Bruno Engine " << BRUNO_BUILD_ID << std::endl;
+		BR_CORE_TRACE << "Initializing..." << std::endl;
 	}
 
 	void ShutdownCore()
 	{
-		BR_CORE_INFO << "Shutting down... " << std::endl;
+		BR_CORE_TRACE << "Shutting down... " << std::endl;
 
 		Log::Shutdown();
 	}

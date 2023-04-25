@@ -166,7 +166,7 @@ namespace Bruno
 					window->m_minimized = true;
 					if (!window->m_inSuspend)
 					{
-						BR_CORE_INFO << "OnSuspending" << std::endl;
+						BR_CORE_TRACE << "OnSuspending" << std::endl;
 						//window->Suspend();
 					}
 					window->m_inSuspend = true;
@@ -177,14 +177,14 @@ namespace Bruno
 				window->m_minimized = false;
 				if (window->m_inSuspend)
 				{
-					BR_CORE_INFO << "OnResuming" << std::endl;
+					BR_CORE_TRACE << "OnResuming" << std::endl;
 					//window->Resume();
 				}
 				window->m_inSuspend = false;
 			}
 			else if (!window->m_inSizeMove)
 			{
-				BR_CORE_INFO << "ClientSizeChanged" << std::endl;
+				BR_CORE_TRACE << "ClientSizeChanged" << std::endl;
 				window->m_game->OnClientSizeChanged();
 			}
 			break;
@@ -207,7 +207,7 @@ namespace Bruno
 
 			if (window->m_prevClientWidth != clientWidth || window->m_prevClientHeight != clientHeight)
 			{
-				BR_CORE_INFO << "ClientSizeChanged" << std::endl;
+				BR_CORE_TRACE << "ClientSizeChanged" << std::endl;
 				window->m_data.Height = clientHeight;
 				window->m_data.Width = clientWidth;
 
@@ -229,12 +229,12 @@ namespace Bruno
 			{
 				if (wParam)
 				{
-					BR_CORE_INFO << "Activated" << std::endl;
+					BR_CORE_TRACE << "Activated" << std::endl;
 					//window->Activated();
 				}
 				else
 				{
-					BR_CORE_INFO << "Deactivated" << std::endl;
+					BR_CORE_TRACE << "Deactivated" << std::endl;
 					//window->Deactivated();
 				}
 			}
@@ -246,7 +246,7 @@ namespace Bruno
 			case PBT_APMQUERYSUSPEND:
 				if (!window->m_inSuspend)
 				{
-					BR_CORE_INFO << "OnSuspending" << std::endl;
+					BR_CORE_TRACE << "OnSuspending" << std::endl;
 					//window->Suspend();
 				}
 
@@ -258,7 +258,7 @@ namespace Bruno
 				{
 					if (window->m_inSuspend)
 					{
-						BR_CORE_INFO << "OnResuming" << std::endl;
+						BR_CORE_TRACE << "OnResuming" << std::endl;
 						//window->Resume();
 					}
 					window->m_inSuspend = false;

@@ -2,7 +2,8 @@
 
 #include "Logger.h"
 
-#define BR_CORE_INFO *Bruno::Log::GetCoreLogger()
+#define BR_CORE_TRACE (*Bruno::Log::GetCoreLogger())(LogLevel::Trace)
+#define BR_CORE_DEBUG (*Bruno::Log::GetCoreLogger())(LogLevel::Debug)
 
 namespace Bruno
 {

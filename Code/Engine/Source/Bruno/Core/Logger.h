@@ -14,10 +14,12 @@ namespace Bruno
 	
 	enum class LogLevel : uint8_t
 	{
-		Debug = 0,
+		Trace = 0,
+		Debug,
 		Info,
 		Warn,
 		Error,
+		Fatal
 	};
 
 	typedef std::ostream& (*ManipFn)(std::ostream&);
@@ -85,13 +87,11 @@ namespace Bruno
 		Logger(It begin, It end) :
 			m_sinks(begin, end)
 		{
-
 		}
 
 		Logger(std::initializer_list<Sink> sinks) :
 			m_sinks(sinks.begin(), sinks.end())
 		{
-
 		}
 		
 		~Logger() = default;
@@ -113,13 +113,14 @@ namespace Bruno
 			for (auto& sink : m_sinks)
 			{
 				manip(sink.m_stream);
-
-				if (manip == static_cast<ManipFn>(std::flush)
-					|| manip == static_cast<ManipFn>(std::endl))
-				{
-					sink.Flush();
-				}
 			}
+
+			if (manip == static_cast<ManipFn>(std::flush)
+				|| manip == static_cast<ManipFn>(std::endl))
+			{
+				Flush();
+			}
+			
 			return *this;
 		}
 
@@ -142,12 +143,25 @@ namespace Bruno
 		{
 			for (auto& sink : m_sinks)
 			{
+				sink << GetLogLevelName(m_logLevel) << " ";
 				sink.Flush();
 			}
 		}
 
 	protected:
 		std::vector<Sink> m_sinks;
-		LogLevel m_logLevel{ LogLevel::Debug };
+		LogLevel m_logLevel{ LogLevel::Trace };
+
+	private:
+		const char* GetLogLevelName(LogLevel level)
+		{
+			if (level == LogLevel::Trace) return "Trace";
+			if (level == LogLevel::Debug) return "Debug";
+			if (level == LogLevel::Info) return "Info";
+			if (level == LogLevel::Warn) return "Warn";
+			if (level == LogLevel::Error) return "Error";
+			if (level == LogLevel::Fatal) return "Fatal";
+			return "";
+		}
 	};
 }
