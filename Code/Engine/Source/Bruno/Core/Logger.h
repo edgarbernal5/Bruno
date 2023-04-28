@@ -160,9 +160,13 @@ namespace Bruno
 			//https://github.com/i42output/neolib/blob/master/include/neolib/app/i_logger.hpp
 
 			std::string logContent = m_stream.str();
+			std::ostringstream builder;
+			builder << "[" << GetLogLevelName(m_logLevel)  << "] " << logContent;
+			std::string ouputMessage = builder.str();
+
 			for (auto& sink : m_sinks)
 			{
-				sink << GetLogLevelName(m_logLevel) << " " << logContent;
+				sink << ouputMessage;
 				sink.Flush();
 			}
 
