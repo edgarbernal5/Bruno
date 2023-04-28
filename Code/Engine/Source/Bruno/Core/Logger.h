@@ -61,22 +61,43 @@ namespace Bruno
 			return *this;
 		}
 
-		void Flush()
+		virtual void Flush()
 		{
-			/*
-			  m_stream.str() has your full message here.
-			  Good place to prepend time, log-level.
-			  Send to console, file, socket, or whatever you like here.
-			*/
-
-			//m_stream.str(std::string());
+			//m_stream.flush();
 			m_stream.clear();
 		}
-		
+
 		friend class Logger;
 	protected:
 		std::ostream& m_stream;
+		//inline virtual std::ostream& Stream() = 0;
 	};
+
+	/*class ConsoleSink : public Sink
+	{
+	public:
+		ConsoleSink();
+		virtual ~ConsoleSink() = default;
+	private:
+		std::ostream& m_stream;
+
+	protected:
+		inline std::ostream& Stream() override;
+	};
+
+	/*class FileSink : public Sink
+	{
+	public:
+		FileSink();
+		FileSink(std::string filename);
+		virtual ~FileSink() = default;
+
+	private:
+		std::ofstream& m_stream;
+
+	protected:
+		inline std::ostream& Stream() override;
+	};*/
 
 	class Logger
 	{
@@ -101,35 +122,25 @@ namespace Bruno
 		template<class T>
 		Logger& operator<<(const T& outputMessage)
 		{
-			for (auto& sink : m_sinks)
-			{
-				sink << outputMessage;
-			}
+			m_stream << outputMessage;
 			return *this;
 		}
 
 		Logger& operator<<(ManipFn manip) /// endl, flush, setw, setfill, etc.
 		{
-			for (auto& sink : m_sinks)
-			{
-				manip(sink.m_stream);
-			}
+			manip(m_stream);
 
 			if (manip == static_cast<ManipFn>(std::flush)
 				|| manip == static_cast<ManipFn>(std::endl))
-			{
 				Flush();
-			}
-			
+
 			return *this;
 		}
 
 		Logger& operator<<(FlagsFn manip) /// setiosflags, resetiosflags
 		{
-			for (auto& sink : m_sinks)
-			{
-				manip(sink.m_stream);
-			}
+			manip(m_stream);
+
 			return *this;
 		}
 
@@ -141,18 +152,30 @@ namespace Bruno
 
 		void Flush()
 		{
+			/*
+			  m_stream.str() has your full message here.
+			  Good place to prepend time, log-level.
+			  Send to console, file, socket, or whatever you like here.
+			*/
+			//https://github.com/i42output/neolib/blob/master/include/neolib/app/i_logger.hpp
+
+			std::string logContent = m_stream.str();
 			for (auto& sink : m_sinks)
 			{
-				sink << GetLogLevelName(m_logLevel) << " ";
+				sink << GetLogLevelName(m_logLevel) << " " << logContent;
 				sink.Flush();
 			}
+
+			m_stream.str({});
+			m_stream.clear();
 		}
 
-	protected:
-		std::vector<Sink> m_sinks;
+	private:
+		std::stringstream m_stream;
 		LogLevel m_logLevel{ LogLevel::Trace };
 
-	private:
+		std::vector<Sink> m_sinks;
+
 		const char* GetLogLevelName(LogLevel level)
 		{
 			if (level == LogLevel::Trace) return "Trace";
