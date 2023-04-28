@@ -1,18 +1,21 @@
 #include "brpch.h"
 #include "Logger.h"
 
-#include <fstream>
-
 namespace Bruno
 {
-	Sink::Sink() :
-		m_stream(std::cout)
+	ConsoleSink::ConsoleSink() :
+		m_stream{ std::cout }
 	{
 	}
 
-	Sink::Sink(std::ostream& stream) :
+	ConsoleSink::ConsoleSink(std::ostream& stream) :
 		m_stream{ stream }
 	{
+	}
+
+	void ConsoleSink::Commit(const std::string& outputMessage)
+	{
+		std::cout << outputMessage;
 	}
 
 	Logger::Logger(const Logger& other) :
@@ -20,30 +23,20 @@ namespace Bruno
 		m_logLevel(other.m_logLevel)
 	{
 	}
-	/*
-	FileSink::FileSink() :
-		//Sink(),
-		m_stream(std::cout)
+
+	FileSink::FileSink(const std::string& filename)
 	{
+		m_stream.open(filename);
 	}
 
-	FileSink::FileSink(std::string filename) //: 
-		//Sink(),
-		//m_stream(std::cout)
+	FileSink::~FileSink()
 	{
-		std::ofstream outfile;
-		m_stream = outfile;
+		m_stream.close();
 	}
 
-	std::ostream& FileSink::Stream()
+	void FileSink::Commit(const std::string& outputMessage)
 	{
-		return m_stream;
-	}*/
-
-	/*ConsoleSink::ConsoleSink() :
-		//Sink(),
-		m_stream(std::cout)
-	{
-	}*/
-
+		m_stream << outputMessage;
+		//m_stream.flush();
+	}
 }

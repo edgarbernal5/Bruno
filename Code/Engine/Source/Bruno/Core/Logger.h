@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <fstream>
 
 namespace Bruno
 {
@@ -32,85 +33,56 @@ namespace Bruno
 	public:
 		//typedef std::ostringstream Buffer;
 
-		Sink();
-		Sink(std::ostream& stream);
-		~Sink() = default;
-
-
-		template<class T>
-		Sink& operator<<(const T& outputMessage)
-		{
-			m_stream << outputMessage;
-			return *this;
-		}
-
-		Sink& operator<<(ManipFn manip) /// endl, flush, setw, setfill, etc.
-		{
-			manip(m_stream);
-
-			if (manip == static_cast<ManipFn>(std::flush)
-				|| manip == static_cast<ManipFn>(std::endl))
-				this->Flush();
-
-			return *this;
-		}
-
-		Sink& operator<<(FlagsFn manip) /// setiosflags, resetiosflags
-		{
-			manip(m_stream);
-			return *this;
-		}
-
-		virtual void Flush()
-		{
-			//m_stream.flush();
-			m_stream.clear();
-		}
+		virtual ~Sink() = default;
+		virtual void Commit(const std::string& outputMessage) = 0;
 
 		friend class Logger;
-	protected:
-		std::ostream& m_stream;
-		//inline virtual std::ostream& Stream() = 0;
 	};
 
-	/*class ConsoleSink : public Sink
+	class ConsoleSink : public Sink
 	{
 	public:
 		ConsoleSink();
+		ConsoleSink(std::ostream& stream);
 		virtual ~ConsoleSink() = default;
+
+		void Commit(const std::string& outputMessage) override;
+
 	private:
 		std::ostream& m_stream;
-
-	protected:
-		inline std::ostream& Stream() override;
 	};
 
-	/*class FileSink : public Sink
+	class FileSink : public Sink
 	{
 	public:
-		FileSink();
-		FileSink(std::string filename);
-		virtual ~FileSink() = default;
+		FileSink(const std::string& filename);
+		virtual ~FileSink();
 
+		void Commit(const std::string& outputMessage) override;
 	private:
-		std::ofstream& m_stream;
-
-	protected:
-		inline std::ostream& Stream() override;
-	};*/
+		std::ofstream m_stream;
+	};
 
 	class Logger
 	{
 	public:
-		Logger() = default;
+		explicit Logger() :
+			m_sinks()
+		{
+		}
 
 		template<typename It>
 		Logger(It begin, It end) :
 			m_sinks(begin, end)
 		{
 		}
+		
+		Logger(std::shared_ptr<Sink> sink) :
+			Logger({ std::move(sink) })
+		{
+		}
 
-		Logger(std::initializer_list<Sink> sinks) :
+		Logger(std::initializer_list<std::shared_ptr<Sink>> sinks) :
 			m_sinks(sinks.begin(), sinks.end())
 		{
 		}
@@ -164,10 +136,11 @@ namespace Bruno
 			builder << "[" << GetLogLevelName(m_logLevel)  << "] " << logContent;
 			std::string ouputMessage = builder.str();
 
-			for (auto& sink : m_sinks)
+			for (auto sink : m_sinks)
 			{
-				sink << ouputMessage;
-				sink.Flush();
+				//sink << ouputMessage;
+				//sink.Flush();
+				sink->Commit(ouputMessage);
 			}
 
 			m_stream.str({});
@@ -178,7 +151,7 @@ namespace Bruno
 		std::stringstream m_stream;
 		LogLevel m_logLevel{ LogLevel::Trace };
 
-		std::vector<Sink> m_sinks;
+		std::vector<std::shared_ptr<Sink>> m_sinks;
 
 		const char* GetLogLevelName(LogLevel level)
 		{
