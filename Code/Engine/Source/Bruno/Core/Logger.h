@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <filesystem>
 
 namespace Bruno
 {
@@ -131,9 +132,18 @@ namespace Bruno
 			*/
 			//https://github.com/i42output/neolib/blob/master/include/neolib/app/i_logger.hpp
 
+			char timeBuffer[32];
+			std::time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+			
+			struct tm timeinfo;
+			localtime_s(&timeinfo, &currentTime);
+
+			strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H-%M-%S", &timeinfo);
+
 			std::string logContent = m_stream.str();
 			std::ostringstream builder;
-			builder << "[" << GetLogLevelName(m_logLevel)  << "] " << logContent;
+			builder << "[" << timeBuffer << "] [" << GetLogLevelName(m_logLevel) << "] " << logContent;
+			
 			std::string ouputMessage = builder.str();
 
 			for (auto sink : m_sinks)
