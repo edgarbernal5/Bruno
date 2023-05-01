@@ -6,3 +6,4 @@ namespace Bruno
 	void ShutdownCore();
 }
 
+#include "Assert.h"

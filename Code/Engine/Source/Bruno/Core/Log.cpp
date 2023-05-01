@@ -19,4 +19,11 @@ namespace Bruno
 	{
 		g_CoreLogger.reset();
 	}
+
+	void Log::PrintAssertMessage(const char* message, const char* file, int line)
+	{
+		std::ostringstream builder;
+		builder << message << " at file " << file << ". Line " << line;
+		*(g_CoreLogger) << builder.str() << std::endl;
+	}
 }

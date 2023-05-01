@@ -93,6 +93,9 @@
     <ClInclude Include="Source\Bruno\Core\Base.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\Assert.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">

@@ -17,6 +17,8 @@ namespace Bruno
 		{
 			return g_CoreLogger;
 		}
+
+		static void PrintAssertMessage(const char* message, const char* file, int line);
 	private:
 		static std::shared_ptr<Logger> g_CoreLogger;
 	};

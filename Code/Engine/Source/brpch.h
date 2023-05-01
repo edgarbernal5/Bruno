@@ -16,3 +16,4 @@
 
 #include <Bruno/Core/Game.h>
 #include <Bruno/Core/Log.h>
+#include <Bruno/Core/Assert.h>
