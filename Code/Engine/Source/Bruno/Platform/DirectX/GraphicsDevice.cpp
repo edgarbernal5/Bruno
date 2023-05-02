@@ -185,7 +185,7 @@ namespace Bruno
         return m_dxgiFactory.Get();
     }
 
-    ID3D12Device* GraphicsDevice::GetD3DDevice()
+    ID3D12Device2* GraphicsDevice::GetD3DDevice()
     {
         return m_d3dDevice.Get();
     }

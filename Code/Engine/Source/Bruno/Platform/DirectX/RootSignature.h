@@ -12,9 +12,9 @@ namespace Bruno
         RootSignature(GraphicsDevice* device, const D3D12_ROOT_SIGNATURE_DESC1& rootSignatureDesc);
         ~RootSignature();
 
-        Microsoft::WRL::ComPtr<ID3D12RootSignature> GetD3D12RootSignature() const
+        ID3D12RootSignature* GetD3D12RootSignature() const
         {
-            return m_rootSignature;
+            return m_rootSignature.Get();
         }
 
         const D3D12_ROOT_SIGNATURE_DESC1& GetRootSignatureDesc() const

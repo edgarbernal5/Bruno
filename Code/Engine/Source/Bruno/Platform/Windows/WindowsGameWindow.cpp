@@ -184,6 +184,9 @@ namespace Bruno
 			}
 			else if (!window->m_inSizeMove)
 			{
+				window->m_data.Height = HIWORD(lParam);
+				window->m_data.Width = LOWORD(lParam);
+
 				BR_CORE_TRACE << "ClientSizeChanged" << std::endl;
 				window->m_game->OnClientSizeChanged();
 			}

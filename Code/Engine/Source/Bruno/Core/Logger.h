@@ -148,8 +148,6 @@ namespace Bruno
 
 			for (auto sink : m_sinks)
 			{
-				//sink << ouputMessage;
-				//sink.Flush();
 				sink->Commit(ouputMessage);
 			}
 

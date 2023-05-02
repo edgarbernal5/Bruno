@@ -106,8 +106,8 @@ namespace Bruno
 		// set viewport and scissor rect
 		m_viewport.TopLeftX = 0.f;
 		m_viewport.TopLeftY = 0.f;
-		m_viewport.Width = (float)width;
-		m_viewport.Height = (float)height;
+		m_viewport.Width = (float)backBufferWidth;
+		m_viewport.Height = (float)backBufferHeight;
 		m_viewport.MinDepth = D3D12_MIN_DEPTH;
 		m_viewport.MaxDepth = D3D12_MAX_DEPTH;
 

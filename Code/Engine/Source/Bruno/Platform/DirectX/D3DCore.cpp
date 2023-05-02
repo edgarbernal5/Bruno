@@ -12,7 +12,7 @@ namespace Bruno::Device::Core
         }
         else
         {
-            std::cout << "Warning: D3D12 Debug interface is not available." << std::endl;
+            BR_CORE_WARN << "D3D12 Debug interface is not available." << std::endl;
         }
     }
 }

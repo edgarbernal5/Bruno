@@ -19,7 +19,7 @@ namespace Bruno
 		~GraphicsDevice() = default;
 
 		IDXGIFactory4* GetFactory();
-		ID3D12Device* GetD3DDevice();
+		ID3D12Device2* GetD3DDevice();
 		CommandQueue* GetCommandQueue();
 		UploadCommand* GetUploadCommand();
 		DescriptorHeap& GetRtvDescriptionHeap(); 
@@ -36,7 +36,7 @@ namespace Bruno
 
 		std::shared_ptr<GraphicsAdapter>					m_adapter;
 
-		Microsoft::WRL::ComPtr<ID3D12Device>                m_d3dDevice;
+		Microsoft::WRL::ComPtr<ID3D12Device2>               m_d3dDevice;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator>      m_commandAllocators[Graphics::Core::FRAME_BUFFER_COUNT];
 		std::unique_ptr<CommandQueue>						m_commandQueue;
 		std::unique_ptr<UploadCommand>						m_uploadCommand;

@@ -7,11 +7,11 @@
 
 #endif
 
+//STL Headers
 #include <vector>
 #include <string>
 #include <exception>
 #include <mutex>
-#include <stdio.h>
 #include <iostream>
 
 #include <Bruno/Core/Game.h>
