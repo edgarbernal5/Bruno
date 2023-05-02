@@ -12,7 +12,7 @@
 	#define BR_ASSERT(expression, ...) \
 		if (expression){ } \
 		else { \
-			Bruno::Log::PrintAssertMessage("Assertion fails: "#__VA_ARGS__, __FILE__, __LINE__); \
+			Bruno::Log::PrintAssertMessage(__FILE__, __LINE__, "Assertion failed", __VA_ARGS__); \
 			BR_DEBUG_BREAK; \
 		}
 #else
