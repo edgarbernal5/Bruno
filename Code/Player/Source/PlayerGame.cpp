@@ -106,7 +106,7 @@ namespace Bruno
 
 		D3D12_RT_FORMAT_ARRAY rtvFormats = {};
 		rtvFormats.NumRenderTargets = 1;
-		rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtvFormats.RTFormats[0] = DXGI_FORMAT_B8G8R8A8_UNORM;//DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		pipelineStateStream.pRootSignature = m_rootSignature.Get();
 		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
@@ -120,6 +120,13 @@ namespace Bruno
 			sizeof(PipelineStateStream), &pipelineStateStream
 		};
 		ThrowIfFailed(device->GetD3DDevice()->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_pipelineState)));
+
+		// Create the descriptor heap for the depth-stencil view.
+		D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+		dsvHeapDesc.NumDescriptors = 1;
+		dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+		dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		ThrowIfFailed(device->GetD3DDevice()->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DSVHeap)));
 
 		m_gameWindow->Show();
 	}
@@ -136,11 +143,15 @@ namespace Bruno
 
 		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 
-		m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
-		m_commandList->SetPipelineState(m_pipelineState.Get());
-		m_commandList->RSSetViewports(1, &m_surface->GetViewport());
+		auto rtv = m_surface->GetRtv();
+		auto dsv = m_DSVHeap->GetCPUDescriptorHandleForHeapStart();
+
 		m_commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
-		
+		m_commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+		m_commandList->RSSetViewports(1, &m_surface->GetViewport());
+		m_commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+
 		// Update the model matrix.
 		float          angle = 0.0f;
 		//float          angle = static_cast<float>(e.TotalTime * 90.0);
@@ -149,7 +160,7 @@ namespace Bruno
 		XMMATRIX       modelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
 
 		// Update the view matrix.
-		const XMVECTOR eyePosition = XMVectorSet(0, 2, -10, 1);
+		const XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
 		const XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
 		const XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
 		XMMATRIX       viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
@@ -161,8 +172,9 @@ namespace Bruno
 		XMMATRIX mvpMatrix = XMMatrixMultiply(modelMatrix, viewMatrix);
 		mvpMatrix = XMMatrixMultiply(mvpMatrix, projectionMatrix);
 
-		int aaa = sizeof(mvpMatrix) / sizeof(uint32_t);//, & constants
-		m_commandList->SetGraphicsRoot32BitConstants(0, aaa, &mvpMatrix, 0);
+		m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
+		m_commandList->SetPipelineState(m_pipelineState.Get());
+		m_commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
 
 		m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_commandList->IASetVertexBuffers(0, 1, &m_vertexBuffer->GetView());
@@ -178,5 +190,32 @@ namespace Bruno
 	void PlayerGame::OnClientSizeChanged()
 	{
 		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
+		// Resize screen dependent resources.
+		// Create a depth buffer.
+		D3D12_CLEAR_VALUE optimizedClearValue = {};
+		optimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+		optimizedClearValue.DepthStencil = { 1.0f, 0 };
+
+		auto movil = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+		auto movil2 = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_gameWindow->GetWidth(), m_gameWindow->GetHeight(),
+			1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+		ThrowIfFailed(m_device->GetD3DDevice()->CreateCommittedResource(
+			&movil,
+			D3D12_HEAP_FLAG_NONE,
+			&movil2,
+			D3D12_RESOURCE_STATE_DEPTH_WRITE,
+			&optimizedClearValue,
+			IID_PPV_ARGS(&m_depthBuffer)
+		));
+
+		// Update the depth-stencil view.
+		D3D12_DEPTH_STENCIL_VIEW_DESC dsv = {};
+		dsv.Format = DXGI_FORMAT_D32_FLOAT;
+		dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+		dsv.Texture2D.MipSlice = 0;
+		dsv.Flags = D3D12_DSV_FLAG_NONE;
+
+		m_device->GetD3DDevice()->CreateDepthStencilView(m_depthBuffer.Get(), &dsv,
+			m_DSVHeap->GetCPUDescriptorHandleForHeapStart());
 	}
 }

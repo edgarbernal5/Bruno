@@ -29,6 +29,11 @@ namespace Bruno
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_rootSignature;
 
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pipelineState;
+
+		// Depth buffer.
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_depthBuffer;
+		// Descriptor heap for depth buffer.
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DSVHeap;
 	};
 
 }
