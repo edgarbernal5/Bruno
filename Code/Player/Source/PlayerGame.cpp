@@ -68,6 +68,14 @@ namespace Bruno
 		};
 
 		GraphicsDevice* device = Graphics::GetDevice();
+
+		// Create the descriptor heap for the depth-stencil view.
+		D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+		dsvHeapDesc.NumDescriptors = 1;
+		dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+		dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		ThrowIfFailed(device->GetD3DDevice()->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DSVHeap)));
+
 		// Allow input layout and deny unnecessary access to certain pipeline stages.
 		D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
@@ -77,7 +85,7 @@ namespace Bruno
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 
 		// A single 32-bit constant root parameter that is used by the vertex shader.
-		CD3DX12_ROOT_PARAMETER1 rootParameters[1];
+		CD3DX12_ROOT_PARAMETER1 rootParameters[1]{};
 		rootParameters[0].InitAsConstants(sizeof(XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDescription;
@@ -106,7 +114,7 @@ namespace Bruno
 
 		D3D12_RT_FORMAT_ARRAY rtvFormats = {};
 		rtvFormats.NumRenderTargets = 1;
-		rtvFormats.RTFormats[0] = DXGI_FORMAT_B8G8R8A8_UNORM;//DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;//DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		pipelineStateStream.pRootSignature = m_rootSignature.Get();
 		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
@@ -121,13 +129,6 @@ namespace Bruno
 		};
 		ThrowIfFailed(device->GetD3DDevice()->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_pipelineState)));
 
-		// Create the descriptor heap for the depth-stencil view.
-		D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
-		dsvHeapDesc.NumDescriptors = 1;
-		dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-		dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		ThrowIfFailed(device->GetD3DDevice()->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DSVHeap)));
-
 		m_gameWindow->Show();
 	}
 
@@ -138,7 +139,7 @@ namespace Bruno
 		commandQueue->BeginFrame();
 
 		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
-		ResourceBarrier::Transition(commandQueue->GetCommandList(),
+		ResourceBarrier::Transition(m_commandList,
 			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
@@ -150,15 +151,16 @@ namespace Bruno
 		m_commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 		m_commandList->RSSetViewports(1, &m_surface->GetViewport());
+		m_commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
 		m_commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 
 		// Update the model matrix.
-		float          angle = 0.0f;
-		//float          angle = static_cast<float>(e.TotalTime * 90.0);
+		static float TotalTime = 0.0f;
+		float          angle = static_cast<float>(TotalTime * 90.0);
 		const XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
 		//XMMATRIX       modelMatrix = XMMatrixIdentity();
 		XMMATRIX       modelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
-
+		TotalTime += 0.0016f;
 		// Update the view matrix.
 		const XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
 		const XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);

@@ -111,7 +111,7 @@ namespace Bruno
 		m_viewport.MinDepth = D3D12_MIN_DEPTH;
 		m_viewport.MaxDepth = D3D12_MAX_DEPTH;
 
-		m_scissorRect = { 0, 0, (int32_t)width, (int32_t)height };
+		m_scissorRect = { 0, 0, (int32_t)backBufferWidth, (int32_t)backBufferHeight };
 
 		m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
 		Finalize();

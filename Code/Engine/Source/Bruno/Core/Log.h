@@ -36,7 +36,7 @@ namespace Bruno
 		builder << message;
 		
 		((builder << ". " << std::forward<Args>(args)), ...);
-		builder << ". File: " << file << ". Line: " << line;
+		builder << std::endl << "File: " << file << ". Line: " << line;
 		
 		(*g_CoreLogger)(LogLevel::Error) << builder.str() << std::endl;
 	}

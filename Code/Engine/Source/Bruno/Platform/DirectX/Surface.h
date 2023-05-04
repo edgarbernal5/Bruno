@@ -9,7 +9,7 @@ namespace Bruno
 	{
 		uint32_t Width;
 		uint32_t Height;
-		DXGI_FORMAT BackBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+		DXGI_FORMAT BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM; //DXGI_FORMAT_B8G8R8A8_UNORM;
 		uint32_t BackBufferCount = Graphics::Core::FRAME_BUFFER_COUNT;
 		HWND WindowHandle;
 		bool Fullscreen = false;
@@ -30,6 +30,7 @@ namespace Bruno
 		constexpr ID3D12Resource* const GetBackBuffer() const { return m_renderTargetData[m_currentBackBufferIndex].Resource; }
 		constexpr D3D12_CPU_DESCRIPTOR_HANDLE GetRtv() const { return m_renderTargetData[m_currentBackBufferIndex].Rtv.Cpu; }
 		constexpr const D3D12_VIEWPORT& GetViewport() const { return m_viewport; }
+		constexpr const D3D12_RECT& GetScissorRect() const { return m_scissorRect; }
 	private:
 		struct RenderTargetData
 		{

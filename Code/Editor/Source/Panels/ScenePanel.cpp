@@ -51,6 +51,7 @@ namespace Bruno
 			if (idxx == 2) clearColor[0] = 0.0f;
 
 			commandQueue->GetCommandList()->RSSetViewports(1, &m_surface->GetViewport());
+			commandQueue->GetCommandList()->RSSetScissorRects(1, &m_surface->GetScissorRect());
 			commandQueue->GetCommandList()->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
 
 			ResourceBarrier::Transition(commandQueue->GetCommandList(),
