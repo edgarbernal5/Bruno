@@ -10,6 +10,7 @@
 
 #include <nana/gui.hpp>
 #include <iostream>
+#include <Bruno/Core/Log.h>
 
 namespace Bruno
 {
@@ -47,7 +48,7 @@ namespace Bruno
 		idxx = idx;
 
 		this->events().resized([this](const nana::arg_resized& args) {
-			std::cout << "Resized panel id = " << idxx << ". " << args.width << "; " << args.height << std::endl;
+			BR_CORE_TRACE << "Resized panel id = " << idxx << ". " << args.width << "; " << args.height << std::endl;
 			SurfaceWindowParameters parameters;
 			parameters.Width = args.width;
 			parameters.Height = args.height;
@@ -166,7 +167,7 @@ namespace Bruno
 		ThrowIfFailed(device->GetD3DDevice()->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_pipelineState)));
 
 		this->draw_through([this](){
-			std::cout << "Paint panel. id = " << idxx << std::endl;
+			BR_CORE_TRACE << "Paint panel. id = " << idxx << std::endl;
 			auto device = Bruno::Graphics::GetDevice();
 			auto commandQueue = device->GetCommandQueue();
 			auto m_commandList = commandQueue->GetCommandList();
