@@ -7,6 +7,7 @@
 #include <Bruno/Platform/DirectX/CommandQueue.h>
 #include <Bruno/Platform/DirectX/ResourceBarrier.h>
 
+
 namespace Bruno
 {
 	using namespace DirectX;
