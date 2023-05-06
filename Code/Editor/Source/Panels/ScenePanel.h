@@ -39,5 +39,6 @@ namespace Bruno
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DSVHeap;
 
 		nana::timer m_timer;
+		float m_totalTime = 0.0f;
 	};
 }

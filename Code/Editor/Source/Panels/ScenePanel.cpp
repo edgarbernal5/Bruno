@@ -47,6 +47,8 @@ namespace Bruno
 		idx++;
 		idxx = idx;
 
+		//TO-DO: ver si se puede agregar un evento al form o nested_form cuando llega un mensaje de WM_ACTIVATEAPP 
+		//para luego disparar un evento y saber si el panel está activado o no. Es útil para el timer y el rendering/painting.
 		this->events().unload([this](const nana::arg_unload& args)
 		{
 			BR_CORE_TRACE << "Unload or close panel id = " << idxx << std::endl;
@@ -202,12 +204,12 @@ namespace Bruno
 
 
 			// Update the model matrix.
-			static float TotalTime = 0.0f;
-			float          angle = static_cast<float>(TotalTime * 90.0);
+			
+			float          angle = static_cast<float>(m_totalTime * 90.0);
 			const XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
 			//XMMATRIX       modelMatrix = XMMatrixIdentity();
 			XMMATRIX       modelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
-			TotalTime += 0.016f;
+			m_totalTime += 0.016f;
 			// Update the view matrix.
 			const XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
 			const XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
@@ -246,7 +248,7 @@ namespace Bruno
 			::InvalidateRect(hwnd, &r, FALSE);
 		});
 
-		m_timer.interval(std::chrono::duration<double>(16));
+		m_timer.interval(std::chrono::milliseconds(16));
 		m_timer.start();
 	}
 }
