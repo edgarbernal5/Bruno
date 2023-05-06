@@ -47,6 +47,12 @@ namespace Bruno
 		idx++;
 		idxx = idx;
 
+		this->events().unload([this](const nana::arg_unload& args)
+		{
+			BR_CORE_TRACE << "Unload or close panel id = " << idxx << std::endl;
+			m_timer.stop();
+		});
+
 		this->events().resized([this](const nana::arg_resized& args) {
 			BR_CORE_TRACE << "Resized panel id = " << idxx << ". " << args.width << "; " << args.height << std::endl;
 			SurfaceWindowParameters parameters;
@@ -229,6 +235,18 @@ namespace Bruno
 
 			commandQueue->EndFrame(m_surface.get());
 		});
+		
 		this->show();
+
+		HWND hwnd = reinterpret_cast<HWND>(this->native_handle());
+		m_timer.elapse([hwnd, this] {
+			//BR_CORE_TRACE << "timer id = " << idxx << std::endl;
+			RECT r;
+			::GetClientRect(hwnd, &r);
+			::InvalidateRect(hwnd, &r, FALSE);
+		});
+
+		m_timer.interval(std::chrono::duration<double>(16));
+		m_timer.start();
 	}
 }

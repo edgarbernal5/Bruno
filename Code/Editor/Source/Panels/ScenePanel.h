@@ -3,6 +3,7 @@
 #include <nana/gui/widgets/panel.hpp>
 #include <nana/gui/place.hpp>
 #include <nana/gui/widgets/form.hpp>
+#include <nana/gui/timer.hpp>
 
 #include <Bruno/Platform/DirectX/IndexBuffer.h>
 #include <Bruno/Platform/DirectX/VertexBuffer.h>
@@ -36,5 +37,7 @@ namespace Bruno
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_depthBuffer;
 		// Descriptor heap for depth buffer.
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DSVHeap;
+
+		nana::timer m_timer;
 	};
 }
