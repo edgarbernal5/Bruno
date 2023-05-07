@@ -127,7 +127,7 @@ namespace Bruno
 		m_inDeviceTransition = false;
 	}
 
-	LRESULT CALLBACK WindowsGameWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+	LRESULT CALLBACK WindowsGameWindow::WndProc(HWND hWnd, uint32_t message, WPARAM wParam, LPARAM lParam)
 	{
 		//TODO: eliminar la dependencia con la clase Game. Implementar eventos!
 		WindowsGameWindow* window = reinterpret_cast<WindowsGameWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));

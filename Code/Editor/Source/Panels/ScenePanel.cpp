@@ -52,9 +52,18 @@ namespace Bruno
 		this->events().unload([this](const nana::arg_unload& args)
 		{
 			BR_CORE_TRACE << "Unload or close panel id = " << idxx << std::endl;
-			m_timer.stop();
+			
 		});
+		this->events().expose([this](const nana::arg_expose& args) {
 
+			BR_CORE_TRACE << "Expose panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
+			if (args.exposed) {
+				m_timer.start();
+			}
+			else {
+				m_timer.stop();
+			}
+			});
 		this->events().resized([this](const nana::arg_resized& args) {
 			BR_CORE_TRACE << "Resized panel id = " << idxx << ". " << args.width << "; " << args.height << std::endl;
 			SurfaceWindowParameters parameters;
@@ -175,7 +184,7 @@ namespace Bruno
 		ThrowIfFailed(device->GetD3DDevice()->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_pipelineState)));
 
 		this->draw_through([this](){
-			BR_CORE_TRACE << "Paint panel. id = " << idxx << std::endl;
+			//BR_CORE_TRACE << "Paint panel. id = " << idxx << std::endl;
 			auto device = Bruno::Graphics::GetDevice();
 			auto commandQueue = device->GetCommandQueue();
 			auto m_commandList = commandQueue->GetCommandList();
@@ -242,13 +251,12 @@ namespace Bruno
 
 		HWND hwnd = reinterpret_cast<HWND>(this->native_handle());
 		m_timer.elapse([hwnd, this] {
-			//BR_CORE_TRACE << "timer id = " << idxx << std::endl;
+			BR_CORE_TRACE << "timer id = " << idxx << std::endl;
 			RECT r;
 			::GetClientRect(hwnd, &r);
 			::InvalidateRect(hwnd, &r, FALSE);
 		});
 
 		m_timer.interval(std::chrono::milliseconds(16));
-		m_timer.start();
 	}
 }

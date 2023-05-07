@@ -42,7 +42,7 @@ namespace Bruno
 
 	private:
 		// Windows procedure
-		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+		static LRESULT CALLBACK WndProc(HWND hWnd, uint32_t message, WPARAM wParam, LPARAM lParam);
 	};
 }
 
