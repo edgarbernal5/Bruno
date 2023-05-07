@@ -49,6 +49,12 @@ namespace Bruno
 
 		//TO-DO: ver si se puede agregar un evento al form o nested_form cuando llega un mensaje de WM_ACTIVATEAPP 
 		//para luego disparar un evento y saber si el panel está activado o no. Es útil para el timer y el rendering/painting.
+		/*
+		1. quitar el mensaje WM_ACTIVATEAPP como trivial (bedrock_windows.cpp)
+		2. crear el evento (en general_events.hpp)
+		3. crear el event code (event_code.hpp)
+		4. ver y analizar metodo bedrock::event_expose para emitir el evento
+		*/
 		this->events().unload([this](const nana::arg_unload& args)
 		{
 			BR_CORE_TRACE << "Unload or close panel id = " << idxx << std::endl;
