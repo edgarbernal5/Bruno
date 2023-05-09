@@ -58,10 +58,10 @@ namespace Bruno
 		this->events().unload([this](const nana::arg_unload& args)
 		{
 			BR_CORE_TRACE << "Unload or close panel id = " << idxx << std::endl;
-			
 		});
-		this->events().expose([this](const nana::arg_expose& args) {
 
+		this->events().expose([this](const nana::arg_expose& args)
+		{
 			BR_CORE_TRACE << "Expose panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
 			if (args.exposed) {
 				m_timer.start();
@@ -69,9 +69,10 @@ namespace Bruno
 			else {
 				m_timer.stop();
 			}
-			});
+		});
+
 		this->events().resized([this](const nana::arg_resized& args) {
-			BR_CORE_TRACE << "Resized panel id = " << idxx << ". " << args.width << "; " << args.height << std::endl;
+			BR_CORE_TRACE << "Resized panel id = " << idxx << ". " << "hwnd = " << this->native_handle() << "." << args.width << "; " << args.height << std::endl;
 			SurfaceWindowParameters parameters;
 			parameters.Width = args.width;
 			parameters.Height = args.height;
@@ -224,7 +225,7 @@ namespace Bruno
 			const XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
 			//XMMATRIX       modelMatrix = XMMatrixIdentity();
 			XMMATRIX       modelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
-			m_totalTime += 0.016f;
+			m_totalTime += 0.0016f;
 			// Update the view matrix.
 			const XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
 			const XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
@@ -257,7 +258,7 @@ namespace Bruno
 
 		HWND hwnd = reinterpret_cast<HWND>(this->native_handle());
 		m_timer.elapse([hwnd, this] {
-			BR_CORE_TRACE << "timer id = " << idxx << std::endl;
+			//BR_CORE_TRACE << "timer id = " << idxx << std::endl;
 			RECT r;
 			::GetClientRect(hwnd, &r);
 			::InvalidateRect(hwnd, &r, FALSE);
