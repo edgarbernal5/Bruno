@@ -193,6 +193,9 @@ namespace Bruno
 	void PlayerGame::OnClientSizeChanged()
 	{
 		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
+
+		m_depthBuffer.Reset();
+
 		// Resize screen dependent resources.
 		// Create a depth buffer.
 		D3D12_CLEAR_VALUE optimizedClearValue = {};
