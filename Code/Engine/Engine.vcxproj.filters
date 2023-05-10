@@ -96,6 +96,9 @@
     <ClInclude Include="Source\Bruno\Core\Assert.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -157,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\Base.cpp">
       <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

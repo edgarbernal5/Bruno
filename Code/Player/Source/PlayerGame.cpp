@@ -70,13 +70,6 @@ namespace Bruno
 
 		GraphicsDevice* device = Graphics::GetDevice();
 
-		// Create the descriptor heap for the depth-stencil view.
-		D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
-		dsvHeapDesc.NumDescriptors = 1;
-		dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-		dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		ThrowIfFailed(device->GetD3DDevice()->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DSVHeap)));
-
 		// Allow input layout and deny unnecessary access to certain pipeline stages.
 		D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
@@ -146,7 +139,7 @@ namespace Bruno
 		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 
 		auto rtv = m_surface->GetRtv();
-		auto dsv = m_DSVHeap->GetCPUDescriptorHandleForHeapStart();
+		auto dsv = m_depthBuffer->GetDsv().Cpu;
 
 		m_commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
 		m_commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
@@ -192,36 +185,12 @@ namespace Bruno
 
 	void PlayerGame::OnClientSizeChanged()
 	{
+		// Resize screen dependent resources.
 		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
 
-		m_depthBuffer.Reset();
+		m_depthBuffer.reset();
 
-		// Resize screen dependent resources.
 		// Create a depth buffer.
-		D3D12_CLEAR_VALUE optimizedClearValue = {};
-		optimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
-		optimizedClearValue.DepthStencil = { 1.0f, 0 };
-
-		auto movil = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-		auto movil2 = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_gameWindow->GetWidth(), m_gameWindow->GetHeight(),
-			1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
-		ThrowIfFailed(m_device->GetD3DDevice()->CreateCommittedResource(
-			&movil,
-			D3D12_HEAP_FLAG_NONE,
-			&movil2,
-			D3D12_RESOURCE_STATE_DEPTH_WRITE,
-			&optimizedClearValue,
-			IID_PPV_ARGS(&m_depthBuffer)
-		));
-
-		// Update the depth-stencil view.
-		D3D12_DEPTH_STENCIL_VIEW_DESC dsv = {};
-		dsv.Format = DXGI_FORMAT_D32_FLOAT;
-		dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-		dsv.Texture2D.MipSlice = 0;
-		dsv.Flags = D3D12_DSV_FLAG_NONE;
-
-		m_device->GetD3DDevice()->CreateDepthStencilView(m_depthBuffer.Get(), &dsv,
-			m_DSVHeap->GetCPUDescriptorHandleForHeapStart());
+		m_depthBuffer = std::make_unique<DepthBuffer>(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
 	}
 }

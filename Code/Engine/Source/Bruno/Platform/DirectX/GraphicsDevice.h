@@ -23,6 +23,7 @@ namespace Bruno
 		CommandQueue* GetCommandQueue();
 		UploadCommand* GetUploadCommand();
 		DescriptorHeap& GetRtvDescriptionHeap(); 
+		DescriptorHeap& GetDsvDescriptionHeap();
 		
 		D3D_ROOT_SIGNATURE_VERSION GetHighestRootSignatureVersion() const
 		{
@@ -47,6 +48,7 @@ namespace Bruno
 		D3D_FEATURE_LEVEL                                   m_d3dFeatureLevel;
 
 		DescriptorHeap										m_rtvDescriptorHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_RTV };
+		DescriptorHeap										m_dsvDescriptorHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_DSV };
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature>			m_rootSignature;
 		D3D_ROOT_SIGNATURE_VERSION							m_highestRootSignatureVersion;

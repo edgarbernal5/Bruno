@@ -108,6 +108,7 @@ namespace Bruno
 
         bool result = true;
         result &= m_rtvDescriptorHeap.Initialize(this);
+        result &= m_dsvDescriptorHeap.Initialize(this);
 
         D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
 
@@ -203,5 +204,10 @@ namespace Bruno
     DescriptorHeap& GraphicsDevice::GetRtvDescriptionHeap()
     {
         return m_rtvDescriptorHeap;
+    }
+
+    DescriptorHeap& GraphicsDevice::GetDsvDescriptionHeap()
+    {
+        return m_dsvDescriptorHeap;
     }
 }

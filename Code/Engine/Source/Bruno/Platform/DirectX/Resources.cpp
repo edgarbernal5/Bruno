@@ -25,7 +25,7 @@ namespace Bruno
     {
         D3D12_DESCRIPTOR_HEAP_DESC desc{};
         desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-        desc.NumDescriptors = 512;//Graphics::Core::FRAME_BUFFER_COUNT;
+        desc.NumDescriptors = 512; //capacity
         desc.Type = m_type;
         desc.NodeMask = 0;
 
