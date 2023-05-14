@@ -87,8 +87,6 @@ namespace Bruno
 				m_surface = std::make_unique<Surface>(parameters);
 				m_surface->Initialize();
 			}
-			m_depthBuffer.reset();
-			m_depthBuffer = std::make_unique<DepthBuffer>(args.width, args.height);
 		});
 
 
@@ -120,16 +118,8 @@ namespace Bruno
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDescription;
 		rootSignatureDescription.Init_1_1(_countof(rootParameters), rootParameters, 0, nullptr, rootSignatureFlags);
-
-		// Serialize the root signature.
-		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureBlob;
-		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
-		ThrowIfFailed(D3DX12SerializeVersionedRootSignature(&rootSignatureDescription,
-			device->GetHighestRootSignatureVersion(), &rootSignatureBlob, &errorBlob));
-
-		// Create the root signature.
-		ThrowIfFailed(device->GetD3DDevice()->CreateRootSignature(0, rootSignatureBlob->GetBufferPointer(),
-			rootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
+		
+		m_rootSignature = std::make_unique<RootSignature>(device, rootSignatureDescription.Desc_1_1);
 
 		struct PipelineStateStream
 		{
@@ -146,7 +136,7 @@ namespace Bruno
 		rtvFormats.NumRenderTargets = 1;
 		rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;//DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		pipelineStateStream.pRootSignature = m_rootSignature.Get();
+		pipelineStateStream.pRootSignature = m_rootSignature->GetD3D12RootSignature();
 		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
 		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
@@ -174,7 +164,7 @@ namespace Bruno
 			if (idxx == 2) clearColor[0] = 0.0f;
 
 			auto rtv = m_surface->GetRtv();
-			auto dsv = m_depthBuffer->GetDsv().Cpu;
+			auto dsv = m_surface->GetDsv();
 
 			m_commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
 			m_commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
@@ -208,7 +198,7 @@ namespace Bruno
 			XMMATRIX mvpMatrix = XMMatrixMultiply(modelMatrix, viewMatrix);
 			mvpMatrix = XMMatrixMultiply(mvpMatrix, projectionMatrix);
 
-			m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
+			m_commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
 			m_commandList->SetPipelineState(m_pipelineState.Get());
 			m_commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
 

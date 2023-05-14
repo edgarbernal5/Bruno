@@ -26,6 +26,8 @@ namespace Bruno
         uint32_t GetNumDescriptors(uint32_t rootIndex) const;
 
 	private:
+        friend class std::default_delete<RootSignature>;
+
         void Destroy();
         void SetRootSignatureDesc(const D3D12_ROOT_SIGNATURE_DESC1& rootSignatureDesc);
 

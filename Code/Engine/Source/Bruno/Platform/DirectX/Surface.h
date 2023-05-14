@@ -2,6 +2,7 @@
 
 #include "D3DCommon.h"
 #include "Resources.h"
+#include "DepthBuffer.h"
 
 namespace Bruno
 {
@@ -29,6 +30,7 @@ namespace Bruno
 
 		constexpr ID3D12Resource* const GetBackBuffer() const { return m_renderTargetData[m_currentBackBufferIndex].Resource; }
 		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetRtv() const { return m_renderTargetData[m_currentBackBufferIndex].Rtv.Cpu; }
+		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetDsv() const { return m_depthBuffer->GetDsv().Cpu; }
 		constexpr const D3D12_VIEWPORT& GetViewport() const { return m_viewport; }
 		constexpr const D3D12_RECT& GetScissorRect() const { return m_scissorRect; }
 	private:
@@ -43,6 +45,9 @@ namespace Bruno
 		Microsoft::WRL::ComPtr<IDXGISwapChain4> m_swapChain;
 		RenderTargetData						m_renderTargetData[Graphics::Core::FRAME_BUFFER_COUNT]{};
 		mutable uint32_t						m_currentBackBufferIndex{ 0 };
+
+		// Depth buffer.
+		std::unique_ptr<DepthBuffer>			m_depthBuffer;
 
 		D3D12_VIEWPORT							m_viewport;
 		D3D12_RECT								m_scissorRect{};

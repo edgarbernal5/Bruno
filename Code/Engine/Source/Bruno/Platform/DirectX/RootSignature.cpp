@@ -5,7 +5,6 @@
 
 namespace Bruno
 {
-
     RootSignature::RootSignature(GraphicsDevice* device, const D3D12_ROOT_SIGNATURE_DESC1& rootSignatureDesc)
         : m_device(device)
         , m_rootSignatureDesc{}
