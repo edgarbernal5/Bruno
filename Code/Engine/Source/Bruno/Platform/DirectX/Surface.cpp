@@ -66,7 +66,7 @@ namespace Bruno
 			m_renderTargetData[i].Rtv = device->GetRtvDescriptionHeap().Allocate();
 		}
 
-		m_depthBuffer = std::make_unique<DepthBuffer>(backBufferWidth, backBufferHeight);
+		m_depthBuffer = std::make_unique<DepthBuffer>(backBufferWidth, backBufferHeight, m_parameters.DepthBufferFormat);
 		Finalize();
 	}
 
@@ -115,7 +115,7 @@ namespace Bruno
 		m_scissorRect = { 0, 0, (int32_t)backBufferWidth, (int32_t)backBufferHeight };
 
 		m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
-		m_depthBuffer.reset(new DepthBuffer(backBufferWidth, backBufferHeight));
+		m_depthBuffer.reset(new DepthBuffer(backBufferWidth, backBufferHeight, m_parameters.DepthBufferFormat));
 
 		Finalize();
 	}
