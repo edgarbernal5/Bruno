@@ -9,6 +9,7 @@
 #include <Bruno/Platform/DirectX/VertexBuffer.h>
 #include <Bruno/Platform/DirectX/Shader.h>
 #include <Bruno/Platform/DirectX/RootSignature.h>
+#include <Bruno/Platform/DirectX/PipelineStateObject.h>
 
 namespace Bruno
 {
@@ -31,7 +32,7 @@ namespace Bruno
 		std::unique_ptr<Shader> m_pixelShader;
 		std::unique_ptr<RootSignature> m_rootSignature;
 
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pipelineState;
+		std::unique_ptr<PipelineStateObject> m_pipelineState;
 
 		nana::timer m_timer;
 		float m_totalTime = 0.0f;

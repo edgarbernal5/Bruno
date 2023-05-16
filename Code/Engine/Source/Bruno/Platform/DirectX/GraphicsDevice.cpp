@@ -124,56 +124,6 @@ namespace Bruno
             featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
         }
         m_highestRootSignatureVersion = featureData.HighestVersion;
-
-        /*D3D12_DESCRIPTOR_RANGE1 ranges[1];
-        ranges[0].BaseShaderRegister = 0;
-        ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-        ranges[0].NumDescriptors = 1;
-        ranges[0].RegisterSpace = 0;
-        ranges[0].OffsetInDescriptorsFromTableStart = 0;
-        ranges[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE;
-
-        D3D12_ROOT_PARAMETER1 rootParameters[1];
-        rootParameters[0].ParameterType =
-            D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-        rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-
-        rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
-        rootParameters[0].DescriptorTable.pDescriptorRanges = ranges;
-
-        D3D12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-        rootSignatureDesc.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
-        rootSignatureDesc.Desc_1_1.Flags =
-            D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-        rootSignatureDesc.Desc_1_1.NumParameters = 1;
-        rootSignatureDesc.Desc_1_1.pParameters = rootParameters;
-        rootSignatureDesc.Desc_1_1.NumStaticSamplers = 0;
-        rootSignatureDesc.Desc_1_1.pStaticSamplers = nullptr;
-
-        ID3DBlob* signature;
-        ID3DBlob* error;
-        try
-        {
-            ThrowIfFailed(D3D12SerializeVersionedRootSignature(
-                &rootSignatureDesc, &signature, &error));
-            ThrowIfFailed(m_d3dDevice->CreateRootSignature(
-                0, signature->GetBufferPointer(), signature->GetBufferSize(),
-                IID_PPV_ARGS(m_rootSignature.ReleaseAndGetAddressOf())));
-            m_rootSignature->SetName(L"Hello Triangle Root Signature");
-        }
-        catch (std::exception e)
-        {
-            const char* errStr = (const char*)error->GetBufferPointer();
-            std::cout << errStr;
-            error->Release();
-            error = nullptr;
-        }
-
-        if (signature)
-        {
-            signature->Release();
-            signature = nullptr;
-        }*/
 	}
 
     std::shared_ptr<GraphicsDevice> GraphicsDevice::Create(std::shared_ptr<GraphicsAdapter> adapter)

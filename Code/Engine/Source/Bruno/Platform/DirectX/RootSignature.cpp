@@ -5,9 +5,8 @@
 
 namespace Bruno
 {
-    RootSignature::RootSignature(GraphicsDevice* device, const D3D12_ROOT_SIGNATURE_DESC1& rootSignatureDesc)
-        : m_device(device)
-        , m_rootSignatureDesc{}
+    RootSignature::RootSignature(const D3D12_ROOT_SIGNATURE_DESC1& rootSignatureDesc)
+        : m_rootSignatureDesc{}
         , m_numDescriptorsPerTable{ 0 }
         , m_samplerTableBitMask(0)
         , m_descriptorTableBitMask(0)
@@ -117,20 +116,29 @@ namespace Bruno
         CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC versionRootSignatureDesc;
         versionRootSignatureDesc.Init_1_1(numParameters, pParameters, numStaticSamplers, pStaticSamplers, flags);
 
-        D3D_ROOT_SIGNATURE_VERSION highestVersion = m_device->GetHighestRootSignatureVersion();
+        GraphicsDevice* device = Graphics::GetDevice();
+        D3D_ROOT_SIGNATURE_VERSION highestVersion = device->GetHighestRootSignatureVersion();
 
         // Serialize the root signature.
         Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureBlob;
         Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
-        ThrowIfFailed(D3DX12SerializeVersionedRootSignature(&versionRootSignatureDesc, highestVersion,
-            &rootSignatureBlob, &errorBlob));
 
-        auto d3d12Device = m_device->GetD3DDevice();
+        auto d3d12Device = device->GetD3DDevice();
+        try
+        {
+            ThrowIfFailed(D3DX12SerializeVersionedRootSignature(&versionRootSignatureDesc, highestVersion,
+                &rootSignatureBlob, &errorBlob));
 
-        // Create the root signature.
-        ThrowIfFailed(d3d12Device->CreateRootSignature(0, rootSignatureBlob->GetBufferPointer(),
-            rootSignatureBlob->GetBufferSize(),
-            IID_PPV_ARGS(&m_rootSignature)));
+            // Create the root signature.
+            ThrowIfFailed(d3d12Device->CreateRootSignature(0, rootSignatureBlob->GetBufferPointer(),
+                rootSignatureBlob->GetBufferSize(),
+                IID_PPV_ARGS(&m_rootSignature)));
+        }
+        catch (std::exception exc)
+        {
+            const char* errStr = (const char*)errorBlob->GetBufferPointer();
+            BR_CORE_ERROR << "Error creating root signature. " << errStr;
+        }
     }
 
     uint32_t RootSignature::GetDescriptorTableBitMask(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) const

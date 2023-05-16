@@ -9,8 +9,8 @@ namespace Bruno
 	class RootSignature
 	{
 	public:
-        RootSignature(GraphicsDevice* device, const D3D12_ROOT_SIGNATURE_DESC1& rootSignatureDesc);
-        ~RootSignature();
+        RootSignature(const D3D12_ROOT_SIGNATURE_DESC1& rootSignatureDesc);
+        virtual ~RootSignature();
 
         ID3D12RootSignature* GetD3D12RootSignature() const
         {
@@ -26,12 +26,9 @@ namespace Bruno
         uint32_t GetNumDescriptors(uint32_t rootIndex) const;
 
 	private:
-        friend class std::default_delete<RootSignature>;
-
         void Destroy();
         void SetRootSignatureDesc(const D3D12_ROOT_SIGNATURE_DESC1& rootSignatureDesc);
 
-        GraphicsDevice* m_device;
         D3D12_ROOT_SIGNATURE_DESC1                  m_rootSignatureDesc;
         Microsoft::WRL::ComPtr<ID3D12RootSignature> m_rootSignature;
 

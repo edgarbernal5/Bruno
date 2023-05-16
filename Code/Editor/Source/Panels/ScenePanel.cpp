@@ -119,7 +119,7 @@ namespace Bruno
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDescription;
 		rootSignatureDescription.Init_1_1(_countof(rootParameters), rootParameters, 0, nullptr, rootSignatureFlags);
 		
-		m_rootSignature = std::make_unique<RootSignature>(device, rootSignatureDescription.Desc_1_1);
+		m_rootSignature = std::make_unique<RootSignature>(rootSignatureDescription.Desc_1_1);
 
 		struct PipelineStateStream
 		{
@@ -147,7 +147,7 @@ namespace Bruno
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
 			sizeof(PipelineStateStream), &pipelineStateStream
 		};
-		ThrowIfFailed(device->GetD3DDevice()->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_pipelineState)));
+		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineStateStreamDesc);
 
 		this->draw_through([this](){
 			//BR_CORE_TRACE << "Paint panel. id = " << idxx << std::endl;
@@ -199,7 +199,7 @@ namespace Bruno
 			mvpMatrix = XMMatrixMultiply(mvpMatrix, projectionMatrix);
 
 			m_commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
-			m_commandList->SetPipelineState(m_pipelineState.Get());
+			m_commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
 			m_commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
 
 			m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

@@ -90,6 +90,7 @@
     <ClInclude Include="Source\Bruno\Core\Logger.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\PipelineStateObject.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ResourceBarrier.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCore.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
@@ -116,6 +117,7 @@
     <ClCompile Include="Source\Bruno\Core\Logger.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\PipelineStateObject.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ResourceBarrier.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueue.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\D3DCore.cpp" />
