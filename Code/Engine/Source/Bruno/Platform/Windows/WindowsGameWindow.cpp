@@ -154,7 +154,7 @@ namespace Bruno
 			////window->Paint();
 			//EndPaint(hWnd, &ps);
 			//break;
-			window->m_game->Tick();
+			window->m_game->OnTick();
 			return 0;
 		}
 

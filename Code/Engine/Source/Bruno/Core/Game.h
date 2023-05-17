@@ -36,7 +36,7 @@ namespace Bruno
 		std::shared_ptr<GraphicsDevice> m_device;
 
 		virtual void DoOnInitialize() = 0;
-		virtual void Tick();
+		virtual void OnTick();
 		virtual void OnClientSizeChanged();
 
 	private:

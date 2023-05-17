@@ -38,7 +38,7 @@ namespace Bruno
 		m_gameWindow->Run();
 	}
 
-	void Game::Tick()
+	void Game::OnTick()
 	{
 	}
 

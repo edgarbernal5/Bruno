@@ -18,12 +18,14 @@ namespace Bruno
 	class ScenePanel : public nana::nested_form
 	{
 	public:
-		ScenePanel(nana::window window);
+		ScenePanel(nana::window window, DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D32_FLOAT);
 		~ScenePanel() = default;
 
 	private:
 		std::unique_ptr<Surface> m_surface;
 		int idxx = 0;
+		DXGI_FORMAT m_backBufferFormat;
+		DXGI_FORMAT m_depthBufferFormat;
 		//Scene* m_scene;
 
 		std::unique_ptr<IndexBuffer> m_indexBuffer;

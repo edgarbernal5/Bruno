@@ -17,7 +17,7 @@ namespace Bruno
 
 	protected:
 		void DoOnInitialize() override;
-		void Tick() override;
+		void OnTick() override;
 		void OnClientSizeChanged() override;
 
 	private:
