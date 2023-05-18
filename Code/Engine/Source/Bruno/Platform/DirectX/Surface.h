@@ -53,7 +53,6 @@ namespace Bruno
 		D3D12_VIEWPORT							m_viewport;
 		D3D12_RECT								m_scissorRect{};
 
-		void CreateDependentResources();
 		void Finalize();
 		void Release();
 	};

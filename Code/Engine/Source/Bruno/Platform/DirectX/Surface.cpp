@@ -120,10 +120,6 @@ namespace Bruno
 		Finalize();
 	}
 
-	void Surface::CreateDependentResources()
-	{
-	}
-
 	void Surface::Finalize()
 	{
 		GraphicsDevice* device = Graphics::GetDevice();
