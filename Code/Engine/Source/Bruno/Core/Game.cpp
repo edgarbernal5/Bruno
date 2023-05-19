@@ -21,10 +21,17 @@ namespace Bruno
 		Device::Core::EnableDebugLayer();
 #endif
 
+#if BR_PLATFORM_WINDOWS
+		HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED); //To be used by DirectXTex.
+		if (FAILED(hr))
+		{
+			BR_CORE_ERROR << "CoInitialize failed." << std::endl;
+			throw std::exception("CoInitialize failed.");
+		}
+#endif
+
 		m_device = GraphicsDevice::Create();
 		Bruno::Graphics::GetDevice() = m_device.get();
-
-		
 	}
 
 	Game::~Game()

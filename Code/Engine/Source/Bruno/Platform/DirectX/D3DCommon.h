@@ -5,6 +5,7 @@
 #include <d3dcompiler.h>
 #include <d3dx12.h>
 #include <DirectXMath.h>
+#include <DirectXTex.h>
 
 #ifdef BR_DEBUG
 #include <dxgidebug.h>

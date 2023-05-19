@@ -5,6 +5,73 @@
 
 namespace Bruno
 {
+    Texture::Texture(const std::wstring& filename)
+    {
+        std::filesystem::path filePath(filename);
+        if (!std::filesystem::exists(filePath))
+        {
+            return;
+        }
+
+        DirectX::TexMetadata  metadata;
+        DirectX::ScratchImage scratchImage;
+
+        if (filePath.extension() == ".dds")
+        {
+            ThrowIfFailed(LoadFromDDSFile(filename.c_str(), DirectX::DDS_FLAGS_FORCE_RGB, &metadata, scratchImage));
+        }
+        else
+        {
+            ThrowIfFailed(LoadFromWICFile(filename.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metadata, scratchImage));
+        }
+
+        D3D12_RESOURCE_DESC textureDesc = {};
+        switch (metadata.dimension)
+        {
+        case DirectX::TEX_DIMENSION_TEXTURE1D:
+            textureDesc = CD3DX12_RESOURCE_DESC::Tex1D(metadata.format, static_cast<UINT64>(metadata.width),
+                static_cast<UINT16>(metadata.arraySize));
+            break;
+        case DirectX::TEX_DIMENSION_TEXTURE2D:
+            textureDesc = CD3DX12_RESOURCE_DESC::Tex2D(metadata.format, static_cast<UINT64>(metadata.width),
+                static_cast<UINT>(metadata.height),
+                static_cast<UINT16>(metadata.arraySize));
+            break;
+        case DirectX::TEX_DIMENSION_TEXTURE3D:
+            textureDesc = CD3DX12_RESOURCE_DESC::Tex3D(metadata.format, static_cast<UINT64>(metadata.width),
+                static_cast<UINT>(metadata.height),
+                static_cast<UINT16>(metadata.depth));
+            break;
+        default:
+            throw std::exception("Invalid texture dimension.");
+            break;
+        }
+        auto device = Graphics::GetDevice();
+
+        ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
+            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &textureDesc,
+            D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&m_d3d12Resource)));
+
+        m_srv = device->GetSrvDescriptionHeap().Allocate();
+        device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), nullptr, m_srv.Cpu);
+
+        std::vector<D3D12_SUBRESOURCE_DATA> subresources(scratchImage.GetImageCount());
+        const DirectX::Image* pImages = scratchImage.GetImages();
+        for (int i = 0; i < scratchImage.GetImageCount(); ++i)
+        {
+            auto& subresource = subresources[i];
+            subresource.RowPitch = pImages[i].rowPitch;
+            subresource.SlicePitch = pImages[i].slicePitch;
+            subresource.pData = pImages[i].pixels;
+        }
+
+        CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
+        if (subresources.size() < m_d3d12Resource->GetDesc().MipLevels)
+        {
+            //GenerateMips();
+        }
+    }
+
     /*
     ver primal. d3d12_texture (D3D12Resources.cpp)
     */
@@ -22,47 +89,23 @@ namespace Bruno
 
 	}
 
-    void Texture::CreateViews()
+    void Texture::CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData)
     {
-        if (m_d3d12Resource)
-        {
+        if (m_d3d12Resource) {
             auto device = Graphics::GetDevice();
-            CD3DX12_RESOURCE_DESC desc(m_d3d12Resource->GetDesc());
 
-            // Create RTV
-            if ((desc.Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET) != 0 /* && CheckRTVSupport()*/)
-            {
-                //m_RenderTargetView = m_Device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-                //d3d12Device->CreateRenderTargetView(m_d3d12Resource.Get(), nullptr,
-                //    m_RenderTargetView.GetDescriptorHandle());
-            }
-            // Create DSV
-            if ((desc.Flags & D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL) != 0 /* && CheckDSVSupport()*/)
-            {
-                //m_DepthStencilView = m_Device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-                //d3d12Device->CreateDepthStencilView(m_d3d12Resource.Get(), nullptr,
-                //    m_DepthStencilView.GetDescriptorHandle());
-            }
-            // Create SRV
-            if ((desc.Flags & D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE) == 0 /* && CheckSRVSupport() */ )
-            {
-                //m_ShaderResourceView = m_Device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-                //d3d12Device->CreateShaderResourceView(m_d3d12Resource.Get(), nullptr,
-                //    m_ShaderResourceView.GetDescriptorHandle());
-            }
-            // Create UAV for each mip (only supported for 1D and 2D textures).
-            if ((desc.Flags & D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS) != 0 /*&& CheckUAVSupport()*/ &&
-                desc.DepthOrArraySize == 1)
-            {
-                //m_UnorderedAccessView =
-                //    m_Device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, desc.MipLevels);
-                /*for (int i = 0; i < desc.MipLevels; ++i)
-                {
-                    auto uavDesc = GetUAVDesc(desc, i);
-                    d3d12Device->CreateUnorderedAccessView(m_d3d12Resource.Get(), nullptr, &uavDesc,
-                        m_UnorderedAccessView.GetDescriptorHandle(i));
-                }*/
-            }
+            uint64_t requiredSize = GetRequiredIntermediateSize(m_d3d12Resource.Get(), firstSubresource, numSubresources);
+
+            // Create a temporary (intermediate) resource for uploading the subresources
+            Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
+            ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
+                &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
+                &CD3DX12_RESOURCE_DESC::Buffer(requiredSize), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+                IID_PPV_ARGS(&intermediateResource)));
+
+            UpdateSubresources(device->GetCommandQueue()->GetCommandList(), m_d3d12Resource.Get(), intermediateResource.Get(), 0,
+                firstSubresource, numSubresources, subresourceData);
+
         }
     }
 }

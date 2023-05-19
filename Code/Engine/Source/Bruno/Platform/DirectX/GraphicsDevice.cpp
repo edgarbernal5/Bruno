@@ -107,8 +107,9 @@ namespace Bruno
         m_uploadCommand = std::make_unique<UploadCommand>(this);
 
         bool result = true;
-        result &= m_rtvDescriptorHeap.Initialize(this);
-        result &= m_dsvDescriptorHeap.Initialize(this);
+        result &= m_rtvDescriptorHeap.Initialize(this, 512);
+        result &= m_dsvDescriptorHeap.Initialize(this, 512);
+        result &= m_srvDescriptorHeap.Initialize(this, 4096, true);
 
         D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
 
@@ -124,6 +125,7 @@ namespace Bruno
             featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
         }
         m_highestRootSignatureVersion = featureData.HighestVersion;
+
 	}
 
     std::shared_ptr<GraphicsDevice> GraphicsDevice::Create(std::shared_ptr<GraphicsAdapter> adapter)
@@ -159,5 +161,10 @@ namespace Bruno
     DescriptorHeap& GraphicsDevice::GetDsvDescriptionHeap()
     {
         return m_dsvDescriptorHeap;
+    }
+
+    DescriptorHeap& GraphicsDevice::GetSrvDescriptionHeap()
+    {
+        return m_srvDescriptorHeap;
     }
 }

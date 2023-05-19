@@ -25,7 +25,7 @@ namespace Bruno
 		DescriptorHeap& operator=(DescriptorHeap&&) = delete;
 
 		DescriptorHandle Allocate();
-		bool Initialize(GraphicsDevice* device);
+		bool Initialize(GraphicsDevice* device, uint32_t capacity, bool isShaderVisible = false);
 		constexpr D3D12_CPU_DESCRIPTOR_HANDLE GetCpuStart() const { return m_cpu_start; }
 
 	private:

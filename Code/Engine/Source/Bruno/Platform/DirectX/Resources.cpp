@@ -21,11 +21,13 @@ namespace Bruno
         return handle;
     }
 
-    bool DescriptorHeap::Initialize(GraphicsDevice* device)
+    bool DescriptorHeap::Initialize(GraphicsDevice* device, uint32_t capacity, bool isShaderVisible)
     {
         D3D12_DESCRIPTOR_HEAP_DESC desc{};
-        desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-        desc.NumDescriptors = 512; //capacity
+        desc.Flags = isShaderVisible
+            ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE
+            : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+        desc.NumDescriptors = capacity;
         desc.Type = m_type;
         desc.NodeMask = 0;
 
@@ -36,7 +38,8 @@ namespace Bruno
         m_size = 0;
         m_descriptor_size = device->GetD3DDevice()->GetDescriptorHandleIncrementSize(m_type);
         m_cpu_start = m_heap->GetCPUDescriptorHandleForHeapStart();
-        m_gpu_start = D3D12_GPU_DESCRIPTOR_HANDLE{ 0 };
+        m_gpu_start = isShaderVisible ?
+            m_heap->GetGPUDescriptorHandleForHeapStart() : D3D12_GPU_DESCRIPTOR_HANDLE{ 0 };
 
         return true;
     }
