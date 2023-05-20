@@ -13,13 +13,13 @@ namespace Bruno
 		UploadCommand(GraphicsDevice* device);
 		~UploadCommand();
 
-		void BeginUpload(uint32_t bufferSize);
-		Microsoft::WRL::ComPtr<ID3D12Resource> Update(const void* bufferData, uint32_t bufferSize);
+		void BeginUpload(uint64_t bufferSize);
+		Microsoft::WRL::ComPtr<ID3D12Resource> Update(const void* bufferData, uint64_t bufferSize);
+		Microsoft::WRL::ComPtr<ID3D12Resource> Update(Microsoft::WRL::ComPtr<ID3D12Resource> resource, const D3D12_SUBRESOURCE_DATA* subresourcesData, uint32_t firstSubresource, uint32_t numSubresources);
 		void EndUpload();
 		void Flush();
 
 		ID3D12CommandQueue* GetQueue();
-		//ID3D12GraphicsCommandList6* GetCommandList();
 
 	private:
 		struct UploadFrame

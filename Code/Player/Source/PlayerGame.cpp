@@ -55,7 +55,7 @@ namespace Bruno
 
 		m_vertexShader = std::make_unique<Shader>(L"VertexShader.hlsl", "main", "vs_5_1");
 		m_pixelShader = std::make_unique<Shader>(L"PixelShader.hlsl", "main", "ps_5_1");
-		//Texture* texture = new Texture(L"Textures/Mona_Lisa.jpg");
+		Texture* texture = new Texture(L"Textures/Mona_Lisa.jpg");
 		GraphicsDevice* device = Graphics::GetDevice();
 
 		// Allow input layout and deny unnecessary access to certain pipeline stages.

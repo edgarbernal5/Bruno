@@ -51,7 +51,7 @@ namespace Bruno
 		m_fenceValue = 0;
 	}
 
-	void UploadCommand::BeginUpload(uint32_t bufferSize)
+	void UploadCommand::BeginUpload(uint64_t bufferSize)
 	{
 		UploadFrame& frame{ m_uploadFrames[m_frameIndex] };
 
@@ -73,7 +73,7 @@ namespace Bruno
 		ThrowIfFailed(frame.CommandList->Reset(frame.CommandAllocator, nullptr));
 	}
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> UploadCommand::Update(const void* bufferData, uint32_t bufferSize)
+	Microsoft::WRL::ComPtr<ID3D12Resource> UploadCommand::Update(const void* bufferData, uint64_t bufferSize)
 	{
 		UploadFrame& frame{ m_uploadFrames[m_frameIndex] };
 		Microsoft::WRL::ComPtr<ID3D12Resource> d3d12Resource;
@@ -95,6 +95,16 @@ namespace Bruno
 			&subresourceData);
 
 		return d3d12Resource;
+	}
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> UploadCommand::Update(Microsoft::WRL::ComPtr<ID3D12Resource> resource, const D3D12_SUBRESOURCE_DATA* subresourcesData, uint32_t firstSubresource, uint32_t numSubresources)
+	{
+		UploadFrame& frame{ m_uploadFrames[m_frameIndex] };
+
+		UpdateSubresources(frame.CommandList, resource.Get(), frame.UploadBuffer, 0, firstSubresource, numSubresources,
+			subresourcesData);
+
+		return resource;
 	}
 
 	void UploadCommand::EndUpload()
