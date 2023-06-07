@@ -15,8 +15,8 @@ namespace Bruno
             D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
             uint32_t subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
         {
-            //assert(resource);
-            //assert(_offset < MAX_RESOURCE_BARRIERS);
+            BR_ASSERT(resource);
+            BR_ASSERT(m_offset < MAX_RESOURCE_BARRIERS);
             D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
             barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
             barrier.Flags = flags;
@@ -32,8 +32,8 @@ namespace Bruno
         constexpr void Add(ID3D12Resource* resource,
             D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE)
         {
-            //assert(resource);
-            //assert(_offset < MAX_RESOURCE_BARRIERS);
+            BR_ASSERT(resource);
+            BR_ASSERT(m_offset < MAX_RESOURCE_BARRIERS);
             D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
             barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
             barrier.Flags = flags;
@@ -46,8 +46,8 @@ namespace Bruno
         constexpr void Add(ID3D12Resource* resourceBefore, ID3D12Resource* resourceAfter,
             D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE)
         {
-            //assert(resourceBefore && resourceAfter);
-            //assert(_offset < MAX_RESOURCE_BARRIERS);
+            BR_ASSERT(resourceBefore && resourceAfter);
+            BR_ASSERT(m_offset < MAX_RESOURCE_BARRIERS);
             D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
             barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_ALIASING;
             barrier.Flags = flags;
@@ -59,7 +59,7 @@ namespace Bruno
 
         void Apply(ID3D12GraphicsCommandList6* commandList)
         {
-            //assert(_offset);
+            BR_ASSERT(m_offset);
             commandList->ResourceBarrier(m_offset, m_barriers);
             m_offset = 0;
         }

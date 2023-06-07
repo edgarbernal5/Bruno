@@ -26,15 +26,17 @@ namespace Bruno
 
 		DescriptorHandle Allocate();
 		bool Initialize(GraphicsDevice* device, uint32_t capacity, bool isShaderVisible = false);
-		constexpr D3D12_CPU_DESCRIPTOR_HANDLE GetCpuStart() const { return m_cpu_start; }
+		constexpr D3D12_CPU_DESCRIPTOR_HANDLE GetCpuStart() const { return m_cpuStart; }
+		constexpr bool IsShaderVisible() const { return m_gpuStart.ptr != 0; }
 
 	private:
 		ID3D12DescriptorHeap*				m_heap;
-		D3D12_CPU_DESCRIPTOR_HANDLE         m_cpu_start{};
-		D3D12_GPU_DESCRIPTOR_HANDLE         m_gpu_start{};
+		D3D12_CPU_DESCRIPTOR_HANDLE         m_cpuStart{};
+		D3D12_GPU_DESCRIPTOR_HANDLE         m_gpuStart{};
 
-		uint32_t							m_descriptor_size{0};
+		uint32_t							m_descriptorSize{0};
 		uint32_t							m_size{0};
+		uint32_t							m_capacity{ 0 };
 		const D3D12_DESCRIPTOR_HEAP_TYPE    m_type{};
 	};
 }

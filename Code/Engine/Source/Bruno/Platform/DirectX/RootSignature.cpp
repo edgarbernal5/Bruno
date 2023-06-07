@@ -137,7 +137,7 @@ namespace Bruno
         catch (std::exception exc)
         {
             const char* errStr = (const char*)errorBlob->GetBufferPointer();
-            BR_CORE_ERROR << "Error creating root signature. " << errStr;
+            BR_CORE_ERROR << "Error creating root signature. " << errStr << std::endl;
         }
     }
 

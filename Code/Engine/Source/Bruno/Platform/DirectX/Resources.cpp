@@ -8,14 +8,19 @@ namespace Bruno
     DescriptorHandle DescriptorHeap::Allocate()
     {
         //std::lock_guard lock{ m_mutex };
+        BR_ASSERT(m_heap);
+        BR_ASSERT(m_size < m_capacity);
 
         const uint32_t index{ m_size };
-        const uint32_t offset{ index * m_descriptor_size };
+        const uint32_t offset{ index * m_descriptorSize };
         ++m_size;
 
         DescriptorHandle handle;
-        handle.Cpu.ptr = m_cpu_start.ptr + offset;
-
+        handle.Cpu.ptr = m_cpuStart.ptr + offset;
+        if (IsShaderVisible())
+        {
+            handle.Gpu.ptr = m_gpuStart.ptr + offset;
+        }
         handle.Index = index;
 
         return handle;
@@ -35,10 +40,11 @@ namespace Bruno
         hr = device->GetD3DDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_heap));
         if (FAILED(hr)) return false;
 
+        m_capacity = capacity;
         m_size = 0;
-        m_descriptor_size = device->GetD3DDevice()->GetDescriptorHandleIncrementSize(m_type);
-        m_cpu_start = m_heap->GetCPUDescriptorHandleForHeapStart();
-        m_gpu_start = isShaderVisible ?
+        m_descriptorSize = device->GetD3DDevice()->GetDescriptorHandleIncrementSize(m_type);
+        m_cpuStart = m_heap->GetCPUDescriptorHandleForHeapStart();
+        m_gpuStart = isShaderVisible ?
             m_heap->GetGPUDescriptorHandleForHeapStart() : D3D12_GPU_DESCRIPTOR_HANDLE{ 0 };
 
         return true;

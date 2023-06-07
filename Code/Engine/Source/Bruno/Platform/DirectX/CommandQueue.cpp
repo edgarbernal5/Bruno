@@ -79,7 +79,7 @@ namespace Bruno
 		ID3D12CommandList* const commandLists[]{ m_commandList.Get()};
 		m_commandQueue->ExecuteCommandLists(_countof(commandLists), &commandLists[0]);
 
-		// Presenting swap chain buffers happens in lockstep with frame buffers.
+		// Present swap chain buffers
 		surface->Present();
 
 		uint64_t& currentFenceValue{ m_fenceValue };

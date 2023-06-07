@@ -109,11 +109,11 @@ namespace Bruno
 	void PlayerGame::OnTick()
 	{
 		auto commandQueue = m_device->GetCommandQueue();
-		auto m_commandList = commandQueue->GetCommandList();
+		auto commandList = commandQueue->GetCommandList();
 		commandQueue->BeginFrame();
 
 		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
-		ResourceBarrier::Transition(m_commandList,
+		ResourceBarrier::Transition(commandList,
 			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
@@ -121,12 +121,12 @@ namespace Bruno
 		auto rtv = m_surface->GetRtv();
 		auto dsv = m_surface->GetDsv();
 
-		m_commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
-		m_commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
+		commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-		m_commandList->RSSetViewports(1, &m_surface->GetViewport());
-		m_commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
-		m_commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+		commandList->RSSetViewports(1, &m_surface->GetViewport());
+		commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
+		commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 
 		// Update the model matrix.
 		static float TotalTime = 0.0f;
@@ -148,14 +148,14 @@ namespace Bruno
 		XMMATRIX mvpMatrix = XMMatrixMultiply(modelMatrix, viewMatrix);
 		mvpMatrix = XMMatrixMultiply(mvpMatrix, projectionMatrix);
 
-		m_commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
-		m_commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
-		m_commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
+		commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
+		commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
+		commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
 
-		m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_commandList->IASetVertexBuffers(0, 1, &m_vertexBuffer->GetView());
-		m_commandList->IASetIndexBuffer(&m_indexBuffer->GetView());
-		m_commandList->DrawIndexedInstanced(m_indexBuffer->GetNumIndices(), 1, 0, 0, 0);
+		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetVertexBuffers(0, 1, &m_vertexBuffer->GetView());
+		commandList->IASetIndexBuffer(&m_indexBuffer->GetView());
+		commandList->DrawIndexedInstanced(m_indexBuffer->GetNumIndices(), 1, 0, 0, 0);
 
 		ResourceBarrier::Transition(commandQueue->GetCommandList(),
 			currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
