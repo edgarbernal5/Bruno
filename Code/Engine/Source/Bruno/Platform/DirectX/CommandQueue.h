@@ -14,6 +14,7 @@ namespace Bruno
 		~CommandQueue();
 
 		void BeginFrame();
+		void BeginFrame2();
 		void EndFrame(Surface* surface);
 		void Flush();
 

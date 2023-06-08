@@ -55,7 +55,9 @@ namespace Bruno
 
 		m_vertexShader = std::make_unique<Shader>(L"VertexShader.hlsl", "main", "vs_5_1");
 		m_pixelShader = std::make_unique<Shader>(L"PixelShader.hlsl", "main", "ps_5_1");
-		Texture* texture = new Texture(L"Textures/Mona_Lisa.jpg");
+
+		m_objectBuffer = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		//Texture* texture = new Texture(L"Textures/Mona_Lisa.jpg");
 		GraphicsDevice* device = Graphics::GetDevice();
 
 		// Allow input layout and deny unnecessary access to certain pipeline stages.
@@ -67,13 +69,34 @@ namespace Bruno
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 
 		// A single 32-bit constant root parameter that is used by the vertex shader.
-		CD3DX12_ROOT_PARAMETER1 rootParameters[1]{};
-		rootParameters[0].InitAsConstants(sizeof(XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+		CD3DX12_ROOT_PARAMETER rootParameters[1]{};
+		//rootParameters[0].InitAsConstants(sizeof(XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+		rootParameters[0].InitAsConstantBufferView(0);
 
-		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDescription;
-		rootSignatureDescription.Init_1_1(_countof(rootParameters), rootParameters, 0, nullptr, rootSignatureFlags);
+		// A root signature is an array of root parameters.
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, rootParameters,
+			0, nullptr,
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-		m_rootSignature = std::make_unique<RootSignature>(rootSignatureDescription.Desc_1_1);
+		//m_rootSignature = std::make_unique<RootSignature>(rootSignatureDescription.Desc_1_1);
+
+		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+		Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
+		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+		HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+			serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+		if (errorBlob != nullptr)
+		{
+			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+		}
+		ThrowIfFailed(hr);
+
+		ThrowIfFailed(m_device->GetD3DDevice()->CreateRootSignature(
+			0,
+			serializedRootSig->GetBufferPointer(),
+			serializedRootSig->GetBufferSize(),
+			IID_PPV_ARGS(m_rootSignature.GetAddressOf())));
 
 		struct PipelineStateStream
 		{
@@ -90,7 +113,7 @@ namespace Bruno
 		rtvFormats.NumRenderTargets = 1;
 		rtvFormats.RTFormats[0] = surfaceParameters.BackBufferFormat;
 
-		pipelineStateStream.pRootSignature = m_rootSignature->GetD3D12RootSignature();
+		pipelineStateStream.pRootSignature = m_rootSignature.Get();
 		pipelineStateStream.InputLayout =  VertexPositionColor::InputLayout;
 		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
@@ -108,25 +131,6 @@ namespace Bruno
 
 	void PlayerGame::OnTick()
 	{
-		auto commandQueue = m_device->GetCommandQueue();
-		auto commandList = commandQueue->GetCommandList();
-		commandQueue->BeginFrame();
-
-		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
-		ResourceBarrier::Transition(commandList,
-			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
-
-		auto rtv = m_surface->GetRtv();
-		auto dsv = m_surface->GetDsv();
-
-		commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
-		commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-		commandList->RSSetViewports(1, &m_surface->GetViewport());
-		commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
-		commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 
 		// Update the model matrix.
 		static float TotalTime = 0.0f;
@@ -147,14 +151,47 @@ namespace Bruno
 			XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspectRatio, 0.1f, 1000.0f);
 		XMMATRIX mvpMatrix = XMMatrixMultiply(modelMatrix, viewMatrix);
 		mvpMatrix = XMMatrixMultiply(mvpMatrix, projectionMatrix);
+		ObjectBuffer objectBuffer;
+		objectBuffer.m_world = mvpMatrix;
 
-		commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
+		auto commandQueue = m_device->GetCommandQueue();
+		auto commandList = commandQueue->GetCommandList();
+		commandQueue->BeginFrame();
+
+		m_objectBuffer->CopyData(objectBuffer);
+
+		commandQueue->BeginFrame2();
+		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
+		ResourceBarrier::Transition(commandList,
+			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+
+		auto rtv = m_surface->GetRtv();
+		auto dsv = m_surface->GetDsv();
+
+		commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
+		commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+		commandList->RSSetViewports(1, &m_surface->GetViewport());
+		commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
+		commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+
+		ID3D12DescriptorHeap* descriptorHeaps[] = { m_device->GetSrvDescriptionHeap().GetHeap()};
+		commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+		commandList->SetGraphicsRootSignature(m_rootSignature.Get());
 		commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
-		commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
+		//commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
+
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetVertexBuffers(0, 1, &m_vertexBuffer->GetView());
 		commandList->IASetIndexBuffer(&m_indexBuffer->GetView());
+
+		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
+		commandList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+
 		commandList->DrawIndexedInstanced(m_indexBuffer->GetNumIndices(), 1, 0, 0, 0);
 
 		ResourceBarrier::Transition(commandQueue->GetCommandList(),

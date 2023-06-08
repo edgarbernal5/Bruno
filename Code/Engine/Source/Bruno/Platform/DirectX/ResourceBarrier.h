@@ -1,6 +1,7 @@
 #pragma once
 
 #include "D3DCommon.h"
+#include <Bruno/Core/Assert.h>
 
 namespace Bruno
 {

@@ -69,6 +69,13 @@ namespace Bruno
 	{
 		CommandFrame& frame{ m_commandFrames[m_frameIndex] };
 		frame.Wait(m_fenceEvent, m_fence.Get());
+
+
+	}
+
+	void CommandQueue::BeginFrame2() {
+
+		CommandFrame& frame{ m_commandFrames[m_frameIndex] };
 		ThrowIfFailed(frame.CommandAllocator->Reset());
 		ThrowIfFailed(m_commandList->Reset(frame.CommandAllocator, nullptr));
 	}

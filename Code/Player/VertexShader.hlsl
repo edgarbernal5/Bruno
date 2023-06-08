@@ -1,9 +1,8 @@
-struct ModelViewProjection
+cbuffer cbPerObject : register(b0)
 {
-    matrix MVP;
+    float4x4 gWorldViewProj;
+    //float4x4 gTexTransform;
 };
-
-ConstantBuffer<ModelViewProjection> ModelViewProjectionCB : register(b0);
 
 struct VertexPosColor
 {
@@ -21,7 +20,7 @@ VertexShaderOutput main(VertexPosColor IN)
 {
     VertexShaderOutput OUT;
 
-    OUT.Position = mul(ModelViewProjectionCB.MVP, float4(IN.Position, 1.0f));
+    OUT.Position = mul(gWorldViewProj, float4(IN.Position, 1.0f));
     OUT.Color = float4(IN.Color, 1.0f);
 
     return OUT;
