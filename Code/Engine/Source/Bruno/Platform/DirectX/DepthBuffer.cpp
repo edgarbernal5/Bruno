@@ -30,10 +30,10 @@ namespace Bruno
 			IID_PPV_ARGS(&m_depthBuffer)
 		));
 
-		m_dsv = device->GetDsvDescriptionHeap().Allocate();
+		m_dsvHandle = device->GetDsvDescriptionHeap().Allocate();
 
 		device->GetD3DDevice()->CreateDepthStencilView(m_depthBuffer.Get(), &dsv_desc,
-			m_dsv.Cpu);
+			m_dsvHandle.Cpu);
 	}
 
 	DepthBuffer::~DepthBuffer()

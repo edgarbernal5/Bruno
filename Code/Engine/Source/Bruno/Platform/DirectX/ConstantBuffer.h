@@ -27,7 +27,7 @@ namespace Bruno
 
 		void CopyData(const T& data)
 		{
-			memcpy(&m_mappedData, &data, sizeof(T));
+			memcpy(m_mappedData, &data, sizeof(T));
 		}
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_d3dBuffer;

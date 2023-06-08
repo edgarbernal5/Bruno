@@ -57,6 +57,16 @@ namespace Bruno
 		m_pixelShader = std::make_unique<Shader>(L"PixelShader.hlsl", "main", "ps_5_1");
 
 		m_objectBuffer = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
+
+		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+		cbvDesc.BufferLocation = cbAddress;
+		cbvDesc.SizeInBytes = 256;//d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+
+		m_device->GetD3DDevice()->CreateConstantBufferView(
+			&cbvDesc,
+			m_device->GetSrvDescriptionHeap().GetHeap()->GetCPUDescriptorHandleForHeapStart());
+
 		//Texture* texture = new Texture(L"Textures/Mona_Lisa.jpg");
 		GraphicsDevice* device = Graphics::GetDevice();
 
@@ -71,7 +81,19 @@ namespace Bruno
 		// A single 32-bit constant root parameter that is used by the vertex shader.
 		CD3DX12_ROOT_PARAMETER rootParameters[1]{};
 		//rootParameters[0].InitAsConstants(sizeof(XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
-		rootParameters[0].InitAsConstantBufferView(0);
+
+		// Create a single descriptor table of CBVs.
+		CD3DX12_DESCRIPTOR_RANGE cbvTable;
+		cbvTable.Init(
+			D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
+			1, // Number of descriptors in table
+			0); // base shader register arguments are bound to for this root parameter
+		
+		rootParameters[0].InitAsDescriptorTable(
+				1, // Number of ranges
+				&cbvTable); // Pointer to array of ranges
+
+		//rootParameters[1].InitAsConstantBufferView(0);
 
 		// A root signature is an array of root parameters.
 		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, rootParameters,
@@ -89,6 +111,7 @@ namespace Bruno
 		if (errorBlob != nullptr)
 		{
 			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			BR_CORE_ERROR << "Error during root signature creation. " << (char*)errorBlob->GetBufferPointer() << std::endl;
 		}
 		ThrowIfFailed(hr);
 
@@ -97,7 +120,7 @@ namespace Bruno
 			serializedRootSig->GetBufferPointer(),
 			serializedRootSig->GetBufferSize(),
 			IID_PPV_ARGS(m_rootSignature.GetAddressOf())));
-
+		
 		struct PipelineStateStream
 		{
 			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE pRootSignature;
@@ -118,20 +141,19 @@ namespace Bruno
 		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
 		pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pixelShader->GetBlob());
-		pipelineStateStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+		pipelineStateStream.DSVFormat = surfaceParameters.DepthBufferFormat;
 		pipelineStateStream.RTVFormats = rtvFormats;
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
 			sizeof(PipelineStateStream), &pipelineStateStream
 		};
 		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineStateStreamDesc);
-
+		
 		m_gameWindow->Show();
 	}
 
 	void PlayerGame::OnTick()
 	{
-
 		// Update the model matrix.
 		static float TotalTime = 0.0f;
 		float          angle = static_cast<float>(TotalTime * 90.0);
@@ -151,8 +173,9 @@ namespace Bruno
 			XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspectRatio, 0.1f, 1000.0f);
 		XMMATRIX mvpMatrix = XMMatrixMultiply(modelMatrix, viewMatrix);
 		mvpMatrix = XMMatrixMultiply(mvpMatrix, projectionMatrix);
+		
 		ObjectBuffer objectBuffer;
-		objectBuffer.m_world = mvpMatrix;
+		XMStoreFloat4x4(&objectBuffer.m_world, mvpMatrix);
 
 		auto commandQueue = m_device->GetCommandQueue();
 		auto commandList = commandQueue->GetCommandList();
@@ -160,7 +183,6 @@ namespace Bruno
 
 		m_objectBuffer->CopyData(objectBuffer);
 
-		commandQueue->BeginFrame2();
 		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
 		ResourceBarrier::Transition(commandList,
 			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -182,15 +204,19 @@ namespace Bruno
 
 		commandList->SetGraphicsRootSignature(m_rootSignature.Get());
 		commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
-		//commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
-
-
+		
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetVertexBuffers(0, 1, &m_vertexBuffer->GetView());
 		commandList->IASetIndexBuffer(&m_indexBuffer->GetView());
 
-		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
-		commandList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+		//CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_device->GetSrvDescriptionHeap().GetHeap()->GetGPUDescriptorHandleForHeapStart());
+		//commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
+
+
+		//D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
+		//commandList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+
+		commandList->SetGraphicsRootDescriptorTable(0, m_device->GetSrvDescriptionHeap().GetHeap()->GetGPUDescriptorHandleForHeapStart());
 
 		commandList->DrawIndexedInstanced(m_indexBuffer->GetNumIndices(), 1, 0, 0, 0);
 

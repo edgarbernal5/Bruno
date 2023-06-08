@@ -34,7 +34,7 @@ namespace Bruno
 
 		struct ObjectBuffer
 		{
-			DirectX::XMMATRIX m_world;
+			DirectX::XMFLOAT4X4 m_world;
 		};
 		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer;
 	};

@@ -11,7 +11,7 @@ namespace Bruno
 #else
 		uint32_t compileFlags = 0;
 #endif
-		Microsoft::WRL::ComPtr<ID3DBlob> errors;
+		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 
 		HRESULT hr = D3DCompileFromFile(pathToSource.c_str(), 
 			nullptr, 
@@ -21,13 +21,13 @@ namespace Bruno
 			compileFlags, 
 			0, 
 			m_blob.ReleaseAndGetAddressOf(),
-			errors.ReleaseAndGetAddressOf());
+			errorBlob.ReleaseAndGetAddressOf());
 
 		if (FAILED(hr))
 		{
-			if (errors)
+			if (errorBlob)
 			{
-				BR_CORE_ERROR << "Compilation error. " << (char*)errors->GetBufferPointer() << std::endl;
+				BR_CORE_ERROR << "Compilation error. " << (char*)errorBlob->GetBufferPointer() << std::endl;
 			}
 		}
 	}
