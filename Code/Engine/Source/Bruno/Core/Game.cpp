@@ -36,7 +36,15 @@ namespace Bruno
 
 	Game::~Game()
 	{
-		delete m_gameWindow;
+		//TODO: Flush command queue before changing any resources.
+		if (m_gameWindow != nullptr) {
+			delete m_gameWindow;
+			m_gameWindow = nullptr;
+		}
+
+#if BR_PLATFORM_WINDOWS
+		CoUninitialize();
+#endif
 	}
 
 	void Game::Run()

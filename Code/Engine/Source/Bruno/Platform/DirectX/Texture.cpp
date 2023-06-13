@@ -25,6 +25,7 @@ namespace Bruno
         {
             ThrowIfFailed(LoadFromWICFile(filename.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metadata, scratchImage));
         }
+        metadata.format = MakeSRGB(metadata.format);
 
         D3D12_RESOURCE_DESC textureDesc = {};
         switch (metadata.dimension)
@@ -57,8 +58,16 @@ namespace Bruno
             nullptr,
             IID_PPV_ARGS(&m_d3d12Resource)));
 
-        m_srv = device->GetSrvDescriptionHeap().Allocate();
-        device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), nullptr, m_srv.Cpu);
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srvDesc.Format = metadata.format;
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+        m_srvHandle = device->GetSrvDescriptionHeap().Allocate();
+        device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), &srvDesc, m_srvHandle.Cpu);
 
         std::vector<D3D12_SUBRESOURCE_DATA> subresources(scratchImage.GetImageCount());
         const DirectX::Image* pImages = scratchImage.GetImages();
@@ -73,7 +82,42 @@ namespace Bruno
         CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
         if (subresources.size() < m_d3d12Resource->GetDesc().MipLevels)
         {
-            //GenerateMips();
+            GenerateMips();
+        }
+    }
+
+    void Texture::GenerateMips()
+    {
+
+    }
+
+    DXGI_FORMAT Texture::MakeSRGB(DXGI_FORMAT fmt)
+    {
+        switch (fmt)
+        {
+        case DXGI_FORMAT_R8G8B8A8_UNORM:
+            return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC1_UNORM:
+            return DXGI_FORMAT_BC1_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC2_UNORM:
+            return DXGI_FORMAT_BC2_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC3_UNORM:
+            return DXGI_FORMAT_BC3_UNORM_SRGB;
+
+        case DXGI_FORMAT_B8G8R8A8_UNORM:
+            return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+
+        case DXGI_FORMAT_B8G8R8X8_UNORM:
+            return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC7_UNORM:
+            return DXGI_FORMAT_BC7_UNORM_SRGB;
+
+        default:
+            return fmt;
         }
     }
 

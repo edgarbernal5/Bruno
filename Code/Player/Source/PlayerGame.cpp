@@ -13,15 +13,15 @@ namespace Bruno
 {
 	using namespace DirectX;
 
-	static VertexPositionColor g_Vertices[8] = {
-	VertexPositionColor{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },  // 0
-	VertexPositionColor{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },   // 1
-	VertexPositionColor{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(1.0f, 1.0f, 0.0f) },    // 2
-	VertexPositionColor{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },   // 3
-	VertexPositionColor{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },   // 4
-	VertexPositionColor{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 1.0f) },    // 5
-	VertexPositionColor{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f) },     // 6
-	VertexPositionColor{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 1.0f) }     // 7
+	static VertexPositionColorTexture g_Vertices[8] = {
+	VertexPositionColorTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(0.0f,1.0f)},  // 0
+	VertexPositionColorTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f,0.0f) },   // 1
+	VertexPositionColorTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(1.0f, 1.0f, 0.0f), XMFLOAT2(1.0f,0.0f) },    // 2
+	VertexPositionColorTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f,1.0f) },   // 3
+	VertexPositionColorTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f,1.0f) },   // 4
+	VertexPositionColorTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 1.0f), XMFLOAT2(0.0f,1.0f) },    // 5
+	VertexPositionColorTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f,0.0f) },     // 6
+	VertexPositionColorTexture{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f,0.0f) }     // 7
 	};
 
 	static uint16_t g_Indices[36] = { 0, 1, 2, 0, 2, 3, 4, 6, 5, 4, 7, 6, 4, 5, 1, 4, 1, 0,
@@ -51,13 +51,12 @@ namespace Bruno
 		m_surface->Initialize();
 
 		m_indexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
-		m_vertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionColor));
+		m_vertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionColorTexture));
 
 		m_vertexShader = std::make_unique<Shader>(L"VertexShader.hlsl", "main", "vs_5_1");
 		m_pixelShader = std::make_unique<Shader>(L"PixelShader.hlsl", "main", "ps_5_1");
 
-		m_objectBuffer = std::make_unique<ConstantBuffer<ObjectBuffer>>();
-		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
+		/*D3D12_GPU_VIRTUAL_ADDRESS cbAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 		cbvDesc.BufferLocation = cbAddress;
@@ -66,8 +65,9 @@ namespace Bruno
 		m_device->GetD3DDevice()->CreateConstantBufferView(
 			&cbvDesc,
 			m_device->GetSrvDescriptionHeap().GetHeap()->GetCPUDescriptorHandleForHeapStart());
-
-		//Texture* texture = new Texture(L"Textures/Mona_Lisa.jpg");
+		*/
+		m_objectBuffer = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		Texture* texture = new Texture(L"Textures/Mona_Lisa.jpg");
 		GraphicsDevice* device = Graphics::GetDevice();
 
 		// Allow input layout and deny unnecessary access to certain pipeline stages.
@@ -78,26 +78,21 @@ namespace Bruno
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 
+		CD3DX12_DESCRIPTOR_RANGE texTable;
+		texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
 		// A single 32-bit constant root parameter that is used by the vertex shader.
-		CD3DX12_ROOT_PARAMETER rootParameters[1]{};
+		CD3DX12_ROOT_PARAMETER rootParameters[2]{};
 		//rootParameters[0].InitAsConstants(sizeof(XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 
-		// Create a single descriptor table of CBVs.
-		CD3DX12_DESCRIPTOR_RANGE cbvTable;
-		cbvTable.Init(
-			D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
-			1, // Number of descriptors in table
-			0); // base shader register arguments are bound to for this root parameter
-		
-		rootParameters[0].InitAsDescriptorTable(
-				1, // Number of ranges
-				&cbvTable); // Pointer to array of ranges
+		// Perfomance TIP: Order from most frequent to least frequent.
+		rootParameters[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
+		rootParameters[1].InitAsConstantBufferView(0);
 
-		//rootParameters[1].InitAsConstantBufferView(0);
-
+		CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
 		// A root signature is an array of root parameters.
-		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, rootParameters,
-			0, nullptr,
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, rootParameters,
+			1, &linearRepeatSampler,
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		//m_rootSignature = std::make_unique<RootSignature>(rootSignatureDescription.Desc_1_1);
@@ -137,7 +132,7 @@ namespace Bruno
 		rtvFormats.RTFormats[0] = surfaceParameters.BackBufferFormat;
 
 		pipelineStateStream.pRootSignature = m_rootSignature.Get();
-		pipelineStateStream.InputLayout =  VertexPositionColor::InputLayout;
+		pipelineStateStream.InputLayout =  VertexPositionColorTexture::InputLayout;
 		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
 		pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pixelShader->GetBlob());
@@ -209,14 +204,12 @@ namespace Bruno
 		commandList->IASetVertexBuffers(0, 1, &m_vertexBuffer->GetView());
 		commandList->IASetIndexBuffer(&m_indexBuffer->GetView());
 
-		//CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_device->GetSrvDescriptionHeap().GetHeap()->GetGPUDescriptorHandleForHeapStart());
-		//commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_device->GetSrvDescriptionHeap().GetHeap()->GetGPUDescriptorHandleForHeapStart());
 
-
-		//D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
-		//commandList->SetGraphicsRootConstantBufferView(0, objCBAddress);
-
-		commandList->SetGraphicsRootDescriptorTable(0, m_device->GetSrvDescriptionHeap().GetHeap()->GetGPUDescriptorHandleForHeapStart());
+		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
+		
+		commandList->SetGraphicsRootDescriptorTable(0, tex);
+		commandList->SetGraphicsRootConstantBufferView(1, objCBAddress);
 
 		commandList->DrawIndexedInstanced(m_indexBuffer->GetNumIndices(), 1, 0, 0, 0);
 

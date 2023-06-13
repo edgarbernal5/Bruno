@@ -125,7 +125,6 @@ namespace Bruno
             featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
         }
         m_highestRootSignatureVersion = featureData.HighestVersion;
-
 	}
 
     std::shared_ptr<GraphicsDevice> GraphicsDevice::Create(std::shared_ptr<GraphicsAdapter> adapter)

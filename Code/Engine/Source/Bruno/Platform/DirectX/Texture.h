@@ -14,8 +14,10 @@ namespace Bruno
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_d3d12Resource;
 		std::unique_ptr<D3D12_CLEAR_VALUE>     m_d3d12ClearValue;
-		DescriptorHandle m_srv;
+		DescriptorHandle m_srvHandle;
 
 		void CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData);
+		void GenerateMips();
+		DXGI_FORMAT MakeSRGB(DXGI_FORMAT fmt);
 	};
 }

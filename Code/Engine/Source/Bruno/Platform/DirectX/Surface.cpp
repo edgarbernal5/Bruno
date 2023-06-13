@@ -87,6 +87,7 @@ namespace Bruno
 		m_parameters.Width = backBufferWidth;
 		m_parameters.Height = backBufferHeight;
 
+		//TODO: Flush command queue before changing any resources.
 		Release();
 
 		HRESULT hr = m_swapChain->ResizeBuffers(
