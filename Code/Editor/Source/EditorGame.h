@@ -19,6 +19,8 @@ namespace Bruno
 	protected:
 		void InitUI();
 		virtual void DoOnInitialize() override;
+		void DoOnUpdate(const GameTimer& timer) override;
+		void DoOnDraw() override;
 
 	private:
 		NanaGameWindow* m_nanaGameWindow;

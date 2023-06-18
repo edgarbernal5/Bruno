@@ -53,8 +53,10 @@ namespace Bruno
 		m_gameWindow->Run();
 	}
 
-	void Game::OnTick()
+	void Game::OnTick(const GameTimer& timer)
 	{
+		DoOnUpdate(timer);
+		DoOnDraw();
 	}
 
 	void Game::OnClientSizeChanged()

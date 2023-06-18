@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Bruno/Core/Base.h"
+#include "Bruno/Core/GameTimer.h"
 
 #include <cstdint>
 #include <string>
@@ -36,12 +37,14 @@ namespace Bruno
 		std::shared_ptr<GraphicsDevice> m_device;
 
 		virtual void DoOnInitialize() = 0;
-		virtual void OnTick();
+		virtual void OnTick(const GameTimer& timer);
 		virtual void OnClientSizeChanged();
+
+		virtual void DoOnUpdate(const GameTimer& timer) = 0;
+		virtual void DoOnDraw() = 0;
 
 	private:
 		static Game* g_instance;
-
 	};
 
 	Game* CreateGame(int argc, char** argv);

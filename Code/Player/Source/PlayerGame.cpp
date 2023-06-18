@@ -7,25 +7,58 @@
 #include <Bruno/Platform/DirectX/CommandQueue.h>
 #include <Bruno/Platform/DirectX/ResourceBarrier.h>
 #include <Bruno/Platform/DirectX/VertexTypes.h>
-#include <Bruno/Platform/DirectX/Texture.h>
+#include <Bruno/Renderer/RenderItem.h>
 
 namespace Bruno
 {
 	using namespace DirectX;
 
-	static VertexPositionColorTexture g_Vertices[8] = {
-	VertexPositionColorTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(0.0f,1.0f)},  // 0
-	VertexPositionColorTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f,0.0f) },   // 1
-	VertexPositionColorTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(1.0f, 1.0f, 0.0f), XMFLOAT2(1.0f,0.0f) },    // 2
-	VertexPositionColorTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f,1.0f) },   // 3
-	VertexPositionColorTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f,1.0f) },   // 4
-	VertexPositionColorTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 1.0f), XMFLOAT2(0.0f,1.0f) },    // 5
-	VertexPositionColorTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f,0.0f) },     // 6
-	VertexPositionColorTexture{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f,0.0f) }     // 7
+	static VertexPositionNormalTexture g_Vertices[24] = {
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 1.0f) },
+
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(+1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f) },
+
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+
 	};
 
-	static uint16_t g_Indices[36] = { 0, 1, 2, 0, 2, 3, 4, 6, 5, 4, 7, 6, 4, 5, 1, 4, 1, 0,
-							   3, 2, 6, 3, 6, 7, 1, 5, 6, 1, 6, 2, 4, 0, 3, 4, 3, 7 };
+	static uint16_t g_Indices[36] = { 0, 1, 2,
+		0, 2, 3,
+		4, 5, 6, 
+		4, 6, 7,
+		8, 9, 10, 
+		8, 10, 11,
+		12, 13, 14, 
+		12, 14, 15, 
+		16, 17, 18, 
+		16, 18, 19, 
+		20, 21, 22,
+		20, 22, 23 
+	};
 
 	PlayerGame::PlayerGame(const Bruno::GameParameters& parameters)
 		: Game(parameters)
@@ -50,8 +83,11 @@ namespace Bruno
 		m_surface = std::make_unique<Surface>(surfaceParameters);
 		m_surface->Initialize();
 
-		m_indexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
-		m_vertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionColorTexture));
+		auto boxRenderItem = std::make_shared<RenderItem>();
+		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
+		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
+		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
+		m_renderItems.push_back(boxRenderItem);
 
 		m_vertexShader = std::make_unique<Shader>(L"VertexShader.hlsl", "main", "vs_5_1");
 		m_pixelShader = std::make_unique<Shader>(L"PixelShader.hlsl", "main", "ps_5_1");
@@ -67,7 +103,8 @@ namespace Bruno
 			m_device->GetSrvDescriptionHeap().GetHeap()->GetCPUDescriptorHandleForHeapStart());
 		*/
 		m_objectBuffer = std::make_unique<ConstantBuffer<ObjectBuffer>>();
-		Texture* texture = new Texture(L"Textures/Mona_Lisa.jpg");
+		m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
+
 		GraphicsDevice* device = Graphics::GetDevice();
 
 		// Allow input layout and deny unnecessary access to certain pipeline stages.
@@ -132,7 +169,7 @@ namespace Bruno
 		rtvFormats.RTFormats[0] = surfaceParameters.BackBufferFormat;
 
 		pipelineStateStream.pRootSignature = m_rootSignature.Get();
-		pipelineStateStream.InputLayout =  VertexPositionColorTexture::InputLayout;
+		pipelineStateStream.InputLayout = VertexPositionNormalTexture::InputLayout;
 		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
 		pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pixelShader->GetBlob());
@@ -147,7 +184,13 @@ namespace Bruno
 		m_gameWindow->Show();
 	}
 
-	void PlayerGame::OnTick()
+	void PlayerGame::OnClientSizeChanged()
+	{
+		// Resize screen dependent resources.
+		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
+	}
+
+	void PlayerGame::DoOnUpdate(const GameTimer& timer)
 	{
 		// Update the model matrix.
 		static float TotalTime = 0.0f;
@@ -155,7 +198,8 @@ namespace Bruno
 		const XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
 		//XMMATRIX       modelMatrix = XMMatrixIdentity();
 		XMMATRIX       modelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
-		TotalTime += 0.0016f;
+		BR_CORE_TRACE << "delta time = " << timer.GetDeltaTime() << std::endl;
+		TotalTime += timer.GetDeltaTime() * 0.095f;
 		// Update the view matrix.
 		const XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
 		const XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
@@ -168,7 +212,7 @@ namespace Bruno
 			XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspectRatio, 0.1f, 1000.0f);
 		XMMATRIX mvpMatrix = XMMatrixMultiply(modelMatrix, viewMatrix);
 		mvpMatrix = XMMatrixMultiply(mvpMatrix, projectionMatrix);
-		
+
 		ObjectBuffer objectBuffer;
 		XMStoreFloat4x4(&objectBuffer.m_world, mvpMatrix);
 
@@ -177,6 +221,12 @@ namespace Bruno
 		commandQueue->BeginFrame();
 
 		m_objectBuffer->CopyData(objectBuffer);
+	}
+
+	void PlayerGame::DoOnDraw()
+	{
+		auto commandQueue = m_device->GetCommandQueue();
+		auto commandList = commandQueue->GetCommandList();
 
 		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
 		ResourceBarrier::Transition(commandList,
@@ -194,34 +244,35 @@ namespace Bruno
 		commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
 		commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 
-		ID3D12DescriptorHeap* descriptorHeaps[] = { m_device->GetSrvDescriptionHeap().GetHeap()};
+		ID3D12DescriptorHeap* descriptorHeaps[] = { m_device->GetSrvDescriptionHeap().GetHeap() };
 		commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
 		commandList->SetGraphicsRootSignature(m_rootSignature.Get());
 		commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
-		
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->IASetVertexBuffers(0, 1, &m_vertexBuffer->GetView());
-		commandList->IASetIndexBuffer(&m_indexBuffer->GetView());
 
-		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_device->GetSrvDescriptionHeap().GetHeap()->GetGPUDescriptorHandleForHeapStart());
+		for (auto& item : m_renderItems)
+		{
+			commandList->IASetPrimitiveTopology(item->PrimitiveType);
+			commandList->IASetVertexBuffers(0, 1, &item->VertexBuffer->GetView());
+			commandList->IASetIndexBuffer(&item->IndexBuffer->GetView());
 
-		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
-		
-		commandList->SetGraphicsRootDescriptorTable(0, tex);
-		commandList->SetGraphicsRootConstantBufferView(1, objCBAddress);
+			CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_texture->GetSrvHandle().Gpu);
 
-		commandList->DrawIndexedInstanced(m_indexBuffer->GetNumIndices(), 1, 0, 0, 0);
+			D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
+
+			commandList->SetGraphicsRootDescriptorTable(0, tex);
+			commandList->SetGraphicsRootConstantBufferView(1, objCBAddress);
+
+			commandList->DrawIndexedInstanced(item->IndexCount,
+				1,
+				item->StartIndexLocation,
+				item->BaseVertexLocation,
+				0);
+		}
 
 		ResourceBarrier::Transition(commandQueue->GetCommandList(),
 			currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 		commandQueue->EndFrame(m_surface.get());
-	}
-
-	void PlayerGame::OnClientSizeChanged()
-	{
-		// Resize screen dependent resources.
-		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
 	}
 }

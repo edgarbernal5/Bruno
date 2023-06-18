@@ -50,26 +50,26 @@ namespace Bruno
         static const D3D12_INPUT_ELEMENT_DESC InputElements[InputElementCount];
     };
 
-    struct VertexPositionColorTexture
+    struct VertexPositionNormalTexture
     {
-        VertexPositionColorTexture() = default;
+        VertexPositionNormalTexture() = default;
 
-        explicit VertexPositionColorTexture(const DirectX::XMFLOAT3& position,
-            const DirectX::XMFLOAT3& color, const DirectX::XMFLOAT2& texture)
+        explicit VertexPositionNormalTexture(const DirectX::XMFLOAT3& position,
+            const DirectX::XMFLOAT3& normal, const DirectX::XMFLOAT2& texture)
             :   Position(position),
-                Color(color),
+            Normal(normal),
                 Texture(texture)
         {}
 
-        explicit VertexPositionColorTexture(DirectX::FXMVECTOR position, DirectX::FXMVECTOR color, DirectX::FXMVECTOR texture)
+        explicit VertexPositionNormalTexture(DirectX::FXMVECTOR position, DirectX::FXMVECTOR normal, DirectX::FXMVECTOR texture)
         {
             DirectX::XMStoreFloat3(&(this->Position), position);
-            DirectX::XMStoreFloat3(&(this->Color), color);
+            DirectX::XMStoreFloat3(&(this->Normal), normal);
             DirectX::XMStoreFloat2(&(this->Texture), texture);
         }
 
         DirectX::XMFLOAT3 Position;
-        DirectX::XMFLOAT3 Color;
+        DirectX::XMFLOAT3 Normal;
         DirectX::XMFLOAT2 Texture;
 
         static const D3D12_INPUT_LAYOUT_DESC InputLayout;

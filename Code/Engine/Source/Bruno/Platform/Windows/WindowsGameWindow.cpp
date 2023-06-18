@@ -90,6 +90,8 @@ namespace Bruno
 	{
 		MSG msg = { 0 };
 
+		m_timer.Reset();
+
 		while (msg.message != WM_QUIT)
 		{
 			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -154,7 +156,8 @@ namespace Bruno
 			////window->Paint();
 			//EndPaint(hWnd, &ps);
 			//break;
-			window->m_game->OnTick();
+			window->m_timer.Tick();
+			window->m_game->OnTick(window->m_timer);
 			return 0;
 		}
 
@@ -194,12 +197,14 @@ namespace Bruno
 
 		case WM_ENTERSIZEMOVE:
 			window->m_inSizeMove = true;
+			window->m_timer.Stop();
 			window->BeginScreenDeviceChange();
 			break;
 
 		case WM_EXITSIZEMOVE:
 		{
 			window->m_inSizeMove = false;
+			window->m_timer.Start();
 
 			RECT rc;
 			GetClientRect(hWnd, &rc);
@@ -233,11 +238,13 @@ namespace Bruno
 				if (wParam)
 				{
 					BR_CORE_TRACE << "Activated" << std::endl;
+					window->m_timer.Start();
 					//window->Activated();
 				}
 				else
 				{
 					BR_CORE_TRACE << "Deactivated" << std::endl;
+					window->m_timer.Stop();
 					//window->Deactivated();
 				}
 			}

@@ -10,7 +10,7 @@ namespace Bruno
 		VertexBuffer(uint32_t numVertices, const void* bufferData, uint32_t vertexStride);
 		~VertexBuffer() = default;
 
-		const D3D12_VERTEX_BUFFER_VIEW& GetView() { return m_vertexBufferView; }
+		constexpr const D3D12_VERTEX_BUFFER_VIEW& GetView() { return m_vertexBufferView; }
 	private:
 		uint32_t m_numVertices;
 		uint32_t m_vertexStride;

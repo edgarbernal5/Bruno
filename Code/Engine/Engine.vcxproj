@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Bruno\Core\Assert.h" />
     <ClInclude Include="Source\Bruno\Core\Base.h" />
+    <ClInclude Include="Source\Bruno\Core\GameTimer.h" />
     <ClInclude Include="Source\Bruno\Core\Log.h" />
     <ClInclude Include="Source\Bruno\Core\Logger.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
@@ -113,8 +114,10 @@
     <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
+    <ClInclude Include="Source\Bruno\Renderer\RenderItem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Bruno\Core\GameTimer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Core\Base.cpp" />
     <ClCompile Include="Source\Bruno\Core\Log.cpp" />
@@ -142,6 +145,7 @@
     <ClCompile Include="Source\Bruno\Platform\Windows\NanaGameWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

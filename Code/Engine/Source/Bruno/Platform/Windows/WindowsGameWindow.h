@@ -8,6 +8,8 @@
 
 #endif
 
+#include <Bruno/Core/GameTimer.h>
+
 namespace Bruno
 {
 	class Game;
@@ -41,6 +43,8 @@ namespace Bruno
 		void EndScreenDeviceChange(int clientWidth, int clientHeight);
 
 	private:
+		GameTimer m_timer;
+
 		// Windows procedure
 		static LRESULT CALLBACK WndProc(HWND hWnd, uint32_t message, WPARAM wParam, LPARAM lParam);
 	};

@@ -20,27 +20,26 @@ namespace Bruno
 			m_mappedData = nullptr;
 		}
 
-		ID3D12Resource* GetResource() const
-		{
-			return m_d3dBuffer.Get();
-		}
+		constexpr ID3D12Resource* GetResource() const { return m_d3dBuffer.Get(); }
+		constexpr const uint32_t GetSizeInBytes() const { return m_elementSizeInBytes; }
 
 		void CopyData(const T& data)
 		{
 			memcpy(m_mappedData, &data, sizeof(T));
 		}
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_d3dBuffer;
 		uint32_t m_elementSizeInBytes;
 		uint8_t* m_mappedData = nullptr;
 
-		uint32_t GetConstantBufferSize(uint32_t sizeInBytes);
+		uint32_t GetAlignedConstantBufferSize(uint32_t sizeInBytes);
 	};
 
 	template<typename T>
 	inline ConstantBuffer<T>::ConstantBuffer()
 	{
-		m_elementSizeInBytes = GetConstantBufferSize(sizeof(T));
+		m_elementSizeInBytes = GetAlignedConstantBufferSize(sizeof(T));
 
 		auto device = Graphics::GetDevice();
 		auto sads = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
@@ -53,11 +52,11 @@ namespace Bruno
 			nullptr,
 			IID_PPV_ARGS(&m_d3dBuffer)));
 
-		ThrowIfFailed(m_d3dBuffer->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedData)));
+		ThrowIfFailed(m_d3dBuffer->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedData))); // m_mappedData = cpu_address
 	}
 
 	template<typename T>
-	inline uint32_t ConstantBuffer<T>::GetConstantBufferSize(uint32_t sizeInBytes)
+	inline uint32_t ConstantBuffer<T>::GetAlignedConstantBufferSize(uint32_t sizeInBytes)
 	{
 		return (sizeInBytes + 255) & ~255;
 	}

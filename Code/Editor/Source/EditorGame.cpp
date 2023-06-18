@@ -32,6 +32,14 @@ namespace Bruno
 		m_gameWindow->Show();
 	}
 
+	void EditorGame::DoOnUpdate(const GameTimer& timer)
+	{
+	}
+
+	void EditorGame::DoOnDraw()
+	{
+	}
+
 	void EditorGame::InitUI()
 	{
 		nana::form& form = m_nanaGameWindow->GetForm();
