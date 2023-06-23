@@ -9,8 +9,8 @@ namespace Bruno
 	struct GameWindowParameters
 	{
 		std::string Title;
-		uint32_t Width;
-		uint32_t Height;
+		uint32_t Width = 800;
+		uint32_t Height = 600;
 	};
 
 #if BR_PLATFORM_WINDOWS

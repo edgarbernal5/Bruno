@@ -20,8 +20,8 @@ namespace Bruno
 	protected:
 		void DoOnInitialize() override;
 		void OnClientSizeChanged() override;
-		void DoOnUpdate(const GameTimer& timer) override;
-		void DoOnDraw() override;
+		void OnUpdate(const GameTimer& timer) override;
+		void OnDraw() override;
 
 	private:
 		std::unique_ptr<Surface> m_surface;
@@ -39,7 +39,7 @@ namespace Bruno
 		{
 			DirectX::XMFLOAT4X4 m_world;
 		};
-		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer;
+		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAME_BUFFER_COUNT];
 	};
 
 }

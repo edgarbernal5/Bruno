@@ -29,19 +29,22 @@ namespace Bruno
 		void Run();
 
 		static Game* GetInstance() { return g_instance; }
-		
+
+		virtual void OnTick();
+
 		friend class WindowsGameWindow;
+		friend class NanaGameWindow;
 	protected:
-		GameWindow* m_gameWindow;
+		std::unique_ptr<GameWindow> m_gameWindow;
 		GameParameters m_parameters;
+		GameTimer m_timer;
 		std::shared_ptr<GraphicsDevice> m_device;
 
 		virtual void DoOnInitialize() = 0;
-		virtual void OnTick(const GameTimer& timer);
 		virtual void OnClientSizeChanged();
 
-		virtual void DoOnUpdate(const GameTimer& timer) = 0;
-		virtual void DoOnDraw() = 0;
+		virtual void OnUpdate(const GameTimer& timer) = 0;
+		virtual void OnDraw() = 0;
 
 	private:
 		static Game* g_instance;

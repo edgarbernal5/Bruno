@@ -67,18 +67,17 @@ namespace Bruno
 		__int64 startTime;
 		QueryPerformanceCounter((LARGE_INTEGER*)&startTime);
 
-
 		// Accumulate the time elapsed between stop and start pairs.
 		//
 		//                     |<-------d------->|
 		// ----*---------------*-----------------*------------> time
 		//  mBaseTime       mStopTime        startTime     
 
+		m_prevTime = startTime;
 		if (m_stopped)
 		{
 			m_pausedTime += (startTime - m_stopTime);
 
-			m_prevTime = startTime;
 			m_stopTime = 0;
 			m_stopped = false;
 		}

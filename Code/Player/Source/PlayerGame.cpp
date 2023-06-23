@@ -8,6 +8,7 @@
 #include <Bruno/Platform/DirectX/ResourceBarrier.h>
 #include <Bruno/Platform/DirectX/VertexTypes.h>
 #include <Bruno/Renderer/RenderItem.h>
+#include <iostream>
 
 namespace Bruno
 {
@@ -72,11 +73,11 @@ namespace Bruno
 		windowParameters.Height = m_parameters.WindowHeight;
 		windowParameters.Title = m_parameters.Name;
 
-		m_gameWindow = new WindowsGameWindow(windowParameters, this);
+		m_gameWindow = std::make_unique<WindowsGameWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
 
 		SurfaceWindowParameters surfaceParameters;
-		surfaceParameters.Width= m_parameters.WindowWidth;
+		surfaceParameters.Width = m_parameters.WindowWidth;
 		surfaceParameters.Height = m_parameters.WindowHeight;
 		surfaceParameters.WindowHandle = reinterpret_cast<HWND>(m_gameWindow->GetHandle());
 
@@ -92,17 +93,10 @@ namespace Bruno
 		m_vertexShader = std::make_unique<Shader>(L"VertexShader.hlsl", "main", "vs_5_1");
 		m_pixelShader = std::make_unique<Shader>(L"PixelShader.hlsl", "main", "ps_5_1");
 
-		/*D3D12_GPU_VIRTUAL_ADDRESS cbAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
-
-		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-		cbvDesc.BufferLocation = cbAddress;
-		cbvDesc.SizeInBytes = 256;//d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-
-		m_device->GetD3DDevice()->CreateConstantBufferView(
-			&cbvDesc,
-			m_device->GetSrvDescriptionHeap().GetHeap()->GetCPUDescriptorHandleForHeapStart());
-		*/
-		m_objectBuffer = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		for (size_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; i++)
+		{
+			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		}
 		m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
 
 		GraphicsDevice* device = Graphics::GetDevice();
@@ -190,16 +184,17 @@ namespace Bruno
 		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
 	}
 
-	void PlayerGame::DoOnUpdate(const GameTimer& timer)
+	void PlayerGame::OnUpdate(const GameTimer& timer)
 	{
 		// Update the model matrix.
 		static float TotalTime = 0.0f;
-		float          angle = static_cast<float>(TotalTime * 90.0);
+		float          angle = static_cast<float>(TotalTime * 45.0);
 		const XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
 		//XMMATRIX       modelMatrix = XMMatrixIdentity();
 		XMMATRIX       modelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
-		BR_CORE_TRACE << "delta time = " << timer.GetDeltaTime() << std::endl;
-		TotalTime += timer.GetDeltaTime() * 0.095f;
+		//BR_CORE_TRACE << "delta time = " << timer.GetDeltaTime() << ". TotalTime " << TotalTime << std::endl;
+		TotalTime += timer.GetDeltaTime();
+
 		// Update the view matrix.
 		const XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
 		const XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
@@ -220,13 +215,15 @@ namespace Bruno
 		auto commandList = commandQueue->GetCommandList();
 		commandQueue->BeginFrame();
 
-		m_objectBuffer->CopyData(objectBuffer);
+		int frameIndex = commandQueue->GetFrameIndex();
+		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
 	}
 
-	void PlayerGame::DoOnDraw()
+	void PlayerGame::OnDraw()
 	{
 		auto commandQueue = m_device->GetCommandQueue();
 		auto commandList = commandQueue->GetCommandList();
+		int frameIndex = commandQueue->GetFrameIndex();
 
 		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
 		ResourceBarrier::Transition(commandList,
@@ -258,7 +255,7 @@ namespace Bruno
 
 			CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_texture->GetSrvHandle().Gpu);
 
-			D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer->GetResource()->GetGPUVirtualAddress();
+			D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer[frameIndex]->GetResource()->GetGPUVirtualAddress();
 
 			commandList->SetGraphicsRootDescriptorTable(0, tex);
 			commandList->SetGraphicsRootConstantBufferView(1, objCBAddress);

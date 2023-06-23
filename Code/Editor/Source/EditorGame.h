@@ -9,6 +9,7 @@ namespace Bruno
 {
 	class NanaGameWindow;
 	class GraphicsDevice;
+	class ScenePanel;
 
 	class EditorGame : public Game
 	{
@@ -16,15 +17,20 @@ namespace Bruno
 		EditorGame(const GameParameters& parameters);
 		~EditorGame();
 
+		friend class ScenePanel;
 	protected:
 		void InitUI();
 		virtual void DoOnInitialize() override;
-		void DoOnUpdate(const GameTimer& timer) override;
-		void DoOnDraw() override;
+		void OnUpdate(const GameTimer& timer) override;
+		void OnDraw() override;
 
 	private:
 		NanaGameWindow* m_nanaGameWindow;
 		nana::menubar m_menubar;
 		nana::place m_place;
+		std::vector<ScenePanel*> m_scenePanels;
+
+		void AddScenePanel(ScenePanel* panel);
+		void RemoveScenePanel(ScenePanel* panel);
 	};
 }

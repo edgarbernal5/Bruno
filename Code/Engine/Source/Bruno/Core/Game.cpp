@@ -12,8 +12,7 @@ namespace Bruno
 	Game* Game::g_instance{ nullptr };
 
 	Game::Game(const GameParameters& parameters) :
-		m_parameters(parameters),
-		m_gameWindow(nullptr)
+		m_parameters(parameters)
 	{
 		g_instance = this;
 
@@ -37,10 +36,9 @@ namespace Bruno
 	Game::~Game()
 	{
 		//TODO: Flush command queue before changing any resources.
-		if (m_gameWindow != nullptr) {
-			delete m_gameWindow;
-			m_gameWindow = nullptr;
-		}
+		m_device->GetCommandQueue()->Flush();
+
+		m_gameWindow.reset();
 
 #if BR_PLATFORM_WINDOWS
 		CoUninitialize();
@@ -49,14 +47,17 @@ namespace Bruno
 
 	void Game::Run()
 	{
+		m_timer.Reset();
 		DoOnInitialize();
+
 		m_gameWindow->Run();
 	}
 
-	void Game::OnTick(const GameTimer& timer)
+	void Game::OnTick()
 	{
-		DoOnUpdate(timer);
-		DoOnDraw();
+		m_timer.Tick();
+		OnUpdate(m_timer);
+		OnDraw();
 	}
 
 	void Game::OnClientSizeChanged()

@@ -84,10 +84,10 @@ namespace Bruno
 		if (backBufferWidth == m_parameters.Width && backBufferHeight == m_parameters.Height)
 			return;
 
-		m_parameters.Width = backBufferWidth;
-		m_parameters.Height = backBufferHeight;
-
 		//TODO: Flush command queue before changing any resources.
+		auto device = Graphics::GetDevice();
+		device->GetCommandQueue()->Flush();
+
 		Release();
 
 		HRESULT hr = m_swapChain->ResizeBuffers(
@@ -101,9 +101,13 @@ namespace Bruno
 		if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
 		{
 		}
-		else {
+		else
+		{
 			ThrowIfFailed(hr);
 		}
+
+		m_parameters.Width = backBufferWidth;
+		m_parameters.Height = backBufferHeight;
 
 		// set viewport and scissor rect
 		m_viewport.TopLeftX = 0.f;

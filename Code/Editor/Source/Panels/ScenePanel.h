@@ -10,16 +10,21 @@
 #include <Bruno/Platform/DirectX/Shader.h>
 #include <Bruno/Platform/DirectX/RootSignature.h>
 #include <Bruno/Platform/DirectX/PipelineStateObject.h>
+#include <Bruno/Core/GameTimer.h>
 
 namespace Bruno
 {
 	class Surface;
+	class EditorGame;
 
 	class ScenePanel : public nana::nested_form
 	{
 	public:
-		ScenePanel(nana::window window, DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D32_FLOAT);
-		~ScenePanel() = default;
+		ScenePanel(nana::window window, EditorGame* editorGame, DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D32_FLOAT);
+		~ScenePanel();
+
+		void OnUpdate(const GameTimer& timer);
+		void OnDraw();
 
 	private:
 		std::unique_ptr<Surface> m_surface;
@@ -36,7 +41,10 @@ namespace Bruno
 
 		std::unique_ptr<PipelineStateObject> m_pipelineState;
 
-		nana::timer m_timer;
+		bool m_isResizing = false;
+		bool m_isExposed = false;
+		//nana::timer m_nanaTimer;
+		//GameTimer m_gameTimer;
 		float m_totalTime = 0.0f;
 	};
 }

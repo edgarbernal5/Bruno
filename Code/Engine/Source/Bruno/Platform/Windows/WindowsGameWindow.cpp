@@ -90,8 +90,6 @@ namespace Bruno
 	{
 		MSG msg = { 0 };
 
-		m_timer.Reset();
-
 		while (msg.message != WM_QUIT)
 		{
 			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -152,13 +150,14 @@ namespace Bruno
 			//	EndPaint(hWnd, &ps);
 			//}
 
-			//hdc = BeginPaint(hWnd, &ps);
+			/*PAINTSTRUCT ps;
+			std::ignore = BeginPaint(hWnd, &ps);
 			////window->Paint();
-			//EndPaint(hWnd, &ps);
-			//break;
-			window->m_timer.Tick();
-			window->m_game->OnTick(window->m_timer);
+			EndPaint(hWnd, &ps);
+			break;*/
+			window->m_game->OnTick();
 			return 0;
+			//break;
 		}
 
 		case WM_SIZE:
@@ -196,15 +195,18 @@ namespace Bruno
 			break;
 
 		case WM_ENTERSIZEMOVE:
+
+			BR_CORE_TRACE << "Native enter size move" << std::endl;
 			window->m_inSizeMove = true;
-			window->m_timer.Stop();
+			//window->m_timer.Stop();
 			window->BeginScreenDeviceChange();
 			break;
 
 		case WM_EXITSIZEMOVE:
 		{
+			BR_CORE_TRACE << "Native exit size move" << std::endl;
 			window->m_inSizeMove = false;
-			window->m_timer.Start();
+			//window->m_timer.Start();
 
 			RECT rc;
 			GetClientRect(hWnd, &rc);
@@ -238,13 +240,13 @@ namespace Bruno
 				if (wParam)
 				{
 					BR_CORE_TRACE << "Activated" << std::endl;
-					window->m_timer.Start();
+					//window->m_timer.Start();
 					//window->Activated();
 				}
 				else
 				{
 					BR_CORE_TRACE << "Deactivated" << std::endl;
-					window->m_timer.Stop();
+					//window->m_timer.Stop();
 					//window->Deactivated();
 				}
 			}

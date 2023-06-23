@@ -17,6 +17,8 @@ namespace Bruno
 		void EndFrame(Surface* surface);
 		void Flush();
 
+		constexpr uint32_t GetFrameIndex() const { return m_frameIndex; }
+
 		ID3D12CommandQueue* GetQueue();
 		ID3D12GraphicsCommandList6* GetCommandList();
 
