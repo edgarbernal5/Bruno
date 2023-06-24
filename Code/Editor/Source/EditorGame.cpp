@@ -34,6 +34,12 @@ namespace Bruno
 
 	void EditorGame::OnUpdate(const GameTimer& timer)
 	{
+		std::vector<ScenePanel*> temp;
+		{
+			std::lock_guard lock{ m_scenePanelsMutex };
+			temp.reserve(m_scenePanels.size());
+			temp.assign(m_scenePanels.begin(), m_scenePanels.end());
+		}
 		for (auto panel : m_scenePanels)
 		{
 			panel->OnUpdate(timer);
@@ -42,7 +48,13 @@ namespace Bruno
 
 	void EditorGame::OnDraw()
 	{
-		for (auto panel : m_scenePanels)
+		std::vector<ScenePanel*> temp;
+		{
+			std::lock_guard lock{ m_scenePanelsMutex };
+			temp.reserve(m_scenePanels.size());
+			temp.assign(m_scenePanels.begin(), m_scenePanels.end());
+		}
+		for (auto panel : temp)
 		{
 			panel->OnDraw();
 		}
@@ -50,11 +62,14 @@ namespace Bruno
 
 	void EditorGame::AddScenePanel(ScenePanel* panel)
 	{
+		std::lock_guard lock{ m_scenePanelsMutex };
 		m_scenePanels.push_back(panel);
 	}
 
 	void EditorGame::RemoveScenePanel(ScenePanel* panel)
 	{
+		std::lock_guard lock{ m_scenePanelsMutex };
+
 		auto it = std::find(m_scenePanels.begin(), m_scenePanels.end(), panel);
 		if (it != m_scenePanels.end())
 			m_scenePanels.erase(it);

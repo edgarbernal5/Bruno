@@ -61,22 +61,6 @@ namespace Bruno
 			}
 		};
 
-		const D3D12_HEAP_PROPERTIES DefaultHeap {
-			D3D12_HEAP_TYPE_DEFAULT,                        // Type
-			D3D12_CPU_PAGE_PROPERTY_UNKNOWN,                // CPUPageProperty
-			D3D12_MEMORY_POOL_UNKNOWN,                      // MemoryPoolPreference
-			0,                                              // CreationNodeMask
-			0                                               // VisibleNodeMask
-		};
-
-		const D3D12_HEAP_PROPERTIES UploadHeap {
-			D3D12_HEAP_TYPE_UPLOAD,                         // Type
-			D3D12_CPU_PAGE_PROPERTY_UNKNOWN,                // CPUPageProperty
-			D3D12_MEMORY_POOL_UNKNOWN,                      // MemoryPoolPreference
-			0,                                              // CreationNodeMask
-			0                                               // VisibleNodeMask
-		};
-
 		GraphicsDevice*									m_device;
 
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue>		m_uploadCommand;

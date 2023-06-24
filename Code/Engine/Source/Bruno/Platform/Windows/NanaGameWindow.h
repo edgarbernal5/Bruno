@@ -14,7 +14,7 @@ namespace Bruno
 	{
 	public:
 		NanaGameWindow(const GameWindowParameters& parameters, Game* game);
-		~NanaGameWindow();
+		~NanaGameWindow() = default;
 
 		virtual WindowHandle GetHandle() override;
 		virtual void Initialize() override;

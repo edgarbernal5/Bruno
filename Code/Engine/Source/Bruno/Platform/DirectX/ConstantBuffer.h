@@ -42,12 +42,11 @@ namespace Bruno
 		m_elementSizeInBytes = GetAlignedConstantBufferSize(sizeof(T));
 
 		auto device = Graphics::GetDevice();
-		auto sads = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-		auto asdjasd = CD3DX12_RESOURCE_DESC::Buffer(m_elementSizeInBytes);
+		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(m_elementSizeInBytes);
 		ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
-			&sads,
+			&Graphics::Core::HeapProperties.UploadHeap,
 			D3D12_HEAP_FLAG_NONE,
-			&asdjasd,
+			&resourceDesc,
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(&m_d3dBuffer)));

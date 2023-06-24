@@ -51,7 +51,7 @@ namespace Bruno
         auto device = Graphics::GetDevice();
         
         ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
-            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), 
+            &Graphics::Core::HeapProperties.DefaultHeap, 
             D3D12_HEAP_FLAG_NONE, 
             &textureDesc,
             D3D12_RESOURCE_STATE_COMMON,
@@ -133,7 +133,7 @@ namespace Bruno
         }
 
         ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
-            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+            &Graphics::Core::HeapProperties.DefaultHeap,
             D3D12_HEAP_FLAG_NONE, 
             &resourceDesc,
             D3D12_RESOURCE_STATE_COMMON,

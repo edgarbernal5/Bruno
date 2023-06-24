@@ -55,6 +55,8 @@ namespace Bruno
 		this->events().unload([editorGame, this](const nana::arg_unload& args)
 		{
 			BR_CORE_TRACE << "Unload or close panel id = " << idxx << std::endl;
+
+			std::lock_guard lock{ m_mutex }; 
 			auto device = Graphics::GetDevice();
 			device->GetCommandQueue()->Flush();
 
@@ -64,26 +66,44 @@ namespace Bruno
 		this->events().expose([this](const nana::arg_expose& args)
 		{
 			BR_CORE_TRACE << "Expose panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
+
+			std::lock_guard lock{ m_mutex };
 			m_isExposed = args.exposed;
 		});
 
 		this->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
 			BR_CORE_TRACE << "enter_size_move /panel id = " << idxx << std::endl;
+			std::lock_guard lock{ m_mutex };
+			m_isSizingMoving = true;
 		});
+
 		this->events().exit_size_move([this](const nana::arg_size_move& args)
 		{
 			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
+
+			std::lock_guard lock{ m_mutex };
+			if (m_surface)
+			{
+				m_surface->Resize(this->size().width, this->size().height);
+			}
+			m_isSizingMoving = false;
 		});
 
 		this->events().activate([this](const nana::arg_activate& args)
 		{
 			BR_CORE_TRACE << "activate /panel id = " << idxx << std::endl;
 		});
+
 		this->events().resized([this](const nana::arg_resized& args) {
-			//BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << this->native_handle() << "." << args.width << "; " << args.height << std::endl;
+			BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << this->native_handle() << "." << args.width << "; " << args.height << std::endl;
+
+			std::lock_guard lock{ m_mutex };
+			if (m_isSizingMoving)
+				return;
+
 			m_isResizing = true;
-			
+
 			if (m_surface)
 			{
 				m_surface->Resize(args.width, args.height);
@@ -156,7 +176,10 @@ namespace Bruno
 		};
 		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineStateStreamDesc);
 
-		editorGame->AddScenePanel(this);
+		{
+			std::lock_guard lock{ m_mutex };
+			editorGame->AddScenePanel(this);
+		}
 
 		this->show();
 	}
@@ -165,11 +188,16 @@ namespace Bruno
 	{
 		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
 
+		std::lock_guard lock{ m_mutex };
+		auto device = Graphics::GetDevice();
+		device->GetCommandQueue()->Flush();
 	}
 	
 	void ScenePanel::OnUpdate(const GameTimer& timer)
 	{
-		if (!enabled() || !m_isExposed || m_isResizing)
+		std::lock_guard lock{ m_mutex };
+
+		if (!m_isExposed || m_isResizing || m_isSizingMoving)
 			return;
 
 		//BR_CORE_TRACE << "Paint panel. id = " << idxx << ". delta time = " << timer.GetDeltaTime() << std::endl;
@@ -179,7 +207,7 @@ namespace Bruno
 		commandQueue->BeginFrame();
 
 		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
-		ResourceBarrier::Transition(commandQueue->GetCommandList(),
+		ResourceBarrier::Transition(m_commandList,
 			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; //Yellow
@@ -195,9 +223,9 @@ namespace Bruno
 		m_commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
 		m_commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 
-		commandQueue->GetCommandList()->RSSetViewports(1, &m_surface->GetViewport());
-		commandQueue->GetCommandList()->RSSetScissorRects(1, &m_surface->GetScissorRect());
-		commandQueue->GetCommandList()->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
+		m_commandList->RSSetViewports(1, &m_surface->GetViewport());
+		m_commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
+		m_commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
 
 		// Update the model matrix.
 
@@ -229,7 +257,7 @@ namespace Bruno
 		m_commandList->IASetIndexBuffer(&m_indexBuffer->GetView());
 		m_commandList->DrawIndexedInstanced(m_indexBuffer->GetNumIndices(), 1, 0, 0, 0);
 
-		ResourceBarrier::Transition(commandQueue->GetCommandList(),
+		ResourceBarrier::Transition(m_commandList,
 			currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 		commandQueue->EndFrame(m_surface.get());

@@ -4,6 +4,7 @@
 
 #include <nana/gui/widgets/menubar.hpp>
 #include <nana/gui/place.hpp>
+#include <mutex>
 
 namespace Bruno
 {
@@ -29,6 +30,8 @@ namespace Bruno
 		nana::menubar m_menubar;
 		nana::place m_place;
 		std::vector<ScenePanel*> m_scenePanels;
+
+		std::mutex m_scenePanelsMutex{};
 
 		void AddScenePanel(ScenePanel* panel);
 		void RemoveScenePanel(ScenePanel* panel);

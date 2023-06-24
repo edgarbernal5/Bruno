@@ -13,6 +13,7 @@ namespace Bruno
 		while (!exitRequested.load())
 		{
 			game.OnTick();
+			//std::this_thread::sleep_for(std::chrono::milliseconds(16));
 		}
 	}
 
@@ -23,10 +24,6 @@ namespace Bruno
 	{
 		m_data.Width = parameters.Width;
 		m_data.Height = parameters.Height;
-	}
-
-	Bruno::NanaGameWindow::~NanaGameWindow()
-	{
 	}
 
 	WindowHandle NanaGameWindow::GetHandle()

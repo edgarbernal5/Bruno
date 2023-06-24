@@ -11,6 +11,7 @@
 #include <Bruno/Platform/DirectX/RootSignature.h>
 #include <Bruno/Platform/DirectX/PipelineStateObject.h>
 #include <Bruno/Core/GameTimer.h>
+#include <mutex>
 
 namespace Bruno
 {
@@ -41,10 +42,11 @@ namespace Bruno
 
 		std::unique_ptr<PipelineStateObject> m_pipelineState;
 
+		std::mutex m_mutex{};
 		bool m_isResizing = false;
+		bool m_isSizingMoving = false;
 		bool m_isExposed = false;
-		//nana::timer m_nanaTimer;
-		//GameTimer m_gameTimer;
+
 		float m_totalTime = 0.0f;
 	};
 }

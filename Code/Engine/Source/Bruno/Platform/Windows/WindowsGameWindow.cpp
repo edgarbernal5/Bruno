@@ -195,10 +195,8 @@ namespace Bruno
 			break;
 
 		case WM_ENTERSIZEMOVE:
-
 			BR_CORE_TRACE << "Native enter size move" << std::endl;
 			window->m_inSizeMove = true;
-			//window->m_timer.Stop();
 			window->BeginScreenDeviceChange();
 			break;
 
@@ -206,7 +204,6 @@ namespace Bruno
 		{
 			BR_CORE_TRACE << "Native exit size move" << std::endl;
 			window->m_inSizeMove = false;
-			//window->m_timer.Start();
 
 			RECT rc;
 			GetClientRect(hWnd, &rc);

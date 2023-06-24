@@ -105,6 +105,7 @@ namespace Bruno
 		{
 			ThrowIfFailed(hr);
 		}
+		m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
 
 		m_parameters.Width = backBufferWidth;
 		m_parameters.Height = backBufferHeight;
@@ -119,7 +120,6 @@ namespace Bruno
 
 		m_scissorRect = { 0, 0, (int32_t)backBufferWidth, (int32_t)backBufferHeight };
 
-		m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
 		m_depthBuffer.reset(new DepthBuffer(backBufferWidth, backBufferHeight, m_parameters.DepthBufferFormat));
 
 		Finalize();

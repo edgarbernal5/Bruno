@@ -22,7 +22,7 @@ namespace Bruno
 		dsv_desc.Texture2D.MipSlice = 0;
 
 		ThrowIfFailed(Graphics::GetDevice()->GetD3DDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			&Graphics::Core::HeapProperties.DefaultHeap,
 			D3D12_HEAP_FLAG_NONE,
 			&depthTextureDesc,
 			D3D12_RESOURCE_STATE_DEPTH_WRITE,

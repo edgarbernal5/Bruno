@@ -59,7 +59,7 @@ namespace Bruno
 			auto desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize);
 			ID3D12Resource* intermediateBuffer;
 			m_device->GetD3DDevice()->CreateCommittedResource(
-				&UploadHeap,
+				&Graphics::Core::HeapProperties.UploadHeap,
 				D3D12_HEAP_FLAG_NONE,
 				&desc,
 				D3D12_RESOURCE_STATE_GENERIC_READ,
@@ -78,11 +78,11 @@ namespace Bruno
 		UploadFrame& frame{ m_uploadFrames[m_frameIndex] };
 		Microsoft::WRL::ComPtr<ID3D12Resource> d3d12Resource;
 
+		auto desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize, D3D12_RESOURCE_FLAG_NONE);
 		ThrowIfFailed(m_device->GetD3DDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			&Graphics::Core::HeapProperties.DefaultHeap,
 			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(bufferSize,
-			D3D12_RESOURCE_FLAG_NONE), 
+			&desc,
 			D3D12_RESOURCE_STATE_COMMON, nullptr,
 			IID_PPV_ARGS(&d3d12Resource)));
 
