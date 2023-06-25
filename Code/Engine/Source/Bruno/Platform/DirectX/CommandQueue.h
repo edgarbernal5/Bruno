@@ -13,6 +13,7 @@ namespace Bruno
 		CommandQueue(GraphicsDevice* device, D3D12_COMMAND_LIST_TYPE type);
 		~CommandQueue();
 
+		void WaitFrame();
 		void BeginFrame();
 		void EndFrame(Surface* surface);
 		void Flush();

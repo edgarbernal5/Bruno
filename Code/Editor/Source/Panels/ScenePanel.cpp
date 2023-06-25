@@ -18,19 +18,53 @@ namespace Bruno
 {
 	using namespace DirectX;
 
-	static VertexPositionColor g_Vertices[8] = {
-	VertexPositionColor{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },  // 0
-	VertexPositionColor{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },   // 1
-	VertexPositionColor{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(1.0f, 1.0f, 0.0f) },    // 2
-	VertexPositionColor{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },   // 3
-	VertexPositionColor{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },   // 4
-	VertexPositionColor{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 1.0f) },    // 5
-	VertexPositionColor{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f) },     // 6
-	VertexPositionColor{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 1.0f) }     // 7
+
+	static VertexPositionNormalTexture g_Vertices[24] = {
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 1.0f) },
+
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(+1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f) },
+
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+
 	};
 
-	static uint16_t g_Indices[36] = { 0, 1, 2, 0, 2, 3, 4, 6, 5, 4, 7, 6, 4, 5, 1, 4, 1, 0,
-							   3, 2, 6, 3, 6, 7, 1, 5, 6, 1, 6, 2, 4, 0, 3, 4, 3, 7 };
+	static uint16_t g_Indices[36] = { 0, 1, 2,
+		0, 2, 3,
+		4, 5, 6,
+		4, 6, 7,
+		8, 9, 10,
+		8, 10, 11,
+		12, 13, 14,
+		12, 14, 15,
+		16, 17, 18,
+		16, 18, 19,
+		20, 21, 22,
+		20, 22, 23
+	};
 
 	ScenePanel::ScenePanel(nana::window window, EditorGame *editorGame, DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat) :
 		nana::nested_form(window, nana::appear::bald<>()),
@@ -126,6 +160,19 @@ namespace Bruno
 		m_vertexShader = std::make_unique<Shader>(L"VertexShader.hlsl", "main", "vs_5_1");
 		m_pixelShader = std::make_unique<Shader>(L"PixelShader.hlsl", "main", "ps_5_1");
 
+
+		auto boxRenderItem = std::make_shared<RenderItem>();
+		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
+		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
+		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
+		m_renderItems.push_back(boxRenderItem);
+
+		for (size_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; i++)
+		{
+			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		}
+		m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
+
 		GraphicsDevice* device = Graphics::GetDevice();
 
 		// Allow input layout and deny unnecessary access to certain pipeline stages.
@@ -136,15 +183,43 @@ namespace Bruno
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 
+		CD3DX12_DESCRIPTOR_RANGE texTable;
+		texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
 		// A single 32-bit constant root parameter that is used by the vertex shader.
-		CD3DX12_ROOT_PARAMETER1 rootParameters[1]{};
-		rootParameters[0].InitAsConstants(sizeof(XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+		CD3DX12_ROOT_PARAMETER rootParameters[2]{};
+		//rootParameters[0].InitAsConstants(sizeof(XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 
-		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDescription;
-		rootSignatureDescription.Init_1_1(_countof(rootParameters), rootParameters, 0, nullptr, rootSignatureFlags);
-		
-		m_rootSignature = std::make_unique<RootSignature>(rootSignatureDescription.Desc_1_1);
+		// Perfomance TIP: Order from most frequent to least frequent.
+		rootParameters[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
+		rootParameters[1].InitAsConstantBufferView(0);
 
+		CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
+		// A root signature is an array of root parameters.
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, rootParameters,
+			1, &linearRepeatSampler,
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+		//m_rootSignature = std::make_unique<RootSignature>(rootSignatureDescription.Desc_1_1);
+
+		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+		Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
+		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+		HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+			serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+		if (errorBlob != nullptr)
+		{
+			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			BR_CORE_ERROR << "Error during root signature creation. " << (char*)errorBlob->GetBufferPointer() << std::endl;
+		}
+		ThrowIfFailed(hr);
+
+		ThrowIfFailed(device->GetD3DDevice()->CreateRootSignature(
+			0,
+			serializedRootSig->GetBufferPointer(),
+			serializedRootSig->GetBufferSize(),
+			IID_PPV_ARGS(m_rootSignature.GetAddressOf())));
 		struct PipelineStateStream
 		{
 			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE pRootSignature;
@@ -160,12 +235,12 @@ namespace Bruno
 		rtvFormats.NumRenderTargets = 1;
 		rtvFormats.RTFormats[0] = m_backBufferFormat;
 
-		pipelineStateStream.pRootSignature = m_rootSignature->GetD3D12RootSignature();
-		pipelineStateStream.InputLayout = VertexPositionColor::InputLayout;
+		pipelineStateStream.pRootSignature = m_rootSignature.Get();
+		pipelineStateStream.InputLayout = VertexPositionNormalTexture::InputLayout;
 		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
 		pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pixelShader->GetBlob());
-		pipelineStateStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+		pipelineStateStream.DSVFormat = m_depthBufferFormat;
 		pipelineStateStream.RTVFormats = rtvFormats;
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
@@ -200,29 +275,6 @@ namespace Bruno
 		//BR_CORE_TRACE << "Paint panel. id = " << idxx << ". delta time = " << timer.GetDeltaTime() << std::endl;
 		auto device = Bruno::Graphics::GetDevice();
 		auto commandQueue = device->GetCommandQueue();
-		auto m_commandList = commandQueue->GetCommandList();
-		commandQueue->BeginFrame();
-
-		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
-		ResourceBarrier::Transition(m_commandList,
-			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; //Yellow
-		if (idxx == 2) clearColor[0] = 0.0f;
-
-		auto rtv = m_surface->GetRtv();
-		auto dsv = m_surface->GetDsv();
-
-		m_commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
-		m_commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-		m_commandList->RSSetViewports(1, &m_surface->GetViewport());
-		m_commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
-		m_commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
-
-		m_commandList->RSSetViewports(1, &m_surface->GetViewport());
-		m_commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
-		m_commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
 
 		// Update the model matrix.
 
@@ -245,22 +297,83 @@ namespace Bruno
 		XMMATRIX mvpMatrix = XMMatrixMultiply(modelMatrix, viewMatrix);
 		mvpMatrix = XMMatrixMultiply(mvpMatrix, projectionMatrix);
 
-		m_commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
-		m_commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
-		m_commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
+		ObjectBuffer objectBuffer;
+		XMStoreFloat4x4(&objectBuffer.m_world, mvpMatrix);
 
-		m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_commandList->IASetVertexBuffers(0, 1, &m_vertexBuffer->GetView());
-		m_commandList->IASetIndexBuffer(&m_indexBuffer->GetView());
-		m_commandList->DrawIndexedInstanced(m_indexBuffer->GetNumIndices(), 1, 0, 0, 0);
+		commandQueue->WaitFrame();
+		int frameIndex = commandQueue->GetFrameIndex();
 
-		ResourceBarrier::Transition(m_commandList,
+		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
+
+		
+	}
+
+	void ScenePanel::OnDraw()
+	{
+		std::lock_guard lock{ m_mutex };
+
+		if (!m_isExposed || m_isResizing || m_isSizingMoving)
+			return;
+
+		auto device = Bruno::Graphics::GetDevice();
+		auto commandQueue = device->GetCommandQueue();
+		auto commandList = commandQueue->GetCommandList();
+		int frameIndex = commandQueue->GetFrameIndex();
+
+		commandQueue->BeginFrame();
+		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
+		ResourceBarrier::Transition(commandList,
+			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; //Yellow
+		if (idxx == 2) clearColor[0] = 0.0f;
+
+		auto rtv = m_surface->GetRtv();
+		auto dsv = m_surface->GetDsv();
+
+		commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
+		commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+		commandList->RSSetViewports(1, &m_surface->GetViewport());
+		commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
+		commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+
+		ID3D12DescriptorHeap* descriptorHeaps[] = { device->GetSrvDescriptionHeap().GetHeap() };
+		commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+		commandList->SetGraphicsRootSignature(m_rootSignature.Get());
+		commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
+
+		for (auto& item : m_renderItems)
+		{
+			commandList->IASetPrimitiveTopology(item->PrimitiveType);
+			commandList->IASetVertexBuffers(0, 1, &item->VertexBuffer->GetView());
+			commandList->IASetIndexBuffer(&item->IndexBuffer->GetView());
+
+			CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_texture->GetSrvHandle().Gpu);
+
+			D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer[frameIndex]->GetResource()->GetGPUVirtualAddress();
+
+			commandList->SetGraphicsRootDescriptorTable(0, tex);
+			commandList->SetGraphicsRootConstantBufferView(1, objCBAddress);
+
+			commandList->DrawIndexedInstanced(item->IndexCount,
+				1,
+				item->StartIndexLocation,
+				item->BaseVertexLocation,
+				0);
+		}
+
+		ResourceBarrier::Transition(commandList,
 			currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 		commandQueue->EndFrame(m_surface.get());
 	}
 
-	void ScenePanel::OnDraw()
+	bool ScenePanel::IsEnabled()
 	{
+		std::lock_guard lock{ m_mutex };
+
+		return (m_isExposed && !m_isResizing && !m_isSizingMoving);
 	}
 }

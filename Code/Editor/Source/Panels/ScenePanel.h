@@ -11,7 +11,10 @@
 #include <Bruno/Platform/DirectX/RootSignature.h>
 #include <Bruno/Platform/DirectX/PipelineStateObject.h>
 #include <Bruno/Core/GameTimer.h>
+#include <Bruno/Renderer/RenderItem.h>
+#include <Bruno/Platform/DirectX/ConstantBuffer.h>
 #include <mutex>
+#include <Bruno/Platform/DirectX/Texture.h>
 
 namespace Bruno
 {
@@ -27,6 +30,8 @@ namespace Bruno
 		void OnUpdate(const GameTimer& timer);
 		void OnDraw();
 
+		bool IsEnabled();
+
 	private:
 		std::unique_ptr<Surface> m_surface;
 		int idxx = 0;
@@ -38,11 +43,22 @@ namespace Bruno
 		std::unique_ptr<VertexBuffer> m_vertexBuffer;
 		std::unique_ptr<Shader> m_vertexShader;
 		std::unique_ptr<Shader> m_pixelShader;
-		std::unique_ptr<RootSignature> m_rootSignature;
+		//std::unique_ptr<RootSignature> m_rootSignature;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_rootSignature;
 
 		std::unique_ptr<PipelineStateObject> m_pipelineState;
+		std::unique_ptr<Texture> m_texture;
 
 		std::mutex m_mutex{};
+
+		std::vector<std::shared_ptr<RenderItem>> m_renderItems;
+
+		struct ObjectBuffer
+		{
+			DirectX::XMFLOAT4X4 m_world;
+		};
+		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAME_BUFFER_COUNT];
+
 		bool m_isResizing = false;
 		bool m_isSizingMoving = false;
 		bool m_isExposed = false;

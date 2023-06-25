@@ -213,7 +213,7 @@ namespace Bruno
 
 		auto commandQueue = m_device->GetCommandQueue();
 		auto commandList = commandQueue->GetCommandList();
-		commandQueue->BeginFrame();
+		commandQueue->WaitFrame();
 
 		int frameIndex = commandQueue->GetFrameIndex();
 		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
@@ -225,6 +225,7 @@ namespace Bruno
 		auto commandList = commandQueue->GetCommandList();
 		int frameIndex = commandQueue->GetFrameIndex();
 
+		commandQueue->BeginFrame();
 		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
 		ResourceBarrier::Transition(commandList,
 			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
