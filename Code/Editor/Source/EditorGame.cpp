@@ -63,6 +63,14 @@ namespace Bruno
 	void EditorGame::AddScenePanel(ScenePanel* panel)
 	{
 		std::lock_guard lock{ m_scenePanelsMutex };
+		panel->events().enter_size_move([this](const nana::arg_size_move& args)
+		{
+			OnStartSizeMove();
+		});
+		panel->events().exit_size_move([this](const nana::arg_size_move& args)
+		{
+			OnEndSizeMove();
+		});
 		m_scenePanels.push_back(panel);
 	}
 
@@ -120,10 +128,6 @@ namespace Bruno
 			BR_CORE_TRACE << "exit_size_move / form." << std::endl;
 		});
 
-		form.events().activate([this](const nana::arg_activate& args)
-		{
-			BR_CORE_TRACE << "activate / form. " << args.window_handle << std::endl;
-		});
 		form.events().expose([this](const nana::arg_expose& args)
 		{
 			BR_CORE_TRACE << "expose / form." << std::endl;

@@ -41,13 +41,19 @@ namespace Bruno
 		std::shared_ptr<GraphicsDevice> m_device;
 
 		virtual void DoOnInitialize() = 0;
-		virtual void OnClientSizeChanged();
 
 		virtual void OnUpdate(const GameTimer& timer) = 0;
 		virtual void OnDraw() = 0;
+		virtual void OnResize();
+		virtual void OnActivated();
+		virtual void OnDeactivated();
+		virtual void OnStartSizeMove();
+		virtual void OnEndSizeMove();
 
 	private:
 		static Game* g_instance;
+
+		bool m_gamePaused = false;
 	};
 
 	Game* CreateGame(int argc, char** argv);

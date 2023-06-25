@@ -178,7 +178,7 @@ namespace Bruno
 		m_gameWindow->Show();
 	}
 
-	void PlayerGame::OnClientSizeChanged()
+	void PlayerGame::OnResize()
 	{
 		// Resize screen dependent resources.
 		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());

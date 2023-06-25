@@ -189,8 +189,8 @@ namespace Bruno
 				window->m_data.Height = HIWORD(lParam);
 				window->m_data.Width = LOWORD(lParam);
 
-				BR_CORE_TRACE << "ClientSizeChanged" << std::endl;
-				window->m_game->OnClientSizeChanged();
+				BR_CORE_TRACE << "OnResize" << std::endl;
+				window->m_game->OnResize();
 			}
 			break;
 
@@ -198,6 +198,7 @@ namespace Bruno
 			BR_CORE_TRACE << "Native enter size move" << std::endl;
 			window->m_inSizeMove = true;
 			window->BeginScreenDeviceChange();
+			window->m_game->OnStartSizeMove();
 			break;
 
 		case WM_EXITSIZEMOVE:
@@ -214,12 +215,13 @@ namespace Bruno
 
 			if (window->m_prevClientWidth != clientWidth || window->m_prevClientHeight != clientHeight)
 			{
-				BR_CORE_TRACE << "ClientSizeChanged" << std::endl;
+				BR_CORE_TRACE << "OnResize" << std::endl;
 				window->m_data.Height = clientHeight;
 				window->m_data.Width = clientWidth;
 
-				window->m_game->OnClientSizeChanged();
+				window->m_game->OnResize();
 			}
+			window->m_game->OnEndSizeMove();
 			break;
 		}
 
@@ -237,14 +239,12 @@ namespace Bruno
 				if (wParam)
 				{
 					BR_CORE_TRACE << "Activated" << std::endl;
-					//window->m_timer.Start();
-					//window->Activated();
+					window->m_game->OnActivated();
 				}
 				else
 				{
 					BR_CORE_TRACE << "Deactivated" << std::endl;
-					//window->m_timer.Stop();
-					//window->Deactivated();
+					window->m_game->OnDeactivated();
 				}
 			}
 			break;

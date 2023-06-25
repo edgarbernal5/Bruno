@@ -19,7 +19,7 @@ namespace Bruno
 
 	protected:
 		void DoOnInitialize() override;
-		void OnClientSizeChanged() override;
+		void OnResize() override;
 		void OnUpdate(const GameTimer& timer) override;
 		void OnDraw() override;
 

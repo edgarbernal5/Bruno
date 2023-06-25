@@ -40,7 +40,27 @@ namespace Bruno
 		{
 			m_data.Height = args.height;
 			m_data.Width = args.width;
-			m_game->OnClientSizeChanged();
+			m_game->OnResize();
+		});
+
+		m_form->events().activate([this](const nana::arg_activate& args)
+		{	
+			if (args.activated)
+			{
+				m_game->OnActivated();
+				return;
+			}
+			m_game->OnDeactivated();
+		});
+
+		m_form->events().enter_size_move([this](const nana::arg_size_move& args)
+		{
+			m_game->OnStartSizeMove();
+		});
+
+		m_form->events().exit_size_move([this](const nana::arg_size_move& args)
+		{
+			m_game->OnEndSizeMove();
 		});
 	}
 

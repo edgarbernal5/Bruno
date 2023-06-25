@@ -55,12 +55,48 @@ namespace Bruno
 
 	void Game::OnTick()
 	{
+		if (m_gamePaused)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			return;
+		}
+
 		m_timer.Tick();
 		OnUpdate(m_timer);
 		OnDraw();
 	}
 
-	void Game::OnClientSizeChanged()
+	void Game::OnResize()
 	{
+	}
+
+	void Game::OnActivated()
+	{
+		m_gamePaused = false;
+		m_timer.Start();
+	}
+
+	void Game::OnDeactivated()
+	{
+		m_gamePaused = true; 
+		m_timer.Stop();
+	}
+
+	void Game::OnStartSizeMove()
+	{
+		if (m_gamePaused)
+			return;
+
+		m_gamePaused = true;
+		m_timer.Stop();
+	}
+
+	void Game::OnEndSizeMove()
+	{
+		if (!m_gamePaused)
+			return;
+
+		m_gamePaused = false;
+		m_timer.Start();
 	}
 }

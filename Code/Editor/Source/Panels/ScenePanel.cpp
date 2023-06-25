@@ -74,6 +74,7 @@ namespace Bruno
 		this->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
 			BR_CORE_TRACE << "enter_size_move /panel id = " << idxx << std::endl;
+			
 			std::lock_guard lock{ m_mutex };
 			m_isSizingMoving = true;
 		});
@@ -90,12 +91,8 @@ namespace Bruno
 			m_isSizingMoving = false;
 		});
 
-		this->events().activate([this](const nana::arg_activate& args)
+		this->events().resized([this](const nana::arg_resized& args)
 		{
-			BR_CORE_TRACE << "activate /panel id = " << idxx << std::endl;
-		});
-
-		this->events().resized([this](const nana::arg_resized& args) {
 			BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << this->native_handle() << "." << args.width << "; " << args.height << std::endl;
 
 			std::lock_guard lock{ m_mutex };
