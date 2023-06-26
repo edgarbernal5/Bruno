@@ -64,6 +64,18 @@ namespace Bruno
 		m_timer.Tick();
 		OnUpdate(m_timer);
 		OnDraw();
+
+		//TODO: improve this timer with a high precision timer.
+		m_elapsedTime += m_timer.GetDeltaTime();
+		m_framesThisSecond++;
+		if (m_elapsedTime >= 1.0f)
+		{
+			m_framesPerSecond = m_framesThisSecond;
+			m_framesThisSecond = 0;
+			m_elapsedTime -= 1.0f;
+
+			BR_CORE_TRACE << "FPS: " << m_framesPerSecond << std::endl;
+		}
 	}
 
 	void Game::OnResize()
@@ -82,7 +94,7 @@ namespace Bruno
 		m_timer.Stop();
 	}
 
-	void Game::OnStartSizeMove()
+	void Game::OnResizeMoveStarted()
 	{
 		if (m_gamePaused)
 			return;
@@ -91,7 +103,7 @@ namespace Bruno
 		m_timer.Stop();
 	}
 
-	void Game::OnEndSizeMove()
+	void Game::OnResizeMoveFinished()
 	{
 		if (!m_gamePaused)
 			return;

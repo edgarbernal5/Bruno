@@ -63,14 +63,16 @@ namespace Bruno
 	void EditorGame::AddScenePanel(ScenePanel* panel)
 	{
 		std::lock_guard lock{ m_scenePanelsMutex };
+		
 		panel->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
-			OnStartSizeMove();
+			OnResizeMoveStarted();
 		});
 		panel->events().exit_size_move([this](const nana::arg_size_move& args)
 		{
-			OnEndSizeMove();
+			OnResizeMoveFinished();
 		});
+
 		m_scenePanels.push_back(panel);
 	}
 

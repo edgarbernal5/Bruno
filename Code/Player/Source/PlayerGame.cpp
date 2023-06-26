@@ -212,7 +212,6 @@ namespace Bruno
 		XMStoreFloat4x4(&objectBuffer.m_world, mvpMatrix);
 
 		auto commandQueue = m_device->GetCommandQueue();
-		auto commandList = commandQueue->GetCommandList();
 		commandQueue->WaitFrame();
 
 		int frameIndex = commandQueue->GetFrameIndex();

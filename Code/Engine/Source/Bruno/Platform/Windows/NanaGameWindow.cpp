@@ -55,12 +55,12 @@ namespace Bruno
 
 		m_form->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
-			m_game->OnStartSizeMove();
+			m_game->OnResizeMoveStarted();
 		});
 
 		m_form->events().exit_size_move([this](const nana::arg_size_move& args)
 		{
-			m_game->OnEndSizeMove();
+			m_game->OnResizeMoveFinished();
 		});
 	}
 

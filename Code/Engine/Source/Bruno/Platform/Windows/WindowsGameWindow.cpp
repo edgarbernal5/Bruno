@@ -157,7 +157,6 @@ namespace Bruno
 			break;*/
 			window->m_game->OnTick();
 			return 0;
-			//break;
 		}
 
 		case WM_SIZE:
@@ -198,7 +197,7 @@ namespace Bruno
 			BR_CORE_TRACE << "Native enter size move" << std::endl;
 			window->m_inSizeMove = true;
 			window->BeginScreenDeviceChange();
-			window->m_game->OnStartSizeMove();
+			window->m_game->OnResizeMoveStarted();
 			break;
 
 		case WM_EXITSIZEMOVE:
@@ -221,7 +220,7 @@ namespace Bruno
 
 				window->m_game->OnResize();
 			}
-			window->m_game->OnEndSizeMove();
+			window->m_game->OnResizeMoveFinished();
 			break;
 		}
 

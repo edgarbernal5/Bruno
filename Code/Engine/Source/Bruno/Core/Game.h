@@ -47,9 +47,12 @@ namespace Bruno
 		virtual void OnResize();
 		virtual void OnActivated();
 		virtual void OnDeactivated();
-		virtual void OnStartSizeMove();
-		virtual void OnEndSizeMove();
+		virtual void OnResizeMoveStarted();
+		virtual void OnResizeMoveFinished();
 
+		int m_framesThisSecond = 0;
+		int m_framesPerSecond = 0;
+		float m_elapsedTime = 0.0f;
 	private:
 		static Game* g_instance;
 

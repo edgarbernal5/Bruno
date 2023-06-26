@@ -96,6 +96,17 @@ namespace Bruno
 
 			editorGame->RemoveScenePanel(this);
 		});
+
+		// Single thread rendering.
+		//auto hwnd = reinterpret_cast<HWND>(this->native_handle());
+		//this->draw_through([editorGame, hwnd, this]
+		//{
+		//	editorGame->OnTick();
+
+		//	/*RECT r;
+		//	::GetClientRect(hwnd, &r);
+		//	::InvalidateRect(hwnd, &r, FALSE);*/
+		//});
 		
 		this->events().expose([this](const nana::arg_expose& args)
 		{
@@ -160,7 +171,6 @@ namespace Bruno
 		m_vertexShader = std::make_unique<Shader>(L"VertexShader.hlsl", "main", "vs_5_1");
 		m_pixelShader = std::make_unique<Shader>(L"PixelShader.hlsl", "main", "ps_5_1");
 
-
 		auto boxRenderItem = std::make_shared<RenderItem>();
 		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
 		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
@@ -220,6 +230,7 @@ namespace Bruno
 			serializedRootSig->GetBufferPointer(),
 			serializedRootSig->GetBufferSize(),
 			IID_PPV_ARGS(m_rootSignature.GetAddressOf())));
+
 		struct PipelineStateStream
 		{
 			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE pRootSignature;

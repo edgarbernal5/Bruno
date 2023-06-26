@@ -102,8 +102,7 @@ namespace Bruno
 		{
 			m_commandFrames[i].Wait(m_fenceEvent, m_fence.Get());
 		}
-		//BR_CORE_TRACE << "Flush(). previous = " << m_frameIndex << std::endl;
-		//m_frameIndex = 0;
+		//m_frameIndex = 0; TODO: Fix this bug with render thread of nana window
 	}
 
 	ID3D12CommandQueue* CommandQueue::GetQueue()
