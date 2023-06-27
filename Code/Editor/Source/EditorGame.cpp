@@ -7,8 +7,7 @@
 namespace Bruno
 {
 	EditorGame::EditorGame(const GameParameters& parameters) :
-		Game(parameters),
-		m_nanaGameWindow(nullptr)
+		Game(parameters)
 	{
 	}
 
@@ -16,30 +15,19 @@ namespace Bruno
 	{
 	}
 
-	void EditorGame::DoOnInitialize()
+	void EditorGame::OnInitialize(const GameWindowParameters& windowParameters)
 	{
-		GameWindowParameters windowParameters;
-		windowParameters.Width = m_parameters.WindowWidth;
-		windowParameters.Height = m_parameters.WindowHeight;
-		windowParameters.Title = m_parameters.Name;
-
 		m_gameWindow = std::make_unique<NanaGameWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
-		m_nanaGameWindow = reinterpret_cast<NanaGameWindow*>(m_gameWindow.get());
 
-		InitUI();
+		InitializeUI();
 
 		m_gameWindow->Show();
 	}
 
 	void EditorGame::OnUpdate(const GameTimer& timer)
 	{
-		std::vector<ScenePanel*> temp;
-		{
-			std::lock_guard lock{ m_scenePanelsMutex };
-			temp.reserve(m_scenePanels.size());
-			temp.assign(m_scenePanels.begin(), m_scenePanels.end());
-		}
+		std::lock_guard lock{ m_scenePanelsMutex };
 		for (auto panel : m_scenePanels)
 		{
 			panel->OnUpdate(timer);
@@ -48,13 +36,8 @@ namespace Bruno
 
 	void EditorGame::OnDraw()
 	{
-		std::vector<ScenePanel*> temp;
-		{
-			std::lock_guard lock{ m_scenePanelsMutex };
-			temp.reserve(m_scenePanels.size());
-			temp.assign(m_scenePanels.begin(), m_scenePanels.end());
-		}
-		for (auto panel : temp)
+		std::lock_guard lock{ m_scenePanelsMutex };
+		for (auto panel : m_scenePanels)
 		{
 			panel->OnDraw();
 		}
@@ -85,14 +68,16 @@ namespace Bruno
 			m_scenePanels.erase(it);
 	}
 
-	void EditorGame::InitUI()
+	void EditorGame::InitializeUI()
 	{
-		nana::form& form = m_nanaGameWindow->GetForm();
+		auto nanaGameWindow = reinterpret_cast<NanaGameWindow*>(m_gameWindow.get());
+
+		nana::form& form = nanaGameWindow->GetForm();
 		m_place.bind(form.handle());
 		m_menubar.create(form.handle());
 
 		m_menubar.push_back("&File");
-		m_menubar.at(0).append("Exit", [this](nana::menu::item_proxy& ip)
+		m_menubar.at(0).append("Exit", [](nana::menu::item_proxy& ip)
 		{
 			nana::API::exit_all();
 		});

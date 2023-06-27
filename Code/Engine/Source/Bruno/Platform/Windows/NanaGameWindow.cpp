@@ -26,6 +26,11 @@ namespace Bruno
 		m_data.Height = parameters.Height;
 	}
 
+	nana::form& NanaGameWindow::GetForm()
+	{
+		return *m_form;
+	}
+
 	WindowHandle NanaGameWindow::GetHandle()
 	{
 		return reinterpret_cast<WindowHandle>(m_form->native_handle());
@@ -62,11 +67,6 @@ namespace Bruno
 		{
 			m_game->OnResizeMoveFinished();
 		});
-	}
-
-	nana::form& NanaGameWindow::GetForm()
-	{
-		return *m_form;
 	}
 
 	int NanaGameWindow::Run()

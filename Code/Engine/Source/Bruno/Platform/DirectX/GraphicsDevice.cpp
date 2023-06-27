@@ -50,7 +50,7 @@ namespace Bruno
         );
         ThrowIfFailed(hr);
 
-        m_d3dDevice->SetName(L"DeviceResources");
+        m_d3dDevice->SetName(L"GraphicsDevice");
 
 #ifndef NDEBUG
         // Configure debug device (if active).

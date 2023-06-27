@@ -64,7 +64,8 @@ namespace Bruno
 
 		std::wstring m_mainWndTitle(m_parameters.Title.begin(), m_parameters.Title.end());
 
-		m_hwnd = CreateWindowEx(
+		m_hwnd = CreateWindowEx
+		(
 			0,
 			L"BrunoEngineClass", 
 			m_mainWndTitle.c_str(), 
@@ -76,14 +77,14 @@ namespace Bruno
 			nullptr,			// We have no parent window.
 			nullptr,			// We aren't using menus.
 			hInstance,
-			nullptr);
+			this
+		);
 
 		if (!m_hwnd)
 		{
-			//MessageBox(0, L"CreateWindow Failed.", 0, 0);
+			BR_CORE_ERROR << "CreateWindow Failed." << std::endl;
 			return;
 		}
-		SetWindowLongPtr(m_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 	}
 
 	int WindowsGameWindow::Run()
@@ -106,7 +107,6 @@ namespace Bruno
 	void WindowsGameWindow::Show()
 	{
 		ShowWindow(m_hwnd, SW_SHOW);
-		UpdateWindow(m_hwnd);
 	}
 
 	inline RECT WindowsGameWindow::GetClientBounds()
@@ -136,61 +136,67 @@ namespace Bruno
 
 		switch (message)
 		{
+
+		case WM_CREATE:
+		{
+			LPCREATESTRUCT pCreateStruct = reinterpret_cast<LPCREATESTRUCT>(lParam);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pCreateStruct->lpCreateParams));
+
+			return 0;
+		}
 		case WM_PAINT:
 		{
 			//std::cout << "Native form Paint" << std::endl;
 			//ver codigo nana (Bedrock_WIN32_WindowProc, bedrock_windows.cpp)
-
-			//if (window->m_inSizeMove && window->m_game) {
-			//	window->m_game->Tick();
-			//}
-			//else {
-			//	PAINTSTRUCT ps;
-			//	std::ignore = BeginPaint(hWnd, &ps);
-			//	EndPaint(hWnd, &ps);
-			//}
 
 			/*PAINTSTRUCT ps;
 			std::ignore = BeginPaint(hWnd, &ps);
 			////window->Paint();
 			EndPaint(hWnd, &ps);
 			break;*/
-			window->m_game->OnTick();
+			if (window)
+			{
+				window->m_game->OnTick();
+			}
 			return 0;
 		}
 
 		case WM_SIZE:
-			if (wParam == SIZE_MINIMIZED)
+			if (window)
 			{
-				if (!window->m_minimized)
+				if (wParam == SIZE_MINIMIZED)
 				{
-					window->m_minimized = true;
-					if (!window->m_inSuspend)
+					if (!window->m_minimized)
 					{
-						BR_CORE_TRACE << "OnSuspending" << std::endl;
-						//window->Suspend();
+						window->m_minimized = true;
+						if (!window->m_inSuspend)
+						{
+							BR_CORE_TRACE << "OnSuspending" << std::endl;
+							//window->Suspend();
+						}
+						window->m_inSuspend = true;
 					}
-					window->m_inSuspend = true;
 				}
-			}
-			else if (window->m_minimized)
-			{
-				window->m_minimized = false;
-				if (window->m_inSuspend)
+				else if (window->m_minimized)
 				{
-					BR_CORE_TRACE << "OnResuming" << std::endl;
-					//window->Resume();
+					window->m_minimized = false;
+					if (window->m_inSuspend)
+					{
+						BR_CORE_TRACE << "OnResuming" << std::endl;
+						//window->Resume();
+					}
+					window->m_inSuspend = false;
 				}
-				window->m_inSuspend = false;
-			}
-			else if (!window->m_inSizeMove)
-			{
-				window->m_data.Height = HIWORD(lParam);
-				window->m_data.Width = LOWORD(lParam);
+				else if (!window->m_inSizeMove)
+				{
+					window->m_data.Height = HIWORD(lParam);
+					window->m_data.Width = LOWORD(lParam);
 
-				BR_CORE_TRACE << "OnResize" << std::endl;
-				window->m_game->OnResize();
+					BR_CORE_TRACE << "OnResize" << std::endl;
+					window->m_game->OnResize();
+				}
 			}
+			
 			break;
 
 		case WM_ENTERSIZEMOVE:

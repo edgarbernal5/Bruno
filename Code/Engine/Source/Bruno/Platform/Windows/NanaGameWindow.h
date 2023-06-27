@@ -16,13 +16,13 @@ namespace Bruno
 		NanaGameWindow(const GameWindowParameters& parameters, Game* game);
 		~NanaGameWindow() = default;
 
+		nana::form& GetForm();
 		virtual WindowHandle GetHandle() override;
 		virtual void Initialize() override;
 		virtual int Run() override;
 
 		virtual void Show() override;
 
-		nana::form& GetForm();
 	private:
 		std::unique_ptr<nana::form> m_form;
 		GameWindowParameters m_parameters;

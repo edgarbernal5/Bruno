@@ -14,6 +14,7 @@ namespace Bruno
 		{
 			Bruno::Game* game = Bruno::CreateGame(argc, argv);
 			BR_ASSERT(game, "Client game is null!");
+			game->Initialize();
 			game->Run();
 			delete game;
 		}

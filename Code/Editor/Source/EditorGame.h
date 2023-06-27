@@ -20,13 +20,12 @@ namespace Bruno
 
 		friend class ScenePanel;
 	protected:
-		void InitUI();
-		virtual void DoOnInitialize() override;
+		void InitializeUI();
+		void OnInitialize(const GameWindowParameters& windowParameters) override;
 		void OnUpdate(const GameTimer& timer) override;
 		void OnDraw() override;
 
 	private:
-		NanaGameWindow* m_nanaGameWindow;
 		nana::menubar m_menubar;
 		nana::place m_place;
 		std::vector<ScenePanel*> m_scenePanels;

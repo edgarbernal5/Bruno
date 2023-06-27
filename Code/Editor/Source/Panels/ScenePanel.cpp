@@ -89,15 +89,16 @@ namespace Bruno
 		this->events().unload([editorGame, this](const nana::arg_unload& args)
 		{
 			BR_CORE_TRACE << "Unload or close panel id = " << idxx << std::endl;
-
-			std::lock_guard lock{ m_mutex }; 
-			auto device = Graphics::GetDevice();
-			device->GetCommandQueue()->Flush();
+			{
+				std::lock_guard lock{ m_mutex };
+				auto device = Graphics::GetDevice();
+				device->GetCommandQueue()->Flush();
+			}
 
 			editorGame->RemoveScenePanel(this);
 		});
 
-		// Single thread rendering.
+		// Single-thread rendering.
 		//auto hwnd = reinterpret_cast<HWND>(this->native_handle());
 		//this->draw_through([editorGame, hwnd, this]
 		//{
@@ -278,12 +279,12 @@ namespace Bruno
 	
 	void ScenePanel::OnUpdate(const GameTimer& timer)
 	{
+		//BR_CORE_TRACE << "Paint panel. id = " << idxx << ". delta time = " << timer.GetDeltaTime() << std::endl;
 		std::lock_guard lock{ m_mutex };
 
 		if (!m_isExposed || m_isResizing || m_isSizingMoving)
 			return;
 
-		//BR_CORE_TRACE << "Paint panel. id = " << idxx << ". delta time = " << timer.GetDeltaTime() << std::endl;
 		auto device = Bruno::Graphics::GetDevice();
 		auto commandQueue = device->GetCommandQueue();
 
@@ -315,8 +316,6 @@ namespace Bruno
 		int frameIndex = commandQueue->GetFrameIndex();
 
 		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
-
-		
 	}
 
 	void ScenePanel::OnDraw()

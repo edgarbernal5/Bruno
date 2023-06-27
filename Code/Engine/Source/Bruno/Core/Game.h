@@ -3,6 +3,8 @@
 #include "Bruno/Core/Base.h"
 #include "Bruno/Core/GameTimer.h"
 
+#include "Bruno/Core/GameWindow.h"
+
 #include <cstdint>
 #include <string>
 #include <memory>
@@ -16,7 +18,6 @@ namespace Bruno
 		uint32_t WindowHeight = 600;
 	};
 
-	class GameWindow;
 	class GraphicsDevice;
 
 	class Game
@@ -26,6 +27,7 @@ namespace Bruno
 		virtual ~Game();
 
 		inline GraphicsDevice* GetDevice() { return m_device.get(); }
+		void Initialize();
 		void Run();
 
 		static Game* GetInstance() { return g_instance; }
@@ -40,7 +42,7 @@ namespace Bruno
 		GameTimer m_timer;
 		std::shared_ptr<GraphicsDevice> m_device;
 
-		virtual void DoOnInitialize() = 0;
+		virtual void OnInitialize(const GameWindowParameters& windowParameters) = 0;
 
 		virtual void OnUpdate(const GameTimer& timer) = 0;
 		virtual void OnDraw() = 0;

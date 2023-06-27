@@ -18,7 +18,7 @@ namespace Bruno
 		PlayerGame(const GameParameters& parameters);
 
 	protected:
-		void DoOnInitialize() override;
+		void OnInitialize(const GameWindowParameters& windowParameters) override;
 		void OnResize() override;
 		void OnUpdate(const GameTimer& timer) override;
 		void OnDraw() override;
