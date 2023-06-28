@@ -43,8 +43,7 @@ namespace Bruno
 		std::unique_ptr<VertexBuffer> m_vertexBuffer;
 		std::unique_ptr<Shader> m_vertexShader;
 		std::unique_ptr<Shader> m_pixelShader;
-		//std::unique_ptr<RootSignature> m_rootSignature;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_rootSignature;
+		std::unique_ptr<RootSignature> m_rootSignature;
 
 		std::unique_ptr<PipelineStateObject> m_pipelineState;
 		std::unique_ptr<Texture> m_texture;
@@ -64,5 +63,7 @@ namespace Bruno
 		bool m_isExposed = false;
 
 		float m_totalTime = 0.0f;
+
+		void UpdateCBs(const GameTimer& timer);
 	};
 }

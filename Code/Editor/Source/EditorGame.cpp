@@ -27,7 +27,7 @@ namespace Bruno
 
 	void EditorGame::OnUpdate(const GameTimer& timer)
 	{
-		std::lock_guard lock{ m_scenePanelsMutex };
+		std::scoped_lock lock{ m_scenePanelsMutex };
 		for (auto panel : m_scenePanels)
 		{
 			panel->OnUpdate(timer);
@@ -36,7 +36,7 @@ namespace Bruno
 
 	void EditorGame::OnDraw()
 	{
-		std::lock_guard lock{ m_scenePanelsMutex };
+		std::scoped_lock lock{ m_scenePanelsMutex };
 		for (auto panel : m_scenePanels)
 		{
 			panel->OnDraw();
@@ -45,7 +45,7 @@ namespace Bruno
 
 	void EditorGame::AddScenePanel(ScenePanel* panel)
 	{
-		std::lock_guard lock{ m_scenePanelsMutex };
+		std::scoped_lock lock{ m_scenePanelsMutex };
 		
 		panel->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
@@ -61,7 +61,7 @@ namespace Bruno
 
 	void EditorGame::RemoveScenePanel(ScenePanel* panel)
 	{
-		std::lock_guard lock{ m_scenePanelsMutex };
+		std::scoped_lock lock{ m_scenePanelsMutex };
 
 		auto it = std::find(m_scenePanels.begin(), m_scenePanels.end(), panel);
 		if (it != m_scenePanels.end())

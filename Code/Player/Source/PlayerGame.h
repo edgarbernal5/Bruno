@@ -28,8 +28,7 @@ namespace Bruno
 		std::unique_ptr<Shader> m_vertexShader;
 		std::unique_ptr<Shader> m_pixelShader;
 		std::unique_ptr<Texture> m_texture;
-		//std::unique_ptr<RootSignature> m_rootSignature;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_rootSignature;
+		std::unique_ptr<RootSignature> m_rootSignature;
 
 		std::unique_ptr<PipelineStateObject> m_pipelineState;
 
@@ -37,9 +36,11 @@ namespace Bruno
 
 		struct ObjectBuffer
 		{
-			DirectX::XMFLOAT4X4 m_world;
+			Math::Matrix m_world;
 		};
 		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAME_BUFFER_COUNT];
+
+		void UpdateCBs(const GameTimer& timer);
 	};
 
 }

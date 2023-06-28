@@ -89,6 +89,7 @@
     <ClInclude Include="Source\Bruno\Core\GameTimer.h" />
     <ClInclude Include="Source\Bruno\Core\Log.h" />
     <ClInclude Include="Source\Bruno\Core\Logger.h" />
+    <ClInclude Include="Source\Bruno\Math\Math.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
@@ -121,6 +122,7 @@
     <ClCompile Include="Source\Bruno\Core\Base.cpp" />
     <ClCompile Include="Source\Bruno\Core\Log.cpp" />
     <ClCompile Include="Source\Bruno\Core\Logger.cpp" />
+    <ClCompile Include="Source\Bruno\Math\Math.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\PipelineStateObject.cpp" />
@@ -145,6 +147,9 @@
     <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\Bruno\Math\Math.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

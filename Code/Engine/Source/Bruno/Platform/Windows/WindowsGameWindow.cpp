@@ -196,7 +196,6 @@ namespace Bruno
 					window->m_game->OnResize();
 				}
 			}
-			
 			break;
 
 		case WM_ENTERSIZEMOVE:

@@ -53,6 +53,7 @@ namespace Bruno
 		D3D12_VIEWPORT							m_viewport;
 		D3D12_RECT								m_scissorRect{};
 
+		void HandleDeviceLost();
 		void Finalize();
 		void Release();
 	};

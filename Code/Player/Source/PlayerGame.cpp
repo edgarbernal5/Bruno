@@ -12,38 +12,36 @@
 
 namespace Bruno
 {
-	using namespace DirectX;
-
 	static VertexPositionNormalTexture g_Vertices[24] = {
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 1.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(1.0f, 1.0f) },
 
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f)},
-	VertexPositionNormalTexture{ XMFLOAT3(+1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(1.0f, 1.0f)},
+	VertexPositionNormalTexture{ Math::Vector3(+1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(0.0f, 1.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(1.0f, 0.0f) },
 
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(1.0f, 1.0f) },
 
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f)},
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(1.0f, 1.0f)},
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(0.0f, 1.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
 
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, 1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, 1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, -1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 1.0f) },
 
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, -1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 1.0f)},
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, -1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, 1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
+	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, 1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 1.0f) },
 
 	};
 
@@ -107,41 +105,20 @@ namespace Bruno
 		CD3DX12_DESCRIPTOR_RANGE texTable;
 		texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-		// A single 32-bit constant root parameter that is used by the vertex shader.
 		CD3DX12_ROOT_PARAMETER rootParameters[2]{};
-		//rootParameters[0].InitAsConstants(sizeof(XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
-
 		// Perfomance TIP: Order from most frequent to least frequent.
 		rootParameters[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
 		rootParameters[1].InitAsConstantBufferView(0);
 
 		CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
 		// A root signature is an array of root parameters.
-		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, rootParameters,
+		CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDescription(2, rootParameters,
 			1, &linearRepeatSampler,
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-		//m_rootSignature = std::make_unique<RootSignature>(rootSignatureDescription.Desc_1_1);
-
 		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
-		Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
-		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-		HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-			serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+		m_rootSignature = std::make_unique<RootSignature>(rootSignatureDescription);
 
-		if (errorBlob != nullptr)
-		{
-			::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-			BR_CORE_ERROR << "Error during root signature creation. " << (char*)errorBlob->GetBufferPointer() << std::endl;
-		}
-		ThrowIfFailed(hr);
-
-		ThrowIfFailed(m_device->GetD3DDevice()->CreateRootSignature(
-			0,
-			serializedRootSig->GetBufferPointer(),
-			serializedRootSig->GetBufferSize(),
-			IID_PPV_ARGS(m_rootSignature.GetAddressOf())));
-		
 		struct PipelineStateStream
 		{
 			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE pRootSignature;
@@ -157,7 +134,7 @@ namespace Bruno
 		rtvFormats.NumRenderTargets = 1;
 		rtvFormats.RTFormats[0] = surfaceParameters.BackBufferFormat;
 
-		pipelineStateStream.pRootSignature = m_rootSignature.Get();
+		pipelineStateStream.pRootSignature = m_rootSignature->GetD3D12RootSignature();
 		pipelineStateStream.InputLayout = VertexPositionNormalTexture::InputLayout;
 		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
@@ -181,36 +158,12 @@ namespace Bruno
 
 	void PlayerGame::OnUpdate(const GameTimer& timer)
 	{
-		// Update the model matrix.
-		static float TotalTime = 0.0f;
-		float          angle = static_cast<float>(TotalTime * 45.0);
-		const XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
-		//XMMATRIX       modelMatrix = XMMatrixIdentity();
-		XMMATRIX       modelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
 		//BR_CORE_TRACE << "delta time = " << timer.GetDeltaTime() << ". TotalTime " << TotalTime << std::endl;
-		TotalTime += timer.GetDeltaTime();
-
-		// Update the view matrix.
-		const XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
-		const XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
-		const XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
-		XMMATRIX       viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
-
-		// Update the projection matrix.
-		float    aspectRatio = m_surface->GetViewport().Width / m_surface->GetViewport().Height;
-		XMMATRIX projectionMatrix =
-			XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspectRatio, 0.1f, 1000.0f);
-		XMMATRIX mvpMatrix = XMMatrixMultiply(modelMatrix, viewMatrix);
-		mvpMatrix = XMMatrixMultiply(mvpMatrix, projectionMatrix);
-
-		ObjectBuffer objectBuffer;
-		XMStoreFloat4x4(&objectBuffer.m_world, mvpMatrix);
-
+		
 		auto commandQueue = m_device->GetCommandQueue();
 		commandQueue->WaitFrame();
 
-		int frameIndex = commandQueue->GetFrameIndex();
-		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
+		UpdateCBs(timer);
 	}
 
 	void PlayerGame::OnDraw()
@@ -239,7 +192,7 @@ namespace Bruno
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_device->GetSrvDescriptionHeap().GetHeap() };
 		commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
-		commandList->SetGraphicsRootSignature(m_rootSignature.Get());
+		commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
 		commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
 
 		for (auto& item : m_renderItems)
@@ -266,5 +219,34 @@ namespace Bruno
 			currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 		commandQueue->EndFrame(m_surface.get());
+	}
+
+	void PlayerGame::UpdateCBs(const GameTimer& timer)
+	{
+		auto commandQueue = m_device->GetCommandQueue();
+
+		// Update the model matrix.
+		static float TotalTime = 0.0f;
+		float          angle = static_cast<float>(TotalTime * 45.0);
+		
+		Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
+		TotalTime += timer.GetDeltaTime();
+
+		// Update the view matrix.
+		Math::Matrix viewMatrix = Math::Matrix::CreateLookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
+
+		// Update the projection matrix.
+		float    aspectRatio = m_surface->GetViewport().Width / m_surface->GetViewport().Height;
+		Math::Matrix projectionMatrix = Math::Matrix::CreatePerspectiveFieldOfView(Math::ConvertToRadians(45.0f),
+			aspectRatio, 0.1f, 100.0f);
+		
+		Math::Matrix mvpMatrix = modelMatrix * viewMatrix;
+		mvpMatrix = mvpMatrix * projectionMatrix;
+
+		ObjectBuffer objectBuffer;
+		objectBuffer.m_world = mvpMatrix;
+
+		int frameIndex = commandQueue->GetFrameIndex();
+		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
 	}
 }

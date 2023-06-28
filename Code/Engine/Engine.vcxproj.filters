@@ -22,6 +22,9 @@
     <Filter Include="Source\Bruno\Platform\DirectX">
       <UniqueIdentifier>{18329f70-4523-498a-aca8-ec3efe1dc4e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Bruno\Math">
+      <UniqueIdentifier>{b0f92797-1c0b-4ea9-94e6-c57b7c875b0c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -117,6 +120,9 @@
     <ClInclude Include="Source\Bruno\Core\GameTimer.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Math\Math.h">
+      <Filter>Source\Bruno\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -197,5 +203,13 @@
     <ClCompile Include="Source\Bruno\Core\GameTimer.cpp">
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Bruno\Math\Math.cpp">
+      <Filter>Source\Bruno\Math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\Bruno\Math\Math.inl">
+      <Filter>Source\Bruno\Math</Filter>
+    </None>
   </ItemGroup>
 </Project>

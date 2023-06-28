@@ -8,7 +8,7 @@ namespace Bruno
     {
         VertexPosition() = default;
 
-        explicit VertexPosition(const DirectX::XMFLOAT3& position)
+        explicit VertexPosition(const Math::Vector3& position)
             : Position(position)
         {}
 
@@ -17,7 +17,7 @@ namespace Bruno
             DirectX::XMStoreFloat3(&(this->Position), position);
         }
 
-        DirectX::XMFLOAT3 Position;
+        Math::Vector3 Position;
 
         static const D3D12_INPUT_LAYOUT_DESC InputLayout;
     private:
@@ -29,8 +29,8 @@ namespace Bruno
     {
         VertexPositionColor() = default;
 
-        explicit VertexPositionColor(const DirectX::XMFLOAT3& position, 
-            const DirectX::XMFLOAT3& color)
+        explicit VertexPositionColor(const Math::Vector3& position, 
+            const Math::Vector3& color)
             : Position(position),
               Color(color)
         {}
@@ -41,8 +41,8 @@ namespace Bruno
             DirectX::XMStoreFloat3(&(this->Color), color);
         }
 
-        DirectX::XMFLOAT3 Position;
-        DirectX::XMFLOAT3 Color;
+        Math::Vector3 Position;
+        Math::Vector3 Color;
 
         static const D3D12_INPUT_LAYOUT_DESC InputLayout;
     private:
@@ -54,8 +54,8 @@ namespace Bruno
     {
         VertexPositionNormalTexture() = default;
 
-        explicit VertexPositionNormalTexture(const DirectX::XMFLOAT3& position,
-            const DirectX::XMFLOAT3& normal, const DirectX::XMFLOAT2& texture)
+        explicit VertexPositionNormalTexture(const Math::Vector3& position,
+            const Math::Vector3& normal, const Math::Vector2& texture)
             :   Position(position),
             Normal(normal),
                 Texture(texture)
@@ -68,9 +68,9 @@ namespace Bruno
             DirectX::XMStoreFloat2(&(this->Texture), texture);
         }
 
-        DirectX::XMFLOAT3 Position;
-        DirectX::XMFLOAT3 Normal;
-        DirectX::XMFLOAT2 Texture;
+        Math::Vector3 Position;
+        Math::Vector3 Normal;
+        Math::Vector2 Texture;
 
         static const D3D12_INPUT_LAYOUT_DESC InputLayout;
     private:

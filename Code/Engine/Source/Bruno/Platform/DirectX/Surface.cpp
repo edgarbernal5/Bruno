@@ -100,6 +100,16 @@ namespace Bruno
 
 		if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
 		{
+#ifdef BR_DEBUG
+			char buffer[64] = {};
+			sprintf_s(buffer, "Device Lost on ResizeBuffers: Reason code 0x%08X\n",
+				static_cast<unsigned int>((hr == DXGI_ERROR_DEVICE_REMOVED) ? device->GetD3DDevice()->GetDeviceRemovedReason() : hr));
+			OutputDebugStringA(buffer);
+
+			BR_CORE_ERROR << buffer << std::endl;
+#endif
+			HandleDeviceLost();
+			return;
 		}
 		else
 		{
@@ -123,6 +133,11 @@ namespace Bruno
 		m_depthBuffer.reset(new DepthBuffer(backBufferWidth, backBufferHeight, m_parameters.DepthBufferFormat));
 
 		Finalize();
+	}
+
+	void Surface::HandleDeviceLost()
+	{
+
 	}
 
 	void Surface::Finalize()
