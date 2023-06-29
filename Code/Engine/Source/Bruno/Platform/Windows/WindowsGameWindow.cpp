@@ -284,14 +284,41 @@ namespace Bruno
 			PostQuitMessage(0);
 			break;
 
-		case WM_INPUT:
-		case WM_MOUSEMOVE:
 		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
 		case WM_MBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+		{
+			MouseButtonState btnState{};
+			btnState.LeftButton = (wParam & MK_LBUTTON) != 0;
+			btnState.RightButton = (wParam & MK_RBUTTON) != 0;
+			btnState.MiddleButton = (wParam & MK_MBUTTON) != 0;
+
+			window->m_game->OnMouseDown(btnState, ((int)(short)LOWORD(lParam)), ((int)(short)HIWORD(lParam)));
+			break;
+		}
+		case WM_MOUSEMOVE:
+		{
+			MouseButtonState btnState{};
+			btnState.LeftButton = (wParam & MK_LBUTTON) != 0;
+			btnState.RightButton = (wParam & MK_RBUTTON) != 0;
+			btnState.MiddleButton = (wParam & MK_MBUTTON) != 0;
+
+			window->m_game->OnMouseMove(btnState, ((int)(short)LOWORD(lParam)), ((int)(short)HIWORD(lParam)));
+			break;
+		}
+		case WM_LBUTTONUP:
 		case WM_MBUTTONUP:
+		case WM_RBUTTONUP:
+		{
+			MouseButtonState btnState{};
+			btnState.LeftButton = (wParam & MK_LBUTTON) != 0;
+			btnState.RightButton = (wParam & MK_RBUTTON) != 0;
+			btnState.MiddleButton = (wParam & MK_MBUTTON) != 0;
+			
+			window->m_game->OnMouseUp(btnState, ((int)(short)LOWORD(lParam)), ((int)(short)HIWORD(lParam)));
+			break;
+		}
+		case WM_INPUT:
 		case WM_MOUSEWHEEL:
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:

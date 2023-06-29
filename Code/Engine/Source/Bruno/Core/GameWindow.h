@@ -13,6 +13,14 @@ namespace Bruno
 		uint32_t Height = 600;
 	};
 
+	struct MouseButtonState
+	{
+		bool LeftButton : 1;
+		bool RightButton : 1;
+		bool MiddleButton : 1;
+
+	};
+
 #if BR_PLATFORM_WINDOWS
 	using WindowHandle = HWND;
 #else

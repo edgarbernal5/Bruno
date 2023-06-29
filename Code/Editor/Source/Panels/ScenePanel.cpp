@@ -66,7 +66,9 @@ namespace Bruno
 	ScenePanel::ScenePanel(nana::window window, EditorGame *editorGame, DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat) :
 		nana::nested_form(window, nana::appear::bald<>()),
 		m_backBufferFormat(backBufferFormat),
-		m_depthBufferFormat(depthBufferFormat)
+		m_depthBufferFormat(depthBufferFormat),
+
+		m_editorGame(editorGame)
 	{
 		this->caption("Scene");
 		this->bgcolor(nana::colors::dark_red);
@@ -83,17 +85,6 @@ namespace Bruno
 		3. crear el event code (event_code.hpp)
 		4. ver y analizar metodo bedrock::event_expose para emitir el evento
 		*/
-		this->events().unload([editorGame, this](const nana::arg_unload& args)
-		{
-			BR_CORE_TRACE << "Unload or close panel id = " << idxx << std::endl;
-			{
-				std::scoped_lock lock{ m_mutex };
-				auto device = Graphics::GetDevice();
-				device->GetCommandQueue()->Flush();
-			}
-
-			editorGame->RemoveScenePanel(this);
-		});
 
 		// Single-thread rendering.
 		//auto hwnd = reinterpret_cast<HWND>(this->native_handle());
@@ -108,37 +99,39 @@ namespace Bruno
 		
 		this->events().expose([this](const nana::arg_expose& args)
 		{
+			std::lock_guard lock{ m_mutex };
 			BR_CORE_TRACE << "Expose panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
 
-			std::scoped_lock lock{ m_mutex };
 			m_isExposed = args.exposed;
 		});
 
 		this->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
+			std::lock_guard lock{ m_mutex };
 			BR_CORE_TRACE << "enter_size_move /panel id = " << idxx << std::endl;
-			
-			std::scoped_lock lock{ m_mutex };
+
 			m_isSizingMoving = true;
 		});
 
 		this->events().exit_size_move([this](const nana::arg_size_move& args)
 		{
+			std::lock_guard lock{ m_mutex };
 			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
 
-			std::scoped_lock lock{ m_mutex };
 			if (m_surface)
 			{
 				m_surface->Resize(this->size().width, this->size().height);
 			}
+			m_camera.SetViewport(Math::Viewport(0, 0, (float)this->size().width, this->size().height));
+			m_camera.UpdateMatrices();
 			m_isSizingMoving = false;
 		});
 
 		this->events().resized([this](const nana::arg_resized& args)
 		{
+			std::lock_guard lock{ m_mutex };
 			BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << this->native_handle() << "." << args.width << "; " << args.height << std::endl;
 
-			std::scoped_lock lock{ m_mutex };
 			if (m_isSizingMoving)
 				return;
 
@@ -160,6 +153,8 @@ namespace Bruno
 				m_surface = std::make_unique<Surface>(parameters);
 				m_surface->Initialize();
 			}
+			m_camera.SetViewport(Math::Viewport(0, 0, args.width, args.height));
+			m_camera.UpdateMatrices();
 			m_isResizing = false;
 		});
 
@@ -237,26 +232,49 @@ namespace Bruno
 		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineStateStreamDesc);
 
 		{
-			std::scoped_lock lock{ m_mutex };
+			std::lock_guard lock{ m_mutex };
 			editorGame->AddScenePanel(this);
 		}
+
+		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
+		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0,0,1,1), 0.1f, 100.0f);
+
+		this->events().mouse_down([this](const nana::arg_mouse& args)
+		{
+			m_lastMousePosition.x = args.pos.x;
+			m_lastMousePosition.y = args.pos.y;
+		});
+		
+		this->events().mouse_move([this](const nana::arg_mouse& args)
+		{
+			Math::Int2 currentPosition = Math::Int2(args.pos.x, args.pos.y);
+			if (args.left_button)
+			{
+				m_camera.Rotate(currentPosition, m_lastMousePosition);
+				m_camera.UpdateMatrices();
+			}
+			m_lastMousePosition.x = args.pos.x;
+			m_lastMousePosition.y = args.pos.y;
+		});
 
 		this->show();
 	}
 
 	ScenePanel::~ScenePanel()
 	{
+		std::lock_guard lock{ m_mutex };
 		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
 
-		std::scoped_lock lock{ m_mutex };
 		auto device = Graphics::GetDevice();
 		device->GetCommandQueue()->Flush();
+
+		m_editorGame->RemoveScenePanel(this);
 	}
 	
 	void ScenePanel::OnUpdate(const GameTimer& timer)
 	{
 		//BR_CORE_TRACE << "Paint panel. id = " << idxx << ". delta time = " << timer.GetDeltaTime() << std::endl;
-		std::scoped_lock lock{ m_mutex };
+		std::lock_guard lock{ m_mutex };
 
 		if (!m_isExposed || m_isResizing || m_isSizingMoving)
 			return;
@@ -270,7 +288,7 @@ namespace Bruno
 
 	void ScenePanel::OnDraw()
 	{
-		std::scoped_lock lock{ m_mutex };
+		std::lock_guard lock{ m_mutex };
 
 		if (!m_isExposed || m_isResizing || m_isSizingMoving)
 			return;
@@ -332,7 +350,7 @@ namespace Bruno
 
 	bool ScenePanel::IsEnabled()
 	{
-		std::scoped_lock lock{ m_mutex };
+		std::lock_guard lock{ m_mutex };
 
 		return (m_isExposed && !m_isResizing && !m_isSizingMoving);
 	}
@@ -343,24 +361,17 @@ namespace Bruno
 		auto commandQueue = device->GetCommandQueue();
 
 		// Update the model matrix.
-		float angle = static_cast<float>(m_totalTime * 45.0);
+		//float angle = static_cast<float>(m_totalTime * 45.0);
+		float angle = static_cast<float>(0.0);
 
 		Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
+		//Math::Matrix modelMatrix = Math::Matrix::Identity;
 		m_totalTime += timer.GetDeltaTime();
 
-		// Update the view matrix.
-		Math::Matrix viewMatrix = Math::Matrix::CreateLookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
-
-		// Update the projection matrix.
-		float    aspectRatio = m_surface->GetViewport().Width / m_surface->GetViewport().Height;
-		Math::Matrix projectionMatrix = Math::Matrix::CreatePerspectiveFieldOfView(Math::ConvertToRadians(45.0f),
-			aspectRatio, 0.1f, 100.0f);
-
-		Math::Matrix mvpMatrix = modelMatrix * viewMatrix;
-		mvpMatrix = mvpMatrix * projectionMatrix;
+		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();;
 
 		ObjectBuffer objectBuffer;
-		objectBuffer.m_world = mvpMatrix;
+		objectBuffer.World = mvpMatrix;
 
 		int frameIndex = commandQueue->GetFrameIndex();
 		m_objectBuffer[frameIndex]->CopyData(objectBuffer);

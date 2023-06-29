@@ -87,10 +87,6 @@ namespace Bruno
 		OnDraw();
 	}
 
-	void Game::OnResize()
-	{
-	}
-
 	void Game::OnActivated()
 	{
 		m_gamePaused = false;

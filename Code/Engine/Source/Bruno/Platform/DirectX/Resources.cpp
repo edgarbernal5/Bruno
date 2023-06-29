@@ -7,7 +7,7 @@ namespace Bruno
 {
     DescriptorHandle DescriptorHeap::Allocate()
     {
-        //std::scoped_lock lock{ m_mutex };
+        //std::lock_guard lock{ m_mutex };
         BR_ASSERT(m_heap);
         BR_ASSERT(m_size < m_capacity);
 

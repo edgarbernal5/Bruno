@@ -47,7 +47,7 @@ namespace Bruno
 			m_data.Width = args.width;
 			m_game->OnResize();
 		});
-
+		
 		m_form->events().activate([this](const nana::arg_activate& args)
 		{	
 			if (args.activated)
@@ -66,6 +66,36 @@ namespace Bruno
 		m_form->events().exit_size_move([this](const nana::arg_size_move& args)
 		{
 			m_game->OnResizeMoveFinished();
+		});
+
+		m_form->events().mouse_down([this](const nana::arg_mouse& args)
+		{
+			MouseButtonState btnState{};
+			btnState.LeftButton = args.left_button;
+			btnState.RightButton = args.right_button;
+			btnState.MiddleButton = args.mid_button;
+
+			m_game->OnMouseDown(btnState, args.pos.x, args.pos.y);
+		});
+
+		m_form->events().mouse_move([this](const nana::arg_mouse& args)
+		{
+			MouseButtonState btnState{};
+			btnState.LeftButton = args.left_button;
+			btnState.RightButton = args.right_button;
+			btnState.MiddleButton = args.mid_button;
+
+			m_game->OnMouseMove(btnState, args.pos.x, args.pos.y);
+		});
+
+		m_form->events().mouse_up([this](const nana::arg_mouse& args)
+		{
+			MouseButtonState btnState{};
+			btnState.LeftButton = args.left_button;
+			btnState.RightButton = args.right_button;
+			btnState.MiddleButton = args.mid_button;
+
+			m_game->OnMouseUp(btnState, args.pos.x, args.pos.y);
 		});
 	}
 

@@ -15,6 +15,7 @@
 #include <Bruno/Platform/DirectX/ConstantBuffer.h>
 #include <mutex>
 #include <Bruno/Platform/DirectX/Texture.h>
+#include <Bruno/Renderer/Camera.h>
 
 namespace Bruno
 {
@@ -37,6 +38,7 @@ namespace Bruno
 		int idxx = 0;
 		DXGI_FORMAT m_backBufferFormat;
 		DXGI_FORMAT m_depthBufferFormat;
+		EditorGame* m_editorGame;
 		//Scene* m_scene;
 
 		std::unique_ptr<IndexBuffer> m_indexBuffer;
@@ -54,10 +56,13 @@ namespace Bruno
 
 		struct ObjectBuffer
 		{
-			DirectX::XMFLOAT4X4 m_world;
+			Math::Matrix World;
 		};
 		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAME_BUFFER_COUNT];
 
+		Camera m_camera;
+
+		Math::Int2 m_lastMousePosition;
 		bool m_isResizing = false;
 		bool m_isSizingMoving = false;
 		bool m_isExposed = false;

@@ -123,6 +123,9 @@
     <ClInclude Include="Source\Bruno\Math\Math.h">
       <Filter>Source\Bruno\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\Camera.h">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -205,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Math\Math.cpp">
       <Filter>Source\Bruno\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\Camera.cpp">
+      <Filter>Source\Bruno\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

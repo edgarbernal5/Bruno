@@ -27,8 +27,13 @@ namespace Bruno
 
 	void EditorGame::OnUpdate(const GameTimer& timer)
 	{
-		std::scoped_lock lock{ m_scenePanelsMutex };
-		for (auto panel : m_scenePanels)
+		std::vector<ScenePanel*> temp;
+		{
+			std::lock_guard lock{ m_scenePanelsMutex };
+			temp.reserve(m_scenePanels.size());
+			temp.assign(m_scenePanels.begin(), m_scenePanels.end());
+		}
+		for (auto panel : temp)
 		{
 			panel->OnUpdate(timer);
 		}
@@ -36,8 +41,13 @@ namespace Bruno
 
 	void EditorGame::OnDraw()
 	{
-		std::scoped_lock lock{ m_scenePanelsMutex };
-		for (auto panel : m_scenePanels)
+		std::vector<ScenePanel*> temp;
+		{
+			std::lock_guard lock{ m_scenePanelsMutex };
+			temp.reserve(m_scenePanels.size());
+			temp.assign(m_scenePanels.begin(), m_scenePanels.end());
+		}
+		for (auto panel : temp)
 		{
 			panel->OnDraw();
 		}
@@ -45,7 +55,7 @@ namespace Bruno
 
 	void EditorGame::AddScenePanel(ScenePanel* panel)
 	{
-		std::scoped_lock lock{ m_scenePanelsMutex };
+		std::lock_guard lock{ m_scenePanelsMutex };
 		
 		panel->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
@@ -61,7 +71,7 @@ namespace Bruno
 
 	void EditorGame::RemoveScenePanel(ScenePanel* panel)
 	{
-		std::scoped_lock lock{ m_scenePanelsMutex };
+		std::lock_guard lock{ m_scenePanelsMutex };
 
 		auto it = std::find(m_scenePanels.begin(), m_scenePanels.end(), panel);
 		if (it != m_scenePanels.end())
@@ -96,10 +106,10 @@ namespace Bruno
 		*/
 
 		m_place.dock<ScenePanel>("pane1", "f1", this);
-		m_place.dock<ScenePanel>("pane1", "f2", this);
+		//m_place.dock<ScenePanel>("pane1", "f2", this);
 		//m_place.dock<nana::button>("pane1", "f2", std::string("Button2"));
 		m_place.dock_create("f1");
-		m_place.dock_create("f2");
+		//m_place.dock_create("f2");
 		m_place.dock<nana::button>("pane2", "f3", std::string("Button3"));
 		m_place.dock_create("f3");
 

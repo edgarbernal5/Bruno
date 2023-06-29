@@ -147,6 +147,9 @@ namespace Bruno
 		};
 		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineStateStreamDesc);
 		
+		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
+		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
+		
 		m_gameWindow->Show();
 	}
 
@@ -154,6 +157,9 @@ namespace Bruno
 	{
 		// Resize screen dependent resources.
 		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
+		
+		m_camera.SetViewport(Math::Viewport(0, 0, m_surface->GetViewport().Width, m_surface->GetViewport().Height));
+		m_camera.UpdateMatrices();
 	}
 
 	void PlayerGame::OnUpdate(const GameTimer& timer)
@@ -221,30 +227,45 @@ namespace Bruno
 		commandQueue->EndFrame(m_surface.get());
 	}
 
+	void PlayerGame::OnMouseDown(MouseButtonState btnState, int x, int y)
+	{
+		m_lastMousePosition = Math::Int2(x, y);
+
+		SetCapture(m_gameWindow->GetHandle());
+	}
+
+	void PlayerGame::OnMouseMove(MouseButtonState btnState, int x, int y)
+	{
+		Math::Int2 currentPosition = Math::Int2(x, y);
+		if (btnState.LeftButton)
+		{
+			m_camera.Rotate(currentPosition, m_lastMousePosition);
+			m_camera.UpdateMatrices();
+		}
+		m_lastMousePosition = currentPosition;
+	}
+
+	void PlayerGame::OnMouseUp(MouseButtonState btnState, int x, int y)
+	{
+		ReleaseCapture();
+	}
+
 	void PlayerGame::UpdateCBs(const GameTimer& timer)
 	{
 		auto commandQueue = m_device->GetCommandQueue();
 
-		// Update the model matrix.
 		static float TotalTime = 0.0f;
-		float          angle = static_cast<float>(TotalTime * 45.0);
+		float angle = static_cast<float>(0.0);
+		//float angle = static_cast<float>(TotalTime * 45.0);
 		
-		Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
+		Math::Matrix modelMatrix = Math::Matrix::Identity;
+		//Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
 		TotalTime += timer.GetDeltaTime();
 
-		// Update the view matrix.
-		Math::Matrix viewMatrix = Math::Matrix::CreateLookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
-
-		// Update the projection matrix.
-		float    aspectRatio = m_surface->GetViewport().Width / m_surface->GetViewport().Height;
-		Math::Matrix projectionMatrix = Math::Matrix::CreatePerspectiveFieldOfView(Math::ConvertToRadians(45.0f),
-			aspectRatio, 0.1f, 100.0f);
-		
-		Math::Matrix mvpMatrix = modelMatrix * viewMatrix;
-		mvpMatrix = mvpMatrix * projectionMatrix;
+		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
 
 		ObjectBuffer objectBuffer;
-		objectBuffer.m_world = mvpMatrix;
+		objectBuffer.World = mvpMatrix;
 
 		int frameIndex = commandQueue->GetFrameIndex();
 		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
