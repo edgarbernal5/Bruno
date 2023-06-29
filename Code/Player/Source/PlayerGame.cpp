@@ -256,6 +256,13 @@ namespace Bruno
 		ReleaseCapture();
 	}
 
+	void PlayerGame::OnMouseWheel(MouseButtonState btnState, int x, int y, int wheelDelta) 
+	{
+		float zoom = -wheelDelta * 0.0025f;
+		m_camera.Zoom(zoom);
+		m_camera.UpdateMatrices();
+	}
+
 	void PlayerGame::UpdateCBs(const GameTimer& timer)
 	{
 		auto commandQueue = m_device->GetCommandQueue();

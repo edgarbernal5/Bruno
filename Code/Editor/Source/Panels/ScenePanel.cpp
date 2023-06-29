@@ -122,7 +122,7 @@ namespace Bruno
 			{
 				m_surface->Resize(this->size().width, this->size().height);
 			}
-			m_camera.SetViewport(Math::Viewport(0, 0, (float)this->size().width, this->size().height));
+			m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)this->size().width, (float)this->size().height));
 			m_camera.UpdateMatrices();
 			m_isSizingMoving = false;
 		});
@@ -153,7 +153,7 @@ namespace Bruno
 				m_surface = std::make_unique<Surface>(parameters);
 				m_surface->Initialize();
 			}
-			m_camera.SetViewport(Math::Viewport(0, 0, args.width, args.height));
+			m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.width, (float)args.height));
 			m_camera.UpdateMatrices();
 			m_isResizing = false;
 		});
@@ -232,7 +232,7 @@ namespace Bruno
 		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineStateStreamDesc);
 
 		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
-		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0,0,1,1), 0.1f, 100.0f);
+		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 0.1f, 100.0f);
 
 		this->events().mouse_down([this](const nana::arg_mouse& args)
 		{
@@ -250,6 +250,16 @@ namespace Bruno
 			}
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
+		});
+
+		this->events().mouse_wheel([this](const nana::arg_wheel& args)
+		{
+			BR_CORE_TRACE << "mouse wheel = " << args.distance << std::endl;
+			float zoom = args.distance * 0.0025f;
+			if (args.upwards) zoom = -zoom;
+
+			m_camera.Zoom(zoom);
+			m_camera.UpdateMatrices();
 		});
 
 		{

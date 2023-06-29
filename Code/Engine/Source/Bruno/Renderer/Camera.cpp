@@ -1,13 +1,10 @@
 #include "brpch.h"
 #include "Camera.h"
 
-
 namespace Bruno
 {
 	Camera::Camera() :
 		m_position{},
-		m_target{},
-		m_up{},
 		m_nearPlane{ 0.1f },
 		m_farPlane{ 100.0f },
 		m_fovY{ 100.0f },
@@ -34,7 +31,7 @@ namespace Bruno
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}*/
 
-	void Camera::Rotate(Math::Int2 mousePosition, Math::Int2 previousPosition)
+	void Camera::Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
 	{
 		auto mousePositionNDC = GetScreenCoordToNDC(mousePosition);
 		auto currentQRotation = GetNDCToArcBall(mousePositionNDC);
@@ -83,12 +80,14 @@ namespace Bruno
 		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
 	}
 
+	void Camera::Zoom(float delta)
+	{
+		m_zoom += delta;
+		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}
+
 	void Camera::LookAt(const Math::Vector3& position, const Math::Vector3& target, const Math::Vector3& up)
 	{
-		m_position = position;
-		m_target = target;
-		m_up = up;
-
 		auto direction = target - position;
 		auto zAxis = direction;
 		zAxis.Normalize();
@@ -105,6 +104,10 @@ namespace Bruno
 		auto rotationMatrix = Math::Matrix{
 			xAxis, yAxis, zAxis
 		};
+		rotationMatrix = rotationMatrix.Transpose();
+
+		m_position = -target;
+		m_zoom = direction.Length();
 
 		m_targetQRotation = Math::Quaternion::CreateFromRotationMatrix(rotationMatrix);
 		m_targetQRotation.Normalize();
@@ -127,7 +130,11 @@ namespace Bruno
 		if (m_states.ViewDirty)
 		{
 			auto rotationMatrix = Math::Matrix::CreateFromQuaternion(m_currentQRotation);
-			m_view = rotationMatrix * Math::Matrix::CreateTranslation(-m_position);
+
+			m_view = Math::Matrix::CreateTranslation(m_position) 
+				* rotationMatrix 
+				* Math::Matrix::CreateTranslation(Math::Vector3::UnitZ * m_zoom);
+			
 			m_inverseView = m_view.Invert();
 			m_states.ViewDirty = false;
 		}

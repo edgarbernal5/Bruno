@@ -54,6 +54,7 @@ namespace Bruno
 		virtual void OnMouseDown(MouseButtonState btnState, int x, int y) {}
 		virtual void OnMouseMove(MouseButtonState btnState, int x, int y) {}
 		virtual void OnMouseUp(MouseButtonState btnState, int x, int y) {}
+		virtual void OnMouseWheel(MouseButtonState btnState, int x, int y, int wheelDelta) {}
 
 		int m_framesThisSecond = 0;
 		int m_framesPerSecond = 0;

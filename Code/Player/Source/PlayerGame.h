@@ -29,6 +29,7 @@ namespace Bruno
 		void OnMouseDown(MouseButtonState btnState, int x, int y) override;
 		void OnMouseMove(MouseButtonState btnState, int x, int y) override;
 		void OnMouseUp(MouseButtonState btnState, int x, int y) override;
+		void OnMouseWheel(MouseButtonState btnState, int x, int y, int wheelDelta) override;
 
 	private:
 		std::unique_ptr<Surface> m_surface;

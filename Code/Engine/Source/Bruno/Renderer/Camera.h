@@ -25,15 +25,17 @@ namespace Bruno
 		void LookAt(const Math::Vector3& position, const Math::Vector3& target, const Math::Vector3& up);
 		void SetLens(float fovY, const Math::Viewport& viewport, float nearPlane, float farPlane);
 
-		void Rotate(Math::Int2 mousePosition, Math::Int2 previousPosition);
+		void Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition);
+		void Zoom(float delta);
 
 		void UpdateMatrices();
 
 	private:
 		Math::Vector3 m_position;
-		Math::Vector3 m_target;
-		Math::Vector3 m_up;
+		//Math::Vector3 m_target;
+		//Math::Vector3 m_up;
 
+		float m_zoom;
 		float m_nearPlane;
 		float m_farPlane;
 		float m_fovY;

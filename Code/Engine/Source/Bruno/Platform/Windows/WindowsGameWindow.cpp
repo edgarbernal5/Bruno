@@ -293,7 +293,10 @@ namespace Bruno
 			btnState.RightButton = (wParam & MK_RBUTTON) != 0;
 			btnState.MiddleButton = (wParam & MK_MBUTTON) != 0;
 
-			window->m_game->OnMouseDown(btnState, ((int)(short)LOWORD(lParam)), ((int)(short)HIWORD(lParam)));
+			int x = ((int)(short)LOWORD(lParam));
+			int y = ((int)(short)HIWORD(lParam));
+
+			window->m_game->OnMouseDown(btnState, x, y);
 			break;
 		}
 		case WM_MOUSEMOVE:
@@ -303,7 +306,10 @@ namespace Bruno
 			btnState.RightButton = (wParam & MK_RBUTTON) != 0;
 			btnState.MiddleButton = (wParam & MK_MBUTTON) != 0;
 
-			window->m_game->OnMouseMove(btnState, ((int)(short)LOWORD(lParam)), ((int)(short)HIWORD(lParam)));
+			int x = ((int)(short)LOWORD(lParam));
+			int y = ((int)(short)HIWORD(lParam));
+
+			window->m_game->OnMouseMove(btnState, x, y);
 			break;
 		}
 		case WM_LBUTTONUP:
@@ -314,12 +320,36 @@ namespace Bruno
 			btnState.LeftButton = (wParam & MK_LBUTTON) != 0;
 			btnState.RightButton = (wParam & MK_RBUTTON) != 0;
 			btnState.MiddleButton = (wParam & MK_MBUTTON) != 0;
-			
-			window->m_game->OnMouseUp(btnState, ((int)(short)LOWORD(lParam)), ((int)(short)HIWORD(lParam)));
+
+			int x = ((int)(short)LOWORD(lParam));
+			int y = ((int)(short)HIWORD(lParam));
+
+			window->m_game->OnMouseUp(btnState, x, y);
+			break;
+		}
+		case WM_MOUSEWHEEL:
+		{
+			int zoomDelta = ((int)(short)HIWORD(wParam));
+			short keyStates = (short)LOWORD(wParam);
+
+			MouseButtonState btnState{};
+			btnState.LeftButton = (keyStates & MK_LBUTTON) != 0;
+			btnState.RightButton = (keyStates & MK_RBUTTON) != 0;
+			btnState.MiddleButton = (keyStates & MK_MBUTTON) != 0;
+
+			int x = ((int)(short)LOWORD(lParam));
+			int y = ((int)(short)HIWORD(lParam));
+
+			// Convert the screen coordinates to client coordinates.
+			POINT screenToClientPoint;
+			screenToClientPoint.x = x;
+			screenToClientPoint.y = y;
+			::ScreenToClient(hWnd, &screenToClientPoint);
+
+			window->m_game->OnMouseWheel(btnState, (int)screenToClientPoint.x, (int)screenToClientPoint.y, zoomDelta);
 			break;
 		}
 		case WM_INPUT:
-		case WM_MOUSEWHEEL:
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
 		case WM_MOUSEHOVER:
