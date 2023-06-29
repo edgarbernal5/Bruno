@@ -158,8 +158,14 @@ namespace Bruno
 		// Resize screen dependent resources.
 		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
 		
-		m_camera.SetViewport(Math::Viewport(0, 0, m_surface->GetViewport().Width, m_surface->GetViewport().Height));
+		m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, m_gameWindow->GetWidth(), m_gameWindow->GetHeight()));
 		m_camera.UpdateMatrices();
+	}
+	
+	void PlayerGame::OnGameLoop(const GameTimer& timer)
+	{
+		OnUpdate(m_timer);
+		OnDraw();
 	}
 
 	void PlayerGame::OnUpdate(const GameTimer& timer)

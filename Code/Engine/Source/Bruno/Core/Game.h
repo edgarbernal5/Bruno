@@ -44,13 +44,12 @@ namespace Bruno
 
 		virtual void OnInitialize(const GameWindowParameters& windowParameters) = 0;
 
-		virtual void OnUpdate(const GameTimer& timer) = 0;
-		virtual void OnDraw() = 0;
 		virtual void OnResize() {}
 		virtual void OnActivated();
 		virtual void OnDeactivated();
 		virtual void OnResizeMoveStarted();
 		virtual void OnResizeMoveFinished();
+		virtual void OnGameLoop(const GameTimer& timer) = 0;
 
 		virtual void OnMouseDown(MouseButtonState btnState, int x, int y) {}
 		virtual void OnMouseMove(MouseButtonState btnState, int x, int y) {}

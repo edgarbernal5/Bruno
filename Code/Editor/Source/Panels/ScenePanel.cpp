@@ -231,11 +231,6 @@ namespace Bruno
 		};
 		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineStateStreamDesc);
 
-		{
-			std::lock_guard lock{ m_mutex };
-			editorGame->AddScenePanel(this);
-		}
-
 		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0,0,1,1), 0.1f, 100.0f);
 
@@ -256,6 +251,11 @@ namespace Bruno
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
 		});
+
+		{
+			std::lock_guard lock{ m_mutex };
+			editorGame->AddScenePanel(this);
+		}
 
 		this->show();
 	}
@@ -368,7 +368,7 @@ namespace Bruno
 		//Math::Matrix modelMatrix = Math::Matrix::Identity;
 		m_totalTime += timer.GetDeltaTime();
 
-		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();;
+		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
 
 		ObjectBuffer objectBuffer;
 		objectBuffer.World = mvpMatrix;

@@ -22,8 +22,9 @@ namespace Bruno
 	protected:
 		void OnInitialize(const GameWindowParameters& windowParameters) override;
 		void OnResize() override;
-		void OnUpdate(const GameTimer& timer) override;
-		void OnDraw() override;
+		void OnGameLoop(const GameTimer& timer) override;
+		void OnUpdate(const GameTimer& timer);
+		void OnDraw();
 
 		void OnMouseDown(MouseButtonState btnState, int x, int y) override;
 		void OnMouseMove(MouseButtonState btnState, int x, int y) override;

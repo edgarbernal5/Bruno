@@ -83,8 +83,7 @@ namespace Bruno
 			BR_CORE_TRACE << "FPS: " << m_framesPerSecond << std::endl;
 		}
 
-		OnUpdate(m_timer);
-		OnDraw();
+		OnGameLoop(m_timer);
 	}
 
 	void Game::OnActivated()

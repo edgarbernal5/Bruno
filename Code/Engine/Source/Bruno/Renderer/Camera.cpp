@@ -4,28 +4,21 @@
 
 namespace Bruno
 {
-	Camera::Camera()
+	Camera::Camera() :
+		m_position{},
+		m_target{},
+		m_up{},
+		m_nearPlane{ 0.1f },
+		m_farPlane{ 100.0f },
+		m_fovY{ 100.0f },
+
+		m_viewport{ 0, 0, 1, 1 }
 	{
 	}
 
-	void Camera::SetPosition(const Math::Vector3& position)
+	/*void Camera::SetPosition(const Math::Vector3& position)
 	{
 		m_position = position;
-		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
-	}
-
-	void Camera::Rotate(Math::Int2 mousePosition, Math::Int2 previousPosition)
-	{
-		auto mousePositionNDC = GetScreenCoordToNDC(mousePosition);
-		auto currentQRotation = GetNDCToArcBall(mousePositionNDC);
-		
-		auto previousmousePositionNDC = GetScreenCoordToNDC(previousPosition);
-		auto previousQRotation = GetNDCToArcBall(previousmousePositionNDC);
-
-		m_targetQRotation = (m_targetQRotation * previousQRotation * currentQRotation);
-		m_targetQRotation.Normalize();
-
-		m_currentQRotation = Math::Quaternion::Slerp(m_currentQRotation, m_targetQRotation, 0.9f);
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}
 
@@ -39,10 +32,26 @@ namespace Bruno
 	{
 		m_up = up;
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}*/
+
+	void Camera::Rotate(Math::Int2 mousePosition, Math::Int2 previousPosition)
+	{
+		auto mousePositionNDC = GetScreenCoordToNDC(mousePosition);
+		auto currentQRotation = GetNDCToArcBall(mousePositionNDC);
+
+		auto previousmousePositionNDC = GetScreenCoordToNDC(previousPosition);
+		auto previousQRotation = GetNDCToArcBall(previousmousePositionNDC);
+
+		m_targetQRotation = (m_targetQRotation * previousQRotation * currentQRotation);
+		m_targetQRotation.Normalize();
+
+		m_currentQRotation = Math::Quaternion::Slerp(m_currentQRotation, m_targetQRotation, 0.9f);
+		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}
 
 	Math::Vector2 Camera::GetScreenCoordToNDC(const Math::Int2& mousePosition)
 	{
+		//NDC position must be in [-1, -1] to [1, 1].
 		return 
 		{
 			1.0f - mousePosition.x * 2.0f / m_viewport.width,
@@ -117,9 +126,9 @@ namespace Bruno
 	{
 		if (m_states.ViewDirty)
 		{
-			//m_view = Math::Matrix::CreateLookAt(m_position, m_target, m_up);
 			auto rotationMatrix = Math::Matrix::CreateFromQuaternion(m_currentQRotation);
 			m_view = rotationMatrix * Math::Matrix::CreateTranslation(-m_position);
+			m_inverseView = m_view.Invert();
 			m_states.ViewDirty = false;
 		}
 
