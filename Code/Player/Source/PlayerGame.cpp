@@ -148,7 +148,7 @@ namespace Bruno
 		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineStateStreamDesc);
 		
 		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
-		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
+		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
 		
 		m_gameWindow->Show();
 	}
@@ -248,6 +248,16 @@ namespace Bruno
 			m_camera.Rotate(currentPosition, m_lastMousePosition);
 			m_camera.UpdateMatrices();
 		}
+		else if (btnState.MiddleButton)
+		{
+			m_camera.HandTool(currentPosition, m_lastMousePosition);
+			m_camera.UpdateMatrices();
+		}
+		else  if (btnState.RightButton)
+		{
+			m_camera.PitchYaw(currentPosition, m_lastMousePosition);
+			m_camera.UpdateMatrices();
+		}
 		m_lastMousePosition = currentPosition;
 	}
 
@@ -258,7 +268,7 @@ namespace Bruno
 
 	void PlayerGame::OnMouseWheel(MouseButtonState btnState, int x, int y, int wheelDelta) 
 	{
-		float zoom = -wheelDelta * 0.0025f;
+		float zoom = wheelDelta * 0.0025f;
 		m_camera.Zoom(zoom);
 		m_camera.UpdateMatrices();
 	}

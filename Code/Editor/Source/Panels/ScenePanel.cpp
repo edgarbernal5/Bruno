@@ -248,15 +248,24 @@ namespace Bruno
 				m_camera.Rotate(currentPosition, m_lastMousePosition);
 				m_camera.UpdateMatrices();
 			}
+			else if (args.mid_button)
+			{
+				m_camera.HandTool(currentPosition, m_lastMousePosition);
+				m_camera.UpdateMatrices();
+			}
+			else if (args.right_button)
+			{
+				m_camera.PitchYaw(currentPosition, m_lastMousePosition);
+				m_camera.UpdateMatrices();
+			}
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
 		});
 
 		this->events().mouse_wheel([this](const nana::arg_wheel& args)
 		{
-			BR_CORE_TRACE << "mouse wheel = " << args.distance << std::endl;
 			float zoom = args.distance * 0.0025f;
-			if (args.upwards) zoom = -zoom;
+			if (!args.upwards) zoom = -zoom;
 
 			m_camera.Zoom(zoom);
 			m_camera.UpdateMatrices();

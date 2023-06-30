@@ -13,65 +13,34 @@ namespace Bruno
 	{
 	}
 
-	/*void Camera::SetPosition(const Math::Vector3& position)
-	{
-		m_position = position;
-		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
-	}
-
-	void Camera::SetTarget(const Math::Vector3& target)
-	{
-		m_target = target;
-		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
-	}
-
-	void Camera::SetUp(const Math::Vector3& up)
-	{
-		m_up = up;
-		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
-	}*/
-
 	void Camera::Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
 	{
-		auto mousePositionNDC = GetScreenCoordToNDC(mousePosition);
-		auto currentQRotation = GetNDCToArcBall(mousePositionNDC);
+		Math::Vector2 deltaAngles(2.0f * DirectX::XM_PI / m_viewport.width, DirectX::XM_PI / m_viewport.height);
+		Math::Vector2 mouseVelocity(mousePosition.x - previousPosition.x, mousePosition.y - previousPosition.y);
+		auto angles = mouseVelocity * deltaAngles;
 
-		auto previousmousePositionNDC = GetScreenCoordToNDC(previousPosition);
-		auto previousQRotation = GetNDCToArcBall(previousmousePositionNDC);
+		auto zAxis = m_target - m_position;
+		zAxis.Normalize();
 
-		m_targetQRotation = (m_targetQRotation * previousQRotation * currentQRotation);
-		m_targetQRotation.Normalize();
+		auto xAxis = m_up.Cross(zAxis);
+		xAxis.Normalize();
 
-		m_currentQRotation = Math::Quaternion::Slerp(m_currentQRotation, m_targetQRotation, 0.9f);
+		auto yAxis = zAxis.Cross(xAxis);
+		yAxis.Normalize();
+
+		xAxis = yAxis.Cross(zAxis);
+		xAxis.Normalize();
+
+		auto rotationMatrixX = Math::Matrix::CreateFromAxisAngle(xAxis, (angles.y));
+		auto position = Math::Vector3::Transform(m_position - m_target, rotationMatrixX) + m_target;
+
+		auto rotationMatrixY = Math::Matrix::CreateFromAxisAngle(yAxis, (angles.x));
+		position = Math::Vector3::Transform(position - m_target, rotationMatrixY) + m_target;
+
+		m_position = position;
+		m_up = Math::Vector3::TransformNormal(yAxis, rotationMatrixX);
+		m_up = Math::Vector3::TransformNormal(m_up, rotationMatrixY);
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
-	}
-
-	Math::Vector2 Camera::GetScreenCoordToNDC(const Math::Int2& mousePosition)
-	{
-		//NDC position must be in [-1, -1] to [1, 1].
-		return 
-		{
-			1.0f - mousePosition.x * 2.0f / m_viewport.width,
-				2.0f * mousePosition.y / m_viewport.height - 1.0f
-		};
-	}
-
-	Math::Quaternion Camera::GetNDCToArcBall(const Math::Vector2& point)
-	{
-		const float dist = point.Dot(point);
-
-		if (dist <= 1.0f)
-		{
-			return {
-				point.x, point.y, std::sqrtf(1.0f - dist), 0.0f
-			};
-		}
-		Math::Vector2 proj = point;
-		proj.Normalize();
-
-		return {
-			proj.x, proj.y, 0.0f, 0.0f
-		};
 	}
 
 	void Camera::SetViewport(const Math::Viewport& viewport)
@@ -80,9 +49,66 @@ namespace Bruno
 		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
 	}
 
+	void Camera::HandTool(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
+	{
+		Math::Vector2 mouseVelocity(mousePosition.x - previousPosition.x, mousePosition.y - previousPosition.y);
+		
+		auto zAxis = m_target - m_position;
+		zAxis.Normalize();
+
+		auto xAxis = m_up.Cross(zAxis);
+		xAxis.Normalize();
+
+		auto deltaMovement = xAxis * mouseVelocity.x * 0.1f - m_up * mouseVelocity.y * 0.1f;
+		m_position += deltaMovement;
+		m_target += deltaMovement;
+
+		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}
+
+	void Camera::PitchYaw(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
+	{
+		Math::Vector2 deltaAngles(2.0f * DirectX::XM_PI / m_viewport.width, DirectX::XM_PI / m_viewport.height);
+		Math::Vector2 mouseVelocity(mousePosition.x - previousPosition.x, mousePosition.y - previousPosition.y);
+		auto angles = mouseVelocity * deltaAngles;
+		
+		auto zAxis = m_target - m_position;
+		float distance = zAxis.Length();
+		zAxis.Normalize();
+
+		auto xAxis = m_up.Cross(zAxis);
+		xAxis.Normalize();
+
+		auto yAxis = zAxis.Cross(xAxis);
+		yAxis.Normalize();
+
+		xAxis = yAxis.Cross(zAxis);
+		xAxis.Normalize();
+
+		auto rotationMatrixPitch = Math::Matrix::CreateFromAxisAngle(xAxis, (angles.y));
+		yAxis = Math::Vector3::TransformNormal(yAxis, rotationMatrixPitch);
+		zAxis = Math::Vector3::TransformNormal(zAxis, rotationMatrixPitch);
+
+		auto rotationMatrixYaw = Math::Matrix::CreateRotationY((angles.x));
+		xAxis = Math::Vector3::TransformNormal(xAxis, rotationMatrixYaw);
+		yAxis = Math::Vector3::TransformNormal(yAxis, rotationMatrixYaw);
+		zAxis = Math::Vector3::TransformNormal(zAxis, rotationMatrixYaw);
+
+		m_target = m_position + zAxis * distance;
+		m_up = yAxis;
+		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}
+
 	void Camera::Zoom(float delta)
 	{
-		m_zoom += delta;
+		auto zAxis = m_target - m_position;
+		zAxis.Normalize();
+		auto newPosition = m_position + zAxis * delta;
+
+		if (Math::Vector3::DistanceSquared(newPosition, m_target) < 0.25f)
+			return;
+
+		m_position = newPosition;
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}
 
@@ -101,18 +127,10 @@ namespace Bruno
 		xAxis = yAxis.Cross(zAxis);
 		xAxis.Normalize();
 
-		auto rotationMatrix = Math::Matrix{
-			xAxis, yAxis, zAxis
-		};
-		rotationMatrix = rotationMatrix.Transpose();
+		m_position = position;
+		m_target = target;
+		m_up = yAxis;
 
-		m_position = -target;
-		m_zoom = direction.Length();
-
-		m_targetQRotation = Math::Quaternion::CreateFromRotationMatrix(rotationMatrix);
-		m_targetQRotation.Normalize();
-
-		m_currentQRotation = m_targetQRotation;
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}
 	
@@ -129,11 +147,7 @@ namespace Bruno
 	{
 		if (m_states.ViewDirty)
 		{
-			auto rotationMatrix = Math::Matrix::CreateFromQuaternion(m_currentQRotation);
-
-			m_view = Math::Matrix::CreateTranslation(m_position) 
-				* rotationMatrix 
-				* Math::Matrix::CreateTranslation(Math::Vector3::UnitZ * m_zoom);
+			m_view = Math::Matrix::CreateLookAt(m_position, m_target, m_up);
 			
 			m_inverseView = m_view.Invert();
 			m_states.ViewDirty = false;

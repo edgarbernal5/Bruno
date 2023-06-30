@@ -46,6 +46,7 @@ namespace Bruno::Math
         return 1.0f;
     }
 
+    struct Int2;
     struct Vector2;
     struct Vector4;
     struct Matrix;
@@ -381,6 +382,8 @@ namespace Bruno::Math
         static const Vector3 Left;
         static const Vector3 Forward;
         static const Vector3 Backward;
+
+        friend std::ostream& operator<<(std::ostream& os, const Vector3& V);
     };
 
     // Binary operators

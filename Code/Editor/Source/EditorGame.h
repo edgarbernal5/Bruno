@@ -27,8 +27,8 @@ namespace Bruno
 	private:
 		nana::menubar m_menubar;
 		nana::place m_place;
-		std::vector<ScenePanel*> m_scenePanels;
 
+		std::vector<ScenePanel*> m_scenePanels;
 		std::mutex m_scenePanelsMutex{};
 
 		void AddScenePanel(ScenePanel* panel);

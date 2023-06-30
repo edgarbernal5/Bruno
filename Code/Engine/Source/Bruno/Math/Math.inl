@@ -166,7 +166,6 @@ inline bool Int2::operator != (const Int2& V) const noexcept
     return XMVector2NotEqual(v1, v2);
 }
 
-
 inline std::ostream& operator<<(std::ostream& os, const Int2& V)
 {
     os << V.x << " / " << V.y;
@@ -954,6 +953,12 @@ inline Vector3& Vector3::operator/= (float S) noexcept
     const XMVECTOR X = XMVectorScale(v1, 1.f / S);
     XMStoreFloat3(this, X);
     return *this;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const Vector3& V)
+{
+    os << V.x << " / " << V.y << " / " << V.z;
+    return os;
 }
 
 //------------------------------------------------------------------------------
