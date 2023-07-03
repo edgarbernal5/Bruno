@@ -4,6 +4,7 @@
 #include "Bruno/Core/GameTimer.h"
 
 #include "Bruno/Core/GameWindow.h"
+#include "Bruno/Core/KeyCodes.h"
 
 #include <cstdint>
 #include <string>
@@ -55,6 +56,8 @@ namespace Bruno
 		virtual void OnMouseMove(MouseButtonState btnState, int x, int y) {}
 		virtual void OnMouseUp(MouseButtonState btnState, int x, int y) {}
 		virtual void OnMouseWheel(MouseButtonState btnState, int x, int y, int wheelDelta) {}
+		virtual void OnKeyPressed(KeyCode key, KeyboardState state) {}
+		virtual void OnKeyReleased(KeyCode key, KeyboardState state) {}
 
 		int m_framesThisSecond = 0;
 		int m_framesPerSecond = 0;

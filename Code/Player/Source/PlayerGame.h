@@ -31,6 +31,8 @@ namespace Bruno
 		void OnMouseUp(MouseButtonState btnState, int x, int y) override;
 		void OnMouseWheel(MouseButtonState btnState, int x, int y, int wheelDelta) override;
 
+		void OnKeyPressed(KeyCode key, KeyboardState state) override;
+		void OnKeyReleased(KeyCode key, KeyboardState state) override;
 	private:
 		std::unique_ptr<Surface> m_surface;
 		std::unique_ptr<Shader> m_vertexShader;

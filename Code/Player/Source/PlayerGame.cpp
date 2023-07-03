@@ -158,7 +158,7 @@ namespace Bruno
 		// Resize screen dependent resources.
 		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
 		
-		m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, m_gameWindow->GetWidth(), m_gameWindow->GetHeight()));
+		m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)m_gameWindow->GetWidth(), (float)m_gameWindow->GetHeight()));
 		m_camera.UpdateMatrices();
 	}
 	
@@ -253,7 +253,7 @@ namespace Bruno
 			m_camera.HandTool(currentPosition, m_lastMousePosition);
 			m_camera.UpdateMatrices();
 		}
-		else  if (btnState.RightButton)
+		else if (btnState.RightButton)
 		{
 			m_camera.PitchYaw(currentPosition, m_lastMousePosition);
 			m_camera.UpdateMatrices();
@@ -271,6 +271,36 @@ namespace Bruno
 		float zoom = wheelDelta * 0.0025f;
 		m_camera.Zoom(zoom);
 		m_camera.UpdateMatrices();
+	}
+
+	void PlayerGame::OnKeyPressed(KeyCode key, KeyboardState state)
+	{
+		//BR_CORE_TRACE << "key pressed: " << (uint8_t)key << ". alt " << state.Alt << ". ctrl " << state.Ctrl << ". shift " << state.Shift << std::endl;
+		if (key == KeyCode::A)
+		{
+			m_camera.Strafe(-0.25f);
+			m_camera.UpdateMatrices();
+		}
+		else if (key == KeyCode::D)
+		{
+			m_camera.Strafe(0.25f);
+			m_camera.UpdateMatrices();
+		}
+		else if (key == KeyCode::W)
+		{
+			m_camera.Walk(0.25f);
+			m_camera.UpdateMatrices();
+		}
+		else if (key == KeyCode::S)
+		{
+			m_camera.Walk(-0.25f);
+			m_camera.UpdateMatrices();
+		}
+	}
+
+	void PlayerGame::OnKeyReleased(KeyCode key, KeyboardState state)
+	{
+		//BR_CORE_TRACE << "key released: " << (uint8_t)key << ". alt " << state.Alt << ". ctrl " << state.Ctrl << ". shift " << state.Shift << std::endl;
 	}
 
 	void PlayerGame::UpdateCBs(const GameTimer& timer)

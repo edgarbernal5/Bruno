@@ -21,6 +21,8 @@ namespace Bruno
 		void Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition);
 		void PitchYaw(const Math::Int2& mousePosition, const Math::Int2& previousPosition);
 		void Zoom(float delta);
+		void Strafe(float delta);
+		void Walk(float delta);
 
 		void UpdateMatrices();
 

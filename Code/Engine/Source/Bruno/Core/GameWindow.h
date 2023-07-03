@@ -4,6 +4,8 @@
 #include <Windows.h>
 #endif
 
+#include <Bruno/Core/KeyCodes.h>
+
 namespace Bruno
 {
 	struct GameWindowParameters
@@ -11,14 +13,6 @@ namespace Bruno
 		std::string Title;
 		uint32_t Width = 800;
 		uint32_t Height = 600;
-	};
-
-	struct MouseButtonState
-	{
-		bool LeftButton : 1;
-		bool RightButton : 1;
-		bool MiddleButton : 1;
-
 	};
 
 #if BR_PLATFORM_WINDOWS

@@ -67,12 +67,12 @@ namespace Bruno
 		m_hwnd = CreateWindowEx
 		(
 			0,
-			L"BrunoEngineClass", 
-			m_mainWndTitle.c_str(), 
+			L"BrunoEngineClass",
+			m_mainWndTitle.c_str(),
 			WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT, 
-			CW_USEDEFAULT, 
-			windowRect.right - windowRect.left, 
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			windowRect.right - windowRect.left,
 			windowRect.bottom - windowRect.top,
 			nullptr,			// We have no parent window.
 			nullptr,			// We aren't using menus.
@@ -357,13 +357,31 @@ namespace Bruno
 
 		case WM_KEYDOWN:
 		case WM_KEYUP:
-		case WM_SYSKEYUP:
-			break;
-
 		case WM_SYSKEYDOWN:
+		case WM_SYSKEYUP:
+		{
+			WORD vkCode = LOWORD(wParam);
+
+			KeyboardState btnState{};
+			btnState.Alt = (0 != (::GetKeyState(VK_MENU) & 0x80));
+			btnState.Ctrl = (0 != (::GetKeyState(VK_CONTROL) & 0x80));
+			btnState.Shift = (0 != (::GetKeyState(VK_SHIFT) & 0x80));
+			WORD keyFlags = HIWORD(lParam);
+
+			BOOL isKeyReleased = (keyFlags & KF_UP) == KF_UP;
+
+			KeyCode keycode = static_cast<KeyCode>(vkCode);
+			if (isKeyReleased)
+			{
+				window->m_game->OnKeyReleased(keycode, btnState);
+			}
+			else
+			{
+				window->m_game->OnKeyPressed(keycode, btnState);
+			}
 			break;
 		}
-
+		}
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 }

@@ -103,6 +103,8 @@ namespace Bruno
 			BR_CORE_TRACE << "Expose panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
 
 			m_isExposed = args.exposed;
+			if (args.exposed) 
+				this->focus();
 		});
 
 		this->events().enter_size_move([this](const nana::arg_size_move& args)
@@ -271,10 +273,31 @@ namespace Bruno
 			m_camera.UpdateMatrices();
 		});
 
+		this->events().key_press([this](const nana::arg_keyboard& args)
 		{
-			std::lock_guard lock{ m_mutex };
-			editorGame->AddScenePanel(this);
-		}
+			if (args.key == 'A')
+			{
+				m_camera.Strafe(-0.25f);
+				m_camera.UpdateMatrices();
+			}
+			else if (args.key == 'D')
+			{
+				m_camera.Strafe(0.25f);
+				m_camera.UpdateMatrices();
+			}
+			else if (args.key == 'W')
+			{
+				m_camera.Walk(0.25f);
+				m_camera.UpdateMatrices();
+			}
+			else if (args.key == 'S')
+			{
+				m_camera.Walk(-0.25f);
+				m_camera.UpdateMatrices();
+			}
+		});
+
+		editorGame->AddScenePanel(this);
 
 		this->show();
 	}

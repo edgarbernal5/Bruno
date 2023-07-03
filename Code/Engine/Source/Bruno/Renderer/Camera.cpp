@@ -31,15 +31,15 @@ namespace Bruno
 		xAxis = yAxis.Cross(zAxis);
 		xAxis.Normalize();
 
-		auto rotationMatrixX = Math::Matrix::CreateFromAxisAngle(xAxis, (angles.y));
-		auto position = Math::Vector3::Transform(m_position - m_target, rotationMatrixX) + m_target;
+		auto rotationMatrixPitch = Math::Matrix::CreateFromAxisAngle(xAxis, angles.y);
+		auto position = Math::Vector3::Transform(m_position - m_target, rotationMatrixPitch) + m_target;
 
-		auto rotationMatrixY = Math::Matrix::CreateFromAxisAngle(yAxis, (angles.x));
-		position = Math::Vector3::Transform(position - m_target, rotationMatrixY) + m_target;
+		auto rotationMatrixYaw = Math::Matrix::CreateFromAxisAngle(yAxis, angles.x);
+		position = Math::Vector3::Transform(position - m_target, rotationMatrixYaw) + m_target;
 
 		m_position = position;
-		m_up = Math::Vector3::TransformNormal(yAxis, rotationMatrixX);
-		m_up = Math::Vector3::TransformNormal(m_up, rotationMatrixY);
+		m_up = Math::Vector3::TransformNormal(yAxis, rotationMatrixPitch);
+		m_up = Math::Vector3::TransformNormal(m_up, rotationMatrixYaw);
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}
 
@@ -59,7 +59,7 @@ namespace Bruno
 		auto xAxis = m_up.Cross(zAxis);
 		xAxis.Normalize();
 
-		auto deltaMovement = xAxis * mouseVelocity.x * 0.1f - m_up * mouseVelocity.y * 0.1f;
+		auto deltaMovement = xAxis * mouseVelocity.x * 0.01f - m_up * mouseVelocity.y * 0.01f;
 		m_position += deltaMovement;
 		m_target += deltaMovement;
 
@@ -85,17 +85,43 @@ namespace Bruno
 		xAxis = yAxis.Cross(zAxis);
 		xAxis.Normalize();
 
-		auto rotationMatrixPitch = Math::Matrix::CreateFromAxisAngle(xAxis, (angles.y));
+		auto rotationMatrixPitch = Math::Matrix::CreateFromAxisAngle(xAxis, angles.y);
 		yAxis = Math::Vector3::TransformNormal(yAxis, rotationMatrixPitch);
 		zAxis = Math::Vector3::TransformNormal(zAxis, rotationMatrixPitch);
 
-		auto rotationMatrixYaw = Math::Matrix::CreateRotationY((angles.x));
+		auto rotationMatrixYaw = Math::Matrix::CreateRotationY(angles.x);
 		xAxis = Math::Vector3::TransformNormal(xAxis, rotationMatrixYaw);
 		yAxis = Math::Vector3::TransformNormal(yAxis, rotationMatrixYaw);
 		zAxis = Math::Vector3::TransformNormal(zAxis, rotationMatrixYaw);
 
 		m_target = m_position + zAxis * distance;
 		m_up = yAxis;
+
+		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}
+
+	void Camera::Strafe(float delta)
+	{
+		auto zAxis = m_target - m_position;
+		zAxis.Normalize();
+
+		auto xAxis = m_up.Cross(zAxis);
+		xAxis.Normalize();
+
+		m_position += xAxis * delta;
+		m_target += xAxis * delta;
+
+		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}
+
+	void Camera::Walk(float delta)
+	{
+		auto zAxis = m_target - m_position;
+		zAxis.Normalize();
+
+		m_position += zAxis * delta;
+		m_target += zAxis * delta;
+
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}
 

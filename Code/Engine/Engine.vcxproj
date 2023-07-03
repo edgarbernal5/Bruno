@@ -84,6 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Bruno\Core\KeyCodes.h" />
     <ClInclude Include="Source\Bruno\Core\Assert.h" />
     <ClInclude Include="Source\Bruno\Core\Base.h" />
     <ClInclude Include="Source\Bruno\Core\GameTimer.h" />
