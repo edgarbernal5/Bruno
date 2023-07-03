@@ -103,8 +103,8 @@ namespace Bruno
 			BR_CORE_TRACE << "Expose panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
 
 			m_isExposed = args.exposed;
-			if (args.exposed) 
-				this->focus();
+			/*if (args.exposed) 
+				this->focus();*/
 		});
 
 		this->events().enter_size_move([this](const nana::arg_size_move& args)
@@ -240,11 +240,12 @@ namespace Bruno
 		{
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
+
+			set_capture(true);
 		});
-		
 		this->events().mouse_move([this](const nana::arg_mouse& args)
 		{
-			Math::Int2 currentPosition = Math::Int2(args.pos.x, args.pos.y);
+			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
 			if (args.left_button)
 			{
 				m_camera.Rotate(currentPosition, m_lastMousePosition);
@@ -262,6 +263,11 @@ namespace Bruno
 			}
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
+		});
+
+		this->events().mouse_up([this](const nana::arg_mouse& args)
+		{
+			release_capture();
 		});
 
 		this->events().mouse_wheel([this](const nana::arg_wheel& args)

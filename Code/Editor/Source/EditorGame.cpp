@@ -93,12 +93,12 @@ namespace Bruno
 		*/
 
 		m_place.dock<ScenePanel>("pane1", "f1", this);
-		//m_place.dock<ScenePanel>("pane2", "f3", this);
+		m_place.dock<ScenePanel>("pane2", "f3", this);
 		m_place.dock<nana::button>("pane1", "f2", std::string("Button2"));
 		m_place.dock_create("f1");
 		m_place.dock_create("f2");
 		//m_place.dock<nana::button>("pane2", "f3", std::string("Button3"));
-		//m_place.dock_create("f3");
+		m_place.dock_create("f3");
 
 		m_place.collocate();
 
