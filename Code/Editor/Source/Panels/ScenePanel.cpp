@@ -64,13 +64,14 @@ namespace Bruno
 	};
 
 	ScenePanel::ScenePanel(nana::window window, EditorGame *editorGame, DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat) :
-		//nana::nested_form(window, nana::appear::bald<>()),
-		nana::panel<true>(window),
+		nana::nested_form(window, nana::appear::bald<>()),
+		//nana::panel<true>(window),
 		m_backBufferFormat(backBufferFormat),
 		m_depthBufferFormat(depthBufferFormat),
 
 		m_editorGame(editorGame)
 	{
+		m_form = this;
 		static int idx = 0;
 		idx++;
 		idxx = idx;
@@ -80,7 +81,7 @@ namespace Bruno
 		this->caption(idstr.str());
 		this->bgcolor(nana::colors::dark_red);
 
-		m_form = std::make_unique<nana::nested_form>(this->handle(), nana::appear::bald<>());
+		//m_form = std::make_unique<nana::nested_form>(this->handle(), nana::appear::bald<>());
 
 		//TO-DO: ver si se puede agregar un evento al form o nested_form cuando llega un mensaje de WM_ACTIVATEAPP 
 		//para luego disparar un evento y saber si el panel está activado o no. Es útil para el timer y el rendering/painting.
@@ -353,9 +354,9 @@ namespace Bruno
 
 	ScenePanel::~ScenePanel()
 	{
-		/*std::lock_guard lock{ m_mutex };
+		std::lock_guard lock{ m_mutex };
 		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
-
+		/*
 		auto device = Graphics::GetDevice();
 		device->GetCommandQueue()->Flush();
 
@@ -397,6 +398,7 @@ namespace Bruno
 
 		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; //Yellow
 		if (idxx == 2) clearColor[0] = 0.0f;
+		else if (idxx == 3) { clearColor[0] = 0.0f; clearColor[1] = 0.0f; }
 
 		auto rtv = m_surface->GetRtv();
 		auto dsv = m_surface->GetDsv();
