@@ -22,7 +22,8 @@ namespace Bruno
 	class Surface;
 	class EditorGame;
 
-	class ScenePanel : public nana::nested_form
+	class ScenePanel : public nana::panel<true>
+	//class ScenePanel : public nana::nested_form
 	{
 	public:
 		ScenePanel(nana::window window, EditorGame* editorGame, DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D32_FLOAT);
@@ -32,8 +33,11 @@ namespace Bruno
 		void OnDraw();
 
 		bool IsEnabled();
-
+		std::mutex& GetMutex() {
+			return m_mutex;
+		}
 	private:
+		std::unique_ptr<nana::nested_form> m_form;
 		std::unique_ptr<Surface> m_surface;
 		int idxx = 0;
 		DXGI_FORMAT m_backBufferFormat;

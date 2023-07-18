@@ -64,18 +64,23 @@ namespace Bruno
 	};
 
 	ScenePanel::ScenePanel(nana::window window, EditorGame *editorGame, DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat) :
-		nana::nested_form(window, nana::appear::bald<>()),
+		//nana::nested_form(window, nana::appear::bald<>()),
+		nana::panel<true>(window),
 		m_backBufferFormat(backBufferFormat),
 		m_depthBufferFormat(depthBufferFormat),
 
 		m_editorGame(editorGame)
 	{
-		this->caption("Scene");
-		this->bgcolor(nana::colors::dark_red);
-
 		static int idx = 0;
 		idx++;
 		idxx = idx;
+
+		std::ostringstream idstr;
+		idstr << "Scene id " << idxx;
+		this->caption(idstr.str());
+		this->bgcolor(nana::colors::dark_red);
+
+		m_form = std::make_unique<nana::nested_form>(this->handle(), nana::appear::bald<>());
 
 		//TO-DO: ver si se puede agregar un evento al form o nested_form cuando llega un mensaje de WM_ACTIVATEAPP 
 		//para luego disparar un evento y saber si el panel está activado o no. Es útil para el timer y el rendering/painting.
@@ -96,6 +101,23 @@ namespace Bruno
 		//	::GetClientRect(hwnd, &r);
 		//	::InvalidateRect(hwnd, &r, FALSE);*/
 		//});
+
+		this->events().destroy([this](const nana::arg_destroy& args) {
+			std::lock_guard lock{ m_mutex };
+			BR_CORE_TRACE << "destroy. panel id = " << idxx << std::endl;
+
+			auto device = Graphics::GetDevice();
+			device->GetCommandQueue()->Flush();
+
+			m_isExposed = false;
+			m_editorGame->RemoveScenePanel(this);
+		});
+
+		this->events().resized([this](const nana::arg_resized& args)
+		{
+			nana::size newSize(args.width, args.height);
+			m_form->size(newSize);
+		});
 		
 		this->events().expose([this](const nana::arg_expose& args)
 		{
@@ -103,11 +125,31 @@ namespace Bruno
 			BR_CORE_TRACE << "Expose panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
 
 			m_isExposed = args.exposed;
+			if (m_isExposed)
+				m_form->show();
+			else
+				m_form->hide();
+
 			/*if (args.exposed) 
 				this->focus();*/
 		});
+		
+		//m_form->events().expose([this](const nana::arg_expose& args)
+		//{
+		//	std::lock_guard lock{ m_mutex };
+		//	BR_CORE_TRACE << "Expose panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
 
-		this->events().enter_size_move([this](const nana::arg_size_move& args)
+		//	m_isExposed = args.exposed;
+		//	/*if (m_isExposed)
+		//		m_form->show();
+		//	else
+		//		m_form->hide();*/
+
+		//	/*if (args.exposed) 
+		//		this->focus();*/
+		//});
+
+		m_form->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
 			std::lock_guard lock{ m_mutex };
 			BR_CORE_TRACE << "enter_size_move /panel id = " << idxx << std::endl;
@@ -115,7 +157,7 @@ namespace Bruno
 			m_isSizingMoving = true;
 		});
 
-		this->events().exit_size_move([this](const nana::arg_size_move& args)
+		m_form->events().exit_size_move([this](const nana::arg_size_move& args)
 		{
 			std::lock_guard lock{ m_mutex };
 			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
@@ -129,10 +171,10 @@ namespace Bruno
 			m_isSizingMoving = false;
 		});
 
-		this->events().resized([this](const nana::arg_resized& args)
+		m_form->events().resized([this](const nana::arg_resized& args)
 		{
 			std::lock_guard lock{ m_mutex };
-			BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << this->native_handle() << "." << args.width << "; " << args.height << std::endl;
+			//BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << m_form->native_handle() << ". w=" << args.width << "; h=" << args.height << std::endl;
 
 			if (m_isSizingMoving)
 				return;
@@ -150,7 +192,7 @@ namespace Bruno
 				parameters.Height = args.height;
 				parameters.BackBufferFormat = m_backBufferFormat;
 				parameters.DepthBufferFormat = m_depthBufferFormat;
-				parameters.WindowHandle = reinterpret_cast<HWND>(this->native_handle());
+				parameters.WindowHandle = reinterpret_cast<HWND>(m_form->native_handle());
 
 				m_surface = std::make_unique<Surface>(parameters);
 				m_surface->Initialize();
@@ -236,14 +278,15 @@ namespace Bruno
 		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 0.1f, 100.0f);
 
-		this->events().mouse_down([this](const nana::arg_mouse& args)
+		m_form->events().mouse_down([this](const nana::arg_mouse& args)
 		{
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
 
-			set_capture(true);
+			m_form->set_capture(true);
 		});
-		this->events().mouse_move([this](const nana::arg_mouse& args)
+
+		m_form->events().mouse_move([this](const nana::arg_mouse& args)
 		{
 			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
 			if (args.left_button)
@@ -265,12 +308,12 @@ namespace Bruno
 			m_lastMousePosition.y = args.pos.y;
 		});
 
-		this->events().mouse_up([this](const nana::arg_mouse& args)
+		m_form->events().mouse_up([this](const nana::arg_mouse& args)
 		{
-			release_capture();
+			m_form->release_capture();
 		});
 
-		this->events().mouse_wheel([this](const nana::arg_wheel& args)
+		m_form->events().mouse_wheel([this](const nana::arg_wheel& args)
 		{
 			float zoom = args.distance * 0.0025f;
 			if (!args.upwards) zoom = -zoom;
@@ -279,7 +322,7 @@ namespace Bruno
 			m_camera.UpdateMatrices();
 		});
 
-		this->events().key_press([this](const nana::arg_keyboard& args)
+		m_form->events().key_press([this](const nana::arg_keyboard& args)
 		{
 			if (args.key == 'A')
 			{
@@ -303,28 +346,29 @@ namespace Bruno
 			}
 		});
 
-		editorGame->AddScenePanel(this);
-
-		this->show();
+		//editorGame->AddScenePanel(this);
+		m_form->show();
+		m_isExposed = true;
 	}
 
 	ScenePanel::~ScenePanel()
 	{
-		std::lock_guard lock{ m_mutex };
+		/*std::lock_guard lock{ m_mutex };
 		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
 
 		auto device = Graphics::GetDevice();
 		device->GetCommandQueue()->Flush();
 
-		m_editorGame->RemoveScenePanel(this);
+		m_isExposed = false;
+		m_editorGame->RemoveScenePanel(this);*/
 	}
 	
 	void ScenePanel::OnUpdate(const GameTimer& timer)
 	{
 		//BR_CORE_TRACE << "Paint panel. id = " << idxx << ". delta time = " << timer.GetDeltaTime() << std::endl;
-		std::lock_guard lock{ m_mutex };
+		//std::lock_guard lock{ m_mutex };
 
-		if (!m_isExposed || m_isResizing || m_isSizingMoving)
+		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
 		auto device = Bruno::Graphics::GetDevice();
@@ -336,9 +380,9 @@ namespace Bruno
 
 	void ScenePanel::OnDraw()
 	{
-		std::lock_guard lock{ m_mutex };
+		//std::lock_guard lock{ m_mutex };
 
-		if (!m_isExposed || m_isResizing || m_isSizingMoving)
+		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
 		auto device = Bruno::Graphics::GetDevice();

@@ -4,6 +4,8 @@
 
 #include <nana/gui/widgets/menubar.hpp>
 #include <nana/gui/place.hpp>
+#include <nana/gui/br_place.hpp>
+#include <nana/gui/widgets/panel.hpp>
 #include <mutex>
 
 namespace Bruno
@@ -25,8 +27,12 @@ namespace Bruno
 		void OnGameLoop(const GameTimer& timer) override;
 
 	private:
-		nana::menubar m_menubar;
-		nana::place m_place;
+		nana::menubar		m_menubar;
+		nana::place			m_place;
+		nana::br_place		m_dockPlace;
+		nana::panel<false>	m_panelMargin;
+		//nana::br_place		m_panelMarginPlace;
+		nana::panel<true>	m_panelView;
 
 		std::vector<ScenePanel*> m_scenePanels;
 		std::mutex m_scenePanelsMutex{};

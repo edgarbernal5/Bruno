@@ -80,7 +80,7 @@ namespace Bruno
 			m_framesThisSecond = 0;
 			m_elapsedTime += 1.0f;
 
-			BR_CORE_TRACE << "FPS: " << m_framesPerSecond << std::endl;
+			//BR_CORE_TRACE << "FPS: " << m_framesPerSecond << std::endl;
 		}
 
 		OnGameLoop(m_timer);
