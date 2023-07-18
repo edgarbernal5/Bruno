@@ -45,14 +45,14 @@ namespace Bruno
 	{
 		std::lock_guard lock{ m_scenePanelsMutex };
 		
-		//panel->events().enter_size_move([this](const nana::arg_size_move& args)
-		//{
-		//	OnResizeMoveStarted();
-		//});
-		//panel->events().exit_size_move([this](const nana::arg_size_move& args)
-		//{
-		//	OnResizeMoveFinished();
-		//});
+		panel->events().enter_size_move([this](const nana::arg_size_move& args)
+		{
+			OnResizeMoveStarted();
+		});
+		panel->events().exit_size_move([this](const nana::arg_size_move& args)
+		{
+			OnResizeMoveFinished();
+		});
 
 		m_scenePanels.push_back(panel);
 	}
@@ -140,7 +140,7 @@ namespace Bruno
 				//auto panel = m_dockPlace.add_pane<nana::button>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "Scene right", "pane1", panelIdxx %2 == 0 ? nana::dock_position::down : nana::dock_position::right, std::string("A new pane is created."));
 				auto panel = m_dockPlace.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "Scene right", "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
 				m_dockPlace.collocate();
-				AddScenePanel(panel);
+				//AddScenePanel(panel);
 				panelIdxx++;
 			}
 			else if (args.key == 'P')
@@ -167,7 +167,7 @@ namespace Bruno
 			//BR_CORE_TRACE << "expose / form." << std::endl;
 		});
 
-		AddScenePanel(panel);
+		//AddScenePanel(panel);
 	}
 	//void EditorGame::InitializeUI()
 	//{

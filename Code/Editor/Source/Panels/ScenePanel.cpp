@@ -114,11 +114,11 @@ namespace Bruno
 			m_editorGame->RemoveScenePanel(this);
 		});
 
-		this->events().resized([this](const nana::arg_resized& args)
-		{
-			nana::size newSize(args.width, args.height);
-			m_form->size(newSize);
-		});
+		//this->events().resized([this](const nana::arg_resized& args)
+		//{
+		//	nana::size newSize(args.width, args.height);
+		//	m_form->size(newSize);
+		//});
 		
 		this->events().expose([this](const nana::arg_expose& args)
 		{
@@ -347,9 +347,9 @@ namespace Bruno
 			}
 		});
 
-		//editorGame->AddScenePanel(this);
+		editorGame->AddScenePanel(this);
 		m_form->show();
-		m_isExposed = true;
+		//m_isExposed = true;
 	}
 
 	ScenePanel::~ScenePanel()
