@@ -118,35 +118,55 @@ namespace Bruno
 	
 	void EditorGame::InitializeUI()
 	{
+		static int panelIdxx = 0;
 		auto nanaGameWindow = reinterpret_cast<NanaGameWindow*>(m_gameWindow.get());
 
 		nana::form& form = nanaGameWindow->GetForm();
 		m_dockPlace.bind(form.handle());
-		//m_panelMargin.create(form.handle());
+		m_menubar.create(form.handle());
 		////////// VIEW
-		//m_place.div("vert <menubar weight=25> vert <dock<pane1>>");
-		//m_dockPlace.bind(m_panelMargin);
-		m_dockPlace.div("dock");
+		m_dockPlace.div("vert <menubar weight=25> <dock>");
+		m_dockPlace["menubar"] << m_menubar;
+
+		m_menubar.push_back("&File");
+		m_menubar.at(0).append("Exit", [](nana::menu::item_proxy& ip)
+		{
+			nana::API::exit_all();
+		});
+
+		m_menubar.push_back("&Edit");
+		m_menubar.at(1).append("Right panel", [this](nana::menu::item_proxy& ip)
+		{
+			//auto panel = m_dockPlace.add_pane<nana::button>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "Scene right", "pane1", panelIdxx %2 == 0 ? nana::dock_position::down : nana::dock_position::right, std::string("A new pane is created."));
+			auto panel = m_dockPlace.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
+			m_dockPlace.collocate();
+			//AddScenePanel(panel);
+			panelIdxx++;
+		});
+
+		m_menubar.at(1).append("Tab Panel", [this](nana::menu::item_proxy& ip)
+		{
+			
+		});
 
 		//auto panel = m_dockPlace.add_pane<nana::button>("pane1", "Scene main", "", nana::dock_position::right, std::string("This is the main scene\nEnjoy!"));
-		auto panel = m_dockPlace.add_pane<ScenePanel>("pane1", "Scene cap", "", nana::dock_position::right, this);
+		auto panel = m_dockPlace.add_pane<ScenePanel>("pane1", "", nana::dock_position::right, this);
 
 		m_dockPlace.collocate();
 
-		static int panelIdxx = 0;
 		form.events().key_release([this](const nana::arg_keyboard& args) {
 			if (args.key == 'O')
 			{
 				//auto panel = m_dockPlace.add_pane<nana::button>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "Scene right", "pane1", panelIdxx %2 == 0 ? nana::dock_position::down : nana::dock_position::right, std::string("A new pane is created."));
-				auto panel = m_dockPlace.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "Scene right", "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
+				auto panel = m_dockPlace.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
 				m_dockPlace.collocate();
 				//AddScenePanel(panel);
 				panelIdxx++;
 			}
 			else if (args.key == 'P')
 			{
-				auto panel = m_dockPlace.add_pane<nana::button>("pane1", "Scene tab", "", nana::dock_position::tab, std::string("This is a scene tab!!\nTow."));
-				//auto panel = m_dockPlace.add_pane<ScenePanel>("pane1", "Scene tab", "", nana::dock_position::tab, this);
+				auto panel = m_dockPlace.add_pane<nana::button>("pane1", "", nana::dock_position::tab, std::string("This is a scene tab!!\nTow."));
+				//auto panel = m_dockPlace.add_pane<ScenePanel>("pane1", "", nana::dock_position::tab, this);
 				m_dockPlace.collocate();
 				//AddScenePanel(panel);
 			}

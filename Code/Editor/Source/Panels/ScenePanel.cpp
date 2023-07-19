@@ -399,6 +399,7 @@ namespace Bruno
 		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; //Yellow
 		if (idxx == 2) clearColor[0] = 0.0f;
 		else if (idxx == 3) { clearColor[0] = 0.0f; clearColor[1] = 0.0f; }
+		else if (idxx == 4) { clearColor[1] = 0.0f; clearColor[2] = 1.0f; }
 
 		auto rtv = m_surface->GetRtv();
 		auto dsv = m_surface->GetDsv();
