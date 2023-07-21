@@ -16,7 +16,7 @@ namespace Bruno
 	void Camera::Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
 	{
 		Math::Vector2 deltaAngles(2.0f * DirectX::XM_PI / m_viewport.width, DirectX::XM_PI / m_viewport.height);
-		Math::Vector2 mouseVelocity(mousePosition.x - previousPosition.x, mousePosition.y - previousPosition.y);
+		Math::Vector2 mouseVelocity((float)(mousePosition.x - previousPosition.x), (float)(mousePosition.y - previousPosition.y));
 		auto angles = mouseVelocity * deltaAngles;
 
 		auto zAxis = m_target - m_position;
@@ -51,7 +51,7 @@ namespace Bruno
 
 	void Camera::HandTool(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
 	{
-		Math::Vector2 mouseVelocity(mousePosition.x - previousPosition.x, mousePosition.y - previousPosition.y);
+		Math::Vector2 mouseVelocity((float)(mousePosition.x - previousPosition.x), (float)(mousePosition.y - previousPosition.y));
 		
 		auto zAxis = m_target - m_position;
 		zAxis.Normalize();
@@ -69,7 +69,7 @@ namespace Bruno
 	void Camera::PitchYaw(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
 	{
 		Math::Vector2 deltaAngles(2.0f * DirectX::XM_PI / m_viewport.width, DirectX::XM_PI / m_viewport.height);
-		Math::Vector2 mouseVelocity(mousePosition.x - previousPosition.x, mousePosition.y - previousPosition.y);
+		Math::Vector2 mouseVelocity((float)(mousePosition.x - previousPosition.x), (float)(mousePosition.y - previousPosition.y));
 		auto angles = mouseVelocity * deltaAngles;
 		
 		auto zAxis = m_target - m_position;

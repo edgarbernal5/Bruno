@@ -1,0 +1,2 @@
+4d9d7a8ceba6d6a121cd1aae160a0b856ef03d89
+https://github.com/microsoft/DirectXTex/commits/main
