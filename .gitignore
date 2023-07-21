@@ -1,6 +1,8 @@
 # Binaries
 Output/Debug_x64
 Output/Debug_x64_tmp
+Output/Release_x64
+Output/Release_x64_tmp
 Code/Engine/Dependencies/temp
 
 # Visual Studio files and folder

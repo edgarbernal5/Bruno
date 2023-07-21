@@ -707,7 +707,7 @@ struct CD3DX12_RASTERIZER_DESC2 : public D3D12_RASTERIZER_DESC2
     }
     operator D3D12_RASTERIZER_DESC() const noexcept
     {
-        return (D3D12_RASTERIZER_DESC)CD3DX12_RASTERIZER_DESC1((D3D12_RASTERIZER_DESC1)*this);
+        return static_cast<D3D12_RASTERIZER_DESC>(CD3DX12_RASTERIZER_DESC1(static_cast<D3D12_RASTERIZER_DESC1>(*this)));
     }
 };
 #endif // D3D12_SDK_VERSION >= 610
@@ -761,7 +761,7 @@ struct CD3DX12_HEAP_PROPERTIES : public D3D12_HEAP_PROPERTIES
     bool IsCPUAccessible() const noexcept
     {
         return Type == D3D12_HEAP_TYPE_UPLOAD || Type == D3D12_HEAP_TYPE_READBACK
-#if defined(D3D12_SDK_VERSION) && (D3D12_SDK_VERSION >= 609)
+#if 0
             || Type == D3D12_HEAP_TYPE_GPU_UPLOAD
 #endif
             || (Type == D3D12_HEAP_TYPE_CUSTOM &&
@@ -5580,7 +5580,9 @@ public: // Function declaration
 #endif
 
 #if defined(D3D12_SDK_VERSION) && (D3D12_SDK_VERSION >= 609)
+#if 0
     BOOL GPUUploadHeapSupported() const noexcept;
+#endif
 
     // D3D12_OPTIONS17
     BOOL NonNormalizedCoordinateSamplersSupported() const noexcept;
@@ -6279,7 +6281,9 @@ FEATURE_SUPPORT_GET(BOOL, m_dOptions15, DynamicIndexBufferStripCutSupported);
 FEATURE_SUPPORT_GET(BOOL, m_dOptions16, DynamicDepthBiasSupported);
 #endif
 #if defined(D3D12_SDK_VERSION) && (D3D12_SDK_VERSION >= 609)
+#if 0
 FEATURE_SUPPORT_GET(BOOL, m_dOptions16, GPUUploadHeapSupported);
+#endif
 
 // 46: Options17
 FEATURE_SUPPORT_GET(BOOL, m_dOptions17, NonNormalizedCoordinateSamplersSupported);
