@@ -148,6 +148,12 @@ namespace Bruno
 			
 		});
 
+		m_menubar.push_back("Debug");
+		m_menubar.at(2).append("Enable Printing", [this](nana::menu::item_proxy& ip)
+		{
+			m_dockPlace.enable_print_debug(!m_dockPlace.is_enabled_print_debug());
+		});
+
 		//auto panel = m_dockPlace.add_pane<nana::button>("pane1", "Scene main", "", nana::dock_position::right, std::string("This is the main scene\nEnjoy!"));
 		auto panel = m_dockPlace.add_pane<ScenePanel>("pane1", "", nana::dock_position::right, this);
 
