@@ -48,7 +48,5 @@ namespace Bruno
 		{
 			return (Is(T::GetTypeIdClass()) ? reinterpret_cast<T*>(const_cast<RTTI*>(this)) : nullptr);
 		}
-		
-		virtual bool Equals(const RTTI* rhs) const { return this == rhs; }
 	};
 }

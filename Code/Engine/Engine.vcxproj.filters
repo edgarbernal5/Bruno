@@ -25,6 +25,12 @@
     <Filter Include="Source\Bruno\Math">
       <UniqueIdentifier>{b0f92797-1c0b-4ea9-94e6-c57b7c875b0c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Bruno\Content">
+      <UniqueIdentifier>{dc1c70f1-7679-4939-b129-8d3fe0f2ffd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Bruno\Content\Readers">
+      <UniqueIdentifier>{7e2a5cdc-332c-4da7-8a96-8fa9f7fa4d7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -132,6 +138,18 @@
     <ClInclude Include="Source\Bruno\Core\RTTI.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\ContentManager.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\ContentTypeReader.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h">
+      <Filter>Source\Bruno\Content\Readers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\ContentTypeReaderManager.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -217,6 +235,18 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\Camera.cpp">
       <Filter>Source\Bruno\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\ContentManager.cpp">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\ContentTypeReader.cpp">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp">
+      <Filter>Source\Bruno\Content\Readers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\ContentTypeReaderManager.cpp">
+      <Filter>Source\Bruno\Content</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

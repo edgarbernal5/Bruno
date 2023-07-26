@@ -6,6 +6,8 @@
 
 namespace Bruno
 {
+    BR_RTTI_DEFINITIONS(Texture);
+
     Texture::Texture(const std::wstring& filename)
     {
         std::filesystem::path filePath(filename);

@@ -7,6 +7,10 @@
 #include "Bruno/Platform/DirectX/GraphicsAdapter.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 
+#include "Bruno/Content/ContentTypeReaderManager.h"
+
+#include <filesystem>
+
 namespace Bruno
 {
 	Game* Game::g_instance{ nullptr };
@@ -19,6 +23,10 @@ namespace Bruno
 #if BR_DEBUG
 		Device::Core::EnableDebugLayer();
 #endif
+
+		if (!parameters.WorkingDirectory.empty()) {
+			std::filesystem::current_path(parameters.WorkingDirectory);
+		}
 	}
 
 	Game::~Game()
@@ -32,6 +40,8 @@ namespace Bruno
 #if BR_PLATFORM_WINDOWS
 		CoUninitialize();
 #endif
+
+		ContentTypeReaderManager::Shutdown();
 	}
 
 	void Game::Initialize()
@@ -53,6 +63,8 @@ namespace Bruno
 		windowParameters.Height = m_parameters.WindowHeight;
 		windowParameters.Title = m_parameters.Name;
 		OnInitialize(windowParameters);
+
+		ContentTypeReaderManager::Initialize();
 	}
 
 	void Game::Run()

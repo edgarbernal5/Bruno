@@ -3,10 +3,14 @@
 #include "D3DCommon.h"
 #include "Resources.h"
 
+#include <Bruno/Core/RTTI.h>
+
 namespace Bruno
 {
-	class Texture
+	class Texture : public RTTI
 	{
+		BR_RTTI_DECLARATION(Texture, RTTI);
+
 	public:
 		Texture(const std::wstring& filename);
 		Texture(const D3D12_RESOURCE_DESC& resourceDesc, const D3D12_CLEAR_VALUE* clearValue = nullptr);

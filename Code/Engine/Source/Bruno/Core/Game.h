@@ -17,6 +17,7 @@ namespace Bruno
 		std::string Name = "Bruno";
 		uint32_t WindowWidth = 800;
 		uint32_t WindowHeight = 600;
+		std::string WorkingDirectory;
 	};
 
 	class GraphicsDevice;

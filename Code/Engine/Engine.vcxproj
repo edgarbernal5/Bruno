@@ -96,6 +96,9 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Bruno\Content\ContentManager.h" />
+    <ClInclude Include="Source\Bruno\Content\ContentTypeReader.h" />
+    <ClInclude Include="Source\Bruno\Content\ContentTypeReaderManager.h" />
     <ClInclude Include="Source\Bruno\Core\KeyCodes.h" />
     <ClInclude Include="Source\Bruno\Core\Assert.h" />
     <ClInclude Include="Source\Bruno\Core\Base.h" />
@@ -131,8 +134,12 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
     <ClInclude Include="Source\Bruno\Renderer\Camera.h" />
     <ClInclude Include="Source\Bruno\Renderer\RenderItem.h" />
+    <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
+    <ClCompile Include="Source\Bruno\Content\ContentTypeReader.cpp" />
+    <ClCompile Include="Source\Bruno\Content\ContentTypeReaderManager.cpp" />
     <ClCompile Include="Source\Bruno\Core\GameTimer.cpp" />
     <ClCompile Include="Source\Bruno\Core\Base.cpp" />
     <ClCompile Include="Source\Bruno\Core\Log.cpp" />
@@ -164,6 +171,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Camera.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp" />
+    <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Bruno\Math\Math.inl" />
