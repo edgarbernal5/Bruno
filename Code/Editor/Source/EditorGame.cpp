@@ -118,8 +118,8 @@ namespace Bruno
 	void EditorGame::InitializeUI()
 	{
 		static int panelIdxx = 0;
-		auto nanaGameWindow = reinterpret_cast<NanaGameWindow*>(m_gameWindow.get());
-
+		auto nanaGameWindow = m_gameWindow->As<NanaGameWindow>();
+		
 		nana::form& form = nanaGameWindow->GetForm();
 		m_dockPlace.bind(form.handle());
 		m_menubar.create(form.handle());

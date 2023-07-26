@@ -12,6 +12,8 @@ namespace Bruno
 
 	class NanaGameWindow : public GameWindow
 	{
+		BR_RTTI_DECLARATION(NanaGameWindow, GameWindow);
+
 	public:
 		NanaGameWindow(const GameWindowParameters& parameters, Game* game);
 		~NanaGameWindow() = default;

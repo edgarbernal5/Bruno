@@ -5,6 +5,7 @@
 #endif
 
 #include <Bruno/Core/KeyCodes.h>
+#include <Bruno/Core/RTTI.h>
 
 namespace Bruno
 {
@@ -21,8 +22,9 @@ namespace Bruno
 	using WindowHandle = void*;
 #endif
 
-	class GameWindow
+	class GameWindow : public RTTI
 	{
+		BR_RTTI_DECLARATION(GameWindow, RTTI);
 	public:
 		virtual ~GameWindow() {}
 

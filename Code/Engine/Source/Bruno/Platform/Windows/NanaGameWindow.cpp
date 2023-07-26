@@ -8,6 +8,8 @@
 
 namespace Bruno
 {
+	BR_RTTI_DEFINITIONS(NanaGameWindow);
+
 	void RenderTask(Game& game, std::atomic<bool>& exitRequested)
 	{
 		while (!exitRequested.load())

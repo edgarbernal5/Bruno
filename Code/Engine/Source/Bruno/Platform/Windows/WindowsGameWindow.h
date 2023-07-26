@@ -14,6 +14,8 @@ namespace Bruno
 
 	class WindowsGameWindow : public GameWindow
 	{
+		BR_RTTI_DECLARATION(WindowsGameWindow, GameWindow);
+
 	public:
 		WindowsGameWindow(const GameWindowParameters& parameters, Game* game);
 		virtual ~WindowsGameWindow();
