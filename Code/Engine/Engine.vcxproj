@@ -102,6 +102,7 @@
     <ClInclude Include="Source\Bruno\Core\GameTimer.h" />
     <ClInclude Include="Source\Bruno\Core\Log.h" />
     <ClInclude Include="Source\Bruno\Core\Logger.h" />
+    <ClInclude Include="Source\Bruno\Core\RTTI.h" />
     <ClInclude Include="Source\Bruno\Math\Math.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
