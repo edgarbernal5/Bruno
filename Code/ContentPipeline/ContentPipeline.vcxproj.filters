@@ -4,6 +4,9 @@
     <Filter Include="Source">
       <UniqueIdentifier>{d5330e20-87dd-4400-9a2e-4e5f90d8eeca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Processors">
+      <UniqueIdentifier>{07e3b8e0-8c6f-42c0-9c1a-33257c6b82aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp">
@@ -12,10 +15,24 @@
     <ClCompile Include="Source\ContentPipelineGame.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GameContentBuilder.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Processors\ProcessorManager.cpp">
+      <Filter>Source\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Processors\AbstractProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GameContentBuilder.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Processors\ProcessorManager.h">
+      <Filter>Source\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Processors\AbstractProcessor.h" />
   </ItemGroup>
 </Project>

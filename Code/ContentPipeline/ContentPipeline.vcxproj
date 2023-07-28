@@ -146,11 +146,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\GameContentBuilder.cpp" />
+    <ClCompile Include="Source\Processors\AbstractProcessor.cpp" />
+    <ClCompile Include="Source\Processors\ProcessorManager.cpp" />
     <ClCompile Include="Source\ContentPipelineGame.cpp" />
     <ClCompile Include="Source\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h" />
+    <ClInclude Include="Source\GameContentBuilder.h" />
+    <ClInclude Include="Source\Processors\AbstractProcessor.h" />
+    <ClInclude Include="Source\Processors\ProcessorManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -10,6 +10,7 @@ namespace Bruno
 	class ContentTypeReaderManager
 	{
 	public:
+		ContentTypeReaderManager() = delete;
 		~ContentTypeReaderManager() = default;
 
 		static const std::map<RTTI::IdType, std::shared_ptr<AbstractContentTypeReader>>& ContentTypeReaders();
