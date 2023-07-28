@@ -15,7 +15,7 @@ namespace Bruno
 
 	void ConsoleSink::Commit(const std::string& outputMessage)
 	{
-		std::cout << outputMessage;
+		m_stream << outputMessage;
 	}
 
 	Logger::Logger(const Logger& other) :

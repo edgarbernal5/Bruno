@@ -13,7 +13,7 @@ namespace Bruno
 	}
 	std::shared_ptr<RTTI> ContentManager::ReadAsset(const RTTI::IdType targetTypeId, const std::string& assetName)
 	{
-		const auto& contentTypeReaders = ContentTypeReaderManager::ContentTypeReaders();
+		const auto& contentTypeReaders = ContentTypeReaderManager::GetContentTypeReaders();
 		auto it = contentTypeReaders.find(targetTypeId);
 		if (it == contentTypeReaders.end())
 		{

@@ -67,7 +67,7 @@ namespace Bruno
 	class Logger
 	{
 	public:
-		explicit Logger() :
+		Logger() :
 			m_sinks()
 		{
 		}

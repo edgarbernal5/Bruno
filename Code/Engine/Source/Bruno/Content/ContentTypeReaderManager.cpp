@@ -8,7 +8,7 @@ namespace Bruno
 	std::map<RTTI::IdType, std::shared_ptr<AbstractContentTypeReader>> ContentTypeReaderManager::g_contentTypeReaders;
 	bool ContentTypeReaderManager::g_initialized = false;
 
-	const std::map<RTTI::IdType, std::shared_ptr<AbstractContentTypeReader>>& ContentTypeReaderManager::ContentTypeReaders()
+	const std::map<RTTI::IdType, std::shared_ptr<AbstractContentTypeReader>>& ContentTypeReaderManager::GetContentTypeReaders()
 	{
 		return g_contentTypeReaders;
 	}

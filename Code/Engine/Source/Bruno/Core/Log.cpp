@@ -8,9 +8,12 @@ namespace Bruno
 	void Log::Initialize()
 	{
 		std::vector<std::shared_ptr<Sink>> coreSinks = {
+			std::make_shared<ConsoleSink>()
+		};
+		/*std::vector<std::shared_ptr<Sink>> coreSinks = {
 			std::make_shared<ConsoleSink>(),
 			std::make_shared<FileSink>("LogTest.log"),
-		};
+		};*/
 
 		g_CoreLogger = std::make_shared<Logger>(coreSinks.begin(), coreSinks.end());
 	}

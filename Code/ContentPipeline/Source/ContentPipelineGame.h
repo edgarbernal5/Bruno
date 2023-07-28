@@ -22,5 +22,9 @@ namespace Bruno
 		void InitializeUI();
 		void OnInitialize(const GameWindowParameters& windowParameters) override;
 		void OnGameLoop(const GameTimer& timer) override;
+
+	private:
+		nana::menubar		m_menubar;
+		nana::place			m_place;
 	};
 }
