@@ -38,8 +38,10 @@ namespace Bruno
 			auto selectedFiles = fileBox();
 			if (!selectedFiles.empty())
 			{
-				GameContentBuilder::Settings settings{};
+				std::wstring rootDirectory = selectedFiles[0].parent_path();
+				GameContentBuilder::Settings settings{ rootDirectory };
 				m_contentBuilder.SetSettings(settings);
+
 				for (auto& file : selectedFiles)
 				{
 					m_contentBuilder.RequestBuild(file.c_str());

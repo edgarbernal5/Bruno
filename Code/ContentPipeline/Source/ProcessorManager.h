@@ -15,7 +15,7 @@ namespace Bruno
 		static const std::vector<std::shared_ptr<AbstractProcessor>>& GetProcessors();
 		static bool AddProcessor(std::shared_ptr<AbstractProcessor> processor);
 
-		static std::shared_ptr<AbstractProcessor> GetProcessorByExtension(const std::wstring& extension);
+		static const std::shared_ptr<AbstractProcessor>& GetProcessorByExtension(const std::wstring& extension);
 		static void Initialize();
 		static void Shutdown();
 

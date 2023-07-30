@@ -23,6 +23,10 @@ namespace Bruno
 		{																											\
 			return (name == GetTypeName() ? true : ParentType::Is(name));											\
 		}																											\
+		virtual std::string ToString() const																		\
+		{																											\
+			return Type::GetTypeName();																				\
+		}																											\
 	private:																										\
 		static RTTI::IdType g_runTimeTypeId;
 
