@@ -147,16 +147,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\GameContentBuilder.cpp" />
-    <ClCompile Include="Source\Processors\AbstractProcessor.cpp" />
-    <ClCompile Include="Source\Processors\ProcessorManager.cpp" />
+    <ClCompile Include="Source\AbstractProcessor.cpp" />
+    <ClCompile Include="Source\ProcessorManager.cpp" />
     <ClCompile Include="Source\ContentPipelineGame.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Processors\ShaderProcessor.cpp" />
+    <ClCompile Include="Source\Processors\TextureProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h" />
     <ClInclude Include="Source\GameContentBuilder.h" />
-    <ClInclude Include="Source\Processors\AbstractProcessor.h" />
-    <ClInclude Include="Source\Processors\ProcessorManager.h" />
+    <ClInclude Include="Source\AbstractProcessor.h" />
+    <ClInclude Include="Source\ProcessorManager.h" />
+    <ClInclude Include="Source\Processors\ShaderProcessor.h" />
+    <ClInclude Include="Source\Processors\TextureProcessor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

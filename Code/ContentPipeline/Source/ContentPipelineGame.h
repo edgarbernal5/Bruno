@@ -8,6 +8,8 @@
 #include <nana/gui/widgets/panel.hpp>
 #include <mutex>
 
+#include "GameContentBuilder.h"
+
 namespace Bruno
 {
 	class NanaGameWindow;
@@ -26,5 +28,7 @@ namespace Bruno
 	private:
 		nana::menubar		m_menubar;
 		nana::place			m_place;
+
+		GameContentBuilder	m_contentBuilder;
 	};
 }

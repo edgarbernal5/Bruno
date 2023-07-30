@@ -18,10 +18,16 @@
     <ClCompile Include="Source\GameContentBuilder.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Processors\ProcessorManager.cpp">
+    <ClCompile Include="Source\Processors\TextureProcessor.cpp">
       <Filter>Source\Processors</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Processors\AbstractProcessor.cpp" />
+    <ClCompile Include="Source\ProcessorManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\AbstractProcessor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Processors\ShaderProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h">
@@ -30,9 +36,15 @@
     <ClInclude Include="Source\GameContentBuilder.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Processors\ProcessorManager.h">
+    <ClInclude Include="Source\Processors\TextureProcessor.h">
       <Filter>Source\Processors</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Processors\AbstractProcessor.h" />
+    <ClInclude Include="Source\ProcessorManager.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AbstractProcessor.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Processors\ShaderProcessor.h" />
   </ItemGroup>
 </Project>
