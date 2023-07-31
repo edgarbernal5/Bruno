@@ -6,13 +6,18 @@
 
 namespace Bruno
 {
+	struct ContentItem
+	{
+
+	};
+
 	class AbstractProcessor : public RTTI
 	{
 		BR_RTTI_DECLARATION(AbstractProcessor, RTTI);
 	public:
 		virtual ~AbstractProcessor() = default;
 
-		virtual void Process(const std::wstring& assetFilename) = 0;
+		virtual ContentItem Process(const std::wstring& assetFilename) = 0;
 
 		const std::vector<std::wstring>& GetExtensionsSupported()
 		{

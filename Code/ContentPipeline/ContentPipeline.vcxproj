@@ -146,21 +146,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\GameContentBuilder.cpp" />
-    <ClCompile Include="Source\AbstractProcessor.cpp" />
-    <ClCompile Include="Source\ProcessorManager.cpp" />
+    <ClCompile Include="Source\Pipeline\GameContentBuilder.cpp" />
+    <ClCompile Include="Source\Pipeline\AbstractProcessor.cpp" />
+    <ClCompile Include="Source\Pipeline\ProcessorManager.cpp" />
     <ClCompile Include="Source\ContentPipelineGame.cpp" />
     <ClCompile Include="Source\Main.cpp" />
-    <ClCompile Include="Source\Processors\ShaderProcessor.cpp" />
-    <ClCompile Include="Source\Processors\TextureProcessor.cpp" />
+    <ClCompile Include="Source\Pipeline\Processors\ShaderProcessor.cpp" />
+    <ClCompile Include="Source\Pipeline\Processors\TextureProcessor.cpp" />
+    <ClCompile Include="Source\Pipeline\Serialization\FileStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h" />
-    <ClInclude Include="Source\GameContentBuilder.h" />
-    <ClInclude Include="Source\AbstractProcessor.h" />
-    <ClInclude Include="Source\ProcessorManager.h" />
-    <ClInclude Include="Source\Processors\ShaderProcessor.h" />
-    <ClInclude Include="Source\Processors\TextureProcessor.h" />
+    <ClInclude Include="Source\Pipeline\GameContentBuilder.h" />
+    <ClInclude Include="Source\Pipeline\AbstractProcessor.h" />
+    <ClInclude Include="Source\Pipeline\ProcessorManager.h" />
+    <ClInclude Include="Source\Pipeline\Processors\ShaderProcessor.h" />
+    <ClInclude Include="Source\Pipeline\Processors\TextureProcessor.h" />
+    <ClInclude Include="Source\Pipeline\Serialization\FileStream.h" />
+    <ClInclude Include="Source\Pipeline\Serialization\Stream.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

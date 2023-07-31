@@ -1,15 +1,16 @@
 #pragma once
 
-#include "AbstractProcessor.h"
+#include "Pipeline/AbstractProcessor.h"
 
 namespace Bruno
 {
 	class TextureProcessor : public AbstractProcessor
 	{
 		BR_RTTI_DECLARATION(TextureProcessor, AbstractProcessor);
+
 	public:
 		TextureProcessor();
 
-		virtual void Process(const std::wstring& assetFilename) override;
+		virtual ContentItem Process(const std::wstring& assetFilename) override;
 	};
 }

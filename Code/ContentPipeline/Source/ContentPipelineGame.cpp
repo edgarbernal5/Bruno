@@ -1,6 +1,6 @@
 #include "ContentPipelineGame.h"
 
-#include "ProcessorManager.h"
+#include "Pipeline/ProcessorManager.h"
 
 #include <Bruno/Platform/Windows/NanaGameWindow.h>
 
@@ -44,7 +44,8 @@ namespace Bruno
 
 				for (auto& file : selectedFiles)
 				{
-					m_contentBuilder.RequestBuild(file.c_str());
+					auto relativePath = std::filesystem::relative(file, rootDirectory);
+					m_contentBuilder.RequestBuild(file.c_str(), relativePath);
 				}
 			}
 		});

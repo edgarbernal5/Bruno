@@ -8,7 +8,7 @@
 #include <nana/gui/widgets/panel.hpp>
 #include <mutex>
 
-#include "GameContentBuilder.h"
+#include "Pipeline/GameContentBuilder.h"
 
 namespace Bruno
 {

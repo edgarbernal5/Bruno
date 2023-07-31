@@ -31,6 +31,16 @@ namespace Bruno
 		return nullptr;
 	}
 
+	const std::shared_ptr<AbstractProcessor>& ProcessorManager::GetProcessorByName(const std::string& name)
+	{
+		for (auto& processor : g_processors)
+		{
+			if (processor->ToString() == name)
+				return processor;
+		}
+		return nullptr;
+	}
+
 	void ProcessorManager::Initialize()
 	{
 		if (g_initialized)

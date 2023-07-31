@@ -4,8 +4,14 @@
     <Filter Include="Source">
       <UniqueIdentifier>{d5330e20-87dd-4400-9a2e-4e5f90d8eeca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Processors">
+    <Filter Include="Source\Pipeline">
+      <UniqueIdentifier>{056b72f5-7c30-4f8d-a461-fb32c2e0245c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Pipeline\Processors">
       <UniqueIdentifier>{07e3b8e0-8c6f-42c0-9c1a-33257c6b82aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Pipeline\Serialization">
+      <UniqueIdentifier>{163dc3b5-a888-451f-8efd-ed9675003956}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -15,36 +21,43 @@
     <ClCompile Include="Source\ContentPipelineGame.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameContentBuilder.cpp">
-      <Filter>Source</Filter>
+    <ClCompile Include="Source\Pipeline\Processors\TextureProcessor.cpp">
+      <Filter>Source\Pipeline\Processors</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Processors\TextureProcessor.cpp">
-      <Filter>Source\Processors</Filter>
+    <ClCompile Include="Source\Pipeline\AbstractProcessor.cpp">
+      <Filter>Source\Pipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ProcessorManager.cpp">
-      <Filter>Source</Filter>
+    <ClCompile Include="Source\Pipeline\GameContentBuilder.cpp">
+      <Filter>Source\Pipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Source\AbstractProcessor.cpp">
-      <Filter>Source</Filter>
+    <ClCompile Include="Source\Pipeline\ProcessorManager.cpp">
+      <Filter>Source\Pipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Processors\ShaderProcessor.cpp" />
+    <ClCompile Include="Source\Pipeline\Processors\ShaderProcessor.cpp">
+      <Filter>Source\Pipeline\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\FileStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameContentBuilder.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\Pipeline\Processors\TextureProcessor.h">
+      <Filter>Source\Pipeline\Processors</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Processors\TextureProcessor.h">
-      <Filter>Source\Processors</Filter>
+    <ClInclude Include="Source\Pipeline\AbstractProcessor.h">
+      <Filter>Source\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ProcessorManager.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\Pipeline\GameContentBuilder.h">
+      <Filter>Source\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Source\AbstractProcessor.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\Pipeline\ProcessorManager.h">
+      <Filter>Source\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Processors\ShaderProcessor.h" />
+    <ClInclude Include="Source\Pipeline\Processors\ShaderProcessor.h">
+      <Filter>Source\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\Stream.h" />
+    <ClInclude Include="Source\Pipeline\Serialization\FileStream.h" />
   </ItemGroup>
 </Project>

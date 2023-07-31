@@ -9,8 +9,8 @@ namespace Bruno
 		m_supportedExtensions = { L".hlsl", L".fx" };
 	}
 
-	void ShaderProcessor::Process(const std::wstring& assetFilename)
+	ContentItem ShaderProcessor::Process(const std::wstring& assetFilename)
 	{
-
+		return ContentItem();
 	}
 }
