@@ -11,8 +11,11 @@ namespace Bruno
 		MemoryStream(uint32_t capacity);
 		~MemoryStream() = default;
 
-		virtual void Write(uint8_t* buffer, int count) override;
+		int ReadByte() override;
 		virtual int Read(uint8_t* buffer, int count) override;
+
+		void WriteByte(uint8_t byte) override;
+		virtual void Write(uint8_t* buffer, int count) override;
 
 	private:
 		uint8_t* m_buffer;

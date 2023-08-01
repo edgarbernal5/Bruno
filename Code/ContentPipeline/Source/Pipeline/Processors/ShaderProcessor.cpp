@@ -1,4 +1,5 @@
 #include "ShaderProcessor.h"
+#include "Pipeline/Graphics/ShaderContentItem.h"
 
 namespace Bruno
 {
@@ -9,8 +10,8 @@ namespace Bruno
 		m_supportedExtensions = { L".hlsl", L".fx" };
 	}
 
-	ContentItem ShaderProcessor::Process(const std::wstring& assetFilename)
+	ContentItem* ShaderProcessor::Process(const std::wstring& assetFilename)
 	{
-		return ContentItem();
+		return new ShaderContentItem();
 	}
 }

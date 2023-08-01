@@ -146,6 +146,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Pipeline\ContentItem.cpp" />
+    <ClCompile Include="Source\Pipeline\Graphics\ShaderContentItem.cpp" />
+    <ClCompile Include="Source\Pipeline\Serialization\ContentTypeWriter.cpp" />
     <ClCompile Include="Source\Pipeline\GameContentBuilder.cpp" />
     <ClCompile Include="Source\Pipeline\AbstractProcessor.cpp" />
     <ClCompile Include="Source\Pipeline\ProcessorManager.cpp" />
@@ -154,22 +157,29 @@
     <ClCompile Include="Source\Pipeline\Processors\ShaderProcessor.cpp" />
     <ClCompile Include="Source\Pipeline\Processors\TextureProcessor.cpp" />
     <ClCompile Include="Source\Pipeline\Serialization\ContentCompiler.cpp" />
+    <ClCompile Include="Source\Pipeline\Serialization\ContentTypeWriterManager.cpp" />
     <ClCompile Include="Source\Pipeline\Serialization\ContentWriter.cpp" />
     <ClCompile Include="Source\Pipeline\Serialization\FileStream.cpp" />
     <ClCompile Include="Source\Pipeline\Serialization\MemoryStream.cpp" />
+    <ClCompile Include="Source\Pipeline\Serialization\Writers\ShaderWriter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h" />
+    <ClInclude Include="Source\Pipeline\ContentItem.h" />
     <ClInclude Include="Source\Pipeline\GameContentBuilder.h" />
     <ClInclude Include="Source\Pipeline\AbstractProcessor.h" />
+    <ClInclude Include="Source\Pipeline\Graphics\ShaderContentItem.h" />
     <ClInclude Include="Source\Pipeline\ProcessorManager.h" />
     <ClInclude Include="Source\Pipeline\Processors\ShaderProcessor.h" />
     <ClInclude Include="Source\Pipeline\Processors\TextureProcessor.h" />
+    <ClInclude Include="Source\Pipeline\Serialization\ContentTypeWriter.h" />
     <ClInclude Include="Source\Pipeline\Serialization\ContentCompiler.h" />
+    <ClInclude Include="Source\Pipeline\Serialization\ContentTypeWriterManager.h" />
     <ClInclude Include="Source\Pipeline\Serialization\ContentWriter.h" />
     <ClInclude Include="Source\Pipeline\Serialization\FileStream.h" />
     <ClInclude Include="Source\Pipeline\Serialization\MemoryStream.h" />
     <ClInclude Include="Source\Pipeline\Serialization\Stream.h" />
+    <ClInclude Include="Source\Pipeline\Serialization\Writers\ShaderWriter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

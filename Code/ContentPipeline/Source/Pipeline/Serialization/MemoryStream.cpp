@@ -1,4 +1,5 @@
 #include "MemoryStream.h"
+
 #include <string.h>
 #include <exception>
 
@@ -18,6 +19,15 @@ namespace Bruno
 	{
 		m_length = 0;
 		m_position = 0;
+	}
+
+	int MemoryStream::ReadByte()
+	{
+		if (m_position >= m_length)
+		{
+			return -1;
+		}
+		return m_buffer[m_position++];
 	}
 
 	int MemoryStream::Read(uint8_t* buffer, int count)
@@ -45,6 +55,26 @@ namespace Bruno
 		}
 		m_position += byteCount;
 		return byteCount;
+	}
+
+	void MemoryStream::WriteByte(uint8_t value)
+	{
+		if (m_position >= m_length)
+		{
+			uint32_t num = m_position + 1;
+			bool flag = m_position > m_length;
+			if ((num >= m_capacity) && EnsureCapacity(num))
+			{
+				flag = false;
+			}
+			if (flag)
+			{
+				//Esto no es necesario.
+				//memcpy(m_buffer + m_length, 0x00, m_position - m_length);
+			}
+			m_length = num;
+		}
+		m_buffer[m_position++] = value;
 	}
 
 	void MemoryStream::Write(uint8_t* buffer, int count)
@@ -88,7 +118,7 @@ namespace Bruno
 		if (value <= m_capacity)
 			return false;
 
-		int num = value;
+		uint32_t num = value;
 		if (num < 0x100)
 		{
 			num = 0x100;

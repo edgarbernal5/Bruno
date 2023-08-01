@@ -23,7 +23,7 @@ namespace Bruno
 		{																											\
 			return (name == GetTypeName() ? true : ParentType::Is(name));											\
 		}																											\
-		virtual std::string ToString() const																		\
+		virtual std::string ToString() const override																\
 		{																											\
 			return Type::GetTypeName();																				\
 		}																											\
@@ -51,6 +51,10 @@ namespace Bruno
 		T* As() const
 		{
 			return (Is(T::GetTypeIdClass()) ? reinterpret_cast<T*>(const_cast<RTTI*>(this)) : nullptr);
+		}
+		virtual std::string ToString() const
+		{
+			return "RTTI";
 		}
 	};
 }

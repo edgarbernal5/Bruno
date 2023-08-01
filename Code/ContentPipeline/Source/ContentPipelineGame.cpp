@@ -1,6 +1,7 @@
 #include "ContentPipelineGame.h"
 
 #include "Pipeline/ProcessorManager.h"
+#include "Pipeline/Serialization/ContentTypeWriterManager.h"
 
 #include <Bruno/Platform/Windows/NanaGameWindow.h>
 
@@ -71,6 +72,7 @@ namespace Bruno
 		InitializeUI();
 
 		ProcessorManager::Initialize();
+		ContentTypeWriterManager::Initialize();
 
 		m_gameWindow->Show();
 	}

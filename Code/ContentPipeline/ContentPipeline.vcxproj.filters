@@ -13,6 +13,12 @@
     <Filter Include="Source\Pipeline\Serialization">
       <UniqueIdentifier>{163dc3b5-a888-451f-8efd-ed9675003956}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Pipeline\Serialization\Writers">
+      <UniqueIdentifier>{cd2563f7-c348-43cf-a836-402865d8ddfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Pipeline\Graphics">
+      <UniqueIdentifier>{55d72a7e-4417-4337-8c24-2c7d1dc8d3e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp">
@@ -48,6 +54,21 @@
     <ClCompile Include="Source\Pipeline\Serialization\MemoryStream.cpp">
       <Filter>Source\Pipeline\Serialization</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\ContentTypeWriter.cpp">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\Writers\ShaderWriter.cpp">
+      <Filter>Source\Pipeline\Serialization\Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\ContentItem.cpp">
+      <Filter>Source\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\ContentTypeWriterManager.cpp">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Graphics\ShaderContentItem.cpp">
+      <Filter>Source\Pipeline\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h">
@@ -81,6 +102,21 @@
       <Filter>Source\Pipeline\Serialization</Filter>
     </ClInclude>
     <ClInclude Include="Source\Pipeline\Serialization\MemoryStream.h">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\ContentTypeWriter.h">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Graphics\ShaderContentItem.h">
+      <Filter>Source\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\Writers\ShaderWriter.h">
+      <Filter>Source\Pipeline\Serialization\Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\ContentItem.h">
+      <Filter>Source\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\ContentTypeWriterManager.h">
       <Filter>Source\Pipeline\Serialization</Filter>
     </ClInclude>
   </ItemGroup>

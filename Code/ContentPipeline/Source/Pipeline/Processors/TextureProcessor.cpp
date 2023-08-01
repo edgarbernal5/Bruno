@@ -9,8 +9,8 @@ namespace Bruno
 		m_supportedExtensions = { L".dds", L".bmp", L".jpg" };
 	}
 
-	ContentItem TextureProcessor::Process(const std::wstring& assetFilename)
+	ContentItem* TextureProcessor::Process(const std::wstring& assetFilename)
 	{
-		return ContentItem();
+		return new ContentItem();
 	}
 }

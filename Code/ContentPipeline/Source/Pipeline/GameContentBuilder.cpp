@@ -75,10 +75,10 @@ namespace Bruno
 	void GameContentBuilder::BuildAsset(BuildItem& buildItem)
 	{
 		auto processor = ProcessorManager::GetProcessorByName(buildItem.Request.ProcessorName);
-		ContentItem output = processor->Process(buildItem.Request.SourceFilename);
-
+		ContentItem* output = processor->Process(buildItem.Request.SourceFilename);
+		
 		buildItem.IsBuilt = true;
-		SerializeAsset(buildItem, output);
+		SerializeAsset(buildItem, *output);
 	}
 
 	void GameContentBuilder::PreparePaths()
