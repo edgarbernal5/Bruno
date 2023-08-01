@@ -1,6 +1,8 @@
 #include "GameContentBuilder.h"
 
 #include "ProcessorManager.h"
+#include "Serialization/FileStream.h"
+#include "Serialization/ContentCompiler.h"
 
 namespace Bruno
 {
@@ -107,6 +109,11 @@ namespace Bruno
 
 	void GameContentBuilder::SerializeAsset(const BuildItem& buildItem, const ContentItem& contentItem)
 	{
-
+		FileStream fileStream(buildItem.OutputFilename, FileAccess::Write);
+		
+		ContentCompiler compiler;
+		compiler.Compile(fileStream, contentItem, false, m_settings.OutputDirectory, buildItem.OutputFilename);
+		
+		fileStream.Close();
 	}
 }

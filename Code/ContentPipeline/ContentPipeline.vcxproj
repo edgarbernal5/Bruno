@@ -153,7 +153,10 @@
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Pipeline\Processors\ShaderProcessor.cpp" />
     <ClCompile Include="Source\Pipeline\Processors\TextureProcessor.cpp" />
+    <ClCompile Include="Source\Pipeline\Serialization\ContentCompiler.cpp" />
+    <ClCompile Include="Source\Pipeline\Serialization\ContentWriter.cpp" />
     <ClCompile Include="Source\Pipeline\Serialization\FileStream.cpp" />
+    <ClCompile Include="Source\Pipeline\Serialization\MemoryStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h" />
@@ -162,7 +165,10 @@
     <ClInclude Include="Source\Pipeline\ProcessorManager.h" />
     <ClInclude Include="Source\Pipeline\Processors\ShaderProcessor.h" />
     <ClInclude Include="Source\Pipeline\Processors\TextureProcessor.h" />
+    <ClInclude Include="Source\Pipeline\Serialization\ContentCompiler.h" />
+    <ClInclude Include="Source\Pipeline\Serialization\ContentWriter.h" />
     <ClInclude Include="Source\Pipeline\Serialization\FileStream.h" />
+    <ClInclude Include="Source\Pipeline\Serialization\MemoryStream.h" />
     <ClInclude Include="Source\Pipeline\Serialization\Stream.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

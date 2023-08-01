@@ -18,13 +18,21 @@ namespace Bruno
 		m_stream.close();
 	}
 
-	int FileStream::Read(uint8_t* buffer, int offset, int count)
+	int FileStream::Read(uint8_t* buffer, int count)
 	{
+		std::streamsize numBytesRead = 0;
+
+		m_stream.read((char*)&buffer, sizeof(uint8_t) * count);
+		numBytesRead = m_stream.gcount();
+
 		return 0;
 	}
 
-	void FileStream::Write(uint8_t* buffer, int offset, int count)
+	void FileStream::Write(uint8_t* buffer, int count)
 	{
+		m_stream.write((char*)&buffer, sizeof(uint8_t) * count);
+		if (m_stream.good()) {
 
+		}
 	}
 }

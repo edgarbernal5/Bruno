@@ -10,13 +10,13 @@ namespace Bruno
 		virtual ~Stream() = default;
 		virtual void Close() { }
 
-		virtual void Write(uint8_t* buffer, int offset, int count) = 0;
-		virtual int Read(uint8_t* buffer, int offset, int count) = 0;
+		virtual void Write(uint8_t* buffer, int count) = 0;
+		virtual int Read(uint8_t* buffer, int count) = 0;
 
 		virtual int ReadByte()
 		{
 			uint8_t buffer[1];
-			if (Read(buffer, 0, 1) == 0)
+			if (Read(buffer, 1) == 0)
 			{
 				return -1;
 			}
@@ -27,7 +27,7 @@ namespace Bruno
 		{
 			uint8_t buffer[1] = { value };
 
-			Write(buffer, 0, 1);
+			Write(buffer, 1);
 		}
 	};
 }

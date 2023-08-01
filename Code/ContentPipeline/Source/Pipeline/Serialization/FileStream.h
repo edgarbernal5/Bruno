@@ -33,8 +33,8 @@ namespace Bruno
 
 		virtual void Close() override;
 
-		virtual int Read(uint8_t* buffer, int offset, int count) override;
-		virtual void Write(uint8_t* buffer, int offset, int count) override;
+		virtual int Read(uint8_t* buffer, int count) override;
+		virtual void Write(uint8_t* buffer, int count) override;
 
 	private:
 

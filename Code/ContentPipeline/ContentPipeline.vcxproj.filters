@@ -36,7 +36,18 @@
     <ClCompile Include="Source\Pipeline\Processors\ShaderProcessor.cpp">
       <Filter>Source\Pipeline\Processors</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Pipeline\Serialization\FileStream.cpp" />
+    <ClCompile Include="Source\Pipeline\Serialization\ContentCompiler.cpp">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\ContentWriter.cpp">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\FileStream.cpp">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\MemoryStream.cpp">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h">
@@ -57,7 +68,20 @@
     <ClInclude Include="Source\Pipeline\Processors\ShaderProcessor.h">
       <Filter>Source\Pipeline\Processors</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Pipeline\Serialization\Stream.h" />
-    <ClInclude Include="Source\Pipeline\Serialization\FileStream.h" />
+    <ClInclude Include="Source\Pipeline\Serialization\ContentCompiler.h">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\ContentWriter.h">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\FileStream.h">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\Stream.h">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\MemoryStream.h">
+      <Filter>Source\Pipeline\Serialization</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
