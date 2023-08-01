@@ -18,13 +18,16 @@ namespace Bruno
 	public:
 		ContentWriter(ContentCompiler* compiler, Stream& stream, bool compressContent, const std::wstring& rootDirectory, std::wstring referenceRelocationPath);
 
+		void FlushOutput();
+
 		void WriteBytes(uint8_t *buffer, int count);
+		void WriteChar(char value);
 		void WriteInt32(int32_t value);
 		void WriteUInt32(uint32_t value);
 		void WriteObject(const ContentItem& object);
 		
 	private:
-		Stream& m_stream;
+		Stream& m_finalOutputStream;
 		MemoryStream m_headerDataStream;
 		MemoryStream m_contentDataStream;
 
@@ -34,6 +37,8 @@ namespace Bruno
 		std::vector<AbstractContentTypeWriter*> m_writers;
 
 		AbstractContentTypeWriter* GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex);
+		void WriteHeader();
+		void WriteFinalOutput();
 	};
 }
 

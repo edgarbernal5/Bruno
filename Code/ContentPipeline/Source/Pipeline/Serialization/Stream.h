@@ -10,6 +10,8 @@ namespace Bruno
 		virtual ~Stream() = default;
 		virtual void Close() { }
 
+		virtual long GetLength() = 0;
+
 		virtual void Write(uint8_t* buffer, int count) = 0;
 		virtual int Read(uint8_t* buffer, int count) = 0;
 
