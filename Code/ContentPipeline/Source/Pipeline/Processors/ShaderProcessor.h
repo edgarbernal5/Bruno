@@ -11,6 +11,6 @@ namespace Bruno
 	public:
 		ShaderProcessor();
 
-		virtual ContentItem* Process(const std::wstring& assetFilename) override;
+		virtual std::shared_ptr<ContentItem> Process(const std::wstring& assetFilename) override;
 	};
 }

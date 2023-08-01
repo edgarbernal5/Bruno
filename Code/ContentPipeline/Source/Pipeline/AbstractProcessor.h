@@ -13,7 +13,7 @@ namespace Bruno
 	public:
 		virtual ~AbstractProcessor() = default;
 
-		virtual ContentItem* Process(const std::wstring& assetFilename) = 0;
+		virtual std::shared_ptr<ContentItem> Process(const std::wstring& assetFilename) = 0;
 
 		const std::vector<std::wstring>& GetExtensionsSupported()
 		{
