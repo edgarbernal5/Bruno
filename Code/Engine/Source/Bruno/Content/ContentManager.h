@@ -24,7 +24,7 @@ namespace Bruno
 	template<typename T>
 	inline std::shared_ptr<T> ContentManager::Load(const std::string& assetName, bool forceReload)
 	{
-		if (forceReload == false)
+		if (!forceReload)
 		{
 			auto it = m_loadedAssets.find(assetName);
 			if (it != m_loadedAssets.end())

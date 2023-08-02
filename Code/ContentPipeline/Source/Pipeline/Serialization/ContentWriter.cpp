@@ -69,11 +69,11 @@ namespace Bruno
 
 	AbstractContentTypeWriter* ContentWriter::GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex)
 	{
-		auto it = m_writerIndexTable.find(writerTypeId);
-		if (it == m_writerIndexTable.end()) {
+		auto it = m_writersIndexTable.find(writerTypeId);
+		if (it == m_writersIndexTable.end()) {
 
 			typeIndex = m_writers.size();
-			m_writerIndexTable[writerTypeId] = typeIndex;
+			m_writersIndexTable[writerTypeId] = typeIndex;
 			auto allTypeWriters = ContentTypeWriterManager::GetContentTypeWriters();
 			auto typeWriter = allTypeWriters[writerTypeId];
 			

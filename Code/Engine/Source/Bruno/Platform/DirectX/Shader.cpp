@@ -3,6 +3,8 @@
 
 namespace Bruno
 {
+	BR_RTTI_DEFINITIONS(Shader);
+
 	Shader::Shader(const std::wstring& pathToSource, std::string entryPoint, std::string target)
 	{
 #if defined(BR_DEBUG)

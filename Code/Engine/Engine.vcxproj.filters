@@ -150,6 +150,12 @@
     <ClInclude Include="Source\Bruno\Content\ContentTypeReaderManager.h">
       <Filter>Source\Bruno\Content</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\Readers\ShaderReader.h">
+      <Filter>Source\Bruno\Content\Readers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\ContentReader.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -246,6 +252,12 @@
       <Filter>Source\Bruno\Content\Readers</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Content\ContentTypeReaderManager.cpp">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\Readers\ShaderReader.cpp">
+      <Filter>Source\Bruno\Content\Readers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\ContentReader.cpp">
       <Filter>Source\Bruno\Content</Filter>
     </ClCompile>
   </ItemGroup>

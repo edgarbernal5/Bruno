@@ -97,8 +97,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno\Content\ContentManager.h" />
+    <ClInclude Include="Source\Bruno\Content\ContentReader.h" />
     <ClInclude Include="Source\Bruno\Content\ContentTypeReader.h" />
     <ClInclude Include="Source\Bruno\Content\ContentTypeReaderManager.h" />
+    <ClInclude Include="Source\Bruno\Content\Readers\ShaderReader.h" />
     <ClInclude Include="Source\Bruno\Core\KeyCodes.h" />
     <ClInclude Include="Source\Bruno\Core\Assert.h" />
     <ClInclude Include="Source\Bruno\Core\Base.h" />
@@ -138,8 +140,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
+    <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentTypeReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentTypeReaderManager.cpp" />
+    <ClCompile Include="Source\Bruno\Content\Readers\ShaderReader.cpp" />
     <ClCompile Include="Source\Bruno\Core\GameTimer.cpp" />
     <ClCompile Include="Source\Bruno\Core\Base.cpp" />
     <ClCompile Include="Source\Bruno\Core\Log.cpp" />

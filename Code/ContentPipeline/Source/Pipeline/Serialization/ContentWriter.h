@@ -33,7 +33,7 @@ namespace Bruno
 
 		Stream* m_currentStream;
 
-		std::map<RTTI::IdType, int> m_writerIndexTable;
+		std::map<RTTI::IdType, int> m_writersIndexTable;
 		std::vector<AbstractContentTypeWriter*> m_writers;
 
 		AbstractContentTypeWriter* GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex);
