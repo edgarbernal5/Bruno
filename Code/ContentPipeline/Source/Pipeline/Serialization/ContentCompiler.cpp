@@ -7,5 +7,6 @@ namespace Bruno
 	{
 		ContentWriter writer(this, stream, compressContent, rootDirectory, referenceRelocationPath);
 		writer.WriteObject(object);
+		writer.FlushOutput();
 	}
 }

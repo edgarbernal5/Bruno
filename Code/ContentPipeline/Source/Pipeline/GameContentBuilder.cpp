@@ -109,10 +109,11 @@ namespace Bruno
 
 	void GameContentBuilder::SerializeAsset(const BuildItem& buildItem, const ContentItem& contentItem)
 	{
-		FileStream fileStream(buildItem.OutputFilename, FileAccess::Write);
+		auto absolutePath = std::filesystem::path(m_settings.RootDirectory) / std::filesystem::path(buildItem.OutputFilename);
+		FileStream fileStream(absolutePath, FileAccess::Write);
 		
 		ContentCompiler compiler;
-		compiler.Compile(fileStream, contentItem, false, m_settings.OutputDirectory, buildItem.OutputFilename);
+		compiler.Compile(fileStream, contentItem, false, m_settings.OutputDirectory, absolutePath);
 		
 		fileStream.Close();
 	}

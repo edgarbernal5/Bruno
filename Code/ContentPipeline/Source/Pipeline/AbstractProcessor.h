@@ -10,6 +10,7 @@ namespace Bruno
 	class AbstractProcessor : public RTTI
 	{
 		BR_RTTI_DECLARATION(AbstractProcessor, RTTI);
+
 	public:
 		virtual ~AbstractProcessor() = default;
 

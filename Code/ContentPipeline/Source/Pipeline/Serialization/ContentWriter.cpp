@@ -4,7 +4,7 @@
 
 namespace Bruno
 {
-	ContentWriter::ContentWriter(ContentCompiler* compiler, Stream& stream, bool compressContent, const std::wstring& rootDirectory, std::wstring referenceRelocationPath) :
+	ContentWriter::ContentWriter(ContentCompiler* compiler, Stream& stream, bool compressContent, const std::wstring& rootDirectory, const std::wstring& referenceRelocationPath) :
 		m_finalOutputStream(stream)
 	{
 		m_currentStream = &m_contentDataStream;
@@ -106,5 +106,6 @@ namespace Bruno
 		WriteChar('O');
 
 		m_currentStream->Write(m_headerDataStream.GetBuffer(), m_headerDataStream.GetLength());
+		m_currentStream->Write(m_contentDataStream.GetBuffer(), m_contentDataStream.GetLength());
 	}
 }

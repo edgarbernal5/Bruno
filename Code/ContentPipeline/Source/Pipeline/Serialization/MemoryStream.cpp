@@ -21,6 +21,16 @@ namespace Bruno
 		m_position = 0;
 	}
 
+	uint8_t* MemoryStream::GetBuffer()
+	{
+		return m_buffer;
+	}
+
+	long MemoryStream::GetLength()
+	{
+		return (long)(m_length);
+	}
+
 	int MemoryStream::ReadByte()
 	{
 		if (m_position >= m_length)

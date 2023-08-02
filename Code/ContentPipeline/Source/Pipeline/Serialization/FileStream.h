@@ -19,9 +19,9 @@ namespace Bruno
 
 	enum class FileAccess : uint32_t
 	{
-		None = (1 << 0),
-		Read = (1 << 1),
-		Write = (1 << 2)
+		None = 0,
+		Read = 1,
+		Write = 2
 	};
 	BR_DEFINITION_ENUM_FLAG(FileAccess);
 
@@ -32,6 +32,7 @@ namespace Bruno
 		~FileStream() = default;
 
 		virtual void Close() override;
+		long GetLength() override;
 
 		virtual int Read(uint8_t* buffer, int count) override;
 		virtual void Write(uint8_t* buffer, int count) override;

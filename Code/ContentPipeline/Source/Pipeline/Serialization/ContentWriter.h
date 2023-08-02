@@ -16,7 +16,7 @@ namespace Bruno
 	class ContentWriter
 	{
 	public:
-		ContentWriter(ContentCompiler* compiler, Stream& stream, bool compressContent, const std::wstring& rootDirectory, std::wstring referenceRelocationPath);
+		ContentWriter(ContentCompiler* compiler, Stream& stream, bool compressContent, const std::wstring& rootDirectory, const std::wstring& referenceRelocationPath);
 
 		void FlushOutput();
 

@@ -11,6 +11,8 @@ namespace Bruno
 		MemoryStream(uint32_t capacity);
 		~MemoryStream() = default;
 
+		uint8_t* GetBuffer();
+		long GetLength() override;
 		int ReadByte() override;
 		virtual int Read(uint8_t* buffer, int count) override;
 

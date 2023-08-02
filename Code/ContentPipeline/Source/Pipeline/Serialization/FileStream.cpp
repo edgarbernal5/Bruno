@@ -18,6 +18,11 @@ namespace Bruno
 		m_stream.close();
 	}
 
+	long FileStream::GetLength()
+	{
+		return 0;
+	}
+
 	int FileStream::Read(uint8_t* buffer, int count)
 	{
 		std::streamsize numBytesRead = 0;
