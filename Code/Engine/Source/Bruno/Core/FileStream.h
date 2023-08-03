@@ -29,7 +29,7 @@ namespace Bruno
 	{
 	public:
 		FileStream(const std::wstring& filename, FileAccess fileAccess);
-		~FileStream() = default;
+		~FileStream();
 
 		virtual void Close() override;
 		long GetLength() override;

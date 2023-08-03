@@ -10,7 +10,7 @@ namespace Bruno
 	{
 	}
 
-	std::shared_ptr<Shader> ShaderReader::ReadInternal(const std::string& assetName)
+	std::shared_ptr<Shader> ShaderReader::ReadInternal(const std::wstring& assetName)
 	{
 		return std::shared_ptr<Shader>();
 	}

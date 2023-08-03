@@ -8,7 +8,7 @@ namespace Bruno
 	{
 	public:
 		ShaderWriter();
-
+		
 		virtual void Write(ContentWriter& output, const ContentItem& contentItem) override;
 	};
 }

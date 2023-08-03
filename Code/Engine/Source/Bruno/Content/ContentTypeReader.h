@@ -14,7 +14,7 @@ namespace Bruno
 		virtual ~AbstractContentTypeReader() = default;
 
 		RTTI::IdType GetTargetTypeId() const;
-		virtual std::shared_ptr<RTTI> Read(const std::string& assetName) = 0;
+		virtual std::shared_ptr<RTTI> Read(const std::wstring& assetName) = 0;
 	protected:
 		AbstractContentTypeReader(const RTTI::IdType targetTypeId);
 
@@ -27,12 +27,12 @@ namespace Bruno
 	public:
 		virtual ~ContentTypeReader() = default;
 
-		virtual std::shared_ptr<RTTI> Read(const std::string& assetName) override;
+		virtual std::shared_ptr<RTTI> Read(const std::wstring& assetName) override;
 
 	protected:
 		ContentTypeReader(const RTTI::IdType targetTypeId);
 
-		virtual std::shared_ptr<T> ReadInternal(const std::string& assetName) = 0;
+		virtual std::shared_ptr<T> ReadInternal(const std::wstring& assetName) = 0;
 	};
 
 	template<typename T>
@@ -42,7 +42,7 @@ namespace Bruno
 	}
 
 	template<typename T>
-	inline std::shared_ptr<RTTI> ContentTypeReader<T>::Read(const std::string& assetName)
+	inline std::shared_ptr<RTTI> ContentTypeReader<T>::Read(const std::wstring& assetName)
 	{
 		return ReadInternal(assetName);
 	}

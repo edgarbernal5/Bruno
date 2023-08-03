@@ -11,6 +11,7 @@ namespace Bruno
 	public:
 		virtual ~AbstractContentTypeWriter() = default;
 
+		virtual std::string GetRuntimeReader();
 		RTTI::IdType GetTargetTypeId() const;
 		virtual void Write(ContentWriter& output, const ContentItem& contentItem) = 0;
 

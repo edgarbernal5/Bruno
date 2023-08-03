@@ -2,6 +2,7 @@
 #include "ContentTypeReaderManager.h"
 
 #include "Readers/TextureReader.h"
+#include "Readers/ShaderReader.h"
 
 namespace Bruno
 {
@@ -24,6 +25,7 @@ namespace Bruno
 			return;
 
 		AddContentTypeReader(std::make_shared<TextureReader>());
+		AddContentTypeReader(std::make_shared<ShaderReader>());
 
 		g_initialized = true;
 	}

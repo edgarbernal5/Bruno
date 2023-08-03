@@ -4,8 +4,7 @@
 #include <map>
 #include <vector>
 
-#include "Stream.h"
-#include "MemoryStream.h"
+#include <Bruno/Core/MemoryStream.h>
 #include "Pipeline/AbstractProcessor.h"
 
 namespace Bruno
@@ -25,6 +24,7 @@ namespace Bruno
 		void WriteInt32(int32_t value);
 		void WriteUInt32(uint32_t value);
 		void WriteObject(const ContentItem& object);
+		void WriteString(const std::string& value);
 		
 	private:
 		Stream& m_finalOutputStream;

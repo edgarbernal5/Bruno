@@ -156,6 +156,15 @@
     <ClInclude Include="Source\Bruno\Content\ContentReader.h">
       <Filter>Source\Bruno\Content</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\MemoryStream.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\Stream.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\FileStream.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -259,6 +268,12 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp">
       <Filter>Source\Bruno\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\FileStream.cpp">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\MemoryStream.cpp">
+      <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
 //#include <map>
 //#include <vector>
 
-//#include "Stream.h"
+#include "Bruno/Core/Stream.h"
 
 namespace Bruno
 {
@@ -13,7 +13,15 @@ namespace Bruno
 	class ContentReader
 	{
 	public:
+		ContentReader(ContentManager* contentManager, Stream& stream, const std::wstring& assetName);
 
+		char ReadChar();
+		int ReadInt32();
+
+	private:
+		ContentManager* m_contentManager;
+		Stream& m_stream;
+		std::wstring m_assetName;
 	};
 }
 

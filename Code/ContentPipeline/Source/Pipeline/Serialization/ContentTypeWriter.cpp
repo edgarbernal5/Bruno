@@ -9,6 +9,16 @@ namespace Bruno
 	{
 	}
 
+	std::string AbstractContentTypeWriter::GetRuntimeReader()
+	{
+		auto writerName = this->ToString();
+		if (!writerName.empty() && writerName.find_last_of("Reader") == writerName.size() - 6 - 1)
+		{
+			writerName = writerName.substr(0, writerName.size() - 6) + "Reader";
+		}
+		return writerName;
+	}
+
 	RTTI::IdType AbstractContentTypeWriter::GetTargetTypeId() const
 	{
 		return m_targetTypeId;

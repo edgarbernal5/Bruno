@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Stream.h"
+#include <Bruno/Core/Stream.h>
 #include "Pipeline/AbstractProcessor.h"
 
 namespace Bruno

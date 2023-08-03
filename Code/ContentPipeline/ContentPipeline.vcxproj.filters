@@ -48,12 +48,6 @@
     <ClCompile Include="Source\Pipeline\Serialization\ContentWriter.cpp">
       <Filter>Source\Pipeline\Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Pipeline\Serialization\FileStream.cpp">
-      <Filter>Source\Pipeline\Serialization</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Pipeline\Serialization\MemoryStream.cpp">
-      <Filter>Source\Pipeline\Serialization</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Pipeline\Serialization\ContentTypeWriter.cpp">
       <Filter>Source\Pipeline\Serialization</Filter>
     </ClCompile>
@@ -93,15 +87,6 @@
       <Filter>Source\Pipeline\Serialization</Filter>
     </ClInclude>
     <ClInclude Include="Source\Pipeline\Serialization\ContentWriter.h">
-      <Filter>Source\Pipeline\Serialization</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Pipeline\Serialization\FileStream.h">
-      <Filter>Source\Pipeline\Serialization</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Pipeline\Serialization\Stream.h">
-      <Filter>Source\Pipeline\Serialization</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Pipeline\Serialization\MemoryStream.h">
       <Filter>Source\Pipeline\Serialization</Filter>
     </ClInclude>
     <ClInclude Include="Source\Pipeline\Serialization\ContentTypeWriter.h">

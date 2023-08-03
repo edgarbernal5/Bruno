@@ -4,6 +4,8 @@
 #include "Pipeline/Serialization/ContentTypeWriterManager.h"
 
 #include <Bruno/Platform/Windows/NanaGameWindow.h>
+#include <Bruno/Platform/DirectX/Shader.h>
+#include <Bruno/Content/ContentManager.h>
 
 #include <nana/gui/filebox.hpp>
 
@@ -54,6 +56,29 @@ namespace Bruno
 		menuFile.append("Build", [this](nana::menu::item_proxy& ip)
 		{
 			m_contentBuilder.Run();
+		});
+		menuFile.append("Read", [&form, this](nana::menu::item_proxy& ip)
+		{
+			nana::filebox fileBox(form, true);
+			fileBox.add_filter("Shader File", "*.hlsl;*.fx");
+			fileBox.add_filter("Image File", "*.bmp;*.jpg;*.dds");
+			fileBox.add_filter("All Files", "*.*");
+
+			auto selectedFiles = fileBox();
+			if (!selectedFiles.empty())
+			{
+				std::wstring rootDirectory = selectedFiles[0].parent_path();
+				GameContentBuilder::Settings settings{ rootDirectory };
+				m_contentBuilder.SetSettings(settings);
+
+				for (auto& file : selectedFiles)
+				{
+					auto relativePath = std::filesystem::relative(file, rootDirectory);
+
+					ContentManager manager(rootDirectory);
+					auto shader=manager.Load<Shader>(relativePath);
+				}
+			}
 		});
 		menuFile.append_splitter();
 		menuFile.append("Exit", [](nana::menu::item_proxy& ip)

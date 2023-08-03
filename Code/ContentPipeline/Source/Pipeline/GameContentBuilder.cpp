@@ -1,7 +1,7 @@
 #include "GameContentBuilder.h"
 
 #include "ProcessorManager.h"
-#include "Serialization/FileStream.h"
+#include <Bruno/Core/FileStream.h>
 #include "Serialization/ContentCompiler.h"
 
 namespace Bruno
@@ -57,17 +57,19 @@ namespace Bruno
 	std::wstring GameContentBuilder::ChooseOutputFilename(const BuildRequest& request)
 	{
 		std::wstring outputFilename;
-		std::wstring intermediateDirectory = m_settings.OutputDirectory;
+		std::wstring outputDirectory = m_settings.OutputDirectory;
 
-		if (request.AssetName.empty()) {
+		if (request.AssetName.empty())
+		{
 
 		}
-		else {
-			std::filesystem::path ss = intermediateDirectory;
-			ss /= request.AssetName;
-			ss += OutputExtention;
+		else
+		{
+			std::filesystem::path outputPath = outputDirectory;
+			outputPath /= request.AssetName;
+			outputPath += OutputExtention;
 
-			outputFilename = std::filesystem::relative(ss, m_settings.RootDirectory);
+			outputFilename = std::filesystem::relative(outputPath, m_settings.RootDirectory);
 		}
 		return outputFilename;
 	}
@@ -114,7 +116,5 @@ namespace Bruno
 		
 		ContentCompiler compiler;
 		compiler.Compile(fileStream, contentItem, false, m_settings.OutputDirectory, absolutePath);
-		
-		fileStream.Close();
 	}
 }

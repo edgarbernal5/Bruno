@@ -67,6 +67,12 @@ namespace Bruno
 		typeWriter->Write(*this, object);
 	}
 
+	void ContentWriter::WriteString(const std::string& value)
+	{
+		WriteUInt32(value.size());
+		WriteBytes((uint8_t*)value.c_str(), value.size());
+	}
+
 	AbstractContentTypeWriter* ContentWriter::GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex)
 	{
 		auto it = m_writersIndexTable.find(writerTypeId);
@@ -91,7 +97,7 @@ namespace Bruno
 		WriteUInt32(m_writers.size());
 		for (size_t i = 0; i < m_writers.size(); i++)
 		{
-
+			WriteString(m_writers[i]->GetRuntimeReader());
 		}
 	}
 
@@ -105,6 +111,12 @@ namespace Bruno
 		WriteChar('N');
 		WriteChar('O');
 
+		int headerLength = (int)m_headerDataStream.GetLength();
+		int contentLength = (int)m_contentDataStream.GetLength();
+
+		const int HeaderSize = 5; // "BRUNO"
+
+		WriteInt32(HeaderSize + sizeof(int) + headerLength + contentLength);
 		m_currentStream->Write(m_headerDataStream.GetBuffer(), m_headerDataStream.GetLength());
 		m_currentStream->Write(m_contentDataStream.GetBuffer(), m_contentDataStream.GetLength());
 	}

@@ -1,3 +1,4 @@
+#include "brpch.h"
 #include "MemoryStream.h"
 
 #include <string.h>
