@@ -59,12 +59,14 @@ namespace Bruno
 		return true;
 	}
 
-	void MemoryStream::Write(const uint8_t* buffer, size_t count)
+	void MemoryStream::Write(const uint8_t* source, size_t count)
 	{
 		if (m_position + count > m_capacity)
-			return;
+		{
+			EnsureCapacity(m_position + count);
+		}
 
-		memcpy(m_buffer + m_position, buffer, count);
+		memcpy(m_buffer + m_position, source, count);
 		m_length += count;
 		m_position += count;
 	}

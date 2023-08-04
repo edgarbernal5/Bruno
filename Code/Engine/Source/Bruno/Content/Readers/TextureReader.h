@@ -14,6 +14,6 @@ namespace Bruno
 		~TextureReader() = default;
 
 	protected:
-		virtual std::shared_ptr<Texture> ReadInternal(const std::wstring& assetName) override;
+		virtual std::shared_ptr<Texture> ReadInternal(ContentReader& input) override;
 	};
 }

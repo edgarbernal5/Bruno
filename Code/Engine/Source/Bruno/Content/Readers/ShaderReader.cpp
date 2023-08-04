@@ -1,6 +1,8 @@
 #include "brpch.h"
 #include "ShaderReader.h"
 
+#include "Bruno/Content/ContentReader.h"
+
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(ShaderReader);
@@ -10,8 +12,11 @@ namespace Bruno
 	{
 	}
 
-	std::shared_ptr<Shader> ShaderReader::ReadInternal(const std::wstring& assetName)
+	std::shared_ptr<Shader> ShaderReader::ReadInternal(ContentReader& input)
 	{
-		return std::shared_ptr<Shader>();
+		std::vector<uint8_t> data;
+		input.ReadBytes(data);
+	
+		return std::make_shared<Shader>(data);
 	}
 }

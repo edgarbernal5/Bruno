@@ -16,9 +16,9 @@ namespace Bruno
 		WriteFinalOutput();
 	}
 
-	void ContentWriter::WriteBytes(uint8_t* buffer, int count)
+	void ContentWriter::WriteBytes(const std::vector<uint8_t>& buffer)
 	{
-		m_currentStream->Write(buffer, count);
+		m_currentStream->WriteBytes(buffer);
 	}
 
 	void ContentWriter::WriteChar(char value)
@@ -93,7 +93,7 @@ namespace Bruno
 		WriteUInt32(m_writers.size());
 		for (size_t i = 0; i < m_writers.size(); i++)
 		{
-			WriteString(m_writers[i]->GetRuntimeReader());
+			WriteString(m_writers[i]->GetReaderName());
 		}
 	}
 

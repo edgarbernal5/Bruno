@@ -19,7 +19,7 @@ namespace Bruno
 
 		virtual bool Read(uint8_t* destination, size_t count) override;
 
-		virtual void Write(const uint8_t* buffer, size_t count) override;
+		virtual void Write(const uint8_t* source, size_t count) override;
 
 	private:
 		uint8_t* m_buffer;

@@ -14,7 +14,7 @@ namespace Bruno
 		~ShaderReader() = default;
 
 	protected:
-		virtual std::shared_ptr<Shader> ReadInternal(const std::wstring& assetName) override;
+		virtual std::shared_ptr<Shader> ReadInternal(ContentReader& input) override;
 	};
 }
 

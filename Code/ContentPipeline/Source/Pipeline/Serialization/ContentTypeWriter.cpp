@@ -9,15 +9,15 @@ namespace Bruno
 	{
 	}
 
-	std::string AbstractContentTypeWriter::GetRuntimeReader()
-	{
-		auto writerName = ToString();
-		if (!writerName.empty() && writerName.find_last_of("Writer") == writerName.size() - 1)
-		{
-			writerName = writerName.substr(0, writerName.size() - 6) + "Reader";
-		}
-		return writerName;
-	}
+	//std::string AbstractContentTypeWriter::GetReaderName()
+	//{
+	//	auto writerName = this->ToString();
+	//	if (!writerName.empty() && writerName.find_last_of("Writer") == writerName.size() - 1)
+	//	{
+	//		writerName = writerName.substr(0, writerName.size() - 6) + "Reader";
+	//	}
+	//	return writerName;
+	//}
 
 	RTTI::IdType AbstractContentTypeWriter::GetTargetTypeId() const
 	{

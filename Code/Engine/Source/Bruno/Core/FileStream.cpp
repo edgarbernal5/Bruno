@@ -49,13 +49,13 @@ namespace Bruno
 
 		m_stream.read((char*)destination, count);
 		numBytesRead = m_stream.gcount();
-
+		//numBytesRead == count ?
 		return true;
 	}
 
-	void FileStream::Write(const uint8_t* buffer, size_t count)
+	void FileStream::Write(const uint8_t* source, size_t count)
 	{
-		m_stream.write((char*)buffer, count);
+		m_stream.write((char*)source, count);
 		
 	}
 }

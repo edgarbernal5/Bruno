@@ -10,7 +10,7 @@ namespace Bruno
 	{
 	}
 
-	std::shared_ptr<Texture> TextureReader::ReadInternal(const std::wstring& assetName)
+	std::shared_ptr<Texture> TextureReader::ReadInternal(ContentReader& input)
 	{
 		return std::shared_ptr<Texture>();
 	}

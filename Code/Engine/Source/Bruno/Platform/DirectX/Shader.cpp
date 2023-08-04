@@ -33,4 +33,10 @@ namespace Bruno
 			}
 		}
 	}
+
+	Shader::Shader(const std::vector<uint8_t>& compiledCode)
+	{
+		D3DCreateBlob(compiledCode.size(), &m_blob);
+		CopyMemory(m_blob->GetBufferPointer(), compiledCode.data(), compiledCode.size());
+	}
 }

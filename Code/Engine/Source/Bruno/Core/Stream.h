@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 #include <string>
 
 namespace Bruno
@@ -17,6 +18,8 @@ namespace Bruno
 
 		virtual bool Read(uint8_t* destination, size_t count) = 0;
 
+		void ReadBytes(std::vector<uint8_t>& bytes, size_t size = 0);
+
 		template<typename T>
 		void ReadRaw(T& object)
 		{
@@ -24,7 +27,9 @@ namespace Bruno
 		}
 		void ReadString(std::string& string);
 
-		virtual void Write(const uint8_t* buffer, size_t count) = 0;
+		virtual void Write(const uint8_t* source, size_t count) = 0;
+
+		void WriteBytes(const std::vector<uint8_t>& bytes, bool writeSize = true);
 
 		template<typename T>
 		void WriteRaw(const T& object)

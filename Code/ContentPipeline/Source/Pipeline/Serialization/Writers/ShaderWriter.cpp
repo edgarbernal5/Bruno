@@ -9,10 +9,14 @@ namespace Bruno
 	{
 	}
 
+	std::string ShaderWriter::GetReaderName()
+	{
+		return "ShaderReader";
+	}
+
 	void ShaderWriter::Write(ContentWriter& output, const ContentItem& contentItem)
 	{
 		auto shaderContentItem = contentItem.As<ShaderContentItem>();
-		output.WriteUInt32(shaderContentItem->CompiledCodeData.size());
-		output.WriteBytes(shaderContentItem->CompiledCodeData.data(), shaderContentItem->CompiledCodeData.size());
+		output.WriteBytes(shaderContentItem->CompiledCodeData);
 	}
 }

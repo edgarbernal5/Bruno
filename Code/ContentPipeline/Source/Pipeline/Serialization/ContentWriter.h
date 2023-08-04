@@ -19,7 +19,7 @@ namespace Bruno
 
 		void FlushOutput();
 
-		void WriteBytes(uint8_t *buffer, int count);
+		void WriteBytes(const std::vector<uint8_t>& buffer);
 		void WriteChar(char value);
 		void WriteInt32(int32_t value);
 		void WriteUInt32(uint32_t value);

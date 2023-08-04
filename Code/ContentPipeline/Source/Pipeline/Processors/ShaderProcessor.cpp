@@ -48,7 +48,7 @@ namespace Bruno
 		}
 
 		auto output = std::make_shared<ShaderContentItem>();
-		output->CompiledCodeData.reserve(compiledBlob->GetBufferSize());
+		output->CompiledCodeData.resize(compiledBlob->GetBufferSize());
 		memcpy(output->CompiledCodeData.data(), compiledBlob->GetBufferPointer(), compiledBlob->GetBufferSize());
 
 		return output;

@@ -5,6 +5,7 @@
 namespace Bruno
 {
 	class Game;
+	class ContentReader;
 
 	class AbstractContentTypeReader : public RTTI
 	{
@@ -14,7 +15,7 @@ namespace Bruno
 		virtual ~AbstractContentTypeReader() = default;
 
 		RTTI::IdType GetTargetTypeId() const;
-		virtual std::shared_ptr<RTTI> Read(const std::wstring& assetName) = 0;
+		virtual std::shared_ptr<RTTI> Read(ContentReader& input) = 0;
 	protected:
 		AbstractContentTypeReader(const RTTI::IdType targetTypeId);
 
@@ -27,12 +28,12 @@ namespace Bruno
 	public:
 		virtual ~ContentTypeReader() = default;
 
-		virtual std::shared_ptr<RTTI> Read(const std::wstring& assetName) override;
+		virtual std::shared_ptr<RTTI> Read(ContentReader& input) override;
 
 	protected:
 		ContentTypeReader(const RTTI::IdType targetTypeId);
 
-		virtual std::shared_ptr<T> ReadInternal(const std::wstring& assetName) = 0;
+		virtual std::shared_ptr<T> ReadInternal(ContentReader& input) = 0;
 	};
 
 	template<typename T>
@@ -42,8 +43,8 @@ namespace Bruno
 	}
 
 	template<typename T>
-	inline std::shared_ptr<RTTI> ContentTypeReader<T>::Read(const std::wstring& assetName)
+	inline std::shared_ptr<RTTI> ContentTypeReader<T>::Read(ContentReader& input)
 	{
-		return ReadInternal(assetName);
+		return ReadInternal(input);
 	}
 }

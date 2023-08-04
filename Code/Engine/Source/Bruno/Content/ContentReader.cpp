@@ -2,6 +2,7 @@
 #include "ContentReader.h"
 
 #include "ContentManager.h"
+#include "ContentTypeReaderManager.h"
 
 namespace Bruno
 {
@@ -34,8 +35,9 @@ namespace Bruno
     std::shared_ptr<RTTI> ContentReader::ReadAsset()
     {
         uint32_t sharedResourceCount = ReadHeader();
+        auto object = ReadObject();
 
-        return std::shared_ptr<RTTI>();
+        return object;
     }
 
     void ContentReader::ReadChar(char& output)
@@ -58,10 +60,13 @@ namespace Bruno
         m_stream.ReadString(output);
     }
 
+    void ContentReader::ReadBytes(std::vector<uint8_t>& output)
+    {
+        m_stream.ReadBytes(output);
+    }
+
     uint32_t ContentReader::ReadHeader()
     {
-        auto len = m_stream.GetLength();
-        auto pos = m_stream.GetPosition();
         uint32_t readersCount;
         ReadUInt32(readersCount);
 
@@ -69,9 +74,29 @@ namespace Bruno
         {
             std::string readerName;
             ReadString(readerName);
+
+            auto reader = ContentTypeReaderManager::GetReaderByName(readerName);
+            m_readers.push_back(reader.get());
         }
 
         return 0;
+    }
+
+    std::shared_ptr<RTTI> ContentReader::ReadObject()
+    {
+        int readerIndex;
+        ReadInt32(readerIndex);
+
+        if (readerIndex == 0)
+            return nullptr;
+
+        --readerIndex;
+        if (readerIndex >= m_readers.size())
+        {
+            throw std::exception("Invalid type reader index.");
+        }
+
+        return m_readers[readerIndex]->Read(*this);
     }
 
     /*int ContentReader::ReadInt32()

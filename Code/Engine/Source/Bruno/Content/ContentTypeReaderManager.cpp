@@ -19,6 +19,17 @@ namespace Bruno
 		return g_contentTypeReaders.emplace(reader->GetTargetTypeId(), std::move(reader)).second;
 	}
 
+
+	const std::shared_ptr<AbstractContentTypeReader>& ContentTypeReaderManager::GetReaderByName(const std::string& name)
+	{
+		for (auto& [rtti, reader] : g_contentTypeReaders)
+		{
+			if (reader->ToString() == name)
+				return reader;
+		}
+		return nullptr;
+	}
+
 	void ContentTypeReaderManager::Initialize()
 	{
 		if (g_initialized)

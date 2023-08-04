@@ -8,10 +8,11 @@ namespace Bruno
 	class AbstractContentTypeWriter : public RTTI
 	{
 		BR_RTTI_DECLARATION(AbstractContentTypeWriter, RTTI);
+
 	public:
 		virtual ~AbstractContentTypeWriter() = default;
 
-		virtual std::string GetRuntimeReader();
+		virtual std::string GetReaderName() = 0;
 		RTTI::IdType GetTargetTypeId() const;
 		virtual void Write(ContentWriter& output, const ContentItem& contentItem) = 0;
 

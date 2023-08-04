@@ -11,6 +11,7 @@ namespace Bruno
 
 	public:
 		Shader(const std::wstring& pathToSource, std::string entryPoint, std::string target);
+		Shader(const std::vector<uint8_t>& compiledCode);
 
 		ID3DBlob* GetBlob() { return m_blob.Get(); }
 
