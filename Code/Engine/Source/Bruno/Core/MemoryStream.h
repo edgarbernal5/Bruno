@@ -9,7 +9,7 @@ namespace Bruno
 	public:
 		MemoryStream();
 		MemoryStream(uint32_t capacity);
-		~MemoryStream() = default;
+		~MemoryStream();
 
 		uint8_t* GetBuffer() { return m_buffer; }
 

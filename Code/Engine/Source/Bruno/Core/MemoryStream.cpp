@@ -24,6 +24,16 @@ namespace Bruno
 		EnsureCapacity(capacity);
 	}
 
+	MemoryStream::~MemoryStream()
+	{
+		if (m_buffer)
+			delete[] m_buffer;
+
+		m_buffer = nullptr;
+		m_length = 0;
+		m_position = 0;
+	}
+
 	long MemoryStream::GetLength()
 	{
 		return (long)(m_length);
