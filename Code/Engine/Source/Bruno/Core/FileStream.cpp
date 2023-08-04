@@ -55,7 +55,7 @@ namespace Bruno
 
 	void FileStream::Write(const uint8_t* buffer, size_t count)
 	{
-		m_stream.write((char*)buffer, sizeof(uint8_t) * count);
+		m_stream.write((char*)buffer, count);
 		
 	}
 }

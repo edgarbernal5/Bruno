@@ -43,6 +43,8 @@ namespace Bruno
 			{
 				std::wstring rootDirectory = selectedFiles[0].parent_path();
 				GameContentBuilder::Settings settings{ rootDirectory };
+				settings.OutputDirectory = rootDirectory;
+
 				m_contentBuilder.SetSettings(settings);
 
 				for (auto& file : selectedFiles)

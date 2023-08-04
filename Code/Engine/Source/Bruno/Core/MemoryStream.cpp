@@ -45,6 +45,7 @@ namespace Bruno
 			return false;
 
 		memcpy(destination, (char*)m_buffer + m_position, count);
+		m_position += count;
 		return true;
 	}
 
@@ -53,8 +54,9 @@ namespace Bruno
 		if (m_position + count > m_capacity)
 			return;
 
-		m_length += count;
 		memcpy(m_buffer + m_position, buffer, count);
+		m_length += count;
+		m_position += count;
 	}
 
 	bool MemoryStream::EnsureCapacity(uint64_t capacity)

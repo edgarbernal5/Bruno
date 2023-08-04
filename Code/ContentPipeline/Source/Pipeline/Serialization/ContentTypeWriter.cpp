@@ -12,7 +12,7 @@ namespace Bruno
 	std::string AbstractContentTypeWriter::GetRuntimeReader()
 	{
 		auto writerName = ToString();
-		if (!writerName.empty() && writerName.find_last_of("Reader") == writerName.size() - 6 - 1)
+		if (!writerName.empty() && writerName.find_last_of("Writer") == writerName.size() - 1)
 		{
 			writerName = writerName.substr(0, writerName.size() - 6) + "Reader";
 		}

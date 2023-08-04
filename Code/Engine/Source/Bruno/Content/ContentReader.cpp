@@ -53,6 +53,11 @@ namespace Bruno
         m_stream.ReadRaw<uint32_t>(output);
     }
 
+    void ContentReader::ReadString(std::string& output)
+    {
+        m_stream.ReadString(output);
+    }
+
     uint32_t ContentReader::ReadHeader()
     {
         auto len = m_stream.GetLength();
@@ -60,6 +65,11 @@ namespace Bruno
         uint32_t readersCount;
         ReadUInt32(readersCount);
 
+        for (size_t i = 0; i < readersCount; i++)
+        {
+            std::string readerName;
+            ReadString(readerName);
+        }
 
         return 0;
     }

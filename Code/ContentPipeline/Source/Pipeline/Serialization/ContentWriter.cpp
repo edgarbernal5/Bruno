@@ -93,7 +93,7 @@ namespace Bruno
 		WriteUInt32(m_writers.size());
 		for (size_t i = 0; i < m_writers.size(); i++)
 		{
-			//WriteString(m_writers[i]->GetRuntimeReader());
+			WriteString(m_writers[i]->GetRuntimeReader());
 		}
 	}
 

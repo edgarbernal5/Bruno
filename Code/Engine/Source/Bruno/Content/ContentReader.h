@@ -19,8 +19,8 @@ namespace Bruno
 
 		void ReadChar(char& output);
 		void ReadInt32(int32_t &output);
-		void ReadUInt32(uint32_t&output);
-
+		void ReadUInt32(uint32_t& output);
+		void ReadString(std::string& output);
 
 	private:
 		ContentManager* m_contentManager;
