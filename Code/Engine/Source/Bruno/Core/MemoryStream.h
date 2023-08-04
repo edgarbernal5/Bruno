@@ -11,21 +11,23 @@ namespace Bruno
 		MemoryStream(uint32_t capacity);
 		~MemoryStream() = default;
 
-		uint8_t* GetBuffer();
-		long GetLength() override;
-		int ReadByte() override;
-		virtual int Read(uint8_t* buffer, int count) override;
+		uint8_t* GetBuffer() { return m_buffer; }
 
-		void WriteByte(uint8_t byte) override;
-		virtual void Write(uint8_t* buffer, int count) override;
+		long GetLength() override;
+		uint64_t GetPosition() override;
+		bool IsStreamValid() const override;
+
+		virtual bool Read(uint8_t* destination, size_t count) override;
+
+		virtual void Write(const uint8_t* buffer, size_t count) override;
 
 	private:
 		uint8_t* m_buffer;
-		uint32_t m_capacity;
-		int m_length;
-		int m_position;
+		uint64_t m_capacity;
+		long m_length;
+		uint64_t m_position;
 
-		bool EnsureCapacity(uint32_t value);
+		bool EnsureCapacity(uint64_t value);
 	};
 }
 

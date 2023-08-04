@@ -12,6 +12,10 @@ namespace Bruno
 				m_stream.open(filename.c_str(), std::fstream::in | std::fstream::binary);
 		else if ((fileAccess & FileAccess::Write) != FileAccess::None)
 			m_stream.open(filename.c_str(), std::fstream::out | std::fstream::binary);
+
+		if (m_stream.good() && (fileAccess & FileAccess::Read) != FileAccess::None) {
+			m_fileLength = std::filesystem::file_size(filename);
+		}
 	}
 
 	FileStream::~FileStream()
@@ -26,24 +30,32 @@ namespace Bruno
 
 	long FileStream::GetLength()
 	{
-		return 0;
+		return m_fileLength;
 	}
 
-	int FileStream::Read(uint8_t* buffer, int count)
+	uint64_t FileStream::GetPosition()
+	{
+		return m_stream.tellp();
+	}
+
+	bool FileStream::IsStreamValid() const
+	{
+		return m_stream.good();
+	}
+
+	bool FileStream::Read(uint8_t* destination, size_t count)
 	{
 		std::streamsize numBytesRead = 0;
 
-		m_stream.read((char*)buffer, sizeof(uint8_t) * count);
+		m_stream.read((char*)destination, count);
 		numBytesRead = m_stream.gcount();
 
-		return 0;
+		return true;
 	}
 
-	void FileStream::Write(uint8_t* buffer, int count)
+	void FileStream::Write(const uint8_t* buffer, size_t count)
 	{
 		m_stream.write((char*)buffer, sizeof(uint8_t) * count);
-		if (m_stream.good()) {
-
-		}
+		
 	}
 }

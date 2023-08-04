@@ -31,14 +31,18 @@ namespace Bruno
 		FileStream(const std::wstring& filename, FileAccess fileAccess);
 		~FileStream();
 
-		virtual void Close() override;
-		long GetLength() override;
+		void Close() override;
 
-		virtual int Read(uint8_t* buffer, int count) override;
-		virtual void Write(uint8_t* buffer, int count) override;
+		virtual long GetLength() override;
+		virtual uint64_t GetPosition() override;
+		virtual bool IsStreamValid() const override;
+
+		bool Read(uint8_t* destination, size_t count) override;
+
+		void Write(const uint8_t* buffer, size_t count) override;
 
 	private:
-
+		long m_fileLength;
 		std::fstream m_stream;
 	};	
 }

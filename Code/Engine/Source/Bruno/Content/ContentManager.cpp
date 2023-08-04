@@ -24,8 +24,9 @@ namespace Bruno
 
 		FileStream fileStream(assetName, FileAccess::Read);
 		ContentReader contentReader(this, fileStream, assetName);
+		return contentReader.ReadAsset();
 
-		auto& reader = it->second;
-		return reader->Read(assetName);
+		//auto& reader = it->second;
+		//return reader->Read(assetName);
 	}
 }

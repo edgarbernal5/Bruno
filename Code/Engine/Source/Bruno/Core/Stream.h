@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace Bruno
 {
@@ -11,25 +12,25 @@ namespace Bruno
 		virtual void Close() { }
 
 		virtual long GetLength() = 0;
+		virtual uint64_t GetPosition() = 0;
+		virtual bool IsStreamValid() const = 0;
 
-		virtual void Write(uint8_t* buffer, int count) = 0;
-		virtual int Read(uint8_t* buffer, int count) = 0;
+		virtual bool Read(uint8_t* destination, size_t count) = 0;
 
-		virtual int ReadByte()
+		template<typename T>
+		void ReadRaw(T& object)
 		{
-			uint8_t buffer[1];
-			if (Read(buffer, 1) == 0)
-			{
-				return -1;
-			}
-			return buffer[0];
+			Read((uint8_t*)&object, sizeof(T));
 		}
+		void ReadString(std::string& string);
 
-		virtual void WriteByte(uint8_t value)
+		virtual void Write(const uint8_t* buffer, size_t count) = 0;
+
+		template<typename T>
+		void WriteRaw(const T& object)
 		{
-			uint8_t buffer[1] = { value };
-
-			Write(buffer, 1);
+			Write((uint8_t*)&object, sizeof(T));
 		}
+		void WriteString(const std::string& string);
 	};
 }

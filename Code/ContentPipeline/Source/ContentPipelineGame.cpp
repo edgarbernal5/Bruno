@@ -67,15 +67,13 @@ namespace Bruno
 			if (!selectedFiles.empty())
 			{
 				std::wstring rootDirectory = selectedFiles[0].parent_path();
-				GameContentBuilder::Settings settings{ rootDirectory };
-				m_contentBuilder.SetSettings(settings);
 
 				for (auto& file : selectedFiles)
 				{
 					auto relativePath = std::filesystem::relative(file, rootDirectory);
 
 					ContentManager manager(rootDirectory);
-					auto shader=manager.Load<Shader>(relativePath);
+					auto shader = manager.Load<Shader>(relativePath);
 				}
 			}
 		});

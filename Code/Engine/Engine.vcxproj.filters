@@ -275,6 +275,7 @@
     <ClCompile Include="Source\Bruno\Core\MemoryStream.cpp">
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\Stream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Bruno\Math\Math.inl">

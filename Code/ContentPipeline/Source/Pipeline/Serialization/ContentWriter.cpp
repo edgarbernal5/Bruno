@@ -31,24 +31,20 @@ namespace Bruno
 
 	void ContentWriter::WriteInt32(int32_t value)
 	{
-		uint8_t buffer[4];
+		/*uint8_t buffer[4];
 		buffer[0] = (uint8_t)value;
 		buffer[1] = (uint8_t)(value >> 8);
 		buffer[2] = (uint8_t)(value >> 0x10);
 		buffer[3] = (uint8_t)(value >> 0x18);
 
-		m_currentStream->Write(buffer, 4);
+		m_currentStream->Write(buffer, 4);*/
+
+		m_currentStream->WriteRaw<int32_t>(value);
 	}
 
 	void ContentWriter::WriteUInt32(uint32_t value)
 	{
-		uint8_t buffer[4];
-		buffer[0] = (uint8_t)value;
-		buffer[1] = (uint8_t)(value >> 8);
-		buffer[2] = (uint8_t)(value >> 0x10);
-		buffer[3] = (uint8_t)(value >> 0x18);
-
-		m_currentStream->Write(buffer, 4);
+		m_currentStream->WriteRaw<uint32_t>(value);
 	}
 
 	void ContentWriter::WriteObject(const ContentItem& object)
@@ -69,8 +65,7 @@ namespace Bruno
 
 	void ContentWriter::WriteString(const std::string& value)
 	{
-		WriteUInt32(value.size());
-		WriteBytes((uint8_t*)value.c_str(), value.size());
+		m_currentStream->WriteString(value);
 	}
 
 	AbstractContentTypeWriter* ContentWriter::GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex)
@@ -83,6 +78,7 @@ namespace Bruno
 			auto allTypeWriters = ContentTypeWriterManager::GetContentTypeWriters();
 			auto typeWriter = allTypeWriters[writerTypeId];
 			
+			m_writers.push_back(typeWriter.get());
 			return typeWriter.get();
 		}
 
@@ -97,7 +93,7 @@ namespace Bruno
 		WriteUInt32(m_writers.size());
 		for (size_t i = 0; i < m_writers.size(); i++)
 		{
-			WriteString(m_writers[i]->GetRuntimeReader());
+			//WriteString(m_writers[i]->GetRuntimeReader());
 		}
 	}
 

@@ -153,6 +153,7 @@
     <ClCompile Include="Source\Bruno\Core\Log.cpp" />
     <ClCompile Include="Source\Bruno\Core\Logger.cpp" />
     <ClCompile Include="Source\Bruno\Core\MemoryStream.cpp" />
+    <ClCompile Include="Source\Bruno\Core\Stream.cpp" />
     <ClCompile Include="Source\Bruno\Math\Math.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />

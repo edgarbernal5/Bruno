@@ -9,34 +9,62 @@ namespace Bruno
         m_contentManager(contentManager),
         m_stream(stream)
     {
-        auto b = ReadChar();
-        auto r = ReadChar();
-        auto u = ReadChar();
-        auto n = ReadChar();
-        auto o = ReadChar();
-        if (b != 'B' ||
-            r != 'R' ||
-            u != 'U' ||
-            n != 'N' ||
-            o != 'O')
+        char stamp[5];
+        m_stream.Read((uint8_t*)stamp, 5);
+        if (stamp[0] != 'B' ||
+            stamp[1] != 'R' ||
+            stamp[2] != 'U' ||
+            stamp[3] != 'N' ||
+            stamp[4] != 'O')
         {
-            int aaa = 3;
+            throw std::exception("bad bruno file. header.");
         }
 
-        int totalSizeInBytes = ReadInt32();
+        int totalSizeInBytes;
+        ReadInt32(totalSizeInBytes);
+
+        const int HeaderSize = 5; // "BRUNO"
+        int headerAndContentSize = HeaderSize + sizeof(int);
+        if (totalSizeInBytes - headerAndContentSize > m_stream.GetLength() - m_stream.GetPosition())
+        {
+            throw std::exception("corrupt file.");
+        }
     }
 
-    char ContentReader::ReadChar()
+    std::shared_ptr<RTTI> ContentReader::ReadAsset()
     {
-        uint8_t byte;
-        if (m_stream.Read(&byte, 1) == -1)
-        {
-            throw std::exception("Error Read()");
-        }
-        return (char)byte;
+        uint32_t sharedResourceCount = ReadHeader();
+
+        return std::shared_ptr<RTTI>();
     }
 
-    int ContentReader::ReadInt32()
+    void ContentReader::ReadChar(char& output)
+    {
+        m_stream.ReadRaw<char>(output);
+    }
+
+    void ContentReader::ReadInt32(int32_t& output)
+    {
+        m_stream.ReadRaw<int32_t>(output);
+    }
+
+    void ContentReader::ReadUInt32(uint32_t& output)
+    {
+        m_stream.ReadRaw<uint32_t>(output);
+    }
+
+    uint32_t ContentReader::ReadHeader()
+    {
+        auto len = m_stream.GetLength();
+        auto pos = m_stream.GetPosition();
+        uint32_t readersCount;
+        ReadUInt32(readersCount);
+
+
+        return 0;
+    }
+
+    /*int ContentReader::ReadInt32()
     {
         uint8_t buffer[4];
         if (m_stream.Read(buffer, 4) == -1)
@@ -47,5 +75,5 @@ namespace Bruno
             (buffer[1]) << 8 |
             (buffer[2]) << 16 |
             (buffer[3]) << 24;
-    }
+    }*/
 }
