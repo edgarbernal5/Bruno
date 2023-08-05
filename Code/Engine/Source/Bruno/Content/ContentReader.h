@@ -19,7 +19,10 @@ namespace Bruno
 
 		void ReadChar(char& output);
 		void ReadInt32(int32_t &output);
+		void ReadInt64(int64_t &output);
+		void ReadUInt8(uint8_t& output);
 		void ReadUInt32(uint32_t& output);
+		void ReadUInt64(uint64_t& output);
 		void ReadString(std::string& output);
 		void ReadBytes(std::vector<uint8_t>& output);
 

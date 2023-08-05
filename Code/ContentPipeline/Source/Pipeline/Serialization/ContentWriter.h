@@ -22,7 +22,10 @@ namespace Bruno
 		void WriteBytes(const std::vector<uint8_t>& buffer);
 		void WriteChar(char value);
 		void WriteInt32(int32_t value);
+		void WriteInt64(int64_t value);
+		void WriteUInt8(uint8_t value);
 		void WriteUInt32(uint32_t value);
+		void WriteUInt64(uint64_t value);
 		void WriteObject(const ContentItem& object);
 		void WriteString(const std::string& value);
 		

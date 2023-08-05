@@ -2,6 +2,7 @@
 #include "ContentTypeWriterManager.h"
 
 #include "Writers/ShaderWriter.h"
+#include "Writers/TextureWriter.h"
 
 namespace Bruno
 {
@@ -24,6 +25,7 @@ namespace Bruno
 			return;
 
 		AddContentTypeWriter(std::make_shared<ShaderWriter>());
+		AddContentTypeWriter(std::make_shared<TextureWriter>());
 
 		g_initialized = true;
 	}

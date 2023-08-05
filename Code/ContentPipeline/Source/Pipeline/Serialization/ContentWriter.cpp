@@ -42,9 +42,24 @@ namespace Bruno
 		m_currentStream->WriteRaw<int32_t>(value);
 	}
 
+	void ContentWriter::WriteInt64(int64_t value)
+	{
+		m_currentStream->WriteRaw<int64_t>(value);
+	}
+
+	void ContentWriter::WriteUInt8(uint8_t value)
+	{
+		m_currentStream->WriteRaw<uint8_t>(value);
+	}
+
 	void ContentWriter::WriteUInt32(uint32_t value)
 	{
 		m_currentStream->WriteRaw<uint32_t>(value);
+	}
+
+	void ContentWriter::WriteUInt64(uint64_t value)
+	{
+		m_currentStream->WriteRaw<uint64_t>(value);
 	}
 
 	void ContentWriter::WriteObject(const ContentItem& object)
@@ -90,7 +105,7 @@ namespace Bruno
 	{
 		m_currentStream = &m_headerDataStream;
 
-		WriteUInt32(m_writers.size());
+		WriteUInt64(m_writers.size());
 		for (size_t i = 0; i < m_writers.size(); i++)
 		{
 			WriteString(m_writers[i]->GetReaderName());

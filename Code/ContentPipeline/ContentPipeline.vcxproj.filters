@@ -63,6 +63,12 @@
     <ClCompile Include="Source\Pipeline\Graphics\ShaderContentItem.cpp">
       <Filter>Source\Pipeline\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\Writers\TextureWriter.cpp">
+      <Filter>Source\Pipeline\Serialization\Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Graphics\TextureContentItem.cpp">
+      <Filter>Source\Pipeline\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h">
@@ -103,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="Source\Pipeline\Serialization\ContentTypeWriterManager.h">
       <Filter>Source\Pipeline\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Graphics\TextureContentItem.h">
+      <Filter>Source\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\Writers\TextureWriter.h">
+      <Filter>Source\Pipeline\Serialization\Writers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

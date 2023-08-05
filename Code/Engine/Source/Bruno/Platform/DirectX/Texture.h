@@ -12,8 +12,28 @@ namespace Bruno
 		BR_RTTI_DECLARATION(Texture, RTTI);
 
 	public:
+
+		struct InitData
+		{
+			size_t Width;
+			size_t Height;
+			size_t Depth;
+			size_t ArraySize;
+			size_t MipLevels;
+			uint32_t Format;
+			uint8_t Dimension;
+
+			struct ImageInitData
+			{
+				int64_t RowPitch;
+				int64_t SlicePitch;
+				std::vector<uint8_t> Pixels;
+			};
+			std::vector<ImageInitData> Images;
+		};
+
 		Texture(const std::wstring& filename);
-		Texture(const D3D12_RESOURCE_DESC& resourceDesc, const D3D12_CLEAR_VALUE* clearValue = nullptr);
+		Texture(const InitData& textureInitData);
 
 		constexpr const DescriptorHandle& GetSrvHandle() const { return m_srvHandle; }
 	private:

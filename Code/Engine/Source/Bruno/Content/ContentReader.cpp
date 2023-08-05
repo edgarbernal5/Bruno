@@ -50,9 +50,24 @@ namespace Bruno
         m_stream.ReadRaw<int32_t>(output);
     }
 
+    void ContentReader::ReadInt64(int64_t& output)
+    {
+        m_stream.ReadRaw<int64_t>(output);
+    }
+
+    void ContentReader::ReadUInt8(uint8_t& output)
+    {
+        m_stream.ReadRaw<uint8_t>(output);
+    }
+
     void ContentReader::ReadUInt32(uint32_t& output)
     {
         m_stream.ReadRaw<uint32_t>(output);
+    }
+
+    void ContentReader::ReadUInt64(uint64_t& output)
+    {
+        m_stream.ReadRaw<uint64_t>(output);
     }
 
     void ContentReader::ReadString(std::string& output)
@@ -67,8 +82,8 @@ namespace Bruno
 
     uint32_t ContentReader::ReadHeader()
     {
-        uint32_t readersCount;
-        ReadUInt32(readersCount);
+        uint64_t readersCount;
+        ReadUInt64(readersCount);
 
         for (size_t i = 0; i < readersCount; i++)
         {
