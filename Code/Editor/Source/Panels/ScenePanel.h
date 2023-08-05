@@ -53,7 +53,8 @@ namespace Bruno
 		std::unique_ptr<RootSignature> m_rootSignature;
 
 		std::unique_ptr<PipelineStateObject> m_pipelineState;
-		std::unique_ptr<Texture> m_texture;
+		std::shared_ptr<Texture> m_texture;
+		//std::unique_ptr<Texture> m_texture;
 
 		std::mutex m_mutex{};
 

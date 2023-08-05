@@ -22,11 +22,21 @@ namespace Bruno
 
 		if (filePath.extension() == ".dds")
 		{
-			ThrowIfFailed(LoadFromDDSFile(assetFilename.c_str(), DirectX::DDS_FLAGS_FORCE_RGB, &metadata, scratchImage));
+			HRESULT hr = LoadFromDDSFile(assetFilename.c_str(), DirectX::DDS_FLAGS_FORCE_RGB, &metadata, scratchImage);
+			if (FAILED(hr))
+			{
+
+			}
+			ThrowIfFailed(hr);
 		}
 		else
 		{
-			ThrowIfFailed(LoadFromWICFile(assetFilename.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metadata, scratchImage));
+			HRESULT hr = LoadFromWICFile(assetFilename.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metadata, scratchImage);
+			if (FAILED(hr))
+			{
+
+			}
+			ThrowIfFailed(hr);
 		}
 
 		auto outputContentItem = std::make_shared<TextureContentItem>();
@@ -47,6 +57,7 @@ namespace Bruno
 			imageContentItem.Pixels.resize(pImages[i].slicePitch); //TODO: 3d textures.
 			memcpy(imageContentItem.Pixels.data(), pImages[i].pixels, pImages[i].slicePitch);
 		}
+
 		return outputContentItem;
 	}
 }

@@ -8,6 +8,7 @@
 #include <Bruno/Platform/DirectX/VertexBuffer.h>
 #include <Bruno/Platform/DirectX/Shader.h>
 #include <Bruno/Platform/DirectX/VertexTypes.h>
+#include <Bruno/Content/ContentManager.h>
 #include "EditorGame.h"
 
 #include <nana/gui.hpp>
@@ -219,7 +220,10 @@ namespace Bruno
 		{
 			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
 		}
-		m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
+		ContentManager manager(L"");
+		m_texture = manager.Load<Texture>(L"Textures/Mona_Lisa.jpg.bruno");
+		//m_texture.reset(sharedTexture.get());
+		//m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
 
 		GraphicsDevice* device = Graphics::GetDevice();
 

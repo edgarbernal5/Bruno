@@ -2,6 +2,7 @@
 
 #include "Bruno/Platform/Windows/NanaGameWindow.h"
 #include "Panels/ScenePanel.h"
+#include <Bruno/Content/ContentTypeReaderManager.h>
 #include <nana/gui/widgets/button.hpp>
 
 namespace Bruno
@@ -35,6 +36,8 @@ namespace Bruno
 	{
 		m_gameWindow = std::make_unique<NanaGameWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
+
+		ContentTypeReaderManager::Initialize();
 
 		InitializeUI();
 

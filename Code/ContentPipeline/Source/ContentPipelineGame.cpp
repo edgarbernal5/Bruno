@@ -95,10 +95,10 @@ namespace Bruno
 		m_gameWindow = std::make_unique<NanaGameWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
 
-		InitializeUI();
-
 		ProcessorManager::Initialize();
 		ContentTypeWriterManager::Initialize();
+
+		InitializeUI();
 
 		m_gameWindow->Show();
 	}
