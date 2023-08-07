@@ -16,7 +16,7 @@ namespace Bruno
 		std::wstring m_rootDirectory;
 		std::map<std::wstring, std::shared_ptr<RTTI>> m_loadedAssets;
 
-		std::shared_ptr<RTTI> ReadAsset(const RTTI::IdType targetTypeId, const std::wstring& assetName);
+		std::shared_ptr<RTTI> ReadAsset(const std::wstring& assetName);
 
 		static const std::wstring DefaultRootDirectory;
 	};
@@ -33,11 +33,10 @@ namespace Bruno
 			}
 		}
 
-		auto targetTypeId = T::GetTypeIdClass();
 		std::filesystem::path assetPath = m_rootDirectory;
 		assetPath /= assetName;
 
-		auto asset = ReadAsset(targetTypeId, assetPath);
+		auto asset = ReadAsset(assetPath);
 		m_loadedAssets[assetName] = asset;
 
 		return std::static_pointer_cast<T>(asset);

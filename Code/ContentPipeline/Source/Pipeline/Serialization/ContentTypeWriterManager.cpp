@@ -3,6 +3,9 @@
 
 #include "Writers/ShaderWriter.h"
 #include "Writers/TextureWriter.h"
+#include "Writers/ModelWriter.h"
+#include "Writers/MaterialWriter.h"
+#include "Writers/ExternalReferenceWriter.h"
 
 namespace Bruno
 {
@@ -26,6 +29,9 @@ namespace Bruno
 
 		AddContentTypeWriter(std::make_shared<ShaderWriter>());
 		AddContentTypeWriter(std::make_shared<TextureWriter>());
+		AddContentTypeWriter(std::make_shared<ModelWriter>());
+		AddContentTypeWriter(std::make_shared<MaterialWriter>());
+		AddContentTypeWriter(std::make_shared<ExternalReferenceWriter>());
 
 		g_initialized = true;
 	}

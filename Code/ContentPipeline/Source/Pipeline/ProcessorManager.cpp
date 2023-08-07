@@ -2,6 +2,8 @@
 
 #include "Processors/TextureProcessor.h"
 #include "Processors/ShaderProcessor.h"
+#include "Processors/ModelProcessor.h"
+#include "Processors/MaterialProcessor.h"
 
 namespace Bruno
 {
@@ -48,6 +50,8 @@ namespace Bruno
 
 		AddProcessor(std::make_shared<TextureProcessor>());
 		AddProcessor(std::make_shared<ShaderProcessor>());
+		AddProcessor(std::make_shared<ModelProcessor>());
+		AddProcessor(std::make_shared<MaterialProcessor>());
 
 		g_initialized = true;
 	}

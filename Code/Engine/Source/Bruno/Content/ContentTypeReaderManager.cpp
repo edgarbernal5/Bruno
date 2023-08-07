@@ -3,6 +3,9 @@
 
 #include "Readers/TextureReader.h"
 #include "Readers/ShaderReader.h"
+#include "Readers/ModelReader.h"
+#include "Readers/MaterialReader.h"
+#include "Readers/ExternalReferenceReader.h"
 
 namespace Bruno
 {
@@ -37,6 +40,9 @@ namespace Bruno
 
 		AddContentTypeReader(std::make_shared<TextureReader>());
 		AddContentTypeReader(std::make_shared<ShaderReader>());
+		AddContentTypeReader(std::make_shared<ModelReader>());
+		AddContentTypeReader(std::make_shared<MaterialReader>());
+		AddContentTypeReader(std::make_shared<ExternalReferenceReader>());
 
 		g_initialized = true;
 	}

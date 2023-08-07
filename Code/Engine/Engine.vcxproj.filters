@@ -165,6 +165,15 @@
     <ClInclude Include="Source\Bruno\Core\FileStream.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\Readers\ModelReader.h">
+      <Filter>Source\Bruno\Content\Readers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\Readers\MaterialReader.h">
+      <Filter>Source\Bruno\Content\Readers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\Readers\ExternalReferenceReader.h">
+      <Filter>Source\Bruno\Content\Readers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -275,7 +284,18 @@
     <ClCompile Include="Source\Bruno\Core\MemoryStream.cpp">
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Bruno\Core\Stream.cpp" />
+    <ClCompile Include="Source\Bruno\Content\Readers\ModelReader.cpp">
+      <Filter>Source\Bruno\Content\Readers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\Readers\MaterialReader.cpp">
+      <Filter>Source\Bruno\Content\Readers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\Stream.cpp">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\Readers\ExternalReferenceReader.cpp">
+      <Filter>Source\Bruno\Content\Readers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Bruno\Math\Math.inl">

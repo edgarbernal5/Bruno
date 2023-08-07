@@ -13,20 +13,10 @@ namespace Bruno
 		m_rootDirectory(rootDirectory)
 	{
 	}
-	std::shared_ptr<RTTI> ContentManager::ReadAsset(const RTTI::IdType targetTypeId, const std::wstring& assetName)
+	std::shared_ptr<RTTI> ContentManager::ReadAsset(const std::wstring& assetName)
 	{
-		const auto& contentTypeReaders = ContentTypeReaderManager::GetContentTypeReaders();
-		auto it = contentTypeReaders.find(targetTypeId);
-		if (it == contentTypeReaders.end())
-		{
-			throw std::exception("Content type reader not registered.");
-		}
-
 		FileStream fileStream(assetName, FileAccess::Read);
 		ContentReader contentReader(this, fileStream, assetName);
 		return contentReader.ReadAsset();
-
-		//auto& reader = it->second;
-		//return reader->Read(assetName);
 	}
 }

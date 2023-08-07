@@ -45,6 +45,21 @@ namespace Bruno
         m_stream.ReadRaw<char>(output);
     }
 
+    std::shared_ptr<RTTI> ContentReader::ReadExternalReference()
+    {
+        std::wstring referenceName;
+        ReadWString(referenceName);
+
+        if (referenceName.empty())
+            return nullptr;
+
+        std::filesystem::path path(referenceName);
+
+        std::filesystem::path cleanPath = path / referenceName;
+
+        return m_contentManager->Load<RTTI>(cleanPath);
+    }
+
     void ContentReader::ReadInt32(int32_t& output)
     {
         m_stream.ReadRaw<int32_t>(output);
@@ -75,6 +90,11 @@ namespace Bruno
         m_stream.ReadString(output);
     }
 
+    void ContentReader::ReadWString(std::wstring& output)
+    {
+        m_stream.ReadWString(output);
+    }
+
     void ContentReader::ReadBytes(std::vector<uint8_t>& output)
     {
         m_stream.ReadBytes(output);
@@ -94,7 +114,10 @@ namespace Bruno
             m_readers.push_back(reader.get());
         }
 
-        return 0;
+        uint32_t sharedResources;
+        ReadUInt32(sharedResources);
+
+        return sharedResources;
     }
 
     std::shared_ptr<RTTI> ContentReader::ReadObject()

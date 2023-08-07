@@ -26,6 +26,7 @@ namespace Bruno
 			Read((uint8_t*)&object, sizeof(T));
 		}
 		void ReadString(std::string& string);
+		void ReadWString(std::wstring& string);
 
 		virtual void Write(const uint8_t* source, size_t count) = 0;
 
@@ -37,5 +38,6 @@ namespace Bruno
 			Write((uint8_t*)&object, sizeof(T));
 		}
 		void WriteString(const std::string& string);
+		void WriteWString(const std::wstring& string);
 	};
 }

@@ -1,17 +1,20 @@
 #include "ContentWriter.h"
 
 #include "ContentTypeWriterManager.h"
+#include <filesystem>
 
 namespace Bruno
 {
 	ContentWriter::ContentWriter(ContentCompiler* compiler, Stream& stream, bool compressContent, const std::wstring& rootDirectory, const std::wstring& referenceRelocationPath) :
-		m_finalOutputStream(stream)
+		m_finalOutputStream(stream),
+		m_referenceRelocationPath(referenceRelocationPath)
 	{
 		m_currentStream = &m_contentDataStream;
 	}
 
 	void ContentWriter::FlushOutput()
 	{
+		WriteSharedResources();
 		WriteHeader();
 		WriteFinalOutput();
 	}
@@ -27,6 +30,29 @@ namespace Bruno
 		buffer[0] = (uint8_t)value;
 
 		m_currentStream->Write(buffer, 1);
+	}
+
+	void ContentWriter::WriteExternalReference(ExternalReferenceContentItem& const reference)
+	{
+		if (reference.Filename.empty()) {
+			WriteWString(L"");
+		}
+		else
+		{
+			std::wstring filename = reference.Filename;
+			if (std::filesystem::path(filename).extension() != FileExtension)
+			{
+				throw std::exception("external reference. ext");
+			}
+			filename = filename.substr(0, filename.size() - wcslen(FileExtension));
+			std::filesystem::path basePath(m_referenceRelocationPath);
+
+			auto outputPath = std::filesystem::relative(filename, basePath).wstring();
+			if (outputPath.size() > 3 && outputPath.substr(0, 3) == L"..\\") {
+				outputPath = outputPath.substr(3);
+			}
+			WriteWString(outputPath);
+		}
 	}
 
 	void ContentWriter::WriteInt32(int32_t value)
@@ -83,6 +109,41 @@ namespace Bruno
 		m_currentStream->WriteString(value);
 	}
 
+	void ContentWriter::WriteWString(const std::wstring& value)
+	{
+		m_currentStream->WriteWString(value);
+	}
+
+	void ContentWriter::WriteSharedResource(const ContentItem* resource)
+	{
+		if (resource == nullptr) {
+			WriteUInt32(0);
+		}
+		else
+		{
+			auto it = m_sharedResourcesIndexTable.find(resource);
+			if (it == m_sharedResourcesIndexTable.end())
+			{
+				m_sharedResources.push(resource);
+				m_sharedResourcesIndexTable[resource] = m_sharedResources.size();
+				WriteUInt32(m_sharedResources.size());
+			}
+			else
+			{
+				WriteUInt32(it->second);
+			}
+		}
+	}
+
+	void ContentWriter::WriteSharedResources()
+	{
+		while (m_sharedResources.size() > 0)
+		{
+			auto resource = m_sharedResources.front(); m_sharedResources.pop();
+			WriteObject(*resource);
+		}
+	}
+
 	AbstractContentTypeWriter* ContentWriter::GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex)
 	{
 		auto it = m_writersIndexTable.find(writerTypeId);
@@ -110,6 +171,7 @@ namespace Bruno
 		{
 			WriteString(m_writers[i]->GetReaderName());
 		}
+		WriteUInt32((uint32_t)m_sharedResourcesIndexTable.size());
 	}
 
 	void ContentWriter::WriteFinalOutput()

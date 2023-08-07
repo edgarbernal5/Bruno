@@ -21,6 +21,15 @@ namespace Bruno
 		Read((uint8_t*)string.data(), sizeof(char) * size);
 	}
 
+	void Stream::ReadWString(std::wstring& string)
+	{
+		size_t size;
+		Read((uint8_t*)&size, sizeof(size_t));
+
+		string.resize(size);
+		Read((uint8_t*)string.data(), sizeof(wchar_t) * size);
+	}
+
 	void Stream::WriteBytes(const std::vector<uint8_t>& bytes, bool writeSize)
 	{
 		if (writeSize)
@@ -37,5 +46,12 @@ namespace Bruno
 		size_t size = string.size();
 		Write((uint8_t*)&size, sizeof(size_t));
 		Write((uint8_t*)string.data(), sizeof(char) * string.size());
+	}
+
+	void Stream::WriteWString(const std::wstring& string)
+	{
+		size_t size = string.size();
+		Write((uint8_t*)&size, sizeof(size_t));
+		Write((uint8_t*)string.data(), sizeof(wchar_t) * string.size());
 	}
 }

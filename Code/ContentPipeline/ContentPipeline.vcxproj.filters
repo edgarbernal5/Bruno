@@ -69,6 +69,30 @@
     <ClCompile Include="Source\Pipeline\Graphics\TextureContentItem.cpp">
       <Filter>Source\Pipeline\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Pipeline\Processors\ModelProcessor.cpp">
+      <Filter>Source\Pipeline\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\Writers\ModelWriter.cpp">
+      <Filter>Source\Pipeline\Serialization\Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Graphics\ModelContentItem.cpp">
+      <Filter>Source\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Graphics\MaterialContentItem.cpp">
+      <Filter>Source\Pipeline\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\Writers\MaterialWriter.cpp">
+      <Filter>Source\Pipeline\Serialization\Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Processors\MaterialProcessor.cpp">
+      <Filter>Source\Pipeline\Processors</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\ExternalReferenceContentItem.cpp">
+      <Filter>Source\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pipeline\Serialization\Writers\ExternalReferenceWriter.cpp">
+      <Filter>Source\Pipeline\Serialization\Writers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h">
@@ -114,6 +138,30 @@
       <Filter>Source\Pipeline\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Pipeline\Serialization\Writers\TextureWriter.h">
+      <Filter>Source\Pipeline\Serialization\Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Processors\ModelProcessor.h">
+      <Filter>Source\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\Writers\ModelWriter.h">
+      <Filter>Source\Pipeline\Serialization\Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Graphics\ModelContentItem.h">
+      <Filter>Source\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Graphics\MaterialContentItem.h">
+      <Filter>Source\Pipeline\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\Writers\MaterialWriter.h">
+      <Filter>Source\Pipeline\Serialization\Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Processors\MaterialProcessor.h">
+      <Filter>Source\Pipeline\Processors</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\ExternalReferenceContentItem.h">
+      <Filter>Source\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\Serialization\Writers\ExternalReferenceWriter.h">
       <Filter>Source\Pipeline\Serialization\Writers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -100,6 +100,9 @@
     <ClInclude Include="Source\Bruno\Content\ContentReader.h" />
     <ClInclude Include="Source\Bruno\Content\ContentTypeReader.h" />
     <ClInclude Include="Source\Bruno\Content\ContentTypeReaderManager.h" />
+    <ClInclude Include="Source\Bruno\Content\Readers\ExternalReferenceReader.h" />
+    <ClInclude Include="Source\Bruno\Content\Readers\MaterialReader.h" />
+    <ClInclude Include="Source\Bruno\Content\Readers\ModelReader.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\ShaderReader.h" />
     <ClInclude Include="Source\Bruno\Core\FileStream.h" />
     <ClInclude Include="Source\Bruno\Core\KeyCodes.h" />
@@ -146,6 +149,9 @@
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentTypeReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentTypeReaderManager.cpp" />
+    <ClCompile Include="Source\Bruno\Content\Readers\ExternalReferenceReader.cpp" />
+    <ClCompile Include="Source\Bruno\Content\Readers\MaterialReader.cpp" />
+    <ClCompile Include="Source\Bruno\Content\Readers\ModelReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\ShaderReader.cpp" />
     <ClCompile Include="Source\Bruno\Core\FileStream.cpp" />
     <ClCompile Include="Source\Bruno\Core\GameTimer.cpp" />

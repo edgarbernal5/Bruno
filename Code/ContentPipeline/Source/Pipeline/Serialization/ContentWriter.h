@@ -2,10 +2,12 @@
 
 #include <string>
 #include <map>
+#include <queue>
 #include <vector>
 
 #include <Bruno/Core/MemoryStream.h>
 #include "Pipeline/AbstractProcessor.h"
+#include "Pipeline/ExternalReferenceContentItem.h"
 
 namespace Bruno
 {
@@ -21,6 +23,7 @@ namespace Bruno
 
 		void WriteBytes(const std::vector<uint8_t>& buffer);
 		void WriteChar(char value);
+		void WriteExternalReference(ExternalReferenceContentItem& const reference);
 		void WriteInt32(int32_t value);
 		void WriteInt64(int64_t value);
 		void WriteUInt8(uint8_t value);
@@ -28,8 +31,13 @@ namespace Bruno
 		void WriteUInt64(uint64_t value);
 		void WriteObject(const ContentItem& object);
 		void WriteString(const std::string& value);
-		
+		void WriteWString(const std::wstring& value);
+		void WriteSharedResource(const ContentItem* resource);
+		void WriteSharedResources();
+
 	private:
+		const wchar_t* FileExtension = L".bruno";
+		std::wstring m_referenceRelocationPath;
 		Stream& m_finalOutputStream;
 		MemoryStream m_headerDataStream;
 		MemoryStream m_contentDataStream;
@@ -38,6 +46,8 @@ namespace Bruno
 
 		std::map<RTTI::IdType, int> m_writersIndexTable;
 		std::vector<AbstractContentTypeWriter*> m_writers;
+		std::map<const ContentItem*, int> m_sharedResourcesIndexTable;
+		std::queue<const ContentItem*> m_sharedResources;
 
 		AbstractContentTypeWriter* GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex);
 		void WriteHeader();
