@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <memory>
+
 namespace Bruno
 {
 	class GameContentBuilder;
