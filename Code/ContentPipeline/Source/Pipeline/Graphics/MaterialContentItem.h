@@ -16,7 +16,7 @@ namespace Bruno
 		std::string Name;
 		std::map<std::string, ExternalReferenceContentItem> m_textureByKeys;
 
-		void AddTexture(const std::string& key, ExternalReferenceContentItem reference);
+		void AddTexture(const std::string& key, const ExternalReferenceContentItem& reference);
 	};
 
 }

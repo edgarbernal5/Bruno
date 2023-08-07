@@ -14,7 +14,7 @@ namespace Bruno
 		m_supportedExtensions = { L".dds", L".bmp", L".jpg" };
 	}
 
-	std::shared_ptr<ContentItem> TextureProcessor::Process(const std::wstring& assetFilename)
+	std::shared_ptr<ContentItem> TextureProcessor::Process(const std::wstring& assetFilename, ContentProcessorContext& context)
 	{
 		std::filesystem::path filePath(assetFilename);
 		DirectX::TexMetadata  metadata;

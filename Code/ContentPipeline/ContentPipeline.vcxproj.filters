@@ -93,6 +93,9 @@
     <ClCompile Include="Source\Pipeline\Serialization\Writers\ExternalReferenceWriter.cpp">
       <Filter>Source\Pipeline\Serialization\Writers</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Pipeline\ContentProcessorContext.cpp">
+      <Filter>Source\Pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h">
@@ -163,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="Source\Pipeline\Serialization\Writers\ExternalReferenceWriter.h">
       <Filter>Source\Pipeline\Serialization\Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\ContentProcessorContext.h">
+      <Filter>Source\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Pipeline\ContentItem.cpp" />
+    <ClCompile Include="Source\Pipeline\ContentProcessorContext.cpp" />
     <ClCompile Include="Source\Pipeline\ExternalReferenceContentItem.cpp" />
     <ClCompile Include="Source\Pipeline\Graphics\MaterialContentItem.cpp" />
     <ClCompile Include="Source\Pipeline\Graphics\ModelContentItem.cpp" />
@@ -174,6 +175,7 @@
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h" />
     <ClInclude Include="Source\Pipeline\ContentItem.h" />
+    <ClInclude Include="Source\Pipeline\ContentProcessorContext.h" />
     <ClInclude Include="Source\Pipeline\ExternalReferenceContentItem.h" />
     <ClInclude Include="Source\Pipeline\GameContentBuilder.h" />
     <ClInclude Include="Source\Pipeline\AbstractProcessor.h" />

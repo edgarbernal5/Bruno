@@ -2,6 +2,7 @@
 
 #include <Bruno/Core/RTTI.h>
 #include "Pipeline/ContentItem.h"
+#include "Pipeline/ContentProcessorContext.h"
 #include <string>
 #include <vector>
 
@@ -14,7 +15,7 @@ namespace Bruno
 	public:
 		virtual ~AbstractProcessor() = default;
 
-		virtual std::shared_ptr<ContentItem> Process(const std::wstring& assetFilename) = 0;
+		virtual std::shared_ptr<ContentItem> Process(const std::wstring& assetFilename, ContentProcessorContext& context) = 0;
 
 		const std::vector<std::wstring>& GetExtensionsSupported()
 		{

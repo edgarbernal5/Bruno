@@ -8,6 +8,29 @@
 
 namespace Bruno
 {
+	struct BuildRequest
+	{
+		std::wstring	SourceFilename;
+		std::wstring	AssetName;
+		std::string		ProcessorName;
+
+		bool operator==(const BuildRequest& other)
+		{
+			return AssetName == other.AssetName && ProcessorName == other.ProcessorName;
+		}
+	};
+	struct BuildItem
+	{
+		BuildRequest	Request;
+		bool IsBuilt{ false };
+		std::wstring	OutputFilename;
+
+		bool operator==(const BuildItem& other)
+		{
+			return Request == other.Request && IsBuilt == other.IsBuilt;
+		}
+	};
+
 	class GameContentBuilder
 	{
 	public:
@@ -31,28 +54,7 @@ namespace Bruno
 
 		const std::string OutputExtention = ".bruno";
 	private:
-		struct BuildRequest
-		{
-			std::wstring	SourceFilename;
-			std::wstring	AssetName;
-			std::string		ProcessorName;
-
-			bool operator==(const BuildRequest& other)
-			{
-				return AssetName == other.AssetName && ProcessorName == other.ProcessorName;
-			}
-		};
-		struct BuildItem
-		{
-			BuildRequest	Request;
-			bool IsBuilt	{ false };
-			std::wstring	OutputFilename;
-
-			bool operator==(const BuildItem& other)
-			{
-				return Request == other.Request && IsBuilt == other.IsBuilt;
-			}
-		};
+		
 		Settings m_settings;
 
 		std::vector<BuildRequest> m_requests;
@@ -62,6 +64,8 @@ namespace Bruno
 		void PreparePaths();
 		void SerializeAsset(const BuildItem& buildItem, const ContentItem& contentItem);
 		std::wstring ChooseOutputFilename(const BuildRequest& request);
+
+		friend class ContentProcessorContext;
 	};
 }
 

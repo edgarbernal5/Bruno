@@ -28,7 +28,7 @@ namespace Bruno
 		g_textureTypeMappings[ModelProcessor::TextureType::TextureTypeLightMap] = std::make_pair(aiTextureType_LIGHTMAP, "LightMapTexture");
 	}
 
-	std::shared_ptr<ContentItem> ModelProcessor::Process(const std::wstring& assetFilename)
+	std::shared_ptr<ContentItem> ModelProcessor::Process(const std::wstring& assetFilename, ContentProcessorContext& context)
 	{
 		Assimp::Importer importer;
 
@@ -55,7 +55,7 @@ namespace Bruno
 		{
 			std::filesystem::path directory = assetFilename;
 
-			ProcessMaterials(aiScene, directory.parent_path(), materials);
+			ProcessMaterials(aiScene, directory.parent_path(), materials, context);
 		}
 
 		std::vector<std::shared_ptr<MeshContentItem>> meshes;
@@ -100,6 +100,7 @@ namespace Bruno
 				mesh->BiNormals.emplace_back(reinterpret_cast<const float*>(&aiMesh->mBitangents[i]));
 			}
 		}
+
 		uint32_t uvChannelCount = aiMesh->GetNumUVChannels();
 		mesh->TextureCoordinates.reserve(uvChannelCount);
 		for (uint32_t i = 0; i < uvChannelCount; i++)
@@ -132,7 +133,7 @@ namespace Bruno
 		meshes.emplace_back(mesh);
 	}
 
-	void ModelProcessor::ProcessMaterials(const aiScene* aiScene, const std::wstring& directory, std::vector<std::shared_ptr<MaterialContentItem>>& materials)
+	void ModelProcessor::ProcessMaterials(const aiScene* aiScene, const std::wstring& directory, std::vector<std::shared_ptr<MaterialContentItem>>& materials, ContentProcessorContext& context)
 	{
 		for (uint32_t i = 0; i < aiScene->mNumMaterials; i++)
 		{
@@ -143,13 +144,13 @@ namespace Bruno
 			aiMaterial->Get(AI_MATKEY_NAME, name);
 			materialContent->Name = name.C_Str();
 
-			ProcessTexturesForMaterial(*materialContent, aiMaterial, directory);
+			ProcessTexturesForMaterial(*materialContent, aiMaterial, directory, context);
 
 			materials.push_back(materialContent);
 		}
 	}
 
-	void ModelProcessor::ProcessTexturesForMaterial(MaterialContentItem& materialContentItem, aiMaterial* aiMaterial, const std::wstring& directory)
+	void ModelProcessor::ProcessTexturesForMaterial(MaterialContentItem& materialContentItem, aiMaterial* aiMaterial, const std::wstring& directory, ContentProcessorContext& context)
 	{
 		for (auto it = g_textureTypeMappings.begin(); it != g_textureTypeMappings.end(); ++it)
 		{
@@ -175,6 +176,8 @@ namespace Bruno
 						ExternalReferenceContentItem textureReference(filenameTexture);
 						std::string textureName = (it->second.second);
 						materialContentItem.AddTexture(textureName, textureReference);
+
+
 					}
 				}
 			}

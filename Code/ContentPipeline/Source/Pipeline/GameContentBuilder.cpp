@@ -77,7 +77,9 @@ namespace Bruno
 	void GameContentBuilder::BuildAsset(BuildItem& buildItem)
 	{
 		auto processor = ProcessorManager::GetProcessorByName(buildItem.Request.ProcessorName);
-		auto output = processor->Process(buildItem.Request.SourceFilename);
+
+		ContentProcessorContext context(this, &buildItem);
+		auto output = processor->Process(buildItem.Request.SourceFilename, context);
 		
 		buildItem.IsBuilt = true;
 		SerializeAsset(buildItem, *output.get());

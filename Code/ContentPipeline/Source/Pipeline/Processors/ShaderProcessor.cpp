@@ -14,7 +14,7 @@ namespace Bruno
 		m_supportedExtensions = { L".hlsl", L".fx" };
 	}
 
-	std::shared_ptr<ContentItem> ShaderProcessor::Process(const std::wstring& assetFilename)
+	std::shared_ptr<ContentItem> ShaderProcessor::Process(const std::wstring& assetFilename, ContentProcessorContext& context)
 	{
 #if defined(BR_DEBUG)
 		// Enable better shader debugging with the graphics debugging tools.

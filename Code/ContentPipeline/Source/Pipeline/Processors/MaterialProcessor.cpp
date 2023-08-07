@@ -14,7 +14,7 @@ namespace Bruno
 		m_supportedExtensions = { L".mat" };
 	}
 
-	std::shared_ptr<ContentItem> MaterialProcessor::Process(const std::wstring& assetFilename)
+	std::shared_ptr<ContentItem> MaterialProcessor::Process(const std::wstring& assetFilename, ContentProcessorContext& context)
 	{
 
 
