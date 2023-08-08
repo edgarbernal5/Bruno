@@ -15,7 +15,7 @@ namespace Bruno
 	}
 	std::shared_ptr<RTTI> ContentManager::ReadAsset(const std::wstring& assetName)
 	{
-		FileStream fileStream(assetName, FileAccess::Read);
+		FileStream fileStream(assetName + L".bruno", FileAccess::Read);
 		ContentReader contentReader(this, fileStream, assetName);
 		return contentReader.ReadAsset();
 	}

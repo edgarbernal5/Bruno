@@ -10,24 +10,36 @@ namespace Bruno
 {
 	struct BuildRequest
 	{
+		BuildRequest() = default;
+
 		std::wstring	SourceFilename;
 		std::wstring	AssetName;
 		std::string		ProcessorName;
 
-		bool operator==(const BuildRequest& other)
+		/*bool operator==(const BuildRequest& other)
 		{
 			return AssetName == other.AssetName && ProcessorName == other.ProcessorName;
+		}*/
+		bool operator==(const BuildRequest* other)
+		{
+			return AssetName == other->AssetName && ProcessorName == other->ProcessorName;
 		}
 	};
 	struct BuildItem
 	{
-		BuildRequest	Request;
+		BuildItem();
+
+		BuildRequest*	Request;
 		bool IsBuilt{ false };
 		std::wstring	OutputFilename;
 
-		bool operator==(const BuildItem& other)
+		/*bool operator==(const BuildItem& other)
 		{
 			return Request == other.Request && IsBuilt == other.IsBuilt;
+		}*/
+		bool operator==(const BuildItem* other)
+		{
+			return Request == other->Request && IsBuilt == other->IsBuilt;
 		}
 	};
 
@@ -51,15 +63,15 @@ namespace Bruno
 			m_settings = settings;
 			PreparePaths();
 		}
-		void RequestBuild(const std::filesystem::path& sourceFilename, const std::wstring& assetName, const std::string& processorName = "");
+		BuildItem* RequestBuild(const std::filesystem::path& sourceFilename, const std::wstring& assetName, const std::string& processorName = "");
 		void Run();
 
 		const std::wstring OutputExtention = L".bruno";
 	private:
 		Settings m_settings;
 
-		std::vector<BuildRequest> m_requests;
-		std::vector<BuildItem> m_buildItems;
+		std::vector<BuildRequest*> m_requests;
+		std::vector<BuildItem*> m_buildItems;
 
 		void BuildAsset(BuildItem& item);
 		void PreparePaths();

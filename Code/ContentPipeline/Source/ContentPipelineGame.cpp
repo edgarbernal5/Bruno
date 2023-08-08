@@ -63,7 +63,8 @@ namespace Bruno
 		menuFile.append("Read", [&form, this](nana::menu::item_proxy& ip)
 		{
 			nana::filebox fileBox(form, true);
-			fileBox.add_filter("Bruno File", "*.bruno");
+			fileBox.add_filter("Shader File", "*.hlsl;*.fx");
+			fileBox.add_filter("Image File", "*.bmp;*.jpg;*.dds");
 			fileBox.add_filter("All Files", "*.*");
 
 			auto selectedFiles = fileBox();

@@ -12,6 +12,7 @@ namespace Bruno
 	public:
 		ExternalReferenceContentItem() = default;
 		ExternalReferenceContentItem(const std::wstring& filename);
+
 		std::wstring Filename;
 	};
 

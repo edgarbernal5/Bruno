@@ -23,12 +23,8 @@ namespace Bruno
 		return std::filesystem::path(m_settings.RootDirectory) / path;
 	}
 
-	void GameContentBuilder::RequestBuild(const std::filesystem::path& sourceFilename, const std::wstring& assetName, const std::string& processorName)
+	BuildItem* GameContentBuilder::RequestBuild(const std::filesystem::path& sourceFilename, const std::wstring& assetName, const std::string& processorName)
 	{
-		auto it = std::find(m_requests.begin(), m_requests.end(), BuildRequest{ sourceFilename, assetName , processorName });
-		if (it != m_requests.end())
-			return;
-
 		std::string newProcessorName = processorName;
 		if (processorName.empty())
 		{
@@ -41,16 +37,49 @@ namespace Bruno
 		if (newProcessorName.empty())
 			throw std::exception("Invalid parameter, processor name.");
 
-		auto& newRequest = m_requests.emplace_back();
-		newRequest.SourceFilename = sourceFilename.c_str();
-		newRequest.AssetName = assetName;
-		newRequest.ProcessorName = newProcessorName;
+		BuildRequest* newRequest = new BuildRequest();
+		newRequest->SourceFilename = sourceFilename.c_str();
+		newRequest->AssetName = assetName;
+		newRequest->ProcessorName = newProcessorName;
 
-		auto& buildItem = m_buildItems.emplace_back();
-		buildItem.Request = newRequest;
-		buildItem.IsBuilt = false;
+		BuildItem* itemToBuild = nullptr;
+		for (size_t i = 0; i < m_buildItems.size(); i++)
+		{
+			auto request = m_buildItems.at(i);
+			if (request->Request->AssetName == newRequest->AssetName &&
+				request->Request->SourceFilename == newRequest->SourceFilename &&
+				request->Request->ProcessorName == newRequest->ProcessorName)
+			{
+				itemToBuild = request;
+				break;
+			}
+		}
 
-		buildItem.OutputFilename = ChooseOutputFilename(newRequest);
+		if (itemToBuild != nullptr && itemToBuild->Request->AssetName.empty() && !newRequest->AssetName.empty()) {
+			//m_buildItems.erase
+			auto it = std::find(m_buildItems.begin(), m_buildItems.end(), itemToBuild);
+			if (it != m_buildItems.end())
+				m_buildItems.erase(it);
+
+			delete itemToBuild;
+			itemToBuild = nullptr;
+		}
+
+		if (itemToBuild == nullptr)
+		{
+			itemToBuild = new BuildItem();
+			itemToBuild->Request = newRequest;
+			itemToBuild->IsBuilt = false;
+			itemToBuild->OutputFilename = ChooseOutputFilename(*newRequest);
+
+			m_buildItems.push_back(itemToBuild);
+			m_requests.push_back(newRequest);
+		}
+		else {
+			delete newRequest; //TODO: make it shared ptr
+		}
+
+		return itemToBuild;
 	}
 
 	void GameContentBuilder::Run()
@@ -58,10 +87,10 @@ namespace Bruno
 		for (size_t i = 0; i < m_buildItems.size(); i++)
 		{
 			auto& item = m_buildItems[i];
-			if (item.IsBuilt)
+			if (item->IsBuilt)
 				continue;
 
-			BuildAsset(item);
+			BuildAsset(*item);
 		}
 	}
 
@@ -81,14 +110,14 @@ namespace Bruno
 			if (assetNameStub.size() > 32) {
 				assetNameStub = assetNameStub.substr(0, 32);
 			}
-			int num = 0;
+			uint32_t indexing = 0;
 			do {
 				std::wstringstream ss;
-				ss << assetNameStub << '_' << num << OutputExtention;
+				ss << assetNameStub << '_' << indexing << OutputExtention;
 
 				outputFilename = ss.str();
 
-				++num;
+				++indexing;
 			} while (FindBuildItemByFilename(outputFilename) != nullptr);
 
 		}
@@ -107,18 +136,18 @@ namespace Bruno
 	{
 		for (size_t i = 0; i < m_buildItems.size(); i++)
 		{
-			if (m_buildItems[i].OutputFilename == outputFilename)
-				return &m_buildItems[i];
+			if (m_buildItems[i]->OutputFilename == outputFilename)
+				return m_buildItems[i];
 		}
 		return nullptr;
 	}
 
 	void GameContentBuilder::BuildAsset(BuildItem& buildItem)
 	{
-		auto processor = ProcessorManager::GetProcessorByName(buildItem.Request.ProcessorName);
+		auto processor = ProcessorManager::GetProcessorByName(buildItem.Request->ProcessorName);
 
 		ContentProcessorContext context(this, &buildItem);
-		auto output = processor->Process(buildItem.Request.SourceFilename, context);
+		auto output = processor->Process(buildItem.Request->SourceFilename, context);
 		
 		buildItem.IsBuilt = true;
 		SerializeAsset(buildItem, *output.get());
@@ -159,5 +188,12 @@ namespace Bruno
 		
 		ContentCompiler compiler;
 		compiler.Compile(fileStream, contentItem, false, m_settings.OutputDirectory, absolutePath);
+	}
+
+	BuildItem::BuildItem() :
+		IsBuilt(false),
+		Request(nullptr),
+		OutputFilename{}
+	{
 	}
 }
