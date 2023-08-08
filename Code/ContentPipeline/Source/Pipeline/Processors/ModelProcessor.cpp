@@ -173,11 +173,14 @@ namespace Bruno
 
 					if (std::filesystem::exists(filenameTexture))
 					{
-						ExternalReferenceContentItem textureReference(filenameTexture);
+						ExternalReferenceContentItem sourceTextureReference(filenameTexture);
+						ExternalReferenceContentItem textureReference = context.BuildAsset(sourceTextureReference, "TextureProcessor", L"");
 						std::string textureName = (it->second.second);
+						//materialContentItem.AddTexture(textureName, sourceTextureReference);
+
 						materialContentItem.AddTexture(textureName, textureReference);
 
-
+						
 					}
 				}
 			}

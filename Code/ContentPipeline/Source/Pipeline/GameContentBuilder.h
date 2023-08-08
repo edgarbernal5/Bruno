@@ -44,6 +44,8 @@ namespace Bruno
 		GameContentBuilder() = default;
 		GameContentBuilder(const Settings& settings);
 
+		std::wstring GetAbsolutePath(const std::wstring path);
+
 		inline void SetSettings(const Settings& settings)
 		{
 			m_settings = settings;
@@ -52,9 +54,8 @@ namespace Bruno
 		void RequestBuild(const std::filesystem::path& sourceFilename, const std::wstring& assetName, const std::string& processorName = "");
 		void Run();
 
-		const std::string OutputExtention = ".bruno";
+		const std::wstring OutputExtention = L".bruno";
 	private:
-		
 		Settings m_settings;
 
 		std::vector<BuildRequest> m_requests;
@@ -64,6 +65,7 @@ namespace Bruno
 		void PreparePaths();
 		void SerializeAsset(const BuildItem& buildItem, const ContentItem& contentItem);
 		std::wstring ChooseOutputFilename(const BuildRequest& request);
+		BuildItem* FindBuildItemByFilename(const std::wstring& outputFilename);
 
 		friend class ContentProcessorContext;
 	};

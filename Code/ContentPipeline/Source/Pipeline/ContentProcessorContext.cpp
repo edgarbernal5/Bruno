@@ -10,11 +10,20 @@ namespace Bruno
 		m_currentBuildItem(buildItem)
 	{
 	}
-	std::shared_ptr<ContentItem> ContentProcessorContext::Convert(ContentItem* item, const std::string& processorName)
-	{
-		auto processor = ProcessorManager::GetProcessorByName(processorName);
 
-		//return processor->Process(;
-		return nullptr;
+	ExternalReferenceContentItem ContentProcessorContext::BuildAsset(ExternalReferenceContentItem sourceAsset, const std::string& processorName, const std::wstring& assetName)
+	{
+		
+		m_gameContentBuilder->RequestBuild(sourceAsset.Filename, assetName, processorName);
+
+		return ExternalReferenceContentItem(m_gameContentBuilder->GetAbsolutePath(sourceAsset.Filename));
 	}
+
+	//std::shared_ptr<ContentItem> ContentProcessorContext::Convert(ContentItem* item, const std::string& processorName)
+	//{
+	//	auto processor = ProcessorManager::GetProcessorByName(processorName);
+
+	//	//return processor->Process(;
+	//	return nullptr;
+	//}
 }

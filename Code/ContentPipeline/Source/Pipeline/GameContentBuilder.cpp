@@ -4,12 +4,23 @@
 #include <Bruno/Core/FileStream.h>
 #include "Serialization/ContentCompiler.h"
 
+#include <sstream>
+
 namespace Bruno
 {
 	GameContentBuilder::GameContentBuilder(const Settings& settings) :
 		m_settings(settings)
 	{
 		PreparePaths();
+	}
+
+	std::wstring GameContentBuilder::GetAbsolutePath(const std::wstring path)
+	{
+		std::filesystem::path fsPath(path);
+		if (fsPath.has_root_path())
+			return path;
+
+		return std::filesystem::path(m_settings.RootDirectory) / path;
 	}
 
 	void GameContentBuilder::RequestBuild(const std::filesystem::path& sourceFilename, const std::wstring& assetName, const std::string& processorName)
@@ -61,6 +72,24 @@ namespace Bruno
 
 		if (request.AssetName.empty())
 		{
+			std::filesystem::path sourceFilePath(request.SourceFilename);
+			if (!sourceFilePath.has_root_path()) {
+
+			}
+
+			std::wstring assetNameStub = sourceFilePath.stem();
+			if (assetNameStub.size() > 32) {
+				assetNameStub = assetNameStub.substr(0, 32);
+			}
+			int num = 0;
+			do {
+				std::wstringstream ss;
+				ss << assetNameStub << '_' << num << OutputExtention;
+
+				outputFilename = ss.str();
+
+				++num;
+			} while (FindBuildItemByFilename(outputFilename) != nullptr);
 
 		}
 		else
@@ -72,6 +101,16 @@ namespace Bruno
 			outputFilename = std::filesystem::relative(outputPath, m_settings.RootDirectory);
 		}
 		return outputFilename;
+	}
+
+	BuildItem* GameContentBuilder::FindBuildItemByFilename(const std::wstring& outputFilename)
+	{
+		for (size_t i = 0; i < m_buildItems.size(); i++)
+		{
+			if (m_buildItems[i].OutputFilename == outputFilename)
+				return &m_buildItems[i];
+		}
+		return nullptr;
 	}
 
 	void GameContentBuilder::BuildAsset(BuildItem& buildItem)
@@ -113,6 +152,8 @@ namespace Bruno
 
 	void GameContentBuilder::SerializeAsset(const BuildItem& buildItem, const ContentItem& contentItem)
 	{
+		std::filesystem::path fspath(buildItem.OutputFilename);
+
 		auto absolutePath = std::filesystem::path(m_settings.RootDirectory) / std::filesystem::path(buildItem.OutputFilename);
 		FileStream fileStream(absolutePath, FileAccess::Write);
 		
