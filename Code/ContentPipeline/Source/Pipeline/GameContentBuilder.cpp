@@ -118,8 +118,7 @@ namespace Bruno
 				outputFilename = ss.str();
 
 				++indexing;
-			} while (FindBuildItemByFilename(outputFilename) != nullptr);
-
+			} while (FindBuildItemByOutputFilename(outputFilename) != nullptr);
 		}
 		else
 		{
@@ -132,7 +131,7 @@ namespace Bruno
 		return outputFilename;
 	}
 
-	BuildItem* GameContentBuilder::FindBuildItemByFilename(const std::wstring& outputFilename)
+	BuildItem* GameContentBuilder::FindBuildItemByOutputFilename(const std::wstring& outputFilename)
 	{
 		for (size_t i = 0; i < m_buildItems.size(); i++)
 		{

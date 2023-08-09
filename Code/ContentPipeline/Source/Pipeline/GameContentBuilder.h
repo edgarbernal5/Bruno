@@ -77,7 +77,7 @@ namespace Bruno
 		void PreparePaths();
 		void SerializeAsset(const BuildItem& buildItem, const ContentItem& contentItem);
 		std::wstring ChooseOutputFilename(const BuildRequest& request);
-		BuildItem* FindBuildItemByFilename(const std::wstring& outputFilename);
+		BuildItem* FindBuildItemByOutputFilename(const std::wstring& outputFilename);
 
 		friend class ContentProcessorContext;
 	};

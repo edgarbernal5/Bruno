@@ -5,6 +5,7 @@
 
 #include "Bruno/Core/Stream.h"
 #include "ContentTypeReader.h"
+#include <functional>
 
 namespace Bruno
 {
@@ -27,13 +28,15 @@ namespace Bruno
 		void ReadString(std::string& output);
 		void ReadWString(std::wstring& output);
 		void ReadBytes(std::vector<uint8_t>& output);
-
+		void ReadSharedResources(uint32_t sharedResourceCount);
 	private:
 		ContentManager* m_contentManager;
 		Stream& m_stream;
 		std::wstring m_assetName;
 		std::vector<AbstractContentTypeReader*> m_readers;
+		std::vector<std::vector<std::function<void(std::shared_ptr<RTTI>)> > > m_sharedResourceFixups;
 
+		void ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action);
 		uint32_t ReadHeader();
 		std::shared_ptr<RTTI> ReadObject();
 	};

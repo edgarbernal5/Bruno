@@ -36,6 +36,7 @@ namespace Bruno
     {
         uint32_t sharedResourceCount = ReadHeader();
         auto object = ReadObject();
+        ReadSharedResources(sharedResourceCount);
 
         return object;
     }
@@ -100,6 +101,42 @@ namespace Bruno
         m_stream.ReadBytes(output);
     }
 
+    void ContentReader::ReadSharedResources(uint32_t sharedResourceCount)
+    {
+        if (sharedResourceCount > 0)
+        {
+            std::vector<std::shared_ptr<RTTI>> objects(sharedResourceCount, nullptr);
+            for (uint32_t i = 0; i < sharedResourceCount; i++)
+            {
+                objects[i] = ReadObject();
+            }
+
+            for (uint32_t i = 0; i < sharedResourceCount; i++)
+            {
+                for (uint32_t j = 0; j < m_sharedResourceFixups[i].size(); j++)
+                {
+                    m_sharedResourceFixups[i][j](objects[i]);
+                }
+            }
+        }
+    }
+
+    void ContentReader::ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action)
+    {
+        int index;
+        ReadInt32(index);
+
+        if (index != 0)
+        {
+            index--;
+            if (index >= m_sharedResourceFixups.size())
+            {
+                throw std::exception("bad bruno");
+            }
+            m_sharedResourceFixups[index].push_back(action);
+        }
+    }
+
     uint32_t ContentReader::ReadHeader()
     {
         uint64_t readersCount;
@@ -116,6 +153,11 @@ namespace Bruno
 
         uint32_t sharedResources;
         ReadUInt32(sharedResources);
+
+        if (sharedResources > 0)
+        {
+            m_sharedResourceFixups.resize(sharedResources);
+        }
 
         return sharedResources;
     }
