@@ -6,6 +6,7 @@
 
 #include <Bruno/Platform/DirectX/D3DCommon.h>
 #include <filesystem>
+#include <sstream>
 
 namespace Bruno
 {
@@ -173,8 +174,11 @@ namespace Bruno
 
 					if (std::filesystem::exists(filenameTexture))
 					{
+						std::wstringstream relativePathToTextureW;
+						relativePathToTextureW << textureRelativePath.C_Str();
+
 						ExternalReferenceContentItem sourceTextureReference(filenameTexture);
-						ExternalReferenceContentItem textureReference = context.BuildAsset(sourceTextureReference, "TextureProcessor", L"");
+						ExternalReferenceContentItem textureReference = context.BuildAsset(sourceTextureReference, "TextureProcessor", relativePathToTextureW.str());
 						std::string textureName = (it->second.second);
 						//materialContentItem.AddTexture(textureName, sourceTextureReference);
 
