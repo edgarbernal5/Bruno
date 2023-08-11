@@ -6,6 +6,7 @@
 #include <Bruno/Platform/Windows/NanaGameWindow.h>
 #include <Bruno/Platform/DirectX/Shader.h>
 #include <Bruno/Platform/DirectX/Texture.h>
+#include <Bruno/Renderer/Model.h>
 #include <Bruno/Content/ContentManager.h>
 
 #include <nana/gui/filebox.hpp>
@@ -78,7 +79,8 @@ namespace Bruno
 
 					ContentManager manager(rootDirectory);
 					//auto shader = manager.Load<Shader>(relativePath);
-					auto texture = manager.Load<Texture>(relativePath);
+					//auto texture = manager.Load<Texture>(relativePath);
+					auto model= manager.Load<Model>(relativePath);
 				}
 			}
 		});

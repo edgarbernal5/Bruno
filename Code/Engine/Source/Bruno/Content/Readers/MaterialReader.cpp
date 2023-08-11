@@ -8,12 +8,15 @@ namespace Bruno
 	BR_RTTI_DEFINITIONS(MaterialReader);
 
 	MaterialReader::MaterialReader() :
-		ContentTypeReader(Texture::GetTypeIdClass())
+		ContentTypeReader(Material::GetTypeIdClass())
 	{
 	}
 
-	std::shared_ptr<Texture> MaterialReader::ReadInternal(ContentReader& input)
+	std::shared_ptr<Material> MaterialReader::ReadInternal(ContentReader& input)
 	{
-		return nullptr;
+		auto material = std::make_shared<Material>();
+		input.ReadString(material->Name);
+
+		return material;
 	}
 }

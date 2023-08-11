@@ -8,12 +8,13 @@ namespace Bruno
 	BR_RTTI_DEFINITIONS(ModelReader);
 
 	ModelReader::ModelReader() :
-		ContentTypeReader(Texture::GetTypeIdClass())
+		ContentTypeReader(Model::GetTypeIdClass())
 	{
 	}
 
-	std::shared_ptr<Texture> ModelReader::ReadInternal(ContentReader& input)
+	std::shared_ptr<Model> ModelReader::ReadInternal(ContentReader& input)
 	{
-		return nullptr;
+		auto model = std::make_shared<Model>();
+		return model;
 	}
 }

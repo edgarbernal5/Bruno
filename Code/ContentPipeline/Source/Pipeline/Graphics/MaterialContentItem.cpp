@@ -6,6 +6,6 @@ namespace Bruno
 	
 	void MaterialContentItem::AddTexture(const std::string& key, const ExternalReferenceContentItem& reference)
 	{
-		m_textureByKeys[key] = reference;
+		TexturesByKeys[key] = reference;
 	}
 }

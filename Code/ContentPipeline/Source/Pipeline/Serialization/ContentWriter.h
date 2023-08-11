@@ -9,6 +9,8 @@
 #include "Pipeline/AbstractProcessor.h"
 #include "Pipeline/ExternalReferenceContentItem.h"
 
+#include <Bruno/Math/Math.h>
+
 namespace Bruno
 {
 	class ContentCompiler;
@@ -34,6 +36,9 @@ namespace Bruno
 		void WriteWString(const std::wstring& value);
 		void WriteSharedResource(const ContentItem* resource);
 		void WriteSharedResources();
+		void WriteVector2(const Math::Vector2& vector2);
+		void WriteVector3(const Math::Vector3& vector3);
+		void WriteVector4(const Math::Vector4& vector4);
 
 	private:
 		const wchar_t* FileExtension = L".bruno";

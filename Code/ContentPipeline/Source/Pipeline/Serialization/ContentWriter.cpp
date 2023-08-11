@@ -144,6 +144,21 @@ namespace Bruno
 		}
 	}
 
+	void ContentWriter::WriteVector2(const Math::Vector2& vector2)
+	{
+		m_currentStream->WriteRaw<Math::Vector2>(vector2);
+	}
+
+	void ContentWriter::WriteVector3(const Math::Vector3& vector3)
+	{
+		m_currentStream->WriteRaw<Math::Vector3>(vector3);
+	}
+
+	void ContentWriter::WriteVector4(const Math::Vector4& vector4)
+	{
+		m_currentStream->WriteRaw<Math::Vector4>(vector4);
+	}
+
 	AbstractContentTypeWriter* ContentWriter::GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex)
 	{
 		auto it = m_writersIndexTable.find(writerTypeId);

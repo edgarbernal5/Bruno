@@ -1,11 +1,11 @@
 #pragma once
 
 #include <Bruno/Content/ContentTypeReader.h>
-#include <Bruno/Platform/DirectX/Texture.h>
+#include <Bruno/Renderer/Model.h>
 
 namespace Bruno
 {
-	class ModelReader : public ContentTypeReader<Texture>
+	class ModelReader : public ContentTypeReader<Model>
 	{
 		BR_RTTI_DECLARATION(ModelReader, AbstractContentTypeReader);
 
@@ -14,6 +14,6 @@ namespace Bruno
 		~ModelReader() = default;
 
 	protected:
-		virtual std::shared_ptr<Texture> ReadInternal(ContentReader& input) override;
+		virtual std::shared_ptr<Model> ReadInternal(ContentReader& input) override;
 	};
 }

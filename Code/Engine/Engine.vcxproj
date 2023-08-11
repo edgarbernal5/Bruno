@@ -141,6 +141,8 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
     <ClInclude Include="Source\Bruno\Renderer\Camera.h" />
+    <ClInclude Include="Source\Bruno\Renderer\Material.h" />
+    <ClInclude Include="Source\Bruno\Renderer\Model.h" />
     <ClInclude Include="Source\Bruno\Renderer\RenderItem.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
   </ItemGroup>
@@ -186,6 +188,8 @@
     <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Camera.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\Material.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\Model.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp" />
   </ItemGroup>
