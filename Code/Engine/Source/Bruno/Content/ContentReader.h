@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Bruno/Core/Stream.h"
+#include "Bruno/Math/Math.h"
 #include "ContentTypeReader.h"
 #include <functional>
 
@@ -29,6 +30,10 @@ namespace Bruno
 		void ReadWString(std::wstring& output);
 		void ReadBytes(std::vector<uint8_t>& output);
 		void ReadSharedResources(uint32_t sharedResourceCount);
+		void ReadVector2(Math::Vector2& output);
+		void ReadVector3(Math::Vector3& output);
+		void ReadVector4(Math::Vector4& output);
+
 	private:
 		ContentManager* m_contentManager;
 		Stream& m_stream;

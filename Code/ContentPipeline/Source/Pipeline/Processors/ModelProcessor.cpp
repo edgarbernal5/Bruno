@@ -75,7 +75,7 @@ namespace Bruno
 	void ModelProcessor::ProcessMesh(aiMesh* aiMesh, std::vector<std::shared_ptr<MeshContentItem>>& meshes)
 	{
 		auto mesh = std::make_shared<MeshContentItem>();
-
+		mesh->MaterialIndex = aiMesh->mMaterialIndex;
 		mesh->Vertices.reserve(aiMesh->mNumVertices);
 		for (uint32_t i = 0; i < aiMesh->mNumVertices; i++)
 		{
@@ -115,6 +115,20 @@ namespace Bruno
 			}
 
 			mesh->TextureCoordinates.push_back(move(textureCoordinates));
+		}
+
+		uint32_t colorChannelCount = aiMesh->GetNumColorChannels();
+		mesh->VertexColors.reserve(colorChannelCount);
+		for (uint32_t i = 0; i < colorChannelCount; i++)
+		{
+			std::vector<Math::Vector4> vertexColors;
+			vertexColors.reserve(aiMesh->mNumVertices);
+			aiColor4D* aiVertexColors = aiMesh->mColors[i];
+			for (uint32_t j = 0; j < aiMesh->mNumVertices; j++)
+			{
+				vertexColors.emplace_back(reinterpret_cast<const float*>(&aiVertexColors[j]));
+			}
+			mesh->VertexColors.push_back(move(vertexColors));
 		}
 
 		if (aiMesh->HasFaces())

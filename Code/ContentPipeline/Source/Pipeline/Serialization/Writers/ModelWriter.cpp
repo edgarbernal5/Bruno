@@ -30,10 +30,13 @@ namespace Bruno
 				output.WriteExternalReference(reference);
 			}
 		}
+
 		output.WriteUInt64(modelContentItem->Meshes.size());
 		for (size_t i = 0; i < modelContentItem->Meshes.size(); i++)
 		{
 			output.WriteString(modelContentItem->Meshes[i]->Name);
+			output.WriteUInt32(modelContentItem->Meshes[i]->MaterialIndex);
+			
 			output.WriteUInt64(modelContentItem->Meshes[i]->Vertices.size());
 			for (size_t j = 0; j < modelContentItem->Meshes[i]->Vertices.size(); j++)
 			{

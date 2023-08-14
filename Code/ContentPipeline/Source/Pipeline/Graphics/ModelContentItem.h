@@ -31,9 +31,10 @@ namespace Bruno
 		std::vector<Math::Vector3> Tangents;
 		std::vector<Math::Vector3> BiNormals;
 		std::vector<std::vector<Math::Vector3>> TextureCoordinates;
-		//std::vector<std::vector<Math::Vector4>> VertexColors;
+		std::vector<std::vector<Math::Vector4>> VertexColors;
 		std::uint32_t FaceCount{ 0 };
 		std::vector<std::uint32_t> Indices;
+		uint32_t MaterialIndex{ 0 };
 	};
 
 }

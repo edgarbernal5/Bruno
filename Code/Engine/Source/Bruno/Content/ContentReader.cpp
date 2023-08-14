@@ -121,6 +121,21 @@ namespace Bruno
         }
     }
 
+    void ContentReader::ReadVector2(Math::Vector2& output)
+    {
+        m_stream.ReadRaw<Math::Vector2>(output);
+    }
+
+    void ContentReader::ReadVector3(Math::Vector3& output)
+    {
+        m_stream.ReadRaw<Math::Vector3>(output);
+    }
+
+    void ContentReader::ReadVector4(Math::Vector4& output)
+    {
+        m_stream.ReadRaw<Math::Vector4>(output);
+    }
+
     void ContentReader::ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action)
     {
         int index;
