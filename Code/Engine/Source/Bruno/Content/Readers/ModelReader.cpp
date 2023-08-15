@@ -2,6 +2,8 @@
 #include "ModelReader.h"
 
 #include "Bruno/Content/ContentReader.h"
+#include "Bruno/Platform/DirectX/IndexBuffer.h"
+#include "Bruno/Platform/DirectX/VertexBuffer.h"
 
 namespace Bruno
 {
@@ -51,6 +53,7 @@ namespace Bruno
 			size_t count;
 			input.ReadUInt64(count);
 			std::vector<Math::Vector3> vertices;
+			vertices.reserve(count);
 
 			for (size_t j = 0; j < count; j++)
 			{
@@ -59,8 +62,86 @@ namespace Bruno
 
 				vertices.push_back(vertex);
 			}
+
+			input.ReadUInt64(count);
+			std::vector<Math::Vector3> normals;
+			normals.reserve(count);
+
+			for (size_t j = 0; j < count; j++)
+			{
+				Math::Vector3 normal;
+				input.ReadVector3(normal);
+
+				normals.push_back(normal);
+			}
+
+			input.ReadUInt64(count);
+			std::vector<Math::Vector3> tangents;
+			tangents.reserve(count);
+
+			for (size_t j = 0; j < count; j++)
+			{
+				Math::Vector3 tangent;
+				input.ReadVector3(tangent);
+
+				tangents.push_back(tangent);
+			}
+
+			input.ReadUInt64(count);
+			std::vector<Math::Vector3> binormals;
+			binormals.reserve(count);
+
+			for (size_t j = 0; j < count; j++)
+			{
+				Math::Vector3 binormal;
+				input.ReadVector3(binormal);
+
+				binormals.push_back(binormal);
+			}
+
+			std::vector < std::vector<Math::Vector3>> texCoords;
+			input.ReadUInt64(count);
+			for (size_t j = 0; j < count; j++)
+			{
+				size_t textureCount;
+				input.ReadUInt64(textureCount);
+				std::vector<Math::Vector3> texCoordsChannel;
+				texCoordsChannel.reserve(textureCount);
+
+				for (size_t k = 0; k < textureCount; k++)
+				{
+					Math::Vector3 texCoord;
+					input.ReadVector3(texCoord);
+
+					texCoordsChannel.push_back(texCoord);
+				}
+
+				texCoords.emplace_back(std::move(texCoordsChannel));
+			}
+			uint32_t faceCount;
+			input.ReadUInt32(faceCount);
+
+			input.ReadUInt64(count);
+			std::vector< uint32_t> indices;
+			indices.reserve(count);
+
+			for (size_t j = 0; j < count; j++)
+			{
+				uint32_t index;
+				input.ReadUInt32(index);
+
+				indices.push_back(index);
+			}
+
+			auto indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(count), indices.data(), sizeof(uint32_t));
+			auto vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(vertices.size()), vertices.data(), sizeof(uint32_t));
+
+			//auto mesh = std::make_shared<Mesh>(vertices, normals, tangents, binormals, texCoords);
+			auto mesh = std::make_shared<Mesh>(std::move(vertices), std::move(normals), std::move(texCoords));
+
+			//meshes.emplace_back(std::move(mesh));
 		}
-		auto model = std::make_shared<Model>();
+		auto model = std::make_shared<Model>(/*std::move(meshes)*/);
 		return model;
 	}
 }

@@ -87,7 +87,7 @@ namespace Bruno
 			mesh->Normals.reserve(aiMesh->mNumVertices);
 			for (uint32_t i = 0; i < aiMesh->mNumVertices; i++)
 			{
-				mesh->Vertices.emplace_back(reinterpret_cast<const float*>(&aiMesh->mNormals[i]));
+				mesh->Normals.emplace_back(reinterpret_cast<const float*>(&aiMesh->mNormals[i]));
 			}
 		}
 
@@ -114,7 +114,7 @@ namespace Bruno
 				textureCoordinates.emplace_back(reinterpret_cast<const float*>(&aiTextureCoordinates[j]));
 			}
 
-			mesh->TextureCoordinates.push_back(move(textureCoordinates));
+			mesh->TextureCoordinates.push_back(std::move(textureCoordinates));
 		}
 
 		uint32_t colorChannelCount = aiMesh->GetNumColorChannels();
@@ -128,7 +128,7 @@ namespace Bruno
 			{
 				vertexColors.emplace_back(reinterpret_cast<const float*>(&aiVertexColors[j]));
 			}
-			mesh->VertexColors.push_back(move(vertexColors));
+			mesh->VertexColors.push_back(std::move(vertexColors));
 		}
 
 		if (aiMesh->HasFaces())

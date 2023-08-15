@@ -54,9 +54,16 @@ namespace Bruno
         if (referenceName.empty())
             return nullptr;
 
-        std::filesystem::path path(referenceName);
+        std::size_t directorySeparatorIndex = m_assetName.find_last_of(L"/\\");
+        std::wstring path;
 
-        std::filesystem::path cleanPath = path / referenceName;
+        if (directorySeparatorIndex != std::wstring::npos)
+        {
+            path = m_assetName.substr(0, directorySeparatorIndex);
+        }
+
+        std::filesystem::path cleanPath(path);
+        cleanPath /= referenceName;
 
         return m_contentManager->Load<RTTI>(cleanPath);
     }

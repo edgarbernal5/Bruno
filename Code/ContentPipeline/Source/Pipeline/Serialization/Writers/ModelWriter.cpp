@@ -37,26 +37,35 @@ namespace Bruno
 			output.WriteString(modelContentItem->Meshes[i]->Name);
 			output.WriteUInt32(modelContentItem->Meshes[i]->MaterialIndex);
 			
+			//vertices.
 			output.WriteUInt64(modelContentItem->Meshes[i]->Vertices.size());
 			for (size_t j = 0; j < modelContentItem->Meshes[i]->Vertices.size(); j++)
 			{
 				output.WriteVector3(modelContentItem->Meshes[i]->Vertices[j]);
 			}
+
+			//normals.
 			output.WriteUInt64(modelContentItem->Meshes[i]->Normals.size());
 			for (size_t j = 0; j < modelContentItem->Meshes[i]->Normals.size(); j++)
 			{
 				output.WriteVector3(modelContentItem->Meshes[i]->Normals[j]);
 			}
+			
+			//tangents.
 			output.WriteUInt64(modelContentItem->Meshes[i]->Tangents.size());
 			for (size_t j = 0; j < modelContentItem->Meshes[i]->Tangents.size(); j++)
 			{
 				output.WriteVector3(modelContentItem->Meshes[i]->Tangents[j]);
 			}
+			
+			//binormals.
 			output.WriteUInt64(modelContentItem->Meshes[i]->BiNormals.size());
 			for (size_t j = 0; j < modelContentItem->Meshes[i]->BiNormals.size(); j++)
 			{
 				output.WriteVector3(modelContentItem->Meshes[i]->BiNormals[j]);
 			}
+			
+			//texture coordinates.
 			output.WriteUInt64(modelContentItem->Meshes[i]->TextureCoordinates.size());
 			for (size_t j = 0; j < modelContentItem->Meshes[i]->TextureCoordinates.size(); j++)
 			{
@@ -66,6 +75,7 @@ namespace Bruno
 					output.WriteVector3(modelContentItem->Meshes[i]->TextureCoordinates[j][k]);
 				}
 			}
+			
 			output.WriteUInt32(modelContentItem->Meshes[i]->FaceCount);
 			output.WriteUInt64(modelContentItem->Meshes[i]->Indices.size());
 			for (size_t j = 0; j < modelContentItem->Meshes[i]->Indices.size(); j++)

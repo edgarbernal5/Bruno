@@ -11,7 +11,7 @@ namespace Bruno
 
 	TextureProcessor::TextureProcessor()
 	{
-		m_supportedExtensions = { L".dds", L".bmp", L".jpg" };
+		m_supportedExtensions = { L".dds", L".bmp", L".jpg", L".png" };
 	}
 
 	std::shared_ptr<ContentItem> TextureProcessor::Process(const std::wstring& assetFilename, ContentProcessorContext& context)
