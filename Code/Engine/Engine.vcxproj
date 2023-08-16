@@ -59,7 +59,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;Dependencies\DirectXTex\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -68,7 +68,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\build\bin\nana_v143_Debug_x64.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\build\bin\nana_v143_Debug_x64.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -104,6 +104,7 @@
     <ClInclude Include="Source\Bruno\Content\Readers\MaterialReader.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\ModelReader.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\ShaderReader.h" />
+    <ClInclude Include="Source\Bruno\Core\Compressor.h" />
     <ClInclude Include="Source\Bruno\Core\FileStream.h" />
     <ClInclude Include="Source\Bruno\Core\KeyCodes.h" />
     <ClInclude Include="Source\Bruno\Core\Assert.h" />
@@ -155,6 +156,7 @@
     <ClCompile Include="Source\Bruno\Content\Readers\MaterialReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\ModelReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\ShaderReader.cpp" />
+    <ClCompile Include="Source\Bruno\Core\Compressor.cpp" />
     <ClCompile Include="Source\Bruno\Core\FileStream.cpp" />
     <ClCompile Include="Source\Bruno\Core\GameTimer.cpp" />
     <ClCompile Include="Source\Bruno\Core\Base.cpp" />

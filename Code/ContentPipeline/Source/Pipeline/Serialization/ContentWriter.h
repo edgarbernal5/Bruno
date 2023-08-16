@@ -42,6 +42,7 @@ namespace Bruno
 
 	private:
 		const wchar_t* FileExtension = L".bruno";
+		bool m_compressContent;
 		std::wstring m_referenceRelocationPath;
 		Stream& m_finalOutputStream;
 		MemoryStream m_headerDataStream;

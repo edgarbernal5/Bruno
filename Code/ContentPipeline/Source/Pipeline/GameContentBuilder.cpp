@@ -186,7 +186,7 @@ namespace Bruno
 		FileStream fileStream(absolutePath, FileAccess::Write);
 		
 		ContentCompiler compiler;
-		compiler.Compile(fileStream, contentItem, false, m_settings.OutputDirectory, absolutePath);
+		compiler.Compile(fileStream, contentItem, true, m_settings.OutputDirectory, absolutePath);
 	}
 
 	BuildItem::BuildItem() :

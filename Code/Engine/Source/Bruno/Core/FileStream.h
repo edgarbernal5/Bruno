@@ -43,6 +43,8 @@ namespace Bruno
 
 	private:
 		long m_fileLength;
+		std::wstring m_filename;
+		FileAccess m_fileAccess;
 		std::fstream m_stream;
 	};	
 }

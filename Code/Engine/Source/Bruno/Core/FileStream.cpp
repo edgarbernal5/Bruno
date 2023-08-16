@@ -3,7 +3,10 @@
 
 namespace Bruno
 {
-	Bruno::FileStream::FileStream(const std::wstring& filename, FileAccess fileAccess)
+	Bruno::FileStream::FileStream(const std::wstring& filename, FileAccess fileAccess) :
+		m_filename(filename),
+		m_fileAccess(fileAccess),
+		m_fileLength(0)
 	{
 		if ((fileAccess & FileAccess::Read) != FileAccess::None)
 			if ((fileAccess & FileAccess::Write) != FileAccess::None)
@@ -30,6 +33,10 @@ namespace Bruno
 
 	long FileStream::GetLength()
 	{
+		if ((m_fileAccess & FileAccess::Write) != FileAccess::None) {
+			m_fileLength = std::filesystem::file_size(m_filename);
+			return m_fileLength;
+		}
 		return m_fileLength;
 	}
 

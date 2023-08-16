@@ -3,10 +3,13 @@
 #include "ContentTypeWriterManager.h"
 #include <filesystem>
 
+#include "Bruno/Core/Compressor.h"
+
 namespace Bruno
 {
 	ContentWriter::ContentWriter(ContentCompiler* compiler, Stream& stream, bool compressContent, const std::wstring& rootDirectory, const std::wstring& referenceRelocationPath) :
 		m_finalOutputStream(stream),
+		m_compressContent(compressContent),
 		m_referenceRelocationPath(referenceRelocationPath)
 	{
 		m_currentStream = &m_contentDataStream;
@@ -203,6 +206,24 @@ namespace Bruno
 		int contentLength = (int)m_contentDataStream.GetLength();
 
 		const int HeaderSize = 5; // "BRUNO"
+
+		if (m_compressContent)
+		{
+			int anana= (int)m_finalOutputStream.GetLength();
+			Compressor compressor(m_finalOutputStream);
+			compressor.Compress(m_headerDataStream.GetBuffer(), static_cast<unsigned long>(m_headerDataStream.GetLength()));
+			anana = (int)m_finalOutputStream.GetLength();
+			compressor.Compress(m_contentDataStream.GetBuffer(), static_cast<unsigned long>(m_contentDataStream.GetLength()));
+
+			int streamSize = (int)m_finalOutputStream.GetLength();
+			int headersSize = HeaderSize + sizeof(int) + headerLength + contentLength;
+
+			if (streamSize < headersSize)
+			{
+
+			}
+			return;
+		}
 
 		WriteInt32(HeaderSize + sizeof(int) + headerLength + contentLength);
 		m_currentStream->Write(m_headerDataStream.GetBuffer(), m_headerDataStream.GetLength());
