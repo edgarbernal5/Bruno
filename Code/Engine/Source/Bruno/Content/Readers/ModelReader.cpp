@@ -33,13 +33,12 @@ namespace Bruno
 
 				auto texture = input.ReadExternalReference();
 			}
-			
 		}
 
 		size_t meshesCount;
 		input.ReadUInt64(meshesCount);
 
-		std::vector<Mesh> meshes;
+		std::vector<std::shared_ptr<Mesh>> meshes;
 		meshes.reserve(meshesCount);
 
 		for (size_t i = 0; i < meshesCount; i++)
@@ -139,9 +138,9 @@ namespace Bruno
 			//auto mesh = std::make_shared<Mesh>(vertices, normals, tangents, binormals, texCoords);
 			auto mesh = std::make_shared<Mesh>(std::move(vertices), std::move(normals), std::move(texCoords));
 
-			//meshes.emplace_back(std::move(mesh));
+			meshes.emplace_back(std::move(mesh));
 		}
-		auto model = std::make_shared<Model>(/*std::move(meshes)*/);
+		auto model = std::make_shared<Model>(std::move(meshes));
 		return model;
 	}
 }

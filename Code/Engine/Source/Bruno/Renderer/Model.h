@@ -15,10 +15,10 @@ namespace Bruno
 		BR_RTTI_DECLARATION(Model, RTTI);
 
 	public:
-		//Model(std::vector<Mesh>&& meshes);
+		Model(std::vector<std::shared_ptr<Mesh>>&& meshes);
 
 	private:
-		std::vector<Mesh> m_meshes;
+		std::vector<std::shared_ptr<Mesh>> m_meshes;
 	};
 
 	class Mesh

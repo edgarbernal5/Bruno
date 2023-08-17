@@ -49,6 +49,10 @@ namespace Bruno
 		return false;
 	}
 
+	void MemoryStream::SetPosition(uint64_t position)
+	{
+	}
+
 	bool MemoryStream::Read(uint8_t* destination, size_t count)
 	{
 		if (m_position + count > m_capacity)

@@ -5,10 +5,10 @@ namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(Model);
 
-	/*Model::Model(std::vector<Mesh>&& meshes) :
+	Model::Model(std::vector<std::shared_ptr<Mesh>>&& meshes) :
 		m_meshes(std::move(meshes))
 	{
-	}*/
+	}
 
 	Mesh::Mesh(std::vector<Math::Vector3>&& vertices, std::vector<Math::Vector3>&& normals, std::vector<std::vector<Math::Vector3>>&& texCoords) :
 		m_vertices(std::move(vertices)),

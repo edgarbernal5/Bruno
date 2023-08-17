@@ -209,23 +209,28 @@ namespace Bruno
 
 		if (m_compressContent)
 		{
-			int anana= (int)m_finalOutputStream.GetLength();
+			WriteChar('1'); // compression
+			WriteInt32(0);
+			WriteInt32(headerLength + contentLength);
+
 			Compressor compressor(m_finalOutputStream);
 			compressor.Compress(m_headerDataStream.GetBuffer(), static_cast<unsigned long>(m_headerDataStream.GetLength()));
-			anana = (int)m_finalOutputStream.GetLength();
 			compressor.Compress(m_contentDataStream.GetBuffer(), static_cast<unsigned long>(m_contentDataStream.GetLength()));
+			compressor.FlushOutput();
 
 			int streamSize = (int)m_finalOutputStream.GetLength();
-			int headersSize = HeaderSize + sizeof(int) + headerLength + contentLength;
+			int headersSize = HeaderSize + sizeof(char) + sizeof(int) + headerLength + contentLength;
 
 			if (streamSize < headersSize)
 			{
-
+				m_currentStream->SetPosition(6);
+				WriteInt32(streamSize);
 			}
 			return;
 		}
 
-		WriteInt32(HeaderSize + sizeof(int) + headerLength + contentLength);
+		WriteChar('0'); // no compression
+		WriteInt32(HeaderSize + sizeof(char) + sizeof(int) + headerLength + contentLength);
 		m_currentStream->Write(m_headerDataStream.GetBuffer(), m_headerDataStream.GetLength());
 		m_currentStream->Write(m_contentDataStream.GetBuffer(), m_contentDataStream.GetLength());
 	}

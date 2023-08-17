@@ -36,6 +36,7 @@ namespace Bruno
 		virtual long GetLength() override;
 		virtual uint64_t GetPosition() override;
 		virtual bool IsStreamValid() const override;
+		void SetPosition(uint64_t position) override;
 
 		bool Read(uint8_t* destination, size_t count) override;
 

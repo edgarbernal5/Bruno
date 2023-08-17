@@ -16,7 +16,8 @@ namespace Bruno
 		else if ((fileAccess & FileAccess::Write) != FileAccess::None)
 			m_stream.open(filename.c_str(), std::fstream::out | std::fstream::binary);
 
-		if (m_stream.good() && (fileAccess & FileAccess::Read) != FileAccess::None) {
+		if (m_stream.good() && (fileAccess & FileAccess::Read) != FileAccess::None)
+		{
 			m_fileLength = std::filesystem::file_size(filename);
 		}
 	}
@@ -48,6 +49,11 @@ namespace Bruno
 	bool FileStream::IsStreamValid() const
 	{
 		return m_stream.good();
+	}
+
+	void FileStream::SetPosition(uint64_t position)
+	{
+		m_stream.seekg(position, std::ios::beg);
 	}
 
 	bool FileStream::Read(uint8_t* destination, size_t count)

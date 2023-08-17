@@ -79,8 +79,8 @@ namespace Bruno
 
 					ContentManager manager(rootDirectory);
 					//auto shader = manager.Load<Shader>(relativePath);
-					//auto texture = manager.Load<Texture>(relativePath);
-					auto model= manager.Load<Model>(relativePath);
+					auto texture = manager.Load<Texture>(relativePath);
+					//auto model= manager.Load<Model>(relativePath);
 				}
 			}
 		});

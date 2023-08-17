@@ -37,6 +37,8 @@ namespace Bruno
 	private:
 		ContentManager* m_contentManager;
 		Stream& m_stream;
+		Stream* m_currentStream;
+
 		std::wstring m_assetName;
 		std::vector<AbstractContentTypeReader*> m_readers;
 		std::vector<std::vector<std::function<void(std::shared_ptr<RTTI>)> > > m_sharedResourceFixups;

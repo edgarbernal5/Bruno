@@ -3,6 +3,8 @@
 
 #include "ContentManager.h"
 #include "ContentTypeReaderManager.h"
+#include "Bruno/Core/MemoryStream.h"
+#include "Bruno/Core/Compressor.h"
 
 namespace Bruno
 {
@@ -10,6 +12,8 @@ namespace Bruno
         m_contentManager(contentManager),
         m_stream(stream)
     {
+        m_currentStream = &m_stream;
+
         char stamp[5];
         m_stream.Read((uint8_t*)stamp, 5);
         if (stamp[0] != 'B' ||
@@ -20,15 +24,32 @@ namespace Bruno
         {
             throw std::exception("bad bruno file. header.");
         }
+        const int HeaderSize = 5; // "BRUNO"
+
+        char isCompressed;
+        ReadChar(isCompressed);
 
         int totalSizeInBytes;
         ReadInt32(totalSizeInBytes);
 
-        const int HeaderSize = 5; // "BRUNO"
-        int headerAndContentSize = HeaderSize + sizeof(int);
+        int headerAndContentSize = HeaderSize + sizeof(char) + sizeof(int);
         if (totalSizeInBytes - headerAndContentSize > m_stream.GetLength() - m_stream.GetPosition())
         {
             throw std::exception("corrupt file.");
+        }
+
+        if (isCompressed == '1')
+        {
+            int compressedLength = totalSizeInBytes - headerAndContentSize - 4;
+
+            int decompressedLength;
+            ReadInt32(decompressedLength);
+
+            MemoryStream* memoryStream = new MemoryStream(decompressedLength);
+            Decompressor decompressor(memoryStream);
+            decompressor.Decompress(&stream, compressedLength, decompressedLength);
+
+            m_currentStream = memoryStream;
         }
     }
 
@@ -43,7 +64,7 @@ namespace Bruno
 
     void ContentReader::ReadChar(char& output)
     {
-        m_stream.ReadRaw<char>(output);
+        m_currentStream->ReadRaw<char>(output);
     }
 
     std::shared_ptr<RTTI> ContentReader::ReadExternalReference()
@@ -70,42 +91,42 @@ namespace Bruno
 
     void ContentReader::ReadInt32(int32_t& output)
     {
-        m_stream.ReadRaw<int32_t>(output);
+        m_currentStream->ReadRaw<int32_t>(output);
     }
 
     void ContentReader::ReadInt64(int64_t& output)
     {
-        m_stream.ReadRaw<int64_t>(output);
+        m_currentStream->ReadRaw<int64_t>(output);
     }
 
     void ContentReader::ReadUInt8(uint8_t& output)
     {
-        m_stream.ReadRaw<uint8_t>(output);
+        m_currentStream->ReadRaw<uint8_t>(output);
     }
 
     void ContentReader::ReadUInt32(uint32_t& output)
     {
-        m_stream.ReadRaw<uint32_t>(output);
+        m_currentStream->ReadRaw<uint32_t>(output);
     }
 
     void ContentReader::ReadUInt64(uint64_t& output)
     {
-        m_stream.ReadRaw<uint64_t>(output);
+        m_currentStream->ReadRaw<uint64_t>(output);
     }
 
     void ContentReader::ReadString(std::string& output)
     {
-        m_stream.ReadString(output);
+        m_currentStream->ReadString(output);
     }
 
     void ContentReader::ReadWString(std::wstring& output)
     {
-        m_stream.ReadWString(output);
+        m_currentStream->ReadWString(output);
     }
 
     void ContentReader::ReadBytes(std::vector<uint8_t>& output)
     {
-        m_stream.ReadBytes(output);
+        m_currentStream->ReadBytes(output);
     }
 
     void ContentReader::ReadSharedResources(uint32_t sharedResourceCount)
@@ -130,17 +151,17 @@ namespace Bruno
 
     void ContentReader::ReadVector2(Math::Vector2& output)
     {
-        m_stream.ReadRaw<Math::Vector2>(output);
+        m_currentStream->ReadRaw<Math::Vector2>(output);
     }
 
     void ContentReader::ReadVector3(Math::Vector3& output)
     {
-        m_stream.ReadRaw<Math::Vector3>(output);
+        m_currentStream->ReadRaw<Math::Vector3>(output);
     }
 
     void ContentReader::ReadVector4(Math::Vector4& output)
     {
-        m_stream.ReadRaw<Math::Vector4>(output);
+        m_currentStream->ReadRaw<Math::Vector4>(output);
     }
 
     void ContentReader::ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action)

@@ -15,6 +15,7 @@ namespace Bruno
 		virtual long GetLength() = 0;
 		virtual uint64_t GetPosition() = 0;
 		virtual bool IsStreamValid() const = 0;
+		virtual void SetPosition(uint64_t position) = 0;
 
 		virtual bool Read(uint8_t* destination, size_t count) = 0;
 
