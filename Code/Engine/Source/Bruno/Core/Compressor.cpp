@@ -5,8 +5,8 @@
 
 namespace Bruno
 {
-	Compressor::Compressor(Stream& stream) :
-		m_stream(stream),
+	Compressor::Compressor(Stream& outputStream) :
+		m_outputStream(outputStream),
 		m_buffer(nullptr),
 		m_capacity(0),
 		m_length(0)
@@ -62,32 +62,35 @@ namespace Bruno
 
 		if (result == Z_OK)
 		{
-			BR_CORE_TRACE << "compression successfull." << std::endl;
-			m_stream.Write(compressedBytes, compressedSize);
+			m_outputStream.Write(compressedBytes, compressedSize);
 		}
 		else
 		{
-			// Handle compression error
-			BR_CORE_TRACE << " compression error." << std::endl;
+			BR_CORE_TRACE << "Compression error. Result = " << result << std::endl;
 		}
 		delete[] compressedBytes;
 	}
 
-	Decompressor::Decompressor(MemoryStream* stream) :
-		m_stream(stream)
+	Decompressor::Decompressor(MemoryStream* outputStream) :
+		m_outputStream(outputStream)
 	{
 		
 	}
 
-	void Decompressor::Decompress(Stream* source, int compressedLength, int decompressedLength)
+	void Decompressor::Decompress(Stream* inputStream, int compressedLength, int decompressedLength)
 	{
-		std::vector<uint8_t> buffer;
-		source->ReadBytes(buffer, compressedLength);
+		std::vector<uint8_t> inputBuffer;
+		inputStream->ReadBytes(inputBuffer, compressedLength);
 
-		unsigned long finalL = decompressedLength;
-		int result = uncompress(m_stream->GetBuffer(), &finalL, buffer.data(), compressedLength);
+		unsigned long decompressedSize = static_cast<unsigned long>(decompressedLength);
+		std::vector<uint8_t> outputBuffer;
+		outputBuffer.resize(decompressedSize);
+		
+		int result = uncompress(outputBuffer.data(), &decompressedSize, inputBuffer.data(), compressedLength);
 		if (result == Z_OK)
 		{
+			m_outputStream->WriteBytes(outputBuffer, false);
+			m_outputStream->SetPosition(0);
 		}
 	}
 }

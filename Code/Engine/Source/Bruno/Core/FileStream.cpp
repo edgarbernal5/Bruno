@@ -34,16 +34,16 @@ namespace Bruno
 
 	long FileStream::GetLength()
 	{
-		if ((m_fileAccess & FileAccess::Write) != FileAccess::None) {
-			m_fileLength = std::filesystem::file_size(m_filename);
-			return m_fileLength;
+		if ((m_fileAccess & FileAccess::Write) != FileAccess::None)
+		{
+			return (long)m_stream.tellp();
 		}
 		return m_fileLength;
 	}
 
 	uint64_t FileStream::GetPosition()
 	{
-		return m_stream.tellp();
+		return (uint64_t)m_stream.tellp();
 	}
 
 	bool FileStream::IsStreamValid() const

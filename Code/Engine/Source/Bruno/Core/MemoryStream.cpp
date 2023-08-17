@@ -17,7 +17,7 @@ namespace Bruno
 
 	MemoryStream::MemoryStream(uint32_t capacity) :
 		m_buffer(nullptr),
-		m_capacity(capacity),
+		m_capacity(0),
 		m_position(0)
 	{
 		m_length = 0;
@@ -51,6 +51,7 @@ namespace Bruno
 
 	void MemoryStream::SetPosition(uint64_t position)
 	{
+		m_position = position;
 	}
 
 	bool MemoryStream::Read(uint8_t* destination, size_t count)

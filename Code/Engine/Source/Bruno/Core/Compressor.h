@@ -10,14 +10,14 @@ namespace Bruno
 	class Compressor
 	{
 	public:
-		Compressor(Stream& stream);
+		Compressor(Stream& outputStream);
 		~Compressor();
 
 		void Compress(uint8_t* inputBytes, unsigned long sizeInBytes);
 		void FlushOutput();
 
 	private:
-		Stream& m_stream;
+		Stream& m_outputStream;
 		uint8_t* m_buffer;
 		uint32_t m_capacity;
 		uint32_t m_length;
@@ -26,12 +26,12 @@ namespace Bruno
 	class Decompressor
 	{
 	public:
-		Decompressor(MemoryStream* stream);
+		Decompressor(MemoryStream* outputStream);
 
-		void Decompress(Stream* source, int compressedLength, int decompressedLength);
+		void Decompress(Stream* inputStream, int compressedLength, int decompressedLength);
 
 	private:
-		MemoryStream* m_stream;
+		MemoryStream* m_outputStream;
 	};
 }
 

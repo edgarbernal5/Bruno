@@ -11,11 +11,13 @@
 namespace Bruno
 {
 	class ContentManager;
+	class MemoryStream;
 
 	class ContentReader
 	{
 	public:
 		ContentReader(ContentManager* contentManager, Stream& stream, const std::wstring& assetName);
+		~ContentReader();
 
 		std::shared_ptr<RTTI> ReadAsset();
 
@@ -38,6 +40,7 @@ namespace Bruno
 		ContentManager* m_contentManager;
 		Stream& m_stream;
 		Stream* m_currentStream;
+		MemoryStream* m_decompressedStream;
 
 		std::wstring m_assetName;
 		std::vector<AbstractContentTypeReader*> m_readers;

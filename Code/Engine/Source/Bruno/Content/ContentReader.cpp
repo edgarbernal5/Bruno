@@ -32,24 +32,34 @@ namespace Bruno
         int totalSizeInBytes;
         ReadInt32(totalSizeInBytes);
 
-        int headerAndContentSize = HeaderSize + sizeof(char) + sizeof(int);
-        if (totalSizeInBytes - headerAndContentSize > m_stream.GetLength() - m_stream.GetPosition())
+        int headerAndContentLength = HeaderSize + sizeof(char) + sizeof(int);
+        if (totalSizeInBytes - headerAndContentLength > m_stream.GetLength() - m_stream.GetPosition())
         {
             throw std::exception("corrupt file.");
         }
 
         if (isCompressed == '1')
         {
-            int compressedLength = totalSizeInBytes - headerAndContentSize - 4;
+            int compressedLength = totalSizeInBytes - headerAndContentLength - 4; //4 bytes of Int32 (decompressedHeaderAndContentLength).
 
-            int decompressedLength;
-            ReadInt32(decompressedLength);
+            int decompressedHeaderAndContentLength;
+            ReadInt32(decompressedHeaderAndContentLength);
 
-            MemoryStream* memoryStream = new MemoryStream(decompressedLength);
-            Decompressor decompressor(memoryStream);
-            decompressor.Decompress(&stream, compressedLength, decompressedLength);
+            m_decompressedStream = new MemoryStream(decompressedHeaderAndContentLength);
+            Decompressor decompressor(m_decompressedStream);
+            decompressor.Decompress(&stream, compressedLength, decompressedHeaderAndContentLength);
 
-            m_currentStream = memoryStream;
+            stream.Close();
+            m_currentStream = m_decompressedStream;
+        }
+    }
+
+    ContentReader::~ContentReader()
+    {
+        if (m_decompressedStream)
+        {
+            delete m_decompressedStream;
+            m_decompressedStream = nullptr;
         }
     }
 

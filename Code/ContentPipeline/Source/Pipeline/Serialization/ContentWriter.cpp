@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "Bruno/Core/Compressor.h"
+#include <Bruno/Core/Log.h>
 
 namespace Bruno
 {
@@ -210,7 +211,7 @@ namespace Bruno
 		if (m_compressContent)
 		{
 			WriteChar('1'); // compression
-			WriteInt32(0);
+			WriteInt32(0); // we don't know total length, this will be filled after compression.
 			WriteInt32(headerLength + contentLength);
 
 			Compressor compressor(m_finalOutputStream);
@@ -218,15 +219,16 @@ namespace Bruno
 			compressor.Compress(m_contentDataStream.GetBuffer(), static_cast<unsigned long>(m_contentDataStream.GetLength()));
 			compressor.FlushOutput();
 
-			int streamSize = (int)m_finalOutputStream.GetLength();
-			int headersSize = HeaderSize + sizeof(char) + sizeof(int) + headerLength + contentLength;
+			int compressedHeaderAndContentLength = (int)m_finalOutputStream.GetLength();
+			int uncompressedHeaderAndContentLength = HeaderSize + sizeof(char) + sizeof(int) + headerLength + contentLength;
 
-			if (streamSize < headersSize)
+			if (compressedHeaderAndContentLength < uncompressedHeaderAndContentLength)
 			{
-				m_currentStream->SetPosition(6);
-				WriteInt32(streamSize);
+				m_currentStream->SetPosition(6); // put position right after prologue (BRUNO + flag compression)
+				WriteInt32(compressedHeaderAndContentLength);
+				return;
 			}
-			return;
+			m_currentStream->SetPosition(4);
 		}
 
 		WriteChar('0'); // no compression
