@@ -4,6 +4,9 @@
 #include "Bruno/Content/ContentReader.h"
 #include "Bruno/Platform/DirectX/IndexBuffer.h"
 #include "Bruno/Platform/DirectX/VertexBuffer.h"
+#include "Bruno/Platform/DirectX/VertexTypes.h"
+
+#include "Bruno/Renderer/Material.h"
 
 namespace Bruno
 {
@@ -19,10 +22,11 @@ namespace Bruno
 		size_t materialCount;
 		input.ReadUInt64(materialCount);
 
+		std::vector<std::shared_ptr<Material>> materials;
 		for (size_t i = 0; i < materialCount; i++)
 		{
-			std::string name;
-			input.ReadString(name);
+			auto material = std::make_shared<Material>();
+			input.ReadString(material->Name);
 
 			size_t texturexCount;
 			input.ReadUInt64(texturexCount);
@@ -32,7 +36,10 @@ namespace Bruno
 				input.ReadString(textureName);
 
 				auto texture = input.ReadExternalReference();
+				material->TexturesByName[textureName] = std::static_pointer_cast<Texture>(texture);
 			}
+
+			materials.emplace_back(std::move(material));
 		}
 
 		size_t meshesCount;
@@ -132,11 +139,26 @@ namespace Bruno
 				indices.push_back(index);
 			}
 
+			std::vector<VertexPositionNormalTexture> verticesPNT;
+			verticesPNT.reserve(vertices.size());
+			for (size_t j = 0; j < vertices.size(); j++)
+			{
+				auto& vertex = verticesPNT.emplace_back();
+				vertex.Position = vertices[j];
+				vertex.Normal = normals[j];
+				auto& texCoord3D = texCoords.at(0).at(j);
+				vertex.Texture.x = texCoord3D.x;
+				vertex.Texture.y = texCoord3D.y;
+			}
+
 			auto indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(count), indices.data(), sizeof(uint32_t));
-			auto vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(vertices.size()), vertices.data(), sizeof(uint32_t));
+			auto vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(vertices.size()), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
 
 			//auto mesh = std::make_shared<Mesh>(vertices, normals, tangents, binormals, texCoords);
 			auto mesh = std::make_shared<Mesh>(std::move(vertices), std::move(normals), std::move(texCoords));
+			mesh->SetMaterial(materials[materialIndex]);
+			mesh->SetIndexBuffer(indexBuffer);
+			mesh->SetVertexBuffer(vertexBuffer);
 
 			meshes.emplace_back(std::move(mesh));
 		}

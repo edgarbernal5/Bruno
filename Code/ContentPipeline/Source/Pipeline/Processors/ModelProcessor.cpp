@@ -194,11 +194,8 @@ namespace Bruno
 						ExternalReferenceContentItem sourceTextureReference(filenameTexture);
 						ExternalReferenceContentItem textureReference = context.BuildAsset(sourceTextureReference, "TextureProcessor", relativePathToTextureW.str());
 						std::string textureName = (it->second.second);
-						//materialContentItem.AddTexture(textureName, sourceTextureReference);
 
 						materialContentItem.AddTexture(textureName, textureReference);
-
-						
 					}
 				}
 			}

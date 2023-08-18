@@ -49,7 +49,6 @@ namespace Bruno
             Decompressor decompressor(m_decompressedStream);
             decompressor.Decompress(&stream, compressedLength, decompressedHeaderAndContentLength);
 
-            stream.Close();
             m_currentStream = m_decompressedStream;
         }
     }

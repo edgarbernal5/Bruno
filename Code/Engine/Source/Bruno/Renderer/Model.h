@@ -9,6 +9,7 @@
 namespace Bruno
 {
 	class Mesh;
+	class Material;
 
 	class Model : public RTTI
 	{
@@ -30,6 +31,10 @@ namespace Bruno
 
 		//Mesh(std::vector<Math::Vector3> && vertices, std::vector<Math::Vector3>&& normals, std::vector<Math::Vector3>&& tangets, std::vector<Math::Vector3>&& birnormals, std::vector < std::vector<Math::Vector3>> && textureCoordinates);
 
+		void SetIndexBuffer(std::shared_ptr<IndexBuffer> buffer);
+		void SetMaterial(std::shared_ptr<Material> material);
+		void SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer);
+
 		Mesh& operator=(Mesh&&) = default;
 	private:
 		std::vector<Math::Vector3> m_vertices;
@@ -39,7 +44,9 @@ namespace Bruno
 
 		std::vector < std::vector<Math::Vector3>> m_textureCoordinates;
 
-		std::shared_ptr<VertexBuffer> VertexB;
-		std::shared_ptr<IndexBuffer> IndexB;
+		std::shared_ptr<Material> m_material;
+
+		std::shared_ptr<VertexBuffer> m_vertexBuffer;
+		std::shared_ptr<IndexBuffer> m_indexBuffer;
 	};
 }

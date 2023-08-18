@@ -16,4 +16,19 @@ namespace Bruno
 		m_textureCoordinates(std::move(texCoords))
 	{
 	}
+
+	void Mesh::SetIndexBuffer(std::shared_ptr<IndexBuffer> buffer)
+	{
+		m_indexBuffer = buffer;
+	}
+
+	void Mesh::SetMaterial(std::shared_ptr<Material> material)
+	{
+		m_material = material;
+	}
+
+	void Mesh::SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer)
+	{
+		m_vertexBuffer = buffer;
+	}
 }
