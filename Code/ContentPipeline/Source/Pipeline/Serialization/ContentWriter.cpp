@@ -36,9 +36,10 @@ namespace Bruno
 		m_currentStream->Write(buffer, 1);
 	}
 
-	void ContentWriter::WriteExternalReference(ExternalReferenceContentItem& const reference)
+	void ContentWriter::WriteExternalReference(const ExternalReferenceContentItem& reference)
 	{
-		if (reference.Filename.empty()) {
+		if (reference.Filename.empty())
+		{
 			WriteWString(L"");
 		}
 		else
@@ -52,7 +53,8 @@ namespace Bruno
 			std::filesystem::path basePath(m_referenceRelocationPath);
 
 			auto outputPath = std::filesystem::relative(filename, basePath).wstring();
-			if (outputPath.size() > 3 && outputPath.substr(0, 3) == L"..\\") {
+			if (outputPath.size() > 3 && outputPath.substr(0, 3) == L"..\\")
+			{
 				outputPath = outputPath.substr(3);
 			}
 			WriteWString(outputPath);
@@ -129,8 +131,9 @@ namespace Bruno
 			if (it == m_sharedResourcesIndexTable.end())
 			{
 				m_sharedResources.push(resource);
-				m_sharedResourcesIndexTable[resource] = m_sharedResources.size();
-				WriteUInt32(m_sharedResources.size());
+				uint32_t resourceIndex = static_cast<uint32_t>(m_sharedResources.size());
+				m_sharedResourcesIndexTable[resource] = resourceIndex;
+				WriteUInt32(resourceIndex);
 			}
 			else
 			{
@@ -168,7 +171,7 @@ namespace Bruno
 		auto it = m_writersIndexTable.find(writerTypeId);
 		if (it == m_writersIndexTable.end()) {
 
-			typeIndex = m_writers.size();
+			typeIndex = static_cast<int>(m_writers.size());
 			m_writersIndexTable[writerTypeId] = typeIndex;
 			auto allTypeWriters = ContentTypeWriterManager::GetContentTypeWriters();
 			auto typeWriter = allTypeWriters[writerTypeId];
@@ -206,7 +209,7 @@ namespace Bruno
 		int headerLength = (int)m_headerDataStream.GetLength();
 		int contentLength = (int)m_contentDataStream.GetLength();
 
-		const int HeaderSize = 5; // "BRUNO"
+		const int BrunoHeaderSize = 5; // "BRUNO"
 
 		if (m_compressContent)
 		{
@@ -220,7 +223,7 @@ namespace Bruno
 			compressor.FlushOutput();
 
 			int compressedHeaderAndContentLength = (int)m_finalOutputStream.GetLength();
-			int uncompressedHeaderAndContentLength = HeaderSize + sizeof(char) + sizeof(int) + headerLength + contentLength;
+			int uncompressedHeaderAndContentLength = BrunoHeaderSize + sizeof(char) + sizeof(int) + headerLength + contentLength;
 
 			if (compressedHeaderAndContentLength < uncompressedHeaderAndContentLength)
 			{
@@ -232,7 +235,7 @@ namespace Bruno
 		}
 
 		WriteChar('0'); // no compression
-		WriteInt32(HeaderSize + sizeof(char) + sizeof(int) + headerLength + contentLength);
+		WriteInt32(BrunoHeaderSize + sizeof(char) + sizeof(int) + headerLength + contentLength);
 		m_currentStream->Write(m_headerDataStream.GetBuffer(), m_headerDataStream.GetLength());
 		m_currentStream->Write(m_contentDataStream.GetBuffer(), m_contentDataStream.GetLength());
 	}

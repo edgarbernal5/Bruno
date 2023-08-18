@@ -24,7 +24,7 @@ namespace Bruno
         {
             throw std::exception("bad bruno file. header.");
         }
-        const int HeaderSize = 5; // "BRUNO"
+        const int BrunoHeaderSize = 5; // "BRUNO"
 
         char isCompressed;
         ReadChar(isCompressed);
@@ -32,7 +32,7 @@ namespace Bruno
         int totalSizeInBytes;
         ReadInt32(totalSizeInBytes);
 
-        int headerAndContentLength = HeaderSize + sizeof(char) + sizeof(int);
+        int headerAndContentLength = BrunoHeaderSize + sizeof(char) + sizeof(int);
         if (totalSizeInBytes - headerAndContentLength > m_stream.GetLength() - m_stream.GetPosition())
         {
             throw std::exception("corrupt file.");
@@ -175,10 +175,10 @@ namespace Bruno
 
     void ContentReader::ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action)
     {
-        int index;
-        ReadInt32(index);
+        uint32_t index;
+        ReadUInt32(index);
 
-        if (index != 0)
+        if (index > 0)
         {
             index--;
             if (index >= m_sharedResourceFixups.size())

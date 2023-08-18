@@ -59,7 +59,7 @@ namespace Bruno
 		if (m_position + count > m_capacity)
 			return false;
 
-		memcpy(destination, (char*)m_buffer + m_position, count);
+		memcpy(destination, m_buffer + m_position, count);
 		m_position += count;
 		return true;
 	}

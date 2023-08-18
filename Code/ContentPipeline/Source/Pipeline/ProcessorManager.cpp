@@ -21,7 +21,7 @@ namespace Bruno
 		return true;
 	}
 
-	const std::shared_ptr<AbstractProcessor>& ProcessorManager::GetProcessorByExtension(const std::wstring& extension)
+	std::shared_ptr<AbstractProcessor> ProcessorManager::GetProcessorByExtension(const std::wstring& extension)
 	{
 		for (auto& processor : g_processors)
 		{
@@ -33,7 +33,7 @@ namespace Bruno
 		return nullptr;
 	}
 
-	const std::shared_ptr<AbstractProcessor>& ProcessorManager::GetProcessorByName(const std::string& name)
+	std::shared_ptr<AbstractProcessor> ProcessorManager::GetProcessorByName(const std::string& name)
 	{
 		for (auto& processor : g_processors)
 		{

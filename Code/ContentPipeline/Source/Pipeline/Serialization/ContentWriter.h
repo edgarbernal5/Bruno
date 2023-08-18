@@ -25,7 +25,7 @@ namespace Bruno
 
 		void WriteBytes(const std::vector<uint8_t>& buffer);
 		void WriteChar(char value);
-		void WriteExternalReference(ExternalReferenceContentItem& const reference);
+		void WriteExternalReference(const ExternalReferenceContentItem& reference);
 		void WriteInt32(int32_t value);
 		void WriteInt64(int64_t value);
 		void WriteUInt8(uint8_t value);
@@ -52,7 +52,7 @@ namespace Bruno
 
 		std::map<RTTI::IdType, int> m_writersIndexTable;
 		std::vector<AbstractContentTypeWriter*> m_writers;
-		std::map<const ContentItem*, int> m_sharedResourcesIndexTable;
+		std::map<const ContentItem*, uint32_t> m_sharedResourcesIndexTable;
 		std::queue<const ContentItem*> m_sharedResources;
 
 		AbstractContentTypeWriter* GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex);
