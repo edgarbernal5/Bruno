@@ -5,20 +5,25 @@
 
 namespace Bruno
 {
+	enum class ShaderType : uint32_t
+	{
+		Vertex = 0,
+		Pixel,
+
+		Count
+	};
+
 	class Shader : public RTTI
 	{
 		BR_RTTI_DECLARATION(Shader, RTTI);
 
 	public:
-		Shader(const std::wstring& pathToSource, std::string entryPoint, std::string target);
-		Shader(const std::vector<uint8_t>& compiledCode);
+		Shader(std::vector<uint8_t>& data);
+		Shader(const std::wstring& sourceFilename);
 
-		ID3DBlob* GetBlob() { return m_blob.Get(); }
-
+		void SetShaderProgram(const std::wstring& sourceFilename, std::string entryPoint, std::string target);
 	private:
-		Microsoft::WRL::ComPtr<ID3DBlob> m_blob;
+		//std::shared_ptr<ShaderProgram> m_programs[3]{};
 	};
-
-
 }
 

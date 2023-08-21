@@ -48,8 +48,8 @@ namespace Bruno
 
 		std::unique_ptr<IndexBuffer> m_indexBuffer;
 		std::unique_ptr<VertexBuffer> m_vertexBuffer;
-		std::unique_ptr<Shader> m_vertexShader;
-		std::unique_ptr<Shader> m_pixelShader;
+		//std::unique_ptr<ShaderProgram> m_vertexShader;
+		//std::unique_ptr<ShaderProgram> m_pixelShader;
 		std::unique_ptr<RootSignature> m_rootSignature;
 
 		std::unique_ptr<PipelineStateObject> m_pipelineState;

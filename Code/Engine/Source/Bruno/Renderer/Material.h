@@ -4,7 +4,6 @@
 #include <string>
 #include <map>
 
-#include "Bruno/Platform/DirectX/Texture.h"
 
 namespace Bruno
 {

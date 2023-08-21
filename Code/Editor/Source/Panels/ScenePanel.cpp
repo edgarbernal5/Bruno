@@ -207,8 +207,8 @@ namespace Bruno
 		m_indexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
 		m_vertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionColor));
 
-		m_vertexShader = std::make_unique<Shader>(L"VertexShader.hlsl", "main", "vs_5_1");
-		m_pixelShader = std::make_unique<Shader>(L"PixelShader.hlsl", "main", "ps_5_1");
+		//m_vertexShader = std::make_unique<ShaderProgram>(L"VertexShader.hlsl", "main", "vs_5_1");
+		//m_pixelShader = std::make_unique<ShaderProgram>(L"PixelShader.hlsl", "main", "ps_5_1");
 
 		auto boxRenderItem = std::make_shared<RenderItem>();
 		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
@@ -270,8 +270,8 @@ namespace Bruno
 		pipelineStateStream.pRootSignature = m_rootSignature->GetD3D12RootSignature();
 		pipelineStateStream.InputLayout = VertexPositionNormalTexture::InputLayout;
 		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
-		pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pixelShader->GetBlob());
+		//pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
+		//pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pixelShader->GetBlob());
 		pipelineStateStream.DSVFormat = m_depthBufferFormat;
 		pipelineStateStream.RTVFormats = rtvFormats;
 

@@ -35,8 +35,8 @@ namespace Bruno
 		void OnKeyReleased(KeyCode key, KeyboardState state) override;
 	private:
 		std::unique_ptr<Surface> m_surface;
-		std::unique_ptr<Shader> m_vertexShader;
-		std::unique_ptr<Shader> m_pixelShader;
+		//std::unique_ptr<ShaderProgram> m_vertexShader;
+		//std::unique_ptr<ShaderProgram> m_pixelShader;
 		std::unique_ptr<Texture> m_texture;
 		std::unique_ptr<RootSignature> m_rootSignature;
 

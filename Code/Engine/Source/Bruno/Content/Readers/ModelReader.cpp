@@ -7,6 +7,7 @@
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 
 #include "Bruno/Renderer/Material.h"
+#include "Bruno/Platform/DirectX/Texture.h"
 
 namespace Bruno
 {
