@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Pipeline/AbstractProcessor.h"
+#include <Bruno/Platform/DirectX/D3DCore.h>
 
 #include <wrl/client.h>
 #include <d3dcompiler.h>
@@ -32,7 +33,7 @@ namespace Bruno
 			const char* Target;
 		};
 
-		std::vector<uint8_t> m_compiledCodePrograms[2]{};
+		std::vector<uint8_t> m_compiledCodePrograms[Graphics::Core::SHADER_PROGRAMS_COUNT]{};
 
 		bool CompileShader(const std::wstring& assetFilename, const std::string& entryPoint, const std::string& target, Microsoft::WRL::ComPtr<ID3DBlob>& compiledBlob, Microsoft::WRL::ComPtr<ID3DBlob>& errorBlob);
 

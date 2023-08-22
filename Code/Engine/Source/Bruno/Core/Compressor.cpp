@@ -90,7 +90,7 @@ namespace Bruno
 		if (result == Z_OK)
 		{
 			m_outputStream->WriteBytes(outputBuffer, false);
-			m_outputStream->SetPosition(0);
+			m_outputStream->SetPosition(0); //TODO: This is a hack! memory stream should have a buffer and bytes should be written there, to avoid calling set position (0)
 		}
 	}
 }

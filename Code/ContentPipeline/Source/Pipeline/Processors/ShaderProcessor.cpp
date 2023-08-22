@@ -30,9 +30,9 @@ namespace Bruno
 		fileStream.ReadBytes(rawBytes, fileStream.GetLength());
 		content = std::string(rawBytes.data(), rawBytes.data() + rawBytes.size());
 
-		for (size_t i = 0; i < 2; i++)
+		for (size_t i = 0; i < Graphics::Core::SHADER_PROGRAMS_COUNT; i++)
 		{
-			auto entryPointIndex = content.find_first_of(ShaderTypes[i].EntryPoint);
+			auto entryPointIndex = content.find(ShaderTypes[i].EntryPoint);
 			if (entryPointIndex != std::string::npos)
 			{
 				if (!CompileShader(assetFilename, ShaderTypes[i].EntryPoint, ShaderTypes[i].Target, compiledBlob, errorBlob))
@@ -44,9 +44,10 @@ namespace Bruno
 		}
 
 		auto output = std::make_shared<ShaderContentItem>();
-		for (size_t i = 0; i < 2; i++)
+		for (size_t i = 0; i < Graphics::Core::SHADER_PROGRAMS_COUNT; i++)
 		{
-			if (m_compiledCodePrograms[i].size() > 0) {
+			if (m_compiledCodePrograms[i].size() > 0)
+			{
 				output->CompiledCodeProgramsData[i] = std::move(m_compiledCodePrograms[i]);
 			}
 		}

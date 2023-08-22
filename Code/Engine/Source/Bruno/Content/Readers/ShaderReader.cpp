@@ -15,8 +15,8 @@ namespace Bruno
 	std::shared_ptr<Shader> ShaderReader::ReadInternal(ContentReader& input)
 	{
 		std::vector<std::vector<uint8_t>> programsData;
-		programsData.resize(2);
-		for (size_t i = 0; i < 2; i++)
+		programsData.resize(Graphics::Core::SHADER_PROGRAMS_COUNT);
+		for (size_t i = 0; i < Graphics::Core::SHADER_PROGRAMS_COUNT; i++)
 		{
 			std::vector<uint8_t> data;
 			input.ReadBytes(data);

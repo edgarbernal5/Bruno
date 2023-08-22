@@ -17,7 +17,8 @@ namespace Bruno
 	{
 		for (size_t i = 0; i < programsData.size(); i++)
 		{
-			if (programsData[i].size() > 0) {
+			if (programsData[i].size() > 0)
+			{
 				m_programs[i] = std::make_shared<ShaderProgram>(std::move(programsData[i]));
 			}
 		}
@@ -34,10 +35,11 @@ namespace Bruno
 		fileStream.ReadBytes(rawBytes, fileStream.GetLength());
 		content = std::string(rawBytes.data(), rawBytes.data() + rawBytes.size());
 
-		for (size_t i = 0; i < 2; i++)
+		for (size_t i = 0; i < Graphics::Core::SHADER_PROGRAMS_COUNT; i++)
 		{
-			auto entryPointIndex = content.find_first_of(ShaderTypes[i].EntryPoint);
-			if (entryPointIndex != std::string::npos) {
+			auto entryPointIndex = content.find(ShaderTypes[i].EntryPoint);
+			if (entryPointIndex != std::string::npos)
+			{
 				m_programs[i] = std::make_shared<ShaderProgram>(sourceFilename, ShaderTypes[i].EntryPoint, ShaderTypes[i].Target);
 			}
 		}

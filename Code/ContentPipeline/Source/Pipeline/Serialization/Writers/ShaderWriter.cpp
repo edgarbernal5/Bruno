@@ -1,6 +1,7 @@
 #include "ShaderWriter.h"
 
 #include "Pipeline/Graphics/ShaderContentItem.h"
+#include <Bruno/Platform/DirectX/D3DCore.h>
 
 namespace Bruno
 {
@@ -18,7 +19,7 @@ namespace Bruno
 	{
 		auto shaderContentItem = contentItem.As<ShaderContentItem>();
 
-		for (size_t i = 0; i < 2; i++)
+		for (size_t i = 0; i < Graphics::Core::SHADER_PROGRAMS_COUNT; i++)
 		{
 			output.WriteBytes(shaderContentItem->CompiledCodeProgramsData[i]);
 		}

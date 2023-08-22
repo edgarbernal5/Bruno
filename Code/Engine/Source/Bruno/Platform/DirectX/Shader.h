@@ -2,6 +2,7 @@
 
 #include "D3DCommon.h"
 #include "Bruno/Core/RTTI.h"
+#include "D3DCore.h"
 
 namespace Bruno
 {
@@ -29,7 +30,7 @@ namespace Bruno
 			const char* Target;
 			D3D12_SHADER_VISIBILITY Visibility;
 		};
-		std::shared_ptr<ShaderProgram> m_programs[2]{};
+		std::shared_ptr<ShaderProgram> m_programs[Graphics::Core::SHADER_PROGRAMS_COUNT]{};
 
 		static const ShaderTypeDesc& VS, & PS;
 		static const ShaderTypeDesc ShaderTypes[];

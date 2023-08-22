@@ -6,6 +6,8 @@ namespace Bruno::Graphics::Core
 {
     constexpr uint32_t FRAME_BUFFER_COUNT{ 3 };
     constexpr uint32_t UPLOAD_FRAME_COUNT{ 3 };
+    constexpr uint32_t SHADER_PROGRAMS_COUNT{ 2 };
+
     struct
     {
         const CD3DX12_HEAP_PROPERTIES DefaultHeap

@@ -91,7 +91,7 @@ namespace Bruno
         {
             path = m_assetName.substr(0, directorySeparatorIndex);
         }
-
+        
         std::filesystem::path cleanPath(path);
         cleanPath /= referenceName;
 

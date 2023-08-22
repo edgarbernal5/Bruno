@@ -161,7 +161,7 @@ namespace Bruno
 
 			ProcessTexturesForMaterial(*materialContent, aiMaterial, directory, context);
 
-			materials.push_back(materialContent);
+			materials.emplace_back(std::move(materialContent));
 		}
 	}
 
