@@ -10,7 +10,7 @@ namespace Bruno
 		BR_RTTI_DECLARATION(ShaderProgram, RTTI);
 
 	public:
-		ShaderProgram(const std::wstring& sourceFilename, std::string entryPoint, std::string target);
+		ShaderProgram(const std::wstring& sourceFilename, const std::string& entryPoint, const  std::string& target);
 		ShaderProgram(const std::vector<uint8_t>& compiledCode);
 
 		ID3DBlob* GetBlob() { return m_blob.Get(); }

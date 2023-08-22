@@ -14,7 +14,7 @@ namespace Bruno
 		~ContentTypeReaderManager() = default;
 
 		static const std::map<RTTI::IdType, std::shared_ptr<AbstractContentTypeReader>>& GetContentTypeReaders();
-		static const std::shared_ptr<AbstractContentTypeReader>& GetReaderByName(const std::string& name);
+		static std::shared_ptr<AbstractContentTypeReader> GetReaderByName(const std::string& name);
 		static bool AddContentTypeReader(std::shared_ptr<AbstractContentTypeReader> reader);
 
 		static void Initialize();

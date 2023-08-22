@@ -17,6 +17,11 @@ namespace Bruno
 	void ShaderWriter::Write(ContentWriter& output, const ContentItem& contentItem)
 	{
 		auto shaderContentItem = contentItem.As<ShaderContentItem>();
-		output.WriteBytes(shaderContentItem->CompiledCodeData);
+
+		for (size_t i = 0; i < 2; i++)
+		{
+			output.WriteBytes(shaderContentItem->CompiledCodeProgramsData[i]);
+		}
+		
 	}
 }

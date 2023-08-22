@@ -23,7 +23,7 @@ namespace Bruno
 	}
 
 
-	const std::shared_ptr<AbstractContentTypeReader>& ContentTypeReaderManager::GetReaderByName(const std::string& name)
+	std::shared_ptr<AbstractContentTypeReader> ContentTypeReaderManager::GetReaderByName(const std::string& name)
 	{
 		for (auto& [rtti, reader] : g_contentTypeReaders)
 		{

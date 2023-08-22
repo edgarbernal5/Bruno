@@ -2,10 +2,16 @@
 
 #include "Pipeline/Graphics/ShaderContentItem.h"
 #include <Bruno/Core/Log.h>
+#include <Bruno/Core/FileStream.h>
 
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(ShaderProcessor);
+
+	const ShaderProcessor::ShaderTypeDesc& ShaderProcessor::VS = { ShaderProgramType::Vertex, "main_VS", "vs_5_1" };
+	const ShaderProcessor::ShaderTypeDesc& ShaderProcessor::PS = { ShaderProgramType::Pixel, "main_PS", "ps_5_1" };
+
+	const ShaderProcessor::ShaderTypeDesc ShaderProcessor::ShaderTypes[] = { ShaderProcessor::VS, ShaderProcessor::PS };
 
 	Bruno::ShaderProcessor::ShaderProcessor()
 	{
@@ -14,15 +20,36 @@ namespace Bruno
 
 	std::shared_ptr<ContentItem> ShaderProcessor::Process(const std::wstring& assetFilename, ContentProcessorContext& context)
 	{
+		FileStream fileStream(assetFilename, FileAccess::Read);
+
 		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 		Microsoft::WRL::ComPtr<ID3DBlob> compiledBlob;
 		
-		if (!CompileShader(assetFilename, "", "", compiledBlob, errorBlob))
-			return nullptr;
+		std::string content;
+		std::vector<uint8_t> rawBytes;
+		fileStream.ReadBytes(rawBytes, fileStream.GetLength());
+		content = std::string(rawBytes.data(), rawBytes.data() + rawBytes.size());
+
+		for (size_t i = 0; i < 2; i++)
+		{
+			auto entryPointIndex = content.find_first_of(ShaderTypes[i].EntryPoint);
+			if (entryPointIndex != std::string::npos)
+			{
+				if (!CompileShader(assetFilename, ShaderTypes[i].EntryPoint, ShaderTypes[i].Target, compiledBlob, errorBlob))
+					return nullptr;
+
+				m_compiledCodePrograms[i].resize(compiledBlob->GetBufferSize());
+				memcpy(m_compiledCodePrograms[i].data(), compiledBlob->GetBufferPointer(), compiledBlob->GetBufferSize());
+			}
+		}
 
 		auto output = std::make_shared<ShaderContentItem>();
-		output->CompiledCodeData.resize(compiledBlob->GetBufferSize());
-		memcpy(output->CompiledCodeData.data(), compiledBlob->GetBufferPointer(), compiledBlob->GetBufferSize());
+		for (size_t i = 0; i < 2; i++)
+		{
+			if (m_compiledCodePrograms[i].size() > 0) {
+				output->CompiledCodeProgramsData[i] = std::move(m_compiledCodePrograms[i]);
+			}
+		}
 
 		return output;
 	}

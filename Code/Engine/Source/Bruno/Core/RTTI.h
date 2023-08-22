@@ -52,6 +52,7 @@ namespace Bruno
 		{
 			return (Is(T::GetTypeIdClass()) ? reinterpret_cast<T*>(const_cast<RTTI*>(this)) : nullptr);
 		}
+
 		virtual std::string ToString() const
 		{
 			return "RTTI";

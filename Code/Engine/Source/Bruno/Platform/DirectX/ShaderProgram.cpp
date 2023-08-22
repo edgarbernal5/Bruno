@@ -5,7 +5,7 @@ namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(ShaderProgram);
 
-	ShaderProgram::ShaderProgram(const std::wstring& sourceFilename, std::string entryPoint, std::string target)
+	ShaderProgram::ShaderProgram(const std::wstring& sourceFilename, const std::string& entryPoint, const  std::string& target)
 	{
 #if defined(BR_DEBUG)
 		// Enable better shader debugging with the graphics debugging tools.

@@ -11,12 +11,18 @@ namespace Bruno
 		if ((fileAccess & FileAccess::Read) != FileAccess::None)
 		{
 			if ((fileAccess & FileAccess::Write) != FileAccess::None)
+			{
 				m_stream.open(filename.c_str(), std::fstream::in | std::fstream::out | std::fstream::binary);
+			}
 			else
+			{
 				m_stream.open(filename.c_str(), std::fstream::in | std::fstream::binary);
+			}
 		}
 		else if ((fileAccess & FileAccess::Write) != FileAccess::None)
+		{
 			m_stream.open(filename.c_str(), std::fstream::out | std::fstream::binary);
+		}
 
 		if (m_stream.good() && (fileAccess & FileAccess::Read) != FileAccess::None)
 		{

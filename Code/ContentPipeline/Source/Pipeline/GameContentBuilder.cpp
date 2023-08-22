@@ -180,8 +180,6 @@ namespace Bruno
 
 	void GameContentBuilder::SerializeAsset(const BuildItem& buildItem, const ContentItem& contentItem)
 	{
-		std::filesystem::path fspath(buildItem.OutputFilename);
-
 		auto absolutePath = std::filesystem::path(m_settings.RootDirectory) / std::filesystem::path(buildItem.OutputFilename);
 		FileStream fileStream(absolutePath, FileAccess::Write);
 		

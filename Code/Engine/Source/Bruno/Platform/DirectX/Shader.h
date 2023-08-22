@@ -5,25 +5,34 @@
 
 namespace Bruno
 {
-	enum class ShaderType : uint32_t
-	{
-		Vertex = 0,
-		Pixel,
 
-		Count
-	};
+	class ShaderProgram;
 
 	class Shader : public RTTI
 	{
 		BR_RTTI_DECLARATION(Shader, RTTI);
 
 	public:
-		Shader(std::vector<uint8_t>& data);
+		Shader(std::vector<std::vector<uint8_t>>&& programsData);
 		Shader(const std::wstring& sourceFilename);
-
-		void SetShaderProgram(const std::wstring& sourceFilename, std::string entryPoint, std::string target);
+				
 	private:
-		//std::shared_ptr<ShaderProgram> m_programs[3]{};
+		enum class ShaderProgramType : uint32_t
+		{
+			Vertex = 0,
+			Pixel
+		};
+		struct ShaderTypeDesc
+		{
+			ShaderProgramType Type;
+			const char* EntryPoint;
+			const char* Target;
+			D3D12_SHADER_VISIBILITY Visibility;
+		};
+		std::shared_ptr<ShaderProgram> m_programs[2]{};
+
+		static const ShaderTypeDesc& VS, & PS;
+		static const ShaderTypeDesc ShaderTypes[];
 	};
 }
 

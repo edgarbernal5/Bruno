@@ -14,9 +14,16 @@ namespace Bruno
 
 	std::shared_ptr<Shader> ShaderReader::ReadInternal(ContentReader& input)
 	{
-		std::vector<uint8_t> data;
-		input.ReadBytes(data);
+		std::vector<std::vector<uint8_t>> programsData;
+		programsData.resize(2);
+		for (size_t i = 0; i < 2; i++)
+		{
+			std::vector<uint8_t> data;
+			input.ReadBytes(data);
+
+			programsData[i] = std::move(data);
+		}
 	
-		return std::make_shared<Shader>(data);
+		return std::make_shared<Shader>(std::move(programsData));
 	}
 }

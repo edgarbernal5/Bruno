@@ -4,6 +4,7 @@
 
 #include <wrl/client.h>
 #include <d3dcompiler.h>
+#include <vector>
 
 namespace Bruno
 {
@@ -17,14 +18,25 @@ namespace Bruno
 		virtual std::shared_ptr<ContentItem> Process(const std::wstring& assetFilename, ContentProcessorContext& context) override;
 
 	private:
-		struct ShaderEntry
+
+		enum class ShaderProgramType : uint32_t
 		{
-			std::string EntryPoint;
-			std::string TargetPoint;
+			Vertex = 0,
+			Pixel
 		};
 
-		//ShaderEntry Entries[2]{ ShaderEntry{"main_vs", "vs_5_1"}, ShaderEntry{"main_ps", "ps_5_1"} };
+		struct ShaderTypeDesc
+		{
+			ShaderProgramType Type;
+			const char* EntryPoint;
+			const char* Target;
+		};
+
+		std::vector<uint8_t> m_compiledCodePrograms[2]{};
 
 		bool CompileShader(const std::wstring& assetFilename, const std::string& entryPoint, const std::string& target, Microsoft::WRL::ComPtr<ID3DBlob>& compiledBlob, Microsoft::WRL::ComPtr<ID3DBlob>& errorBlob);
+
+		static const ShaderTypeDesc& VS, & PS;
+		static const ShaderTypeDesc ShaderTypes[];
 	};
 }
