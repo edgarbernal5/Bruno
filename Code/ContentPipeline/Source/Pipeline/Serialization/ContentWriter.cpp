@@ -218,8 +218,8 @@ namespace Bruno
 			WriteInt32(headerLength + contentLength);
 
 			Compressor compressor(m_finalOutputStream);
-			compressor.Compress(m_headerDataStream.GetBuffer(), static_cast<unsigned long>(m_headerDataStream.GetLength()));
-			compressor.Compress(m_contentDataStream.GetBuffer(), static_cast<unsigned long>(m_contentDataStream.GetLength()));
+			compressor.Compress(m_headerDataStream.GetBuffer().Data, static_cast<unsigned long>(m_headerDataStream.GetLength()));
+			compressor.Compress(m_contentDataStream.GetBuffer().Data, static_cast<unsigned long>(m_contentDataStream.GetLength()));
 			compressor.FlushOutput();
 
 			int compressedHeaderAndContentLength = (int)m_finalOutputStream.GetLength();
@@ -236,7 +236,7 @@ namespace Bruno
 
 		WriteChar('0'); // no compression
 		WriteInt32(BrunoHeaderSize + sizeof(char) + sizeof(int) + headerLength + contentLength);
-		m_currentStream->Write(m_headerDataStream.GetBuffer(), m_headerDataStream.GetLength());
-		m_currentStream->Write(m_contentDataStream.GetBuffer(), m_contentDataStream.GetLength());
+		m_currentStream->Write(m_headerDataStream.GetBuffer().Data, m_headerDataStream.GetLength());
+		m_currentStream->Write(m_contentDataStream.GetBuffer().Data, m_contentDataStream.GetLength());
 	}
 }

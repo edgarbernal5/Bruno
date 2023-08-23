@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Stream.h"
+#include "Buffer.h"
 
 namespace Bruno
 {
@@ -8,10 +9,11 @@ namespace Bruno
 	{
 	public:
 		MemoryStream();
+		MemoryStream(Buffer& buffer);
 		MemoryStream(uint32_t capacity);
 		~MemoryStream();
 
-		uint8_t* GetBuffer() { return m_buffer; }
+		Buffer& GetBuffer() { return m_buffer; }
 
 		long GetLength() override;
 		uint64_t GetPosition() override;
@@ -23,8 +25,8 @@ namespace Bruno
 		virtual void Write(const uint8_t* source, size_t count) override;
 
 	private:
-		uint8_t* m_buffer;
-		uint64_t m_capacity;
+		Buffer m_buffer;
+		//uint64_t m_capacity;
 		long m_length;
 		uint64_t m_position;
 

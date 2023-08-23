@@ -104,6 +104,7 @@
     <ClInclude Include="Source\Bruno\Content\Readers\MaterialReader.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\ModelReader.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\ShaderReader.h" />
+    <ClInclude Include="Source\Bruno\Core\Buffer.h" />
     <ClInclude Include="Source\Bruno\Core\Compressor.h" />
     <ClInclude Include="Source\Bruno\Core\FileStream.h" />
     <ClInclude Include="Source\Bruno\Core\KeyCodes.h" />

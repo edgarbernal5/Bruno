@@ -83,14 +83,12 @@ namespace Bruno
 		inputStream->ReadBytes(inputBuffer, compressedLength);
 
 		unsigned long decompressedSize = static_cast<unsigned long>(decompressedLength);
-		std::vector<uint8_t> outputBuffer;
-		outputBuffer.resize(decompressedSize);
-		
-		int result = uncompress(outputBuffer.data(), &decompressedSize, inputBuffer.data(), compressedLength);
+		Buffer& outputBuffer = m_outputStream->GetBuffer();
+
+		int result = uncompress(outputBuffer.Data, &decompressedSize, inputBuffer.data(), compressedLength);
 		if (result == Z_OK)
 		{
-			m_outputStream->WriteBytes(outputBuffer, false);
-			m_outputStream->SetPosition(0); //TODO: This is a hack! memory stream should have a buffer and bytes should be written there, to avoid calling set position (0)
+			//All good.
 		}
 	}
 }

@@ -186,6 +186,9 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderProgram.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\Buffer.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
