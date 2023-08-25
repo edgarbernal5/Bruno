@@ -16,10 +16,6 @@ namespace Bruno
 		std::wstring	AssetName;
 		std::string		ProcessorName;
 
-		/*bool operator==(const BuildRequest& other)
-		{
-			return AssetName == other.AssetName && ProcessorName == other.ProcessorName;
-		}*/
 		bool operator==(const BuildRequest* other)
 		{
 			return AssetName == other->AssetName && ProcessorName == other->ProcessorName;
@@ -32,16 +28,15 @@ namespace Bruno
 		BuildRequest*	Request;
 		bool IsBuilt{ false };
 		std::wstring	OutputFilename;
+		std::filesystem::file_time_type SourceTimestamp;
 
-		/*bool operator==(const BuildItem& other)
-		{
-			return Request == other.Request && IsBuilt == other.IsBuilt;
-		}*/
 		bool operator==(const BuildItem* other)
 		{
 			return Request == other->Request && IsBuilt == other->IsBuilt;
 		}
 	};
+
+	class TimestampCache;
 
 	class GameContentBuilder
 	{
@@ -51,10 +46,13 @@ namespace Bruno
 			std::wstring RootDirectory;
 			std::wstring IntermediateDirectory;
 			std::wstring OutputDirectory;
+
+			std::wstring CacheFilename;
+			bool RebuildAllAssets{ false };
 		};
 
-		GameContentBuilder() = default;
-		GameContentBuilder(const Settings& settings);
+		GameContentBuilder();
+		GameContentBuilder(const Settings& settings, TimestampCache* timestampCache = nullptr);
 
 		std::wstring GetAbsolutePath(const std::wstring path);
 
@@ -69,11 +67,13 @@ namespace Bruno
 		const std::wstring OutputExtention = L".bruno";
 	private:
 		Settings m_settings;
+		TimestampCache* m_timestampCache;
 
 		std::vector<BuildRequest*> m_requests;
 		std::vector<BuildItem*> m_buildItems;
 
 		void BuildAsset(BuildItem& item);
+		bool NeedsIncrementalBuild(BuildItem& item, std::string& buildReason);
 		void PreparePaths();
 		void SerializeAsset(const BuildItem& buildItem, const ContentItem& contentItem);
 		std::wstring ChooseOutputFilename(const BuildRequest& request);

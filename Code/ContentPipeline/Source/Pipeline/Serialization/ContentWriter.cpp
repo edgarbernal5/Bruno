@@ -11,6 +11,7 @@ namespace Bruno
 	ContentWriter::ContentWriter(ContentCompiler* compiler, Stream& stream, bool compressContent, const std::wstring& rootDirectory, const std::wstring& referenceRelocationPath) :
 		m_finalOutputStream(stream),
 		m_compressContent(compressContent),
+		m_rootDirectory(rootDirectory),
 		m_referenceRelocationPath(referenceRelocationPath)
 	{
 		m_currentStream = &m_contentDataStream;
@@ -50,8 +51,12 @@ namespace Bruno
 				throw std::exception("external reference. ext");
 			}
 			filename = filename.substr(0, filename.size() - wcslen(FileExtension));
-			std::filesystem::path basePath(m_referenceRelocationPath);
 
+			if (!filename._Starts_with(m_rootDirectory))
+			{
+				throw std::exception("bad external reference. path");
+			}
+			std::filesystem::path basePath(m_referenceRelocationPath);
 			auto outputPath = std::filesystem::relative(filename, basePath).wstring();
 			if (outputPath.size() > 3 && outputPath.substr(0, 3) == L"..\\")
 			{

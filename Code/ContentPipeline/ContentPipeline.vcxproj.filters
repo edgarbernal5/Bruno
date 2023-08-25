@@ -96,6 +96,9 @@
     <ClCompile Include="Source\Pipeline\ContentProcessorContext.cpp">
       <Filter>Source\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Pipeline\TimestampCache.cpp">
+      <Filter>Source\Pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h">
@@ -168,6 +171,9 @@
       <Filter>Source\Pipeline\Serialization\Writers</Filter>
     </ClInclude>
     <ClInclude Include="Source\Pipeline\ContentProcessorContext.h">
+      <Filter>Source\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Pipeline\TimestampCache.h">
       <Filter>Source\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>

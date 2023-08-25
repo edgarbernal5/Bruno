@@ -4,14 +4,27 @@
 #include <Bruno/Core/FileStream.h>
 #include "Serialization/ContentCompiler.h"
 
+#include "TimestampCache.h"
 #include <sstream>
+#include <Bruno/Core/Log.h>
 
 namespace Bruno
 {
-	GameContentBuilder::GameContentBuilder(const Settings& settings) :
+	GameContentBuilder::GameContentBuilder()
+	{
+		m_timestampCache = new TimestampCache();
+	}
+
+	GameContentBuilder::GameContentBuilder(const Settings& settings, TimestampCache* timestampCache) :
 		m_settings(settings)
 	{
 		PreparePaths();
+
+		if (!timestampCache)
+		{
+			timestampCache = new TimestampCache();
+		}
+		m_timestampCache = timestampCache;
 	}
 
 	std::wstring GameContentBuilder::GetAbsolutePath(const std::wstring path)
@@ -25,6 +38,13 @@ namespace Bruno
 
 	BuildItem* GameContentBuilder::RequestBuild(const std::filesystem::path& sourceFilename, const std::wstring& assetName, const std::string& processorName)
 	{
+		if (!m_timestampCache->FileExists(sourceFilename))
+		{
+			std::ostringstream error;
+			error << "Source asset not found. " << sourceFilename;
+			throw std::exception(error.str().c_str());
+		}
+
 		std::string newProcessorName = processorName;
 		if (processorName.empty())
 		{
@@ -61,6 +81,7 @@ namespace Bruno
 			if (it != m_buildItems.end())
 				m_buildItems.erase(it);
 
+			m_timestampCache->Remove(itemToBuild->OutputFilename);
 			delete itemToBuild;
 			itemToBuild = nullptr;
 		}
@@ -143,6 +164,26 @@ namespace Bruno
 
 	void GameContentBuilder::BuildAsset(BuildItem& buildItem)
 	{
+		std::string buildReason;
+		if (!NeedsIncrementalBuild(buildItem, buildReason))
+		{
+			std::ostringstream message;
+			message << "Asset is already up-to-date. " << std::string(buildItem.OutputFilename.begin(), buildItem.OutputFilename.end());
+			BR_CORE_TRACE << message.str();
+			return;
+		}
+
+		if (!m_timestampCache->FileExists(buildItem.Request->SourceFilename))
+		{
+			std::ostringstream error;
+			error << "Source asset not found. " << std::string(buildItem.Request->SourceFilename.begin(), buildItem.Request->SourceFilename.end());
+			throw std::exception(error.str().c_str());
+		}
+
+		if (!buildReason.empty())
+			BR_CORE_TRACE << buildReason << std::endl;
+
+		buildItem.SourceTimestamp = m_timestampCache->GetTimestamp(buildItem.Request->SourceFilename);
 		auto processor = ProcessorManager::GetProcessorByName(buildItem.Request->ProcessorName);
 
 		ContentProcessorContext context(this, &buildItem);
@@ -150,6 +191,33 @@ namespace Bruno
 		
 		buildItem.IsBuilt = true;
 		SerializeAsset(buildItem, *output.get());
+	}
+
+	bool GameContentBuilder::NeedsIncrementalBuild(BuildItem& item, std::string& buildReason)
+	{
+		if (m_settings.RebuildAllAssets)
+		{
+			buildReason = "Rebuild all assets";
+			return true;
+		}
+
+		auto timestamp = m_timestampCache->GetTimestamp(item.Request->SourceFilename);
+		if (timestamp != item.SourceTimestamp)
+		{
+			std::ostringstream reasonBuilder;
+			reasonBuilder << "Rebuild dirty dependency. " << std::string(item.Request->SourceFilename.begin(), item.Request->SourceFilename.end());
+			buildReason = reasonBuilder.str();
+			return true;
+		}
+
+		if (!m_timestampCache->FileExists(GetAbsolutePath(item.OutputFilename)))
+		{
+			std::ostringstream reasonBuilder;
+			reasonBuilder << "Rebuild missing output. " << std::string(item.OutputFilename.begin(), item.OutputFilename.end());
+			buildReason = reasonBuilder.str();
+			return true;
+		}
+		return false;
 	}
 
 	void GameContentBuilder::PreparePaths()
@@ -181,6 +249,7 @@ namespace Bruno
 	void GameContentBuilder::SerializeAsset(const BuildItem& buildItem, const ContentItem& contentItem)
 	{
 		auto absolutePath = std::filesystem::path(m_settings.RootDirectory) / std::filesystem::path(buildItem.OutputFilename);
+		m_timestampCache->Remove(absolutePath);
 		FileStream fileStream(absolutePath, FileAccess::Write);
 		
 		ContentCompiler compiler;

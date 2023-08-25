@@ -173,6 +173,7 @@
     <ClCompile Include="Source\Pipeline\Serialization\Writers\ModelWriter.cpp" />
     <ClCompile Include="Source\Pipeline\Serialization\Writers\ShaderWriter.cpp" />
     <ClCompile Include="Source\Pipeline\Serialization\Writers\TextureWriter.cpp" />
+    <ClCompile Include="Source\Pipeline\TimestampCache.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineGame.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="Source\Pipeline\Serialization\Writers\ModelWriter.h" />
     <ClInclude Include="Source\Pipeline\Serialization\Writers\ShaderWriter.h" />
     <ClInclude Include="Source\Pipeline\Serialization\Writers\TextureWriter.h" />
+    <ClInclude Include="Source\Pipeline\TimestampCache.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

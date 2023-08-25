@@ -13,6 +13,7 @@ namespace Bruno
 		m_rootDirectory(rootDirectory)
 	{
 	}
+
 	std::shared_ptr<RTTI> ContentManager::ReadAsset(const std::wstring& assetName)
 	{
 		FileStream fileStream(assetName + L".bruno", FileAccess::Read);
