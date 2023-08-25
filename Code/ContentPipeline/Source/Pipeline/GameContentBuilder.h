@@ -54,7 +54,8 @@ namespace Bruno
 		GameContentBuilder();
 		GameContentBuilder(const Settings& settings, TimestampCache* timestampCache = nullptr);
 
-		std::wstring GetAbsolutePath(const std::wstring path);
+		std::wstring GetAbsolutePath(const std::wstring& path);
+		std::wstring GetRelativePath(const std::wstring& path);
 
 		inline void SetSettings(const Settings& settings)
 		{

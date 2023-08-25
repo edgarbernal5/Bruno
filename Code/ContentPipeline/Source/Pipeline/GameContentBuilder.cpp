@@ -29,13 +29,22 @@ namespace Bruno
 		m_timestampCache = timestampCache;
 	}
 
-	std::wstring GameContentBuilder::GetAbsolutePath(const std::wstring path)
+	std::wstring GameContentBuilder::GetAbsolutePath(const std::wstring& path)
 	{
 		std::filesystem::path fsPath(path);
 		if (fsPath.has_root_path())
 			return path;
 
 		return std::filesystem::path(m_settings.RootDirectory) / path;
+	}
+
+	std::wstring GameContentBuilder::GetRelativePath(const std::wstring& path)
+	{
+		//BR_ASSERT path is not absolute
+		if (!path._Starts_with(m_settings.RootDirectory))
+			return path;
+
+		return std::filesystem::relative(path, m_settings.RootDirectory).wstring();
 	}
 
 	BuildItem* GameContentBuilder::RequestBuild(const std::filesystem::path& sourceFilename, const std::wstring& assetName, const std::string& processorName)
@@ -60,7 +69,7 @@ namespace Bruno
 			throw std::exception("Invalid parameter, processor name.");
 
 		BuildRequest* newRequest = new BuildRequest();
-		newRequest->SourceFilename = sourceFilename.c_str();
+		newRequest->SourceFilename = GetRelativePath(sourceFilename.c_str());
 		newRequest->AssetName = assetName;
 		newRequest->ProcessorName = newProcessorName;
 
@@ -128,20 +137,32 @@ namespace Bruno
 		if (request.AssetName.empty())
 		{
 			std::filesystem::path sourceFilePath(request.SourceFilename);
-			if (!sourceFilePath.has_root_path()) {
-
+			if (!sourceFilePath.has_root_path())
+			{
+				auto directoryName = std::filesystem::path(request.SourceFilename).parent_path().wstring();
+				auto relativePath = GetRelativePath(m_settings.IntermediateDirectory);
+				
+				if (!directoryName.empty() && directoryName._Starts_with(relativePath))
+				{
+					directoryName = directoryName.substr(relativePath.size());
+				}
+				if (!directoryName.empty())
+				{
+					outputDirectory = std::filesystem::path(outputDirectory) / directoryName;
+				}
 			}
 
 			std::wstring assetNameStub = sourceFilePath.stem();
-			if (assetNameStub.size() > 32) {
+			if (assetNameStub.size() > 32)
+			{
 				assetNameStub = assetNameStub.substr(0, 32);
 			}
 			uint32_t indexing = 0;
 			do {
-				std::wstringstream ss;
-				ss << assetNameStub << '_' << indexing << OutputExtention;
+				std::wstringstream pathBuilder;
+				pathBuilder << outputDirectory << L"\\" << assetNameStub << '_' << indexing << OutputExtention;
 
-				outputFilename = ss.str();
+				outputFilename = GetRelativePath(pathBuilder.str());
 
 				++indexing;
 			} while (FindBuildItemByOutputFilename(outputFilename) != nullptr);
@@ -152,7 +173,7 @@ namespace Bruno
 			outputPath /= request.AssetName;
 			outputPath += OutputExtention;
 
-			outputFilename = std::filesystem::relative(outputPath, m_settings.RootDirectory);
+			outputFilename = GetRelativePath(outputPath);
 		}
 		return outputFilename;
 	}
@@ -178,7 +199,8 @@ namespace Bruno
 			return;
 		}
 
-		if (!m_timestampCache->FileExists(buildItem.Request->SourceFilename))
+		auto absolutePath = GetAbsolutePath(buildItem.Request->SourceFilename);
+		if (!m_timestampCache->FileExists(absolutePath))
 		{
 			std::ostringstream error;
 			error << "Source asset not found. " << std::string(buildItem.Request->SourceFilename.begin(), buildItem.Request->SourceFilename.end());
@@ -190,11 +212,11 @@ namespace Bruno
 		if (!buildReason.empty())
 			BR_CORE_TRACE << buildReason << std::endl;
 
-		buildItem.SourceTimestamp = m_timestampCache->GetTimestamp(buildItem.Request->SourceFilename);
+		buildItem.SourceTimestamp = m_timestampCache->GetTimestamp(absolutePath);
 		auto processor = ProcessorManager::GetProcessorByName(buildItem.Request->ProcessorName);
 
 		ContentProcessorContext context(this, &buildItem);
-		auto output = processor->Process(buildItem.Request->SourceFilename, context);
+		auto output = processor->Process(absolutePath, context);
 		
 		buildItem.IsBuilt = true;
 		SerializeAsset(buildItem, *output.get());
@@ -204,11 +226,12 @@ namespace Bruno
 	{
 		if (m_settings.RebuildAllAssets)
 		{
-			buildReason = "Rebuild all assets";
+			buildReason = "Rebuild all assets.";
 			return true;
 		}
 
-		auto timestamp = m_timestampCache->GetTimestamp(item.Request->SourceFilename);
+		auto absolutePath = GetAbsolutePath(item.Request->SourceFilename);
+		auto timestamp = m_timestampCache->GetTimestamp(absolutePath);
 		if (timestamp != item.SourceTimestamp)
 		{
 			std::ostringstream reasonBuilder;
@@ -217,7 +240,7 @@ namespace Bruno
 			return true;
 		}
 
-		if (!m_timestampCache->FileExists(GetAbsolutePath(item.OutputFilename)))
+		if (!m_timestampCache->FileExists(absolutePath))
 		{
 			std::ostringstream reasonBuilder;
 			reasonBuilder << "Rebuild missing output. " << std::string(item.OutputFilename.begin(), item.OutputFilename.end());
@@ -255,7 +278,7 @@ namespace Bruno
 
 	void GameContentBuilder::SerializeAsset(const BuildItem& buildItem, const ContentItem& contentItem)
 	{
-		auto absolutePath = std::filesystem::path(m_settings.RootDirectory) / std::filesystem::path(buildItem.OutputFilename);
+		auto absolutePath = GetAbsolutePath(buildItem.OutputFilename);
 		m_timestampCache->Remove(absolutePath);
 
 		std::ostringstream message;
