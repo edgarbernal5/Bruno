@@ -12,6 +12,8 @@ namespace Bruno
 {
 	GameContentBuilder::GameContentBuilder()
 	{
+		PreparePaths();
+
 		m_timestampCache = new TimestampCache();
 	}
 
@@ -81,7 +83,10 @@ namespace Bruno
 			if (it != m_buildItems.end())
 				m_buildItems.erase(it);
 
-			m_timestampCache->Remove(itemToBuild->OutputFilename);
+			auto absolutePath = GetAbsolutePath(itemToBuild->OutputFilename);
+			m_timestampCache->Remove(absolutePath);
+			std::filesystem::remove(absolutePath);
+
 			delete itemToBuild;
 			itemToBuild = nullptr;
 		}
@@ -169,7 +174,7 @@ namespace Bruno
 		{
 			std::ostringstream message;
 			message << "Asset is already up-to-date. " << std::string(buildItem.OutputFilename.begin(), buildItem.OutputFilename.end());
-			BR_CORE_TRACE << message.str();
+			BR_CORE_TRACE << message.str() << std::endl;
 			return;
 		}
 
@@ -180,6 +185,8 @@ namespace Bruno
 			throw std::exception(error.str().c_str());
 		}
 
+		BR_CORE_TRACE << "Building item... Source = " << std::string(buildItem.Request->SourceFilename.begin(), buildItem.Request->SourceFilename.end())
+			<< ". Output = " << std::string(buildItem.OutputFilename.begin(), buildItem.OutputFilename.end()) << std::endl;
 		if (!buildReason.empty())
 			BR_CORE_TRACE << buildReason << std::endl;
 
@@ -250,6 +257,11 @@ namespace Bruno
 	{
 		auto absolutePath = std::filesystem::path(m_settings.RootDirectory) / std::filesystem::path(buildItem.OutputFilename);
 		m_timestampCache->Remove(absolutePath);
+
+		std::ostringstream message;
+		message << "Compiling... " << std::string(buildItem.OutputFilename.begin(), buildItem.OutputFilename.end());
+		BR_CORE_TRACE << message.str() << std::endl;
+
 		FileStream fileStream(absolutePath, FileAccess::Write);
 		
 		ContentCompiler compiler;
