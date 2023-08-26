@@ -44,4 +44,10 @@ namespace Bruno
 			}
 		}
 	}
+	D3D12_INPUT_LAYOUT_DESC Shader::GetInputLayout()
+	{
+		if (m_programs[0])
+			return m_programs[0]->GetInputLayout();
+		return D3D12_INPUT_LAYOUT_DESC();
+	}
 }

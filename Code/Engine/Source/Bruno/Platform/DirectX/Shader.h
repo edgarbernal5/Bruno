@@ -16,7 +16,8 @@ namespace Bruno
 	public:
 		Shader(std::vector<std::vector<uint8_t>>&& programsData);
 		Shader(const std::wstring& sourceFilename);
-				
+		
+		D3D12_INPUT_LAYOUT_DESC GetInputLayout();
 	private:
 		enum class ShaderProgramType : uint32_t
 		{

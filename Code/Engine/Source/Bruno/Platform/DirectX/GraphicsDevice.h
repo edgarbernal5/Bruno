@@ -55,7 +55,6 @@ namespace Bruno
 		Microsoft::WRL::ComPtr<ID3D12RootSignature>			m_rootSignature;
 		D3D_ROOT_SIGNATURE_VERSION							m_highestRootSignatureVersion;
 	};
-
 }
 
 namespace Bruno::Graphics
