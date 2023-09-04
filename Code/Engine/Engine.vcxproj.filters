@@ -189,6 +189,9 @@
     <ClInclude Include="Source\Bruno\Core\Buffer.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\StringHelpers.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -322,6 +325,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderProgram.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\StringHelpers.cpp">
+      <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

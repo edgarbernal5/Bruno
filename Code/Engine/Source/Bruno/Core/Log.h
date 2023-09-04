@@ -19,6 +19,7 @@ namespace Bruno
 		{
 			return g_CoreLogger;
 		}
+
 		template<typename... Args>
 		static void PrintAssertMessage(const char* file, int line, const char* message, Args&&... args);
 	private:

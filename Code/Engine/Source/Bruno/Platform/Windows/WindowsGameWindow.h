@@ -29,6 +29,7 @@ namespace Bruno
 	protected:
 		GameWindowParameters m_parameters;
 		HWND m_hwnd;
+		HINSTANCE m_hModuleInstance;
 		Game* m_game;
 		int m_prevClientWidth;
 		int m_prevClientHeight;
@@ -43,7 +44,8 @@ namespace Bruno
 		void EndScreenDeviceChange(int clientWidth, int clientHeight);
 
 	private:
-		// Windows procedure
+		const wchar_t* ApplicationClassName = L"BrunoEngineClass";
+		
 		static LRESULT CALLBACK WndProc(HWND hWnd, uint32_t message, WPARAM wParam, LPARAM lParam);
 	};
 }

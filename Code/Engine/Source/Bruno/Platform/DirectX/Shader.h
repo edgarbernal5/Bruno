@@ -3,11 +3,13 @@
 #include "D3DCommon.h"
 #include "Bruno/Core/RTTI.h"
 #include "D3DCore.h"
+#include <vector>
+#include <map>
 
 namespace Bruno
 {
-
 	class ShaderProgram;
+	class RootSignature;
 
 	class Shader : public RTTI
 	{
@@ -18,6 +20,8 @@ namespace Bruno
 		Shader(const std::wstring& sourceFilename);
 		
 		D3D12_INPUT_LAYOUT_DESC GetInputLayout();
+		std::shared_ptr<RootSignature> CreateRootSignature();
+
 	private:
 		enum class ShaderProgramType : uint32_t
 		{
@@ -32,6 +36,12 @@ namespace Bruno
 			D3D12_SHADER_VISIBILITY Visibility;
 		};
 		std::shared_ptr<ShaderProgram> m_programs[Graphics::Core::SHADER_PROGRAMS_COUNT]{};
+		std::shared_ptr<RootSignature> m_rootSignature;
+		std::map<std::wstring, uint32_t> m_rootParameterIndexMap;
+
+
+		void InitializeParameters();
+		void InitializeParameters(ShaderProgram* program);
 
 		static const ShaderTypeDesc& VS, & PS;
 		static const ShaderTypeDesc ShaderTypes[];

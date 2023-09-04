@@ -54,7 +54,7 @@ namespace Bruno
 		wcex.hIcon = LoadIconW(hInstance, L"IDI_ICON");
 		wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
 		wcex.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
-		wcex.lpszClassName = L"BrunoEngineClass";
+		wcex.lpszClassName = ApplicationClassName;
 		wcex.hIconSm = LoadIconW(wcex.hInstance, L"IDI_ICON");
 		if (!RegisterClassExW(&wcex))
 			return;
@@ -68,7 +68,7 @@ namespace Bruno
 		m_hwnd = CreateWindowEx
 		(
 			0,
-			L"BrunoEngineClass",
+			ApplicationClassName,
 			m_mainWndTitle.c_str(),
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
@@ -86,6 +86,7 @@ namespace Bruno
 			BR_CORE_ERROR << "CreateWindow Failed." << std::endl;
 			return;
 		}
+		m_hModuleInstance = hInstance;
 	}
 
 	int WindowsGameWindow::Run()
@@ -100,6 +101,12 @@ namespace Bruno
 				DispatchMessage(&msg);
 			}
 		}
+
+		DestroyWindow(m_hwnd);
+		m_hwnd = nullptr;
+
+		UnregisterClass(ApplicationClassName, m_hModuleInstance);
+		m_hModuleInstance = nullptr;
 
 		int returnCode = (int)msg.wParam;
 		return returnCode;

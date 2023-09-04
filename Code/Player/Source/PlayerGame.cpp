@@ -134,7 +134,7 @@ namespace Bruno
 		rtvFormats.NumRenderTargets = 1;
 		rtvFormats.RTFormats[0] = surfaceParameters.BackBufferFormat;
 
-		auto sha = new Shader(L"VertexShader.hlsl");
+		auto sha = new Shader(L"Opaque.hlsl");
 		auto asds = sha->GetInputLayout();
 		pipelineStateStream.pRootSignature = m_rootSignature->GetD3D12RootSignature();
 		pipelineStateStream.InputLayout = VertexPositionNormalTexture::InputLayout;

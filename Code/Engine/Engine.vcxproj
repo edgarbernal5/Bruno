@@ -116,6 +116,7 @@
     <ClInclude Include="Source\Bruno\Core\MemoryStream.h" />
     <ClInclude Include="Source\Bruno\Core\RTTI.h" />
     <ClInclude Include="Source\Bruno\Core\Stream.h" />
+    <ClInclude Include="Source\Bruno\Core\StringHelpers.h" />
     <ClInclude Include="Source\Bruno\Math\Math.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
@@ -166,6 +167,7 @@
     <ClCompile Include="Source\Bruno\Core\Logger.cpp" />
     <ClCompile Include="Source\Bruno\Core\MemoryStream.cpp" />
     <ClCompile Include="Source\Bruno\Core\Stream.cpp" />
+    <ClCompile Include="Source\Bruno\Core\StringHelpers.cpp" />
     <ClCompile Include="Source\Bruno\Math\Math.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
