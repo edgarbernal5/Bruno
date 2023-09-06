@@ -80,6 +80,7 @@ namespace Bruno
 		reflector->GetDesc(&desc);
 
 		std::vector<D3D12_ROOT_PARAMETER1> rootParameters;
+		std::vector<CD3DX12_DESCRIPTOR_RANGE1> descriptorRanges;
 
 		for (size_t i = 0; i < desc.BoundResources; i++)
 		{
@@ -104,6 +105,7 @@ namespace Bruno
 					bindDesc.Space, //RegisterSpace
 					D3D12_ROOT_DESCRIPTOR_FLAG_NONE, //Flags
 				};
+				rootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
 				rootParameters.push_back(rootParameter);
 
@@ -111,18 +113,41 @@ namespace Bruno
 			}
 			case D3D_SIT_TBUFFER:
 			{
+				m_rootParameterIndexMap[StringToWString(bindDesc.Name)] = static_cast<uint32_t>(rootParameters.size());
+
 				ID3D12ShaderReflectionConstantBuffer* reflectedConstantBuffer = reflector->GetConstantBufferByName(bindDesc.Name);
 				D3D12_SHADER_BUFFER_DESC bufferDesc;
 				reflectedConstantBuffer->GetDesc(&bufferDesc);
+
+				const CD3DX12_DESCRIPTOR_RANGE1 srvRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+					1u,
+					bindDesc.BindPoint,
+					bindDesc.Space,
+					D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC);
+
+				descriptorRanges.push_back(srvRange);
+
+				D3D12_ROOT_PARAMETER1 rootParameter;
+
+				rootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+				rootParameter.DescriptorTable = {
+					1u,//NumDescriptorRanges
+					&descriptorRanges.back() //pDescriptorRanges 
+				};
+				rootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+				rootParameters.push_back(rootParameter);
 
 				break;
 			}
 			case D3D_SIT_TEXTURE:
 			{
+				//TODO
 				break;
 			}
 			case D3D_SIT_SAMPLER:
 			{
+				//TODO
 				break;
 			}
 			}
