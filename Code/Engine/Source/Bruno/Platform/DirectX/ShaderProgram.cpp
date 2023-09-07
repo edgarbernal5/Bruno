@@ -7,7 +7,8 @@ namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(ShaderProgram);
 
-	ShaderProgram::ShaderProgram(const std::wstring& sourceFilename, const std::string& entryPoint, const  std::string& target)
+	ShaderProgram::ShaderProgram(const std::wstring& sourceFilename, const std::string& entryPoint, const  std::string& target, D3D12_SHADER_VISIBILITY visibility) :
+		m_visibility(visibility)
 	{
 #if defined(BR_DEBUG)
 		// Enable better shader debugging with the graphics debugging tools.
@@ -36,7 +37,8 @@ namespace Bruno
 		}
 	}
 
-	ShaderProgram::ShaderProgram(const std::vector<uint8_t>& compiledCode)
+	ShaderProgram::ShaderProgram(const std::vector<uint8_t>& compiledCode, D3D12_SHADER_VISIBILITY visibility) :
+		m_visibility(visibility)
 	{
 		D3DCreateBlob(compiledCode.size(), &m_blob);
 		CopyMemory(m_blob->GetBufferPointer(), compiledCode.data(), compiledCode.size());

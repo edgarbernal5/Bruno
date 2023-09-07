@@ -157,8 +157,10 @@ namespace Bruno
 			{
 				assetNameStub = assetNameStub.substr(0, 32);
 			}
+
 			uint32_t indexing = 0;
-			do {
+			do
+			{
 				std::wstringstream pathBuilder;
 				pathBuilder << outputDirectory << L"\\" << assetNameStub << '_' << indexing << OutputExtention;
 

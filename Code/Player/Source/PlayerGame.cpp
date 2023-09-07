@@ -7,6 +7,7 @@
 #include <Bruno/Platform/DirectX/CommandQueue.h>
 #include <Bruno/Platform/DirectX/ResourceBarrier.h>
 #include <Bruno/Platform/DirectX/VertexTypes.h>
+#include <Bruno/Platform/DirectX/ShaderProgram.h>
 #include <Bruno/Renderer/RenderItem.h>
 #include <iostream>
 
@@ -83,8 +84,7 @@ namespace Bruno
 		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
 		m_renderItems.push_back(boxRenderItem);
 
-		//m_vertexShader = std::make_unique<ShaderProgram>(L"VertexShader.hlsl", "main", "vs_5_1");
-		//m_pixelShader = std::make_unique<ShaderProgram>(L"PixelShader.hlsl", "main", "ps_5_1");
+		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
 
 		for (size_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; i++)
 		{
@@ -94,30 +94,32 @@ namespace Bruno
 
 		GraphicsDevice* device = Graphics::GetDevice();
 
-		// Allow input layout and deny unnecessary access to certain pipeline stages.
-		D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+		//// Allow input layout and deny unnecessary access to certain pipeline stages.
+		//D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
+		//	D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+		//	D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+		//	D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+		//	D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+		//	D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 
-		CD3DX12_DESCRIPTOR_RANGE texTable;
-		texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+		//CD3DX12_DESCRIPTOR_RANGE texTable;
+		//texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-		CD3DX12_ROOT_PARAMETER rootParameters[2]{};
-		// Perfomance TIP: Order from most frequent to least frequent.
-		rootParameters[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
-		rootParameters[1].InitAsConstantBufferView(0);
+		//CD3DX12_ROOT_PARAMETER rootParameters[2]{};
+		//// Perfomance TIP: Order from most frequent to least frequent.
+		//rootParameters[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
+		//rootParameters[1].InitAsConstantBufferView(0);
 
-		CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
-		// A root signature is an array of root parameters.
-		CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDescription(2, rootParameters,
-			1, &linearRepeatSampler,
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+		//CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
+		//// A root signature is an array of root parameters.
+		//CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDescription(2, rootParameters,
+		//	1, &linearRepeatSampler,
+		//	D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
-		m_rootSignature = std::make_unique<RootSignature>(rootSignatureDescription);
+		//// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+		//m_rootSignature = std::make_shared<RootSignature>(rootSignatureDescription);
+
+		m_rootSignature = m_opaqueShader->CreateRootSignature();
 
 		struct PipelineStateStream
 		{
@@ -134,13 +136,11 @@ namespace Bruno
 		rtvFormats.NumRenderTargets = 1;
 		rtvFormats.RTFormats[0] = surfaceParameters.BackBufferFormat;
 
-		auto sha = new Shader(L"Opaque.hlsl");
-		auto asds = sha->GetInputLayout();
 		pipelineStateStream.pRootSignature = m_rootSignature->GetD3D12RootSignature();
-		pipelineStateStream.InputLayout = VertexPositionNormalTexture::InputLayout;
+		pipelineStateStream.InputLayout = m_opaqueShader->GetInputLayout(); //VertexPositionNormalTexture::InputLayout;
 		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		//pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
-		//pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pixelShader->GetBlob());
+		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex)->GetBlob());
+		pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel)->GetBlob());
 		pipelineStateStream.DSVFormat = surfaceParameters.DepthBufferFormat;
 		pipelineStateStream.RTVFormats = rtvFormats;
 

@@ -61,6 +61,7 @@ namespace Bruno
 		{
 			m_contentBuilder.Run();
 		});
+
 		menuFile.append("Read", [&form, this](nana::menu::item_proxy& ip)
 		{
 			nana::filebox fileBox(form, true);

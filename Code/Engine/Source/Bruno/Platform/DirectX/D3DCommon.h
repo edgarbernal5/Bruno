@@ -41,4 +41,14 @@ namespace Bruno
             throw com_exception(hr);
         }
     }
+
+    template <class T>
+    constexpr void SafeRelease(T*& pointer)
+    {
+        if (pointer)
+        {
+            pointer->Release();
+            pointer = nullptr;
+        }
+    }
 }

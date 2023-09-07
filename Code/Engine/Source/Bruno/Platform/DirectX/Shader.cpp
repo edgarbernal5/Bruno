@@ -17,11 +17,13 @@ namespace Bruno
 
 	Shader::Shader(std::vector<std::vector<uint8_t>>&& programsData)
 	{
+		BR_ASSERT(programsData.size() <= Graphics::Core::SHADER_PROGRAMS_COUNT);
+		
 		for (size_t i = 0; i < programsData.size(); i++)
 		{
 			if (programsData[i].size() > 0)
 			{
-				m_programs[i] = std::make_shared<ShaderProgram>(std::move(programsData[i]));
+				m_programs[i] = std::make_shared<ShaderProgram>(std::move(programsData[i]), ShaderTypes[i].Visibility);
 			}
 		}
 		InitializeParameters();
@@ -43,7 +45,7 @@ namespace Bruno
 			auto entryPointIndex = content.find(ShaderTypes[i].EntryPoint);
 			if (entryPointIndex != std::string::npos)
 			{
-				m_programs[i] = std::make_shared<ShaderProgram>(sourceFilename, ShaderTypes[i].EntryPoint, ShaderTypes[i].Target);
+				m_programs[i] = std::make_shared<ShaderProgram>(sourceFilename, ShaderTypes[i].EntryPoint, ShaderTypes[i].Target, ShaderTypes[i].Visibility);
 			}
 		}
 		InitializeParameters();
@@ -63,8 +65,19 @@ namespace Bruno
 		return std::shared_ptr<RootSignature>();
 	}
 
+	ShaderProgram* Shader::GetShaderProgram(ShaderProgramType type)
+	{
+		if (m_programs[(int)type])
+			return m_programs[(int)type].get();
+		return nullptr;
+	}
+
 	void Shader::InitializeParameters()
 	{
+		m_rootParameters.clear();
+		m_descriptorRanges.clear();
+		m_samplers.clear();
+
 		for (size_t i = 0; i < Graphics::Core::SHADER_PROGRAMS_COUNT; i++)
 		{
 			if (m_programs[i])
@@ -79,9 +92,6 @@ namespace Bruno
 		D3D12_SHADER_DESC desc;
 		reflector->GetDesc(&desc);
 
-		std::vector<D3D12_ROOT_PARAMETER1> rootParameters;
-		std::vector<CD3DX12_DESCRIPTOR_RANGE1> descriptorRanges;
-
 		for (size_t i = 0; i < desc.BoundResources; i++)
 		{
 			D3D12_SHADER_INPUT_BIND_DESC bindDesc;
@@ -91,7 +101,7 @@ namespace Bruno
 			{
 			case D3D_SIT_CBUFFER:
 			{
-				m_rootParameterIndexMap[StringToWString(bindDesc.Name)] = static_cast<uint32_t>(rootParameters.size());
+				m_rootParameterIndexMap[StringToWString(bindDesc.Name)] = static_cast<uint32_t>(m_rootParameters.size());
 
 				ID3D12ShaderReflectionConstantBuffer* reflectedConstantBuffer = reflector->GetConstantBufferByName(bindDesc.Name);
 				D3D12_SHADER_BUFFER_DESC bufferDesc;
@@ -105,15 +115,20 @@ namespace Bruno
 					bindDesc.Space, //RegisterSpace
 					D3D12_ROOT_DESCRIPTOR_FLAG_NONE, //Flags
 				};
-				rootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+				rootParameter.ShaderVisibility = program->GetVisibility();
 
-				rootParameters.push_back(rootParameter);
+				m_rootParameters.push_back(rootParameter);
 
 				break;
 			}
 			case D3D_SIT_TBUFFER:
 			{
-				m_rootParameterIndexMap[StringToWString(bindDesc.Name)] = static_cast<uint32_t>(rootParameters.size());
+				//TODO
+				break;
+			}
+			case D3D_SIT_TEXTURE:
+			{
+				m_rootParameterIndexMap[StringToWString(bindDesc.Name)] = static_cast<uint32_t>(m_rootParameters.size());
 
 				ID3D12ShaderReflectionConstantBuffer* reflectedConstantBuffer = reflector->GetConstantBufferByName(bindDesc.Name);
 				D3D12_SHADER_BUFFER_DESC bufferDesc;
@@ -125,29 +140,28 @@ namespace Bruno
 					bindDesc.Space,
 					D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC);
 
-				descriptorRanges.push_back(srvRange);
+				m_descriptorRanges.push_back(srvRange);
 
 				D3D12_ROOT_PARAMETER1 rootParameter;
 
 				rootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 				rootParameter.DescriptorTable = {
 					1u,//NumDescriptorRanges
-					&descriptorRanges.back() //pDescriptorRanges 
+					&m_descriptorRanges.back() //pDescriptorRanges 
 				};
-				rootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+				rootParameter.ShaderVisibility = program->GetVisibility();
 
-				rootParameters.push_back(rootParameter);
+				m_rootParameters.push_back(rootParameter);
 
-				break;
-			}
-			case D3D_SIT_TEXTURE:
-			{
-				//TODO
 				break;
 			}
 			case D3D_SIT_SAMPLER:
 			{
 				//TODO
+				auto& sampler = m_samplers.emplace_back();
+				sampler.Name = bindDesc.Name;
+				sampler.BindPoint = bindDesc.BindPoint;
+				sampler.Visibility = program->GetVisibility();
 				break;
 			}
 			}
