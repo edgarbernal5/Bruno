@@ -65,22 +65,24 @@ namespace Bruno
 		//versionRootSignatureDesc.Init_1_1(static_cast<uint32_t>(m_rootParameters.size()),
 		//	m_rootParameters.data(), 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
+		std::reverse(m_rootParameters.begin(), m_rootParameters.end());
+		CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
+
 		D3D12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignature;
 		versionedRootSignature.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
 		versionedRootSignature.Desc_1_1 =
 		{
 			static_cast<uint32_t>(m_rootParameters.size()), //NumParameters 
 			m_rootParameters.data(), //pParameters
-			0u, //NumStaticSamplers 
-			nullptr, //pStaticSamplers 
+			1u, //NumStaticSamplers 
+			&linearRepeatSampler, //pStaticSamplers 
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT,//Flags
 		};
 
-		//CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDescription(static_cast<uint32_t>(m_rootParameters.size()),
-		//	m_rootParameters.data(), 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
 		return std::make_shared<RootSignature>(versionedRootSignature);
 		//return nullptr;
+
+		//return std::make_shared<RootSignature>(this);
 	}
 
 	ShaderProgram* Shader::GetShaderProgram(ShaderProgramType type)

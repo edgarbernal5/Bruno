@@ -33,11 +33,24 @@ namespace Bruno
 
 	RootSignature::RootSignature(const D3D12_VERSIONED_ROOT_SIGNATURE_DESC& versionedRootSignatureDesc)
 	{
+		auto device = Graphics::GetDevice();
+
+		// Serialize the root signature.
+		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureBlob;
+		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+		ThrowIfFailed(D3DX12SerializeVersionedRootSignature(&versionedRootSignatureDesc,
+			device->GetHighestRootSignatureVersion(), &rootSignatureBlob, &errorBlob));
+
+		// Create the root signature.
+		ThrowIfFailed(device->GetD3DDevice()->CreateRootSignature(0, rootSignatureBlob->GetBufferPointer(),
+			rootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
 	}
 
 	RootSignature::RootSignature(Shader* shader)
 	{
 		ID3DBlob* code = shader->GetShaderProgram(Shader::ShaderProgramType::Vertex)->GetBlob();
+
+
 	}
 
     RootSignature::~RootSignature()
