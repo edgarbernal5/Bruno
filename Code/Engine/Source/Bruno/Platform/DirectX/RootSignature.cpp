@@ -2,6 +2,8 @@
 #include "RootSignature.h"
 
 #include "GraphicsDevice.h"
+#include "Shader.h"
+#include "ShaderProgram.h"
 
 namespace Bruno
 {
@@ -28,6 +30,15 @@ namespace Bruno
 			serializedRootSig->GetBufferSize(),
 			IID_PPV_ARGS(m_rootSignature.GetAddressOf())));
     }
+
+	RootSignature::RootSignature(const D3D12_VERSIONED_ROOT_SIGNATURE_DESC& versionedRootSignatureDesc)
+	{
+	}
+
+	RootSignature::RootSignature(Shader* shader)
+	{
+		ID3DBlob* code = shader->GetShaderProgram(Shader::ShaderProgramType::Vertex)->GetBlob();
+	}
 
     RootSignature::~RootSignature()
     {

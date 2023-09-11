@@ -5,11 +5,15 @@
 namespace Bruno
 {
     class GraphicsDevice;
+    class Shader;
+    class ShaderProgram;
 
 	class RootSignature
 	{
 	public:
         RootSignature(const CD3DX12_ROOT_SIGNATURE_DESC& rootSignatureDesc);
+        RootSignature(const D3D12_VERSIONED_ROOT_SIGNATURE_DESC& versionedRootSignatureDesc);
+        RootSignature(Shader* shader);
         virtual ~RootSignature();
 
         ID3D12RootSignature* GetD3D12RootSignature() const { return m_rootSignature.Get(); }

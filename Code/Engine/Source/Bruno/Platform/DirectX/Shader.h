@@ -38,6 +38,7 @@ namespace Bruno
 		std::shared_ptr<RootSignature> CreateRootSignature();
 
 		ShaderProgram* GetShaderProgram(ShaderProgramType type);
+		uint32_t GetIndexMap(const std::wstring& name);
 	private:
 		struct ShaderTypeDesc
 		{
@@ -50,7 +51,7 @@ namespace Bruno
 		std::shared_ptr<RootSignature> m_rootSignature;
 		std::map<std::wstring, uint32_t> m_rootParameterIndexMap;
 
-		std::vector<D3D12_ROOT_PARAMETER1> m_rootParameters;
+		std::vector<CD3DX12_ROOT_PARAMETER1> m_rootParameters;
 		std::vector<CD3DX12_DESCRIPTOR_RANGE1> m_descriptorRanges;
 		std::vector<Sampler> m_samplers;
 

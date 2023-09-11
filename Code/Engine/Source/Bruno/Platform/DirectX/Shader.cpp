@@ -61,15 +61,39 @@ namespace Bruno
 
 	std::shared_ptr<RootSignature> Shader::CreateRootSignature()
 	{
-		//m_rootSignature
-		return std::shared_ptr<RootSignature>();
+		//CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC versionRootSignatureDesc;
+		//versionRootSignatureDesc.Init_1_1(static_cast<uint32_t>(m_rootParameters.size()),
+		//	m_rootParameters.data(), 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+		D3D12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignature;
+		versionedRootSignature.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
+		versionedRootSignature.Desc_1_1 =
+		{
+			static_cast<uint32_t>(m_rootParameters.size()), //NumParameters 
+			m_rootParameters.data(), //pParameters
+			0u, //NumStaticSamplers 
+			nullptr, //pStaticSamplers 
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT,//Flags
+		};
+
+		//CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDescription(static_cast<uint32_t>(m_rootParameters.size()),
+		//	m_rootParameters.data(), 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+		return std::make_shared<RootSignature>(versionedRootSignature);
+		//return nullptr;
 	}
 
 	ShaderProgram* Shader::GetShaderProgram(ShaderProgramType type)
 	{
 		if (m_programs[(int)type])
 			return m_programs[(int)type].get();
+
 		return nullptr;
+	}
+
+	uint32_t Shader::GetIndexMap(const std::wstring& name)
+	{
+		return m_rootParameterIndexMap[name];
 	}
 
 	void Shader::InitializeParameters()
@@ -107,13 +131,13 @@ namespace Bruno
 				D3D12_SHADER_BUFFER_DESC bufferDesc;
 				reflectedConstantBuffer->GetDesc(&bufferDesc);
 
-				D3D12_ROOT_PARAMETER1 rootParameter;
+				CD3DX12_ROOT_PARAMETER1 rootParameter;
 				
 				rootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 				rootParameter.Descriptor = {
 					bindDesc.BindPoint,//ShaderRegister
 					bindDesc.Space, //RegisterSpace
-					D3D12_ROOT_DESCRIPTOR_FLAG_NONE, //Flags
+					//D3D12_ROOT_DESCRIPTOR_FLAG_NONE, //Flags
 				};
 				rootParameter.ShaderVisibility = program->GetVisibility();
 
@@ -142,7 +166,7 @@ namespace Bruno
 
 				m_descriptorRanges.push_back(srvRange);
 
-				D3D12_ROOT_PARAMETER1 rootParameter;
+				CD3DX12_ROOT_PARAMETER1 rootParameter;
 
 				rootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 				rootParameter.DescriptorTable = {
