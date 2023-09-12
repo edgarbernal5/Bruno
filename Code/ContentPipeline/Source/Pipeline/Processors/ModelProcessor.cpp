@@ -7,6 +7,7 @@
 #include <Bruno/Platform/DirectX/D3DCommon.h>
 #include <filesystem>
 #include <sstream>
+#include <Bruno/Core/StringHelpers.h>
 
 namespace Bruno
 {
@@ -45,7 +46,7 @@ namespace Bruno
 
 		importer.SetPropertyInteger(AI_CONFIG_PP_FD_REMOVE, true);
 
-		const aiScene* aiScene = importer.ReadFile(std::string(assetFilename.begin(), assetFilename.end()), flags);
+		const aiScene* aiScene = importer.ReadFile(WStringToString(assetFilename), flags);
 		if (aiScene == nullptr)
 		{
 			throw std::exception();

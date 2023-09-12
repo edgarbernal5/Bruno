@@ -230,7 +230,7 @@ namespace Bruno
 				0);
 		}
 
-		ResourceBarrier::Transition(commandQueue->GetCommandList(),
+		ResourceBarrier::Transition(commandList,
 			currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 		commandQueue->EndFrame(m_surface.get());

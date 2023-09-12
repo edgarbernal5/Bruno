@@ -7,6 +7,7 @@
 #include "TimestampCache.h"
 #include <sstream>
 #include <Bruno/Core/Log.h>
+#include <Bruno/Core/StringHelpers.h>
 
 namespace Bruno
 {
@@ -196,7 +197,7 @@ namespace Bruno
 		if (!NeedsIncrementalBuild(buildItem, buildReason))
 		{
 			std::ostringstream message;
-			message << "Asset is already up-to-date. " << std::string(buildItem.OutputFilename.begin(), buildItem.OutputFilename.end());
+			message << "Asset is already up-to-date. " << WStringToString(buildItem.OutputFilename);
 			BR_CORE_TRACE << message.str() << std::endl;
 			return;
 		}
@@ -205,12 +206,13 @@ namespace Bruno
 		if (!m_timestampCache->FileExists(absolutePath))
 		{
 			std::ostringstream error;
-			error << "Source asset not found. " << std::string(buildItem.Request->SourceFilename.begin(), buildItem.Request->SourceFilename.end());
+			error << "Source asset not found. " << WStringToString(buildItem.Request->SourceFilename);
 			throw std::exception(error.str().c_str());
 		}
 
-		BR_CORE_TRACE << "Building item... Source = " << std::string(buildItem.Request->SourceFilename.begin(), buildItem.Request->SourceFilename.end())
-			<< ". Output = " << std::string(buildItem.OutputFilename.begin(), buildItem.OutputFilename.end()) << std::endl;
+		BR_CORE_TRACE << "Building item... Source = " << WStringToString(buildItem.Request->SourceFilename)
+			<< ". Output = " << WStringToString(buildItem.OutputFilename) << std::endl;
+
 		if (!buildReason.empty())
 			BR_CORE_TRACE << buildReason << std::endl;
 
@@ -237,7 +239,7 @@ namespace Bruno
 		if (timestamp != item.SourceTimestamp)
 		{
 			std::ostringstream reasonBuilder;
-			reasonBuilder << "Rebuild dirty dependency. " << std::string(item.Request->SourceFilename.begin(), item.Request->SourceFilename.end());
+			reasonBuilder << "Rebuild dirty dependency. " << WStringToString(item.Request->SourceFilename);
 			buildReason = reasonBuilder.str();
 			return true;
 		}
@@ -245,7 +247,7 @@ namespace Bruno
 		if (!m_timestampCache->FileExists(absolutePath))
 		{
 			std::ostringstream reasonBuilder;
-			reasonBuilder << "Rebuild missing output. " << std::string(item.OutputFilename.begin(), item.OutputFilename.end());
+			reasonBuilder << "Rebuild missing output. " << WStringToString(item.OutputFilename);
 			buildReason = reasonBuilder.str();
 			return true;
 		}
@@ -284,7 +286,7 @@ namespace Bruno
 		m_timestampCache->Remove(absolutePath);
 
 		std::ostringstream message;
-		message << "Compiling... " << std::string(absolutePath.begin(), absolutePath.end());
+		message << "Compiling... " << WStringToString(absolutePath);
 		BR_CORE_TRACE << message.str() << std::endl;
 
 		FileStream fileStream(absolutePath, FileAccess::Write);
