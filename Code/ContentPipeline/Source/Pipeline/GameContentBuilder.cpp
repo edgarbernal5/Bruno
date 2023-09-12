@@ -284,7 +284,7 @@ namespace Bruno
 		m_timestampCache->Remove(absolutePath);
 
 		std::ostringstream message;
-		message << "Compiling... " << std::string(buildItem.OutputFilename.begin(), buildItem.OutputFilename.end());
+		message << "Compiling... " << std::string(absolutePath.begin(), absolutePath.end());
 		BR_CORE_TRACE << message.str() << std::endl;
 
 		FileStream fileStream(absolutePath, FileAccess::Write);

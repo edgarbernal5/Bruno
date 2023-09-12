@@ -66,7 +66,14 @@ namespace Bruno
 		//	m_rootParameters.data(), 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		std::reverse(m_rootParameters.begin(), m_rootParameters.end());
-		CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
+		
+		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers;
+		samplers.resize(m_samplers.size());
+		
+		for (size_t i = 0; i < m_samplers.size(); i++)
+		{
+			samplers[i] = m_samplers[i].Desc;
+		}
 
 		D3D12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignature;
 		versionedRootSignature.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
@@ -74,13 +81,12 @@ namespace Bruno
 		{
 			static_cast<uint32_t>(m_rootParameters.size()), //NumParameters 
 			m_rootParameters.data(), //pParameters
-			1u, //NumStaticSamplers 
-			&linearRepeatSampler, //pStaticSamplers 
+			static_cast<uint32_t>(samplers.size()), //NumStaticSamplers 
+			samplers.data(), //pStaticSamplers 
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT,//Flags
 		};
 
 		return std::make_shared<RootSignature>(versionedRootSignature);
-		//return nullptr;
 
 		//return std::make_shared<RootSignature>(this);
 	}
@@ -139,7 +145,7 @@ namespace Bruno
 				rootParameter.Descriptor = {
 					bindDesc.BindPoint,//ShaderRegister
 					bindDesc.Space, //RegisterSpace
-					//D3D12_ROOT_DESCRIPTOR_FLAG_NONE, //Flags
+					D3D12_ROOT_DESCRIPTOR_FLAG_NONE, //Flags
 				};
 				rootParameter.ShaderVisibility = program->GetVisibility();
 
@@ -188,11 +194,29 @@ namespace Bruno
 				sampler.Name = bindDesc.Name;
 				sampler.BindPoint = bindDesc.BindPoint;
 				sampler.Visibility = program->GetVisibility();
+				sampler.Setup();
 				break;
 			}
 			}
 		}
 
 		reflector->Release();
+	}
+
+	void Shader::Sampler::Setup()
+	{
+		Desc.Filter = D3D12_FILTER_ANISOTROPIC;
+		Desc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		Desc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		Desc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		Desc.MipLODBias = 0;
+		Desc.MaxAnisotropy = 16;
+		Desc.ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		Desc.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE;
+		Desc.MinLOD = 0.0f;
+		Desc.MaxLOD = D3D12_FLOAT32_MAX;
+		Desc.ShaderRegister = BindPoint;
+		Desc.RegisterSpace = 0;
+		Desc.ShaderVisibility = Visibility;
 	}
 }

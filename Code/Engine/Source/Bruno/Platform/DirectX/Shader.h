@@ -29,6 +29,8 @@ namespace Bruno
 			uint32_t BindPoint, BindSlot;
 			D3D12_SHADER_VISIBILITY Visibility;
 			D3D12_STATIC_SAMPLER_DESC Desc;
+
+			void Setup();
 		};
 
 		Shader(std::vector<std::vector<uint8_t>>&& programsData);
