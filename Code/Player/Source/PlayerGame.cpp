@@ -209,6 +209,7 @@ namespace Bruno
 		commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
 		commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
 
+
 		for (auto& item : m_renderItems)
 		{
 			commandList->IASetPrimitiveTopology(item->PrimitiveType);
@@ -219,8 +220,8 @@ namespace Bruno
 
 			D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer[frameIndex]->GetResource()->GetGPUVirtualAddress();
 
-			commandList->SetGraphicsRootDescriptorTable(0, tex);
-			commandList->SetGraphicsRootConstantBufferView(1, objCBAddress);
+			commandList->SetGraphicsRootDescriptorTable(m_opaqueShader->GetIndexMap(L"gDiffuseMap"), tex);
+			commandList->SetGraphicsRootConstantBufferView(m_opaqueShader->GetIndexMap(L"cbPerObject"), objCBAddress);
 
 			commandList->DrawIndexedInstanced(item->IndexCount,
 				1,

@@ -65,7 +65,7 @@ namespace Bruno
 		//versionRootSignatureDesc.Init_1_1(static_cast<uint32_t>(m_rootParameters.size()),
 		//	m_rootParameters.data(), 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-		std::reverse(m_rootParameters.begin(), m_rootParameters.end());
+		//std::reverse(m_rootParameters.begin(), m_rootParameters.end());
 		
 		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers;
 		samplers.resize(m_samplers.size());
