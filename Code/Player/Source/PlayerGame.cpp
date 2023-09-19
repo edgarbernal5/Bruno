@@ -93,61 +93,16 @@ namespace Bruno
 		m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
 
 		GraphicsDevice* device = Graphics::GetDevice();
-
-		//// Allow input layout and deny unnecessary access to certain pipeline stages.
-		//D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
-		//	D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-		//	D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-		//	D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-		//	D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-		//	D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
-
-		//CD3DX12_DESCRIPTOR_RANGE texTable;
-		//texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-
-		//CD3DX12_ROOT_PARAMETER rootParameters[2]{};
-		//// Perfomance TIP: Order from most frequent to least frequent.
-		//rootParameters[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
-		//rootParameters[1].InitAsConstantBufferView(0);
-
-		//CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
-		//// A root signature is an array of root parameters.
-		//CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDescription(2, rootParameters,
-		//	1, &linearRepeatSampler,
-		//	D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
-		//// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
-		//m_rootSignature = std::make_shared<RootSignature>(rootSignatureDescription);
-
 		m_rootSignature = m_opaqueShader->CreateRootSignature();
 
-		struct PipelineStateStream
-		{
-			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE pRootSignature;
-			CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT InputLayout;
-			CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopologyType;
-			CD3DX12_PIPELINE_STATE_STREAM_VS VS;
-			CD3DX12_PIPELINE_STATE_STREAM_PS PS;
-			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
-			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
-		} pipelineStateStream;
-
-		D3D12_RT_FORMAT_ARRAY rtvFormats = {};
-		rtvFormats.NumRenderTargets = 1;
-		rtvFormats.RTFormats[0] = surfaceParameters.BackBufferFormat;
-
-		pipelineStateStream.pRootSignature = m_rootSignature->GetD3D12RootSignature();
-		pipelineStateStream.InputLayout = m_opaqueShader->GetInputLayout(); //VertexPositionNormalTexture::InputLayout;
-		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex)->GetBlob());
-		pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel)->GetBlob());
-		pipelineStateStream.DSVFormat = surfaceParameters.DepthBufferFormat;
-		pipelineStateStream.RTVFormats = rtvFormats;
-
-		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
-			sizeof(PipelineStateStream), &pipelineStateStream
-		};
-		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineStateStreamDesc);
+		GraphicsPipelineDesc pipelineDesc = GetDefaultGraphicsPipelineDesc();
+		pipelineDesc.mVertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
+		pipelineDesc.mPixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
+		pipelineDesc.mRenderTargetDesc.mDepthStencilFormat= surfaceParameters.DepthBufferFormat;
+		pipelineDesc.mRenderTargetDesc.mNumRenderTargets = 1;
+		pipelineDesc.mRenderTargetDesc.mRenderTargetFormats[0] = surfaceParameters.BackBufferFormat;
+		
+		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineDesc, m_rootSignature.get());
 		
 		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
@@ -208,7 +163,6 @@ namespace Bruno
 
 		commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
 		commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
-
 
 		for (auto& item : m_renderItems)
 		{
