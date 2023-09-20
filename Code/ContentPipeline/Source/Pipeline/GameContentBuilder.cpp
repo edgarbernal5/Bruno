@@ -244,7 +244,7 @@ namespace Bruno
 			return true;
 		}
 
-		if (!m_timestampCache->FileExists(absolutePath))
+		if (!m_timestampCache->FileExists(GetAbsolutePath(item.OutputFilename)))
 		{
 			std::ostringstream reasonBuilder;
 			reasonBuilder << "Rebuild missing output. " << WStringToString(item.OutputFilename);
