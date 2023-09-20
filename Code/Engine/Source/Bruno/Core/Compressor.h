@@ -19,7 +19,7 @@ namespace Bruno
 	private:
 		Stream& m_outputStream;
 		uint8_t* m_buffer;
-		uint32_t m_capacity;
+		uint32_t m_maxDescriptors;
 		uint32_t m_length;
 	};
 

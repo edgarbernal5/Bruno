@@ -119,7 +119,9 @@
     <ClInclude Include="Source\Bruno\Core\StringHelpers.h" />
     <ClInclude Include="Source\Bruno\Math\Math.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Context.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\PipelineStateObject.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ResourceBarrier.h" />
@@ -169,7 +171,9 @@
     <ClCompile Include="Source\Bruno\Core\Stream.cpp" />
     <ClCompile Include="Source\Bruno\Core\StringHelpers.cpp" />
     <ClCompile Include="Source\Bruno\Math\Math.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Context.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\PipelineStateObject.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ResourceBarrier.cpp" />

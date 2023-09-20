@@ -10,7 +10,7 @@ namespace Bruno
 	{
 		D3D12_CPU_DESCRIPTOR_HANDLE Cpu{};
 		D3D12_GPU_DESCRIPTOR_HANDLE Gpu{};
-		uint32_t					Index{ 0xffff'ffff };
+		uint32_t					HeapIndex{ 0xffff'ffff };
 	};
 
 	class GraphicsDevice;
@@ -24,8 +24,8 @@ namespace Bruno
 		explicit DescriptorHeap(DescriptorHeap&&) = delete;
 		DescriptorHeap& operator=(DescriptorHeap&&) = delete;
 
-		DescriptorHandle Allocate();
-		bool Initialize(GraphicsDevice* device, uint32_t capacity, bool isShaderVisible = false);
+		DescriptorHandle Allocate(uint32_t count = 1);
+		bool Initialize(GraphicsDevice* device, uint32_t maxDescriptors, bool isShaderVisible = false);
 		constexpr D3D12_CPU_DESCRIPTOR_HANDLE GetCpuStart() const { return m_cpuStart; }
 		constexpr bool IsShaderVisible() const { return m_gpuStart.ptr != 0; }
 		constexpr ID3D12DescriptorHeap* const GetHeap() const { return m_heap; }
@@ -37,7 +37,7 @@ namespace Bruno
 
 		uint32_t							m_descriptorSize{0};
 		uint32_t							m_size{0};
-		uint32_t							m_capacity{ 0 };
+		uint32_t							m_maxDescriptors{ 0 };
 		const D3D12_DESCRIPTOR_HEAP_TYPE    m_type{};
 	};
 }

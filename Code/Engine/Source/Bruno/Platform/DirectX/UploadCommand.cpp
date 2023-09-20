@@ -32,20 +32,20 @@ namespace Bruno
 		ThrowIfFailed(m_device->GetD3DDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
 		m_fence->SetName(L"Upload Fence");
 
-		m_fenceEvent = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
+		m_fenceEventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
 	}
 
 	UploadCommand::~UploadCommand()
 	{
 		for (uint32_t i = 0; i < Graphics::Core::UPLOAD_FRAME_COUNT; ++i)
 		{
-			m_uploadFrames[i].Release(m_fence.Get(), m_fenceEvent);
+			m_uploadFrames[i].Release(m_fence.Get(), m_fenceEventHandle);
 		}
 
-		if (m_fenceEvent)
+		if (m_fenceEventHandle)
 		{
-			CloseHandle(m_fenceEvent);
-			m_fenceEvent = nullptr;
+			CloseHandle(m_fenceEventHandle);
+			m_fenceEventHandle = nullptr;
 		}
 
 		m_fenceValue = 0;
@@ -121,7 +121,7 @@ namespace Bruno
 		m_uploadCommand->Signal(m_fence.Get(), currentFenceValue);
 
 		// Wait for copy queue to finish. Then release the upload buffer.
-		frame.WaitAndReset(m_fence.Get(), m_fenceEvent);
+		frame.WaitAndReset(m_fence.Get(), m_fenceEventHandle);
 
 		m_frameIndex = (m_frameIndex + 1) % Graphics::Core::UPLOAD_FRAME_COUNT;
 	}
@@ -130,7 +130,7 @@ namespace Bruno
 	{
 		for (uint32_t i = 0; i < Graphics::Core::UPLOAD_FRAME_COUNT; ++i)
 		{
-			m_uploadFrames[i].WaitAndReset(m_fence.Get(), m_fenceEvent);
+			m_uploadFrames[i].WaitAndReset(m_fence.Get(), m_fenceEventHandle);
 		}
 		m_frameIndex = 0;
 	}

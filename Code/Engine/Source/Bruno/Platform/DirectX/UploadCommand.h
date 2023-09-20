@@ -68,7 +68,7 @@ namespace Bruno
 		uint64_t										m_fenceValue{ 0 };
 		
 		UploadFrame										m_uploadFrames[Graphics::Core::UPLOAD_FRAME_COUNT];
-		HANDLE											m_fenceEvent{ nullptr };
+		HANDLE											m_fenceEventHandle{ nullptr };
 		uint32_t										m_frameIndex{ 0 };
 	};
 }

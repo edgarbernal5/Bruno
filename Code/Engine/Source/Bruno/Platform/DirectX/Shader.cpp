@@ -124,6 +124,7 @@ namespace Bruno
 		D3D12_SHADER_DESC desc;
 		reflector->GetDesc(&desc);
 
+		//TODO: sort root parameters by priority (most used comes first, example textures).
 		for (size_t i = 0; i < desc.BoundResources; i++)
 		{
 			D3D12_SHADER_INPUT_BIND_DESC bindDesc;
@@ -189,7 +190,6 @@ namespace Bruno
 			}
 			case D3D_SIT_SAMPLER:
 			{
-				//TODO
 				auto& sampler = m_samplers.emplace_back();
 				sampler.Name = bindDesc.Name;
 				sampler.BindPoint = bindDesc.BindPoint;

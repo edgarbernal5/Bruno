@@ -7,7 +7,8 @@
 namespace Bruno
 {
 	CommandQueue::CommandQueue(GraphicsDevice* device, D3D12_COMMAND_LIST_TYPE type) :
-		m_device(device)
+		m_device(device),
+		m_queueType(type)
 	{
 		D3D12_COMMAND_QUEUE_DESC desc = {};
 		desc.Flags		= D3D12_COMMAND_QUEUE_FLAG_NONE;
@@ -47,15 +48,15 @@ namespace Bruno
 		ThrowIfFailed(m_device->GetD3DDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
 		m_fence->SetName(L"CommandQueue");
 
-		m_fenceEvent = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
+		m_fenceEventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
 	}
 
 	CommandQueue::~CommandQueue()
 	{
 		Flush();
 
-		CloseHandle(m_fenceEvent);
-		m_fenceEvent = nullptr;
+		CloseHandle(m_fenceEventHandle);
+		m_fenceEventHandle = nullptr;
 
 		for (uint32_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; ++i)
 		{
@@ -68,7 +69,7 @@ namespace Bruno
 	void CommandQueue::WaitFrame()
 	{
 		CommandFrame& frame{ m_commandFrames[m_frameIndex] };
-		frame.Wait(m_fenceEvent, m_fence.Get());
+		frame.Wait(m_fenceEventHandle, m_fence.Get());
 	}
 
 	void CommandQueue::BeginFrame()
@@ -100,7 +101,7 @@ namespace Bruno
 	{
 		for (uint32_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; ++i)
 		{
-			m_commandFrames[i].Wait(m_fenceEvent, m_fence.Get());
+			m_commandFrames[i].Wait(m_fenceEventHandle, m_fence.Get());
 		}
 		//m_frameIndex = 0; TODO: Fix this bug with render thread of nana window
 	}

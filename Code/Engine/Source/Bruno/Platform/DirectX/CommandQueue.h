@@ -63,7 +63,8 @@ namespace Bruno
 		uint64_t												m_fenceValue{ 0 };
 		
 		CommandFrame											m_commandFrames[Graphics::Core::FRAME_BUFFER_COUNT];
-		HANDLE													m_fenceEvent{ nullptr };
+		HANDLE													m_fenceEventHandle{ nullptr };
 		uint32_t												m_frameIndex{ 0 };
+		D3D12_COMMAND_LIST_TYPE									m_queueType;
 	};
 }
