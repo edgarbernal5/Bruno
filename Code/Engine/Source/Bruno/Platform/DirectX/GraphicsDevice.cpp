@@ -152,17 +152,17 @@ namespace Bruno
         return m_uploadCommand.get();
     }
 
-    DescriptorHeap& GraphicsDevice::GetRtvDescriptionHeap()
+    StagingDescriptorHeap& GraphicsDevice::GetRtvDescriptionHeap()
     {
         return m_rtvDescriptorHeap;
     }
 
-    DescriptorHeap& GraphicsDevice::GetDsvDescriptionHeap()
+    StagingDescriptorHeap& GraphicsDevice::GetDsvDescriptionHeap()
     {
         return m_dsvDescriptorHeap;
     }
 
-    DescriptorHeap& GraphicsDevice::GetSrvDescriptionHeap()
+    StagingDescriptorHeap& GraphicsDevice::GetSrvDescriptionHeap()
     {
         return m_srvDescriptorHeap;
     }

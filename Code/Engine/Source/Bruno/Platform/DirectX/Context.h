@@ -1,6 +1,7 @@
 #pragma once
 
 #include "D3DCommon.h"
+#include "D3DCore.h"
 #include <array>
 
 namespace Bruno

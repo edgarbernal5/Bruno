@@ -22,9 +22,9 @@ namespace Bruno
 		ID3D12Device2* GetD3DDevice();
 		CommandQueue* GetCommandQueue();
 		UploadCommand* GetUploadCommand();
-		DescriptorHeap& GetRtvDescriptionHeap(); 
-		DescriptorHeap& GetDsvDescriptionHeap();
-		DescriptorHeap& GetSrvDescriptionHeap();
+		StagingDescriptorHeap& GetRtvDescriptionHeap();
+		StagingDescriptorHeap& GetDsvDescriptionHeap();
+		StagingDescriptorHeap& GetSrvDescriptionHeap();
 		
 		D3D_ROOT_SIGNATURE_VERSION GetHighestRootSignatureVersion() const
 		{
@@ -48,9 +48,9 @@ namespace Bruno
 		DWORD                                               m_dxgiFactoryFlags{ 0 };
 		D3D_FEATURE_LEVEL                                   m_d3dFeatureLevel;
 
-		DescriptorHeap										m_rtvDescriptorHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_RTV };
-		DescriptorHeap										m_dsvDescriptorHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_DSV };
-		DescriptorHeap										m_srvDescriptorHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV };
+		StagingDescriptorHeap								m_rtvDescriptorHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_RTV };
+		StagingDescriptorHeap								m_dsvDescriptorHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_DSV };
+		StagingDescriptorHeap								m_srvDescriptorHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV };
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature>			m_rootSignature;
 		D3D_ROOT_SIGNATURE_VERSION							m_highestRootSignatureVersion;

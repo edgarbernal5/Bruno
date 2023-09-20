@@ -7,4 +7,8 @@ namespace Bruno
 		Context(device, D3D12_COMMAND_LIST_TYPE_DIRECT)
 	{
 	}
+
+	GraphicsContext::~GraphicsContext()
+	{
+	}
 }
