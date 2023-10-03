@@ -5,6 +5,10 @@
 #include "CommandQueue.h"
 #include "UploadCommand.h"
 
+#include "D3D12MemAlloc.h"
+
+#include <numeric>
+
 namespace Bruno
 {
 	GraphicsDevice::GraphicsDevice(std::shared_ptr<GraphicsAdapter> adapter) :
@@ -106,10 +110,15 @@ namespace Bruno
         m_commandQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_DIRECT);
         m_uploadCommand = std::make_unique<UploadCommand>(this);
 
-        bool result = true;
-        result &= m_rtvDescriptorHeap.Initialize(this, 512);
-        result &= m_dsvDescriptorHeap.Initialize(this, 512);
-        result &= m_srvDescriptorHeap.Initialize(this, 4096, true);
+        m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::NUM_RTV_STAGING_DESCRIPTORS);
+        m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::NUM_DSV_STAGING_DESCRIPTORS);
+        m_srvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::NUM_SRV_STAGING_DESCRIPTORS);
+        mSamplerRenderPassDescriptorHeap = std::make_unique<RenderPassDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 0, Graphics::Core::NUM_SAMPLER_DESCRIPTORS);
+
+        for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
+        {
+            mSRVRenderPassDescriptorHeaps[frameIndex] = std::make_unique<RenderPassDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::NUM_RESERVED_SRV_DESCRIPTORS, Graphics::Core::NUM_SRV_RENDER_PASS_USER_DESCRIPTORS);
+        }
 
         D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
 
@@ -125,11 +134,58 @@ namespace Bruno
             featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
         }
         m_highestRootSignatureVersion = featureData.HighestVersion;
+
+        D3D12MA::ALLOCATOR_DESC desc = {};
+        desc.Flags = D3D12MA::ALLOCATOR_FLAG_NONE;
+        desc.pDevice = m_d3dDevice.Get();
+        desc.pAdapter = m_adapter.get()->GetHandle();
+
+        D3D12MA::CreateAllocator(&desc, &mAllocator);
+
+        mFreeReservedDescriptorIndices.resize(Graphics::Core::NUM_RESERVED_SRV_DESCRIPTORS);
+        for (size_t i = 0; i < mFreeReservedDescriptorIndices.size(); i++)
+        {
+            mFreeReservedDescriptorIndices[i] = i;
+        }
 	}
+
+    void GraphicsDevice::BeginFrame()
+    {
+        m_frameId = (m_frameId + 1) % Graphics::Core::FRAMES_IN_FLIGHT_COUNT;
+
+
+    }
+
+    void GraphicsDevice::EndFrame()
+    {
+    }
+
+    D3D12MA::Allocator* GraphicsDevice::GetAllocator() const
+    {
+        return mAllocator;
+    }
+
+    uint32_t GraphicsDevice::GetFreeReservedDescriptorIndex()
+    {
+        uint32_t index = mFreeReservedDescriptorIndices.back();
+        mFreeReservedDescriptorIndices.pop_back();
+        return index;
+    }
 
     std::shared_ptr<GraphicsDevice> GraphicsDevice::Create(std::shared_ptr<GraphicsAdapter> adapter)
     {
         return std::make_shared<GraphicsDevice>(adapter);
+    }
+
+    void GraphicsDevice::CopySRVHandleToReservedTable(DescriptorHandle srvHandle, uint32_t index)
+    {
+        for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
+        {
+            DescriptorHandle targetDescriptor = mSRVRenderPassDescriptorHeaps[frameIndex]->GetReservedDescriptor(index);
+
+            //CopyDescriptorsSimple(1, targetDescriptor.mCPUHandle, srvHandle.mCPUHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+            m_d3dDevice->CopyDescriptorsSimple(1, targetDescriptor.Cpu, srvHandle.Cpu, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+        }
     }
 
     IDXGIFactory4* GraphicsDevice::GetFactory()
@@ -137,7 +193,7 @@ namespace Bruno
         return m_dxgiFactory.Get();
     }
 
-    ID3D12Device2* GraphicsDevice::GetD3DDevice()
+    ID3D12Device5* GraphicsDevice::GetD3DDevice()
     {
         return m_d3dDevice.Get();
     }
@@ -154,16 +210,16 @@ namespace Bruno
 
     StagingDescriptorHeap& GraphicsDevice::GetRtvDescriptionHeap()
     {
-        return m_rtvDescriptorHeap;
+        return *m_rtvDescriptorHeap;
     }
 
     StagingDescriptorHeap& GraphicsDevice::GetDsvDescriptionHeap()
     {
-        return m_dsvDescriptorHeap;
+        return *m_dsvDescriptorHeap;
     }
 
     StagingDescriptorHeap& GraphicsDevice::GetSrvDescriptionHeap()
     {
-        return m_srvDescriptorHeap;
+        return *m_srvDescriptorHeap;
     }
 }

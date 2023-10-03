@@ -2,17 +2,60 @@
 
 #include "D3DCommon.h"
 #include "Resources.h"
+#include "Resource.h"
 
+#include "Bruno/Core/Base.h"
 #include <Bruno/Core/RTTI.h>
 
 namespace Bruno
 {
-	class Texture : public RTTI
+	enum class TextureViewFlags : uint8_t
 	{
-		BR_RTTI_DECLARATION(Texture, RTTI);
+		None = 0,
+		Rtv = 1,
+		Dsv = 2,
+		Srv = 4,
+		Uav = 8
+	};
+	BR_DEFINITION_FLAG_FROM_ENUM(TextureViewFlags);
+
+	struct TextureCreationDesc
+	{
+		TextureCreationDesc()
+		{
+			mResourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+			mResourceDesc.Width = 0;
+			mResourceDesc.Height = 0;
+			mResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+			mResourceDesc.DepthOrArraySize = 1;
+			mResourceDesc.MipLevels = 1;
+			mResourceDesc.SampleDesc.Count = 1;
+			mResourceDesc.SampleDesc.Quality = 0;
+			mResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+			mResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+			mResourceDesc.Alignment = 0;
+		}
+
+		D3D12_RESOURCE_DESC mResourceDesc{};
+		TextureViewFlags mViewFlags = TextureViewFlags::None;
+	};
+
+	class Texture;
+
+	struct TextureUpload
+	{
+		Texture* mTexture = nullptr;
+		std::unique_ptr<uint8_t[]> mTextureData;
+		size_t mTextureDataSize = 0;
+		uint32_t mNumSubResources = 0;
+		SubResourceLayouts mSubResourceLayouts{ 0 };
+	};
+
+	class Texture : public Resource
+	{
+		BR_RTTI_DECLARATION(Texture, Resource);
 
 	public:
-
 		struct InitData
 		{
 			size_t Width;
@@ -31,15 +74,18 @@ namespace Bruno
 			};
 			std::vector<ImageInitData> Images;
 		};
-
+		Texture();
 		Texture(const std::wstring& filename);
 		Texture(const InitData& textureInitData);
 
-		constexpr const DescriptorHandle& GetSrvHandle() const { return m_srvHandle; }
+		constexpr const DescriptorHandle& GetSrvHandle() const { return mSRVDescriptor; }
+
+		friend class Surface;
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Resource>	m_d3d12Resource;
-		std::unique_ptr<D3D12_CLEAR_VALUE>		m_d3d12ClearValue;
-		DescriptorHandle						m_srvHandle;
+		DescriptorHandle mRTVDescriptor{};
+		DescriptorHandle mDSVDescriptor{};
+		DescriptorHandle mSRVDescriptor{};
+		DescriptorHandle mUAVDescriptor{};
 
 		void CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData);
 		void GenerateMips();

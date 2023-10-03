@@ -131,7 +131,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\nana\include;..\Engine\Dependencies\directx\include;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\nana\include;..\Engine\Dependencies\directx\include;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\assimp\include;..\Engine\Dependencies\D3D12MemoryAllocator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>

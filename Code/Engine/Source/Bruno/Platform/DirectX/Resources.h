@@ -2,10 +2,13 @@
 
 #include "D3DCore.h"
 
+#include <array>
 #include <mutex>
 
 namespace Bruno
 {
+	using SubResourceLayouts = std::array<D3D12_PLACED_SUBRESOURCE_FOOTPRINT, Graphics::Core::MAX_TEXTURE_SUBRESOURCE_COUNT>;
+
 	struct DescriptorHandle
 	{
 		D3D12_CPU_DESCRIPTOR_HANDLE Cpu{};
@@ -18,14 +21,13 @@ namespace Bruno
 	class DescriptorHeap
 	{
 	public:
-		explicit DescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType) : m_heapType{ heapType } {}
+		explicit DescriptorHeap(GraphicsDevice* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t maxDescriptors, bool isShaderVisible);
 		explicit DescriptorHeap(const DescriptorHeap&) = delete;
 		DescriptorHeap& operator=(const DescriptorHeap&) = delete;
 		explicit DescriptorHeap(DescriptorHeap&&) = delete;
 		DescriptorHeap& operator=(DescriptorHeap&&) = delete;
 		~DescriptorHeap();
 
-		bool Initialize(GraphicsDevice* device, uint32_t maxDescriptors, bool isShaderVisible = false);
 		constexpr D3D12_CPU_DESCRIPTOR_HANDLE GetCpuStart() const { return m_cpuStart; }
 		constexpr bool IsShaderVisible() const { return m_gpuStart.ptr != 0; }
 		constexpr ID3D12DescriptorHeap* const GetHeap() const { return m_heap; }
@@ -44,7 +46,7 @@ namespace Bruno
 	class StagingDescriptorHeap : public DescriptorHeap
 	{
 	public:
-		StagingDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType) : DescriptorHeap(heapType){}
+		StagingDescriptorHeap(GraphicsDevice* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t numDescriptors);
 		~StagingDescriptorHeap();
 
 		DescriptorHandle Allocate(uint32_t count = 1);
@@ -59,8 +61,17 @@ namespace Bruno
 	class RenderPassDescriptorHeap : public DescriptorHeap
 	{
 	public:
-		RenderPassDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType) : DescriptorHeap(heapType) {}
+		RenderPassDescriptorHeap(GraphicsDevice* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t reservedCount, uint32_t userCount) :
+			DescriptorHeap(device, heapType, reservedCount + userCount, true), 
+			mReservedHandleCount(reservedCount),
+			mCurrentDescriptorIndex(reservedCount) {}
 
-		DescriptorHandle Allocate();
+		DescriptorHandle Allocate(uint32_t count);
+		DescriptorHandle GetReservedDescriptor(uint32_t index);
+		void Reset();
+
+	private:
+		uint32_t mReservedHandleCount = 0;
+		uint32_t mCurrentDescriptorIndex = 0;
 	};
 }

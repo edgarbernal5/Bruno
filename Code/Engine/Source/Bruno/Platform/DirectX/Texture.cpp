@@ -4,9 +4,15 @@
 #include "GraphicsDevice.h"
 #include "UploadCommand.h"
 
+#include "D3D12MemAlloc.h"
+
 namespace Bruno
 {
     BR_RTTI_DEFINITIONS(Texture);
+
+    Texture::Texture()
+    {
+    }
 
     Texture::Texture(const std::wstring& filename)
     {
@@ -27,65 +33,197 @@ namespace Bruno
         {
             ThrowIfFailed(LoadFromWICFile(filename.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metadata, scratchImage));
         }
-        metadata.format = MakeSRGB(metadata.format);
+        //metadata.format = MakeSRGB(metadata.format);
 
-        D3D12_RESOURCE_DESC textureDesc = {};
-        switch (metadata.dimension)
-        {
-        case DirectX::TEX_DIMENSION_TEXTURE1D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex1D(metadata.format, static_cast<uint64_t>(metadata.width),
-                static_cast<uint16_t>(metadata.arraySize));
-            break;
-        case DirectX::TEX_DIMENSION_TEXTURE2D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex2D(metadata.format, static_cast<uint64_t>(metadata.width),
-                static_cast<uint32_t>(metadata.height),
-                static_cast<uint16_t>(metadata.arraySize));
-            break;
-        case DirectX::TEX_DIMENSION_TEXTURE3D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex3D(metadata.format, static_cast<uint64_t>(metadata.width),
-                static_cast<uint32_t>(metadata.height),
-                static_cast<uint16_t>(metadata.depth));
-            break;
-        default:
-            throw std::exception("Invalid texture dimension.");
-            break;
-        }
+        DXGI_FORMAT textureFormat = metadata.format;
+        bool is3DTexture = metadata.dimension == DirectX::TEX_DIMENSION_TEXTURE3D;
+
+        TextureCreationDesc desc;
+        desc.mResourceDesc.Format = textureFormat;
+        desc.mResourceDesc.Width = metadata.width;
+        desc.mResourceDesc.Height = static_cast<UINT>(metadata.height);
+        desc.mResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+        desc.mResourceDesc.DepthOrArraySize = static_cast<uint16_t>(is3DTexture ? metadata.depth : metadata.arraySize);
+        desc.mResourceDesc.MipLevels = static_cast<uint16_t>(metadata.mipLevels);
+        desc.mResourceDesc.SampleDesc.Count = 1;
+        desc.mResourceDesc.SampleDesc.Quality = 0;
+        desc.mResourceDesc.Dimension = is3DTexture ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        desc.mResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        desc.mResourceDesc.Alignment = 0;
+        desc.mViewFlags = TextureViewFlags::Srv;
+
         auto device = Graphics::GetDevice();
-        
-        ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
-            &Graphics::Core::HeapProperties.DefaultHeap, 
-            D3D12_HEAP_FLAG_NONE, 
-            &textureDesc,
-            D3D12_RESOURCE_STATE_COMMON,
-            nullptr,
-            IID_PPV_ARGS(&m_d3d12Resource)));
 
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srvDesc.Format = metadata.format;
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
-        srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+        //CreateTexture
+        D3D12_RESOURCE_DESC textureDesc = desc.mResourceDesc;
+        textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-        m_srvHandle = device->GetSrvDescriptionHeap().Allocate();
-        device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), &srvDesc, m_srvHandle.Cpu);
+        bool hasRTV = ((desc.mViewFlags & TextureViewFlags::Rtv) == TextureViewFlags::Rtv);
+        bool hasDSV = ((desc.mViewFlags & TextureViewFlags::Dsv) == TextureViewFlags::Dsv);
+        bool hasSRV = ((desc.mViewFlags & TextureViewFlags::Srv) == TextureViewFlags::Srv);
+        bool hasUAV = ((desc.mViewFlags & TextureViewFlags::Uav) == TextureViewFlags::Uav);
 
-        std::vector<D3D12_SUBRESOURCE_DATA> subresources(scratchImage.GetImageCount());
-        const DirectX::Image* pImages = scratchImage.GetImages();
-        for (int i = 0; i < scratchImage.GetImageCount(); ++i)
+        D3D12_RESOURCE_STATES resourceState = D3D12_RESOURCE_STATE_COPY_DEST;
+        DXGI_FORMAT resourceFormat = textureDesc.Format;
+        DXGI_FORMAT shaderResourceViewFormat = textureDesc.Format;
+
+        if (hasRTV)
         {
-            auto& subresource = subresources[i];
-            subresource.RowPitch = pImages[i].rowPitch;
-            subresource.SlicePitch = pImages[i].slicePitch;
-            subresource.pData = pImages[i].pixels;
+            textureDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+            resourceState = D3D12_RESOURCE_STATE_RENDER_TARGET;
         }
 
-        CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
-        if (subresources.size() < m_d3d12Resource->GetDesc().MipLevels)
+        if (hasDSV)
         {
-            GenerateMips();
+            switch (desc.mResourceDesc.Format)
+            {
+            case DXGI_FORMAT_D16_UNORM:
+                resourceFormat = DXGI_FORMAT_R16_TYPELESS;
+                shaderResourceViewFormat = DXGI_FORMAT_R16_UNORM;
+                break;
+            case DXGI_FORMAT_D24_UNORM_S8_UINT:
+                resourceFormat = DXGI_FORMAT_R24G8_TYPELESS;
+                shaderResourceViewFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+                break;
+            case DXGI_FORMAT_D32_FLOAT:
+                resourceFormat = DXGI_FORMAT_R32_TYPELESS;
+                shaderResourceViewFormat = DXGI_FORMAT_R32_FLOAT;
+                break;
+            case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+                resourceFormat = DXGI_FORMAT_R32G8X24_TYPELESS;
+                shaderResourceViewFormat = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+                break;
+            default:
+                BR_ASSERT(false, "Bad depth stencil format.");
+                break;
+            }
+
+            textureDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+            resourceState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
         }
+
+        if (hasUAV)
+        {
+            textureDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+            resourceState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        }
+
+        textureDesc.Format = resourceFormat;
+
+        mDesc = textureDesc;
+        mState = resourceState;
+
+        D3D12_CLEAR_VALUE clearValue = {};
+        clearValue.Format = desc.mResourceDesc.Format;
+
+        if (hasDSV)
+        {
+            clearValue.DepthStencil.Depth = 1.0f;
+        }
+
+        D3D12MA::ALLOCATION_DESC allocationDesc{};
+        allocationDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
+
+        device->GetAllocator()->CreateResource(&allocationDesc, &textureDesc, resourceState, (!hasRTV && !hasDSV) ? nullptr : &clearValue, &this->mAllocation, IID_PPV_ARGS(&this->mResource));
+
+        if (hasSRV)
+        {
+            mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
+            if (hasDSV)
+            {
+                D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+                srvDesc.Format = shaderResourceViewFormat;
+                srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                srvDesc.Texture2D.MipLevels = 1;
+                srvDesc.Texture2D.MostDetailedMip = 0;
+                srvDesc.Texture2D.PlaneSlice = 0;
+                srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+                srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+
+                device->GetD3DDevice()->CreateShaderResourceView(mResource, &srvDesc, mSRVDescriptor.Cpu);
+            }
+            else
+            {
+                D3D12_SHADER_RESOURCE_VIEW_DESC* srvDescPointer = nullptr;
+                D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
+                bool isCubeMap = desc.mResourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D && desc.mResourceDesc.DepthOrArraySize == 6;
+
+                if (isCubeMap)
+                {
+                    shaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+                    shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+                    shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
+                    shaderResourceViewDesc.TextureCube.MipLevels = desc.mResourceDesc.MipLevels;
+                    shaderResourceViewDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+                    srvDescPointer = &shaderResourceViewDesc;
+                }
+
+                device->GetD3DDevice()->CreateShaderResourceView(mResource, srvDescPointer, mSRVDescriptor.Cpu);
+            }
+
+            mDescriptorHeapIndex = device->GetFreeReservedDescriptorIndex();
+
+            device->CopySRVHandleToReservedTable(mSRVDescriptor, mDescriptorHeapIndex);
+        }
+
+        if (hasRTV)
+        {
+            mRTVDescriptor = device->GetRtvDescriptionHeap().Allocate();
+            device->GetD3DDevice()->CreateRenderTargetView(mResource, nullptr, mRTVDescriptor.Cpu);
+        }
+
+        if (hasDSV)
+        {
+            D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+            dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+            dsvDesc.Format = desc.mResourceDesc.Format;
+            dsvDesc.Texture2D.MipSlice = 0;
+            dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+
+            mDSVDescriptor = device->GetDsvDescriptionHeap().Allocate();
+            device->GetD3DDevice()->CreateDepthStencilView(mResource, &dsvDesc, mDSVDescriptor.Cpu);
+        }
+
+        if (hasUAV)
+        {
+            mUAVDescriptor = device->GetSrvDescriptionHeap().Allocate();
+            device->GetD3DDevice()->CreateUnorderedAccessView(mResource, nullptr, nullptr, mUAVDescriptor.Cpu);
+        }
+
+        //ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
+        //    &Graphics::Core::HeapProperties.DefaultHeap, 
+        //    D3D12_HEAP_FLAG_NONE, 
+        //    &textureDesc,
+        //    D3D12_RESOURCE_STATE_COMMON,
+        //    nullptr,
+        //    IID_PPV_ARGS(&m_d3d12Resource)));
+
+        //D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        //srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        //srvDesc.Format = metadata.format;
+        //srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        //srvDesc.Texture2D.MostDetailedMip = 0;
+        //srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
+        //srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+        //mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
+        //device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), &srvDesc, mSRVDescriptor.Cpu);
+
+        //std::vector<D3D12_SUBRESOURCE_DATA> subresources(scratchImage.GetImageCount());
+        //const DirectX::Image* pImages = scratchImage.GetImages();
+        //for (int i = 0; i < scratchImage.GetImageCount(); ++i)
+        //{
+        //    auto& subresource = subresources[i];
+        //    subresource.RowPitch = pImages[i].rowPitch;
+        //    subresource.SlicePitch = pImages[i].slicePitch;
+        //    subresource.pData = pImages[i].pixels;
+        //}
+
+        //CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
+        //if (subresources.size() < m_d3d12Resource->GetDesc().MipLevels)
+        //{
+        //    GenerateMips();
+        //}
     }
 
     void Texture::GenerateMips()
@@ -154,9 +292,9 @@ namespace Bruno
             &textureDesc,
             D3D12_RESOURCE_STATE_COMMON,
             nullptr,
-            IID_PPV_ARGS(&m_d3d12Resource)));
+            IID_PPV_ARGS(&mResource)));
 
-        auto desk = m_d3d12Resource->GetDesc();
+        auto desk = mResource->GetDesc();
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         srvDesc.Format = (DXGI_FORMAT)textureInitData.Format;
@@ -165,8 +303,8 @@ namespace Bruno
         srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
         srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
         
-        m_srvHandle = device->GetSrvDescriptionHeap().Allocate();
-        device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), &srvDesc, m_srvHandle.Cpu);
+        mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
+        device->GetD3DDevice()->CreateShaderResourceView(mResource, &srvDesc, mSRVDescriptor.Cpu);
 
         std::vector<D3D12_SUBRESOURCE_DATA> subresources(textureInitData.Images.size());
         
@@ -179,7 +317,7 @@ namespace Bruno
         }
 
         CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
-        if (subresources.size() < m_d3d12Resource->GetDesc().MipLevels)
+        if (subresources.size() < mResource->GetDesc().MipLevels)
         {
             GenerateMips();
         }
@@ -187,14 +325,14 @@ namespace Bruno
 
     void Texture::CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData)
     {
-        if (m_d3d12Resource) {
+        if (mResource) {
             auto device = Graphics::GetDevice();
 
-            uint64_t requiredSize = GetRequiredIntermediateSize(m_d3d12Resource.Get(), firstSubresource, numSubresources);
+            uint64_t requiredSize = GetRequiredIntermediateSize(mResource, firstSubresource, numSubresources);
 
             auto uploadCommand = device->GetUploadCommand();
             uploadCommand->BeginUpload(requiredSize);
-            uploadCommand->Update(m_d3d12Resource, subresourceData, firstSubresource, numSubresources);
+            uploadCommand->Update(mResource, subresourceData, firstSubresource, numSubresources);
             uploadCommand->EndUpload();
 
             /*

@@ -31,7 +31,7 @@ namespace Bruno
 			break;
 		}
 
-		for (uint32_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; i++)
+		for (uint32_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
 			CommandFrame& frame = m_commandFrames[i];
 			ThrowIfFailed(m_device->GetD3DDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(&frame.CommandAllocator)));
@@ -58,7 +58,7 @@ namespace Bruno
 		CloseHandle(m_fenceEventHandle);
 		m_fenceEventHandle = nullptr;
 
-		for (uint32_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; ++i)
+		for (uint32_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; ++i)
 		{
 			m_commandFrames[i].Release();
 		}
@@ -94,12 +94,12 @@ namespace Bruno
 		frame.FenceValue = currentFenceValue;
 		m_commandQueue->Signal(m_fence.Get(), currentFenceValue);
 
-		m_frameIndex = (m_frameIndex + 1) % Graphics::Core::FRAME_BUFFER_COUNT;
+		m_frameIndex = (m_frameIndex + 1) % Graphics::Core::FRAMES_IN_FLIGHT_COUNT;
 	}
 
 	void CommandQueue::Flush()
 	{
-		for (uint32_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; ++i)
+		for (uint32_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; ++i)
 		{
 			m_commandFrames[i].Wait(m_fenceEventHandle, m_fence.Get());
 		}

@@ -86,7 +86,7 @@ namespace Bruno
 
 		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
 
-		for (size_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; i++)
+		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
 			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
 		}

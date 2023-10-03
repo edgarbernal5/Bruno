@@ -31,6 +31,12 @@
     <Filter Include="Source\Bruno\Content\Readers">
       <UniqueIdentifier>{7e2a5cdc-332c-4da7-8a96-8fa9f7fa4d7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dependencies">
+      <UniqueIdentifier>{348897c2-af42-46d0-b0b1-5a6f204dd12b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\D3D12MemoryAllocator">
+      <UniqueIdentifier>{8651c2ab-da49-418c-bb27-d727f973b23b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -198,6 +204,16 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Resource.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.h">
+      <Filter>Dependencies\D3D12MemoryAllocator</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GPUBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -341,6 +357,16 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsContext.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Resource.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.cpp">
+      <Filter>Dependencies\D3D12MemoryAllocator</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GPUBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Bruno\Math\Math.inl">

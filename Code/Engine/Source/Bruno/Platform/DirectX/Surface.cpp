@@ -3,6 +3,7 @@
 
 #include "GraphicsDevice.h"
 #include "CommandQueue.h"
+#include "Texture.h"
 
 namespace Bruno
 {
@@ -23,6 +24,7 @@ namespace Bruno
 		const uint32_t backBufferWidth = std::max<uint32_t>(m_parameters.Width, 1u);
 		const uint32_t backBufferHeight = std::max<uint32_t>(m_parameters.Height, 1u);
 		const DXGI_FORMAT backBufferFormat = m_parameters.BackBufferFormat;
+		m_parameters.BackBufferCount = std::min<uint32_t>(m_parameters.BackBufferCount, Graphics::Core::MAX_BACK_BUFFER_COUNT);
 
 		uint32_t swapChainFlags = 0; //DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 		//TODO: check tearing
@@ -53,7 +55,7 @@ namespace Bruno
 			nullptr,
 			tempSwapChain.GetAddressOf()
 		);
-		//ThrowIfFailed(hr);
+		ThrowIfFailed(hr);
 
 		hr = tempSwapChain.As(&m_swapChain);
 
@@ -61,7 +63,7 @@ namespace Bruno
 		ThrowIfFailed(device->GetFactory()->MakeWindowAssociation(m_parameters.WindowHandle, DXGI_MWA_NO_ALT_ENTER));
 
 		m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
-		for (uint32_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; ++i)
+		for (uint32_t i = 0; i < m_parameters.BackBufferCount; ++i)
 		{
 			m_renderTargetData[i].Rtv = device->GetRtvDescriptionHeap().Allocate();
 		}
@@ -145,13 +147,27 @@ namespace Bruno
 		GraphicsDevice* device = Graphics::GetDevice();
 
 		// create RTVs for back-buffers
-		for (uint32_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; i++)
+		for (uint32_t i = 0; i < m_parameters.BackBufferCount; i++)
 		{
 			RenderTargetData& data{ m_renderTargetData[i] };
 
-			ThrowIfFailed(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&data.Resource)));
-			
-			device->GetD3DDevice()->CreateRenderTargetView(data.Resource, nullptr, data.Rtv.Cpu);
+			ID3D12Resource* backBufferResource = nullptr;
+			ThrowIfFailed(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&backBufferResource)));
+
+			data.Resource = std::make_shared<Texture>();
+			data.Resource->mRTVDescriptor = data.Rtv;
+			data.Resource->mResource = backBufferResource;
+			data.Resource->mState = D3D12_RESOURCE_STATE_PRESENT;
+			data.Resource->mDesc = backBufferResource->GetDesc();
+
+			//D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+			//rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+			//rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+			//rtvDesc.Texture2D.MipSlice = 0;
+			//rtvDesc.Texture2D.PlaneSlice = 0;
+
+			//device->GetD3DDevice()->CreateRenderTargetView(data.Resource, &rtvDesc, data.Rtv.Cpu);
+			device->GetD3DDevice()->CreateRenderTargetView(data.Resource->GetResource(), nullptr, data.Rtv.Cpu);
 		}
 
 		DXGI_SWAP_CHAIN_DESC desc{};
@@ -174,11 +190,7 @@ namespace Bruno
 	{
 		for (uint32_t i = 0; i < m_parameters.BackBufferCount; ++i)
 		{
-			if (m_renderTargetData[i].Resource)
-			{
-				m_renderTargetData[i].Resource->Release();
-				m_renderTargetData[i].Resource = nullptr;
-			}
+			m_renderTargetData[i].Resource.reset();
 		}
 	}
 }

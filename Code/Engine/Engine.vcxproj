@@ -59,7 +59,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\D3D12MemoryAllocator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -80,7 +80,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\D3D12MemoryAllocator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
@@ -96,6 +96,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.h" />
     <ClInclude Include="Source\Bruno\Content\ContentManager.h" />
     <ClInclude Include="Source\Bruno\Content\ContentReader.h" />
     <ClInclude Include="Source\Bruno\Content\ContentTypeReader.h" />
@@ -121,9 +122,11 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Context.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GPUBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\PipelineStateObject.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Resource.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ResourceBarrier.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCore.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
@@ -141,6 +144,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderProgram.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Texture.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadCommand.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexTypes.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\NanaGameWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h" />
@@ -153,6 +157,7 @@
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentTypeReader.cpp" />
@@ -173,9 +178,11 @@
     <ClCompile Include="Source\Bruno\Math\Math.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Context.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GPUBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\PipelineStateObject.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Resource.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ResourceBarrier.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueue.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\D3DCore.cpp" />
@@ -193,6 +200,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderProgram.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Texture.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadCommand.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexTypes.cpp" />
     <ClCompile Include="Source\Bruno\Platform\Windows\NanaGameWindow.cpp" />

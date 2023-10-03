@@ -125,7 +125,7 @@ namespace Bruno
 		reflector->GetDesc(&desc);
 
 		//TODO: sort root parameters by priority (most used comes first, example textures).
-		for (size_t i = 0; i < desc.BoundResources; i++)
+		for (uint32_t i = 0; i < desc.BoundResources; i++)
 		{
 			D3D12_SHADER_INPUT_BIND_DESC bindDesc;
 			reflector->GetResourceBindingDesc(i, &bindDesc);

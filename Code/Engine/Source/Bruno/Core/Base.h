@@ -8,12 +8,12 @@ namespace Bruno
 
 #include "Assert.h"
 
-#define BR_DEFINITION_FLAG_FROM_ENUM(flag) \
-	inline constexpr enum flag operator |(const enum flag selfValue, const enum flag inValue) \
+#define BR_DEFINITION_FLAG_FROM_ENUM(Flag) \
+	inline constexpr Flag operator |(const Flag selfValue, const Flag inValue) \
 	{ \
-		return (enum flag)(uint32_t(selfValue) | uint32_t(inValue)); \
+		return static_cast<Flag>(static_cast<uint8_t>(selfValue) | static_cast<uint8_t>(inValue)); \
 	} \
-	inline constexpr enum flag operator &(const enum flag selfValue, const enum flag inValue) \
+	inline constexpr Flag operator &(const Flag selfValue, const Flag inValue) \
 	{ \
-		return (enum flag)(uint32_t(selfValue) & uint32_t(inValue)); \
+		return static_cast<Flag>(static_cast<uint8_t>(selfValue) & static_cast<uint8_t>(inValue)); \
 	}

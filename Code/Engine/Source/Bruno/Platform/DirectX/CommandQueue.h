@@ -62,7 +62,7 @@ namespace Bruno
 		Microsoft::WRL::ComPtr<ID3D12Fence1>					m_fence;
 		uint64_t												m_fenceValue{ 0 };
 		
-		CommandFrame											m_commandFrames[Graphics::Core::FRAME_BUFFER_COUNT];
+		CommandFrame											m_commandFrames[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
 		HANDLE													m_fenceEventHandle{ nullptr };
 		uint32_t												m_frameIndex{ 0 };
 		D3D12_COMMAND_LIST_TYPE									m_queueType;
