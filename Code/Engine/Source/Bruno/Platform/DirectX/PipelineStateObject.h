@@ -1,12 +1,26 @@
 #pragma once
 
 #include "D3DCommon.h"
+#include "D3DCore.h"
 #include <array>
+#include <optional>
 
 namespace Bruno
 {
 	class ShaderProgram;
 	class RootSignature;
+
+    enum class PipelineType : uint8_t
+    {
+        graphics = 0,
+        compute
+    };
+
+    struct PipelineResourceMapping
+    {
+        std::array<std::optional<uint32_t>, Graphics::Core::NUM_RESOURCE_SPACES> mCbvMapping{};
+        std::array<std::optional<uint32_t>, Graphics::Core::NUM_RESOURCE_SPACES> mTableMapping{};
+    };
 
 	struct RenderTargetDesc
 	{
@@ -35,8 +49,13 @@ namespace Bruno
 		virtual ~PipelineStateObject() = default;
 		
 		ID3D12PipelineState* GetD3D12PipelineState() const { return m_d3d12PipelineState.Get(); }
-	private:
+        RootSignature* GetRootSignature() const { return m_rootSignature; }
+	    
+        friend class GraphicsContext;
+    private:
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_d3d12PipelineState;
+        RootSignature* m_rootSignature;
+        PipelineType mPipelineType = PipelineType::graphics;
 	};
 
 	inline GraphicsPipelineDesc GetDefaultGraphicsPipelineDesc()

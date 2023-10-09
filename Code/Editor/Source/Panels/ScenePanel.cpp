@@ -108,8 +108,8 @@ namespace Bruno
 			std::lock_guard lock{ m_mutex };
 			BR_CORE_TRACE << "destroy. panel id = " << idxx << std::endl;
 
-			auto device = Graphics::GetDevice();
-			device->GetCommandQueue()->Flush();
+			//auto device = Graphics::GetDevice();
+			//device->GetCommandQueue()->Flush();
 
 			m_isExposed = false;
 			m_editorGame->RemoveScenePanel(this);
@@ -216,7 +216,7 @@ namespace Bruno
 		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
 		m_renderItems.push_back(boxRenderItem);
 
-		for (size_t i = 0; i < Graphics::Core::FRAME_BUFFER_COUNT; i++)
+		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
 			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
 		}
@@ -376,11 +376,11 @@ namespace Bruno
 		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
-		auto device = Bruno::Graphics::GetDevice();
+		/*auto device = Bruno::Graphics::GetDevice();
 		auto commandQueue = device->GetCommandQueue();
 		commandQueue->WaitFrame();
 
-		UpdateCBs(timer);
+		UpdateCBs(timer);*/
 	}
 
 	void ScenePanel::OnDraw()
@@ -390,61 +390,61 @@ namespace Bruno
 		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
-		auto device = Bruno::Graphics::GetDevice();
-		auto commandQueue = device->GetCommandQueue();
-		auto commandList = commandQueue->GetCommandList();
-		int frameIndex = commandQueue->GetFrameIndex();
+		//auto device = Bruno::Graphics::GetDevice();
+		//auto commandQueue = device->GetCommandQueue();
+		//auto commandList = commandQueue->GetCommandList();
+		//int frameIndex = commandQueue->GetFrameIndex();
 
-		commandQueue->BeginFrame();
-		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
-		ResourceBarrier::Transition(commandList,
-			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		//commandQueue->BeginFrame();
+		//ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer().GetResource() };
+		//ResourceBarrier::Transition(commandList,
+		//	currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; //Yellow
-		if (idxx == 2) clearColor[0] = 0.0f;
-		else if (idxx == 3) { clearColor[0] = 0.0f; clearColor[1] = 0.0f; }
-		else if (idxx == 4) { clearColor[1] = 0.0f; clearColor[2] = 1.0f; }
+		//float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; //Yellow
+		//if (idxx == 2) clearColor[0] = 0.0f;
+		//else if (idxx == 3) { clearColor[0] = 0.0f; clearColor[1] = 0.0f; }
+		//else if (idxx == 4) { clearColor[1] = 0.0f; clearColor[2] = 1.0f; }
 
-		auto rtv = m_surface->GetRtv();
-		auto dsv = m_surface->GetDsv();
+		//auto rtv = m_surface->GetRtv();
+		//auto dsv = m_surface->GetDsv();
 
-		commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
-		commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		//commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
+		//commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-		commandList->RSSetViewports(1, &m_surface->GetViewport());
-		commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
-		commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+		//commandList->RSSetViewports(1, &m_surface->GetViewport());
+		//commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
+		//commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 
-		ID3D12DescriptorHeap* descriptorHeaps[] = { device->GetSrvDescriptionHeap().GetHeap() };
-		commandList->SetDescriptorHeaps(1, descriptorHeaps);
+		//ID3D12DescriptorHeap* descriptorHeaps[] = { device->GetSrvDescriptionHeap().GetHeap() };
+		//commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
-		commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
-		commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
+		//commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
+		//commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
 
-		for (auto& item : m_renderItems)
-		{
-			commandList->IASetPrimitiveTopology(item->PrimitiveType);
-			commandList->IASetVertexBuffers(0, 1, &item->VertexBuffer->GetView());
-			commandList->IASetIndexBuffer(&item->IndexBuffer->GetView());
+		//for (auto& item : m_renderItems)
+		//{
+		//	commandList->IASetPrimitiveTopology(item->PrimitiveType);
+		//	commandList->IASetVertexBuffers(0, 1, &item->VertexBuffer->GetView());
+		//	commandList->IASetIndexBuffer(&item->IndexBuffer->GetView());
 
-			CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_texture->GetSrvHandle().Gpu);
+		//	CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_texture->GetSrvHandle().Gpu);
 
-			D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer[frameIndex]->GetResource()->GetGPUVirtualAddress();
+		//	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer[frameIndex]->GetResource()->GetGPUVirtualAddress();
 
-			commandList->SetGraphicsRootDescriptorTable(0, tex);
-			commandList->SetGraphicsRootConstantBufferView(1, objCBAddress);
+		//	commandList->SetGraphicsRootDescriptorTable(0, tex);
+		//	commandList->SetGraphicsRootConstantBufferView(1, objCBAddress);
 
-			commandList->DrawIndexedInstanced(item->IndexCount,
-				1,
-				item->StartIndexLocation,
-				item->BaseVertexLocation,
-				0);
-		}
+		//	commandList->DrawIndexedInstanced(item->IndexCount,
+		//		1,
+		//		item->StartIndexLocation,
+		//		item->BaseVertexLocation,
+		//		0);
+		//}
 
-		ResourceBarrier::Transition(commandList,
-			currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		//ResourceBarrier::Transition(commandList,
+		//	currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
-		commandQueue->EndFrame(m_surface.get());
+		//commandQueue->EndFrame(m_surface.get());
 	}
 
 	bool ScenePanel::IsEnabled()
@@ -456,23 +456,23 @@ namespace Bruno
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
 	{
-		auto device = Bruno::Graphics::GetDevice();
-		auto commandQueue = device->GetCommandQueue();
+		//auto device = Bruno::Graphics::GetDevice();
+		//auto commandQueue = device->GetCommandQueue();
 
-		// Update the model matrix.
-		//float angle = static_cast<float>(m_totalTime * 45.0);
-		float angle = static_cast<float>(0.0);
+		//// Update the model matrix.
+		////float angle = static_cast<float>(m_totalTime * 45.0);
+		//float angle = static_cast<float>(0.0);
 
-		Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
-		//Math::Matrix modelMatrix = Math::Matrix::Identity;
-		m_totalTime += timer.GetDeltaTime();
+		//Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
+		////Math::Matrix modelMatrix = Math::Matrix::Identity;
+		//m_totalTime += timer.GetDeltaTime();
 
-		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
+		//Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
 
-		ObjectBuffer objectBuffer;
-		objectBuffer.World = mvpMatrix;
+		//ObjectBuffer objectBuffer;
+		//objectBuffer.World = mvpMatrix;
 
-		int frameIndex = commandQueue->GetFrameIndex();
-		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
+		//int frameIndex = commandQueue->GetFrameIndex();
+		//m_objectBuffer[frameIndex]->CopyData(objectBuffer);
 	}
 }

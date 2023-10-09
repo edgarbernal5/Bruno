@@ -8,6 +8,29 @@ namespace Bruno
 {
 	class GPUBuffer;
 
+	enum class BufferAccessFlags : uint8_t
+	{
+		gpuOnly = 0,
+		hostWritable = 1
+	};
+
+	enum class BufferViewFlags : uint8_t
+	{
+		none = 0,
+		cbv = 1,
+		srv = 2,
+		uav = 4
+	};
+
+	struct BufferCreationDesc
+	{
+		uint32_t mSize = 0;
+		uint32_t mStride = 0;
+		BufferViewFlags mViewFlags = BufferViewFlags::none;
+		BufferAccessFlags mAccessFlags = BufferAccessFlags::gpuOnly;
+		bool mIsRawAccess = false;
+	};
+
 	struct BufferUpload
 	{
 		GPUBuffer* mBuffer = nullptr;
@@ -20,7 +43,11 @@ namespace Bruno
 		BR_RTTI_DECLARATION(GPUBuffer, Resource);
 
 	public:
-		void SetMappedData(void* data, size_t dataSize);
+		GPUBuffer();
+
+		void SetMappedData(const void* data, size_t dataSize);
+
+		friend class UploadContext;
 
 	protected:
 		uint8_t* mMappedResource = nullptr;

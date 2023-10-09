@@ -64,7 +64,7 @@ namespace Bruno
 		{
 			Math::Matrix World;
 		};
-		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAME_BUFFER_COUNT];
+		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
 
 		Camera m_camera;
 

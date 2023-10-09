@@ -30,7 +30,7 @@ namespace Bruno
 		void Present() const;
 		void Resize(uint32_t width, uint32_t height);
 
-		constexpr Texture& GetBackBuffer() const { return *m_renderTargetData[m_currentBackBufferIndex].Resource; }
+		Texture& GetBackBuffer() const { return *m_renderTargetData[m_currentBackBufferIndex].Resource; }
 		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetRtv() const { return m_renderTargetData[m_currentBackBufferIndex].Rtv.Cpu; }
 		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetDsv() const { return m_depthBuffer->GetDsv().Cpu; }
 		constexpr const D3D12_VIEWPORT& GetViewport() const { return m_viewport; }

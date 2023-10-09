@@ -3,7 +3,9 @@
 
 #include "GraphicsAdapter.h"
 #include "CommandQueue.h"
-#include "UploadCommand.h"
+#include "UploadContext.h"
+#include "GPUBuffer.h"
+#include "Surface.h"
 
 #include "D3D12MemAlloc.h"
 
@@ -107,8 +109,9 @@ namespace Bruno
             m_d3dFeatureLevel = m_d3dMinFeatureLevel;
         }
 
-        m_commandQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_DIRECT);
-        m_uploadCommand = std::make_unique<UploadCommand>(this);
+        mGraphicsQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_DIRECT);
+        mComputeQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+        mCopyQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COPY);
 
         m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::NUM_RTV_STAGING_DESCRIPTORS);
         m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::NUM_DSV_STAGING_DESCRIPTORS);
@@ -142,6 +145,19 @@ namespace Bruno
 
         D3D12MA::CreateAllocator(&desc, &mAllocator);
 
+        BufferCreationDesc uploadBufferDesc;
+        uploadBufferDesc.mSize = 10 * 1024 * 1024;
+        uploadBufferDesc.mAccessFlags = BufferAccessFlags::hostWritable;
+
+        BufferCreationDesc uploadTextureDesc;
+        uploadTextureDesc.mSize = 40 * 1024 * 1024;
+        uploadTextureDesc.mAccessFlags = BufferAccessFlags::hostWritable;
+
+        for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
+        {
+            //mUploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, CreateBuffer(uploadBufferDesc), CreateBuffer(uploadTextureDesc));
+        }
+
         mFreeReservedDescriptorIndices.resize(Graphics::Core::NUM_RESERVED_SRV_DESCRIPTORS);
         for (size_t i = 0; i < mFreeReservedDescriptorIndices.size(); i++)
         {
@@ -153,11 +169,30 @@ namespace Bruno
     {
         m_frameId = (m_frameId + 1) % Graphics::Core::FRAMES_IN_FLIGHT_COUNT;
 
+        //Wait on fences from 2 frames ago.
+        mGraphicsQueue->WaitForFenceCPUBlocking(mEndOfFrameFences[m_frameId].mGraphicsQueueFence);
+        mComputeQueue->WaitForFenceCPUBlocking(mEndOfFrameFences[m_frameId].mComputeQueueFence);
+        mCopyQueue->WaitForFenceCPUBlocking(mEndOfFrameFences[m_frameId].mCopyQueueFence);
 
+        mUploadContexts[m_frameId]->ResolveProcessedUploads();
+        mUploadContexts[m_frameId]->Reset();
+
+        mContextSubmissions[m_frameId].clear();
     }
 
     void GraphicsDevice::EndFrame()
     {
+        mUploadContexts[m_frameId]->ProcessUploads();
+        SubmitContextWork(*mUploadContexts[m_frameId]);
+
+        mEndOfFrameFences[m_frameId].mComputeQueueFence = mComputeQueue->SignalFence();
+        mEndOfFrameFences[m_frameId].mCopyQueueFence = mCopyQueue->SignalFence();
+    }
+
+    void GraphicsDevice::Present(Surface* surface)
+    {
+        surface->Present();
+        mEndOfFrameFences[m_frameId].mGraphicsQueueFence = mGraphicsQueue->SignalFence();
     }
 
     D3D12MA::Allocator* GraphicsDevice::GetAllocator() const
@@ -170,6 +205,42 @@ namespace Bruno
         uint32_t index = mFreeReservedDescriptorIndices.back();
         mFreeReservedDescriptorIndices.pop_back();
         return index;
+    }
+
+    ContextSubmissionResult GraphicsDevice::SubmitContextWork(Context& context)
+    {
+        uint64_t fenceResult = 0;
+
+        switch (context.GetCommandType())
+        {
+        case D3D12_COMMAND_LIST_TYPE_DIRECT:
+            fenceResult = mGraphicsQueue->ExecuteCommandList(context.GetCommandList());
+            break;
+        case D3D12_COMMAND_LIST_TYPE_COMPUTE:
+            fenceResult = mComputeQueue->ExecuteCommandList(context.GetCommandList());
+            break;
+        case D3D12_COMMAND_LIST_TYPE_COPY:
+            fenceResult = mCopyQueue->ExecuteCommandList(context.GetCommandList());
+            break;
+        default:
+            BR_ASSERT(false, "Unsupported submission type.");
+            break;
+        }
+
+        ContextSubmissionResult submissionResult;
+        submissionResult.mFrameId = m_frameId;
+        submissionResult.mSubmissionIndex = static_cast<uint32_t>(mContextSubmissions[m_frameId].size());
+
+        mContextSubmissions[m_frameId].push_back(std::make_pair(fenceResult, context.GetCommandType()));
+
+        return submissionResult;
+    }
+
+    void GraphicsDevice::WaitForIdle()
+    {
+        mGraphicsQueue->WaitForIdle();
+        mComputeQueue->WaitForIdle();
+        mCopyQueue->WaitForIdle();
     }
 
     std::shared_ptr<GraphicsDevice> GraphicsDevice::Create(std::shared_ptr<GraphicsAdapter> adapter)
@@ -200,13 +271,13 @@ namespace Bruno
 
     CommandQueue* GraphicsDevice::GetCommandQueue()
     {
-        return m_commandQueue.get();
+        return mGraphicsQueue.get();
     }
 
-    UploadCommand* GraphicsDevice::GetUploadCommand()
-    {
-        return m_uploadCommand.get();
-    }
+    //GraphicsContext& GraphicsDevice::GetGraphicsContext()
+    //{
+     //   // TODO: insert return statement here
+    //}
 
     StagingDescriptorHeap& GraphicsDevice::GetRtvDescriptionHeap()
     {

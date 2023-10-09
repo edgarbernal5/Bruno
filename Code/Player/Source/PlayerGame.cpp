@@ -8,6 +8,7 @@
 #include <Bruno/Platform/DirectX/ResourceBarrier.h>
 #include <Bruno/Platform/DirectX/VertexTypes.h>
 #include <Bruno/Platform/DirectX/ShaderProgram.h>
+#include <Bruno/Platform/DirectX/GraphicsContext.h>
 #include <Bruno/Renderer/RenderItem.h>
 #include <iostream>
 
@@ -104,6 +105,8 @@ namespace Bruno
 		
 		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineDesc, m_rootSignature.get());
 		
+		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
+
 		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
 		
@@ -130,64 +133,74 @@ namespace Bruno
 		//BR_CORE_TRACE << "delta time = " << timer.GetDeltaTime() << ". TotalTime " << TotalTime << std::endl;
 		
 		auto commandQueue = m_device->GetCommandQueue();
-		commandQueue->WaitFrame();
+		//commandQueue->WaitFrame();
 
 		UpdateCBs(timer);
 	}
 
 	void PlayerGame::OnDraw()
 	{
-		auto commandQueue = m_device->GetCommandQueue();
-		auto commandList = commandQueue->GetCommandList();
-		int frameIndex = commandQueue->GetFrameIndex();
+		//auto commandQueue = m_device->GetCommandQueue();
+		//auto commandList = commandQueue->GetCommandList();
+		uint32_t frameIndex = m_device->GetFrameId();
 
-		commandQueue->BeginFrame();
-		ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer() };
+		m_device->BeginFrame();
+		/*ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer().GetResource() };
 		ResourceBarrier::Transition(commandList,
-			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);*/
 
-		float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+		Math::Color clearColor = { 1.0f, 1.0f, 0.0f, 1.0f };
 
 		auto rtv = m_surface->GetRtv();
 		auto dsv = m_surface->GetDsv();
 
-		commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
-		commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		Texture& backBuffer = m_surface->GetBackBuffer();
 
-		commandList->RSSetViewports(1, &m_surface->GetViewport());
-		commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
-		commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+		m_graphicsContext->Reset();
+		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		m_graphicsContext->FlushBarriers();
 
-		ID3D12DescriptorHeap* descriptorHeaps[] = { m_device->GetSrvDescriptionHeap().GetHeap() };
-		commandList->SetDescriptorHeaps(1, descriptorHeaps);
+		m_graphicsContext->ClearRenderTarget(backBuffer, clearColor);
+		//m_graphicsContext->ClearDepthStencilTarget(*mDepthBuffer, 1.0f, 0);
 
-		commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
-		commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
+		//commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
+		//commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-		for (auto& item : m_renderItems)
-		{
-			commandList->IASetPrimitiveTopology(item->PrimitiveType);
-			commandList->IASetVertexBuffers(0, 1, &item->VertexBuffer->GetView());
-			commandList->IASetIndexBuffer(&item->IndexBuffer->GetView());
+		//m_graphicsContext->RSSetViewports(1, &m_surface->GetViewport());
+		//m_graphicsContext->RSSetScissorRects(1, &m_surface->GetScissorRect());
+		//m_graphicsContext->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 
-			CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_texture->GetSrvHandle().Gpu);
+		//ID3D12DescriptorHeap* descriptorHeaps[] = { m_device->GetSrvDescriptionHeap().GetHeap() };
+		//commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
-			D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer[frameIndex]->GetResource()->GetGPUVirtualAddress();
+		//commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
+		//commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
 
-			commandList->SetGraphicsRootDescriptorTable(m_opaqueShader->GetIndexMap(L"gDiffuseMap"), tex);
-			commandList->SetGraphicsRootConstantBufferView(m_opaqueShader->GetIndexMap(L"cbPerObject"), objCBAddress);
+		//for (auto& item : m_renderItems)
+		//{
+		//	commandList->IASetPrimitiveTopology(item->PrimitiveType);
+		//	commandList->IASetVertexBuffers(0, 1, &item->VertexBuffer->GetView());
+		//	commandList->IASetIndexBuffer(&item->IndexBuffer->GetView());
 
-			commandList->DrawIndexedInstanced(item->IndexCount,
-				1,
-				item->StartIndexLocation,
-				item->BaseVertexLocation,
-				0);
-		}
+		//	CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_texture->GetSrvHandle().Gpu);
 
-		ResourceBarrier::Transition(commandList,
-			currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		//	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer[frameIndex]->GetResource()->GetGPUVirtualAddress();
 
-		commandQueue->EndFrame(m_surface.get());
+		//	commandList->SetGraphicsRootDescriptorTable(m_opaqueShader->GetIndexMap(L"gDiffuseMap"), tex);
+		//	commandList->SetGraphicsRootConstantBufferView(m_opaqueShader->GetIndexMap(L"cbPerObject"), objCBAddress);
+
+		//	commandList->DrawIndexedInstanced(item->IndexCount,
+		//		1,
+		//		item->StartIndexLocation,
+		//		item->BaseVertexLocation,
+		//		0);
+		//}
+
+		//ResourceBarrier::Transition(commandList,
+		//	currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+
+		m_device->EndFrame();
+		m_device->Present(m_surface.get());
 	}
 
 	void PlayerGame::OnMouseDown(MouseButtonState btnState, int x, int y)
@@ -262,22 +275,22 @@ namespace Bruno
 
 	void PlayerGame::UpdateCBs(const GameTimer& timer)
 	{
-		auto commandQueue = m_device->GetCommandQueue();
+		//auto commandQueue = m_device->GetCommandQueue();
 
-		static float TotalTime = 0.0f;
-		float angle = static_cast<float>(0.0);
-		//float angle = static_cast<float>(TotalTime * 45.0);
-		
-		Math::Matrix modelMatrix = Math::Matrix::Identity;
-		//Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
-		TotalTime += timer.GetDeltaTime();
+		//static float TotalTime = 0.0f;
+		//float angle = static_cast<float>(0.0);
+		////float angle = static_cast<float>(TotalTime * 45.0);
+		//
+		//Math::Matrix modelMatrix = Math::Matrix::Identity;
+		////Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
+		//TotalTime += timer.GetDeltaTime();
 
-		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
+		//Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
 
-		ObjectBuffer objectBuffer;
-		objectBuffer.World = mvpMatrix;
+		//ObjectBuffer objectBuffer;
+		//objectBuffer.World = mvpMatrix;
 
-		int frameIndex = commandQueue->GetFrameIndex();
-		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
+		//int frameIndex = commandQueue->GetFrameIndex();
+		//m_objectBuffer[frameIndex]->CopyData(objectBuffer);
 	}
 }

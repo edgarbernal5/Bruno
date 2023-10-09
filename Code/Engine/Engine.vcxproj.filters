@@ -214,6 +214,7 @@
       <Filter>Dependencies\D3D12MemoryAllocator</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\GPUBuffer.h" />
+    <ClInclude Include="Source\Bruno\Core\Memory.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">

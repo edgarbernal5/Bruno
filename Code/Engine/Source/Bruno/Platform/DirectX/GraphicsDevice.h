@@ -17,8 +17,16 @@ namespace Bruno
 {
 	class GraphicsAdapter;
 	class CommandQueue;
-	class UploadCommand;
+	class Context;
+	class GraphicsContext;
 	class UploadContext;
+	class Surface;
+
+    struct ContextSubmissionResult
+    {
+        uint32_t mFrameId = 0;
+        uint32_t mSubmissionIndex = 0;
+    };
 
 	class GraphicsDevice
 	{
@@ -28,6 +36,7 @@ namespace Bruno
 
 		void BeginFrame();
 		void EndFrame();
+		void Present(Surface* surface);
 
 		void CopySRVHandleToReservedTable(DescriptorHandle srvHandle, uint32_t index);
 
@@ -36,7 +45,8 @@ namespace Bruno
 		IDXGIFactory4* GetFactory();
 		ID3D12Device5* GetD3DDevice();
 		CommandQueue* GetCommandQueue();
-		UploadCommand* GetUploadCommand();
+		//GraphicsContext& GetGraphicsContext();
+
 		StagingDescriptorHeap& GetRtvDescriptionHeap();
 		StagingDescriptorHeap& GetDsvDescriptionHeap();
 		StagingDescriptorHeap& GetSrvDescriptionHeap();
@@ -53,17 +63,28 @@ namespace Bruno
 
 		uint32_t GetFreeReservedDescriptorIndex();
 
+		ContextSubmissionResult SubmitContextWork(Context& context);
+		void WaitForIdle();
+
 		static std::shared_ptr<GraphicsDevice> Create(std::shared_ptr<GraphicsAdapter> adapter = nullptr);
 
 	private:
+		struct EndOfFrameFences
+		{
+			uint64_t mGraphicsQueueFence = 0;
+			uint64_t mComputeQueueFence = 0;
+			uint64_t mCopyQueueFence = 0;
+		};
+
 		uint32_t											m_frameId{ 0 };
 		Microsoft::WRL::ComPtr<ID3D12Resource>              m_depthStencil;
 
 		std::shared_ptr<GraphicsAdapter>					m_adapter;
 
 		Microsoft::WRL::ComPtr<ID3D12Device5>               m_d3dDevice;
-		std::unique_ptr<CommandQueue>						m_commandQueue;
-		std::unique_ptr<UploadCommand>						m_uploadCommand;
+		std::unique_ptr<CommandQueue>						mGraphicsQueue;
+		std::unique_ptr<CommandQueue>						mComputeQueue;
+		std::unique_ptr<CommandQueue>						mCopyQueue;
 
 		D3D_FEATURE_LEVEL									m_d3dMinFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };
 		Microsoft::WRL::ComPtr<IDXGIFactory4>               m_dxgiFactory;
@@ -81,7 +102,11 @@ namespace Bruno
 		D3D12MA::Allocator*									mAllocator = nullptr;
 		std::vector<uint32_t>								mFreeReservedDescriptorIndices;
 
+
+		std::array<std::vector<std::pair<uint64_t, D3D12_COMMAND_LIST_TYPE>>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mContextSubmissions;
+
 		std::array<std::unique_ptr<UploadContext>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mUploadContexts;
+		std::array<EndOfFrameFences, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mEndOfFrameFences;
 	};
 }
 

@@ -13,6 +13,7 @@
 namespace Bruno
 {
 	struct RenderItem;
+	class GraphicsContext;
 
 	class PlayerGame : public Game
 	{
@@ -41,6 +42,7 @@ namespace Bruno
 		std::unique_ptr<Shader> m_opaqueShader;
 		
 		std::unique_ptr<PipelineStateObject> m_pipelineState;
+		std::unique_ptr<GraphicsContext> m_graphicsContext;
 
 		std::vector<std::shared_ptr<RenderItem>> m_renderItems;
 
@@ -48,7 +50,7 @@ namespace Bruno
 		{
 			Math::Matrix World;
 		};
-		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAME_BUFFER_COUNT];
+		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
 
 		Math::Int2 m_lastMousePosition;
 		Camera m_camera;

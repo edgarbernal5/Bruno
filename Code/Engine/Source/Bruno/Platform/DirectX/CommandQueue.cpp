@@ -31,88 +31,89 @@ namespace Bruno
 			break;
 		}
 
-		for (uint32_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-		{
-			CommandFrame& frame = m_commandFrames[i];
-			ThrowIfFailed(m_device->GetD3DDevice()->CreateCommandAllocator(type, IID_PPV_ARGS(&frame.CommandAllocator)));
-
-			wchar_t name[25] = {};
-			swprintf_s(name, L"Render target %u", i);
-			frame.CommandAllocator->SetName(name);
-		}
-
-		ThrowIfFailed(m_device->GetD3DDevice()->CreateCommandList(0, type, m_commandFrames[0].CommandAllocator, nullptr, IID_PPV_ARGS(&m_commandList)));
-		m_commandList->Close();
-		m_commandList->SetName(L"CommandQueue");
-
 		ThrowIfFailed(m_device->GetD3DDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
 		m_fence->SetName(L"CommandQueue");
 
+		m_fence->Signal(mLastCompletedFenceValue);
+
 		m_fenceEventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
+		BR_ASSERT(m_fenceEventHandle != INVALID_HANDLE_VALUE);
 	}
 
 	CommandQueue::~CommandQueue()
 	{
-		Flush();
-
 		CloseHandle(m_fenceEventHandle);
 		m_fenceEventHandle = nullptr;
 
-		for (uint32_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; ++i)
+		
+	}
+
+	bool CommandQueue::IsFenceComplete(uint64_t fenceValue)
+	{
+		if (fenceValue > mLastCompletedFenceValue)
 		{
-			m_commandFrames[i].Release();
+			PollCurrentFenceValue();
 		}
 
-		m_fenceValue = 0;
+		return fenceValue <= mLastCompletedFenceValue;
 	}
 
-	void CommandQueue::WaitFrame()
+	void CommandQueue::InsertWait(uint64_t fenceValue)
 	{
-		CommandFrame& frame{ m_commandFrames[m_frameIndex] };
-		frame.Wait(m_fenceEventHandle, m_fence.Get());
+		m_commandQueue->Wait(m_fence.Get(), fenceValue);
 	}
 
-	void CommandQueue::BeginFrame()
+	void CommandQueue::InsertWaitForQueueFence(CommandQueue* otherQueue, uint64_t fenceValue)
 	{
-		CommandFrame& frame{ m_commandFrames[m_frameIndex] };
-		ThrowIfFailed(frame.CommandAllocator->Reset());
-		ThrowIfFailed(m_commandList->Reset(frame.CommandAllocator, nullptr));
+		m_commandQueue->Wait(otherQueue->GetFence(), fenceValue);
 	}
 
-	void CommandQueue::EndFrame(Surface* surface)
+	void CommandQueue::InsertWaitForQueue(CommandQueue* otherQueue)
 	{
-		ThrowIfFailed(m_commandList->Close());
-		ID3D12CommandList* const commandLists[]{ m_commandList.Get()};
-		m_commandQueue->ExecuteCommandLists(_countof(commandLists), &commandLists[0]);
-
-		// Present swap chain buffers
-		surface->Present();
-
-		uint64_t& currentFenceValue{ m_fenceValue };
-		++currentFenceValue;
-		CommandFrame& frame{ m_commandFrames[m_frameIndex] };
-		frame.FenceValue = currentFenceValue;
-		m_commandQueue->Signal(m_fence.Get(), currentFenceValue);
-
-		m_frameIndex = (m_frameIndex + 1) % Graphics::Core::FRAMES_IN_FLIGHT_COUNT;
+		m_commandQueue->Wait(otherQueue->GetFence(), otherQueue->GetNextFenceValue() - 1);
 	}
 
-	void CommandQueue::Flush()
+	void CommandQueue::WaitForFenceCPUBlocking(uint64_t fenceValue)
 	{
-		for (uint32_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; ++i)
+		if (IsFenceComplete(fenceValue))
 		{
-			m_commandFrames[i].Wait(m_fenceEventHandle, m_fence.Get());
+			return;
 		}
-		//m_frameIndex = 0; TODO: Fix this bug with render thread of nana window
+
+		{
+			std::lock_guard<std::mutex> lockGuard(mEventMutex);
+
+			m_fence->SetEventOnCompletion(fenceValue, m_fenceEventHandle);
+			WaitForSingleObjectEx(m_fenceEventHandle, INFINITE, false);
+			mLastCompletedFenceValue = fenceValue;
+		}
 	}
 
-	ID3D12CommandQueue* CommandQueue::GetQueue()
+	void CommandQueue::WaitForIdle()
 	{
-		return m_commandQueue.Get();
+		WaitForFenceCPUBlocking(mNextFenceValue - 1);
 	}
 
-	ID3D12GraphicsCommandList6* CommandQueue::GetCommandList()
+	uint64_t CommandQueue::PollCurrentFenceValue()
 	{
-		return m_commandList.Get();
+		mLastCompletedFenceValue = (std::max)(mLastCompletedFenceValue, m_fence->GetCompletedValue());
+		return mLastCompletedFenceValue;
+	}
+
+	uint64_t CommandQueue::ExecuteCommandList(ID3D12CommandList* commandList)
+	{
+		ThrowIfFailed(static_cast<ID3D12GraphicsCommandList*>(commandList)->Close());
+		m_commandQueue->ExecuteCommandLists(1, &commandList);
+
+		return SignalFence();
+	}
+
+	uint64_t CommandQueue::SignalFence()
+	{
+		std::lock_guard<std::mutex> lockGuard(mFenceMutex);
+
+		m_commandQueue->Signal(m_fence.Get(), mNextFenceValue);
+
+		return mNextFenceValue++;
 	}
 }

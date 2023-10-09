@@ -6,4 +6,8 @@
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(Resource);
+
+	Resource::~Resource()
+	{
+	}
 }

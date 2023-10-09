@@ -41,7 +41,7 @@ namespace Bruno
         TextureCreationDesc desc;
         desc.mResourceDesc.Format = textureFormat;
         desc.mResourceDesc.Width = metadata.width;
-        desc.mResourceDesc.Height = static_cast<UINT>(metadata.height);
+        desc.mResourceDesc.Height = static_cast<uint32_t>(metadata.height);
         desc.mResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
         desc.mResourceDesc.DepthOrArraySize = static_cast<uint16_t>(is3DTexture ? metadata.depth : metadata.arraySize);
         desc.mResourceDesc.MipLevels = static_cast<uint16_t>(metadata.mipLevels);
@@ -190,6 +190,8 @@ namespace Bruno
             device->GetD3DDevice()->CreateUnorderedAccessView(mResource, nullptr, nullptr, mUAVDescriptor.Cpu);
         }
 
+        mIsReady = (hasRTV || hasDSV);
+
         //ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
         //    &Graphics::Core::HeapProperties.DefaultHeap, 
         //    D3D12_HEAP_FLAG_NONE, 
@@ -326,29 +328,29 @@ namespace Bruno
     void Texture::CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData)
     {
         if (mResource) {
-            auto device = Graphics::GetDevice();
-
-            uint64_t requiredSize = GetRequiredIntermediateSize(mResource, firstSubresource, numSubresources);
-
-            auto uploadCommand = device->GetUploadCommand();
-            uploadCommand->BeginUpload(requiredSize);
-            uploadCommand->Update(mResource, subresourceData, firstSubresource, numSubresources);
-            uploadCommand->EndUpload();
-
-            /*
-
-            // Create a temporary (intermediate) resource for uploading the subresources
-            Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
-            ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
-                &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-                D3D12_HEAP_FLAG_NONE,
-                &CD3DX12_RESOURCE_DESC::Buffer(requiredSize),
-                D3D12_RESOURCE_STATE_GENERIC_READ,
-                nullptr,
-                IID_PPV_ARGS(&intermediateResource)));
-*/
-//UpdateSubresources(device->GetCommandQueue()->GetCommandList(), m_d3d12Resource.Get(), intermediateResource.Get(), 0,
-//    firstSubresource, numSubresources, subresourceData);
+//            auto device = Graphics::GetDevice();
+//
+//            uint64_t requiredSize = GetRequiredIntermediateSize(mResource, firstSubresource, numSubresources);
+//
+//            auto uploadCommand = device->GetUploadCommand();
+//            uploadCommand->BeginUpload(requiredSize);
+//            uploadCommand->Update(mResource, subresourceData, firstSubresource, numSubresources);
+//            uploadCommand->EndUpload();
+//
+//            /*
+//
+//            // Create a temporary (intermediate) resource for uploading the subresources
+//            Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
+//            ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
+//                &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+//                D3D12_HEAP_FLAG_NONE,
+//                &CD3DX12_RESOURCE_DESC::Buffer(requiredSize),
+//                D3D12_RESOURCE_STATE_GENERIC_READ,
+//                nullptr,
+//                IID_PPV_ARGS(&intermediateResource)));
+//*/
+////UpdateSubresources(device->GetCommandQueue()->GetCommandList(), m_d3d12Resource.Get(), intermediateResource.Get(), 0,
+////    firstSubresource, numSubresources, subresourceData);
 
         }
     }

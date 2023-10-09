@@ -88,7 +88,7 @@ namespace Bruno
 
 		//TODO: Flush command queue before changing any resources.
 		auto device = Graphics::GetDevice();
-		device->GetCommandQueue()->Flush();
+		//device->GetCommandQueue()->Flush();
 
 		Release();
 

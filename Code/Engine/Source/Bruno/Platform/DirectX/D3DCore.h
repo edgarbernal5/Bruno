@@ -11,6 +11,8 @@ namespace Bruno::Graphics::Core
     constexpr uint32_t SHADER_PROGRAMS_COUNT{ 2 };
     constexpr uint32_t INVALID_RESOURCE_TABLE_INDEX{ 2 };
 
+    constexpr uint8_t NUM_RESOURCE_SPACES{ 4 };
+
     constexpr uint32_t MAX_QUEUED_BARRIERS{ 16 };
     constexpr uint32_t MAX_TEXTURE_SUBRESOURCE_COUNT{ 32 };
 

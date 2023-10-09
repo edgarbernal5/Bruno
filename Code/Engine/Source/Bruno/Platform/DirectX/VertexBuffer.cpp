@@ -11,15 +11,15 @@ namespace Bruno
 		m_vertexStride(vertexStride),
 		m_vertexBufferView{}
 	{
-		GraphicsDevice* device = Graphics::GetDevice();
-		auto uploadCommand = device->GetUploadCommand();
+		//GraphicsDevice* device = Graphics::GetDevice();
+		//auto uploadCommand = device->GetUploadCommand();
 
-		uint32_t bufferSize = numVertices * vertexStride;
+		//uint32_t bufferSize = numVertices * vertexStride;
 
-		// Upload vertex buffer data.
-		uploadCommand->BeginUpload(bufferSize);
-		m_vertexBuffer = uploadCommand->Update(bufferData, bufferSize);
-		uploadCommand->EndUpload();
+		//// Upload vertex buffer data.
+		//uploadCommand->BeginUpload(bufferSize);
+		//m_vertexBuffer = uploadCommand->Update(bufferData, bufferSize);
+		//uploadCommand->EndUpload();
 
 		// Create the vertex buffer view.
 		m_vertexBufferView.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();

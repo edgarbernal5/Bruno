@@ -114,6 +114,7 @@
     <ClInclude Include="Source\Bruno\Core\GameTimer.h" />
     <ClInclude Include="Source\Bruno\Core\Log.h" />
     <ClInclude Include="Source\Bruno\Core\Logger.h" />
+    <ClInclude Include="Source\Bruno\Core\Memory.h" />
     <ClInclude Include="Source\Bruno\Core\MemoryStream.h" />
     <ClInclude Include="Source\Bruno\Core\RTTI.h" />
     <ClInclude Include="Source\Bruno\Core\Stream.h" />

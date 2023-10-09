@@ -81,6 +81,7 @@ namespace Bruno
 		constexpr const DescriptorHandle& GetSrvHandle() const { return mSRVDescriptor; }
 
 		friend class Surface;
+		friend class GraphicsContext;
 	private:
 		DescriptorHandle mRTVDescriptor{};
 		DescriptorHandle mDSVDescriptor{};
