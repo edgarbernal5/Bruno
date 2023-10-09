@@ -3,6 +3,7 @@
 #include "D3DCommon.h"
 #include "Resource.h"
 #include "Resources.h"
+#include "Bruno/Core/Base.h"
 
 namespace Bruno
 {
@@ -13,6 +14,7 @@ namespace Bruno
 		gpuOnly = 0,
 		hostWritable = 1
 	};
+	BR_DEFINITION_FLAG_FROM_ENUM(BufferAccessFlags);
 
 	enum class BufferViewFlags : uint8_t
 	{
@@ -21,6 +23,7 @@ namespace Bruno
 		srv = 2,
 		uav = 4
 	};
+	BR_DEFINITION_FLAG_FROM_ENUM(BufferViewFlags);
 
 	struct BufferCreationDesc
 	{
@@ -43,6 +46,7 @@ namespace Bruno
 		BR_RTTI_DECLARATION(GPUBuffer, Resource);
 
 	public:
+		GPUBuffer(const BufferCreationDesc& desc);
 		GPUBuffer();
 
 		void SetMappedData(const void* data, size_t dataSize);

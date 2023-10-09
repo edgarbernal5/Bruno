@@ -213,8 +213,12 @@
     <ClInclude Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.h">
       <Filter>Dependencies\D3D12MemoryAllocator</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Platform\DirectX\GPUBuffer.h" />
-    <ClInclude Include="Source\Bruno\Core\Memory.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GPUBuffer.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\Memory.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -367,7 +371,9 @@
     <ClCompile Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.cpp">
       <Filter>Dependencies\D3D12MemoryAllocator</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Bruno\Platform\DirectX\GPUBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GPUBuffer.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Bruno\Math\Math.inl">

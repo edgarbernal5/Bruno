@@ -155,7 +155,7 @@ namespace Bruno
 
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
         {
-            //mUploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, CreateBuffer(uploadBufferDesc), CreateBuffer(uploadTextureDesc));
+            mUploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GPUBuffer>(uploadBufferDesc), std::make_unique<GPUBuffer>(uploadTextureDesc));
         }
 
         mFreeReservedDescriptorIndices.resize(Graphics::Core::NUM_RESERVED_SRV_DESCRIPTORS);

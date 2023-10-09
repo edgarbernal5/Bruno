@@ -8,7 +8,9 @@
 namespace Bruno
 {
 	UploadContext::UploadContext(GraphicsDevice& device, std::unique_ptr<GPUBuffer> bufferUploadHeap, std::unique_ptr<GPUBuffer> textureUploadHeap) :
-		Context(device, D3D12_COMMAND_LIST_TYPE_COPY)
+		Context(device, D3D12_COMMAND_LIST_TYPE_COPY),
+        mBufferUploadHeap(std::move(bufferUploadHeap)),
+        mTextureUploadHeap(std::move(textureUploadHeap))
 	{
 	}
 	

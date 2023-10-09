@@ -22,8 +22,8 @@ namespace Bruno
 		//uploadCommand->EndUpload();
 
 		// Create the vertex buffer view.
-		m_vertexBufferView.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();
-        m_vertexBufferView.SizeInBytes = vertexStride * numVertices;
-        m_vertexBufferView.StrideInBytes = vertexStride;
+		//m_vertexBufferView.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();
+  //      m_vertexBufferView.SizeInBytes = vertexStride * numVertices;
+  //      m_vertexBufferView.StrideInBytes = vertexStride;
 	}
 }
