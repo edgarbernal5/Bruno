@@ -77,6 +77,7 @@ namespace Bruno
 		Texture();
 		Texture(const std::wstring& filename);
 		Texture(const InitData& textureInitData);
+		~Texture();
 
 		constexpr const DescriptorHandle& GetSrvHandle() const { return mSRVDescriptor; }
 
@@ -88,6 +89,7 @@ namespace Bruno
 		DescriptorHandle mSRVDescriptor{};
 		DescriptorHandle mUAVDescriptor{};
 
+		void CreateTexture(TextureCreationDesc& desc);
 		void CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData);
 		void GenerateMips();
 		DXGI_FORMAT MakeSRGB(DXGI_FORMAT fmt);

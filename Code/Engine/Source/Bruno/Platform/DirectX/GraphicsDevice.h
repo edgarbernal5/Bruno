@@ -32,7 +32,7 @@ namespace Bruno
 	{
 	public:
 		GraphicsDevice(std::shared_ptr<GraphicsAdapter> adapter = nullptr);
-		~GraphicsDevice() = default;
+		~GraphicsDevice();
 
 		void BeginFrame();
 		void EndFrame();
@@ -53,11 +53,9 @@ namespace Bruno
 
 		RenderPassDescriptorHeap& GetSrvDescriptionHeap(uint32_t frameIndex) { return *mSRVRenderPassDescriptorHeaps[frameIndex]; }
 		RenderPassDescriptorHeap& GetSamplerHeap() { return *mSamplerRenderPassDescriptorHeap; }
+		UploadContext& GetUploadContext() { return *mUploadContexts[m_frameId]; }
 
-		D3D_ROOT_SIGNATURE_VERSION GetHighestRootSignatureVersion() const
-		{
-			return m_highestRootSignatureVersion;
-		}
+		D3D_ROOT_SIGNATURE_VERSION GetHighestRootSignatureVersion() const { return m_highestRootSignatureVersion; }
 
 		D3D12MA::Allocator* GetAllocator() const;
 

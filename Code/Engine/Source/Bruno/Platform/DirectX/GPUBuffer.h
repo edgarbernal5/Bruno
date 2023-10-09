@@ -7,6 +7,7 @@
 
 namespace Bruno
 {
+	class GrapicsDevice;
 	class GPUBuffer;
 
 	enum class BufferAccessFlags : uint8_t
@@ -46,7 +47,7 @@ namespace Bruno
 		BR_RTTI_DECLARATION(GPUBuffer, Resource);
 
 	public:
-		GPUBuffer(const BufferCreationDesc& desc);
+		GPUBuffer(GraphicsDevice& device, const BufferCreationDesc& desc);
 		GPUBuffer();
 
 		void SetMappedData(const void* data, size_t dataSize);

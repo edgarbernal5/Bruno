@@ -14,7 +14,12 @@ namespace Bruno
 
 	Surface::~Surface()
 	{
+		//GraphicsDevice* device = Graphics::GetDevice();
 		Release();
+		//for (uint32_t i = 0; i < m_parameters.BackBufferCount; ++i)
+		//{
+		//	device->GetRtvDescriptionHeap().Free(m_renderTargetData[i].Rtv);
+		//}
 	}
 
 	void Surface::Initialize()
@@ -88,7 +93,7 @@ namespace Bruno
 
 		//TODO: Flush command queue before changing any resources.
 		auto device = Graphics::GetDevice();
-		//device->GetCommandQueue()->Flush();
+		device->WaitForIdle();
 
 		Release();
 
@@ -160,14 +165,14 @@ namespace Bruno
 			data.Resource->mState = D3D12_RESOURCE_STATE_PRESENT;
 			data.Resource->mDesc = backBufferResource->GetDesc();
 
-			//D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-			//rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-			//rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-			//rtvDesc.Texture2D.MipSlice = 0;
-			//rtvDesc.Texture2D.PlaneSlice = 0;
+			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+			rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+			rtvDesc.Texture2D.MipSlice = 0;
+			rtvDesc.Texture2D.PlaneSlice = 0;
 
-			//device->GetD3DDevice()->CreateRenderTargetView(data.Resource, &rtvDesc, data.Rtv.Cpu);
-			device->GetD3DDevice()->CreateRenderTargetView(data.Resource->GetResource(), nullptr, data.Rtv.Cpu);
+			device->GetD3DDevice()->CreateRenderTargetView(data.Resource->GetResource(), &rtvDesc, data.Rtv.Cpu);
+			//device->GetD3DDevice()->CreateRenderTargetView(data.Resource->GetResource(), nullptr, data.Rtv.Cpu);
 		}
 
 		DXGI_SWAP_CHAIN_DESC desc{};

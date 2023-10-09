@@ -2,9 +2,10 @@
 #include "Texture.h"
 
 #include "GraphicsDevice.h"
-#include "UploadCommand.h"
+#include "UploadContext.h"
 
 #include "D3D12MemAlloc.h"
+#include "Bruno/Core/Memory.h"
 
 namespace Bruno
 {
@@ -27,11 +28,11 @@ namespace Bruno
 
         if (filePath.extension() == ".dds")
         {
-            ThrowIfFailed(LoadFromDDSFile(filename.c_str(), DirectX::DDS_FLAGS_FORCE_RGB, &metadata, scratchImage));
+            ThrowIfFailed(LoadFromDDSFile(filename.c_str(), DirectX::DDS_FLAGS_NONE, &metadata, scratchImage));
         }
         else
         {
-            ThrowIfFailed(LoadFromWICFile(filename.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metadata, scratchImage));
+            ThrowIfFailed(LoadFromWICFile(filename.c_str(), DirectX::WIC_FLAGS_NONE, &metadata, scratchImage));
         }
         //metadata.format = MakeSRGB(metadata.format);
 
@@ -55,6 +56,193 @@ namespace Bruno
         auto device = Graphics::GetDevice();
 
         //CreateTexture
+        CreateTexture(desc);
+        auto textureUpload = std::make_unique<TextureUpload>();
+
+        UINT numRows[Graphics::Core::MAX_TEXTURE_SUBRESOURCE_COUNT];
+        uint64_t rowSizesInBytes[Graphics::Core::MAX_TEXTURE_SUBRESOURCE_COUNT];
+
+        textureUpload->mTexture = this;
+        textureUpload->mNumSubResources = static_cast<uint32_t>(metadata.mipLevels * metadata.arraySize);
+
+        device->GetD3DDevice()->GetCopyableFootprints(&desc.mResourceDesc, 0, textureUpload->mNumSubResources, 0, textureUpload->mSubResourceLayouts.data(), numRows, rowSizesInBytes, &textureUpload->mTextureDataSize);
+
+        textureUpload->mTextureData = std::make_unique<uint8_t[]>(textureUpload->mTextureDataSize);
+
+        for (uint64_t arrayIndex = 0; arrayIndex < metadata.arraySize; arrayIndex++)
+        {
+            for (uint64_t mipIndex = 0; mipIndex < metadata.mipLevels; mipIndex++)
+            {
+                const uint64_t subResourceIndex = mipIndex + (arrayIndex * metadata.mipLevels);
+
+                const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& subResourceLayout = textureUpload->mSubResourceLayouts[subResourceIndex];
+                const uint64_t subResourceHeight = numRows[subResourceIndex];
+                const uint64_t subResourcePitch = AlignU32(subResourceLayout.Footprint.RowPitch, D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
+                const uint64_t subResourceDepth = subResourceLayout.Footprint.Depth;
+                uint8_t* destinationSubResourceMemory = textureUpload->mTextureData.get() + subResourceLayout.Offset;
+
+                for (uint64_t sliceIndex = 0; sliceIndex < subResourceDepth; sliceIndex++)
+                {
+                    const DirectX::Image* subImage = scratchImage.GetImage(mipIndex, arrayIndex, sliceIndex);
+                    const uint8_t* sourceSubResourceMemory = subImage->pixels;
+
+                    for (uint64_t height = 0; height < subResourceHeight; height++)
+                    {
+                        memcpy(destinationSubResourceMemory, sourceSubResourceMemory, (std::min)(subResourcePitch, subImage->rowPitch));
+                        destinationSubResourceMemory += subResourcePitch;
+                        sourceSubResourceMemory += subImage->rowPitch;
+                    }
+                }
+            }
+        }
+
+        device->GetUploadContext().AddTextureUpload(std::move(textureUpload));
+        
+
+        //ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
+        //    &Graphics::Core::HeapProperties.DefaultHeap, 
+        //    D3D12_HEAP_FLAG_NONE, 
+        //    &textureDesc,
+        //    D3D12_RESOURCE_STATE_COMMON,
+        //    nullptr,
+        //    IID_PPV_ARGS(&m_d3d12Resource)));
+
+        //D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        //srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        //srvDesc.Format = metadata.format;
+        //srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        //srvDesc.Texture2D.MostDetailedMip = 0;
+        //srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
+        //srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+        //mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
+        //device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), &srvDesc, mSRVDescriptor.Cpu);
+
+        //std::vector<D3D12_SUBRESOURCE_DATA> subresources(scratchImage.GetImageCount());
+        //const DirectX::Image* pImages = scratchImage.GetImages();
+        //for (int i = 0; i < scratchImage.GetImageCount(); ++i)
+        //{
+        //    auto& subresource = subresources[i];
+        //    subresource.RowPitch = pImages[i].rowPitch;
+        //    subresource.SlicePitch = pImages[i].slicePitch;
+        //    subresource.pData = pImages[i].pixels;
+        //}
+
+        //CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
+        //if (subresources.size() < m_d3d12Resource->GetDesc().MipLevels)
+        //{
+        //    GenerateMips();
+        //}
+    }
+
+    void Texture::GenerateMips()
+    {
+
+    }
+
+    DXGI_FORMAT Texture::MakeSRGB(DXGI_FORMAT fmt)
+    {
+        switch (fmt)
+        {
+        case DXGI_FORMAT_R8G8B8A8_UNORM:
+            return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC1_UNORM:
+            return DXGI_FORMAT_BC1_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC2_UNORM:
+            return DXGI_FORMAT_BC2_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC3_UNORM:
+            return DXGI_FORMAT_BC3_UNORM_SRGB;
+
+        case DXGI_FORMAT_B8G8R8A8_UNORM:
+            return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+
+        case DXGI_FORMAT_B8G8R8X8_UNORM:
+            return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC7_UNORM:
+            return DXGI_FORMAT_BC7_UNORM_SRGB;
+
+        default:
+            return fmt;
+        }
+    }
+	Texture::Texture(const InitData& textureInitData)
+	{
+        auto device = Graphics::GetDevice();
+
+        D3D12_RESOURCE_DESC textureDesc = {};
+        switch ((DirectX::TEX_DIMENSION)textureInitData.Dimension)
+        {
+        case DirectX::TEX_DIMENSION_TEXTURE1D:
+            textureDesc = CD3DX12_RESOURCE_DESC::Tex1D((DXGI_FORMAT)textureInitData.Format, static_cast<uint64_t>(textureInitData.Width),
+                static_cast<uint16_t>(textureInitData.ArraySize));
+            break;
+        case DirectX::TEX_DIMENSION_TEXTURE2D:
+            textureDesc = CD3DX12_RESOURCE_DESC::Tex2D((DXGI_FORMAT)textureInitData.Format, static_cast<uint64_t>(textureInitData.Width),
+                static_cast<uint32_t>(textureInitData.Height),
+                static_cast<uint16_t>(textureInitData.ArraySize));
+            break;
+        case DirectX::TEX_DIMENSION_TEXTURE3D:
+            textureDesc = CD3DX12_RESOURCE_DESC::Tex3D((DXGI_FORMAT)textureInitData.Format, static_cast<uint64_t>(textureInitData.Width),
+                static_cast<uint32_t>(textureInitData.Height),
+                static_cast<uint16_t>(textureInitData.Depth));
+            break;
+        default:
+            throw std::exception("Invalid texture dimension.");
+            break;
+        }
+
+        ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
+            &Graphics::Core::HeapProperties.DefaultHeap,
+            D3D12_HEAP_FLAG_NONE,
+            &textureDesc,
+            D3D12_RESOURCE_STATE_COMMON,
+            nullptr,
+            IID_PPV_ARGS(&mResource)));
+
+        auto desk = mResource->GetDesc();
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srvDesc.Format = (DXGI_FORMAT)textureInitData.Format;
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+        
+        mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
+        device->GetD3DDevice()->CreateShaderResourceView(mResource, &srvDesc, mSRVDescriptor.Cpu);
+
+        std::vector<D3D12_SUBRESOURCE_DATA> subresources(textureInitData.Images.size());
+        
+        for (int i = 0; i < textureInitData.Images.size(); ++i)
+        {
+            auto& subresource = subresources[i];
+            subresource.RowPitch = textureInitData.Images[i].RowPitch;
+            subresource.SlicePitch = textureInitData.Images[i].SlicePitch;
+            subresource.pData = textureInitData.Images[i].Pixels.data();
+        }
+
+        CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
+        if (subresources.size() < mResource->GetDesc().MipLevels)
+        {
+            GenerateMips();
+        }
+    }
+
+    Texture::~Texture()
+    {
+        auto device = Graphics::GetDevice();
+        device->GetSrvDescriptionHeap().Free(mSRVDescriptor);
+        
+    }
+
+    void Texture::CreateTexture(TextureCreationDesc& desc)
+    {
+        auto device = Graphics::GetDevice();
+
         D3D12_RESOURCE_DESC textureDesc = desc.mResourceDesc;
         textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -192,137 +380,7 @@ namespace Bruno
 
         mIsReady = (hasRTV || hasDSV);
 
-        //ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
-        //    &Graphics::Core::HeapProperties.DefaultHeap, 
-        //    D3D12_HEAP_FLAG_NONE, 
-        //    &textureDesc,
-        //    D3D12_RESOURCE_STATE_COMMON,
-        //    nullptr,
-        //    IID_PPV_ARGS(&m_d3d12Resource)));
-
-        //D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        //srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        //srvDesc.Format = metadata.format;
-        //srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        //srvDesc.Texture2D.MostDetailedMip = 0;
-        //srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
-        //srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-
-        //mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
-        //device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), &srvDesc, mSRVDescriptor.Cpu);
-
-        //std::vector<D3D12_SUBRESOURCE_DATA> subresources(scratchImage.GetImageCount());
-        //const DirectX::Image* pImages = scratchImage.GetImages();
-        //for (int i = 0; i < scratchImage.GetImageCount(); ++i)
-        //{
-        //    auto& subresource = subresources[i];
-        //    subresource.RowPitch = pImages[i].rowPitch;
-        //    subresource.SlicePitch = pImages[i].slicePitch;
-        //    subresource.pData = pImages[i].pixels;
-        //}
-
-        //CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
-        //if (subresources.size() < m_d3d12Resource->GetDesc().MipLevels)
-        //{
-        //    GenerateMips();
-        //}
-    }
-
-    void Texture::GenerateMips()
-    {
-
-    }
-
-    DXGI_FORMAT Texture::MakeSRGB(DXGI_FORMAT fmt)
-    {
-        switch (fmt)
-        {
-        case DXGI_FORMAT_R8G8B8A8_UNORM:
-            return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
-        case DXGI_FORMAT_BC1_UNORM:
-            return DXGI_FORMAT_BC1_UNORM_SRGB;
-
-        case DXGI_FORMAT_BC2_UNORM:
-            return DXGI_FORMAT_BC2_UNORM_SRGB;
-
-        case DXGI_FORMAT_BC3_UNORM:
-            return DXGI_FORMAT_BC3_UNORM_SRGB;
-
-        case DXGI_FORMAT_B8G8R8A8_UNORM:
-            return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
-
-        case DXGI_FORMAT_B8G8R8X8_UNORM:
-            return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
-
-        case DXGI_FORMAT_BC7_UNORM:
-            return DXGI_FORMAT_BC7_UNORM_SRGB;
-
-        default:
-            return fmt;
-        }
-    }
-	Texture::Texture(const InitData& textureInitData)
-	{
-        auto device = Graphics::GetDevice();
-
-        D3D12_RESOURCE_DESC textureDesc = {};
-        switch ((DirectX::TEX_DIMENSION)textureInitData.Dimension)
-        {
-        case DirectX::TEX_DIMENSION_TEXTURE1D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex1D((DXGI_FORMAT)textureInitData.Format, static_cast<uint64_t>(textureInitData.Width),
-                static_cast<uint16_t>(textureInitData.ArraySize));
-            break;
-        case DirectX::TEX_DIMENSION_TEXTURE2D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex2D((DXGI_FORMAT)textureInitData.Format, static_cast<uint64_t>(textureInitData.Width),
-                static_cast<uint32_t>(textureInitData.Height),
-                static_cast<uint16_t>(textureInitData.ArraySize));
-            break;
-        case DirectX::TEX_DIMENSION_TEXTURE3D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex3D((DXGI_FORMAT)textureInitData.Format, static_cast<uint64_t>(textureInitData.Width),
-                static_cast<uint32_t>(textureInitData.Height),
-                static_cast<uint16_t>(textureInitData.Depth));
-            break;
-        default:
-            throw std::exception("Invalid texture dimension.");
-            break;
-        }
-
-        ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
-            &Graphics::Core::HeapProperties.DefaultHeap,
-            D3D12_HEAP_FLAG_NONE,
-            &textureDesc,
-            D3D12_RESOURCE_STATE_COMMON,
-            nullptr,
-            IID_PPV_ARGS(&mResource)));
-
-        auto desk = mResource->GetDesc();
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srvDesc.Format = (DXGI_FORMAT)textureInitData.Format;
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
-        srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-        
-        mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
-        device->GetD3DDevice()->CreateShaderResourceView(mResource, &srvDesc, mSRVDescriptor.Cpu);
-
-        std::vector<D3D12_SUBRESOURCE_DATA> subresources(textureInitData.Images.size());
-        
-        for (int i = 0; i < textureInitData.Images.size(); ++i)
-        {
-            auto& subresource = subresources[i];
-            subresource.RowPitch = textureInitData.Images[i].RowPitch;
-            subresource.SlicePitch = textureInitData.Images[i].SlicePitch;
-            subresource.pData = textureInitData.Images[i].Pixels.data();
-        }
-
-        CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
-        if (subresources.size() < mResource->GetDesc().MipLevels)
-        {
-            GenerateMips();
-        }
+       
     }
 
     void Texture::CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData)

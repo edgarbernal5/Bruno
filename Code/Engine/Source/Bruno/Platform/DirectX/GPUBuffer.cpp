@@ -10,9 +10,8 @@ namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(GPUBuffer);
 
-	GPUBuffer::GPUBuffer(const BufferCreationDesc& desc)
+	GPUBuffer::GPUBuffer(GraphicsDevice& device, const BufferCreationDesc& desc)
 	{
-        GraphicsDevice* device = Graphics::GetDevice();
 		mType = GPUResourceType::Buffer;
 
 		mDesc.Width = AlignU32(static_cast<uint32_t>(desc.mSize), 256);
@@ -46,7 +45,7 @@ namespace Bruno
         D3D12MA::ALLOCATION_DESC allocationDesc{};
         allocationDesc.HeapType = isHostVisible ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT;
 
-        device->GetAllocator()->CreateResource(&allocationDesc, &mDesc, resourceState, nullptr, &mAllocation, IID_PPV_ARGS(&mResource));
+        device.GetAllocator()->CreateResource(&allocationDesc, &mDesc, resourceState, nullptr, &mAllocation, IID_PPV_ARGS(&mResource));
         mVirtualAddress = mResource->GetGPUVirtualAddress();
 
         if (hasCBV)

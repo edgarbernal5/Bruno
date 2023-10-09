@@ -79,22 +79,22 @@ namespace Bruno
 		m_surface = std::make_unique<Surface>(surfaceParameters);
 		m_surface->Initialize();
 
-		auto boxRenderItem = std::make_shared<RenderItem>();
-		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
-		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
-		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
-		m_renderItems.push_back(boxRenderItem);
+		//auto boxRenderItem = std::make_shared<RenderItem>();
+		//boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
+		//boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
+		//boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
+		//m_renderItems.push_back(boxRenderItem);
 
-		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
+		//m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
 
-		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-		{
-			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
-		}
+		//for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
+		//{
+		//	m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		//}
 		m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
 
 		GraphicsDevice* device = Graphics::GetDevice();
-		m_rootSignature = m_opaqueShader->CreateRootSignature();
+		/*m_rootSignature = m_opaqueShader->CreateRootSignature();
 
 		GraphicsPipelineDesc pipelineDesc = GetDefaultGraphicsPipelineDesc();
 		pipelineDesc.mVertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
@@ -103,7 +103,7 @@ namespace Bruno
 		pipelineDesc.mRenderTargetDesc.mNumRenderTargets = 1;
 		pipelineDesc.mRenderTargetDesc.mRenderTargetFormats[0] = surfaceParameters.BackBufferFormat;
 		
-		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineDesc, m_rootSignature.get());
+		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineDesc, m_rootSignature.get());*/
 		
 		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
 
@@ -198,6 +198,10 @@ namespace Bruno
 
 		//ResourceBarrier::Transition(commandList,
 		//	currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+
+		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
+		m_graphicsContext->FlushBarriers();
+		m_device->SubmitContextWork(*m_graphicsContext);
 
 		m_device->EndFrame();
 		m_device->Present(m_surface.get());

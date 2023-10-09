@@ -150,12 +150,12 @@ namespace Bruno
         uploadBufferDesc.mAccessFlags = BufferAccessFlags::hostWritable;
 
         BufferCreationDesc uploadTextureDesc;
-        uploadTextureDesc.mSize = 40 * 1024 * 1024;
+        uploadTextureDesc.mSize = 80 * 1024 * 1024;
         uploadTextureDesc.mAccessFlags = BufferAccessFlags::hostWritable;
 
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
         {
-            mUploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GPUBuffer>(uploadBufferDesc), std::make_unique<GPUBuffer>(uploadTextureDesc));
+            mUploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GPUBuffer>(*this, uploadBufferDesc), std::make_unique<GPUBuffer>(*this, uploadTextureDesc));
         }
 
         mFreeReservedDescriptorIndices.resize(Graphics::Core::NUM_RESERVED_SRV_DESCRIPTORS);
@@ -164,6 +164,11 @@ namespace Bruno
             mFreeReservedDescriptorIndices[i] = i;
         }
 	}
+
+    GraphicsDevice::~GraphicsDevice()
+    {
+        SafeRelease(mAllocator);
+    }
 
     void GraphicsDevice::BeginFrame()
     {

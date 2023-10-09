@@ -38,6 +38,7 @@ namespace Bruno
 
 	DepthBuffer::~DepthBuffer()
 	{
-		//TODO: hacer release de m_dsv
+		GraphicsDevice* device = Graphics::GetDevice();
+		device->GetDsvDescriptionHeap().Free(m_dsvHandle);
 	}
 }
