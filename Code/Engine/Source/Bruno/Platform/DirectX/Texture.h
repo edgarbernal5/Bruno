@@ -56,7 +56,7 @@ namespace Bruno
 		BR_RTTI_DECLARATION(Texture, Resource);
 
 	public:
-		struct InitData
+		struct AssetPipelineInitData
 		{
 			size_t Width;
 			size_t Height;
@@ -76,10 +76,12 @@ namespace Bruno
 		};
 		Texture();
 		Texture(const std::wstring& filename);
-		Texture(const InitData& textureInitData);
+		Texture(const AssetPipelineInitData& textureInitData);
+		Texture(const TextureCreationDesc& textureDesc);
 		~Texture();
 
 		constexpr const DescriptorHandle& GetSrvHandle() const { return mSRVDescriptor; }
+		constexpr const DescriptorHandle& GetDsvHandle() const { return mDSVDescriptor; }
 
 		friend class Surface;
 		friend class GraphicsContext;
@@ -89,7 +91,7 @@ namespace Bruno
 		DescriptorHandle mSRVDescriptor{};
 		DescriptorHandle mUAVDescriptor{};
 
-		void CreateTexture(TextureCreationDesc& desc);
+		void CreateTexture(const TextureCreationDesc& desc);
 		void CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData);
 		void GenerateMips();
 		DXGI_FORMAT MakeSRGB(DXGI_FORMAT fmt);

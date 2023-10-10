@@ -149,7 +149,7 @@ namespace Bruno
 		ResourceBarrier::Transition(commandList,
 			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);*/
 
-		Math::Color clearColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+		Math::Color clearColor { 1.0f, 1.0f, 0.0f, 1.0f };
 
 		auto rtv = m_surface->GetRtv();
 		auto dsv = m_surface->GetDsv();

@@ -5,6 +5,8 @@
 
 namespace Bruno
 {
+	class Texture;
+
 	class DepthBuffer
 	{
 	public:
@@ -13,8 +15,9 @@ namespace Bruno
 
 		constexpr const DescriptorHandle& GetDsv() { return m_dsvHandle; }
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_depthBuffer;
-		DescriptorHandle   m_dsvHandle{};
+		//Microsoft::WRL::ComPtr<ID3D12Resource>	m_depthBuffer;
+		DescriptorHandle						m_dsvHandle{};
+		std::unique_ptr<Texture>				m_texture{};
 	};
 
 }

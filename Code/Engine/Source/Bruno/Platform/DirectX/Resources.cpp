@@ -43,7 +43,7 @@ namespace Bruno
     {
         if (mActiveHandleCount != 0)
         {
-            BR_ASSERT(false, "There were active handles when the descriptor heap was destroyed. Look for leaks.");
+            BR_ASSERT_ERROR("There were active handles when the descriptor heap was destroyed. Look for leaks.");
         }
     }
 
@@ -53,16 +53,19 @@ namespace Bruno
         BR_ASSERT(m_heap);
         uint32_t newHandleID = 0;
 
-        if (m_currentDescriptorIndex < m_maxDescriptors) {
+        if (m_currentDescriptorIndex < m_maxDescriptors)
+        {
             newHandleID = m_currentDescriptorIndex;
             ++m_currentDescriptorIndex;
         }
-        else if (mFreeDescriptors.size() > 0) {
+        else if (mFreeDescriptors.size() > 0)
+        {
             newHandleID = mFreeDescriptors.back();
             mFreeDescriptors.pop_back();
         }
-        else {
-            BR_ASSERT(false, "Need to increase heap size.");
+        else
+        {
+            BR_ASSERT_ERROR("Need to increase heap size.");
         }
 
         uint32_t offset = newHandleID * m_descriptorSize;
@@ -100,7 +103,7 @@ namespace Bruno
             m_currentDescriptorIndex = blockEnd;
         }
         else {
-            BR_ASSERT(false, "Need to increase heap size.");
+            BR_ASSERT_ERROR("Need to increase heap size.");
         }
 
         uint64_t offset = newHandleID * m_descriptorSize;

@@ -94,17 +94,4 @@ namespace Bruno
 	{
 
 	}
-
-	void PipelineResourceSpace::SetCBV(GPUBuffer* resource)
-	{
-	}
-	void PipelineResourceSpace::SetSRV(const PipelineResourceBinding& binding)
-	{
-	}
-	void PipelineResourceSpace::SetUAV(const PipelineResourceBinding& binding)
-	{
-	}
-	void PipelineResourceSpace::Lock()
-	{
-	}
 }

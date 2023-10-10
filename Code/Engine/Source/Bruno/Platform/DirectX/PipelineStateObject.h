@@ -9,6 +9,10 @@ namespace Bruno
 {
 	class ShaderProgram;
 	class RootSignature;
+	class Resource;
+	class Texture;
+	class GPUBuffer;
+	class PipelineStateObject;
 
     enum class PipelineType : uint8_t
     {
@@ -16,10 +20,54 @@ namespace Bruno
         compute
     };
 
+	struct PipelineInfo
+	{
+		PipelineStateObject* mPipeline = nullptr;
+		std::vector<Texture*> mRenderTargets;
+		Texture* mDepthStencilTarget = nullptr;
+	};
+
+	struct PipelineResourceBinding
+	{
+		uint32_t mBindingIndex = 0;
+		Resource* mResource = nullptr;
+	};
+
+	class PipelineResourceSpace
+	{
+	public:
+		void SetCBV(GPUBuffer* resource);
+		void SetSRV(const PipelineResourceBinding& binding);
+		void SetUAV(const PipelineResourceBinding& binding);
+		void Lock();
+
+		const GPUBuffer* GetCBV() const { return mCBV; }
+		const std::vector<PipelineResourceBinding>& GetUAVs() const { return mUAVs; }
+		const std::vector<PipelineResourceBinding>& GetSRVs() const { return mSRVs; }
+
+		bool IsLocked() const { return mIsLocked; }
+
+	private:
+		uint32_t GetIndexOfBindingIndex(const std::vector<PipelineResourceBinding>& bindings, uint32_t bindingIndex);
+
+		//If a resource space needs more than one CBV, it is likely a design flaw, as you want to consolidate these as much
+		//as possible if they have the same update frequency (which is contained by a PipelineResourceSpace). Of course,
+		//you can freely change this to a vector like the others if you want.
+		GPUBuffer* mCBV = nullptr;
+		std::vector<PipelineResourceBinding> mUAVs;
+		std::vector<PipelineResourceBinding> mSRVs;
+		bool mIsLocked = false;
+	};
+
     struct PipelineResourceMapping
     {
         std::array<std::optional<uint32_t>, Graphics::Core::NUM_RESOURCE_SPACES> mCbvMapping{};
         std::array<std::optional<uint32_t>, Graphics::Core::NUM_RESOURCE_SPACES> mTableMapping{};
+    };
+
+    struct PipelineResourceLayout
+    {
+        std::array<PipelineResourceSpace*, Graphics::Core::NUM_RESOURCE_SPACES> mSpaces{ nullptr };
     };
 
 	struct RenderTargetDesc

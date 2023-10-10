@@ -14,6 +14,8 @@ namespace Bruno
 		D3D12_CPU_DESCRIPTOR_HANDLE Cpu{};
 		D3D12_GPU_DESCRIPTOR_HANDLE Gpu{};
 		uint32_t					HeapIndex{ 0xffff'ffff };
+
+		bool IsValid() { return HeapIndex < 0xffff'ffff; }
 	};
 
 	class GraphicsDevice;

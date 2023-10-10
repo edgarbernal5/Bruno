@@ -14,12 +14,7 @@ namespace Bruno
 
 	Surface::~Surface()
 	{
-		//GraphicsDevice* device = Graphics::GetDevice();
 		Release();
-		//for (uint32_t i = 0; i < m_parameters.BackBufferCount; ++i)
-		//{
-		//	device->GetRtvDescriptionHeap().Free(m_renderTargetData[i].Rtv);
-		//}
 	}
 
 	void Surface::Initialize()
@@ -172,7 +167,6 @@ namespace Bruno
 			rtvDesc.Texture2D.PlaneSlice = 0;
 
 			device->GetD3DDevice()->CreateRenderTargetView(data.Resource->GetResource(), &rtvDesc, data.Rtv.Cpu);
-			//device->GetD3DDevice()->CreateRenderTargetView(data.Resource->GetResource(), nullptr, data.Rtv.Cpu);
 		}
 
 		DXGI_SWAP_CHAIN_DESC desc{};

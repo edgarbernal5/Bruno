@@ -228,7 +228,7 @@ namespace Bruno
             fenceResult = mCopyQueue->ExecuteCommandList(context.GetCommandList());
             break;
         default:
-            BR_ASSERT(false, "Unsupported submission type.");
+            BR_ASSERT_ERROR("Unsupported submission type.");
             break;
         }
 

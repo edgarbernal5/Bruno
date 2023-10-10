@@ -15,6 +15,13 @@
 			Bruno::Log::PrintAssertMessage(__FILE__, __LINE__, "Assertion failed", __VA_ARGS__); \
 			BR_DEBUG_BREAK; \
 		}
+
+	#define BR_ASSERT_ERROR(message) \
+		{ \
+			Bruno::Log::PrintAssertMessage(__FILE__, __LINE__, "Assertion failed", message); \
+			BR_DEBUG_BREAK; \
+		}
 #else
 	#define BR_ASSERT(expression, ...)
+	#define BR_ASSERT_ERROR(message)
 #endif

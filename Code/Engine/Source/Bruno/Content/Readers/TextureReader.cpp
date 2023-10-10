@@ -14,7 +14,7 @@ namespace Bruno
 
 	std::shared_ptr<Texture> TextureReader::ReadInternal(ContentReader& input)
 	{
-		Texture::InitData initData;
+		Texture::AssetPipelineInitData initData;
 		input.ReadUInt64(initData.Width);
 		input.ReadUInt64(initData.Height);
 		input.ReadUInt64(initData.Depth);

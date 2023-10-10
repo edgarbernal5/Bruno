@@ -26,7 +26,6 @@ namespace Bruno
 		static std::shared_ptr<Logger> g_CoreLogger;
 	};
 
-
 	template<typename... Args>
 	void Log::PrintAssertMessage(const char* file, int line, const char* message, Args&&... args)
 	{

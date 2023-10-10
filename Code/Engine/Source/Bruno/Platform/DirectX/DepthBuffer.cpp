@@ -1,14 +1,24 @@
 #include "brpch.h"
 #include "DepthBuffer.h"
+
 #include "GraphicsDevice.h"
+#include "Texture.h"
 
 namespace Bruno
 {
 	DepthBuffer::DepthBuffer(uint32_t width, uint32_t height, DXGI_FORMAT format)
 	{
 		GraphicsDevice* device = Graphics::GetDevice();
+		
+		TextureCreationDesc depthBufferDesc;
+		depthBufferDesc.mResourceDesc.Format = DXGI_FORMAT_D32_FLOAT;
+		depthBufferDesc.mResourceDesc.Width = width;
+		depthBufferDesc.mResourceDesc.Height = height;
+		depthBufferDesc.mViewFlags = TextureViewFlags::Srv | TextureViewFlags::Dsv;
 
-		auto depthTextureDesc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height,
+		m_texture = std::make_unique<Texture>(depthBufferDesc);
+
+		/*auto depthTextureDesc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height,
 			1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
 		D3D12_CLEAR_VALUE optimizedClearValue = {};
@@ -33,12 +43,12 @@ namespace Bruno
 		m_dsvHandle = device->GetDsvDescriptionHeap().Allocate();
 
 		device->GetD3DDevice()->CreateDepthStencilView(m_depthBuffer.Get(), &dsv_desc,
-			m_dsvHandle.Cpu);
+			m_dsvHandle.Cpu);*/
 	}
 
 	DepthBuffer::~DepthBuffer()
 	{
 		GraphicsDevice* device = Graphics::GetDevice();
-		device->GetDsvDescriptionHeap().Free(m_dsvHandle);
+		//device->GetDsvDescriptionHeap().Free(m_dsvHandle);
 	}
 }

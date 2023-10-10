@@ -39,24 +39,23 @@ namespace Bruno
         DXGI_FORMAT textureFormat = metadata.format;
         bool is3DTexture = metadata.dimension == DirectX::TEX_DIMENSION_TEXTURE3D;
 
-        TextureCreationDesc desc;
-        desc.mResourceDesc.Format = textureFormat;
-        desc.mResourceDesc.Width = metadata.width;
-        desc.mResourceDesc.Height = static_cast<uint32_t>(metadata.height);
-        desc.mResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-        desc.mResourceDesc.DepthOrArraySize = static_cast<uint16_t>(is3DTexture ? metadata.depth : metadata.arraySize);
-        desc.mResourceDesc.MipLevels = static_cast<uint16_t>(metadata.mipLevels);
-        desc.mResourceDesc.SampleDesc.Count = 1;
-        desc.mResourceDesc.SampleDesc.Quality = 0;
-        desc.mResourceDesc.Dimension = is3DTexture ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-        desc.mResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-        desc.mResourceDesc.Alignment = 0;
-        desc.mViewFlags = TextureViewFlags::Srv;
+        TextureCreationDesc textureCreationdesc;
+        textureCreationdesc.mResourceDesc.Format = textureFormat;
+        textureCreationdesc.mResourceDesc.Width = metadata.width;
+        textureCreationdesc.mResourceDesc.Height = static_cast<uint32_t>(metadata.height);
+        textureCreationdesc.mResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+        textureCreationdesc.mResourceDesc.DepthOrArraySize = static_cast<uint16_t>(is3DTexture ? metadata.depth : metadata.arraySize);
+        textureCreationdesc.mResourceDesc.MipLevels = static_cast<uint16_t>(metadata.mipLevels);
+        textureCreationdesc.mResourceDesc.SampleDesc.Count = 1;
+        textureCreationdesc.mResourceDesc.SampleDesc.Quality = 0;
+        textureCreationdesc.mResourceDesc.Dimension = is3DTexture ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        textureCreationdesc.mResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        textureCreationdesc.mResourceDesc.Alignment = 0;
+        textureCreationdesc.mViewFlags = TextureViewFlags::Srv;
 
         auto device = Graphics::GetDevice();
 
-        //CreateTexture
-        CreateTexture(desc);
+        CreateTexture(textureCreationdesc);
         auto textureUpload = std::make_unique<TextureUpload>();
 
         UINT numRows[Graphics::Core::MAX_TEXTURE_SUBRESOURCE_COUNT];
@@ -65,7 +64,7 @@ namespace Bruno
         textureUpload->mTexture = this;
         textureUpload->mNumSubResources = static_cast<uint32_t>(metadata.mipLevels * metadata.arraySize);
 
-        device->GetD3DDevice()->GetCopyableFootprints(&desc.mResourceDesc, 0, textureUpload->mNumSubResources, 0, textureUpload->mSubResourceLayouts.data(), numRows, rowSizesInBytes, &textureUpload->mTextureDataSize);
+        device->GetD3DDevice()->GetCopyableFootprints(&textureCreationdesc.mResourceDesc, 0, textureUpload->mNumSubResources, 0, textureUpload->mSubResourceLayouts.data(), numRows, rowSizesInBytes, &textureUpload->mTextureDataSize);
 
         textureUpload->mTextureData = std::make_unique<uint8_t[]>(textureUpload->mTextureDataSize);
 
@@ -98,7 +97,6 @@ namespace Bruno
 
         device->GetUploadContext().AddTextureUpload(std::move(textureUpload));
         
-
         //ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
         //    &Graphics::Core::HeapProperties.DefaultHeap, 
         //    D3D12_HEAP_FLAG_NONE, 
@@ -169,26 +167,26 @@ namespace Bruno
             return fmt;
         }
     }
-	Texture::Texture(const InitData& textureInitData)
+	Texture::Texture(const AssetPipelineInitData& assetPipelineInitData)
 	{
         auto device = Graphics::GetDevice();
 
         D3D12_RESOURCE_DESC textureDesc = {};
-        switch ((DirectX::TEX_DIMENSION)textureInitData.Dimension)
+        switch ((DirectX::TEX_DIMENSION)assetPipelineInitData.Dimension)
         {
         case DirectX::TEX_DIMENSION_TEXTURE1D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex1D((DXGI_FORMAT)textureInitData.Format, static_cast<uint64_t>(textureInitData.Width),
-                static_cast<uint16_t>(textureInitData.ArraySize));
+            textureDesc = CD3DX12_RESOURCE_DESC::Tex1D((DXGI_FORMAT)assetPipelineInitData.Format, static_cast<uint64_t>(assetPipelineInitData.Width),
+                static_cast<uint16_t>(assetPipelineInitData.ArraySize));
             break;
         case DirectX::TEX_DIMENSION_TEXTURE2D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex2D((DXGI_FORMAT)textureInitData.Format, static_cast<uint64_t>(textureInitData.Width),
-                static_cast<uint32_t>(textureInitData.Height),
-                static_cast<uint16_t>(textureInitData.ArraySize));
+            textureDesc = CD3DX12_RESOURCE_DESC::Tex2D((DXGI_FORMAT)assetPipelineInitData.Format, static_cast<uint64_t>(assetPipelineInitData.Width),
+                static_cast<uint32_t>(assetPipelineInitData.Height),
+                static_cast<uint16_t>(assetPipelineInitData.ArraySize));
             break;
         case DirectX::TEX_DIMENSION_TEXTURE3D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex3D((DXGI_FORMAT)textureInitData.Format, static_cast<uint64_t>(textureInitData.Width),
-                static_cast<uint32_t>(textureInitData.Height),
-                static_cast<uint16_t>(textureInitData.Depth));
+            textureDesc = CD3DX12_RESOURCE_DESC::Tex3D((DXGI_FORMAT)assetPipelineInitData.Format, static_cast<uint64_t>(assetPipelineInitData.Width),
+                static_cast<uint32_t>(assetPipelineInitData.Height),
+                static_cast<uint16_t>(assetPipelineInitData.Depth));
             break;
         default:
             throw std::exception("Invalid texture dimension.");
@@ -206,7 +204,7 @@ namespace Bruno
         auto desk = mResource->GetDesc();
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srvDesc.Format = (DXGI_FORMAT)textureInitData.Format;
+        srvDesc.Format = (DXGI_FORMAT)assetPipelineInitData.Format;
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Texture2D.MostDetailedMip = 0;
         srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
@@ -215,14 +213,14 @@ namespace Bruno
         mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
         device->GetD3DDevice()->CreateShaderResourceView(mResource, &srvDesc, mSRVDescriptor.Cpu);
 
-        std::vector<D3D12_SUBRESOURCE_DATA> subresources(textureInitData.Images.size());
+        std::vector<D3D12_SUBRESOURCE_DATA> subresources(assetPipelineInitData.Images.size());
         
-        for (int i = 0; i < textureInitData.Images.size(); ++i)
+        for (int i = 0; i < assetPipelineInitData.Images.size(); ++i)
         {
             auto& subresource = subresources[i];
-            subresource.RowPitch = textureInitData.Images[i].RowPitch;
-            subresource.SlicePitch = textureInitData.Images[i].SlicePitch;
-            subresource.pData = textureInitData.Images[i].Pixels.data();
+            subresource.RowPitch = assetPipelineInitData.Images[i].RowPitch;
+            subresource.SlicePitch = assetPipelineInitData.Images[i].SlicePitch;
+            subresource.pData = assetPipelineInitData.Images[i].Pixels.data();
         }
 
         CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
@@ -232,24 +230,33 @@ namespace Bruno
         }
     }
 
+    Texture::Texture(const TextureCreationDesc& textureDesc)
+    {
+        CreateTexture(textureDesc);
+    }
+
     Texture::~Texture()
     {
         auto device = Graphics::GetDevice();
-        device->GetSrvDescriptionHeap().Free(mSRVDescriptor);
-        
+
+        if (mSRVDescriptor.IsValid())
+            device->GetSrvDescriptionHeap().Free(mSRVDescriptor);
+
+        if (mDSVDescriptor.IsValid())
+            device->GetDsvDescriptionHeap().Free(mDSVDescriptor);
     }
 
-    void Texture::CreateTexture(TextureCreationDesc& desc)
+    void Texture::CreateTexture(const TextureCreationDesc& textureCreationdesc)
     {
         auto device = Graphics::GetDevice();
 
-        D3D12_RESOURCE_DESC textureDesc = desc.mResourceDesc;
+        D3D12_RESOURCE_DESC textureDesc = textureCreationdesc.mResourceDesc;
         textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-        bool hasRTV = ((desc.mViewFlags & TextureViewFlags::Rtv) == TextureViewFlags::Rtv);
-        bool hasDSV = ((desc.mViewFlags & TextureViewFlags::Dsv) == TextureViewFlags::Dsv);
-        bool hasSRV = ((desc.mViewFlags & TextureViewFlags::Srv) == TextureViewFlags::Srv);
-        bool hasUAV = ((desc.mViewFlags & TextureViewFlags::Uav) == TextureViewFlags::Uav);
+        bool hasRTV = ((textureCreationdesc.mViewFlags & TextureViewFlags::Rtv) == TextureViewFlags::Rtv);
+        bool hasDSV = ((textureCreationdesc.mViewFlags & TextureViewFlags::Dsv) == TextureViewFlags::Dsv);
+        bool hasSRV = ((textureCreationdesc.mViewFlags & TextureViewFlags::Srv) == TextureViewFlags::Srv);
+        bool hasUAV = ((textureCreationdesc.mViewFlags & TextureViewFlags::Uav) == TextureViewFlags::Uav);
 
         D3D12_RESOURCE_STATES resourceState = D3D12_RESOURCE_STATE_COPY_DEST;
         DXGI_FORMAT resourceFormat = textureDesc.Format;
@@ -263,7 +270,7 @@ namespace Bruno
 
         if (hasDSV)
         {
-            switch (desc.mResourceDesc.Format)
+            switch (textureCreationdesc.mResourceDesc.Format)
             {
             case DXGI_FORMAT_D16_UNORM:
                 resourceFormat = DXGI_FORMAT_R16_TYPELESS;
@@ -282,7 +289,7 @@ namespace Bruno
                 shaderResourceViewFormat = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
                 break;
             default:
-                BR_ASSERT(false, "Bad depth stencil format.");
+                BR_ASSERT_ERROR("Bad depth stencil format.");
                 break;
             }
 
@@ -302,7 +309,7 @@ namespace Bruno
         mState = resourceState;
 
         D3D12_CLEAR_VALUE clearValue = {};
-        clearValue.Format = desc.mResourceDesc.Format;
+        clearValue.Format = textureCreationdesc.mResourceDesc.Format;
 
         if (hasDSV)
         {
@@ -334,14 +341,14 @@ namespace Bruno
             {
                 D3D12_SHADER_RESOURCE_VIEW_DESC* srvDescPointer = nullptr;
                 D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-                bool isCubeMap = desc.mResourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D && desc.mResourceDesc.DepthOrArraySize == 6;
+                bool isCubeMap = textureCreationdesc.mResourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D && textureCreationdesc.mResourceDesc.DepthOrArraySize == 6;
 
                 if (isCubeMap)
                 {
                     shaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
                     shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
                     shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
-                    shaderResourceViewDesc.TextureCube.MipLevels = desc.mResourceDesc.MipLevels;
+                    shaderResourceViewDesc.TextureCube.MipLevels = textureCreationdesc.mResourceDesc.MipLevels;
                     shaderResourceViewDesc.TextureCube.ResourceMinLODClamp = 0.0f;
                     srvDescPointer = &shaderResourceViewDesc;
                 }
@@ -364,7 +371,7 @@ namespace Bruno
         {
             D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
             dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-            dsvDesc.Format = desc.mResourceDesc.Format;
+            dsvDesc.Format = textureCreationdesc.mResourceDesc.Format;
             dsvDesc.Texture2D.MipSlice = 0;
             dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 
