@@ -201,6 +201,7 @@ namespace Bruno
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();
+
 		m_device->SubmitContextWork(*m_graphicsContext);
 
 		m_device->EndFrame();
