@@ -15,7 +15,8 @@ namespace Bruno
 		D3D12_GPU_DESCRIPTOR_HANDLE Gpu{};
 		uint32_t					HeapIndex{ 0xffff'ffff };
 
-		bool IsValid() { return HeapIndex < 0xffff'ffff; }
+		bool IsValid() const { return Cpu.ptr != 0; }
+		void SetInvalid() { /*HeapIndex = 0xffff'ffff;*/ }
 	};
 
 	class GraphicsDevice;
@@ -52,7 +53,7 @@ namespace Bruno
 		~StagingDescriptorHeap();
 
 		DescriptorHandle Allocate(uint32_t count = 1);
-		void Free(DescriptorHandle handle);
+		void Free(DescriptorHandle& handle);
 
 	private:
 		std::vector<uint32_t> mFreeDescriptors;

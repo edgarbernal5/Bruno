@@ -8,6 +8,7 @@ namespace Bruno
 {
 	class Resource;
 	class Texture;
+	class DepthBuffer;
 	class GPUBuffer;
 	class PipelineStateObject;
 	class PipelineResourceSpace;
@@ -20,7 +21,7 @@ namespace Bruno
 		~GraphicsContext();
 
 		void ClearRenderTarget(const Texture& target, Math::Color color);
-		void ClearDepthStencilTarget(const Texture& target, float depth, uint8_t stencil);
+		void ClearDepthStencilTarget(const DepthBuffer& target, float depth, uint8_t stencil);
 		
 		void Draw(uint32_t vertexCount, uint32_t vertexStartOffset = 0);
 		void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, uint32_t baseVertexLocation = 0);

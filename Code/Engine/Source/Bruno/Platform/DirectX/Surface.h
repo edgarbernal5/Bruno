@@ -19,6 +19,7 @@ namespace Bruno
 
 	class GraphicsDevice;
 	class Texture;
+	class DepthBuffer;
 
 	class Surface
 	{
@@ -31,8 +32,9 @@ namespace Bruno
 		void Resize(uint32_t width, uint32_t height);
 
 		Texture& GetBackBuffer() const { return *m_renderTargetData[m_currentBackBufferIndex].Resource; }
-		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetRtv() const { return m_renderTargetData[m_currentBackBufferIndex].Rtv.Cpu; }
-		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetDsv() const { return m_depthBuffer->GetDsv().Cpu; }
+		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle() const { return m_renderTargetData[m_currentBackBufferIndex].Rtv.Cpu; }
+		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() const { return m_depthBuffer->GetDsvHandle().Cpu; }
+		DepthBuffer& GetDepthBuffer() const { return *m_depthBuffer; }
 		constexpr const D3D12_VIEWPORT& GetViewport() const { return m_viewport; }
 		constexpr const D3D12_RECT& GetScissorRect() const { return m_scissorRect; }
 	private:

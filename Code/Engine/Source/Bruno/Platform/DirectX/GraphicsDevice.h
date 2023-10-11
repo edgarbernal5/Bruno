@@ -38,6 +38,8 @@ namespace Bruno
 		void EndFrame();
 		void Present(Surface* surface);
 
+		void CopyDescriptors(uint32_t numDestDescriptorRanges, const D3D12_CPU_DESCRIPTOR_HANDLE* destDescriptorRangeStarts, const uint32_t* destDescriptorRangeSizes,
+			uint32_t numSrcDescriptorRanges, const D3D12_CPU_DESCRIPTOR_HANDLE* srcDescriptorRangeStarts, const uint32_t* srcDescriptorRangeSizes, D3D12_DESCRIPTOR_HEAP_TYPE descriptorType);
 		void CopySRVHandleToReservedTable(DescriptorHandle srvHandle, uint32_t index);
 
 		uint32_t GetFrameId() { return m_frameId; }
@@ -105,6 +107,8 @@ namespace Bruno
 
 		std::array<std::unique_ptr<UploadContext>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mUploadContexts;
 		std::array<EndOfFrameFences, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mEndOfFrameFences;
+
+		void ProcessDestructions(uint32_t frameIndex);
 	};
 }
 

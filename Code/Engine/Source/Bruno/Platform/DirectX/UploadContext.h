@@ -8,7 +8,7 @@ namespace Bruno
 	class GPUBuffer;
 	struct BufferUpload;
 	struct TextureUpload;
-	struct Texture;
+	class Texture;
 
 	class UploadContext : public Context
 	{

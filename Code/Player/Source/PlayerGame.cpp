@@ -79,9 +79,9 @@ namespace Bruno
 		m_surface = std::make_unique<Surface>(surfaceParameters);
 		m_surface->Initialize();
 
-		//auto boxRenderItem = std::make_shared<RenderItem>();
-		//boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
-		//boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
+		auto boxRenderItem = std::make_shared<RenderItem>();
+		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
+		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
 		//boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
 		//m_renderItems.push_back(boxRenderItem);
 
@@ -140,34 +140,23 @@ namespace Bruno
 
 	void PlayerGame::OnDraw()
 	{
-		//auto commandQueue = m_device->GetCommandQueue();
-		//auto commandList = commandQueue->GetCommandList();
-		uint32_t frameIndex = m_device->GetFrameId();
-
 		m_device->BeginFrame();
-		/*ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer().GetResource() };
-		ResourceBarrier::Transition(commandList,
-			currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);*/
 
 		Math::Color clearColor { 1.0f, 1.0f, 0.0f, 1.0f };
 
-		auto rtv = m_surface->GetRtv();
-		auto dsv = m_surface->GetDsv();
-
 		Texture& backBuffer = m_surface->GetBackBuffer();
+		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
 
 		m_graphicsContext->Reset();
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		m_graphicsContext->FlushBarriers();
 
 		m_graphicsContext->ClearRenderTarget(backBuffer, clearColor);
-		//m_graphicsContext->ClearDepthStencilTarget(*mDepthBuffer, 1.0f, 0);
+		m_graphicsContext->ClearDepthStencilTarget(depthBuffer, 1.0f, 0);
 
-		//commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
-		//commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		m_graphicsContext->SetViewport(m_surface->GetViewport());
+		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
 
-		//m_graphicsContext->RSSetViewports(1, &m_surface->GetViewport());
-		//m_graphicsContext->RSSetScissorRects(1, &m_surface->GetScissorRect());
 		//m_graphicsContext->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 
 		//ID3D12DescriptorHeap* descriptorHeaps[] = { m_device->GetSrvDescriptionHeap().GetHeap() };
@@ -195,9 +184,6 @@ namespace Bruno
 		//		item->BaseVertexLocation,
 		//		0);
 		//}
-
-		//ResourceBarrier::Transition(commandList,
-		//	currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();

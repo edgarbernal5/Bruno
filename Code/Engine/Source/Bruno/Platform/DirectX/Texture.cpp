@@ -135,7 +135,6 @@ namespace Bruno
 
     void Texture::GenerateMips()
     {
-
     }
 
     DXGI_FORMAT Texture::MakeSRGB(DXGI_FORMAT fmt)
@@ -167,6 +166,7 @@ namespace Bruno
             return fmt;
         }
     }
+
 	Texture::Texture(const AssetPipelineInitData& assetPipelineInitData)
 	{
         auto device = Graphics::GetDevice();
@@ -238,6 +238,9 @@ namespace Bruno
     Texture::~Texture()
     {
         auto device = Graphics::GetDevice();
+
+        if (mRTVDescriptor.IsValid())
+            device->GetRtvDescriptionHeap().Free(mRTVDescriptor);
 
         if (mSRVDescriptor.IsValid())
             device->GetSrvDescriptionHeap().Free(mSRVDescriptor);
@@ -386,8 +389,6 @@ namespace Bruno
         }
 
         mIsReady = (hasRTV || hasDSV);
-
-       
     }
 
     void Texture::CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData)

@@ -104,6 +104,7 @@ namespace Bruno
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_d3d12PipelineState;
         RootSignature* m_rootSignature;
         PipelineType mPipelineType = PipelineType::graphics;
+		PipelineResourceMapping mPipelineResourceMapping;
 	};
 
 	inline GraphicsPipelineDesc GetDefaultGraphicsPipelineDesc()

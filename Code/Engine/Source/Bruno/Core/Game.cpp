@@ -32,7 +32,7 @@ namespace Bruno
 	Game::~Game()
 	{
 		//TODO: Flush command queue before changing any resources.
-		//m_device->GetCommandQueue()->Flush();
+		m_device->WaitForIdle();
 
 		m_timer.Stop();
 		m_gameWindow.reset();

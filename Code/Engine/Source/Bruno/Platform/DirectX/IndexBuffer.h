@@ -5,10 +5,12 @@
 
 namespace Bruno
 {
+	class GraphicsDevice;
+
 	class IndexBuffer : public GPUBuffer
 	{
 	public:
-		IndexBuffer(uint32_t numElements, const void* bufferData, uint32_t elementSize);
+		IndexBuffer(uint32_t sizeInBytes, const void* bufferData, uint32_t stride);
 		~IndexBuffer() = default;
 		
 		//uint32_t GetNumIndices() const { return m_numElements; }
@@ -16,7 +18,7 @@ namespace Bruno
 		constexpr const D3D12_INDEX_BUFFER_VIEW& GetView() { return m_indexBufferView; }
 	private:
 		//uint32_t m_numElements;
-		uint32_t m_elementSize;
+		//uint32_t m_elementSize;
 
 		D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
 	};

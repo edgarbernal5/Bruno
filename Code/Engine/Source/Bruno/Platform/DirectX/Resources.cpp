@@ -84,12 +84,13 @@ namespace Bruno
         return handle;
     }
     
-    void StagingDescriptorHeap::Free(DescriptorHandle handle)
+    void StagingDescriptorHeap::Free(DescriptorHandle& handle)
     {
         BR_ASSERT(mActiveHandleCount > 0, "Heap is empty, no handles to be freed.");
         mFreeDescriptors.push_back(handle.HeapIndex);
 
         mActiveHandleCount--;
+        handle.SetInvalid();
     }
 
     DescriptorHandle RenderPassDescriptorHeap::Allocate(uint32_t count)

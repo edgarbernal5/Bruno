@@ -38,6 +38,15 @@ namespace Bruno
 
 		D3D12_RESOURCE_DESC mResourceDesc{};
 		TextureViewFlags mViewFlags = TextureViewFlags::None;
+
+		static TextureCreationDesc Create(uint32_t width, uint32_t height, DXGI_FORMAT format = DXGI_FORMAT_D32_FLOAT, TextureViewFlags viewFlags = TextureViewFlags::None) {
+			TextureCreationDesc desc;
+			desc.mResourceDesc.Format = format;
+			desc.mResourceDesc.Width = width;
+			desc.mResourceDesc.Height = height;
+			desc.mViewFlags = viewFlags;
+			return desc;
+		}
 	};
 
 	class Texture;
@@ -85,12 +94,14 @@ namespace Bruno
 
 		friend class Surface;
 		friend class GraphicsContext;
-	private:
+
+	protected:
 		DescriptorHandle mRTVDescriptor{};
 		DescriptorHandle mDSVDescriptor{};
 		DescriptorHandle mSRVDescriptor{};
 		DescriptorHandle mUAVDescriptor{};
 
+	private:
 		void CreateTexture(const TextureCreationDesc& desc);
 		void CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData);
 		void GenerateMips();

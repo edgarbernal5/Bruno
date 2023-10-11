@@ -28,6 +28,7 @@ namespace Bruno
 
 		friend class Surface;
 		friend class Context;
+		friend class GraphicsContext;
 		friend class UploadContext;
 
 	protected:

@@ -4,6 +4,9 @@
 #include "RootSignature.h"
 #include "PipelineStateObject.h"
 #include "Texture.h"
+#include "DepthBuffer.h"
+#include "GPUBuffer.h"
+#include "GraphicsDevice.h"
 
 namespace Bruno
 {
@@ -21,7 +24,7 @@ namespace Bruno
 		mCommandList->ClearRenderTargetView(target.mRTVDescriptor.Cpu, color, 0, nullptr);
 	}
 
-	void GraphicsContext::ClearDepthStencilTarget(const Texture& target, float depth, uint8_t stencil)
+	void GraphicsContext::ClearDepthStencilTarget(const DepthBuffer& target, float depth, uint8_t stencil)
 	{
 		mCommandList->ClearDepthStencilView(target.mDSVDescriptor.Cpu, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, depth, stencil, 0, nullptr);
 	}
@@ -70,7 +73,8 @@ namespace Bruno
 
 		mCurrentPipeline = pipelineBinding.mPipeline;
 
-		if (mCurrentPipeline->mPipelineType == PipelineType::graphics) {
+		if (mCurrentPipeline->mPipelineType == PipelineType::graphics)
+		{
 			D3D12_CPU_DESCRIPTOR_HANDLE renderTargetHandles[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
 			D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle{ 0 };
 
@@ -91,6 +95,100 @@ namespace Bruno
 	}
 
 	void GraphicsContext::SetPipelineResources(uint32_t spaceId, const PipelineResourceSpace& resources)
+	{
+		BR_ASSERT(mCurrentPipeline);
+		BR_ASSERT(resources.IsLocked());
+
+		static const uint32_t maxNumHandlesPerBinding = 16;
+		static const uint32_t singleDescriptorRangeCopyArray[maxNumHandlesPerBinding]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ,1 };
+
+		const GPUBuffer* cbv = resources.GetCBV();
+		const auto& uavs = resources.GetUAVs();
+		const auto& srvs = resources.GetSRVs();
+		const uint32_t numTableHandles = static_cast<uint32_t>(uavs.size() + srvs.size());
+		D3D12_CPU_DESCRIPTOR_HANDLE handles[maxNumHandlesPerBinding]{};
+		uint32_t currentHandleIndex = 0;
+		BR_ASSERT(numTableHandles <= maxNumHandlesPerBinding);
+
+		if (cbv)
+		{
+			auto& cbvMapping = mCurrentPipeline->mPipelineResourceMapping.mCbvMapping[spaceId];
+			BR_ASSERT(cbvMapping.has_value());
+
+			switch (mCurrentPipeline->mPipelineType)
+			{
+			case PipelineType::graphics:
+				mCommandList->SetGraphicsRootConstantBufferView(cbvMapping.value(), cbv->mVirtualAddress);
+				break;
+			case PipelineType::compute:
+				mCommandList->SetComputeRootConstantBufferView(cbvMapping.value(), cbv->mVirtualAddress);
+				break;
+			default:
+				BR_ASSERT_ERROR("Invalid pipeline type");
+				break;
+			}
+		}
+
+		if (numTableHandles == 0)
+		{
+			return;
+		}
+
+		for (auto& uav : uavs)
+		{
+			if (uav.mResource->mType == GPUResourceType::Buffer)
+			{
+				handles[currentHandleIndex++] = static_cast<GPUBuffer*>(uav.mResource)->mUAVDescriptor.Cpu;
+			}
+			else if (uav.mResource->mType == GPUResourceType::Texture)
+			{
+				handles[currentHandleIndex++] = static_cast<Texture*>(uav.mResource)->mUAVDescriptor.Cpu;
+			}
+		}
+
+		for (auto& srv : srvs)
+		{
+			if (srv.mResource->mType == GPUResourceType::Buffer)
+			{
+				handles[currentHandleIndex++] = static_cast<GPUBuffer*>(srv.mResource)->mSRVDescriptor.Cpu;
+			}
+			else if (srv.mResource->mType == GPUResourceType::Texture)
+			{
+				handles[currentHandleIndex++] = static_cast<Texture*>(srv.mResource)->mSRVDescriptor.Cpu;
+			}
+		}
+
+		DescriptorHandle blockStart = mCurrentSRVHeap->Allocate(numTableHandles);
+		mDevice.CopyDescriptors(1, &blockStart.Cpu, &numTableHandles, numTableHandles, handles, singleDescriptorRangeCopyArray, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		auto& tableMapping = mCurrentPipeline->mPipelineResourceMapping.mTableMapping[spaceId];
+		BR_ASSERT(tableMapping.has_value());
+
+		switch (mCurrentPipeline->mPipelineType)
+		{
+		case PipelineType::graphics:
+			mCommandList->SetGraphicsRootDescriptorTable(tableMapping.value(), blockStart.Gpu);
+			break;
+		case PipelineType::compute:
+			mCommandList->SetComputeRootDescriptorTable(tableMapping.value(), blockStart.Gpu);
+			break;
+		default:
+			BR_ASSERT_ERROR("Invalid pipeline type");
+			break;
+		}
+	}
+
+	void GraphicsContext::SetViewport(const D3D12_VIEWPORT& viewport)
+	{
+		mCommandList->RSSetViewports(1, &viewport);
+	}
+
+	void GraphicsContext::SetScissorRect(const D3D12_RECT& rect)
+	{
+		mCommandList->RSSetScissorRects(1, &rect);
+	}
+
+	void GraphicsContext::SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology)
 	{
 
 	}

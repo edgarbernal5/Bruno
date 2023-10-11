@@ -146,11 +146,11 @@ namespace Bruno
         D3D12MA::CreateAllocator(&desc, &mAllocator);
 
         BufferCreationDesc uploadBufferDesc;
-        uploadBufferDesc.mSize = 10 * 1024 * 1024;
+        uploadBufferDesc.mSize = AlignU32(10 * 1024 * 1024, 256);
         uploadBufferDesc.mAccessFlags = BufferAccessFlags::hostWritable;
 
         BufferCreationDesc uploadTextureDesc;
-        uploadTextureDesc.mSize = 80 * 1024 * 1024;
+        uploadTextureDesc.mSize = AlignU32(80 * 1024 * 1024, 256);
         uploadTextureDesc.mAccessFlags = BufferAccessFlags::hostWritable;
 
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
@@ -167,6 +167,14 @@ namespace Bruno
 
     GraphicsDevice::~GraphicsDevice()
     {
+        WaitForIdle();
+
+        for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
+        {
+            mSRVRenderPassDescriptorHeaps[frameIndex] = nullptr;
+            mUploadContexts[frameIndex] = nullptr;
+        }
+
         SafeRelease(mAllocator);
     }
 
@@ -178,6 +186,8 @@ namespace Bruno
         mGraphicsQueue->WaitForFenceCPUBlocking(mEndOfFrameFences[m_frameId].mGraphicsQueueFence);
         mComputeQueue->WaitForFenceCPUBlocking(mEndOfFrameFences[m_frameId].mComputeQueueFence);
         mCopyQueue->WaitForFenceCPUBlocking(mEndOfFrameFences[m_frameId].mCopyQueueFence);
+
+        ProcessDestructions(m_frameId);
 
         mUploadContexts[m_frameId]->ResolveProcessedUploads();
         mUploadContexts[m_frameId]->Reset();
@@ -251,6 +261,15 @@ namespace Bruno
     std::shared_ptr<GraphicsDevice> GraphicsDevice::Create(std::shared_ptr<GraphicsAdapter> adapter)
     {
         return std::make_shared<GraphicsDevice>(adapter);
+    }
+
+    void GraphicsDevice::ProcessDestructions(uint32_t frameIndex)
+    {
+    }
+
+    void GraphicsDevice::CopyDescriptors(uint32_t numDestDescriptorRanges, const D3D12_CPU_DESCRIPTOR_HANDLE* destDescriptorRangeStarts, const uint32_t* destDescriptorRangeSizes, uint32_t numSrcDescriptorRanges, const D3D12_CPU_DESCRIPTOR_HANDLE* srcDescriptorRangeStarts, const uint32_t* srcDescriptorRangeSizes, D3D12_DESCRIPTOR_HEAP_TYPE descriptorType)
+    {
+        m_d3dDevice->CopyDescriptors(numDestDescriptorRanges, destDescriptorRangeStarts, destDescriptorRangeSizes, numSrcDescriptorRanges, srcDescriptorRangeStarts, srcDescriptorRangeSizes, descriptorType);
     }
 
     void GraphicsDevice::CopySRVHandleToReservedTable(DescriptorHandle srvHandle, uint32_t index)

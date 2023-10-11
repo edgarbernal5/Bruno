@@ -4,6 +4,7 @@
 #include "Resource.h"
 #include "Resources.h"
 #include "Bruno/Core/Base.h"
+#include "Bruno/Core/Memory.h"
 
 namespace Bruno
 {
@@ -33,6 +34,18 @@ namespace Bruno
 		BufferViewFlags mViewFlags = BufferViewFlags::none;
 		BufferAccessFlags mAccessFlags = BufferAccessFlags::gpuOnly;
 		bool mIsRawAccess = false;
+
+		static BufferCreationDesc Create(uint32_t sizeInBytes, uint32_t stride, BufferViewFlags viewFlags = BufferViewFlags::none, BufferAccessFlags accessFlags = BufferAccessFlags::gpuOnly) {
+			BufferCreationDesc creationDesc{};
+
+			creationDesc.mSize = sizeInBytes;
+			creationDesc.mAccessFlags = accessFlags;
+			creationDesc.mViewFlags = viewFlags;
+			creationDesc.mStride = stride;
+			creationDesc.mIsRawAccess = true;
+
+			return creationDesc;
+		}
 	};
 
 	struct BufferUpload
@@ -48,11 +61,12 @@ namespace Bruno
 
 	public:
 		GPUBuffer(GraphicsDevice& device, const BufferCreationDesc& desc);
-		GPUBuffer();
+		virtual ~GPUBuffer();
 
 		void SetMappedData(const void* data, size_t dataSize);
 
 		friend class UploadContext;
+		friend class GraphicsContext;
 
 	protected:
 		uint8_t* mMappedResource = nullptr;
