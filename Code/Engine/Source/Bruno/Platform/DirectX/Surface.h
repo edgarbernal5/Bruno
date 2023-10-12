@@ -10,7 +10,7 @@ namespace Bruno
 	{
 		uint32_t Width;
 		uint32_t Height;
-		DXGI_FORMAT BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM; //DXGI_FORMAT_B8G8R8A8_UNORM;
+		DXGI_FORMAT BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		uint32_t BackBufferCount = Graphics::Core::BACK_BUFFER_COUNT;
 		DXGI_FORMAT DepthBufferFormat = DXGI_FORMAT_D32_FLOAT;
 		HWND WindowHandle;
@@ -32,7 +32,7 @@ namespace Bruno
 		void Resize(uint32_t width, uint32_t height);
 
 		Texture& GetBackBuffer() const { return *m_renderTargetData[m_currentBackBufferIndex].Resource; }
-		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle() const { return m_renderTargetData[m_currentBackBufferIndex].Rtv.Cpu; }
+		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle() const { return m_renderTargetData[m_currentBackBufferIndex].RtvHandle.Cpu; }
 		constexpr const D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() const { return m_depthBuffer->GetDsvHandle().Cpu; }
 		DepthBuffer& GetDepthBuffer() const { return *m_depthBuffer; }
 		constexpr const D3D12_VIEWPORT& GetViewport() const { return m_viewport; }
@@ -41,7 +41,7 @@ namespace Bruno
 		struct RenderTargetData
 		{
 			std::shared_ptr<Texture> Resource{ nullptr };
-			DescriptorHandle Rtv{};
+			DescriptorHandle RtvHandle{};
 		};
 
 		SurfaceWindowParameters					m_parameters;

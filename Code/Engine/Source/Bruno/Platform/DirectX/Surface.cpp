@@ -65,7 +65,7 @@ namespace Bruno
 		m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
 		for (uint32_t i = 0; i < m_parameters.BackBufferCount; ++i)
 		{
-			m_renderTargetData[i].Rtv = device->GetRtvDescriptionHeap().Allocate();
+			m_renderTargetData[i].RtvHandle = device->GetRtvDescriptionHeap().Allocate();
 		}
 
 		m_depthBuffer = std::make_unique<DepthBuffer>(backBufferWidth, backBufferHeight, m_parameters.DepthBufferFormat);
@@ -155,7 +155,7 @@ namespace Bruno
 			ThrowIfFailed(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&backBufferResource)));
 
 			data.Resource = std::make_shared<Texture>();
-			data.Resource->mRTVDescriptor = data.Rtv;
+			data.Resource->mRTVDescriptor = data.RtvHandle;
 			data.Resource->mResource = backBufferResource;
 			data.Resource->mState = D3D12_RESOURCE_STATE_PRESENT;
 			data.Resource->mDesc = backBufferResource->GetDesc();
@@ -166,7 +166,7 @@ namespace Bruno
 			rtvDesc.Texture2D.MipSlice = 0;
 			rtvDesc.Texture2D.PlaneSlice = 0;
 
-			device->GetD3DDevice()->CreateRenderTargetView(data.Resource->GetResource(), &rtvDesc, data.Rtv.Cpu);
+			device->GetD3DDevice()->CreateRenderTargetView(data.Resource->GetResource(), &rtvDesc, data.RtvHandle.Cpu);
 		}
 
 		DXGI_SWAP_CHAIN_DESC desc{};

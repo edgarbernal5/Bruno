@@ -34,7 +34,6 @@ namespace Bruno
         {
             ThrowIfFailed(LoadFromWICFile(filename.c_str(), DirectX::WIC_FLAGS_NONE, &metadata, scratchImage));
         }
-        //metadata.format = MakeSRGB(metadata.format);
 
         DXGI_FORMAT textureFormat = metadata.format;
         bool is3DTexture = metadata.dimension == DirectX::TEX_DIMENSION_TEXTURE3D;
@@ -58,7 +57,7 @@ namespace Bruno
         CreateTexture(textureCreationdesc);
         auto textureUpload = std::make_unique<TextureUpload>();
 
-        UINT numRows[Graphics::Core::MAX_TEXTURE_SUBRESOURCE_COUNT];
+        uint32_t numRows[Graphics::Core::MAX_TEXTURE_SUBRESOURCE_COUNT];
         uint64_t rowSizesInBytes[Graphics::Core::MAX_TEXTURE_SUBRESOURCE_COUNT];
 
         textureUpload->mTexture = this;
@@ -135,36 +134,6 @@ namespace Bruno
 
     void Texture::GenerateMips()
     {
-    }
-
-    DXGI_FORMAT Texture::MakeSRGB(DXGI_FORMAT fmt)
-    {
-        switch (fmt)
-        {
-        case DXGI_FORMAT_R8G8B8A8_UNORM:
-            return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
-        case DXGI_FORMAT_BC1_UNORM:
-            return DXGI_FORMAT_BC1_UNORM_SRGB;
-
-        case DXGI_FORMAT_BC2_UNORM:
-            return DXGI_FORMAT_BC2_UNORM_SRGB;
-
-        case DXGI_FORMAT_BC3_UNORM:
-            return DXGI_FORMAT_BC3_UNORM_SRGB;
-
-        case DXGI_FORMAT_B8G8R8A8_UNORM:
-            return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
-
-        case DXGI_FORMAT_B8G8R8X8_UNORM:
-            return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
-
-        case DXGI_FORMAT_BC7_UNORM:
-            return DXGI_FORMAT_BC7_UNORM_SRGB;
-
-        default:
-            return fmt;
-        }
     }
 
 	Texture::Texture(const AssetPipelineInitData& assetPipelineInitData)

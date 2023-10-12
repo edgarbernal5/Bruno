@@ -24,7 +24,7 @@ namespace Bruno
 	class DescriptorHeap
 	{
 	public:
-		explicit DescriptorHeap(GraphicsDevice* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t maxDescriptors, bool isShaderVisible);
+		explicit DescriptorHeap(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t maxDescriptors, bool isShaderVisible);
 		explicit DescriptorHeap(const DescriptorHeap&) = delete;
 		DescriptorHeap& operator=(const DescriptorHeap&) = delete;
 		explicit DescriptorHeap(DescriptorHeap&&) = delete;
@@ -49,7 +49,7 @@ namespace Bruno
 	class StagingDescriptorHeap : public DescriptorHeap
 	{
 	public:
-		StagingDescriptorHeap(GraphicsDevice* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t numDescriptors);
+		StagingDescriptorHeap(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t numDescriptors);
 		~StagingDescriptorHeap();
 
 		DescriptorHandle Allocate(uint32_t count = 1);
@@ -64,7 +64,7 @@ namespace Bruno
 	class RenderPassDescriptorHeap : public DescriptorHeap
 	{
 	public:
-		RenderPassDescriptorHeap(GraphicsDevice* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t reservedCount, uint32_t userCount) :
+		RenderPassDescriptorHeap(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t reservedCount, uint32_t userCount) :
 			DescriptorHeap(device, heapType, reservedCount + userCount, true), 
 			mReservedHandleCount(reservedCount),
 			mCurrentDescriptorIndex(reservedCount) {}

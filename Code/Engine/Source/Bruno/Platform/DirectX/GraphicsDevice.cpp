@@ -113,14 +113,14 @@ namespace Bruno
         mComputeQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COMPUTE);
         mCopyQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COPY);
 
-        m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::NUM_RTV_STAGING_DESCRIPTORS);
-        m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::NUM_DSV_STAGING_DESCRIPTORS);
-        m_srvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::NUM_SRV_STAGING_DESCRIPTORS);
-        mSamplerRenderPassDescriptorHeap = std::make_unique<RenderPassDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 0, Graphics::Core::NUM_SAMPLER_DESCRIPTORS);
+        m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::NUM_RTV_STAGING_DESCRIPTORS);
+        m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::NUM_DSV_STAGING_DESCRIPTORS);
+        m_srvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::NUM_SRV_STAGING_DESCRIPTORS);
+        mSamplerRenderPassDescriptorHeap = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 0, Graphics::Core::NUM_SAMPLER_DESCRIPTORS);
 
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
         {
-            mSRVRenderPassDescriptorHeaps[frameIndex] = std::make_unique<RenderPassDescriptorHeap>(this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::NUM_RESERVED_SRV_DESCRIPTORS, Graphics::Core::NUM_SRV_RENDER_PASS_USER_DESCRIPTORS);
+            mSRVRenderPassDescriptorHeaps[frameIndex] = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::NUM_RESERVED_SRV_DESCRIPTORS, Graphics::Core::NUM_SRV_RENDER_PASS_USER_DESCRIPTORS);
         }
 
         D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};

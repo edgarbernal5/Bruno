@@ -144,6 +144,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\Shader.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderProgram.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Texture.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\TextureHelpers.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexTypes.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\NanaGameWindow.h" />

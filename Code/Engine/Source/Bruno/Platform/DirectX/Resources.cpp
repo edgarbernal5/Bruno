@@ -5,7 +5,7 @@
 
 namespace Bruno
 {
-    DescriptorHeap::DescriptorHeap(GraphicsDevice* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t maxDescriptors, bool isShaderVisible) :
+    DescriptorHeap::DescriptorHeap(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t maxDescriptors, bool isShaderVisible) :
         m_heapType(heapType)
     {
         D3D12_DESCRIPTOR_HEAP_DESC desc{};
@@ -16,7 +16,7 @@ namespace Bruno
         desc.Type = m_heapType;
         desc.NodeMask = 0;
 
-        ThrowIfFailed(device->GetD3DDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_heap)));
+        ThrowIfFailed(device.GetD3DDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_heap)));
 
         m_maxDescriptors = maxDescriptors;
         m_currentDescriptorIndex = 0;
@@ -25,7 +25,7 @@ namespace Bruno
         m_gpuStart = isShaderVisible ?
             m_heap->GetGPUDescriptorHandleForHeapStart() : D3D12_GPU_DESCRIPTOR_HANDLE{ 0 };
 
-        m_descriptorSize = device->GetD3DDevice()->GetDescriptorHandleIncrementSize(m_heapType);
+        m_descriptorSize = device.GetD3DDevice()->GetDescriptorHandleIncrementSize(m_heapType);
     }
 
     DescriptorHeap::~DescriptorHeap()
@@ -33,7 +33,7 @@ namespace Bruno
         SafeRelease(m_heap);
     }
 
-    StagingDescriptorHeap::StagingDescriptorHeap(GraphicsDevice* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t numDescriptors) :
+    StagingDescriptorHeap::StagingDescriptorHeap(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t numDescriptors) :
         DescriptorHeap(device, heapType, numDescriptors, false)
     {
         mFreeDescriptors.reserve(numDescriptors);
