@@ -144,7 +144,6 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\Shader.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderProgram.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Texture.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadCommand.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexTypes.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\NanaGameWindow.h" />
@@ -200,7 +199,6 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\Shader.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderProgram.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Texture.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadCommand.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexTypes.cpp" />

@@ -2,23 +2,27 @@
 #include "IndexBuffer.h"
 
 #include "GraphicsDevice.h"
-#include "UploadCommand.h"
 #include "Bruno/Core/Memory.h"
 
 #include "D3D12MemAlloc.h"
+#include "UploadContext.h"
 
 namespace Bruno
 {
     IndexBuffer::IndexBuffer(uint32_t sizeInBytes, const void* bufferData, uint32_t stride) :
-		GPUBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(sizeInBytes, stride, BufferViewFlags::srv, BufferAccessFlags::hostWritable)),
+		GPUBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(sizeInBytes, stride, BufferViewFlags::srv, BufferAccessFlags::gpuOnly)),
 		//m_numElements(numElements),
 		//m_elementSize(stride),
 		m_indexBufferView{}
 	{
-		//if (isHostVisible)
-		{
-			SetMappedData(bufferData, sizeInBytes);
-		}
+		auto bufferUpload = std::make_unique<BufferUpload>();
+		bufferUpload->mBuffer = this;
+		bufferUpload->mBufferData = std::make_unique<uint8_t[]>(mDesc.Width);
+		bufferUpload->mBufferDataSize = mDesc.Width;
+
+		memcpy_s(bufferUpload->mBufferData.get(), mDesc.Width, bufferData, mDesc.Width);
+
+		Graphics::GetDevice()->GetUploadContext().AddBufferUpload(std::move(bufferUpload));
 
 		// Create the index buffer view.
 		m_indexBufferView.BufferLocation = mResource->GetGPUVirtualAddress();

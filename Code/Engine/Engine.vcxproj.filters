@@ -93,9 +93,6 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\Shader.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadCommand.h">
-      <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
@@ -264,9 +261,6 @@
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\Shader.cpp">
-      <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadCommand.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignature.cpp">

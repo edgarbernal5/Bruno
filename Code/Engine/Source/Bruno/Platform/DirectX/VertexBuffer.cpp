@@ -2,28 +2,16 @@
 #include "VertexBuffer.h"
 
 #include "GraphicsDevice.h"
-#include "UploadCommand.h"
 
 namespace Bruno
 {
-	VertexBuffer::VertexBuffer(uint32_t numVertices, const void* bufferData, uint32_t vertexStride) :
-		m_numVertices(numVertices),
-		m_vertexStride(vertexStride),
+	VertexBuffer::VertexBuffer(uint32_t sizeInBytes, const void* bufferData, uint32_t vertexStride) :
+		GPUBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(sizeInBytes, vertexStride, BufferViewFlags::srv, BufferAccessFlags::gpuOnly)),
 		m_vertexBufferView{}
 	{
-		//GraphicsDevice* device = Graphics::GetDevice();
-		//auto uploadCommand = device->GetUploadCommand();
-
-		//uint32_t bufferSize = numVertices * vertexStride;
-
-		//// Upload vertex buffer data.
-		//uploadCommand->BeginUpload(bufferSize);
-		//m_vertexBuffer = uploadCommand->Update(bufferData, bufferSize);
-		//uploadCommand->EndUpload();
-
 		// Create the vertex buffer view.
-		//m_vertexBufferView.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();
-  //      m_vertexBufferView.SizeInBytes = vertexStride * numVertices;
-  //      m_vertexBufferView.StrideInBytes = vertexStride;
+		m_vertexBufferView.BufferLocation = mResource->GetGPUVirtualAddress();
+        m_vertexBufferView.SizeInBytes = static_cast<uint32_t>(mDesc.Width);
+        m_vertexBufferView.StrideInBytes = vertexStride;
 	}
 }
