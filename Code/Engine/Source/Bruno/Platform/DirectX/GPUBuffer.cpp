@@ -101,6 +101,7 @@ namespace Bruno
     GPUBuffer::~GPUBuffer()
     {
         auto device = Graphics::GetDevice();
+        //TODO: add a new request to device to destroy the resource. we shouldn't do this here.
 
         if (mCBVDescriptor.IsValid())
             device->GetSrvDescriptionHeap().Free(mCBVDescriptor);

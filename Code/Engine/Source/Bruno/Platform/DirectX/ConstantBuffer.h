@@ -22,18 +22,15 @@ namespace Bruno
 			mMappedResource = nullptr;
 		}
 
-		//constexpr ID3D12Resource* GetResource() const { return m_d3dBuffer.Get(); }
 		constexpr const uint32_t GetSizeInBytes() const { return m_elementSizeInBytes; }
 
 		void CopyData(const T& data)
 		{
-			//memcpy(mMappedResource, &data, sizeof(T));
 			SetMappedData(&data, sizeof(T));
 		}
 
 	private:
 		uint32_t m_elementSizeInBytes;
-
 	};
 
 	template<typename T>

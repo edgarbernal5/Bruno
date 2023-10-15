@@ -109,8 +109,8 @@ namespace Bruno
 			std::lock_guard lock{ m_mutex };
 			BR_CORE_TRACE << "destroy. panel id = " << idxx << std::endl;
 
-			//auto device = Graphics::GetDevice();
-			//device->GetCommandQueue()->Flush();
+			auto device = Graphics::GetDevice();
+			device->WaitForIdle();
 
 			m_isExposed = false;
 			m_editorGame->RemoveScenePanel(this);
@@ -344,7 +344,7 @@ namespace Bruno
 		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
 		
 		auto device = Graphics::GetDevice();
-		device->GetCommandQueue()->WaitForIdle();
+		device->WaitForIdle();
 
 		m_isExposed = false;
 		m_editorGame->RemoveScenePanel(this);
@@ -407,7 +407,6 @@ namespace Bruno
 				pipeline.mPipeline = m_pipelineState.get();
 				pipeline.mRenderTargets.push_back(&backBuffer);
 				pipeline.mDepthStencilTarget = &depthBuffer;
-
 
 				m_graphicsContext->SetPipeline(pipeline);
 				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, mMeshPerObjectResourceSpace);

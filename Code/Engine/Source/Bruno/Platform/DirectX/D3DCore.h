@@ -9,7 +9,7 @@ namespace Bruno::Graphics::Core
     constexpr uint32_t MAX_BACK_BUFFER_COUNT{ 3 };
     constexpr uint32_t UPLOAD_FRAME_COUNT{ 3 };
     constexpr uint32_t SHADER_PROGRAMS_COUNT{ 2 };
-    constexpr uint32_t INVALID_RESOURCE_TABLE_INDEX{ 2 };
+    constexpr uint32_t INVALID_RESOURCE_TABLE_INDEX{ UINT_MAX };
 
     constexpr uint8_t NUM_RESOURCE_SPACES{ 4 };
 
@@ -25,7 +25,6 @@ namespace Bruno::Graphics::Core
     constexpr uint32_t NUM_SRV_RENDER_PASS_USER_DESCRIPTORS{ 65536 };
     
     constexpr uint8_t PER_OBJECT_SPACE = 0;
-
 
     struct
     {

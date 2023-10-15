@@ -46,8 +46,7 @@ namespace Bruno
 
 		IDXGIFactory4* GetFactory();
 		ID3D12Device5* GetD3DDevice();
-		CommandQueue* GetCommandQueue();
-		//GraphicsContext& GetGraphicsContext();
+		CommandQueue* GetGraphicsQueue() { return mGraphicsQueue.get(); }
 
 		StagingDescriptorHeap& GetRtvDescriptionHeap();
 		StagingDescriptorHeap& GetDsvDescriptionHeap();

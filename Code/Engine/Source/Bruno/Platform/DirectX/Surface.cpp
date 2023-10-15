@@ -48,7 +48,7 @@ namespace Bruno
 
 		Microsoft::WRL::ComPtr<IDXGISwapChain1> tempSwapChain;
 		HRESULT hr = device->GetFactory()->CreateSwapChainForHwnd(
-			device->GetCommandQueue()->GetQueue(),
+			device->GetGraphicsQueue()->GetQueue(),
 			m_parameters.WindowHandle,
 			&desc,
 			&fullscreenDesc,
@@ -146,7 +146,6 @@ namespace Bruno
 	{
 		GraphicsDevice* device = Graphics::GetDevice();
 
-		// create RTVs for back-buffers
 		for (uint32_t i = 0; i < m_parameters.BackBufferCount; i++)
 		{
 			RenderTargetData& data{ m_renderTargetData[i] };
@@ -154,7 +153,9 @@ namespace Bruno
 			ID3D12Resource* backBufferResource = nullptr;
 			ThrowIfFailed(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&backBufferResource)));
 
-			data.Resource = std::make_shared<Texture>();
+			if (data.Resource == nullptr) {
+				data.Resource = std::make_shared<Texture>();
+			}
 			data.Resource->mRTVDescriptor = data.RtvHandle;
 			data.Resource->mResource = backBufferResource;
 			data.Resource->mState = D3D12_RESOURCE_STATE_PRESENT;
@@ -189,7 +190,7 @@ namespace Bruno
 	{
 		for (uint32_t i = 0; i < m_parameters.BackBufferCount; ++i)
 		{
-			m_renderTargetData[i].Resource.reset();
+			SafeRelease(m_renderTargetData[i].Resource->mResource);
 		}
 	}
 }

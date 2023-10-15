@@ -59,7 +59,6 @@ namespace Bruno
 		PipelineResourceSpace mMeshPerObjectResourceSpace;
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
 		
-
 		std::mutex m_mutex{};
 
 		std::vector<std::shared_ptr<RenderItem>> m_renderItems;

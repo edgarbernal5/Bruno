@@ -192,7 +192,6 @@ namespace Bruno
 				pipeline.mRenderTargets.push_back(&backBuffer);
 				pipeline.mDepthStencilTarget = &depthBuffer;
 
-
 				m_graphicsContext->SetPipeline(pipeline);
 				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, mMeshPerObjectResourceSpace);
 

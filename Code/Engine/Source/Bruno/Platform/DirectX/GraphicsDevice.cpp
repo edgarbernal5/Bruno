@@ -319,16 +319,6 @@ namespace Bruno
         return m_d3dDevice.Get();
     }
 
-    CommandQueue* GraphicsDevice::GetCommandQueue()
-    {
-        return mGraphicsQueue.get();
-    }
-
-    //GraphicsContext& GraphicsDevice::GetGraphicsContext()
-    //{
-     //   // TODO: insert return statement here
-    //}
-
     StagingDescriptorHeap& GraphicsDevice::GetRtvDescriptionHeap()
     {
         return *m_rtvDescriptorHeap;

@@ -214,6 +214,7 @@ namespace Bruno
     Texture::~Texture()
     {
         auto device = Graphics::GetDevice();
+        //TODO: add a new request to device to destroy the resource. we shouldn't do this here.
 
         if (mRTVDescriptor.IsValid())
             device->GetRtvDescriptionHeap().Free(mRTVDescriptor);
