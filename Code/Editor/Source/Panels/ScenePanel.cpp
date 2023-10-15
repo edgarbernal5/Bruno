@@ -8,6 +8,7 @@
 #include <Bruno/Platform/DirectX/VertexBuffer.h>
 #include <Bruno/Platform/DirectX/Shader.h>
 #include <Bruno/Platform/DirectX/VertexTypes.h>
+#include <Bruno/Platform/DirectX/GraphicsContext.h>
 #include <Bruno/Content/ContentManager.h>
 #include "EditorGame.h"
 
@@ -210,75 +211,56 @@ namespace Bruno
 		//m_vertexShader = std::make_unique<ShaderProgram>(L"VertexShader.hlsl", "main", "vs_5_1");
 		//m_pixelShader = std::make_unique<ShaderProgram>(L"PixelShader.hlsl", "main", "ps_5_1");
 
-		/*auto boxRenderItem = std::make_shared<RenderItem>();
+		auto boxRenderItem = std::make_shared<RenderItem>();
 		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
-		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
-		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
-		m_renderItems.push_back(boxRenderItem);*/
+		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices) * sizeof(uint16_t), g_Indices, (uint32_t)sizeof(uint16_t));
+		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices) * sizeof(VertexPositionNormalTexture), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
+		m_renderItems.push_back(boxRenderItem);
+
+		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
 
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
 			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
 		}
-		ContentManager manager(L"");
-		m_texture = manager.Load<Texture>(L"Textures/Mona_Lisa.jpg.bruno");
+		//ContentManager manager(L"");
+		//m_texture = manager.Load<Texture>(L"Textures/Mona_Lisa.jpg.bruno");
 		//m_texture.reset(sharedTexture.get());
-		//m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
+		m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
 
 		GraphicsDevice* device = Graphics::GetDevice();
 
-		// Allow input layout and deny unnecessary access to certain pipeline stages.
-		D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
 
-		CD3DX12_DESCRIPTOR_RANGE texTable;
-		texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
 
-		CD3DX12_ROOT_PARAMETER rootParameters[2]{};
-		// Perfomance TIP: Order from most frequent to least frequent.
-		rootParameters[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
-		rootParameters[1].InitAsConstantBufferView(0);
+		PipelineResourceBinding textureBinding;
+		textureBinding.mBindingIndex = 0;
+		textureBinding.mResource = m_texture.get();
 
-		CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
-		// A root signature is an array of root parameters.
-		CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDescription(2, rootParameters,
-			1, &linearRepeatSampler,
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+		mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
+		mMeshPerObjectResourceSpace.SetSRV(textureBinding);
+		mMeshPerObjectResourceSpace.Lock();
 
-		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
-		m_rootSignature = std::make_unique<RootSignature>(rootSignatureDescription);
+		PipelineResourceLayout meshResourceLayout;
+		meshResourceLayout.mSpaces[Graphics::Core::PER_OBJECT_SPACE] = &mMeshPerObjectResourceSpace;
 
-		struct PipelineStateStream
-		{
-			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE pRootSignature;
-			CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT InputLayout;
-			CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopologyType;
-			CD3DX12_PIPELINE_STATE_STREAM_VS VS;
-			CD3DX12_PIPELINE_STATE_STREAM_PS PS;
-			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
-			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
-		} pipelineStateStream;
+		PipelineResourceMapping resourceMapping;
 
-		D3D12_RT_FORMAT_ARRAY rtvFormats = {};
-		rtvFormats.NumRenderTargets = 1;
-		rtvFormats.RTFormats[0] = m_backBufferFormat;
+		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
 
-		pipelineStateStream.pRootSignature = m_rootSignature->GetD3D12RootSignature();
-		pipelineStateStream.InputLayout = VertexPositionNormalTexture::InputLayout;
-		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		//pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetBlob());
-		//pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pixelShader->GetBlob());
-		pipelineStateStream.DSVFormat = m_depthBufferFormat;
-		pipelineStateStream.RTVFormats = rtvFormats;
+		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
 
-		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
-			sizeof(PipelineStateStream), &pipelineStateStream
-		};
-		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineStateStreamDesc);
+		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
+		meshPipelineDesc.mVertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
+		meshPipelineDesc.mPixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
+		meshPipelineDesc.mRenderTargetDesc.mDepthStencilFormat = depthBufferFormat;
+		meshPipelineDesc.mRenderTargetDesc.mNumRenderTargets = 1;
+		meshPipelineDesc.mDepthStencilDesc.DepthEnable = true;
+		meshPipelineDesc.mRenderTargetDesc.mRenderTargetFormats[0] = backBufferFormat;
+		//meshPipelineDesc.mDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+
+		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 
 		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 0.1f, 100.0f);
@@ -360,12 +342,12 @@ namespace Bruno
 	{
 		std::lock_guard lock{ m_mutex };
 		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
-		/*
+		
 		auto device = Graphics::GetDevice();
-		device->GetCommandQueue()->Flush();
+		device->GetCommandQueue()->WaitForIdle();
 
 		m_isExposed = false;
-		m_editorGame->RemoveScenePanel(this);*/
+		m_editorGame->RemoveScenePanel(this);
 	}
 	
 	void ScenePanel::OnUpdate(const GameTimer& timer)
@@ -376,11 +358,10 @@ namespace Bruno
 		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
-		/*auto device = Bruno::Graphics::GetDevice();
-		auto commandQueue = device->GetCommandQueue();
-		commandQueue->WaitFrame();
+		auto device = Bruno::Graphics::GetDevice();
+		device->BeginFrame();
 
-		UpdateCBs(timer);*/
+		UpdateCBs(timer);
 	}
 
 	void ScenePanel::OnDraw()
@@ -390,61 +371,63 @@ namespace Bruno
 		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
-		//auto device = Bruno::Graphics::GetDevice();
-		//auto commandQueue = device->GetCommandQueue();
-		//auto commandList = commandQueue->GetCommandList();
-		//int frameIndex = commandQueue->GetFrameIndex();
+		auto device = Bruno::Graphics::GetDevice();
+		Math::Color clearColor{ 1.0f, 1.0f, 0.0f, 1.0f };
 
-		//commandQueue->BeginFrame();
-		//ID3D12Resource* const currentBackBuffer{ m_surface->GetBackBuffer().GetResource() };
-		//ResourceBarrier::Transition(commandList,
-		//	currentBackBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		Texture& backBuffer = m_surface->GetBackBuffer();
+		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
 
-		//float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; //Yellow
-		//if (idxx == 2) clearColor[0] = 0.0f;
-		//else if (idxx == 3) { clearColor[0] = 0.0f; clearColor[1] = 0.0f; }
-		//else if (idxx == 4) { clearColor[1] = 0.0f; clearColor[2] = 1.0f; }
+		m_graphicsContext->Reset();
+		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		m_graphicsContext->FlushBarriers();
 
-		//auto rtv = m_surface->GetRtv();
-		//auto dsv = m_surface->GetDsv();
+		m_graphicsContext->ClearRenderTarget(backBuffer, clearColor);
+		m_graphicsContext->ClearDepthStencilTarget(depthBuffer, 1.0f, 0);
 
-		//commandList->ClearRenderTargetView(m_surface->GetRtv(), clearColor, 0, nullptr);
-		//commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		m_graphicsContext->SetViewport(m_surface->GetViewport());
+		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
 
-		//commandList->RSSetViewports(1, &m_surface->GetViewport());
-		//commandList->RSSetScissorRects(1, &m_surface->GetScissorRect());
-		//commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+		if (m_texture->IsReady()) {
+			for (auto& item : m_renderItems)
+			{
+				if (!item->IndexBuffer->IsReady() || !item->VertexBuffer->IsReady())
+					continue;
 
-		//ID3D12DescriptorHeap* descriptorHeaps[] = { device->GetSrvDescriptionHeap().GetHeap() };
-		//commandList->SetDescriptorHeaps(1, descriptorHeaps);
+				m_graphicsContext->SetVertexBuffer(*item->VertexBuffer);
+				m_graphicsContext->SetIndexBuffer(*item->IndexBuffer);
 
-		//commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
-		//commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
+				PipelineResourceBinding textureBinding;
+				textureBinding.mBindingIndex = 0;
+				textureBinding.mResource = m_texture.get();
 
-		//for (auto& item : m_renderItems)
-		//{
-		//	commandList->IASetPrimitiveTopology(item->PrimitiveType);
-		//	commandList->IASetVertexBuffers(0, 1, &item->VertexBuffer->GetView());
-		//	commandList->IASetIndexBuffer(&item->IndexBuffer->GetView());
+				mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[device->GetFrameId()].get());
+				mMeshPerObjectResourceSpace.SetSRV(textureBinding);
 
-		//	CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_texture->GetSrvHandle().Gpu);
+				PipelineInfo pipeline;
+				pipeline.mPipeline = m_pipelineState.get();
+				pipeline.mRenderTargets.push_back(&backBuffer);
+				pipeline.mDepthStencilTarget = &depthBuffer;
 
-		//	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer[frameIndex]->GetResource()->GetGPUVirtualAddress();
 
-		//	commandList->SetGraphicsRootDescriptorTable(0, tex);
-		//	commandList->SetGraphicsRootConstantBufferView(1, objCBAddress);
+				m_graphicsContext->SetPipeline(pipeline);
+				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, mMeshPerObjectResourceSpace);
 
-		//	commandList->DrawIndexedInstanced(item->IndexCount,
-		//		1,
-		//		item->StartIndexLocation,
-		//		item->BaseVertexLocation,
-		//		0);
-		//}
+				m_graphicsContext->SetPrimitiveTopology(item->PrimitiveType);
+				m_graphicsContext->DrawIndexedInstanced(item->IndexCount,
+					1,
+					item->StartIndexLocation,
+					item->BaseVertexLocation,
+					0);
+			}
+		}
 
-		//ResourceBarrier::Transition(commandList,
-		//	currentBackBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
+		m_graphicsContext->FlushBarriers();
 
-		//commandQueue->EndFrame(m_surface.get());
+		device->SubmitContextWork(*m_graphicsContext);
+
+		device->EndFrame();
+		device->Present(m_surface.get());
 	}
 
 	bool ScenePanel::IsEnabled()
@@ -456,23 +439,21 @@ namespace Bruno
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
 	{
-		//auto device = Bruno::Graphics::GetDevice();
-		//auto commandQueue = device->GetCommandQueue();
+		auto device = Bruno::Graphics::GetDevice();
+		static float TotalTime = 0.0f;
+		float angle = static_cast<float>(0.0);
+		//float angle = static_cast<float>(TotalTime * 45.0);
 
-		//// Update the model matrix.
-		////float angle = static_cast<float>(m_totalTime * 45.0);
-		//float angle = static_cast<float>(0.0);
-
+		Math::Matrix modelMatrix = Math::Matrix::Identity;
 		//Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
-		////Math::Matrix modelMatrix = Math::Matrix::Identity;
-		//m_totalTime += timer.GetDeltaTime();
+		TotalTime += timer.GetDeltaTime();
 
-		//Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
+		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
 
-		//ObjectBuffer objectBuffer;
-		//objectBuffer.World = mvpMatrix;
+		ObjectBuffer objectBuffer;
+		objectBuffer.World = mvpMatrix;
 
-		//int frameIndex = commandQueue->GetFrameIndex();
-		//m_objectBuffer[frameIndex]->CopyData(objectBuffer);
+		uint32_t frameIndex = device->GetFrameId();
+		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
 	}
 }

@@ -195,7 +195,6 @@ namespace Bruno
 
 				m_graphicsContext->SetPipeline(pipeline);
 				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, mMeshPerObjectResourceSpace);
-				//mGraphicsContext->SetPipelineResources(PER_PASS_SPACE, mMeshPerPassResourceSpace);
 
 				m_graphicsContext->SetPrimitiveTopology(item->PrimitiveType);
 				m_graphicsContext->DrawIndexedInstanced(item->IndexCount,

@@ -33,14 +33,17 @@ namespace Bruno
 
 	void GraphicsContext::Draw(uint32_t vertexCount, uint32_t vertexStartOffset)
 	{
+		DrawInstanced(vertexCount, 1, vertexStartOffset, 0);
 	}
 
 	void GraphicsContext::DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, uint32_t baseVertexLocation)
 	{
+		DrawIndexedInstanced(indexCount, 1, startIndexLocation, baseVertexLocation, 0);
 	}
 
 	void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation)
 	{
+		mCommandList->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 	}
 
 	void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, uint32_t startInstanceLocation)
@@ -50,6 +53,7 @@ namespace Bruno
 
 	void GraphicsContext::SetBlendFactor(Math::Color blendFactor)
 	{
+		mCommandList->OMSetBlendFactor(blendFactor);
 	}
 
 	void GraphicsContext::SetIndexBuffer(IndexBuffer& indexBuffer)

@@ -21,6 +21,7 @@ namespace Bruno
 {
 	class Surface;
 	class EditorGame;
+	class GraphicsContext;
 
 	//class ScenePanel : public nana::panel<true>
 	class ScenePanel : public nana::nested_form
@@ -48,13 +49,16 @@ namespace Bruno
 
 		std::unique_ptr<IndexBuffer> m_indexBuffer;
 		std::unique_ptr<VertexBuffer> m_vertexBuffer;
-		//std::unique_ptr<ShaderProgram> m_vertexShader;
-		//std::unique_ptr<ShaderProgram> m_pixelShader;
 		std::unique_ptr<RootSignature> m_rootSignature;
+
+		std::unique_ptr<Shader> m_opaqueShader;
 
 		std::unique_ptr<PipelineStateObject> m_pipelineState;
 		std::shared_ptr<Texture> m_texture;
-		//std::unique_ptr<Texture> m_texture;
+		
+		PipelineResourceSpace mMeshPerObjectResourceSpace;
+		std::unique_ptr<GraphicsContext> m_graphicsContext;
+		
 
 		std::mutex m_mutex{};
 
