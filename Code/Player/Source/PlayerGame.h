@@ -45,6 +45,7 @@ namespace Bruno
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
 
 		std::vector<std::shared_ptr<RenderItem>> m_renderItems;
+		PipelineResourceSpace mMeshPerObjectResourceSpace;
 
 		struct ObjectBuffer
 		{

@@ -24,6 +24,8 @@ namespace Bruno::Graphics::Core
     constexpr uint32_t NUM_RESERVED_SRV_DESCRIPTORS{ 8192 };
     constexpr uint32_t NUM_SRV_RENDER_PASS_USER_DESCRIPTORS{ 65536 };
     
+    constexpr uint8_t PER_OBJECT_SPACE = 0;
+
     struct
     {
         const CD3DX12_HEAP_PROPERTIES DefaultHeap

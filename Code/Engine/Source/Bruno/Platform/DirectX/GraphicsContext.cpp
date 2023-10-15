@@ -7,6 +7,8 @@
 #include "DepthBuffer.h"
 #include "GPUBuffer.h"
 #include "GraphicsDevice.h"
+#include "IndexBuffer.h"
+#include "VertexBuffer.h"
 
 namespace Bruno
 {
@@ -43,14 +45,21 @@ namespace Bruno
 
 	void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, uint32_t startInstanceLocation)
 	{
+		mCommandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 	}
 
 	void GraphicsContext::SetBlendFactor(Math::Color blendFactor)
 	{
 	}
 
-	void GraphicsContext::SetIndexBuffer(const GPUBuffer& indexBuffer)
+	void GraphicsContext::SetIndexBuffer(IndexBuffer& indexBuffer)
 	{
+		mCommandList->IASetIndexBuffer(&indexBuffer.GetView());
+	}
+
+	void GraphicsContext::SetVertexBuffer(VertexBuffer& vertexBuffer)
+	{
+		mCommandList->IASetVertexBuffers(0, 1, &vertexBuffer.GetView());
 	}
 
 	void GraphicsContext::SetTargets(uint32_t numRenderTargets, const D3D12_CPU_DESCRIPTOR_HANDLE renderTargets[], D3D12_CPU_DESCRIPTOR_HANDLE depthStencil)
@@ -190,6 +199,6 @@ namespace Bruno
 
 	void GraphicsContext::SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology)
 	{
-
+		mCommandList->IASetPrimitiveTopology(topology);
 	}
 }

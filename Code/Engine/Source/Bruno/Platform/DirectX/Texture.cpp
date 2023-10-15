@@ -13,10 +13,13 @@ namespace Bruno
 
     Texture::Texture()
     {
+        mType = GPUResourceType::Texture;
     }
 
     Texture::Texture(const std::wstring& filename)
     {
+        mType = GPUResourceType::Texture;
+
         std::filesystem::path filePath(filename);
         if (!std::filesystem::exists(filePath))
         {
@@ -138,6 +141,8 @@ namespace Bruno
 
 	Texture::Texture(const AssetPipelineInitData& assetPipelineInitData)
 	{
+        mType = GPUResourceType::Texture;
+
         auto device = Graphics::GetDevice();
 
         D3D12_RESOURCE_DESC textureDesc = {};
@@ -201,6 +206,8 @@ namespace Bruno
 
     Texture::Texture(const TextureCreationDesc& textureDesc)
     {
+        mType = GPUResourceType::Texture;
+
         CreateTexture(textureDesc);
     }
 

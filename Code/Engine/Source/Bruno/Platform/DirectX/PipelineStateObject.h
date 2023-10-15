@@ -93,7 +93,7 @@ namespace Bruno
 	{
 	public:
 		PipelineStateObject(const D3D12_PIPELINE_STATE_STREAM_DESC& desc);
-		PipelineStateObject(const GraphicsPipelineDesc& desc, RootSignature* rootSignature);
+		PipelineStateObject(const GraphicsPipelineDesc& desc, RootSignature* rootSignature, PipelineResourceMapping& pipelineResourceMapping);
 		virtual ~PipelineStateObject() = default;
 		
 		ID3D12PipelineState* GetD3D12PipelineState() const { return m_d3d12PipelineState.Get(); }

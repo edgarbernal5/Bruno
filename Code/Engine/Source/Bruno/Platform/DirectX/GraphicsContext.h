@@ -10,6 +10,8 @@ namespace Bruno
 	class Texture;
 	class DepthBuffer;
 	class GPUBuffer;
+	class IndexBuffer;
+	class VertexBuffer;
 	class PipelineStateObject;
 	class PipelineResourceSpace;
 	struct PipelineInfo;
@@ -29,7 +31,8 @@ namespace Bruno
 		void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, uint32_t baseVertexLocation, uint32_t startInstanceLocation);
 
 		void SetBlendFactor(Math::Color blendFactor);
-		void SetIndexBuffer(const GPUBuffer& indexBuffer);
+		void SetIndexBuffer(IndexBuffer& indexBuffer);
+		void SetVertexBuffer(VertexBuffer& vertexBuffer);
 		void SetPipeline(const PipelineInfo& pipelineBinding);
 		void SetPipelineResources(uint32_t spaceId, const PipelineResourceSpace& resources);
 		void SetViewport(const D3D12_VIEWPORT& viewPort);

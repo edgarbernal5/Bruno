@@ -81,31 +81,49 @@ namespace Bruno
 
 		auto boxRenderItem = std::make_shared<RenderItem>();
 		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
-		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
-		//boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
+		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices) * sizeof(uint16_t), g_Indices, (uint32_t)sizeof(uint16_t));
+		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices) * sizeof(VertexPositionNormalTexture), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
 		m_renderItems.push_back(boxRenderItem);
 
-		//m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
+		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
 
-		//for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-		//{
-		//	m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
-		//}
+		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
+		{
+			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		}
 		m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
 
 		GraphicsDevice* device = Graphics::GetDevice();
-		/*m_rootSignature = m_opaqueShader->CreateRootSignature();
+		
+		//m_rootSignature = m_opaqueShader->CreateRootSignature();
 
-		GraphicsPipelineDesc pipelineDesc = GetDefaultGraphicsPipelineDesc();
-		pipelineDesc.mVertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-		pipelineDesc.mPixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		pipelineDesc.mRenderTargetDesc.mDepthStencilFormat= surfaceParameters.DepthBufferFormat;
-		pipelineDesc.mRenderTargetDesc.mNumRenderTargets = 1;
-		pipelineDesc.mRenderTargetDesc.mRenderTargetFormats[0] = surfaceParameters.BackBufferFormat;
+		PipelineResourceBinding textureBinding;
+		textureBinding.mBindingIndex = 0;
+		textureBinding.mResource = m_texture.get();
+
+		mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
+		mMeshPerObjectResourceSpace.SetSRV(textureBinding);
+		mMeshPerObjectResourceSpace.Lock();
+
+		PipelineResourceLayout meshResourceLayout;
+		meshResourceLayout.mSpaces[Graphics::Core::PER_OBJECT_SPACE] = &mMeshPerObjectResourceSpace;
 		
-		m_pipelineState = std::make_unique<PipelineStateObject>(pipelineDesc, m_rootSignature.get());*/
-		
+		PipelineResourceMapping resourceMapping;
+
+		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
+
 		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
+
+		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
+		meshPipelineDesc.mVertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
+		meshPipelineDesc.mPixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
+		meshPipelineDesc.mRenderTargetDesc.mDepthStencilFormat = surfaceParameters.DepthBufferFormat;
+		meshPipelineDesc.mRenderTargetDesc.mNumRenderTargets = 1;
+		meshPipelineDesc.mDepthStencilDesc.DepthEnable = true;
+		meshPipelineDesc.mRenderTargetDesc.mRenderTargetFormats[0] = surfaceParameters.BackBufferFormat;
+		meshPipelineDesc.mDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+
+		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 
 		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
@@ -131,17 +149,13 @@ namespace Bruno
 	void PlayerGame::OnUpdate(const GameTimer& timer)
 	{
 		//BR_CORE_TRACE << "delta time = " << timer.GetDeltaTime() << ". TotalTime " << TotalTime << std::endl;
-		
-		auto commandQueue = m_device->GetCommandQueue();
-		//commandQueue->WaitFrame();
+		m_device->BeginFrame();
 
 		UpdateCBs(timer);
 	}
 
 	void PlayerGame::OnDraw()
 	{
-		m_device->BeginFrame();
-
 		Math::Color clearColor { 1.0f, 1.0f, 0.0f, 1.0f };
 
 		Texture& backBuffer = m_surface->GetBackBuffer();
@@ -156,6 +170,33 @@ namespace Bruno
 
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
+
+		if (m_texture->IsReady()) {
+			for (auto& item : m_renderItems)
+			{
+				m_graphicsContext->SetVertexBuffer(*item->VertexBuffer);
+				m_graphicsContext->SetIndexBuffer(*item->IndexBuffer);
+
+				mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[m_device->GetFrameId()].get());
+
+				PipelineInfo pipeline;
+				pipeline.mPipeline = m_pipelineState.get();
+				pipeline.mRenderTargets.push_back(&backBuffer);
+				pipeline.mDepthStencilTarget = &depthBuffer;
+
+				m_graphicsContext->SetPipeline(pipeline);
+				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, mMeshPerObjectResourceSpace);
+				//mGraphicsContext->SetPipelineResources(PER_PASS_SPACE, mMeshPerPassResourceSpace);
+
+				m_graphicsContext->SetPrimitiveTopology(item->PrimitiveType);
+				m_graphicsContext->DrawIndexedInstanced(item->IndexCount,
+					1,
+					item->StartIndexLocation,
+					item->BaseVertexLocation,
+					0);
+			}
+			
+		}
 
 		//m_graphicsContext->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 
@@ -266,22 +307,20 @@ namespace Bruno
 
 	void PlayerGame::UpdateCBs(const GameTimer& timer)
 	{
-		//auto commandQueue = m_device->GetCommandQueue();
+		static float TotalTime = 0.0f;
+		float angle = static_cast<float>(0.0);
+		//float angle = static_cast<float>(TotalTime * 45.0);
+		
+		Math::Matrix modelMatrix = Math::Matrix::Identity;
+		//Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
+		TotalTime += timer.GetDeltaTime();
 
-		//static float TotalTime = 0.0f;
-		//float angle = static_cast<float>(0.0);
-		////float angle = static_cast<float>(TotalTime * 45.0);
-		//
-		//Math::Matrix modelMatrix = Math::Matrix::Identity;
-		////Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
-		//TotalTime += timer.GetDeltaTime();
+		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
 
-		//Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
+		ObjectBuffer objectBuffer;
+		objectBuffer.World = mvpMatrix;
 
-		//ObjectBuffer objectBuffer;
-		//objectBuffer.World = mvpMatrix;
-
-		//int frameIndex = commandQueue->GetFrameIndex();
-		//m_objectBuffer[frameIndex]->CopyData(objectBuffer);
+		uint32_t frameIndex = m_device->GetFrameId();
+		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
 	}
 }

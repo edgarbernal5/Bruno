@@ -26,6 +26,8 @@ namespace Bruno
 		virtual ~Resource();
 		constexpr ID3D12Resource* GetResource() { return mResource; }
 
+		bool IsReady() { return mIsReady; }
+
 		friend class Surface;
 		friend class Context;
 		friend class GraphicsContext;

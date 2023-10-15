@@ -20,7 +20,7 @@ namespace Bruno
 		ThrowIfFailed(d3d12Device->CreatePipelineState(&desc, IID_PPV_ARGS(&m_d3d12PipelineState)));
 	}
 
-	PipelineStateObject::PipelineStateObject(const GraphicsPipelineDesc& desc, RootSignature* rootSignature) :
+	PipelineStateObject::PipelineStateObject(const GraphicsPipelineDesc& desc, RootSignature* rootSignature, PipelineResourceMapping& pipelineResourceMapping) :
 		m_rootSignature(rootSignature)
 	{
 		auto d3d12Device = Graphics::GetDevice()->GetD3DDevice();
@@ -54,8 +54,9 @@ namespace Bruno
 			pipelineDesc.PS.BytecodeLength = desc.mPixelShader->GetBlob()->GetBufferSize();
 		}
 		pipelineDesc.pRootSignature = rootSignature->GetD3D12RootSignature();
-
+		
 		ThrowIfFailed(d3d12Device->CreateGraphicsPipelineState(&pipelineDesc, IID_PPV_ARGS(&m_d3d12PipelineState)));
+		mPipelineResourceMapping = pipelineResourceMapping;
 	}
 
 	void PipelineResourceSpace::SetCBV(GPUBuffer* resource)

@@ -46,6 +46,16 @@ namespace Bruno
 
 			return creationDesc;
 		}
+
+		static BufferCreationDesc Create(uint32_t sizeInBytes, BufferViewFlags viewFlags = BufferViewFlags::none, BufferAccessFlags accessFlags = BufferAccessFlags::gpuOnly) {
+			BufferCreationDesc creationDesc{};
+
+			creationDesc.mSize = sizeInBytes;
+			creationDesc.mAccessFlags = accessFlags;
+			creationDesc.mViewFlags = viewFlags;
+
+			return creationDesc;
+		}
 	};
 
 	struct BufferUpload
