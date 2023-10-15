@@ -158,6 +158,28 @@ namespace Bruno
             mUploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GPUBuffer>(*this, uploadBufferDesc), std::make_unique<GPUBuffer>(*this, uploadTextureDesc));
         }
 
+        //D3D12_SAMPLER_DESC samplerDescs[Graphics::Core::NUM_SAMPLER_DESCRIPTORS]{};
+        //samplerDescs[0].Filter = D3D12_FILTER_ANISOTROPIC;
+        //samplerDescs[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        //samplerDescs[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        //samplerDescs[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        //samplerDescs[0].BorderColor[0] = samplerDescs[0].BorderColor[1] = samplerDescs[0].BorderColor[2] = samplerDescs[0].BorderColor[3] = 0.0f;
+        //samplerDescs[0].MipLODBias = 0.0f;
+        //samplerDescs[0].MaxAnisotropy = 16;
+        //samplerDescs[0].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+        //samplerDescs[0].MinLOD = 0;
+        //samplerDescs[0].MaxLOD = D3D12_FLOAT32_MAX;
+
+        //DescriptorHandle samplerDescriptorBlock = mSamplerRenderPassDescriptorHeap->Allocate(Graphics::Core::NUM_SAMPLER_DESCRIPTORS);
+        //D3D12_CPU_DESCRIPTOR_HANDLE currentSamplerDescriptor = samplerDescriptorBlock.Cpu;
+        //for (uint32_t samplerIndex = 0; samplerIndex < Graphics::Core::NUM_SAMPLER_DESCRIPTORS; samplerIndex++)
+        //{
+        //    m_d3dDevice->CreateSampler(&samplerDescs[samplerIndex], currentSamplerDescriptor);
+        //    //currentSamplerDescriptor.ptr += mSamplerRenderPassDescriptorHeap->GetDescriptorSize();
+        //}
+
+        //CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
+
         mFreeReservedDescriptorIndices.resize(Graphics::Core::NUM_RESERVED_SRV_DESCRIPTORS);
         for (size_t i = 0; i < mFreeReservedDescriptorIndices.size(); i++)
         {
@@ -263,6 +285,11 @@ namespace Bruno
         return std::make_shared<GraphicsDevice>(adapter);
     }
 
+    void GraphicsDevice::CopyDescriptorsSimple(uint32_t numDescriptors, D3D12_CPU_DESCRIPTOR_HANDLE destDescriptorRangeStart, D3D12_CPU_DESCRIPTOR_HANDLE srcDescriptorRangeStart, D3D12_DESCRIPTOR_HEAP_TYPE descriptorType)
+    {
+        m_d3dDevice->CopyDescriptorsSimple(numDescriptors, destDescriptorRangeStart, srcDescriptorRangeStart, descriptorType);
+    }
+
     void GraphicsDevice::ProcessDestructions(uint32_t frameIndex)
     {
     }
@@ -278,8 +305,7 @@ namespace Bruno
         {
             DescriptorHandle targetDescriptor = mSRVRenderPassDescriptorHeaps[frameIndex]->GetReservedDescriptor(index);
 
-            //CopyDescriptorsSimple(1, targetDescriptor.mCPUHandle, srvHandle.mCPUHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-            m_d3dDevice->CopyDescriptorsSimple(1, targetDescriptor.Cpu, srvHandle.Cpu, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+            CopyDescriptorsSimple(1, targetDescriptor.Cpu, srvHandle.Cpu, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
         }
     }
 

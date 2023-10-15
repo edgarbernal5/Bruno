@@ -102,12 +102,12 @@ namespace Bruno
 		D3D12MA::Allocator*									mAllocator = nullptr;
 		std::vector<uint32_t>								mFreeReservedDescriptorIndices;
 
-
 		std::array<std::vector<std::pair<uint64_t, D3D12_COMMAND_LIST_TYPE>>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mContextSubmissions;
 
 		std::array<std::unique_ptr<UploadContext>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mUploadContexts;
 		std::array<EndOfFrameFences, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mEndOfFrameFences;
 
+		void CopyDescriptorsSimple(uint32_t numDescriptors, D3D12_CPU_DESCRIPTOR_HANDLE destDescriptorRangeStart, D3D12_CPU_DESCRIPTOR_HANDLE srcDescriptorRangeStart, D3D12_DESCRIPTOR_HEAP_TYPE descriptorType);
 		void ProcessDestructions(uint32_t frameIndex);
 	};
 }

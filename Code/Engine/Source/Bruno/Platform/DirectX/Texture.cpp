@@ -31,7 +31,7 @@ namespace Bruno
 
         if (filePath.extension() == ".dds")
         {
-            ThrowIfFailed(LoadFromDDSFile(filename.c_str(), DirectX::DDS_FLAGS_NONE, &metadata, scratchImage));
+            ThrowIfFailed(LoadFromDDSFile(filename.c_str(), DirectX::DDS_FLAGS_FORCE_RGB, &metadata, scratchImage));
         }
         else
         {

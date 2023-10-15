@@ -2,6 +2,7 @@
 #include "VertexBuffer.h"
 
 #include "GraphicsDevice.h"
+#include "UploadContext.h"
 
 namespace Bruno
 {
@@ -9,6 +10,15 @@ namespace Bruno
 		GPUBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(sizeInBytes, vertexStride, BufferViewFlags::srv, BufferAccessFlags::gpuOnly)),
 		m_vertexBufferView{}
 	{
+		auto bufferUpload = std::make_unique<BufferUpload>();
+		bufferUpload->mBuffer = this;
+		bufferUpload->mBufferData = std::make_unique<uint8_t[]>(mDesc.Width);
+		bufferUpload->mBufferDataSize = mDesc.Width;
+
+		memcpy_s(bufferUpload->mBufferData.get(), mDesc.Width, bufferData, mDesc.Width);
+
+		Graphics::GetDevice()->GetUploadContext().AddBufferUpload(std::move(bufferUpload));
+
 		// Create the vertex buffer view.
 		m_vertexBufferView.BufferLocation = mResource->GetGPUVirtualAddress();
         m_vertexBufferView.SizeInBytes = static_cast<uint32_t>(mDesc.Width);

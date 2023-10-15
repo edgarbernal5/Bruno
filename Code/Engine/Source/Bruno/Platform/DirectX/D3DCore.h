@@ -16,7 +16,7 @@ namespace Bruno::Graphics::Core
     constexpr uint32_t MAX_QUEUED_BARRIERS{ 16 };
     constexpr uint32_t MAX_TEXTURE_SUBRESOURCE_COUNT{ 32 };
 
-    constexpr uint32_t NUM_SAMPLER_DESCRIPTORS = 6;
+    constexpr uint32_t NUM_SAMPLER_DESCRIPTORS = 1;
 
     constexpr uint32_t NUM_RTV_STAGING_DESCRIPTORS{ 256 };
     constexpr uint32_t NUM_DSV_STAGING_DESCRIPTORS{ 32 };
@@ -25,6 +25,7 @@ namespace Bruno::Graphics::Core
     constexpr uint32_t NUM_SRV_RENDER_PASS_USER_DESCRIPTORS{ 65536 };
     
     constexpr uint8_t PER_OBJECT_SPACE = 0;
+
 
     struct
     {

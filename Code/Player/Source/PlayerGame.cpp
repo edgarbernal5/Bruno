@@ -121,7 +121,7 @@ namespace Bruno
 		meshPipelineDesc.mRenderTargetDesc.mNumRenderTargets = 1;
 		meshPipelineDesc.mDepthStencilDesc.DepthEnable = true;
 		meshPipelineDesc.mRenderTargetDesc.mRenderTargetFormats[0] = surfaceParameters.BackBufferFormat;
-		meshPipelineDesc.mDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		//meshPipelineDesc.mDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 
 		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 
@@ -174,15 +174,24 @@ namespace Bruno
 		if (m_texture->IsReady()) {
 			for (auto& item : m_renderItems)
 			{
+				if (!item->IndexBuffer->IsReady() || !item->VertexBuffer->IsReady())
+					continue;
+
 				m_graphicsContext->SetVertexBuffer(*item->VertexBuffer);
 				m_graphicsContext->SetIndexBuffer(*item->IndexBuffer);
 
+				PipelineResourceBinding textureBinding;
+				textureBinding.mBindingIndex = 0;
+				textureBinding.mResource = m_texture.get();
+
 				mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[m_device->GetFrameId()].get());
+				mMeshPerObjectResourceSpace.SetSRV(textureBinding);
 
 				PipelineInfo pipeline;
 				pipeline.mPipeline = m_pipelineState.get();
 				pipeline.mRenderTargets.push_back(&backBuffer);
 				pipeline.mDepthStencilTarget = &depthBuffer;
+
 
 				m_graphicsContext->SetPipeline(pipeline);
 				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, mMeshPerObjectResourceSpace);
@@ -195,36 +204,7 @@ namespace Bruno
 					item->BaseVertexLocation,
 					0);
 			}
-			
 		}
-
-		//m_graphicsContext->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
-
-		//ID3D12DescriptorHeap* descriptorHeaps[] = { m_device->GetSrvDescriptionHeap().GetHeap() };
-		//commandList->SetDescriptorHeaps(1, descriptorHeaps);
-
-		//commandList->SetGraphicsRootSignature(m_rootSignature->GetD3D12RootSignature());
-		//commandList->SetPipelineState(m_pipelineState->GetD3D12PipelineState());
-
-		//for (auto& item : m_renderItems)
-		//{
-		//	commandList->IASetPrimitiveTopology(item->PrimitiveType);
-		//	commandList->IASetVertexBuffers(0, 1, &item->VertexBuffer->GetView());
-		//	commandList->IASetIndexBuffer(&item->IndexBuffer->GetView());
-
-		//	CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_texture->GetSrvHandle().Gpu);
-
-		//	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_objectBuffer[frameIndex]->GetResource()->GetGPUVirtualAddress();
-
-		//	commandList->SetGraphicsRootDescriptorTable(m_opaqueShader->GetIndexMap(L"gDiffuseMap"), tex);
-		//	commandList->SetGraphicsRootConstantBufferView(m_opaqueShader->GetIndexMap(L"cbPerObject"), objCBAddress);
-
-		//	commandList->DrawIndexedInstanced(item->IndexCount,
-		//		1,
-		//		item->StartIndexLocation,
-		//		item->BaseVertexLocation,
-		//		0);
-		//}
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();

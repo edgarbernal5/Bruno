@@ -80,7 +80,7 @@ namespace Bruno
             handle.Gpu.ptr += static_cast<uint64_t>(offset);
         }
 
-        mActiveHandleCount++;
+        ++mActiveHandleCount;
         return handle;
     }
     
@@ -99,7 +99,7 @@ namespace Bruno
         uint32_t newHandleID = 0;
         uint32_t blockEnd = mCurrentDescriptorIndex + count;
 
-        if (m_currentDescriptorIndex < m_maxDescriptors) {
+        if (blockEnd <= m_maxDescriptors) {
             newHandleID = m_currentDescriptorIndex;
             m_currentDescriptorIndex = blockEnd;
         }

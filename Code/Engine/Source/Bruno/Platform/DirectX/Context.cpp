@@ -127,8 +127,8 @@ namespace Bruno
 
 		ID3D12DescriptorHeap* heapsToBind[2];
 		heapsToBind[0] = mDevice.GetSrvDescriptionHeap(frameIndex).GetHeap();
-		heapsToBind[1] = mDevice.GetSamplerHeap().GetHeap();
+		//heapsToBind[1] = mDevice.GetSamplerHeap().GetHeap();
 
-		mCommandList->SetDescriptorHeaps(2, heapsToBind);
+		mCommandList->SetDescriptorHeaps(1, heapsToBind);
 	}
 }
