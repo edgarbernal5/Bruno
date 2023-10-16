@@ -27,6 +27,10 @@ namespace Bruno
 		virtual void Show() override;
 
 	protected:
+		inline RECT GetClientBounds();
+		void BeginScreenDeviceChange();
+		void EndScreenDeviceChange(int clientWidth, int clientHeight);
+
 		GameWindowParameters m_parameters;
 		HWND m_hwnd;
 		HINSTANCE m_hModuleInstance;
@@ -38,10 +42,6 @@ namespace Bruno
 		bool m_inSizeMove;
 		bool m_inSuspend;
 		bool m_minimized;
-
-		inline RECT GetClientBounds();
-		void BeginScreenDeviceChange();
-		void EndScreenDeviceChange(int clientWidth, int clientHeight);
 
 	private:
 		const wchar_t* ApplicationClassName = L"BrunoEngineClass";

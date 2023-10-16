@@ -14,7 +14,6 @@ namespace Bruno
 		BR_RTTI_DECLARATION(Material, RTTI);
 
 	public:
-
 		std::string Name;
 		std::map<std::string, std::shared_ptr<Texture>> TexturesByName;
 	};

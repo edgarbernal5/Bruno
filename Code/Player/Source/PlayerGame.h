@@ -34,7 +34,10 @@ namespace Bruno
 
 		void OnKeyPressed(KeyCode key, KeyboardState state) override;
 		void OnKeyReleased(KeyCode key, KeyboardState state) override;
+
 	private:
+		void UpdateCBs(const GameTimer& timer);
+
 		std::unique_ptr<Surface> m_surface;
 		std::unique_ptr<Texture> m_texture;
 		std::shared_ptr<RootSignature> m_rootSignature;
@@ -55,7 +58,5 @@ namespace Bruno
 
 		Math::Int2 m_lastMousePosition;
 		Camera m_camera;
-
-		void UpdateCBs(const GameTimer& timer);
 	};
 }

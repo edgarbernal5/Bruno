@@ -38,6 +38,8 @@ namespace Bruno
 			return m_mutex;
 		}
 	private:
+		void UpdateCBs(const GameTimer& timer);
+
 		//std::unique_ptr<nana::nested_form> m_form;
 		nana::nested_form* m_form;
 		std::unique_ptr<Surface> m_surface;
@@ -77,7 +79,5 @@ namespace Bruno
 		bool m_isExposed = false;
 
 		float m_totalTime = 0.0f;
-
-		void UpdateCBs(const GameTimer& timer);
 	};
 }

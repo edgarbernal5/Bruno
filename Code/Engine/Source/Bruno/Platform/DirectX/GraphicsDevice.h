@@ -75,6 +75,9 @@ namespace Bruno
 			uint64_t mCopyQueueFence = 0;
 		};
 
+		void CopyDescriptorsSimple(uint32_t numDescriptors, D3D12_CPU_DESCRIPTOR_HANDLE destDescriptorRangeStart, D3D12_CPU_DESCRIPTOR_HANDLE srcDescriptorRangeStart, D3D12_DESCRIPTOR_HEAP_TYPE descriptorType);
+		void ProcessDestructions(uint32_t frameIndex);
+
 		uint32_t											m_frameId{ 0 };
 		Microsoft::WRL::ComPtr<ID3D12Resource>              m_depthStencil;
 
@@ -105,9 +108,6 @@ namespace Bruno
 
 		std::array<std::unique_ptr<UploadContext>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mUploadContexts;
 		std::array<EndOfFrameFences, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mEndOfFrameFences;
-
-		void CopyDescriptorsSimple(uint32_t numDescriptors, D3D12_CPU_DESCRIPTOR_HANDLE destDescriptorRangeStart, D3D12_CPU_DESCRIPTOR_HANDLE srcDescriptorRangeStart, D3D12_DESCRIPTOR_HEAP_TYPE descriptorType);
-		void ProcessDestructions(uint32_t frameIndex);
 	};
 }
 

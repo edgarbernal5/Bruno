@@ -13,10 +13,10 @@ namespace Bruno
 		BR_RTTI_DECLARATION(MaterialContentItem, ContentItem);
 
 	public:
+		void AddTexture(const std::string& key, const ExternalReferenceContentItem& reference);
+
 		std::string Name;
 		std::map<std::string, ExternalReferenceContentItem> TexturesByKeys;
-
-		void AddTexture(const std::string& key, const ExternalReferenceContentItem& reference);
 	};
 
 }

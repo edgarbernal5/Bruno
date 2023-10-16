@@ -26,7 +26,6 @@ namespace Bruno
 
 	private:
 		Buffer m_buffer;
-		//uint64_t m_capacity;
 		long m_length;
 		uint64_t m_position;
 

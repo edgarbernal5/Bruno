@@ -41,6 +41,10 @@ namespace Bruno
 		void WriteVector4(const Math::Vector4& vector4);
 
 	private:
+		AbstractContentTypeWriter* GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex);
+		void WriteHeader();
+		void WriteFinalOutput();
+
 		const wchar_t* FileExtension = L".bruno";
 		bool m_compressContent;
 		std::wstring m_rootDirectory;
@@ -56,9 +60,6 @@ namespace Bruno
 		std::map<const ContentItem*, uint32_t> m_sharedResourcesIndexTable;
 		std::queue<const ContentItem*> m_sharedResources;
 
-		AbstractContentTypeWriter* GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex);
-		void WriteHeader();
-		void WriteFinalOutput();
 	};
 }
 

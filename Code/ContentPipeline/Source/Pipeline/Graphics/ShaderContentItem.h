@@ -10,7 +10,6 @@ namespace Bruno
 		BR_RTTI_DECLARATION(ShaderContentItem, ContentItem);
 	
 	public:
-		
 		std::vector<uint8_t> CompiledCodeProgramsData[2]{};
 	};
 

@@ -17,10 +17,7 @@ namespace Bruno
 
 		virtual std::shared_ptr<ContentItem> Process(const std::wstring& assetFilename, ContentProcessorContext& context) = 0;
 
-		const std::vector<std::wstring>& GetExtensionsSupported()
-		{
-			return m_supportedExtensions;
-		}
+		const std::vector<std::wstring>& GetExtensionsSupported() { return m_supportedExtensions; }
 
 	protected:
 		std::vector<std::wstring> m_supportedExtensions;

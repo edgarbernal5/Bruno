@@ -27,6 +27,9 @@ namespace Bruno
 		void OnGameLoop(const GameTimer& timer) override;
 
 	private:
+		void AddScenePanel(ScenePanel* panel);
+		void RemoveScenePanel(ScenePanel* panel);
+
 		nana::menubar		m_menubar;
 		nana::place			m_place;
 		nana::panel<false>	m_panelMargin;
@@ -35,8 +38,5 @@ namespace Bruno
 
 		std::vector<ScenePanel*> m_scenePanels;
 		std::mutex m_scenePanelsMutex{};
-
-		void AddScenePanel(ScenePanel* panel);
-		void RemoveScenePanel(ScenePanel* panel);
 	};
 }

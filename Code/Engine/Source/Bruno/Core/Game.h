@@ -39,11 +39,6 @@ namespace Bruno
 		friend class WindowsGameWindow;
 		friend class NanaGameWindow;
 	protected:
-		std::unique_ptr<GameWindow> m_gameWindow;
-		GameParameters m_parameters;
-		GameTimer m_timer;
-		std::shared_ptr<GraphicsDevice> m_device;
-
 		virtual void OnInitialize(const GameWindowParameters& windowParameters) = 0;
 
 		virtual void OnResize() {}
@@ -60,13 +55,18 @@ namespace Bruno
 		virtual void OnKeyPressed(KeyCode key, KeyboardState state) {}
 		virtual void OnKeyReleased(KeyCode key, KeyboardState state) {}
 
+		std::unique_ptr<GameWindow> m_gameWindow;
+		GameParameters m_parameters;
+		GameTimer m_timer;
+		std::shared_ptr<GraphicsDevice> m_device;
+
 		int m_framesThisSecond = 0;
 		int m_framesPerSecond = 0;
 		float m_elapsedTime = 0.0f;
 	private:
-		static Game* g_instance;
-
 		bool m_gamePaused = false;
+
+		static Game* g_instance;
 	};
 
 	Game* CreateGame(int argc, char** argv);

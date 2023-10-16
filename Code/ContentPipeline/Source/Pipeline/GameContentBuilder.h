@@ -21,6 +21,7 @@ namespace Bruno
 			return AssetName == other->AssetName && ProcessorName == other->ProcessorName;
 		}
 	};
+
 	struct BuildItem
 	{
 		BuildItem();
@@ -66,13 +67,9 @@ namespace Bruno
 		void Run();
 
 		const std::wstring OutputExtention = L".bruno";
+
+		friend class ContentProcessorContext;
 	private:
-		Settings m_settings;
-		TimestampCache* m_timestampCache;
-
-		std::vector<BuildRequest*> m_requests;
-		std::vector<BuildItem*> m_buildItems;
-
 		void BuildAsset(BuildItem& item);
 		bool NeedsIncrementalBuild(BuildItem& item, std::string& buildReason);
 		void PreparePaths();
@@ -80,7 +77,11 @@ namespace Bruno
 		std::wstring ChooseOutputFilename(const BuildRequest& request);
 		BuildItem* FindBuildItemByOutputFilename(const std::wstring& outputFilename);
 
-		friend class ContentProcessorContext;
+		Settings m_settings;
+		TimestampCache* m_timestampCache;
+
+		std::vector<BuildRequest*> m_requests;
+		std::vector<BuildItem*> m_buildItems;
 	};
 }
 

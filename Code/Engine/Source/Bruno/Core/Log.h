@@ -15,10 +15,7 @@ namespace Bruno
 		static void Initialize();
 		static void Shutdown();
 
-		static std::shared_ptr<Logger>& GetCoreLogger()
-		{
-			return g_CoreLogger;
-		}
+		static std::shared_ptr<Logger>& GetCoreLogger() { return g_CoreLogger; }
 
 		template<typename... Args>
 		static void PrintAssertMessage(const char* file, int line, const char* message, Args&&... args);

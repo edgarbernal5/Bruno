@@ -33,9 +33,9 @@ namespace Bruno
 			const char* Target;
 		};
 
-		std::vector<uint8_t> m_compiledCodePrograms[Graphics::Core::SHADER_PROGRAMS_COUNT]{};
-
 		bool CompileShader(const std::wstring& assetFilename, const std::string& entryPoint, const std::string& target, Microsoft::WRL::ComPtr<ID3DBlob>& compiledBlob, Microsoft::WRL::ComPtr<ID3DBlob>& errorBlob);
+
+		std::vector<uint8_t> m_compiledCodePrograms[Graphics::Core::SHADER_PROGRAMS_COUNT]{};
 
 		static const ShaderTypeDesc& VS, & PS;
 		static const ShaderTypeDesc ShaderTypes[];

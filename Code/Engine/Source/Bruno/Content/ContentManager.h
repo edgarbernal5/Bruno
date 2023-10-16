@@ -13,10 +13,10 @@ namespace Bruno
 		template <typename T>
 		std::shared_ptr<T> Load(const std::wstring& assetName, bool forceReload = false);
 	private:
+		std::shared_ptr<RTTI> ReadAsset(const std::wstring& assetName);
+
 		std::wstring m_rootDirectory;
 		std::map<std::wstring, std::shared_ptr<RTTI>> m_loadedAssets;
-
-		std::shared_ptr<RTTI> ReadAsset(const std::wstring& assetName);
 
 		static const std::wstring DefaultRootDirectory;
 	};

@@ -37,6 +37,10 @@ namespace Bruno
 		void ReadVector4(Math::Vector4& output);
 
 	private:
+		void ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action);
+		uint32_t ReadHeader();
+		std::shared_ptr<RTTI> ReadObject();
+
 		ContentManager* m_contentManager;
 		Stream& m_stream;
 		Stream* m_currentStream;
@@ -46,9 +50,6 @@ namespace Bruno
 		std::vector<AbstractContentTypeReader*> m_readers;
 		std::vector<std::vector<std::function<void(std::shared_ptr<RTTI>)> > > m_sharedResourceFixups;
 
-		void ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action);
-		uint32_t ReadHeader();
-		std::shared_ptr<RTTI> ReadObject();
 	};
 }
 

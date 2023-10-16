@@ -6,9 +6,6 @@ namespace Bruno
 {
 	struct Buffer
 	{
-		size_t Size;
-		uint8_t* Data;
-
 		Buffer(size_t size) :
 			Data(nullptr),
 			Size(0)
@@ -44,5 +41,8 @@ namespace Bruno
 			Data = newbuffer;
 			return true;
 		}
+
+		size_t Size;
+		uint8_t* Data;
 	};
 }
