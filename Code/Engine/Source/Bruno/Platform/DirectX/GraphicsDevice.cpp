@@ -116,11 +116,11 @@ namespace Bruno
         m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::RTV_STAGING_DESCRIPTORS_COUNT);
         m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::DSV_STAGING_DESCRIPTORS_COUNT);
         m_srvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::SRV_STAGING_DESCRIPTORS_COUNT);
-        mSamplerRenderPassDescriptorHeap = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 0, Graphics::Core::SAMPLER_DESCRIPTORS_COUNT);
+        m_samplerRenderPassDescriptorHeap = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 0, Graphics::Core::SAMPLER_DESCRIPTORS_COUNT);
 
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
         {
-            mSRVRenderPassDescriptorHeaps[frameIndex] = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT, Graphics::Core::SRV_RENDER_PASS_USER_DESCRIPTORS_COUNT);
+            m_srvRenderPassDescriptorHeaps[frameIndex] = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT, Graphics::Core::SRV_RENDER_PASS_USER_DESCRIPTORS_COUNT);
         }
 
         D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
@@ -143,7 +143,7 @@ namespace Bruno
         desc.pDevice = m_d3dDevice.Get();
         desc.pAdapter = m_adapter.get()->GetHandle();
 
-        D3D12MA::CreateAllocator(&desc, &mAllocator);
+        D3D12MA::CreateAllocator(&desc, &m_allocator);
 
         BufferCreationDesc uploadBufferDesc;
         uploadBufferDesc.Size = AlignU32(10 * 1024 * 1024, 256);
@@ -155,7 +155,7 @@ namespace Bruno
 
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
         {
-            mUploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GPUBuffer>(*this, uploadBufferDesc), std::make_unique<GPUBuffer>(*this, uploadTextureDesc));
+            m_uploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GPUBuffer>(*this, uploadBufferDesc), std::make_unique<GPUBuffer>(*this, uploadTextureDesc));
         }
 
         //D3D12_SAMPLER_DESC samplerDescs[Graphics::Core::SAMPLER_DESCRIPTORS_COUNT]{};
@@ -170,20 +170,20 @@ namespace Bruno
         //samplerDescs[0].MinLOD = 0;
         //samplerDescs[0].MaxLOD = D3D12_FLOAT32_MAX;
 
-        //DescriptorHandle samplerDescriptorBlock = mSamplerRenderPassDescriptorHeap->Allocate(Graphics::Core::SAMPLER_DESCRIPTORS_COUNT);
+        //DescriptorHandle samplerDescriptorBlock = m_samplerRenderPassDescriptorHeap->Allocate(Graphics::Core::SAMPLER_DESCRIPTORS_COUNT);
         //D3D12_CPU_DESCRIPTOR_HANDLE currentSamplerDescriptor = samplerDescriptorBlock.Cpu;
         //for (uint32_t samplerIndex = 0; samplerIndex < Graphics::Core::SAMPLER_DESCRIPTORS_COUNT; samplerIndex++)
         //{
         //    m_d3dDevice->CreateSampler(&samplerDescs[samplerIndex], currentSamplerDescriptor);
-        //    //currentSamplerDescriptor.ptr += mSamplerRenderPassDescriptorHeap->GetDescriptorSize();
+        //    //currentSamplerDescriptor.ptr += m_samplerRenderPassDescriptorHeap->GetDescriptorSize();
         //}
 
         //CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
 
-        mFreeReservedDescriptorIndices.resize(Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT);
-        for (size_t i = 0; i < mFreeReservedDescriptorIndices.size(); i++)
+        m_freeReservedDescriptorIndices.resize(Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT);
+        for (size_t i = 0; i < m_freeReservedDescriptorIndices.size(); i++)
         {
-            mFreeReservedDescriptorIndices[i] = i;
+            m_freeReservedDescriptorIndices[i] = i;
         }
 	}
 
@@ -193,11 +193,11 @@ namespace Bruno
 
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
         {
-            mSRVRenderPassDescriptorHeaps[frameIndex] = nullptr;
-            mUploadContexts[frameIndex] = nullptr;
+            m_srvRenderPassDescriptorHeaps[frameIndex] = nullptr;
+            m_uploadContexts[frameIndex] = nullptr;
         }
 
-        SafeRelease(mAllocator);
+        SafeRelease(m_allocator);
     }
 
     void GraphicsDevice::BeginFrame()
@@ -205,42 +205,42 @@ namespace Bruno
         m_frameId = (m_frameId + 1) % Graphics::Core::FRAMES_IN_FLIGHT_COUNT;
 
         //Wait on fences from 2 frames ago.
-        mGraphicsQueue->WaitForFenceCPUBlocking(mEndOfFrameFences[m_frameId].mGraphicsQueueFence);
-        mComputeQueue->WaitForFenceCPUBlocking(mEndOfFrameFences[m_frameId].mComputeQueueFence);
-        mCopyQueue->WaitForFenceCPUBlocking(mEndOfFrameFences[m_frameId].mCopyQueueFence);
+        mGraphicsQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].mGraphicsQueueFence);
+        mComputeQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].mComputeQueueFence);
+        mCopyQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].mCopyQueueFence);
 
         ProcessDestructions(m_frameId);
 
-        mUploadContexts[m_frameId]->ResolveProcessedUploads();
-        mUploadContexts[m_frameId]->Reset();
+        m_uploadContexts[m_frameId]->ResolveProcessedUploads();
+        m_uploadContexts[m_frameId]->Reset();
 
-        mContextSubmissions[m_frameId].clear();
+        m_contextSubmissions[m_frameId].clear();
     }
 
     void GraphicsDevice::EndFrame()
     {
-        mUploadContexts[m_frameId]->ProcessUploads();
-        SubmitContextWork(*mUploadContexts[m_frameId]);
+        m_uploadContexts[m_frameId]->ProcessUploads();
+        SubmitContextWork(*m_uploadContexts[m_frameId]);
 
-        mEndOfFrameFences[m_frameId].mComputeQueueFence = mComputeQueue->SignalFence();
-        mEndOfFrameFences[m_frameId].mCopyQueueFence = mCopyQueue->SignalFence();
+        m_endOfFrameFences[m_frameId].mComputeQueueFence = mComputeQueue->SignalFence();
+        m_endOfFrameFences[m_frameId].mCopyQueueFence = mCopyQueue->SignalFence();
     }
 
     void GraphicsDevice::Present(Surface* surface)
     {
         surface->Present();
-        mEndOfFrameFences[m_frameId].mGraphicsQueueFence = mGraphicsQueue->SignalFence();
+        m_endOfFrameFences[m_frameId].mGraphicsQueueFence = mGraphicsQueue->SignalFence();
     }
 
     D3D12MA::Allocator* GraphicsDevice::GetAllocator() const
     {
-        return mAllocator;
+        return m_allocator;
     }
 
     uint32_t GraphicsDevice::GetFreeReservedDescriptorIndex()
     {
-        uint32_t index = mFreeReservedDescriptorIndices.back();
-        mFreeReservedDescriptorIndices.pop_back();
+        uint32_t index = m_freeReservedDescriptorIndices.back();
+        m_freeReservedDescriptorIndices.pop_back();
         return index;
     }
 
@@ -266,9 +266,9 @@ namespace Bruno
 
         ContextSubmissionResult submissionResult;
         submissionResult.mFrameId = m_frameId;
-        submissionResult.mSubmissionIndex = static_cast<uint32_t>(mContextSubmissions[m_frameId].size());
+        submissionResult.mSubmissionIndex = static_cast<uint32_t>(m_contextSubmissions[m_frameId].size());
 
-        mContextSubmissions[m_frameId].push_back(std::make_pair(fenceResult, context.GetCommandType()));
+        m_contextSubmissions[m_frameId].push_back(std::make_pair(fenceResult, context.GetCommandType()));
 
         return submissionResult;
     }
@@ -303,7 +303,7 @@ namespace Bruno
     {
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
         {
-            DescriptorHandle targetDescriptor = mSRVRenderPassDescriptorHeaps[frameIndex]->GetReservedDescriptor(index);
+            DescriptorHandle targetDescriptor = m_srvRenderPassDescriptorHeaps[frameIndex]->GetReservedDescriptor(index);
 
             CopyDescriptorsSimple(1, targetDescriptor.Cpu, srvHandle.Cpu, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
         }

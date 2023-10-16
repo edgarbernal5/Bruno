@@ -23,18 +23,19 @@ namespace Bruno
 	class DescriptorHeap
 	{
 	public:
-		explicit DescriptorHeap(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t maxDescriptors, bool isShaderVisible);
 		explicit DescriptorHeap(const DescriptorHeap&) = delete;
 		DescriptorHeap& operator=(const DescriptorHeap&) = delete;
 		explicit DescriptorHeap(DescriptorHeap&&) = delete;
 		DescriptorHeap& operator=(DescriptorHeap&&) = delete;
-		~DescriptorHeap();
+		virtual ~DescriptorHeap();
 
 		constexpr D3D12_CPU_DESCRIPTOR_HANDLE GetCpuStart() const { return m_cpuStart; }
 		constexpr bool IsShaderVisible() const { return m_gpuStart.ptr != 0; }
 		constexpr ID3D12DescriptorHeap* const GetHeap() const { return m_heap; }
 
 	protected:
+		explicit DescriptorHeap(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t maxDescriptors, bool isShaderVisible);
+
 		ID3D12DescriptorHeap*				m_heap;
 		D3D12_CPU_DESCRIPTOR_HANDLE         m_cpuStart{};
 		D3D12_GPU_DESCRIPTOR_HANDLE         m_gpuStart{};

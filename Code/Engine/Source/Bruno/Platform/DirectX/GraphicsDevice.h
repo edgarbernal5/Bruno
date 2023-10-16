@@ -52,9 +52,9 @@ namespace Bruno
 		StagingDescriptorHeap& GetDsvDescriptionHeap();
 		StagingDescriptorHeap& GetSrvDescriptionHeap();
 
-		RenderPassDescriptorHeap& GetSrvDescriptionHeap(uint32_t frameIndex) { return *mSRVRenderPassDescriptorHeaps[frameIndex]; }
-		RenderPassDescriptorHeap& GetSamplerHeap() { return *mSamplerRenderPassDescriptorHeap; }
-		UploadContext& GetUploadContext() { return *mUploadContexts[m_frameId]; }
+		RenderPassDescriptorHeap& GetSrvDescriptionHeap(uint32_t frameIndex) { return *m_srvRenderPassDescriptorHeaps[frameIndex]; }
+		RenderPassDescriptorHeap& GetSamplerHeap() { return *m_samplerRenderPassDescriptorHeap; }
+		UploadContext& GetUploadContext() { return *m_uploadContexts[m_frameId]; }
 
 		D3D_ROOT_SIGNATURE_VERSION GetHighestRootSignatureVersion() const { return m_highestRootSignatureVersion; }
 
@@ -96,18 +96,18 @@ namespace Bruno
 		std::unique_ptr<StagingDescriptorHeap>				m_rtvDescriptorHeap;// { D3D12_DESCRIPTOR_HEAP_TYPE_RTV };
 		std::unique_ptr<StagingDescriptorHeap>				m_dsvDescriptorHeap;// { D3D12_DESCRIPTOR_HEAP_TYPE_DSV };
 		std::unique_ptr<StagingDescriptorHeap>				m_srvDescriptorHeap;// { D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV };
-		std::unique_ptr<RenderPassDescriptorHeap>			mSamplerRenderPassDescriptorHeap;
-		std::array<std::unique_ptr<RenderPassDescriptorHeap>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mSRVRenderPassDescriptorHeaps;
+		std::unique_ptr<RenderPassDescriptorHeap>			m_samplerRenderPassDescriptorHeap;
+		std::array<std::unique_ptr<RenderPassDescriptorHeap>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> m_srvRenderPassDescriptorHeaps;
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature>			m_rootSignature;
 		D3D_ROOT_SIGNATURE_VERSION							m_highestRootSignatureVersion;
-		D3D12MA::Allocator*									mAllocator = nullptr;
-		std::vector<uint32_t>								mFreeReservedDescriptorIndices;
+		D3D12MA::Allocator*									m_allocator = nullptr;
+		std::vector<uint32_t>								m_freeReservedDescriptorIndices;
 
-		std::array<std::vector<std::pair<uint64_t, D3D12_COMMAND_LIST_TYPE>>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mContextSubmissions;
+		std::array<std::vector<std::pair<uint64_t, D3D12_COMMAND_LIST_TYPE>>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> m_contextSubmissions;
 
-		std::array<std::unique_ptr<UploadContext>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mUploadContexts;
-		std::array<EndOfFrameFences, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> mEndOfFrameFences;
+		std::array<std::unique_ptr<UploadContext>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> m_uploadContexts;
+		std::array<EndOfFrameFences, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> m_endOfFrameFences;
 	};
 }
 
