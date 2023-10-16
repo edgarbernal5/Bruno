@@ -46,7 +46,7 @@ namespace Bruno
 
 		IDXGIFactory4* GetFactory();
 		ID3D12Device5* GetD3DDevice();
-		CommandQueue* GetGraphicsQueue() { return mGraphicsQueue.get(); }
+		CommandQueue* GetGraphicsQueue() { return m_graphicsQueue.get(); }
 
 		StagingDescriptorHeap& GetRtvDescriptionHeap();
 		StagingDescriptorHeap& GetDsvDescriptionHeap();
@@ -70,9 +70,9 @@ namespace Bruno
 	private:
 		struct EndOfFrameFences
 		{
-			uint64_t mGraphicsQueueFence = 0;
-			uint64_t mComputeQueueFence = 0;
-			uint64_t mCopyQueueFence = 0;
+			uint64_t GraphicsQueueFence = 0;
+			uint64_t ComputeQueueFence = 0;
+			uint64_t CopyQueueFence = 0;
 		};
 
 		void CopyDescriptorsSimple(uint32_t numDescriptors, D3D12_CPU_DESCRIPTOR_HANDLE destDescriptorRangeStart, D3D12_CPU_DESCRIPTOR_HANDLE srcDescriptorRangeStart, D3D12_DESCRIPTOR_HEAP_TYPE descriptorType);
@@ -84,9 +84,9 @@ namespace Bruno
 		std::shared_ptr<GraphicsAdapter>					m_adapter;
 
 		Microsoft::WRL::ComPtr<ID3D12Device5>               m_d3dDevice;
-		std::unique_ptr<CommandQueue>						mGraphicsQueue;
-		std::unique_ptr<CommandQueue>						mComputeQueue;
-		std::unique_ptr<CommandQueue>						mCopyQueue;
+		std::unique_ptr<CommandQueue>						m_graphicsQueue;
+		std::unique_ptr<CommandQueue>						m_computeQueue;
+		std::unique_ptr<CommandQueue>						m_copyQueue;
 
 		D3D_FEATURE_LEVEL									m_d3dMinFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };
 		Microsoft::WRL::ComPtr<IDXGIFactory4>               m_dxgiFactory;

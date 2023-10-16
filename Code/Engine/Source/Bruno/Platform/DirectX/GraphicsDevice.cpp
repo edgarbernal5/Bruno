@@ -109,9 +109,9 @@ namespace Bruno
             m_d3dFeatureLevel = m_d3dMinFeatureLevel;
         }
 
-        mGraphicsQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_DIRECT);
-        mComputeQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COMPUTE);
-        mCopyQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COPY);
+        m_graphicsQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_DIRECT);
+        m_computeQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+        m_copyQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COPY);
 
         m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::RTV_STAGING_DESCRIPTORS_COUNT);
         m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::DSV_STAGING_DESCRIPTORS_COUNT);
@@ -205,9 +205,9 @@ namespace Bruno
         m_frameId = (m_frameId + 1) % Graphics::Core::FRAMES_IN_FLIGHT_COUNT;
 
         //Wait on fences from 2 frames ago.
-        mGraphicsQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].mGraphicsQueueFence);
-        mComputeQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].mComputeQueueFence);
-        mCopyQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].mCopyQueueFence);
+        m_graphicsQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].GraphicsQueueFence);
+        m_computeQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].ComputeQueueFence);
+        m_copyQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].CopyQueueFence);
 
         ProcessDestructions(m_frameId);
 
@@ -222,14 +222,14 @@ namespace Bruno
         m_uploadContexts[m_frameId]->ProcessUploads();
         SubmitContextWork(*m_uploadContexts[m_frameId]);
 
-        m_endOfFrameFences[m_frameId].mComputeQueueFence = mComputeQueue->SignalFence();
-        m_endOfFrameFences[m_frameId].mCopyQueueFence = mCopyQueue->SignalFence();
+        m_endOfFrameFences[m_frameId].ComputeQueueFence = m_computeQueue->SignalFence();
+        m_endOfFrameFences[m_frameId].CopyQueueFence = m_copyQueue->SignalFence();
     }
 
     void GraphicsDevice::Present(Surface* surface)
     {
         surface->Present();
-        m_endOfFrameFences[m_frameId].mGraphicsQueueFence = mGraphicsQueue->SignalFence();
+        m_endOfFrameFences[m_frameId].GraphicsQueueFence = m_graphicsQueue->SignalFence();
     }
 
     D3D12MA::Allocator* GraphicsDevice::GetAllocator() const
@@ -251,13 +251,13 @@ namespace Bruno
         switch (context.GetCommandType())
         {
         case D3D12_COMMAND_LIST_TYPE_DIRECT:
-            fenceResult = mGraphicsQueue->ExecuteCommandList(context.GetCommandList());
+            fenceResult = m_graphicsQueue->ExecuteCommandList(context.GetCommandList());
             break;
         case D3D12_COMMAND_LIST_TYPE_COMPUTE:
-            fenceResult = mComputeQueue->ExecuteCommandList(context.GetCommandList());
+            fenceResult = m_computeQueue->ExecuteCommandList(context.GetCommandList());
             break;
         case D3D12_COMMAND_LIST_TYPE_COPY:
-            fenceResult = mCopyQueue->ExecuteCommandList(context.GetCommandList());
+            fenceResult = m_copyQueue->ExecuteCommandList(context.GetCommandList());
             break;
         default:
             BR_ASSERT_ERROR("Unsupported submission type.");
@@ -275,9 +275,9 @@ namespace Bruno
 
     void GraphicsDevice::WaitForIdle()
     {
-        mGraphicsQueue->WaitForIdle();
-        mComputeQueue->WaitForIdle();
-        mCopyQueue->WaitForIdle();
+        m_graphicsQueue->WaitForIdle();
+        m_computeQueue->WaitForIdle();
+        m_copyQueue->WaitForIdle();
     }
 
     std::shared_ptr<GraphicsDevice> GraphicsDevice::Create(std::shared_ptr<GraphicsAdapter> adapter)
