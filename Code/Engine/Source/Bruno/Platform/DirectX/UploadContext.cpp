@@ -9,8 +9,8 @@ namespace Bruno
 {
 	UploadContext::UploadContext(GraphicsDevice& device, std::unique_ptr<GPUBuffer> bufferUploadHeap, std::unique_ptr<GPUBuffer> textureUploadHeap) :
 		Context(device, D3D12_COMMAND_LIST_TYPE_COPY),
-        mBufferUploadHeap(std::move(bufferUploadHeap)),
-        mTextureUploadHeap(std::move(textureUploadHeap))
+        m_bufferUploadHeap(std::move(bufferUploadHeap)),
+        m_textureUploadHeap(std::move(textureUploadHeap))
 	{
 	}
 	
@@ -20,22 +20,22 @@ namespace Bruno
 
 	void UploadContext::AddBufferUpload(std::unique_ptr<BufferUpload> bufferUpload)
 	{
-		BR_ASSERT(bufferUpload->mBufferDataSize <= mBufferUploadHeap->mDesc.Width);
+		BR_ASSERT(bufferUpload->BufferDataSize <= m_bufferUploadHeap->m_desc.Width);
 
-		mBufferUploads.push_back(std::move(bufferUpload));
+		m_bufferUploads.push_back(std::move(bufferUpload));
 	}
 
 	void UploadContext::AddTextureUpload(std::unique_ptr<TextureUpload> textureUpload)
 	{
-		BR_ASSERT(textureUpload->mTextureDataSize <= mTextureUploadHeap->mDesc.Width);
+		BR_ASSERT(textureUpload->TextureDataSize <= m_textureUploadHeap->m_desc.Width);
 
-		mTextureUploads.push_back(std::move(textureUpload));
+		m_textureUploads.push_back(std::move(textureUpload));
 	}
 	
 	void UploadContext::ProcessUploads()
 	{
-		const uint32_t numBufferUploads = static_cast<uint32_t>(mBufferUploads.size());
-		const uint32_t numTextureUploads = static_cast<uint32_t>(mTextureUploads.size());
+		const uint32_t numBufferUploads = static_cast<uint32_t>(m_bufferUploads.size());
+		const uint32_t numTextureUploads = static_cast<uint32_t>(m_textureUploads.size());
 		uint32_t numBuffersProcessed = 0;
 		uint32_t numTexturesProcessed = 0;
 		size_t bufferUploadHeapOffset = 0;
@@ -43,62 +43,62 @@ namespace Bruno
 
         for (numBuffersProcessed; numBuffersProcessed < numBufferUploads; ++numBuffersProcessed)
         {
-            BufferUpload& currentUpload = *mBufferUploads[numBuffersProcessed];
+            BufferUpload& currentUpload = *m_bufferUploads[numBuffersProcessed];
 
-            if ((bufferUploadHeapOffset + currentUpload.mBufferDataSize) > mBufferUploadHeap->mDesc.Width)
+            if ((bufferUploadHeapOffset + currentUpload.BufferDataSize) > m_bufferUploadHeap->m_desc.Width)
             {
                 break;
             }
 
-            memcpy(mBufferUploadHeap->mMappedResource + bufferUploadHeapOffset, currentUpload.mBufferData.get(), currentUpload.mBufferDataSize);
-            CopyBufferRegion(*currentUpload.mBuffer, 0, *mBufferUploadHeap, bufferUploadHeapOffset, currentUpload.mBufferDataSize);
+            memcpy(m_bufferUploadHeap->m_mappedResource + bufferUploadHeapOffset, currentUpload.BufferData.get(), currentUpload.BufferDataSize);
+            CopyBufferRegion(*currentUpload.Buffer, 0, *m_bufferUploadHeap, bufferUploadHeapOffset, currentUpload.BufferDataSize);
 
-            bufferUploadHeapOffset += currentUpload.mBufferDataSize;
-            mBufferUploadsInProgress.push_back(currentUpload.mBuffer);
+            bufferUploadHeapOffset += currentUpload.BufferDataSize;
+            m_bufferUploadsInProgress.push_back(currentUpload.Buffer);
         }
 
         for (numTexturesProcessed; numTexturesProcessed < numTextureUploads; ++numTexturesProcessed)
         {
-            TextureUpload& currentUpload = *mTextureUploads[numTexturesProcessed];
+            TextureUpload& currentUpload = *m_textureUploads[numTexturesProcessed];
 
-            if ((textureUploadHeapOffset + currentUpload.mTextureDataSize) > mTextureUploadHeap->mDesc.Width)
+            if ((textureUploadHeapOffset + currentUpload.TextureDataSize) > m_textureUploadHeap->m_desc.Width)
             {
                 break;
             }
 
-            memcpy(mTextureUploadHeap->mMappedResource + textureUploadHeapOffset, currentUpload.mTextureData.get(), currentUpload.mTextureDataSize);
-            CopyTextureRegion(*currentUpload.mTexture, *mTextureUploadHeap, textureUploadHeapOffset, currentUpload.mSubResourceLayouts, currentUpload.mNumSubResources);
+            memcpy(m_textureUploadHeap->m_mappedResource + textureUploadHeapOffset, currentUpload.TextureData.get(), currentUpload.TextureDataSize);
+            CopyTextureRegion(*currentUpload.Texture, *m_textureUploadHeap, textureUploadHeapOffset, currentUpload.SubResourceLayouts, currentUpload.SubResourcesCount);
 
-            textureUploadHeapOffset += currentUpload.mTextureDataSize;
+            textureUploadHeapOffset += currentUpload.TextureDataSize;
             textureUploadHeapOffset = AlignU64(textureUploadHeapOffset, 512);
 
-            mTextureUploadsInProgress.push_back(currentUpload.mTexture);
+            m_textureUploadsInProgress.push_back(currentUpload.Texture);
         }
 
         if (numBuffersProcessed > 0)
         {
-            mBufferUploads.erase(mBufferUploads.begin(), mBufferUploads.begin() + numBuffersProcessed);
+            m_bufferUploads.erase(m_bufferUploads.begin(), m_bufferUploads.begin() + numBuffersProcessed);
         }
 
         if (numTexturesProcessed > 0)
         {
-            mTextureUploads.erase(mTextureUploads.begin(), mTextureUploads.begin() + numTexturesProcessed);
+            m_textureUploads.erase(m_textureUploads.begin(), m_textureUploads.begin() + numTexturesProcessed);
         }
 	}
     
     void UploadContext::ResolveProcessedUploads()
     {
-        for (auto& bufferUploadInProgress : mBufferUploadsInProgress)
+        for (auto& bufferUploadInProgress : m_bufferUploadsInProgress)
         {
-            bufferUploadInProgress->mIsReady = true;
+            bufferUploadInProgress->m_isReady = true;
         }
 
-        for (auto& textureUploadInProgress : mTextureUploadsInProgress)
+        for (auto& textureUploadInProgress : m_textureUploadsInProgress)
         {
-            textureUploadInProgress->mIsReady = true;
+            textureUploadInProgress->m_isReady = true;
         }
 
-        mBufferUploadsInProgress.clear();
-        mTextureUploadsInProgress.clear();
+        m_bufferUploadsInProgress.clear();
+        m_textureUploadsInProgress.clear();
     }
 }

@@ -23,28 +23,29 @@ namespace Bruno
 	{
 		TextureCreationDesc()
 		{
-			mResourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-			mResourceDesc.Width = 0;
-			mResourceDesc.Height = 0;
-			mResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-			mResourceDesc.DepthOrArraySize = 1;
-			mResourceDesc.MipLevels = 1;
-			mResourceDesc.SampleDesc.Count = 1;
-			mResourceDesc.SampleDesc.Quality = 0;
-			mResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-			mResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-			mResourceDesc.Alignment = 0;
+			ResourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+			ResourceDesc.Width = 0;
+			ResourceDesc.Height = 0;
+			ResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+			ResourceDesc.DepthOrArraySize = 1;
+			ResourceDesc.MipLevels = 1;
+			ResourceDesc.SampleDesc.Count = 1;
+			ResourceDesc.SampleDesc.Quality = 0;
+			ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+			ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+			ResourceDesc.Alignment = 0;
 		}
 
-		D3D12_RESOURCE_DESC mResourceDesc{};
-		TextureViewFlags mViewFlags = TextureViewFlags::None;
+		D3D12_RESOURCE_DESC ResourceDesc{};
+		TextureViewFlags ViewFlags = TextureViewFlags::None;
 
-		static TextureCreationDesc Create(uint32_t width, uint32_t height, DXGI_FORMAT format = DXGI_FORMAT_D32_FLOAT, TextureViewFlags viewFlags = TextureViewFlags::None) {
+		static TextureCreationDesc Create(uint32_t width, uint32_t height, DXGI_FORMAT format = DXGI_FORMAT_D32_FLOAT, TextureViewFlags viewFlags = TextureViewFlags::None)
+		{
 			TextureCreationDesc desc;
-			desc.mResourceDesc.Format = format;
-			desc.mResourceDesc.Width = width;
-			desc.mResourceDesc.Height = height;
-			desc.mViewFlags = viewFlags;
+			desc.ResourceDesc.Format = format;
+			desc.ResourceDesc.Width = width;
+			desc.ResourceDesc.Height = height;
+			desc.ViewFlags = viewFlags;
 			return desc;
 		}
 	};
@@ -53,11 +54,11 @@ namespace Bruno
 
 	struct TextureUpload
 	{
-		Texture* mTexture = nullptr;
-		std::unique_ptr<uint8_t[]> mTextureData;
-		size_t mTextureDataSize = 0;
-		uint32_t mNumSubResources = 0;
-		SubResourceLayouts mSubResourceLayouts{ 0 };
+		Texture* Texture = nullptr;
+		std::unique_ptr<uint8_t[]> TextureData;
+		size_t TextureDataSize = 0;
+		uint32_t SubResourcesCount = 0;
+		SubResourceLayouts SubResourceLayouts{ 0 };
 	};
 
 	class Texture : public Resource
@@ -89,17 +90,17 @@ namespace Bruno
 		Texture(const TextureCreationDesc& textureDesc);
 		~Texture();
 
-		constexpr const DescriptorHandle& GetSrvHandle() const { return mSRVDescriptor; }
-		constexpr const DescriptorHandle& GetDsvHandle() const { return mDSVDescriptor; }
+		constexpr const DescriptorHandle& GetSrvHandle() const { return m_srvDescriptor; }
+		constexpr const DescriptorHandle& GetDsvHandle() const { return m_dsvDescriptor; }
 
 		friend class Surface;
 		friend class GraphicsContext;
 
 	protected:
-		DescriptorHandle mRTVDescriptor{};
-		DescriptorHandle mDSVDescriptor{};
-		DescriptorHandle mSRVDescriptor{};
-		DescriptorHandle mUAVDescriptor{};
+		DescriptorHandle m_rtvDescriptor{};
+		DescriptorHandle m_dsvDescriptor{};
+		DescriptorHandle m_srvDescriptor{};
+		DescriptorHandle m_uavDescriptor{};
 
 	private:
 		void CreateTexture(const TextureCreationDesc& desc);

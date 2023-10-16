@@ -156,10 +156,10 @@ namespace Bruno
 			if (data.Resource == nullptr) {
 				data.Resource = std::make_shared<Texture>();
 			}
-			data.Resource->mRTVDescriptor = data.RtvHandle;
-			data.Resource->mResource = backBufferResource;
-			data.Resource->mState = D3D12_RESOURCE_STATE_PRESENT;
-			data.Resource->mDesc = backBufferResource->GetDesc();
+			data.Resource->m_rtvDescriptor = data.RtvHandle;
+			data.Resource->m_resource = backBufferResource;
+			data.Resource->m_state = D3D12_RESOURCE_STATE_PRESENT;
+			data.Resource->m_desc = backBufferResource->GetDesc();
 
 			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 			rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -190,7 +190,7 @@ namespace Bruno
 	{
 		for (uint32_t i = 0; i < m_parameters.BackBufferCount; ++i)
 		{
-			SafeRelease(m_renderTargetData[i].Resource->mResource);
+			SafeRelease(m_renderTargetData[i].Resource->m_resource);
 		}
 	}
 }

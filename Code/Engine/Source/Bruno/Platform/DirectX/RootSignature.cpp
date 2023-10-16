@@ -59,11 +59,11 @@ namespace Bruno
         auto device = Graphics::GetDevice();
 
 		std::vector<D3D12_ROOT_PARAMETER1> rootParameters;
-		std::array<std::vector<D3D12_DESCRIPTOR_RANGE1>, Graphics::Core::NUM_RESOURCE_SPACES> desciptorRanges;
+		std::array<std::vector<D3D12_DESCRIPTOR_RANGE1>, Graphics::Core::RESOURCE_SPACES_COUNT> desciptorRanges;
 
-        for (uint32_t spaceId = 0; spaceId < Graphics::Core::NUM_RESOURCE_SPACES; spaceId++)
+        for (uint32_t spaceId = 0; spaceId < Graphics::Core::RESOURCE_SPACES_COUNT; spaceId++)
         {
-            PipelineResourceSpace* currentSpace = layout.mSpaces[spaceId];
+            PipelineResourceSpace* currentSpace = layout.Spaces[spaceId];
             std::vector<D3D12_DESCRIPTOR_RANGE1>& currentDescriptorRange = desciptorRanges[spaceId];
 
             if (currentSpace)
@@ -80,7 +80,7 @@ namespace Bruno
                     rootParameter.Descriptor.RegisterSpace = spaceId;
                     rootParameter.Descriptor.ShaderRegister = 0;
 
-                    resourceMapping.mCbvMapping[spaceId] = static_cast<uint32_t>(rootParameters.size());
+                    resourceMapping.CbvMapping[spaceId] = static_cast<uint32_t>(rootParameters.size());
                     rootParameters.push_back(rootParameter);
                 }
 
@@ -92,7 +92,7 @@ namespace Bruno
                 for (auto& uav : uavs)
                 {
                     D3D12_DESCRIPTOR_RANGE1 range{};
-                    range.BaseShaderRegister = uav.mBindingIndex;
+                    range.BaseShaderRegister = uav.BindingIndex;
                     range.NumDescriptors = 1;
                     range.OffsetInDescriptorsFromTableStart = static_cast<uint32_t>(currentDescriptorRange.size());
                     range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
@@ -105,7 +105,7 @@ namespace Bruno
                 for (auto& srv : srvs)
                 {
                     D3D12_DESCRIPTOR_RANGE1 range{};
-                    range.BaseShaderRegister = srv.mBindingIndex;
+                    range.BaseShaderRegister = srv.BindingIndex;
                     range.NumDescriptors = 1;
                     range.OffsetInDescriptorsFromTableStart = static_cast<uint32_t>(currentDescriptorRange.size());
                     range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
@@ -121,7 +121,7 @@ namespace Bruno
                 desciptorTableForSpace.DescriptorTable.NumDescriptorRanges = static_cast<uint32_t>(currentDescriptorRange.size());
                 desciptorTableForSpace.DescriptorTable.pDescriptorRanges = currentDescriptorRange.data();
 
-                resourceMapping.mTableMapping[spaceId] = static_cast<uint32_t>(rootParameters.size());
+                resourceMapping.TableMapping[spaceId] = static_cast<uint32_t>(rootParameters.size());
                 rootParameters.push_back(desciptorTableForSpace);
             }
         }

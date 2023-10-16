@@ -12,10 +12,10 @@ namespace D3D12MA
 
 namespace Bruno
 {
-	enum class GPUResourceType : bool
+	enum class GPUResourceType : uint8_t
 	{
-		Buffer = false,
-		Texture = true
+		Buffer = 0,
+		Texture
 	};
 
 	class Resource : public RTTI
@@ -24,9 +24,9 @@ namespace Bruno
 
 	public:
 		virtual ~Resource();
-		constexpr ID3D12Resource* GetResource() { return mResource; }
+		constexpr ID3D12Resource* GetResource() { return m_resource; }
 
-		bool IsReady() { return mIsReady; }
+		bool IsReady() { return m_isReady; }
 
 		friend class Surface;
 		friend class Context;
@@ -34,15 +34,15 @@ namespace Bruno
 		friend class UploadContext;
 
 	protected:
-		ID3D12Resource* mResource;
-		D3D12_RESOURCE_DESC mDesc{};
-		D3D12_GPU_VIRTUAL_ADDRESS mVirtualAddress = 0;
-		D3D12_RESOURCE_STATES mState = D3D12_RESOURCE_STATE_COMMON;
-		uint32_t mDescriptorHeapIndex = Graphics::Core::INVALID_RESOURCE_TABLE_INDEX;
-		D3D12MA::Allocation* mAllocation = nullptr;
-		bool mIsReady = false;
+		ID3D12Resource* m_resource;
+		D3D12_RESOURCE_DESC m_desc{};
+		D3D12_GPU_VIRTUAL_ADDRESS m_virtualAddress = 0;
+		D3D12_RESOURCE_STATES m_state = D3D12_RESOURCE_STATE_COMMON;
+		uint32_t m_descriptorHeapIndex = Graphics::Core::INVALID_RESOURCE_TABLE_INDEX;
+		D3D12MA::Allocation* m_allocation = nullptr;
+		bool m_isReady = false;
 
-		GPUResourceType mType = GPUResourceType::Buffer;
+		GPUResourceType m_resourceType = GPUResourceType::Buffer;
 	};
 }
 

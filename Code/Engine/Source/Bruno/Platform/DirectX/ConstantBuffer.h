@@ -16,17 +16,17 @@ namespace Bruno
 		ConstantBuffer& operator=(const ConstantBuffer& rhs) = delete;
 		~ConstantBuffer()
 		{
-			if (mResource != nullptr)
-				mResource->Unmap(0, nullptr);
+			if (m_resource != nullptr)
+				m_resource->Unmap(0, nullptr);
 
-			mMappedResource = nullptr;
+			m_mappedResource = nullptr;
 		}
 
 		constexpr const uint32_t GetSizeInBytes() const { return m_elementSizeInBytes; }
 
-		void CopyData(const T& data)
+		void SetMappedData(const T& data)
 		{
-			SetMappedData(&data, sizeof(T));
+			GPUBuffer::SetMappedData(&data, sizeof(T));
 		}
 
 	private:
@@ -35,7 +35,7 @@ namespace Bruno
 
 	template<typename T>
 	inline ConstantBuffer<T>::ConstantBuffer() :
-		GPUBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(AlignU32(sizeof(T), 256), BufferViewFlags::cbv, BufferAccessFlags::hostWritable))
+		GPUBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(AlignU32(sizeof(T), 256), BufferViewFlags::Cbv, BufferAccessFlags::HostWritable))
 	{
 		m_elementSizeInBytes = AlignU32(sizeof(T), 256);
 	}

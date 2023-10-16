@@ -2,7 +2,6 @@
 
 #include "Bruno/Platform/DirectX/Surface.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
-#include "Bruno/Platform/DirectX/ResourceBarrier.h"
 
 #include <Bruno/Platform/DirectX/IndexBuffer.h>
 #include <Bruno/Platform/DirectX/VertexBuffer.h>
@@ -235,15 +234,15 @@ namespace Bruno
 		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
 
 		PipelineResourceBinding textureBinding;
-		textureBinding.mBindingIndex = 0;
-		textureBinding.mResource = m_texture.get();
+		textureBinding.BindingIndex = 0;
+		textureBinding.Resource = m_texture.get();
 
 		mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
 		mMeshPerObjectResourceSpace.SetSRV(textureBinding);
 		mMeshPerObjectResourceSpace.Lock();
 
 		PipelineResourceLayout meshResourceLayout;
-		meshResourceLayout.mSpaces[Graphics::Core::PER_OBJECT_SPACE] = &mMeshPerObjectResourceSpace;
+		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &mMeshPerObjectResourceSpace;
 
 		PipelineResourceMapping resourceMapping;
 
@@ -252,13 +251,13 @@ namespace Bruno
 		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
 
 		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
-		meshPipelineDesc.mVertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-		meshPipelineDesc.mPixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		meshPipelineDesc.mRenderTargetDesc.mDepthStencilFormat = depthBufferFormat;
-		meshPipelineDesc.mRenderTargetDesc.mNumRenderTargets = 1;
-		meshPipelineDesc.mDepthStencilDesc.DepthEnable = true;
-		meshPipelineDesc.mRenderTargetDesc.mRenderTargetFormats[0] = backBufferFormat;
-		//meshPipelineDesc.mDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
+		meshPipelineDesc.PixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
+		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = depthBufferFormat;
+		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
+		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
+		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = backBufferFormat;
+		//meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 
 		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 
@@ -397,16 +396,16 @@ namespace Bruno
 				m_graphicsContext->SetIndexBuffer(*item->IndexBuffer);
 
 				PipelineResourceBinding textureBinding;
-				textureBinding.mBindingIndex = 0;
-				textureBinding.mResource = m_texture.get();
+				textureBinding.BindingIndex = 0;
+				textureBinding.Resource = m_texture.get();
 
 				mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[device->GetFrameId()].get());
 				mMeshPerObjectResourceSpace.SetSRV(textureBinding);
 
 				PipelineInfo pipeline;
-				pipeline.mPipeline = m_pipelineState.get();
-				pipeline.mRenderTargets.push_back(&backBuffer);
-				pipeline.mDepthStencilTarget = &depthBuffer;
+				pipeline.Pipeline = m_pipelineState.get();
+				pipeline.RenderTargets.push_back(&backBuffer);
+				pipeline.DepthStencilTarget = &depthBuffer;
 
 				m_graphicsContext->SetPipeline(pipeline);
 				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, mMeshPerObjectResourceSpace);
@@ -453,6 +452,6 @@ namespace Bruno
 		objectBuffer.World = mvpMatrix;
 
 		uint32_t frameIndex = device->GetFrameId();
-		m_objectBuffer[frameIndex]->CopyData(objectBuffer);
+		m_objectBuffer[frameIndex]->SetMappedData(objectBuffer);
 	}
 }

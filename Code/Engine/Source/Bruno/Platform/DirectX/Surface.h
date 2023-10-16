@@ -44,6 +44,10 @@ namespace Bruno
 			DescriptorHandle RtvHandle{};
 		};
 
+		void HandleDeviceLost();
+		void Finalize();
+		void Release();
+
 		SurfaceWindowParameters					m_parameters;
 
 		Microsoft::WRL::ComPtr<IDXGISwapChain4> m_swapChain;
@@ -55,9 +59,5 @@ namespace Bruno
 
 		D3D12_VIEWPORT							m_viewport;
 		D3D12_RECT								m_scissorRect{};
-
-		void HandleDeviceLost();
-		void Finalize();
-		void Release();
 	};
 }

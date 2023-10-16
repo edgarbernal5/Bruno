@@ -36,12 +36,12 @@ namespace Bruno
     StagingDescriptorHeap::StagingDescriptorHeap(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t numDescriptors) :
         DescriptorHeap(device, heapType, numDescriptors, false)
     {
-        mFreeDescriptors.reserve(numDescriptors);
+        m_freeDescriptors.reserve(numDescriptors);
     }
 
     StagingDescriptorHeap::~StagingDescriptorHeap()
     {
-        if (mActiveHandleCount != 0)
+        if (m_activeHandleCount != 0)
         {
             BR_ASSERT_ERROR("There were active handles when the descriptor heap was destroyed. Look for leaks.");
         }
@@ -58,10 +58,10 @@ namespace Bruno
             newHandleID = m_currentDescriptorIndex;
             ++m_currentDescriptorIndex;
         }
-        else if (mFreeDescriptors.size() > 0)
+        else if (m_freeDescriptors.size() > 0)
         {
-            newHandleID = mFreeDescriptors.back();
-            mFreeDescriptors.pop_back();
+            newHandleID = m_freeDescriptors.back();
+            m_freeDescriptors.pop_back();
         }
         else
         {
@@ -80,24 +80,23 @@ namespace Bruno
             handle.Gpu.ptr += static_cast<uint64_t>(offset);
         }
 
-        ++mActiveHandleCount;
+        ++m_activeHandleCount;
         return handle;
     }
     
     void StagingDescriptorHeap::Free(DescriptorHandle& handle)
     {
-        BR_ASSERT(mActiveHandleCount > 0, "Heap is empty, no handles to be freed.");
-        mFreeDescriptors.push_back(handle.HeapIndex);
+        BR_ASSERT(m_activeHandleCount > 0, "Heap is empty, no handles to be freed.");
+        m_freeDescriptors.push_back(handle.HeapIndex);
 
-        mActiveHandleCount--;
-        handle.SetInvalid();
+        m_activeHandleCount--;
     }
 
     DescriptorHandle RenderPassDescriptorHeap::Allocate(uint32_t count)
     {
         BR_ASSERT(m_heap);
         uint32_t newHandleID = 0;
-        uint32_t blockEnd = mCurrentDescriptorIndex + count;
+        uint32_t blockEnd = m_currentDescriptorIndex + count;
 
         if (blockEnd <= m_maxDescriptors) {
             newHandleID = m_currentDescriptorIndex;
@@ -120,7 +119,7 @@ namespace Bruno
 
     DescriptorHandle RenderPassDescriptorHeap::GetReservedDescriptor(uint32_t index)
     {
-        BR_ASSERT(index < mReservedHandleCount);
+        BR_ASSERT(index < m_reservedHandleCount);
 
         D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_cpuStart;
         D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = m_gpuStart;
@@ -137,6 +136,6 @@ namespace Bruno
 
     void RenderPassDescriptorHeap::Reset()
     {
-        mCurrentDescriptorIndex = mReservedHandleCount;
+        m_currentDescriptorIndex = m_reservedHandleCount;
     }
 }

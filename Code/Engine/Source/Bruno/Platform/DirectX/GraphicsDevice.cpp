@@ -113,14 +113,14 @@ namespace Bruno
         mComputeQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COMPUTE);
         mCopyQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COPY);
 
-        m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::NUM_RTV_STAGING_DESCRIPTORS);
-        m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::NUM_DSV_STAGING_DESCRIPTORS);
-        m_srvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::NUM_SRV_STAGING_DESCRIPTORS);
-        mSamplerRenderPassDescriptorHeap = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 0, Graphics::Core::NUM_SAMPLER_DESCRIPTORS);
+        m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::RTV_STAGING_DESCRIPTORS_COUNT);
+        m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::DSV_STAGING_DESCRIPTORS_COUNT);
+        m_srvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::SRV_STAGING_DESCRIPTORS_COUNT);
+        mSamplerRenderPassDescriptorHeap = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 0, Graphics::Core::SAMPLER_DESCRIPTORS_COUNT);
 
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
         {
-            mSRVRenderPassDescriptorHeaps[frameIndex] = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::NUM_RESERVED_SRV_DESCRIPTORS, Graphics::Core::NUM_SRV_RENDER_PASS_USER_DESCRIPTORS);
+            mSRVRenderPassDescriptorHeaps[frameIndex] = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT, Graphics::Core::SRV_RENDER_PASS_USER_DESCRIPTORS_COUNT);
         }
 
         D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
@@ -146,19 +146,19 @@ namespace Bruno
         D3D12MA::CreateAllocator(&desc, &mAllocator);
 
         BufferCreationDesc uploadBufferDesc;
-        uploadBufferDesc.mSize = AlignU32(10 * 1024 * 1024, 256);
-        uploadBufferDesc.mAccessFlags = BufferAccessFlags::hostWritable;
+        uploadBufferDesc.Size = AlignU32(10 * 1024 * 1024, 256);
+        uploadBufferDesc.AccessFlags = BufferAccessFlags::HostWritable;
 
         BufferCreationDesc uploadTextureDesc;
-        uploadTextureDesc.mSize = AlignU32(80 * 1024 * 1024, 256);
-        uploadTextureDesc.mAccessFlags = BufferAccessFlags::hostWritable;
+        uploadTextureDesc.Size = AlignU32(80 * 1024 * 1024, 256);
+        uploadTextureDesc.AccessFlags = BufferAccessFlags::HostWritable;
 
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
         {
             mUploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GPUBuffer>(*this, uploadBufferDesc), std::make_unique<GPUBuffer>(*this, uploadTextureDesc));
         }
 
-        //D3D12_SAMPLER_DESC samplerDescs[Graphics::Core::NUM_SAMPLER_DESCRIPTORS]{};
+        //D3D12_SAMPLER_DESC samplerDescs[Graphics::Core::SAMPLER_DESCRIPTORS_COUNT]{};
         //samplerDescs[0].Filter = D3D12_FILTER_ANISOTROPIC;
         //samplerDescs[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
         //samplerDescs[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
@@ -170,9 +170,9 @@ namespace Bruno
         //samplerDescs[0].MinLOD = 0;
         //samplerDescs[0].MaxLOD = D3D12_FLOAT32_MAX;
 
-        //DescriptorHandle samplerDescriptorBlock = mSamplerRenderPassDescriptorHeap->Allocate(Graphics::Core::NUM_SAMPLER_DESCRIPTORS);
+        //DescriptorHandle samplerDescriptorBlock = mSamplerRenderPassDescriptorHeap->Allocate(Graphics::Core::SAMPLER_DESCRIPTORS_COUNT);
         //D3D12_CPU_DESCRIPTOR_HANDLE currentSamplerDescriptor = samplerDescriptorBlock.Cpu;
-        //for (uint32_t samplerIndex = 0; samplerIndex < Graphics::Core::NUM_SAMPLER_DESCRIPTORS; samplerIndex++)
+        //for (uint32_t samplerIndex = 0; samplerIndex < Graphics::Core::SAMPLER_DESCRIPTORS_COUNT; samplerIndex++)
         //{
         //    m_d3dDevice->CreateSampler(&samplerDescs[samplerIndex], currentSamplerDescriptor);
         //    //currentSamplerDescriptor.ptr += mSamplerRenderPassDescriptorHeap->GetDescriptorSize();
@@ -180,7 +180,7 @@ namespace Bruno
 
         //CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
 
-        mFreeReservedDescriptorIndices.resize(Graphics::Core::NUM_RESERVED_SRV_DESCRIPTORS);
+        mFreeReservedDescriptorIndices.resize(Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT);
         for (size_t i = 0; i < mFreeReservedDescriptorIndices.size(); i++)
         {
             mFreeReservedDescriptorIndices[i] = i;

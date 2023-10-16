@@ -13,46 +13,48 @@ namespace Bruno
 
 	enum class BufferAccessFlags : uint8_t
 	{
-		gpuOnly = 0,
-		hostWritable = 1
+		GpuOnly = 0,
+		HostWritable = 1
 	};
 	BR_DEFINITION_FLAG_FROM_ENUM(BufferAccessFlags);
 
 	enum class BufferViewFlags : uint8_t
 	{
-		none = 0,
-		cbv = 1,
-		srv = 2,
-		uav = 4
+		None = 0,
+		Cbv = 1,
+		Srv = 2,
+		Uav = 4
 	};
 	BR_DEFINITION_FLAG_FROM_ENUM(BufferViewFlags);
 
 	struct BufferCreationDesc
 	{
-		uint32_t mSize = 0;
-		uint32_t mStride = 0;
-		BufferViewFlags mViewFlags = BufferViewFlags::none;
-		BufferAccessFlags mAccessFlags = BufferAccessFlags::gpuOnly;
-		bool mIsRawAccess = false;
+		uint32_t Size = 0;
+		uint32_t Stride = 0;
+		BufferViewFlags ViewFlags = BufferViewFlags::None;
+		BufferAccessFlags AccessFlags = BufferAccessFlags::GpuOnly;
+		bool IsRawAccess = false;
 
-		static BufferCreationDesc Create(uint32_t sizeInBytes, uint32_t stride, BufferViewFlags viewFlags = BufferViewFlags::none, BufferAccessFlags accessFlags = BufferAccessFlags::gpuOnly) {
+		static BufferCreationDesc Create(uint32_t sizeInBytes, uint32_t stride, BufferViewFlags viewFlags = BufferViewFlags::None, BufferAccessFlags accessFlags = BufferAccessFlags::GpuOnly)
+		{
 			BufferCreationDesc creationDesc{};
 
-			creationDesc.mSize = sizeInBytes;
-			creationDesc.mAccessFlags = accessFlags;
-			creationDesc.mViewFlags = viewFlags;
-			creationDesc.mStride = stride;
-			creationDesc.mIsRawAccess = true;
+			creationDesc.Size = sizeInBytes;
+			creationDesc.AccessFlags = accessFlags;
+			creationDesc.ViewFlags = viewFlags;
+			creationDesc.Stride = stride;
+			creationDesc.IsRawAccess = true;
 
 			return creationDesc;
 		}
 
-		static BufferCreationDesc Create(uint32_t sizeInBytes, BufferViewFlags viewFlags = BufferViewFlags::none, BufferAccessFlags accessFlags = BufferAccessFlags::gpuOnly) {
+		static BufferCreationDesc Create(uint32_t sizeInBytes, BufferViewFlags viewFlags = BufferViewFlags::None, BufferAccessFlags accessFlags = BufferAccessFlags::GpuOnly)
+		{
 			BufferCreationDesc creationDesc{};
 
-			creationDesc.mSize = sizeInBytes;
-			creationDesc.mAccessFlags = accessFlags;
-			creationDesc.mViewFlags = viewFlags;
+			creationDesc.Size = sizeInBytes;
+			creationDesc.AccessFlags = accessFlags;
+			creationDesc.ViewFlags = viewFlags;
 
 			return creationDesc;
 		}
@@ -60,9 +62,9 @@ namespace Bruno
 
 	struct BufferUpload
 	{
-		GPUBuffer* mBuffer = nullptr;
-		std::unique_ptr<uint8_t[]> mBufferData;
-		size_t mBufferDataSize = 0;
+		GPUBuffer* Buffer = nullptr;
+		std::unique_ptr<uint8_t[]> BufferData;
+		size_t BufferDataSize = 0;
 	};
 
 	class GPUBuffer : public Resource
@@ -73,17 +75,17 @@ namespace Bruno
 		GPUBuffer(GraphicsDevice& device, const BufferCreationDesc& desc);
 		virtual ~GPUBuffer();
 
-		void SetMappedData(const void* data, size_t dataSize);
+		virtual void SetMappedData(const void* data, size_t dataSize);
 
 		friend class UploadContext;
 		friend class GraphicsContext;
 
 	protected:
-		uint8_t* mMappedResource = nullptr;
-		uint32_t mStride = 0;
-		DescriptorHandle mCBVDescriptor{};
-		DescriptorHandle mSRVDescriptor{};
-		DescriptorHandle mUAVDescriptor{};
+		uint8_t* m_mappedResource = nullptr;
+		uint32_t m_stride = 0;
+		DescriptorHandle m_cbvDescriptor{};
+		DescriptorHandle m_srvDescriptor{};
+		DescriptorHandle m_uavDescriptor{};
 	};
 }
 

@@ -7,35 +7,35 @@
 namespace Bruno
 {
 	Context::Context(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE commandType) :
-		mDevice(device),
-		mContextType(commandType)
+		m_device(device),
+		m_contextType(commandType)
 	{
 		for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
 		{
-			ThrowIfFailed(device.GetD3DDevice()->CreateCommandAllocator(commandType, IID_PPV_ARGS(&mCommandAllocators[frameIndex])));
+			ThrowIfFailed(device.GetD3DDevice()->CreateCommandAllocator(commandType, IID_PPV_ARGS(&m_commandAllocators[frameIndex])));
 		}
-		ThrowIfFailed(mDevice.GetD3DDevice()->CreateCommandList1(0, commandType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&mCommandList)));
+		ThrowIfFailed(m_device.GetD3DDevice()->CreateCommandList1(0, commandType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&m_commandList)));
 	}
 	
 	Context::~Context()
 	{
-		SafeRelease(mCommandList);
+		SafeRelease(m_commandList);
 
 		for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
 		{
-			SafeRelease(mCommandAllocators[frameIndex]);
+			SafeRelease(m_commandAllocators[frameIndex]);
 		}
 	}
 
 	void Context::AddBarrier(Resource& resource, D3D12_RESOURCE_STATES newState)
 	{
-		if (mNumQueuedBarriers >= Graphics::Core::MAX_QUEUED_BARRIERS)
+		if (m_totalQueuedBarriers >= Graphics::Core::MAX_QUEUED_BARRIERS)
 		{
 			FlushBarriers();
 		}
 
-		D3D12_RESOURCE_STATES oldState = resource.mState;
-		if (mContextType == D3D12_COMMAND_LIST_TYPE_COMPUTE)
+		D3D12_RESOURCE_STATES oldState = resource.m_state;
+		if (m_contextType == D3D12_COMMAND_LIST_TYPE_COMPUTE)
 		{
 			constexpr D3D12_RESOURCE_STATES VALID_COMPUTE_CONTEXT_STATES = (D3D12_RESOURCE_STATE_UNORDERED_ACCESS | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE |
 				D3D12_RESOURCE_STATE_COPY_DEST | D3D12_RESOURCE_STATE_COPY_SOURCE);
@@ -46,46 +46,46 @@ namespace Bruno
 
 		if (oldState != newState)
 		{
-			D3D12_RESOURCE_BARRIER& barrierDesc = mResourceBarriers[mNumQueuedBarriers];
-			++mNumQueuedBarriers;
+			D3D12_RESOURCE_BARRIER& barrierDesc = m_resourceBarriers[m_totalQueuedBarriers];
+			++m_totalQueuedBarriers;
 
 			barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			barrierDesc.Transition.pResource = resource.mResource;
+			barrierDesc.Transition.pResource = resource.m_resource;
 			barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 			barrierDesc.Transition.StateBefore = oldState;
 			barrierDesc.Transition.StateAfter = newState;
 			barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 
-			resource.mState = newState;
+			resource.m_state = newState;
 		}
 		else if (newState == D3D12_RESOURCE_STATE_UNORDERED_ACCESS)
 		{
-			D3D12_RESOURCE_BARRIER& barrierDesc = mResourceBarriers[mNumQueuedBarriers];
-			++mNumQueuedBarriers;
+			D3D12_RESOURCE_BARRIER& barrierDesc = m_resourceBarriers[m_totalQueuedBarriers];
+			++m_totalQueuedBarriers;
 
 			barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
 			barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-			barrierDesc.UAV.pResource = resource.mResource;
+			barrierDesc.UAV.pResource = resource.m_resource;
 		}
 	}
 
 	void Context::FlushBarriers()
 	{
-		if (mNumQueuedBarriers > 0)
+		if (m_totalQueuedBarriers > 0)
 		{
-			mCommandList->ResourceBarrier(mNumQueuedBarriers, mResourceBarriers.data());
-			mNumQueuedBarriers = 0;
+			m_commandList->ResourceBarrier(m_totalQueuedBarriers, m_resourceBarriers.data());
+			m_totalQueuedBarriers = 0;
 		}
 	}
 
 	void Context::CopyResource(const Resource& destination, const Resource& source)
 	{
-		mCommandList->CopyResource(destination.mResource, source.mResource);
+		m_commandList->CopyResource(destination.m_resource, source.m_resource);
 	}
 
 	void Context::CopyBufferRegion(Resource& destination, uint64_t destOffset, Resource& source, uint64_t sourceOffset, uint64_t numBytes)
 	{
-		mCommandList->CopyBufferRegion(destination.mResource, destOffset, source.mResource, sourceOffset, numBytes);
+		m_commandList->CopyBufferRegion(destination.m_resource, destOffset, source.m_resource, sourceOffset, numBytes);
 	}
 
 	void Context::CopyTextureRegion(Resource& destination, Resource& source, size_t sourceOffset, SubResourceLayouts& subResourceLayouts, uint32_t numSubResources)
@@ -93,42 +93,42 @@ namespace Bruno
 		for (uint32_t subResourceIndex = 0; subResourceIndex < numSubResources; subResourceIndex++)
 		{
 			D3D12_TEXTURE_COPY_LOCATION destinationLocation = {};
-			destinationLocation.pResource = destination.mResource;
+			destinationLocation.pResource = destination.m_resource;
 			destinationLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
 			destinationLocation.SubresourceIndex = subResourceIndex;
 
 			D3D12_TEXTURE_COPY_LOCATION sourceLocation = {};
-			sourceLocation.pResource = source.mResource;
+			sourceLocation.pResource = source.m_resource;
 			sourceLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
 			sourceLocation.PlacedFootprint = subResourceLayouts[subResourceIndex];
 			sourceLocation.PlacedFootprint.Offset += sourceOffset;
 
-			mCommandList->CopyTextureRegion(&destinationLocation, 0, 0, 0, &sourceLocation, nullptr);
+			m_commandList->CopyTextureRegion(&destinationLocation, 0, 0, 0, &sourceLocation, nullptr);
 		}
 	}
 
 	void Context::Reset()
 	{
-		uint32_t frameId = mDevice.GetFrameId();
+		uint32_t frameId = m_device.GetFrameId();
 
-		mCommandAllocators[frameId]->Reset();
-		mCommandList->Reset(mCommandAllocators[frameId], nullptr);
+		m_commandAllocators[frameId]->Reset();
+		m_commandList->Reset(m_commandAllocators[frameId], nullptr);
 
-		if (mContextType != D3D12_COMMAND_LIST_TYPE_COPY)
+		if (m_contextType != D3D12_COMMAND_LIST_TYPE_COPY)
 		{
-			BindDescriptorHeaps(mDevice.GetFrameId());
+			BindDescriptorHeaps(m_device.GetFrameId());
 		}
 	}
 
 	void Context::BindDescriptorHeaps(uint32_t frameIndex)
 	{
-		mCurrentSRVHeap = &mDevice.GetSrvDescriptionHeap(frameIndex);
-		mCurrentSRVHeap->Reset();
+		m_currentSrvHeap = &m_device.GetSrvDescriptionHeap(frameIndex);
+		m_currentSrvHeap->Reset();
 
 		ID3D12DescriptorHeap* heapsToBind[2];
-		heapsToBind[0] = mDevice.GetSrvDescriptionHeap(frameIndex).GetHeap();
-		//heapsToBind[1] = mDevice.GetSamplerHeap().GetHeap();
+		heapsToBind[0] = m_device.GetSrvDescriptionHeap(frameIndex).GetHeap();
+		//heapsToBind[1] = m_device.GetSamplerHeap().GetHeap();
 
-		mCommandList->SetDescriptorHeaps(1, heapsToBind);
+		m_commandList->SetDescriptorHeaps(1, heapsToBind);
 	}
 }

@@ -16,7 +16,6 @@ namespace Bruno
 		uint32_t					HeapIndex{ 0xffff'ffff };
 
 		bool IsValid() const { return Cpu.ptr != 0; }
-		void SetInvalid() { /*HeapIndex = 0xffff'ffff;*/ }
 	};
 
 	class GraphicsDevice;
@@ -56,9 +55,9 @@ namespace Bruno
 		void Free(DescriptorHandle& handle);
 
 	private:
-		std::vector<uint32_t> mFreeDescriptors;
-		uint32_t mCurrentDescriptorIndex = 0;
-		uint32_t mActiveHandleCount = 0;
+		std::vector<uint32_t> m_freeDescriptors;
+		uint32_t m_currentDescriptorIndex = 0;
+		uint32_t m_activeHandleCount = 0;
 	};
 
 	class RenderPassDescriptorHeap : public DescriptorHeap
@@ -66,15 +65,15 @@ namespace Bruno
 	public:
 		RenderPassDescriptorHeap(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t reservedCount, uint32_t userCount) :
 			DescriptorHeap(device, heapType, reservedCount + userCount, true), 
-			mReservedHandleCount(reservedCount),
-			mCurrentDescriptorIndex(reservedCount) {}
+			m_reservedHandleCount(reservedCount),
+			m_currentDescriptorIndex(reservedCount) {}
 
 		DescriptorHandle Allocate(uint32_t count);
 		DescriptorHandle GetReservedDescriptor(uint32_t index);
 		void Reset();
 
 	private:
-		uint32_t mReservedHandleCount = 0;
-		uint32_t mCurrentDescriptorIndex = 0;
+		uint32_t m_reservedHandleCount = 0;
+		uint32_t m_currentDescriptorIndex = 0;
 	};
 }

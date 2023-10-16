@@ -32,9 +32,9 @@ namespace Bruno
 
 		void SetBlendFactor(Math::Color blendFactor);
 		void SetIndexBuffer(IndexBuffer& indexBuffer);
-		void SetVertexBuffer(VertexBuffer& vertexBuffer);
 		void SetPipeline(const PipelineInfo& pipelineBinding);
 		void SetPipelineResources(uint32_t spaceId, const PipelineResourceSpace& resources);
+		void SetVertexBuffer(VertexBuffer& vertexBuffer);
 		void SetViewport(const D3D12_VIEWPORT& viewPort);
 		void SetScissorRect(const D3D12_RECT& rect);
 		void SetStencilRef(uint32_t stencilRef);
@@ -44,7 +44,7 @@ namespace Bruno
 	private:
 		void SetTargets(uint32_t numRenderTargets, const D3D12_CPU_DESCRIPTOR_HANDLE renderTargets[], D3D12_CPU_DESCRIPTOR_HANDLE depthStencil);
 
-		PipelineStateObject* mCurrentPipeline = nullptr;
+		PipelineStateObject* m_currentPipeline = nullptr;
 	};
 }
 

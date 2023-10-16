@@ -6,19 +6,19 @@
 
 namespace Bruno
 {
-	CommandQueue::CommandQueue(GraphicsDevice* device, D3D12_COMMAND_LIST_TYPE type) :
+	CommandQueue::CommandQueue(GraphicsDevice* device, D3D12_COMMAND_LIST_TYPE queueType) :
 		m_device(device),
-		m_queueType(type)
+		m_queueType(queueType)
 	{
 		D3D12_COMMAND_QUEUE_DESC desc = {};
 		desc.Flags		= D3D12_COMMAND_QUEUE_FLAG_NONE;
 		desc.NodeMask	= 0;
 		desc.Priority	= D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-		desc.Type		= type;
+		desc.Type		= queueType;
 
 		ThrowIfFailed(device->GetD3DDevice()->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_commandQueue)));
 		
-		switch (type)
+		switch (queueType)
 		{
 		case D3D12_COMMAND_LIST_TYPE_COPY:
 			m_commandQueue->SetName(L"Copy Command Queue");
@@ -34,7 +34,7 @@ namespace Bruno
 		ThrowIfFailed(m_device->GetD3DDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
 		m_fence->SetName(L"CommandQueue");
 
-		m_fence->Signal(mLastCompletedFenceValue);
+		m_fence->Signal(m_lastCompletedFenceValue);
 
 		m_fenceEventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
 		BR_ASSERT(m_fenceEventHandle != INVALID_HANDLE_VALUE);
@@ -50,12 +50,12 @@ namespace Bruno
 
 	bool CommandQueue::IsFenceComplete(uint64_t fenceValue)
 	{
-		if (fenceValue > mLastCompletedFenceValue)
+		if (fenceValue > m_lastCompletedFenceValue)
 		{
 			PollCurrentFenceValue();
 		}
 
-		return fenceValue <= mLastCompletedFenceValue;
+		return fenceValue <= m_lastCompletedFenceValue;
 	}
 
 	void CommandQueue::InsertWait(uint64_t fenceValue)
@@ -81,23 +81,23 @@ namespace Bruno
 		}
 
 		{
-			std::lock_guard<std::mutex> lockGuard(mEventMutex);
+			std::lock_guard<std::mutex> lockGuard(m_eventMutex);
 
 			m_fence->SetEventOnCompletion(fenceValue, m_fenceEventHandle);
 			WaitForSingleObjectEx(m_fenceEventHandle, INFINITE, false);
-			mLastCompletedFenceValue = fenceValue;
+			m_lastCompletedFenceValue = fenceValue;
 		}
 	}
 
 	void CommandQueue::WaitForIdle()
 	{
-		WaitForFenceCPUBlocking(mNextFenceValue - 1);
+		WaitForFenceCPUBlocking(m_nextFenceValue - 1);
 	}
 
 	uint64_t CommandQueue::PollCurrentFenceValue()
 	{
-		mLastCompletedFenceValue = (std::max)(mLastCompletedFenceValue, m_fence->GetCompletedValue());
-		return mLastCompletedFenceValue;
+		m_lastCompletedFenceValue = (std::max)(m_lastCompletedFenceValue, m_fence->GetCompletedValue());
+		return m_lastCompletedFenceValue;
 	}
 
 	uint64_t CommandQueue::ExecuteCommandList(ID3D12CommandList* commandList)
@@ -110,10 +110,10 @@ namespace Bruno
 
 	uint64_t CommandQueue::SignalFence()
 	{
-		std::lock_guard<std::mutex> lockGuard(mFenceMutex);
+		std::lock_guard<std::mutex> lockGuard(m_fenceMutex);
 
-		m_commandQueue->Signal(m_fence.Get(), mNextFenceValue);
+		m_commandQueue->Signal(m_fence.Get(), m_nextFenceValue);
 
-		return mNextFenceValue++;
+		return m_nextFenceValue++;
 	}
 }

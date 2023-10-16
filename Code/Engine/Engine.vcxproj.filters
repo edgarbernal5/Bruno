@@ -81,9 +81,6 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCore.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Platform\DirectX\ResourceBarrier.h">
-      <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
@@ -252,9 +249,6 @@
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\D3DCore.cpp">
-      <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Platform\DirectX\ResourceBarrier.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp">

@@ -19,11 +19,11 @@ namespace Bruno
 		inline D3D12_SHADER_VISIBILITY GetVisibility() { return m_visibility; }
 
 	private:
-		Microsoft::WRL::ComPtr<ID3DBlob> m_blob;
-		D3D12_SHADER_VISIBILITY m_visibility;
-
 		bool GetBuiltInInputLayout(const D3D12_SHADER_DESC& desc, ID3D12ShaderReflection* reflector, D3D12_INPUT_LAYOUT_DESC& inputLayout);
 		DXGI_FORMAT GetFormat(BYTE mask, D3D_REGISTER_COMPONENT_TYPE componentType);
+
+		Microsoft::WRL::ComPtr<ID3DBlob> m_blob;
+		D3D12_SHADER_VISIBILITY m_visibility;
 	};
 }
 

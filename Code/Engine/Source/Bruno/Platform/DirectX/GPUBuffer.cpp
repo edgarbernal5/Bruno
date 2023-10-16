@@ -12,26 +12,26 @@ namespace Bruno
 
 	GPUBuffer::GPUBuffer(GraphicsDevice& device, const BufferCreationDesc& creationDesc)
 	{
-		mType = GPUResourceType::Buffer;
+		m_resourceType = GPUResourceType::Buffer;
 
-        mDesc.Width = creationDesc.mSize;
-		mDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		mDesc.Alignment = 0;
-		mDesc.Height = 1;
-		mDesc.DepthOrArraySize = 1;
-		mDesc.MipLevels = 1;
-		mDesc.Format = DXGI_FORMAT_UNKNOWN;
-		mDesc.SampleDesc.Count = 1;
-		mDesc.SampleDesc.Quality = 0;
-		mDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		mDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-		mStride = creationDesc.mStride;
+        m_desc.Width = creationDesc.Size;
+		m_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		m_desc.Alignment = 0;
+		m_desc.Height = 1;
+		m_desc.DepthOrArraySize = 1;
+		m_desc.MipLevels = 1;
+		m_desc.Format = DXGI_FORMAT_UNKNOWN;
+		m_desc.SampleDesc.Count = 1;
+		m_desc.SampleDesc.Quality = 0;
+		m_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		m_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+		m_stride = creationDesc.Stride;
 
-        uint32_t numElements = static_cast<uint32_t>(mStride > 0 ? creationDesc.mSize / mStride : 1);
-        bool isHostVisible = ((creationDesc.mAccessFlags & BufferAccessFlags::hostWritable) == BufferAccessFlags::hostWritable);
-        bool hasCBV = ((creationDesc.mViewFlags & BufferViewFlags::cbv) == BufferViewFlags::cbv);
-        bool hasSRV = ((creationDesc.mViewFlags & BufferViewFlags::srv) == BufferViewFlags::srv);
-        bool hasUAV = ((creationDesc.mViewFlags & BufferViewFlags::uav) == BufferViewFlags::uav);
+        uint32_t numElements = static_cast<uint32_t>(m_stride > 0 ? creationDesc.Size / m_stride : 1);
+        bool isHostVisible = ((creationDesc.AccessFlags & BufferAccessFlags::HostWritable) == BufferAccessFlags::HostWritable);
+        bool hasCBV = ((creationDesc.ViewFlags & BufferViewFlags::Cbv) == BufferViewFlags::Cbv);
+        bool hasSRV = ((creationDesc.ViewFlags & BufferViewFlags::Srv) == BufferViewFlags::Srv);
+        bool hasUAV = ((creationDesc.ViewFlags & BufferViewFlags::Uav) == BufferViewFlags::Uav);
 
         D3D12_RESOURCE_STATES resourceState = D3D12_RESOURCE_STATE_COPY_DEST;
 
@@ -40,22 +40,22 @@ namespace Bruno
             resourceState = D3D12_RESOURCE_STATE_GENERIC_READ;
         }
 
-        mState = resourceState;
+        m_state = resourceState;
 
         D3D12MA::ALLOCATION_DESC allocationDesc{};
         allocationDesc.HeapType = isHostVisible ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT;
 
-        device.GetAllocator()->CreateResource(&allocationDesc, &mDesc, resourceState, nullptr, &mAllocation, IID_PPV_ARGS(&mResource));
-        mVirtualAddress = mResource->GetGPUVirtualAddress();
+        device.GetAllocator()->CreateResource(&allocationDesc, &m_desc, resourceState, nullptr, &m_allocation, IID_PPV_ARGS(&m_resource));
+        m_virtualAddress = m_resource->GetGPUVirtualAddress();
 
         if (hasCBV)
         {
             D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
-            constantBufferViewDesc.BufferLocation = mResource->GetGPUVirtualAddress();
-            constantBufferViewDesc.SizeInBytes = static_cast<uint32_t>(mDesc.Width);
+            constantBufferViewDesc.BufferLocation = m_resource->GetGPUVirtualAddress();
+            constantBufferViewDesc.SizeInBytes = static_cast<uint32_t>(m_desc.Width);
 
-            mCBVDescriptor = device.GetSrvDescriptionHeap().Allocate();
-            device.GetD3DDevice()->CreateConstantBufferView(&constantBufferViewDesc, mCBVDescriptor.Cpu);
+            m_cbvDescriptor = device.GetSrvDescriptionHeap().Allocate();
+            device.GetD3DDevice()->CreateConstantBufferView(&constantBufferViewDesc, m_cbvDescriptor.Cpu);
         }
 
         if (hasSRV)
@@ -63,38 +63,38 @@ namespace Bruno
             D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
             srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
             srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-            srvDesc.Format = creationDesc.mIsRawAccess ? DXGI_FORMAT_R32_TYPELESS : DXGI_FORMAT_UNKNOWN;
+            srvDesc.Format = creationDesc.IsRawAccess ? DXGI_FORMAT_R32_TYPELESS : DXGI_FORMAT_UNKNOWN;
             srvDesc.Buffer.FirstElement = 0;
-            srvDesc.Buffer.NumElements = static_cast<uint32_t>(creationDesc.mIsRawAccess ? (creationDesc.mSize / 4) : numElements);
-            srvDesc.Buffer.StructureByteStride = creationDesc.mIsRawAccess ? 0 : mStride;
-            srvDesc.Buffer.Flags = creationDesc.mIsRawAccess ? D3D12_BUFFER_SRV_FLAG_RAW : D3D12_BUFFER_SRV_FLAG_NONE;
+            srvDesc.Buffer.NumElements = static_cast<uint32_t>(creationDesc.IsRawAccess ? (creationDesc.Size / 4) : numElements);
+            srvDesc.Buffer.StructureByteStride = creationDesc.IsRawAccess ? 0 : m_stride;
+            srvDesc.Buffer.Flags = creationDesc.IsRawAccess ? D3D12_BUFFER_SRV_FLAG_RAW : D3D12_BUFFER_SRV_FLAG_NONE;
 
-            mSRVDescriptor = device.GetSrvDescriptionHeap().Allocate();
-            device.GetD3DDevice()->CreateShaderResourceView(mResource, &srvDesc, mSRVDescriptor.Cpu);
+            m_srvDescriptor = device.GetSrvDescriptionHeap().Allocate();
+            device.GetD3DDevice()->CreateShaderResourceView(m_resource, &srvDesc, m_srvDescriptor.Cpu);
 
-            mDescriptorHeapIndex = device.GetFreeReservedDescriptorIndex();
+            m_descriptorHeapIndex = device.GetFreeReservedDescriptorIndex();
 
-            device.CopySRVHandleToReservedTable(mSRVDescriptor, mDescriptorHeapIndex);
+            device.CopySRVHandleToReservedTable(m_srvDescriptor, m_descriptorHeapIndex);
         }
 
         if (hasUAV)
         {
             D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
             uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-            uavDesc.Format = creationDesc.mIsRawAccess ? DXGI_FORMAT_R32_TYPELESS : DXGI_FORMAT_UNKNOWN;
+            uavDesc.Format = creationDesc.IsRawAccess ? DXGI_FORMAT_R32_TYPELESS : DXGI_FORMAT_UNKNOWN;
             uavDesc.Buffer.CounterOffsetInBytes = 0;
             uavDesc.Buffer.FirstElement = 0;
-            uavDesc.Buffer.NumElements = static_cast<uint32_t>(creationDesc.mIsRawAccess ? (creationDesc.mSize / 4) : numElements);
-            uavDesc.Buffer.StructureByteStride = creationDesc.mIsRawAccess ? 0 : mStride;
-            uavDesc.Buffer.Flags = creationDesc.mIsRawAccess ? D3D12_BUFFER_UAV_FLAG_RAW : D3D12_BUFFER_UAV_FLAG_NONE;
+            uavDesc.Buffer.NumElements = static_cast<uint32_t>(creationDesc.IsRawAccess ? (creationDesc.Size / 4) : numElements);
+            uavDesc.Buffer.StructureByteStride = creationDesc.IsRawAccess ? 0 : m_stride;
+            uavDesc.Buffer.Flags = creationDesc.IsRawAccess ? D3D12_BUFFER_UAV_FLAG_RAW : D3D12_BUFFER_UAV_FLAG_NONE;
 
-            mUAVDescriptor = device.GetSrvDescriptionHeap().Allocate();
-            device.GetD3DDevice()->CreateUnorderedAccessView(mResource, nullptr, &uavDesc, mUAVDescriptor.Cpu);
+            m_uavDescriptor = device.GetSrvDescriptionHeap().Allocate();
+            device.GetD3DDevice()->CreateUnorderedAccessView(m_resource, nullptr, &uavDesc, m_uavDescriptor.Cpu);
         }
 
         if (isHostVisible)
         {
-            mResource->Map(0, nullptr, reinterpret_cast<void**>(&mMappedResource));
+            m_resource->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedResource));
         }
 	}
 
@@ -103,19 +103,19 @@ namespace Bruno
         auto device = Graphics::GetDevice();
         //TODO: add a new request to device to destroy the resource. we shouldn't do this here.
 
-        if (mCBVDescriptor.IsValid())
-            device->GetSrvDescriptionHeap().Free(mCBVDescriptor);
+        if (m_cbvDescriptor.IsValid())
+            device->GetSrvDescriptionHeap().Free(m_cbvDescriptor);
 
-        if (mSRVDescriptor.IsValid())
-            device->GetSrvDescriptionHeap().Free(mSRVDescriptor);
+        if (m_srvDescriptor.IsValid())
+            device->GetSrvDescriptionHeap().Free(m_srvDescriptor);
 
-        if (mUAVDescriptor.IsValid())
-            device->GetSrvDescriptionHeap().Free(mUAVDescriptor);
+        if (m_uavDescriptor.IsValid())
+            device->GetSrvDescriptionHeap().Free(m_uavDescriptor);
     }
 
 	void GPUBuffer::SetMappedData(const void* data, size_t dataSize)
 	{
-		BR_ASSERT(mMappedResource != nullptr && data != nullptr && dataSize > 0 && dataSize <= mDesc.Width);
-		memcpy_s(mMappedResource, mDesc.Width, data, dataSize);
+		BR_ASSERT(m_mappedResource != nullptr && data != nullptr && dataSize > 0 && dataSize <= m_desc.Width);
+		memcpy_s(m_mappedResource, m_desc.Width, data, dataSize);
 	}
 }

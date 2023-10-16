@@ -23,14 +23,14 @@ namespace Bruno
 		void ResolveProcessedUploads();
 
 	private:
-		std::unique_ptr<GPUBuffer> mBufferUploadHeap;
-		std::unique_ptr<GPUBuffer> mTextureUploadHeap;
+		std::unique_ptr<GPUBuffer> m_bufferUploadHeap;
+		std::unique_ptr<GPUBuffer> m_textureUploadHeap;
 
-		std::vector<std::unique_ptr<BufferUpload>> mBufferUploads;
-		std::vector<std::unique_ptr<TextureUpload>> mTextureUploads;
+		std::vector<std::unique_ptr<BufferUpload>> m_bufferUploads;
+		std::vector<std::unique_ptr<TextureUpload>> m_textureUploads;
 
-		std::vector<GPUBuffer*> mBufferUploadsInProgress;
-		std::vector<Texture*> mTextureUploadsInProgress;
+		std::vector<GPUBuffer*> m_bufferUploadsInProgress;
+		std::vector<Texture*> m_textureUploadsInProgress;
 	};
 }
 

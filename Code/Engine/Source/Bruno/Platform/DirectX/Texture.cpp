@@ -13,12 +13,12 @@ namespace Bruno
 
     Texture::Texture()
     {
-        mType = GPUResourceType::Texture;
+        m_resourceType = GPUResourceType::Texture;
     }
 
     Texture::Texture(const std::wstring& filename)
     {
-        mType = GPUResourceType::Texture;
+        m_resourceType = GPUResourceType::Texture;
 
         std::filesystem::path filePath(filename);
         if (!std::filesystem::exists(filePath))
@@ -42,18 +42,18 @@ namespace Bruno
         bool is3DTexture = metadata.dimension == DirectX::TEX_DIMENSION_TEXTURE3D;
 
         TextureCreationDesc textureCreationdesc;
-        textureCreationdesc.mResourceDesc.Format = textureFormat;
-        textureCreationdesc.mResourceDesc.Width = metadata.width;
-        textureCreationdesc.mResourceDesc.Height = static_cast<uint32_t>(metadata.height);
-        textureCreationdesc.mResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-        textureCreationdesc.mResourceDesc.DepthOrArraySize = static_cast<uint16_t>(is3DTexture ? metadata.depth : metadata.arraySize);
-        textureCreationdesc.mResourceDesc.MipLevels = static_cast<uint16_t>(metadata.mipLevels);
-        textureCreationdesc.mResourceDesc.SampleDesc.Count = 1;
-        textureCreationdesc.mResourceDesc.SampleDesc.Quality = 0;
-        textureCreationdesc.mResourceDesc.Dimension = is3DTexture ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-        textureCreationdesc.mResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-        textureCreationdesc.mResourceDesc.Alignment = 0;
-        textureCreationdesc.mViewFlags = TextureViewFlags::Srv;
+        textureCreationdesc.ResourceDesc.Format = textureFormat;
+        textureCreationdesc.ResourceDesc.Width = metadata.width;
+        textureCreationdesc.ResourceDesc.Height = static_cast<uint32_t>(metadata.height);
+        textureCreationdesc.ResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+        textureCreationdesc.ResourceDesc.DepthOrArraySize = static_cast<uint16_t>(is3DTexture ? metadata.depth : metadata.arraySize);
+        textureCreationdesc.ResourceDesc.MipLevels = static_cast<uint16_t>(metadata.mipLevels);
+        textureCreationdesc.ResourceDesc.SampleDesc.Count = 1;
+        textureCreationdesc.ResourceDesc.SampleDesc.Quality = 0;
+        textureCreationdesc.ResourceDesc.Dimension = is3DTexture ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        textureCreationdesc.ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        textureCreationdesc.ResourceDesc.Alignment = 0;
+        textureCreationdesc.ViewFlags = TextureViewFlags::Srv;
 
         auto device = Graphics::GetDevice();
 
@@ -63,12 +63,12 @@ namespace Bruno
         uint32_t numRows[Graphics::Core::MAX_TEXTURE_SUBRESOURCE_COUNT];
         uint64_t rowSizesInBytes[Graphics::Core::MAX_TEXTURE_SUBRESOURCE_COUNT];
 
-        textureUpload->mTexture = this;
-        textureUpload->mNumSubResources = static_cast<uint32_t>(metadata.mipLevels * metadata.arraySize);
+        textureUpload->Texture = this;
+        textureUpload->SubResourcesCount = static_cast<uint32_t>(metadata.mipLevels * metadata.arraySize);
 
-        device->GetD3DDevice()->GetCopyableFootprints(&textureCreationdesc.mResourceDesc, 0, textureUpload->mNumSubResources, 0, textureUpload->mSubResourceLayouts.data(), numRows, rowSizesInBytes, &textureUpload->mTextureDataSize);
+        device->GetD3DDevice()->GetCopyableFootprints(&textureCreationdesc.ResourceDesc, 0, textureUpload->SubResourcesCount, 0, textureUpload->SubResourceLayouts.data(), numRows, rowSizesInBytes, &textureUpload->TextureDataSize);
 
-        textureUpload->mTextureData = std::make_unique<uint8_t[]>(textureUpload->mTextureDataSize);
+        textureUpload->TextureData = std::make_unique<uint8_t[]>(textureUpload->TextureDataSize);
 
         for (uint64_t arrayIndex = 0; arrayIndex < metadata.arraySize; arrayIndex++)
         {
@@ -76,11 +76,11 @@ namespace Bruno
             {
                 const uint64_t subResourceIndex = mipIndex + (arrayIndex * metadata.mipLevels);
 
-                const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& subResourceLayout = textureUpload->mSubResourceLayouts[subResourceIndex];
+                const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& subResourceLayout = textureUpload->SubResourceLayouts[subResourceIndex];
                 const uint64_t subResourceHeight = numRows[subResourceIndex];
                 const uint64_t subResourcePitch = AlignU32(subResourceLayout.Footprint.RowPitch, D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
                 const uint64_t subResourceDepth = subResourceLayout.Footprint.Depth;
-                uint8_t* destinationSubResourceMemory = textureUpload->mTextureData.get() + subResourceLayout.Offset;
+                uint8_t* destinationSubResourceMemory = textureUpload->TextureData.get() + subResourceLayout.Offset;
 
                 for (uint64_t sliceIndex = 0; sliceIndex < subResourceDepth; sliceIndex++)
                 {
@@ -115,8 +115,8 @@ namespace Bruno
         //srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
         //srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-        //mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
-        //device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), &srvDesc, mSRVDescriptor.Cpu);
+        //m_srvDescriptor = device->GetSrvDescriptionHeap().Allocate();
+        //device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), &srvDesc, m_srvDescriptor.Cpu);
 
         //std::vector<D3D12_SUBRESOURCE_DATA> subresources(scratchImage.GetImageCount());
         //const DirectX::Image* pImages = scratchImage.GetImages();
@@ -141,7 +141,7 @@ namespace Bruno
 
 	Texture::Texture(const AssetPipelineInitData& assetPipelineInitData)
 	{
-        mType = GPUResourceType::Texture;
+        m_resourceType = GPUResourceType::Texture;
 
         auto device = Graphics::GetDevice();
 
@@ -173,9 +173,9 @@ namespace Bruno
             &textureDesc,
             D3D12_RESOURCE_STATE_COMMON,
             nullptr,
-            IID_PPV_ARGS(&mResource)));
+            IID_PPV_ARGS(&m_resource)));
 
-        auto desk = mResource->GetDesc();
+        auto desk = m_resource->GetDesc();
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         srvDesc.Format = (DXGI_FORMAT)assetPipelineInitData.Format;
@@ -184,8 +184,8 @@ namespace Bruno
         srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
         srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
         
-        mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
-        device->GetD3DDevice()->CreateShaderResourceView(mResource, &srvDesc, mSRVDescriptor.Cpu);
+        m_srvDescriptor = device->GetSrvDescriptionHeap().Allocate();
+        device->GetD3DDevice()->CreateShaderResourceView(m_resource, &srvDesc, m_srvDescriptor.Cpu);
 
         std::vector<D3D12_SUBRESOURCE_DATA> subresources(assetPipelineInitData.Images.size());
         
@@ -198,7 +198,7 @@ namespace Bruno
         }
 
         CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
-        if (subresources.size() < mResource->GetDesc().MipLevels)
+        if (subresources.size() < m_resource->GetDesc().MipLevels)
         {
             GenerateMips();
         }
@@ -206,7 +206,7 @@ namespace Bruno
 
     Texture::Texture(const TextureCreationDesc& textureDesc)
     {
-        mType = GPUResourceType::Texture;
+        m_resourceType = GPUResourceType::Texture;
 
         CreateTexture(textureDesc);
     }
@@ -216,27 +216,27 @@ namespace Bruno
         auto device = Graphics::GetDevice();
         //TODO: add a new request to device to destroy the resource. we shouldn't do this here.
 
-        if (mRTVDescriptor.IsValid())
-            device->GetRtvDescriptionHeap().Free(mRTVDescriptor);
+        if (m_rtvDescriptor.IsValid())
+            device->GetRtvDescriptionHeap().Free(m_rtvDescriptor);
 
-        if (mSRVDescriptor.IsValid())
-            device->GetSrvDescriptionHeap().Free(mSRVDescriptor);
+        if (m_srvDescriptor.IsValid())
+            device->GetSrvDescriptionHeap().Free(m_srvDescriptor);
 
-        if (mDSVDescriptor.IsValid())
-            device->GetDsvDescriptionHeap().Free(mDSVDescriptor);
+        if (m_dsvDescriptor.IsValid())
+            device->GetDsvDescriptionHeap().Free(m_dsvDescriptor);
     }
 
     void Texture::CreateTexture(const TextureCreationDesc& textureCreationdesc)
     {
         auto device = Graphics::GetDevice();
 
-        D3D12_RESOURCE_DESC textureDesc = textureCreationdesc.mResourceDesc;
+        D3D12_RESOURCE_DESC textureDesc = textureCreationdesc.ResourceDesc;
         textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-        bool hasRTV = ((textureCreationdesc.mViewFlags & TextureViewFlags::Rtv) == TextureViewFlags::Rtv);
-        bool hasDSV = ((textureCreationdesc.mViewFlags & TextureViewFlags::Dsv) == TextureViewFlags::Dsv);
-        bool hasSRV = ((textureCreationdesc.mViewFlags & TextureViewFlags::Srv) == TextureViewFlags::Srv);
-        bool hasUAV = ((textureCreationdesc.mViewFlags & TextureViewFlags::Uav) == TextureViewFlags::Uav);
+        bool hasRTV = ((textureCreationdesc.ViewFlags & TextureViewFlags::Rtv) == TextureViewFlags::Rtv);
+        bool hasDSV = ((textureCreationdesc.ViewFlags & TextureViewFlags::Dsv) == TextureViewFlags::Dsv);
+        bool hasSRV = ((textureCreationdesc.ViewFlags & TextureViewFlags::Srv) == TextureViewFlags::Srv);
+        bool hasUAV = ((textureCreationdesc.ViewFlags & TextureViewFlags::Uav) == TextureViewFlags::Uav);
 
         D3D12_RESOURCE_STATES resourceState = D3D12_RESOURCE_STATE_COPY_DEST;
         DXGI_FORMAT resourceFormat = textureDesc.Format;
@@ -250,7 +250,7 @@ namespace Bruno
 
         if (hasDSV)
         {
-            switch (textureCreationdesc.mResourceDesc.Format)
+            switch (textureCreationdesc.ResourceDesc.Format)
             {
             case DXGI_FORMAT_D16_UNORM:
                 resourceFormat = DXGI_FORMAT_R16_TYPELESS;
@@ -285,11 +285,11 @@ namespace Bruno
 
         textureDesc.Format = resourceFormat;
 
-        mDesc = textureDesc;
-        mState = resourceState;
+        m_desc = textureDesc;
+        m_state = resourceState;
 
         D3D12_CLEAR_VALUE clearValue = {};
-        clearValue.Format = textureCreationdesc.mResourceDesc.Format;
+        clearValue.Format = textureCreationdesc.ResourceDesc.Format;
 
         if (hasDSV)
         {
@@ -299,11 +299,11 @@ namespace Bruno
         D3D12MA::ALLOCATION_DESC allocationDesc{};
         allocationDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
 
-        device->GetAllocator()->CreateResource(&allocationDesc, &textureDesc, resourceState, (!hasRTV && !hasDSV) ? nullptr : &clearValue, &this->mAllocation, IID_PPV_ARGS(&this->mResource));
+        device->GetAllocator()->CreateResource(&allocationDesc, &textureDesc, resourceState, (!hasRTV && !hasDSV) ? nullptr : &clearValue, &this->m_allocation, IID_PPV_ARGS(&this->m_resource));
 
         if (hasSRV)
         {
-            mSRVDescriptor = device->GetSrvDescriptionHeap().Allocate();
+            m_srvDescriptor = device->GetSrvDescriptionHeap().Allocate();
             if (hasDSV)
             {
                 D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -315,69 +315,69 @@ namespace Bruno
                 srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
                 srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 
-                device->GetD3DDevice()->CreateShaderResourceView(mResource, &srvDesc, mSRVDescriptor.Cpu);
+                device->GetD3DDevice()->CreateShaderResourceView(m_resource, &srvDesc, m_srvDescriptor.Cpu);
             }
             else
             {
                 D3D12_SHADER_RESOURCE_VIEW_DESC* srvDescPointer = nullptr;
                 D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-                bool isCubeMap = textureCreationdesc.mResourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D && textureCreationdesc.mResourceDesc.DepthOrArraySize == 6;
+                bool isCubeMap = textureCreationdesc.ResourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D && textureCreationdesc.ResourceDesc.DepthOrArraySize == 6;
 
                 if (isCubeMap)
                 {
                     shaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
                     shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
                     shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
-                    shaderResourceViewDesc.TextureCube.MipLevels = textureCreationdesc.mResourceDesc.MipLevels;
+                    shaderResourceViewDesc.TextureCube.MipLevels = textureCreationdesc.ResourceDesc.MipLevels;
                     shaderResourceViewDesc.TextureCube.ResourceMinLODClamp = 0.0f;
                     srvDescPointer = &shaderResourceViewDesc;
                 }
 
-                device->GetD3DDevice()->CreateShaderResourceView(mResource, srvDescPointer, mSRVDescriptor.Cpu);
+                device->GetD3DDevice()->CreateShaderResourceView(m_resource, srvDescPointer, m_srvDescriptor.Cpu);
             }
 
-            mDescriptorHeapIndex = device->GetFreeReservedDescriptorIndex();
+            m_descriptorHeapIndex = device->GetFreeReservedDescriptorIndex();
 
-            device->CopySRVHandleToReservedTable(mSRVDescriptor, mDescriptorHeapIndex);
+            device->CopySRVHandleToReservedTable(m_srvDescriptor, m_descriptorHeapIndex);
         }
 
         if (hasRTV)
         {
-            mRTVDescriptor = device->GetRtvDescriptionHeap().Allocate();
-            device->GetD3DDevice()->CreateRenderTargetView(mResource, nullptr, mRTVDescriptor.Cpu);
+            m_rtvDescriptor = device->GetRtvDescriptionHeap().Allocate();
+            device->GetD3DDevice()->CreateRenderTargetView(m_resource, nullptr, m_rtvDescriptor.Cpu);
         }
 
         if (hasDSV)
         {
             D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
             dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-            dsvDesc.Format = textureCreationdesc.mResourceDesc.Format;
+            dsvDesc.Format = textureCreationdesc.ResourceDesc.Format;
             dsvDesc.Texture2D.MipSlice = 0;
             dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 
-            mDSVDescriptor = device->GetDsvDescriptionHeap().Allocate();
-            device->GetD3DDevice()->CreateDepthStencilView(mResource, &dsvDesc, mDSVDescriptor.Cpu);
+            m_dsvDescriptor = device->GetDsvDescriptionHeap().Allocate();
+            device->GetD3DDevice()->CreateDepthStencilView(m_resource, &dsvDesc, m_dsvDescriptor.Cpu);
         }
 
         if (hasUAV)
         {
-            mUAVDescriptor = device->GetSrvDescriptionHeap().Allocate();
-            device->GetD3DDevice()->CreateUnorderedAccessView(mResource, nullptr, nullptr, mUAVDescriptor.Cpu);
+            m_uavDescriptor = device->GetSrvDescriptionHeap().Allocate();
+            device->GetD3DDevice()->CreateUnorderedAccessView(m_resource, nullptr, nullptr, m_uavDescriptor.Cpu);
         }
 
-        mIsReady = (hasRTV || hasDSV);
+        m_isReady = (hasRTV || hasDSV);
     }
 
     void Texture::CopyTextureSubresource(uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData)
     {
-        if (mResource) {
+        if (m_resource) {
 //            auto device = Graphics::GetDevice();
 //
-//            uint64_t requiredSize = GetRequiredIntermediateSize(mResource, firstSubresource, numSubresources);
+//            uint64_t requiredSize = GetRequiredIntermediateSize(m_resource, firstSubresource, numSubresources);
 //
 //            auto uploadCommand = device->GetUploadCommand();
 //            uploadCommand->BeginUpload(requiredSize);
-//            uploadCommand->Update(mResource, subresourceData, firstSubresource, numSubresources);
+//            uploadCommand->Update(m_resource, subresourceData, firstSubresource, numSubresources);
 //            uploadCommand->EndUpload();
 //
 //            /*

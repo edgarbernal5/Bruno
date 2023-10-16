@@ -9,7 +9,7 @@ namespace Bruno
 {
 	bool SortPipelineBindings(PipelineResourceBinding a, PipelineResourceBinding b)
 	{
-		return a.mBindingIndex < b.mBindingIndex;
+		return a.BindingIndex < b.BindingIndex;
 	}
 
 	PipelineStateObject::PipelineStateObject(const D3D12_PIPELINE_STATE_STREAM_DESC& desc) :
@@ -28,61 +28,61 @@ namespace Bruno
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineDesc{};
 		pipelineDesc.NodeMask = 0;
 		pipelineDesc.SampleMask = 0xFFFFFFFF;
-		pipelineDesc.PrimitiveTopologyType = desc.mTopology;
-		pipelineDesc.InputLayout = desc.mVertexShader->GetInputLayout();
-		pipelineDesc.RasterizerState = desc.mRasterDesc;
-		pipelineDesc.BlendState = desc.mBlendDesc;
-		pipelineDesc.SampleDesc = desc.mSampleDesc;
-		pipelineDesc.DepthStencilState = desc.mDepthStencilDesc;
-		pipelineDesc.DSVFormat = desc.mRenderTargetDesc.mDepthStencilFormat;
+		pipelineDesc.PrimitiveTopologyType = desc.Topology;
+		pipelineDesc.InputLayout = desc.VertexShader->GetInputLayout();
+		pipelineDesc.RasterizerState = desc.RasterDesc;
+		pipelineDesc.BlendState = desc.BlendDesc;
+		pipelineDesc.SampleDesc = desc.SampleDesc;
+		pipelineDesc.DepthStencilState = desc.DepthStencilDesc;
+		pipelineDesc.DSVFormat = desc.RenderTargetDesc.DepthStencilFormat;
 
-		pipelineDesc.NumRenderTargets = desc.mRenderTargetDesc.mNumRenderTargets;
+		pipelineDesc.NumRenderTargets = desc.RenderTargetDesc.RenderTargetsCount;
 		for (uint32_t rtvIndex = 0; rtvIndex < pipelineDesc.NumRenderTargets; rtvIndex++)
 		{
-			pipelineDesc.RTVFormats[rtvIndex] = desc.mRenderTargetDesc.mRenderTargetFormats[rtvIndex];
+			pipelineDesc.RTVFormats[rtvIndex] = desc.RenderTargetDesc.RenderTargetFormats[rtvIndex];
 		}
 
-		if (desc.mVertexShader)
+		if (desc.VertexShader)
 		{
-			pipelineDesc.VS.pShaderBytecode = desc.mVertexShader->GetBlob()->GetBufferPointer();
-			pipelineDesc.VS.BytecodeLength = desc.mVertexShader->GetBlob()->GetBufferSize();
+			pipelineDesc.VS.pShaderBytecode = desc.VertexShader->GetBlob()->GetBufferPointer();
+			pipelineDesc.VS.BytecodeLength = desc.VertexShader->GetBlob()->GetBufferSize();
 		}
 
-		if (desc.mPixelShader)
+		if (desc.PixelShader)
 		{
-			pipelineDesc.PS.pShaderBytecode = desc.mPixelShader->GetBlob()->GetBufferPointer();
-			pipelineDesc.PS.BytecodeLength = desc.mPixelShader->GetBlob()->GetBufferSize();
+			pipelineDesc.PS.pShaderBytecode = desc.PixelShader->GetBlob()->GetBufferPointer();
+			pipelineDesc.PS.BytecodeLength = desc.PixelShader->GetBlob()->GetBufferSize();
 		}
 		pipelineDesc.pRootSignature = rootSignature->GetD3D12RootSignature();
 		
 		ThrowIfFailed(d3d12Device->CreateGraphicsPipelineState(&pipelineDesc, IID_PPV_ARGS(&m_d3d12PipelineState)));
-		mPipelineResourceMapping = pipelineResourceMapping;
+		m_pipelineResourceMapping = pipelineResourceMapping;
 	}
 
 	void PipelineResourceSpace::SetCBV(GPUBuffer* resource)
 	{
-		if (mIsLocked)
+		if (m_isLocked)
 		{
-			if (mCBV == nullptr)
+			if (m_cbv == nullptr)
 			{
 				BR_ASSERT_ERROR("Setting unused binding in a locked resource space");
 			}
 			else
 			{
-				mCBV = resource;
+				m_cbv = resource;
 			}
 		}
 		else
 		{
-			mCBV = resource;
+			m_cbv = resource;
 		}
 	}
 
 	void PipelineResourceSpace::SetSRV(const PipelineResourceBinding& binding)
 	{
-		uint32_t currentIndex = GetIndexOfBindingIndex(mSRVs, binding.mBindingIndex);
+		uint32_t currentIndex = GetIndexOfBindingIndex(m_srvs, binding.BindingIndex);
 
-		if (mIsLocked)
+		if (m_isLocked)
 		{
 			if (currentIndex == UINT_MAX)
 			{
@@ -90,28 +90,28 @@ namespace Bruno
 			}
 			else
 			{
-				mSRVs[currentIndex] = binding;
+				m_srvs[currentIndex] = binding;
 			}
 		}
 		else
 		{
 			if (currentIndex == UINT_MAX)
 			{
-				mSRVs.push_back(binding);
-				std::sort(mSRVs.begin(), mSRVs.end(), SortPipelineBindings);
+				m_srvs.push_back(binding);
+				std::sort(m_srvs.begin(), m_srvs.end(), SortPipelineBindings);
 			}
 			else
 			{
-				mSRVs[currentIndex] = binding;
+				m_srvs[currentIndex] = binding;
 			}
 		}
 	}
 
 	void PipelineResourceSpace::SetUAV(const PipelineResourceBinding& binding)
 	{
-		uint32_t currentIndex = GetIndexOfBindingIndex(mUAVs, binding.mBindingIndex);
+		uint32_t currentIndex = GetIndexOfBindingIndex(m_uavs, binding.BindingIndex);
 
-		if (mIsLocked)
+		if (m_isLocked)
 		{
 			if (currentIndex == UINT_MAX)
 			{
@@ -119,26 +119,26 @@ namespace Bruno
 			}
 			else
 			{
-				mUAVs[currentIndex] = binding;
+				m_uavs[currentIndex] = binding;
 			}
 		}
 		else
 		{
 			if (currentIndex == UINT_MAX)
 			{
-				mUAVs.push_back(binding);
-				std::sort(mUAVs.begin(), mUAVs.end(), SortPipelineBindings);
+				m_uavs.push_back(binding);
+				std::sort(m_uavs.begin(), m_uavs.end(), SortPipelineBindings);
 			}
 			else
 			{
-				mUAVs[currentIndex] = binding;
+				m_uavs[currentIndex] = binding;
 			}
 		}
 	}
 
 	void PipelineResourceSpace::Lock()
 	{
-		mIsLocked = true;
+		m_isLocked = true;
 	}
 
 	uint32_t PipelineResourceSpace::GetIndexOfBindingIndex(const std::vector<PipelineResourceBinding>& bindings, uint32_t bindingIndex)
@@ -146,7 +146,7 @@ namespace Bruno
 		const uint32_t numBindings = static_cast<uint32_t>(bindings.size());
 		for (uint32_t vectorIndex = 0; vectorIndex < numBindings; vectorIndex++)
 		{
-			if (bindings.at(vectorIndex).mBindingIndex == bindingIndex)
+			if (bindings.at(vectorIndex).BindingIndex == bindingIndex)
 			{
 				return vectorIndex;
 			}

@@ -16,21 +16,21 @@ namespace Bruno
 
     enum class PipelineType : uint8_t
     {
-        graphics = 0,
-        compute
+        Graphics = 0,
+        Compute
     };
 
 	struct PipelineInfo
 	{
-		PipelineStateObject* mPipeline = nullptr;
-		std::vector<Texture*> mRenderTargets;
-		Texture* mDepthStencilTarget = nullptr;
+		PipelineStateObject* Pipeline = nullptr;
+		std::vector<Texture*> RenderTargets;
+		Texture* DepthStencilTarget = nullptr;
 	};
 
 	struct PipelineResourceBinding
 	{
-		uint32_t mBindingIndex = 0;
-		Resource* mResource = nullptr;
+		uint32_t BindingIndex = 0;
+		Resource* Resource{ nullptr };
 	};
 
 	class PipelineResourceSpace
@@ -41,11 +41,11 @@ namespace Bruno
 		void SetUAV(const PipelineResourceBinding& binding);
 		void Lock();
 
-		const GPUBuffer* GetCBV() const { return mCBV; }
-		const std::vector<PipelineResourceBinding>& GetUAVs() const { return mUAVs; }
-		const std::vector<PipelineResourceBinding>& GetSRVs() const { return mSRVs; }
+		const GPUBuffer* GetCBV() const { return m_cbv; }
+		const std::vector<PipelineResourceBinding>& GetUAVs() const { return m_uavs; }
+		const std::vector<PipelineResourceBinding>& GetSRVs() const { return m_srvs; }
 
-		bool IsLocked() const { return mIsLocked; }
+		bool IsLocked() const { return m_isLocked; }
 
 	private:
 		uint32_t GetIndexOfBindingIndex(const std::vector<PipelineResourceBinding>& bindings, uint32_t bindingIndex);
@@ -53,40 +53,40 @@ namespace Bruno
 		//If a resource space needs more than one CBV, it is likely a design flaw, as you want to consolidate these as much
 		//as possible if they have the same update frequency (which is contained by a PipelineResourceSpace). Of course,
 		//you can freely change this to a vector like the others if you want.
-		GPUBuffer* mCBV = nullptr;
-		std::vector<PipelineResourceBinding> mUAVs;
-		std::vector<PipelineResourceBinding> mSRVs;
-		bool mIsLocked = false;
+		GPUBuffer* m_cbv = nullptr;
+		std::vector<PipelineResourceBinding> m_uavs;
+		std::vector<PipelineResourceBinding> m_srvs;
+		bool m_isLocked = false;
 	};
 
     struct PipelineResourceMapping
     {
-        std::array<std::optional<uint32_t>, Graphics::Core::NUM_RESOURCE_SPACES> mCbvMapping{};
-        std::array<std::optional<uint32_t>, Graphics::Core::NUM_RESOURCE_SPACES> mTableMapping{};
+        std::array<std::optional<uint32_t>, Graphics::Core::RESOURCE_SPACES_COUNT> CbvMapping{};
+        std::array<std::optional<uint32_t>, Graphics::Core::RESOURCE_SPACES_COUNT> TableMapping{};
     };
 
     struct PipelineResourceLayout
     {
-        std::array<PipelineResourceSpace*, Graphics::Core::NUM_RESOURCE_SPACES> mSpaces{ nullptr };
+        std::array<PipelineResourceSpace*, Graphics::Core::RESOURCE_SPACES_COUNT> Spaces{ nullptr };
     };
 
 	struct RenderTargetDesc
 	{
-		std::array<DXGI_FORMAT, D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT> mRenderTargetFormats{ DXGI_FORMAT_UNKNOWN };
-		uint8_t mNumRenderTargets = 0;
-		DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_UNKNOWN;
+		std::array<DXGI_FORMAT, D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT> RenderTargetFormats{ DXGI_FORMAT_UNKNOWN };
+		uint8_t RenderTargetsCount = 0;
+		DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_UNKNOWN;
 	};
 
 	struct GraphicsPipelineDesc
 	{
-		ShaderProgram* mVertexShader = nullptr;
-		ShaderProgram* mPixelShader = nullptr;
-		D3D12_RASTERIZER_DESC mRasterDesc{};
-		D3D12_BLEND_DESC mBlendDesc{};
-		D3D12_DEPTH_STENCIL_DESC mDepthStencilDesc{};
-		RenderTargetDesc mRenderTargetDesc{};
-		DXGI_SAMPLE_DESC mSampleDesc{};
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE mTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		ShaderProgram* VertexShader = nullptr;
+		ShaderProgram* PixelShader = nullptr;
+		D3D12_RASTERIZER_DESC RasterDesc{};
+		D3D12_BLEND_DESC BlendDesc{};
+		D3D12_DEPTH_STENCIL_DESC DepthStencilDesc{};
+		RenderTargetDesc RenderTargetDesc{};
+		DXGI_SAMPLE_DESC SampleDesc{};
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE Topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	};
 
 	class PipelineStateObject
@@ -103,27 +103,27 @@ namespace Bruno
     private:
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_d3d12PipelineState;
         RootSignature* m_rootSignature;
-        PipelineType mPipelineType = PipelineType::graphics;
-		PipelineResourceMapping mPipelineResourceMapping;
+        PipelineType m_pipelineType = PipelineType::Graphics;
+		PipelineResourceMapping m_pipelineResourceMapping;
 	};
 
 	inline GraphicsPipelineDesc GetDefaultGraphicsPipelineDesc()
 	{
         GraphicsPipelineDesc desc;
-        desc.mRasterDesc.FillMode = D3D12_FILL_MODE_SOLID;
-        desc.mRasterDesc.CullMode = D3D12_CULL_MODE_BACK;
-        desc.mRasterDesc.FrontCounterClockwise = false;
-        desc.mRasterDesc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
-        desc.mRasterDesc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
-        desc.mRasterDesc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
-        desc.mRasterDesc.DepthClipEnable = true;
-        desc.mRasterDesc.MultisampleEnable = false;
-        desc.mRasterDesc.AntialiasedLineEnable = false;
-        desc.mRasterDesc.ForcedSampleCount = 0;
-        desc.mRasterDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+        desc.RasterDesc.FillMode = D3D12_FILL_MODE_SOLID;
+        desc.RasterDesc.CullMode = D3D12_CULL_MODE_BACK;
+        desc.RasterDesc.FrontCounterClockwise = false;
+        desc.RasterDesc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+        desc.RasterDesc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+        desc.RasterDesc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+        desc.RasterDesc.DepthClipEnable = true;
+        desc.RasterDesc.MultisampleEnable = false;
+        desc.RasterDesc.AntialiasedLineEnable = false;
+        desc.RasterDesc.ForcedSampleCount = 0;
+        desc.RasterDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
-        desc.mBlendDesc.AlphaToCoverageEnable = false;
-        desc.mBlendDesc.IndependentBlendEnable = false;
+        desc.BlendDesc.AlphaToCoverageEnable = false;
+        desc.BlendDesc.IndependentBlendEnable = false;
 
         const D3D12_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc =
         {
@@ -136,24 +136,24 @@ namespace Bruno
 
         for (uint32_t i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
         {
-            desc.mBlendDesc.RenderTarget[i] = defaultRenderTargetBlendDesc;
+            desc.BlendDesc.RenderTarget[i] = defaultRenderTargetBlendDesc;
         }
 
-        desc.mDepthStencilDesc.DepthEnable = false;
-        desc.mDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-        desc.mDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-        desc.mDepthStencilDesc.StencilEnable = false;
-        desc.mDepthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
-        desc.mDepthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+        desc.DepthStencilDesc.DepthEnable = false;
+        desc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+        desc.DepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+        desc.DepthStencilDesc.StencilEnable = false;
+        desc.DepthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+        desc.DepthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
 
         const D3D12_DEPTH_STENCILOP_DESC defaultStencilOp =
         { D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
 
-        desc.mDepthStencilDesc.FrontFace = defaultStencilOp;
-        desc.mDepthStencilDesc.BackFace = defaultStencilOp;
+        desc.DepthStencilDesc.FrontFace = defaultStencilOp;
+        desc.DepthStencilDesc.BackFace = defaultStencilOp;
 
-        desc.mSampleDesc.Count = 1;
-        desc.mSampleDesc.Quality = 0;
+        desc.SampleDesc.Count = 1;
+        desc.SampleDesc.Quality = 0;
 
         return desc;
 	}

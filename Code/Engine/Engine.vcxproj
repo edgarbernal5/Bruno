@@ -128,7 +128,6 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\PipelineStateObject.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Resource.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\ResourceBarrier.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCore.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.h" />
@@ -184,7 +183,6 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\PipelineStateObject.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Resource.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\ResourceBarrier.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueue.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\D3DCore.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.cpp" />

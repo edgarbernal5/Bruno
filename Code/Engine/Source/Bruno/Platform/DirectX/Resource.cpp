@@ -9,7 +9,7 @@ namespace Bruno
 
 	Resource::~Resource()
 	{
-		SafeRelease(mResource);
-		SafeRelease(mAllocation);
+		SafeRelease(m_resource);
+		SafeRelease(m_allocation);
 	}
 }

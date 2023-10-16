@@ -49,6 +49,10 @@ namespace Bruno
 			const char* Target;
 			D3D12_SHADER_VISIBILITY Visibility;
 		};
+
+		void InitializeParameters();
+		void InitializeParameters(ShaderProgram* program);
+
 		std::shared_ptr<ShaderProgram> m_programs[Graphics::Core::SHADER_PROGRAMS_COUNT]{};
 		std::shared_ptr<RootSignature> m_rootSignature;
 		std::map<std::wstring, uint32_t> m_rootParameterIndexMap;
@@ -56,9 +60,6 @@ namespace Bruno
 		std::vector<CD3DX12_ROOT_PARAMETER1> m_rootParameters;
 		std::vector<CD3DX12_DESCRIPTOR_RANGE1> m_descriptorRanges;
 		std::vector<Sampler> m_samplers;
-
-		void InitializeParameters();
-		void InitializeParameters(ShaderProgram* program);
 
 		static const ShaderTypeDesc& VS, & PS;
 		static const ShaderTypeDesc ShaderTypes[];
