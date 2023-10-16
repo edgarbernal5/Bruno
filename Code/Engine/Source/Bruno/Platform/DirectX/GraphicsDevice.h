@@ -21,11 +21,14 @@ namespace Bruno
 	class GraphicsContext;
 	class UploadContext;
 	class Surface;
+	class PipelineStateObject;
+	class GPUBuffer;
+	class Texture;
 
     struct ContextSubmissionResult
     {
-        uint32_t mFrameId = 0;
-        uint32_t mSubmissionIndex = 0;
+        uint32_t FrameId = 0;
+        uint32_t SubmissionIndex = 0;
     };
 
 	class GraphicsDevice
@@ -75,6 +78,14 @@ namespace Bruno
 			uint64_t CopyQueueFence = 0;
 		};
 
+		struct DestructionQueue
+		{
+			std::vector<std::unique_ptr<GPUBuffer>> BuffersToDestroy;
+			std::vector<std::unique_ptr<Texture>> TexturesToDestroy;
+			std::vector<std::unique_ptr<PipelineStateObject>> PipelinesToDestroy;
+			std::vector<std::unique_ptr<Context>> ContextsToDestroy;
+		};
+
 		void CopyDescriptorsSimple(uint32_t numDescriptors, D3D12_CPU_DESCRIPTOR_HANDLE destDescriptorRangeStart, D3D12_CPU_DESCRIPTOR_HANDLE srcDescriptorRangeStart, D3D12_DESCRIPTOR_HEAP_TYPE descriptorType);
 		void ProcessDestructions(uint32_t frameIndex);
 
@@ -108,6 +119,7 @@ namespace Bruno
 
 		std::array<std::unique_ptr<UploadContext>, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> m_uploadContexts;
 		std::array<EndOfFrameFences, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> m_endOfFrameFences;
+		std::array<DestructionQueue, Graphics::Core::FRAMES_IN_FLIGHT_COUNT> m_destructionQueues;
 	};
 }
 

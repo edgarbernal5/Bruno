@@ -95,6 +95,7 @@ namespace Bruno
 
 		friend class Surface;
 		friend class GraphicsContext;
+		friend class GraphicsDevice;
 
 	protected:
 		DescriptorHandle m_rtvDescriptor{};

@@ -14,13 +14,13 @@ namespace Bruno
 		ConstantBuffer();
 		ConstantBuffer(const ConstantBuffer& rhs) = delete;
 		ConstantBuffer& operator=(const ConstantBuffer& rhs) = delete;
-		~ConstantBuffer()
-		{
-			if (m_resource != nullptr)
-				m_resource->Unmap(0, nullptr);
+		//~ConstantBuffer()
+		//{
+		//	if (m_resource != nullptr)
+		//		m_resource->Unmap(0, nullptr);
 
-			m_mappedResource = nullptr;
-		}
+		//	m_mappedResource = nullptr;
+		//}
 
 		constexpr const uint32_t GetSizeInBytes() const { return m_elementSizeInBytes; }
 

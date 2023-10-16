@@ -352,7 +352,6 @@ namespace Bruno
 	void ScenePanel::OnUpdate(const GameTimer& timer)
 	{
 		//BR_CORE_TRACE << "Paint panel. id = " << idxx << ". delta time = " << timer.GetDeltaTime() << std::endl;
-		//std::lock_guard lock{ m_mutex };
 
 		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
@@ -365,14 +364,17 @@ namespace Bruno
 
 	void ScenePanel::OnDraw()
 	{
-		//std::lock_guard lock{ m_mutex };
-
 		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
 		auto device = Bruno::Graphics::GetDevice();
 		Math::Color clearColor{ 1.0f, 1.0f, 0.0f, 1.0f };
-
+		if (idxx == 2) {
+			clearColor.R(0.0f);
+		}else if (idxx == 3) {
+			clearColor.R(0.0f);
+			clearColor.B(0.0f);
+		}
 		Texture& backBuffer = m_surface->GetBackBuffer();
 		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
 

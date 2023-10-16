@@ -79,6 +79,7 @@ namespace Bruno
 
 		friend class UploadContext;
 		friend class GraphicsContext;
+		friend class GraphicsDevice;
 
 	protected:
 		uint8_t* m_mappedResource = nullptr;

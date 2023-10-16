@@ -5,6 +5,8 @@
 #include "CommandQueue.h"
 #include "UploadContext.h"
 #include "GPUBuffer.h"
+#include "PipelineStateObject.h"
+#include "RootSignature.h"
 #include "Surface.h"
 
 #include "D3D12MemAlloc.h"
@@ -265,8 +267,8 @@ namespace Bruno
         }
 
         ContextSubmissionResult submissionResult;
-        submissionResult.mFrameId = m_frameId;
-        submissionResult.mSubmissionIndex = static_cast<uint32_t>(m_contextSubmissions[m_frameId].size());
+        submissionResult.FrameId = m_frameId;
+        submissionResult.SubmissionIndex = static_cast<uint32_t>(m_contextSubmissions[m_frameId].size());
 
         m_contextSubmissions[m_frameId].push_back(std::make_pair(fenceResult, context.GetCommandType()));
 
@@ -292,6 +294,72 @@ namespace Bruno
 
     void GraphicsDevice::ProcessDestructions(uint32_t frameIndex)
     {
+        auto& destructionQueueForFrame = m_destructionQueues[frameIndex];
+
+        for (auto& bufferToDestroy : destructionQueueForFrame.BuffersToDestroy)
+        {
+            if (bufferToDestroy->m_cbvDescriptor.IsValid())
+            {
+                m_srvDescriptorHeap->Free(bufferToDestroy->m_cbvDescriptor);
+            }
+
+            if (bufferToDestroy->m_srvDescriptor.IsValid())
+            {
+                m_srvDescriptorHeap->Free(bufferToDestroy->m_srvDescriptor);
+                m_freeReservedDescriptorIndices.push_back(bufferToDestroy->m_descriptorHeapIndex);
+            }
+
+            if (bufferToDestroy->m_uavDescriptor.IsValid())
+            {
+                m_srvDescriptorHeap->Free(bufferToDestroy->m_uavDescriptor);
+            }
+
+            if (bufferToDestroy->m_mappedResource != nullptr)
+            {
+                bufferToDestroy->m_resource->Unmap(0, nullptr);
+            }
+
+            SafeRelease(bufferToDestroy->m_resource);
+            SafeRelease(bufferToDestroy->m_allocation);
+        }
+
+        for (auto& textureToDestroy : destructionQueueForFrame.TexturesToDestroy)
+        {
+            if (textureToDestroy->m_rtvDescriptor.IsValid())
+            {
+                m_rtvDescriptorHeap->Free(textureToDestroy->m_rtvDescriptor);
+            }
+
+            if (textureToDestroy->m_dsvDescriptor.IsValid())
+            {
+                m_dsvDescriptorHeap->Free(textureToDestroy->m_dsvDescriptor);
+            }
+
+            if (textureToDestroy->m_srvDescriptor.IsValid())
+            {
+                m_srvDescriptorHeap->Free(textureToDestroy->m_srvDescriptor);
+                m_freeReservedDescriptorIndices.push_back(textureToDestroy->m_descriptorHeapIndex);
+            }
+
+            if (textureToDestroy->m_uavDescriptor.IsValid())
+            {
+                m_srvDescriptorHeap->Free(textureToDestroy->m_uavDescriptor);
+            }
+
+            SafeRelease(textureToDestroy->m_resource);
+            SafeRelease(textureToDestroy->m_allocation);
+        }
+
+        for (auto& pipelineToDestroy : destructionQueueForFrame.PipelinesToDestroy)
+        {
+            //SafeRelease(pipelineToDestroy->GetRootSignature()->GetD3D12RootSignature());
+            //SafeRelease(pipelineToDestroy->GetD3D12PipelineState());
+        }
+
+        destructionQueueForFrame.BuffersToDestroy.clear();
+        destructionQueueForFrame.TexturesToDestroy.clear();
+        destructionQueueForFrame.PipelinesToDestroy.clear();
+        destructionQueueForFrame.ContextsToDestroy.clear();
     }
 
     void GraphicsDevice::CopyDescriptors(uint32_t numDestDescriptorRanges, const D3D12_CPU_DESCRIPTOR_HANDLE* destDescriptorRangeStarts, const uint32_t* destDescriptorRangeSizes, uint32_t numSrcDescriptorRanges, const D3D12_CPU_DESCRIPTOR_HANDLE* srcDescriptorRangeStarts, const uint32_t* srcDescriptorRangeSizes, D3D12_DESCRIPTOR_HEAP_TYPE descriptorType)
