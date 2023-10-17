@@ -111,9 +111,9 @@ namespace Bruno
             m_d3dFeatureLevel = m_d3dMinFeatureLevel;
         }
 
-        m_graphicsQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_DIRECT);
-        m_computeQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COMPUTE);
-        m_copyQueue = std::make_unique<CommandQueue>(this, D3D12_COMMAND_LIST_TYPE_COPY);
+        m_graphicsQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
+        m_computeQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+        m_copyQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_COPY);
 
         m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::RTV_STAGING_DESCRIPTORS_COUNT);
         m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::DSV_STAGING_DESCRIPTORS_COUNT);
@@ -352,8 +352,8 @@ namespace Bruno
 
         for (auto& pipelineToDestroy : destructionQueueForFrame.PipelinesToDestroy)
         {
-            //SafeRelease(pipelineToDestroy->GetRootSignature()->GetD3D12RootSignature());
-            //SafeRelease(pipelineToDestroy->GetD3D12PipelineState());
+            SafeRelease(*pipelineToDestroy->GetRootSignature()->m_rootSignature.GetAddressOf());
+            SafeRelease(*pipelineToDestroy->m_d3d12PipelineState.GetAddressOf());
         }
 
         destructionQueueForFrame.BuffersToDestroy.clear();

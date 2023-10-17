@@ -100,6 +100,7 @@ namespace Bruno
         RootSignature* GetRootSignature() const { return m_rootSignature; }
 	    
         friend class GraphicsContext;
+        friend class GraphicsDevice;
     private:
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_d3d12PipelineState;
         RootSignature* m_rootSignature;

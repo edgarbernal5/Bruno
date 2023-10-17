@@ -26,7 +26,7 @@ namespace Bruno
 
 		if (m_stream.good() && (fileAccess & FileAccess::Read) != FileAccess::None)
 		{
-			m_fileLength = std::filesystem::file_size(filename);
+			m_fileLength = static_cast<long>(std::filesystem::file_size(filename));
 		}
 	}
 

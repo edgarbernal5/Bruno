@@ -74,8 +74,8 @@ namespace Bruno
 		}
 
 		memcpy(m_buffer.Data + m_position, source, count);
-		m_length += count;
-		m_position += count;
+		m_length += static_cast<long>(count);
+		m_position += static_cast<uint64_t>(count);
 	}
 
 	bool MemoryStream::EnsureCapacity(uint64_t capacity)

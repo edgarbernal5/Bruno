@@ -46,6 +46,7 @@ namespace Bruno
 		void CopySRVHandleToReservedTable(DescriptorHandle srvHandle, uint32_t index);
 
 		void DestroyTexture(std::unique_ptr<Texture> texture);
+
 		uint32_t GetFrameId() { return m_frameId; }
 
 		IDXGIFactory4* GetFactory();

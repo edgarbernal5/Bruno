@@ -14,7 +14,9 @@ namespace Bruno
 
 	Surface::~Surface()
 	{
-		Release();
+		Graphics::GetDevice()->WaitForIdle();
+		
+		ReleaseBackBufferResources();
 	}
 
 	void Surface::Initialize()
@@ -74,7 +76,7 @@ namespace Bruno
 
 	void Surface::Present() const
 	{
-		ThrowIfFailed(m_swapChain->Present(0, 0));
+		ThrowIfFailed(m_swapChain->Present(0, 0)); //Present(1, 0));
 		m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
 	}
 
@@ -86,11 +88,10 @@ namespace Bruno
 		if (backBufferWidth == m_parameters.Width && backBufferHeight == m_parameters.Height)
 			return;
 
-		//TODO: Flush command queue before changing any resources.
 		auto device = Graphics::GetDevice();
 		device->WaitForIdle();
 
-		Release();
+		ReleaseBackBufferResources();
 
 		HRESULT hr = m_swapChain->ResizeBuffers(
 			m_parameters.BackBufferCount,
@@ -186,7 +187,7 @@ namespace Bruno
 		m_scissorRect = { 0, 0, (int32_t)width, (int32_t)height };
 	}
 
-	void Surface::Release()
+	void Surface::ReleaseBackBufferResources()
 	{
 		for (uint32_t i = 0; i < m_parameters.BackBufferCount; ++i)
 		{

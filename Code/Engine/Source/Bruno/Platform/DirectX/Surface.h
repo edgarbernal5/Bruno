@@ -46,7 +46,7 @@ namespace Bruno
 
 		void HandleDeviceLost();
 		void Finalize();
-		void Release();
+		void ReleaseBackBufferResources();
 
 		SurfaceWindowParameters					m_parameters;
 

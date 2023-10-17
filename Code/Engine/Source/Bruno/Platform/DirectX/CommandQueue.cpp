@@ -6,7 +6,7 @@
 
 namespace Bruno
 {
-	CommandQueue::CommandQueue(GraphicsDevice* device, D3D12_COMMAND_LIST_TYPE queueType) :
+	CommandQueue::CommandQueue(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE queueType) :
 		m_device(device),
 		m_queueType(queueType)
 	{
@@ -16,7 +16,7 @@ namespace Bruno
 		desc.Priority	= D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
 		desc.Type		= queueType;
 
-		ThrowIfFailed(device->GetD3DDevice()->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_commandQueue)));
+		ThrowIfFailed(device.GetD3DDevice()->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_commandQueue)));
 		
 		switch (queueType)
 		{
@@ -31,7 +31,7 @@ namespace Bruno
 			break;
 		}
 
-		ThrowIfFailed(m_device->GetD3DDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+		ThrowIfFailed(m_device.GetD3DDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
 		m_fence->SetName(L"CommandQueue");
 
 		m_fence->Signal(m_lastCompletedFenceValue);

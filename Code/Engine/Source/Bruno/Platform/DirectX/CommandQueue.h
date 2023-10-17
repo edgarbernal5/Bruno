@@ -11,7 +11,7 @@ namespace Bruno
 	class CommandQueue
 	{
 	public:
-		CommandQueue(GraphicsDevice* device, D3D12_COMMAND_LIST_TYPE queueType);
+		CommandQueue(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE queueType);
 		~CommandQueue();
 
 		bool IsFenceComplete(uint64_t fenceValue);
@@ -32,7 +32,7 @@ namespace Bruno
 	private:
 		uint64_t PollCurrentFenceValue();
 
-		GraphicsDevice* m_device;
+		GraphicsDevice& m_device;
 
 		D3D12_COMMAND_LIST_TYPE							m_queueType;
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue>		m_commandQueue;
