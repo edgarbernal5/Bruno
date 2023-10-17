@@ -306,16 +306,16 @@ namespace Bruno
         switch (waitType)
         {
         case ContextWaitType::Graphics:
-            m_graphicsQueue->InsertWaitForQueueFence(workSourceQueue, contextSubmission.second);
+            m_graphicsQueue->InsertWaitForQueueFence(workSourceQueue, contextSubmission.first);
             break;
         case ContextWaitType::Compute:
-            m_computeQueue->InsertWaitForQueueFence(workSourceQueue, contextSubmission.second);
+            m_computeQueue->InsertWaitForQueueFence(workSourceQueue, contextSubmission.first);
             break;
         case ContextWaitType::Copy:
-            m_copyQueue->InsertWaitForQueueFence(workSourceQueue, contextSubmission.second);
+            m_copyQueue->InsertWaitForQueueFence(workSourceQueue, contextSubmission.first);
             break;
         case ContextWaitType::Host:
-            workSourceQueue->WaitForFenceCPUBlocking(contextSubmission.second);
+            workSourceQueue->WaitForFenceCPUBlocking(contextSubmission.first);
             break;
         default:
             BR_ASSERT_ERROR("Unsupported wait type.");
