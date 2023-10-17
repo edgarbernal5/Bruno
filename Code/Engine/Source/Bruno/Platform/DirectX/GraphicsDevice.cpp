@@ -377,6 +377,11 @@ namespace Bruno
         }
     }
 
+    void GraphicsDevice::DestroyTexture(std::unique_ptr<Texture> texture)
+    {
+        m_destructionQueues[m_frameId].TexturesToDestroy.push_back(std::move(texture));
+    }
+
     IDXGIFactory4* GraphicsDevice::GetFactory()
     {
         return m_dxgiFactory.Get();

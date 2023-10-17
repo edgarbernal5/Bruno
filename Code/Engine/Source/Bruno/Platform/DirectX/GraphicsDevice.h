@@ -45,6 +45,7 @@ namespace Bruno
 			uint32_t numSrcDescriptorRanges, const D3D12_CPU_DESCRIPTOR_HANDLE* srcDescriptorRangeStarts, const uint32_t* srcDescriptorRangeSizes, D3D12_DESCRIPTOR_HEAP_TYPE descriptorType);
 		void CopySRVHandleToReservedTable(DescriptorHandle srvHandle, uint32_t index);
 
+		void DestroyTexture(std::unique_ptr<Texture> texture);
 		uint32_t GetFrameId() { return m_frameId; }
 
 		IDXGIFactory4* GetFactory();
