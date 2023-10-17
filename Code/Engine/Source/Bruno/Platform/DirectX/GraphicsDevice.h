@@ -31,6 +31,14 @@ namespace Bruno
         uint32_t SubmissionIndex = 0;
     };
 
+	enum class ContextWaitType : uint8_t
+	{
+		Host = 0,
+		Graphics,
+		Compute,
+		Copy
+	};
+
 	class GraphicsDevice
 	{
 	public:
@@ -68,7 +76,9 @@ namespace Bruno
 		uint32_t GetFreeReservedDescriptorIndex();
 
 		ContextSubmissionResult SubmitContextWork(Context& context);
+
 		void WaitForIdle();
+		void WaitOnContextWork(ContextSubmissionResult submission, ContextWaitType waitType);
 
 		static std::shared_ptr<GraphicsDevice> Create(std::shared_ptr<GraphicsAdapter> adapter = nullptr);
 

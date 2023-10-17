@@ -282,6 +282,47 @@ namespace Bruno
         m_copyQueue->WaitForIdle();
     }
 
+    void GraphicsDevice::WaitOnContextWork(ContextSubmissionResult submission, ContextWaitType waitType)
+    {
+        std::pair<uint64_t, D3D12_COMMAND_LIST_TYPE> contextSubmission = m_contextSubmissions[submission.FrameId][submission.SubmissionIndex];
+        CommandQueue* workSourceQueue = nullptr;
+
+        switch (contextSubmission.second)
+        {
+        case D3D12_COMMAND_LIST_TYPE_DIRECT:
+            workSourceQueue = m_graphicsQueue.get();
+            break;
+        case D3D12_COMMAND_LIST_TYPE_COMPUTE:
+            workSourceQueue = m_computeQueue.get();
+            break;
+        case D3D12_COMMAND_LIST_TYPE_COPY:
+            workSourceQueue = m_copyQueue.get();
+            break;
+        default:
+            BR_ASSERT_ERROR("Unsupported submission type.");
+            break;
+        }
+
+        switch (waitType)
+        {
+        case ContextWaitType::Graphics:
+            m_graphicsQueue->InsertWaitForQueueFence(workSourceQueue, contextSubmission.second);
+            break;
+        case ContextWaitType::Compute:
+            m_computeQueue->InsertWaitForQueueFence(workSourceQueue, contextSubmission.second);
+            break;
+        case ContextWaitType::Copy:
+            m_copyQueue->InsertWaitForQueueFence(workSourceQueue, contextSubmission.second);
+            break;
+        case ContextWaitType::Host:
+            workSourceQueue->WaitForFenceCPUBlocking(contextSubmission.second);
+            break;
+        default:
+            BR_ASSERT_ERROR("Unsupported wait type.");
+            break;
+        }
+    }
+
     std::shared_ptr<GraphicsDevice> GraphicsDevice::Create(std::shared_ptr<GraphicsAdapter> adapter)
     {
         return std::make_shared<GraphicsDevice>(adapter);
