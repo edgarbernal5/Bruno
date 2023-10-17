@@ -172,7 +172,12 @@ namespace Bruno
 		form.events().key_release([this](const nana::arg_keyboard& args) {
 			if (args.key == 'O')
 			{
-				auto panel = m_place.add_pane<nana::button>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx %2 == 0 ? nana::dock_position::down : nana::dock_position::right, std::string("A new pane is created."));
+				if (panelIdxx % 2 == 0) {
+					auto panel = m_place.add_pane<nana::button>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : (panelIdxx == 2 ? "pane4" : "pane5")), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, std::string("A new pane is created."));
+				}
+				else {
+					auto panel = m_place.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : (panelIdxx == 2 ? "pane4" : "pane5")), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
+				}
 				//auto panel = m_dockPlace.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
 				m_place.collocate();
 				//AddScenePanel(panel);

@@ -373,7 +373,12 @@ namespace Bruno
 			clearColor.R(0.0f);
 		}else if (idxx == 3) {
 			clearColor.R(0.0f);
-			clearColor.B(0.0f);
+			clearColor.G(0.0f);
+		}
+		else if (idxx == 4) {
+			clearColor.R(0.0f);
+			clearColor.G(0.0f);
+			clearColor.B(0.5f);
 		}
 		Texture& backBuffer = m_surface->GetBackBuffer();
 		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();

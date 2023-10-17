@@ -41,7 +41,6 @@ namespace Bruno
 		uint64_t										m_lastCompletedFenceValue{ 0 };
 
 		HANDLE											m_fenceEventHandle{ nullptr };
-		uint32_t										m_frameIndex{ 0 };
 		std::mutex										m_fenceMutex;
 		std::mutex										m_eventMutex;
 	};

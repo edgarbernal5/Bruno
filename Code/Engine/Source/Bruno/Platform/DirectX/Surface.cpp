@@ -14,7 +14,8 @@ namespace Bruno
 
 	Surface::~Surface()
 	{
-		Graphics::GetDevice()->WaitForIdle();
+		auto device = Graphics::GetDevice();
+		device->WaitForIdle();
 		
 		ReleaseBackBufferResources();
 	}
