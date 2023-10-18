@@ -52,7 +52,7 @@ namespace Bruno
 		StagingDescriptorHeap(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t numDescriptors);
 		~StagingDescriptorHeap();
 
-		DescriptorHandle Allocate(uint32_t count = 1);
+		DescriptorHandle Allocate();
 		void Free(DescriptorHandle& handle);
 
 	private:

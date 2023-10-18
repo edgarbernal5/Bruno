@@ -47,7 +47,7 @@ namespace Bruno
         }
     }
 
-    DescriptorHandle StagingDescriptorHeap::Allocate(uint32_t count)
+    DescriptorHandle StagingDescriptorHeap::Allocate()
     {
         //std::lock_guard lock{ m_mutex };
         BR_ASSERT(m_heap);
