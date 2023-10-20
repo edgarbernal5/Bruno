@@ -5,6 +5,7 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem>
+#include <mutex>
 
 namespace Bruno
 {
@@ -95,12 +96,16 @@ namespace Bruno
 		template<class T>
 		Logger& operator<<(const T& outputMessage)
 		{
+			std::lock_guard lock{ m_mutex };
+
 			m_stream << outputMessage;
 			return *this;
 		}
 
 		Logger& operator<<(ManipFn manip) /// endl, flush, setw, setfill, etc.
 		{
+			std::lock_guard lock{ m_mutex };
+
 			manip(m_stream);
 
 			if (manip == static_cast<ManipFn>(std::flush)
@@ -112,6 +117,7 @@ namespace Bruno
 
 		Logger& operator<<(FlagsFn manip) /// setiosflags, resetiosflags
 		{
+			std::lock_guard lock{ m_mutex };
 			manip(m_stream);
 
 			return *this;
@@ -119,6 +125,8 @@ namespace Bruno
 
 		Logger& operator()(LogLevel level)
 		{
+			std::lock_guard lock{ m_mutex };
+
 			m_logLevel = level;
 			return *this;
 		}
@@ -156,10 +164,6 @@ namespace Bruno
 		}
 
 	private:
-		std::stringstream m_stream;
-		LogLevel m_logLevel{ LogLevel::Trace };
-
-		std::vector<std::shared_ptr<Sink>> m_sinks;
 
 		const char* GetLogLevelName(LogLevel level)
 		{
@@ -171,5 +175,11 @@ namespace Bruno
 			if (level == LogLevel::Fatal) return "Fatal";
 			return "";
 		}
+
+		std::mutex m_mutex;
+		std::stringstream m_stream;
+		LogLevel m_logLevel{ LogLevel::Trace };
+
+		std::vector<std::shared_ptr<Sink>> m_sinks;
 	};
 }
