@@ -39,7 +39,7 @@ namespace Bruno
 		void UpdateCBs(const GameTimer& timer);
 
 		std::unique_ptr<Surface> m_surface;
-		std::unique_ptr<Texture> m_texture;
+		std::shared_ptr<Texture> m_texture;
 		std::shared_ptr<RootSignature> m_rootSignature;
 
 		std::unique_ptr<Shader> m_opaqueShader;

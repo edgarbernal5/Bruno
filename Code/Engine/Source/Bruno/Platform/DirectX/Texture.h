@@ -75,14 +75,16 @@ namespace Bruno
 			size_t MipLevels;
 			uint32_t Format;
 			uint8_t Dimension;
+			uint64_t DataSizeInBytes;
 
-			struct ImageInitData
+			std::vector<uint8_t> Pixels;
+			/*struct ImageInitData
 			{
 				int64_t RowPitch;
 				int64_t SlicePitch;
 				std::vector<uint8_t> Pixels;
 			};
-			std::vector<ImageInitData> Images;
+			std::vector<ImageInitData> Images;*/
 		};
 		Texture();
 		Texture(const std::wstring& filename);

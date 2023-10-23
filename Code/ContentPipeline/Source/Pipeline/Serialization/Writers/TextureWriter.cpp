@@ -25,12 +25,14 @@ namespace Bruno
 		output.WriteUInt32(textueContentItem->Format);
 		output.WriteUInt8(textueContentItem->Dimension);
 
-		output.WriteUInt64(textueContentItem->Images.size());
-		for (size_t i = 0; i < textueContentItem->Images.size(); i++)
-		{
-			output.WriteInt64(textueContentItem->Images[i].RowPitch);
-			output.WriteInt64(textueContentItem->Images[i].SlicePitch);
-			output.WriteBytes(textueContentItem->Images[i].Pixels);
-		}
+		output.WriteUInt64(textueContentItem->DataSizeInBytes);
+		output.WriteBytes(textueContentItem->Pixels);
+		//output.WriteUInt64(textueContentItem->Images.size());
+		//for (size_t i = 0; i < textueContentItem->Images.size(); i++)
+		//{
+		//	output.WriteInt64(textueContentItem->Images[i].RowPitch);
+		//	output.WriteInt64(textueContentItem->Images[i].SlicePitch);
+		//	output.WriteBytes(textueContentItem->Images[i].Pixels);
+		//}
 	}
 }

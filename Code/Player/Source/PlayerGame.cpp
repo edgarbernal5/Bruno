@@ -8,7 +8,9 @@
 #include <Bruno/Platform/DirectX/VertexTypes.h>
 #include <Bruno/Platform/DirectX/ShaderProgram.h>
 #include <Bruno/Platform/DirectX/GraphicsContext.h>
+#include <Bruno/Content/ContentManager.h>
 #include <Bruno/Renderer/RenderItem.h>
+#include <Bruno/Content/ContentTypeReaderManager.h>
 #include <iostream>
 
 namespace Bruno
@@ -70,6 +72,8 @@ namespace Bruno
 		m_gameWindow = std::make_unique<WindowsGameWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
 
+		ContentTypeReaderManager::Initialize();
+
 		SurfaceWindowParameters surfaceParameters;
 		surfaceParameters.Width = m_parameters.WindowWidth;
 		surfaceParameters.Height = m_parameters.WindowHeight;
@@ -90,7 +94,10 @@ namespace Bruno
 		{
 			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
 		}
-		m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
+		ContentManager manager(L"");
+		m_texture = manager.Load<Texture>(L"Textures/Mona_Lisa.jpg");
+		//m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
+		//m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
 
 		GraphicsDevice* device = Graphics::GetDevice();
 		

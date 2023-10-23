@@ -143,65 +143,37 @@ namespace Bruno
 	{
         m_resourceType = GPUResourceType::Texture;
 
+        DXGI_FORMAT textureFormat = (DXGI_FORMAT)assetPipelineInitData.Format;
+        bool is3DTexture = assetPipelineInitData.Dimension == DirectX::TEX_DIMENSION_TEXTURE3D;
+
+        TextureCreationDesc textureCreationdesc;
+        textureCreationdesc.ResourceDesc.Format = textureFormat;
+        textureCreationdesc.ResourceDesc.Width = assetPipelineInitData.Width;
+        textureCreationdesc.ResourceDesc.Height = static_cast<uint32_t>(assetPipelineInitData.Height);
+        textureCreationdesc.ResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+        textureCreationdesc.ResourceDesc.DepthOrArraySize = static_cast<uint16_t>(is3DTexture ? assetPipelineInitData.Depth : assetPipelineInitData.ArraySize);
+        textureCreationdesc.ResourceDesc.MipLevels = static_cast<uint16_t>(assetPipelineInitData.MipLevels);
+        textureCreationdesc.ResourceDesc.SampleDesc.Count = 1;
+        textureCreationdesc.ResourceDesc.SampleDesc.Quality = 0;
+        textureCreationdesc.ResourceDesc.Dimension = is3DTexture ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        textureCreationdesc.ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        textureCreationdesc.ResourceDesc.Alignment = 0;
+        textureCreationdesc.ViewFlags = TextureViewFlags::Srv;
+
         auto device = Graphics::GetDevice();
 
-        D3D12_RESOURCE_DESC textureDesc = {};
-        switch ((DirectX::TEX_DIMENSION)assetPipelineInitData.Dimension)
-        {
-        case DirectX::TEX_DIMENSION_TEXTURE1D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex1D((DXGI_FORMAT)assetPipelineInitData.Format, static_cast<uint64_t>(assetPipelineInitData.Width),
-                static_cast<uint16_t>(assetPipelineInitData.ArraySize));
-            break;
-        case DirectX::TEX_DIMENSION_TEXTURE2D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex2D((DXGI_FORMAT)assetPipelineInitData.Format, static_cast<uint64_t>(assetPipelineInitData.Width),
-                static_cast<uint32_t>(assetPipelineInitData.Height),
-                static_cast<uint16_t>(assetPipelineInitData.ArraySize));
-            break;
-        case DirectX::TEX_DIMENSION_TEXTURE3D:
-            textureDesc = CD3DX12_RESOURCE_DESC::Tex3D((DXGI_FORMAT)assetPipelineInitData.Format, static_cast<uint64_t>(assetPipelineInitData.Width),
-                static_cast<uint32_t>(assetPipelineInitData.Height),
-                static_cast<uint16_t>(assetPipelineInitData.Depth));
-            break;
-        default:
-            throw std::exception("Invalid texture dimension.");
-            break;
-        }
+        CreateTexture(textureCreationdesc);
+        auto textureUpload = std::make_unique<TextureUpload>();
 
-        ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
-            &Graphics::Core::HeapProperties.DefaultHeap,
-            D3D12_HEAP_FLAG_NONE,
-            &textureDesc,
-            D3D12_RESOURCE_STATE_COMMON,
-            nullptr,
-            IID_PPV_ARGS(&m_resource)));
+        textureUpload->Texture = this;
+        textureUpload->SubResourcesCount = static_cast<uint32_t>(assetPipelineInitData.MipLevels * assetPipelineInitData.ArraySize);
+        textureUpload->TextureDataSize = assetPipelineInitData.DataSizeInBytes;
+        textureUpload->TextureData = std::make_unique<uint8_t[]>(textureUpload->TextureDataSize);
+                
+        memcpy(textureUpload->TextureData.get(), assetPipelineInitData.Pixels.data(), assetPipelineInitData.DataSizeInBytes);
 
-        auto desk = m_resource->GetDesc();
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srvDesc.Format = (DXGI_FORMAT)assetPipelineInitData.Format;
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
-        srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-        
-        m_srvDescriptor = device->GetSrvDescriptionHeap().Allocate();
-        device->GetD3DDevice()->CreateShaderResourceView(m_resource, &srvDesc, m_srvDescriptor.Cpu);
+        device->GetUploadContext().AddTextureUpload(std::move(textureUpload));
 
-        std::vector<D3D12_SUBRESOURCE_DATA> subresources(assetPipelineInitData.Images.size());
-        
-        for (int i = 0; i < assetPipelineInitData.Images.size(); ++i)
-        {
-            auto& subresource = subresources[i];
-            subresource.RowPitch = assetPipelineInitData.Images[i].RowPitch;
-            subresource.SlicePitch = assetPipelineInitData.Images[i].SlicePitch;
-            subresource.pData = assetPipelineInitData.Images[i].Pixels.data();
-        }
-
-        CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
-        if (subresources.size() < m_resource->GetDesc().MipLevels)
-        {
-            GenerateMips();
-        }
     }
 
     Texture::Texture(const TextureCreationDesc& textureDesc)
