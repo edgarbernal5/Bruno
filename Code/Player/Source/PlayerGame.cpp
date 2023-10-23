@@ -96,7 +96,7 @@ namespace Bruno
 		}
 		ContentManager manager(L"");
 		m_texture = manager.Load<Texture>(L"Textures/Mona_Lisa.jpg");
-		//m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
+		//m_texture = std::make_shared<Texture>(L"Textures/Mona_Lisa.jpg");
 		//m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
 
 		GraphicsDevice* device = Graphics::GetDevice();

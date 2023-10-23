@@ -72,6 +72,7 @@ namespace Bruno
 		}
 
 		m_depthBuffer = std::make_unique<DepthBuffer>(backBufferWidth, backBufferHeight, m_parameters.DepthBufferFormat);
+		
 		Finalize();
 	}
 

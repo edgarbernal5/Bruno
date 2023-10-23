@@ -26,14 +26,17 @@ namespace Bruno
 		input.ReadUInt64(initData.DataSizeInBytes);
 		input.ReadBytes(initData.Pixels);
 
-		//for (size_t i = 0; i < imagesCount; i++)
-		//{
-		//	auto& imageInitData = initData.Images.emplace_back();
+		uint64_t imagesCount;
+		input.ReadUInt64(imagesCount);
 
-		//	input.ReadInt64(imageInitData.RowPitch);
-		//	input.ReadInt64(imageInitData.SlicePitch);
-		//	input.ReadBytes(imageInitData.Pixels);
-		//}
+		for (size_t i = 0; i < imagesCount; i++)
+		{
+			auto& imageInitData = initData.Images.emplace_back();
+
+			input.ReadInt64(imageInitData.RowPitch);
+			input.ReadInt64(imageInitData.SlicePitch);
+			input.ReadUInt64(imageInitData.Offset);
+		}
 
 		return std::make_shared<Texture>(initData);
 	}

@@ -68,6 +68,11 @@ namespace Bruno
 
 		auto device = Graphics::GetDevice();
 
+		size_t rowPitch, slicePitch;
+
+		DirectX::ComputePitch(textureFormat, metadata.width, metadata.height, rowPitch, slicePitch);
+
+		uint32_t numBytesPerPixel = rowPitch / metadata.width;
 		uint32_t numRows[32];
 		uint64_t rowSizesInBytes[32];
 		std::array<D3D12_PLACED_SUBRESOURCE_FOOTPRINT, 32> subResourceLayouts{ 0 };
@@ -75,12 +80,28 @@ namespace Bruno
 		uint32_t subResourceCount = static_cast<uint32_t>(metadata.mipLevels * metadata.arraySize);
 		device->GetD3DDevice()->GetCopyableFootprints(&resourceDesc, 0, subResourceCount, 0, subResourceLayouts.data(), numRows, rowSizesInBytes, &outputContentItem->DataSizeInBytes);
 
-		outputContentItem->Pixels.resize(outputContentItem->DataSizeInBytes);
-
+		//https://learn.microsoft.com/en-us/windows/win32/direct3d12/subresources
+		//https://learn.microsoft.com/en-us/windows/win32/direct3d12/upload-and-readback-of-texture-data
+		// 
 		//int textureHeapSize = ((((width * numBytesPerPixel) + 255) & ~255) * (height - 1)) + (width * numBytesPerPixel);
 		//https://www.braynzarsoft.net/viewtutorial/q16390-directx-12-textures-from-file
+		outputContentItem->DataSizeInBytes = AlignU64(rowPitch, 256) * (resourceDesc.Height - 1) + (rowPitch);
 
-		for (uint64_t arrayIndex = 0; arrayIndex < metadata.arraySize; arrayIndex++)
+		outputContentItem->Pixels.resize(outputContentItem->DataSizeInBytes);
+
+		uint64_t offset = 0;
+		const DirectX::Image* pImages = scratchImage.GetImages();
+		for (size_t i = 0; i < scratchImage.GetImageCount(); i++)
+		{
+			auto& imageContentItem = outputContentItem->Images.emplace_back();
+			imageContentItem.RowPitch = pImages[i].rowPitch;
+			imageContentItem.SlicePitch = pImages[i].slicePitch;
+			imageContentItem.Offset = offset;
+			memcpy(outputContentItem->Pixels.data() + offset, pImages[i].pixels, pImages[i].slicePitch);
+
+			offset += pImages[i].slicePitch;
+		}
+		/*for (uint64_t arrayIndex = 0; arrayIndex < metadata.arraySize; arrayIndex++)
 		{
 			for (uint64_t mipIndex = 0; mipIndex < metadata.mipLevels; mipIndex++)
 			{
@@ -105,7 +126,7 @@ namespace Bruno
 					}
 				}
 			}
-		}
+		}*/
 
 		//const DirectX::Image* pImages = scratchImage.GetImages();
 		//for (size_t i = 0; i < scratchImage.GetImageCount(); i++)

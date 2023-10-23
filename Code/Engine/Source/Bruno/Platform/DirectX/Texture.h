@@ -78,13 +78,14 @@ namespace Bruno
 			uint64_t DataSizeInBytes;
 
 			std::vector<uint8_t> Pixels;
-			/*struct ImageInitData
+			struct ImageInitData
 			{
 				int64_t RowPitch;
 				int64_t SlicePitch;
-				std::vector<uint8_t> Pixels;
+				uint64_t Offset;
+				//std::vector<uint8_t> Pixels;
 			};
-			std::vector<ImageInitData> Images;*/
+			std::vector<ImageInitData> Images;
 		};
 		Texture();
 		Texture(const std::wstring& filename);

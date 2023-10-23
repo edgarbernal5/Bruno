@@ -143,7 +143,7 @@ namespace Bruno
 	{
         m_resourceType = GPUResourceType::Texture;
 
-        DXGI_FORMAT textureFormat = (DXGI_FORMAT)assetPipelineInitData.Format;
+        DXGI_FORMAT textureFormat = static_cast<DXGI_FORMAT>(assetPipelineInitData.Format);
         bool is3DTexture = assetPipelineInitData.Dimension == DirectX::TEX_DIMENSION_TEXTURE3D;
 
         TextureCreationDesc textureCreationdesc;
@@ -169,11 +169,22 @@ namespace Bruno
         textureUpload->SubResourcesCount = static_cast<uint32_t>(assetPipelineInitData.MipLevels * assetPipelineInitData.ArraySize);
         textureUpload->TextureDataSize = assetPipelineInitData.DataSizeInBytes;
         textureUpload->TextureData = std::make_unique<uint8_t[]>(textureUpload->TextureDataSize);
-                
+        textureUpload->SubResourceLayouts = { 0 };
+        for (size_t i = 0; i < assetPipelineInitData.Images.size(); i++)
+        {
+            auto& image = assetPipelineInitData.Images[i];
+            textureUpload->SubResourceLayouts[i].Footprint.Depth = 1;
+            textureUpload->SubResourceLayouts[i].Footprint.Format = textureFormat;
+            textureUpload->SubResourceLayouts[i].Footprint.Height = assetPipelineInitData.Height;
+            textureUpload->SubResourceLayouts[i].Footprint.Width = assetPipelineInitData.Width;
+            textureUpload->SubResourceLayouts[i].Footprint.RowPitch = image.RowPitch;
+            textureUpload->SubResourceLayouts[i].Offset = image.Offset;
+            //memcpy(textureUpload->TextureData.get(), assetPipelineInitData.Pixels.data() + image.Offset, image.SlicePitch);
+        }
+
         memcpy(textureUpload->TextureData.get(), assetPipelineInitData.Pixels.data(), assetPipelineInitData.DataSizeInBytes);
 
         device->GetUploadContext().AddTextureUpload(std::move(textureUpload));
-
     }
 
     Texture::Texture(const TextureCreationDesc& textureDesc)
@@ -337,7 +348,7 @@ namespace Bruno
             m_uavDescriptor = device->GetSrvDescriptionHeap().Allocate();
             device->GetD3DDevice()->CreateUnorderedAccessView(m_resource, nullptr, nullptr, m_uavDescriptor.Cpu);
         }
-
+        
         m_isReady = (hasRTV || hasDSV);
     }
 

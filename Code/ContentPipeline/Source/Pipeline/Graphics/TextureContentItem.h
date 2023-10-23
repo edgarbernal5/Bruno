@@ -20,13 +20,13 @@ namespace Bruno
 		uint64_t DataSizeInBytes;
 
 		std::vector<uint8_t> Pixels;
-		//struct ImageContentItem
-		//{
-		//	int64_t RowPitch;
-		//	int64_t SlicePitch;
+		struct ImageContentItem
+		{
+			int64_t RowPitch;
+			int64_t SlicePitch;
+			uint64_t Offset;
 		//	std::vector<uint8_t> Pixels;
-		//};
-		//std::vector<ImageContentItem> Images;
+		};
+		std::vector<ImageContentItem> Images;
 	};
-
 }
