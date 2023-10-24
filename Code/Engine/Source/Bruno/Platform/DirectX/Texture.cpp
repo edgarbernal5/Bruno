@@ -98,41 +98,6 @@ namespace Bruno
         }
 
         device->GetUploadContext().AddTextureUpload(std::move(textureUpload));
-        
-        //ThrowIfFailed(device->GetD3DDevice()->CreateCommittedResource(
-        //    &Graphics::Core::HeapProperties.DefaultHeap, 
-        //    D3D12_HEAP_FLAG_NONE, 
-        //    &textureDesc,
-        //    D3D12_RESOURCE_STATE_COMMON,
-        //    nullptr,
-        //    IID_PPV_ARGS(&m_d3d12Resource)));
-
-        //D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        //srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        //srvDesc.Format = metadata.format;
-        //srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        //srvDesc.Texture2D.MostDetailedMip = 0;
-        //srvDesc.Texture2D.MipLevels = 1;// m_d3d12Resource->GetDesc().MipLevels;
-        //srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-
-        //m_srvDescriptor = device->GetSrvDescriptionHeap().Allocate();
-        //device->GetD3DDevice()->CreateShaderResourceView(m_d3d12Resource.Get(), &srvDesc, m_srvDescriptor.Cpu);
-
-        //std::vector<D3D12_SUBRESOURCE_DATA> subresources(scratchImage.GetImageCount());
-        //const DirectX::Image* pImages = scratchImage.GetImages();
-        //for (int i = 0; i < scratchImage.GetImageCount(); ++i)
-        //{
-        //    auto& subresource = subresources[i];
-        //    subresource.RowPitch = pImages[i].rowPitch;
-        //    subresource.SlicePitch = pImages[i].slicePitch;
-        //    subresource.pData = pImages[i].pixels;
-        //}
-
-        //CopyTextureSubresource(0, static_cast<uint32_t>(subresources.size()), subresources.data());
-        //if (subresources.size() < m_d3d12Resource->GetDesc().MipLevels)
-        //{
-        //    GenerateMips();
-        //}
     }
 
     void Texture::GenerateMips()
@@ -170,6 +135,7 @@ namespace Bruno
         textureUpload->TextureDataSize = assetPipelineInitData.DataSizeInBytes;
         textureUpload->TextureData = std::make_unique<uint8_t[]>(textureUpload->TextureDataSize);
         textureUpload->SubResourceLayouts = { 0 };
+
         for (size_t i = 0; i < assetPipelineInitData.Images.size(); i++)
         {
             auto& image = assetPipelineInitData.Images[i];
@@ -179,7 +145,6 @@ namespace Bruno
             textureUpload->SubResourceLayouts[i].Footprint.Width = assetPipelineInitData.Width;
             textureUpload->SubResourceLayouts[i].Footprint.RowPitch = image.RowPitch;
             textureUpload->SubResourceLayouts[i].Offset = image.Offset;
-            //memcpy(textureUpload->TextureData.get(), assetPipelineInitData.Pixels.data() + image.Offset, image.SlicePitch);
         }
 
         memcpy(textureUpload->TextureData.get(), assetPipelineInitData.Pixels.data(), assetPipelineInitData.DataSizeInBytes);

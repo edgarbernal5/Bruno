@@ -27,7 +27,6 @@ namespace Bruno
 			HRESULT hr = LoadFromDDSFile(assetFilename.c_str(), DirectX::DDS_FLAGS_FORCE_RGB, &metadata, scratchImage);
 			if (FAILED(hr))
 			{
-
 			}
 			ThrowIfFailed(hr);
 		}
@@ -36,7 +35,6 @@ namespace Bruno
 			HRESULT hr = LoadFromWICFile(assetFilename.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metadata, scratchImage);
 			if (FAILED(hr))
 			{
-
 			}
 			ThrowIfFailed(hr);
 		}
@@ -69,17 +67,10 @@ namespace Bruno
 		auto device = Graphics::GetDevice();
 
 		size_t rowPitch, slicePitch;
-
 		DirectX::ComputePitch(textureFormat, metadata.width, metadata.height, rowPitch, slicePitch);
 
-		uint32_t numBytesPerPixel = rowPitch / metadata.width;
-		uint32_t numRows[32];
-		uint64_t rowSizesInBytes[32];
-		std::array<D3D12_PLACED_SUBRESOURCE_FOOTPRINT, 32> subResourceLayouts{ 0 };
-
 		uint32_t subResourceCount = static_cast<uint32_t>(metadata.mipLevels * metadata.arraySize);
-		device->GetD3DDevice()->GetCopyableFootprints(&resourceDesc, 0, subResourceCount, 0, subResourceLayouts.data(), numRows, rowSizesInBytes, &outputContentItem->DataSizeInBytes);
-
+		
 		//https://learn.microsoft.com/en-us/windows/win32/direct3d12/subresources
 		//https://learn.microsoft.com/en-us/windows/win32/direct3d12/upload-and-readback-of-texture-data
 		// 
@@ -91,6 +82,8 @@ namespace Bruno
 
 		uint64_t offset = 0;
 		const DirectX::Image* pImages = scratchImage.GetImages();
+		//TODO: add support for 3d texture, mip mapping, cube maps.
+		//See DetermineImageArray function in DirectXTexImage.cpp (DirectxTex) as an example.
 		for (size_t i = 0; i < scratchImage.GetImageCount(); i++)
 		{
 			auto& imageContentItem = outputContentItem->Images.emplace_back();
@@ -101,43 +94,7 @@ namespace Bruno
 
 			offset += pImages[i].slicePitch;
 		}
-		/*for (uint64_t arrayIndex = 0; arrayIndex < metadata.arraySize; arrayIndex++)
-		{
-			for (uint64_t mipIndex = 0; mipIndex < metadata.mipLevels; mipIndex++)
-			{
-				const uint64_t subResourceIndex = mipIndex + (arrayIndex * metadata.mipLevels);
-
-				const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& subResourceLayout = subResourceLayouts[subResourceIndex];
-				const uint64_t subResourceHeight = numRows[subResourceIndex];
-				const uint64_t subResourcePitch = AlignU32(subResourceLayout.Footprint.RowPitch, D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
-				const uint64_t subResourceDepth = subResourceLayout.Footprint.Depth;
-				uint8_t* destinationSubResourceMemory = outputContentItem->Pixels.data() + subResourceLayout.Offset;
-
-				for (uint64_t sliceIndex = 0; sliceIndex < subResourceDepth; sliceIndex++)
-				{
-					const DirectX::Image* subImage = scratchImage.GetImage(mipIndex, arrayIndex, sliceIndex);
-					const uint8_t* sourceSubResourceMemory = subImage->pixels;
-
-					for (uint64_t height = 0; height < subResourceHeight; height++)
-					{
-						memcpy(destinationSubResourceMemory, sourceSubResourceMemory, (std::min)(subResourcePitch, subImage->rowPitch));
-						destinationSubResourceMemory += subResourcePitch;
-						sourceSubResourceMemory += subImage->rowPitch;
-					}
-				}
-			}
-		}*/
-
-		//const DirectX::Image* pImages = scratchImage.GetImages();
-		//for (size_t i = 0; i < scratchImage.GetImageCount(); i++)
-		//{
-		//	auto& imageContentItem = outputContentItem->Images.emplace_back();
-		//	imageContentItem.RowPitch = pImages[i].rowPitch;
-		//	imageContentItem.SlicePitch = pImages[i].slicePitch;
-		//	imageContentItem.Pixels.resize(pImages[i].slicePitch); //TODO: 3d textures.
-		//	memcpy(imageContentItem.Pixels.data(), pImages[i].pixels, pImages[i].slicePitch);
-		//}
-
+		
 		return outputContentItem;
 	}
 }
