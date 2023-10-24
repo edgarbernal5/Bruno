@@ -216,6 +216,9 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\TextureHelpers.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\Application.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -364,6 +367,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\GPUBuffer.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\Application.cpp">
+      <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

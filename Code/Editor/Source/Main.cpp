@@ -1,9 +1,9 @@
 #include "EditorGame.h"
 #include <Bruno/EntryPoint.h>
 
-Bruno::Game* Bruno::CreateGame(int argc, char** argv)
+Bruno::Application* Bruno::CreateApplication(int argc, char** argv)
 {
-	GameParameters parameters;
+	ApplicationParameters parameters;
 	parameters.Name = "Bruno Editor";
 	parameters.WindowHeight = 600;
 	parameters.WindowWidth = 800;

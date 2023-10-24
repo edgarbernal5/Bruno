@@ -7,7 +7,7 @@
 
 namespace Bruno
 {
-	EditorGame::EditorGame(const GameParameters& parameters) :
+	EditorGame::EditorGame(const ApplicationParameters& parameters) :
 		Game(parameters)
 	{
 	}

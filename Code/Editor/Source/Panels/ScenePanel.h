@@ -34,9 +34,8 @@ namespace Bruno
 		void OnDraw();
 
 		bool IsEnabled();
-		std::mutex& GetMutex() {
-			return m_mutex;
-		}
+		std::mutex& GetMutex() { return m_mutex; }
+
 	private:
 		void UpdateCBs(const GameTimer& timer);
 

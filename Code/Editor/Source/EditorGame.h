@@ -17,7 +17,7 @@ namespace Bruno
 	class EditorGame : public Game
 	{
 	public:
-		EditorGame(const GameParameters& parameters);
+		EditorGame(const ApplicationParameters& parameters);
 		~EditorGame();
 
 		friend class ScenePanel;

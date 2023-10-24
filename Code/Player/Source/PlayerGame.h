@@ -18,7 +18,7 @@ namespace Bruno
 	class PlayerGame : public Game
 	{
 	public:
-		PlayerGame(const GameParameters& parameters);
+		PlayerGame(const ApplicationParameters& parameters);
 
 	protected:
 		void OnInitialize(const GameWindowParameters& windowParameters) override;
@@ -36,6 +36,10 @@ namespace Bruno
 		void OnKeyReleased(KeyCode key, KeyboardState state) override;
 
 	private:
+		void InitializeCamera();
+		void InitializeGraphicsContext();
+		void InitializeMeshAndTexture();
+		void InitializeShaderAndPipeline(const SurfaceWindowParameters& surfaceParameters);
 		void UpdateCBs(const GameTimer& timer);
 
 		std::unique_ptr<Surface> m_surface;

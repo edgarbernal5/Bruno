@@ -13,7 +13,7 @@
 
 namespace Bruno
 {
-	ContentPipelineGame::ContentPipelineGame(const GameParameters& parameters) :
+	ContentPipelineGame::ContentPipelineGame(const ApplicationParameters& parameters) :
 		Game(parameters)
 	{
 	}

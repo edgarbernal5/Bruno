@@ -12,6 +12,7 @@
 #include <Bruno/Renderer/RenderItem.h>
 #include <Bruno/Content/ContentTypeReaderManager.h>
 #include <iostream>
+#include <Bruno/Renderer/Model.h>
 
 namespace Bruno
 {
@@ -62,7 +63,7 @@ namespace Bruno
 		20, 22, 23 
 	};
 
-	PlayerGame::PlayerGame(const Bruno::GameParameters& parameters)
+	PlayerGame::PlayerGame(const ApplicationParameters& parameters)
 		: Game(parameters)
 	{
 	}
@@ -82,58 +83,11 @@ namespace Bruno
 		m_surface = std::make_unique<Surface>(surfaceParameters);
 		m_surface->Initialize();
 
-		auto boxRenderItem = std::make_shared<RenderItem>();
-		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
-		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices) * sizeof(uint16_t), g_Indices, (uint32_t)sizeof(uint16_t));
-		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices) * sizeof(VertexPositionNormalTexture), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
-		m_renderItems.push_back(boxRenderItem);
+		InitializeMeshAndTexture();
+		InitializeShaderAndPipeline(surfaceParameters);
+		InitializeCamera();
+		InitializeGraphicsContext();
 
-		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
-
-		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-		{
-			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
-		}
-		ContentManager manager(L"");
-		m_texture = manager.Load<Texture>(L"Textures/Mona_Lisa.jpg");
-		//m_texture = std::make_shared<Texture>(L"Textures/Mona_Lisa.jpg");
-		//m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
-
-		GraphicsDevice* device = Graphics::GetDevice();
-		
-		//m_rootSignature = m_opaqueShader->CreateRootSignature();
-
-		PipelineResourceBinding textureBinding;
-		textureBinding.BindingIndex = 0;
-		textureBinding.Resource = m_texture.get();
-
-		mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
-		mMeshPerObjectResourceSpace.SetSRV(textureBinding);
-		mMeshPerObjectResourceSpace.Lock();
-
-		PipelineResourceLayout meshResourceLayout;
-		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &mMeshPerObjectResourceSpace;
-		
-		PipelineResourceMapping resourceMapping;
-
-		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
-
-		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
-
-		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
-		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-		meshPipelineDesc.PixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = surfaceParameters.DepthBufferFormat;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
-		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = surfaceParameters.BackBufferFormat;
-		//meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-
-		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
-
-		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
-		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
-		
 		m_gameWindow->Show();
 	}
 
@@ -287,6 +241,73 @@ namespace Bruno
 	void PlayerGame::OnKeyReleased(KeyCode key, KeyboardState state)
 	{
 		//BR_CORE_TRACE << "key released: " << (uint8_t)key << ". alt " << state.Alt << ". ctrl " << state.Ctrl << ". shift " << state.Shift << std::endl;
+	}
+
+	void PlayerGame::InitializeCamera()
+	{
+		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
+		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
+	}
+
+	void PlayerGame::InitializeGraphicsContext()
+	{
+		GraphicsDevice* device = Graphics::GetDevice();
+		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
+	}
+
+	void PlayerGame::InitializeMeshAndTexture()
+	{
+		ContentManager manager(L"");
+
+		//auto model = manager.Load<Model>(L"Models/Mona_Lisa.jpg");
+		auto boxRenderItem = std::make_shared<RenderItem>();
+		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
+		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices) * sizeof(uint16_t), g_Indices, (uint32_t)sizeof(uint16_t));
+		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices) * sizeof(VertexPositionNormalTexture), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
+		m_renderItems.push_back(boxRenderItem);
+
+		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
+		{
+			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		}
+
+		//m_texture = manager.Load<Texture>(L"Textures/Mona_Lisa.jpg");
+		m_texture = std::make_shared<Texture>(L"Textures/Mona_Lisa.jpg");
+	}
+
+	void PlayerGame::InitializeShaderAndPipeline(const SurfaceWindowParameters& surfaceParameters)
+	{
+		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
+		//m_rootSignature = m_opaqueShader->CreateRootSignature();
+
+		//m_rootSignature = m_opaqueShader->CreateRootSignature();
+
+		PipelineResourceBinding textureBinding;
+		textureBinding.BindingIndex = 0;
+		textureBinding.Resource = m_texture.get();
+
+		mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
+		mMeshPerObjectResourceSpace.SetSRV(textureBinding);
+		mMeshPerObjectResourceSpace.Lock();
+
+		PipelineResourceLayout meshResourceLayout;
+		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &mMeshPerObjectResourceSpace;
+
+		PipelineResourceMapping resourceMapping;
+
+		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
+
+
+		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
+		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
+		meshPipelineDesc.PixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
+		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = surfaceParameters.DepthBufferFormat;
+		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
+		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
+		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = surfaceParameters.BackBufferFormat;
+		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+
+		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 	}
 
 	void PlayerGame::UpdateCBs(const GameTimer& timer)

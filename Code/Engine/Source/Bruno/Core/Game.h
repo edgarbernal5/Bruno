@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Bruno/Core/Base.h"
+#include "Bruno/Core/Application.h"
 #include "Bruno/Core/GameTimer.h"
 
-#include "Bruno/Core/GameWindow.h"
 #include "Bruno/Core/KeyCodes.h"
 
 #include <cstdint>
@@ -12,27 +12,17 @@
 
 namespace Bruno
 {
-	struct GameParameters
-	{
-		std::string Name = "Bruno";
-		uint32_t WindowWidth = 800;
-		uint32_t WindowHeight = 600;
-		std::string WorkingDirectory;
-	};
-
 	class GraphicsDevice;
 
-	class Game
+	class Game : public Application
 	{
 	public:
-		Game(const GameParameters& parameters);
+		Game(const ApplicationParameters& parameters);
 		virtual ~Game();
 
 		inline GraphicsDevice* GetDevice() { return m_device.get(); }
-		void Initialize();
-		void Run();
-
-		static Game* GetInstance() { return g_instance; }
+		virtual void Initialize() override;
+		virtual void Run() override;
 
 		virtual void OnTick();
 
@@ -55,8 +45,6 @@ namespace Bruno
 		virtual void OnKeyPressed(KeyCode key, KeyboardState state) {}
 		virtual void OnKeyReleased(KeyCode key, KeyboardState state) {}
 
-		std::unique_ptr<GameWindow> m_gameWindow;
-		GameParameters m_parameters;
 		GameTimer m_timer;
 		std::shared_ptr<GraphicsDevice> m_device;
 
@@ -66,8 +54,6 @@ namespace Bruno
 	private:
 		bool m_gamePaused = false;
 
-		static Game* g_instance;
 	};
 
-	Game* CreateGame(int argc, char** argv);
 }

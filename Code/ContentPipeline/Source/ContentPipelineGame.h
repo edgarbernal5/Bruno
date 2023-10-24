@@ -17,7 +17,7 @@ namespace Bruno
 	class ContentPipelineGame : public Game
 	{
 	public:
-		ContentPipelineGame(const GameParameters& parameters);
+		ContentPipelineGame(const ApplicationParameters& parameters);
 		~ContentPipelineGame();
 		
 	protected:

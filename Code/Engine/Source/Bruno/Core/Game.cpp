@@ -13,20 +13,12 @@
 
 namespace Bruno
 {
-	Game* Game::g_instance{ nullptr };
-
-	Game::Game(const GameParameters& parameters) :
-		m_parameters(parameters)
+	Game::Game(const ApplicationParameters& parameters) :
+		Application(parameters)
 	{
-		g_instance = this;
-
 #if BR_DEBUG
 		Device::Core::EnableDebugLayer();
 #endif
-
-		if (!parameters.WorkingDirectory.empty()) {
-			std::filesystem::current_path(parameters.WorkingDirectory);
-		}
 	}
 
 	Game::~Game()

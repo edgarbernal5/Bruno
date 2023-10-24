@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Bruno/Core/Game.h"
+#include "Bruno/Core/Application.h"
 
 #ifdef BR_PLATFORM_WINDOWS
 
-extern Bruno::Game* Bruno::CreateGame(int argc, char** argv);
+extern Bruno::Application* Bruno::CreateApplication(int argc, char** argv);
 
 namespace Bruno
 {
@@ -12,7 +12,7 @@ namespace Bruno
 	{
 		InitializeCore();
 		{
-			Bruno::Game* game = Bruno::CreateGame(argc, argv);
+			Bruno::Application* game = Bruno::CreateApplication(argc, argv);
 			BR_ASSERT(game, "Client game is null!");
 			game->Initialize();
 			game->Run();
