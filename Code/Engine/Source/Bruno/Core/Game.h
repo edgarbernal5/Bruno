@@ -21,29 +21,22 @@ namespace Bruno
 		virtual ~Game();
 
 		inline GraphicsDevice* GetDevice() { return m_device.get(); }
-		virtual void Initialize() override;
-		virtual void Run() override;
 
 		virtual void OnTick();
 
 		friend class WindowsGameWindow;
 		friend class NanaGameWindow;
 	protected:
-		virtual void OnInitialize(const GameWindowParameters& windowParameters) = 0;
+		virtual void OnInitialize() override;
+		virtual void OnInitializeWindow(const GameWindowParameters& windowParameters) = 0;
+		virtual void OnRun() override;
 
-		virtual void OnResize() {}
-		virtual void OnActivated();
-		virtual void OnDeactivated();
-		virtual void OnResizeMoveStarted();
-		virtual void OnResizeMoveFinished();
 		virtual void OnGameLoop(const GameTimer& timer) = 0;
 
-		virtual void OnMouseDown(MouseButtonState btnState, int x, int y) {}
-		virtual void OnMouseMove(MouseButtonState btnState, int x, int y) {}
-		virtual void OnMouseUp(MouseButtonState btnState, int x, int y) {}
-		virtual void OnMouseWheel(MouseButtonState btnState, int x, int y, int wheelDelta) {}
-		virtual void OnKeyPressed(KeyCode key, KeyboardState state) {}
-		virtual void OnKeyReleased(KeyCode key, KeyboardState state) {}
+		virtual void OnActivated() override;
+		virtual void OnDeactivated() override;
+		virtual void OnResizeMoveStarted() override;
+		virtual void OnResizeMoveFinished() override;
 
 		GameTimer m_timer;
 		std::shared_ptr<GraphicsDevice> m_device;

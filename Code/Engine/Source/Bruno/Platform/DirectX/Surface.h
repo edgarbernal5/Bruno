@@ -37,6 +37,9 @@ namespace Bruno
 		DepthBuffer& GetDepthBuffer() const { return *m_depthBuffer; }
 		constexpr const D3D12_VIEWPORT& GetViewport() const { return m_viewport; }
 		constexpr const D3D12_RECT& GetScissorRect() const { return m_scissorRect; }
+
+		DXGI_FORMAT GetSurfaceFormat() const { return m_parameters.BackBufferFormat; }
+		DXGI_FORMAT GetDepthBufferFormat() const { return m_parameters.DepthBufferFormat; }
 	private:
 		struct RenderTargetData
 		{

@@ -14,7 +14,7 @@
 namespace Bruno
 {
 	ContentPipelineApplication::ContentPipelineApplication(const ApplicationParameters& parameters) :
-		Game(parameters)
+		UIApplication(parameters)
 	{
 	}
 
@@ -95,16 +95,21 @@ namespace Bruno
 		m_place.collocate();
 	}
 
-	void ContentPipelineApplication::OnInitialize(const GameWindowParameters& windowParameters)
+	void ContentPipelineApplication::OnInitialize()
 	{
-		m_gameWindow = std::make_unique<NanaGameWindow>(windowParameters, this);
-		m_gameWindow->Initialize();
-
 		ProcessorManager::Initialize();
 		ContentTypeWriterManager::Initialize();
 
 		InitializeUI();
+	}
 
-		m_gameWindow->Show();
+	void ContentPipelineApplication::OnInitializeWindow(const GameWindowParameters& windowParameters)
+	{
+		m_gameWindow = std::make_unique<NanaGameWindow>(windowParameters, this);
+		m_gameWindow->Initialize();
+	}
+
+	void ContentPipelineApplication::OnRun()
+	{
 	}
 }

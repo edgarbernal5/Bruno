@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Bruno/Core/Base.h"
 #include "Bruno/Core/GameWindow.h"
 
 namespace Bruno
@@ -15,12 +16,36 @@ namespace Bruno
 	class Application
 	{
 	public:
-		Application(const ApplicationParameters& appParamteres);
-		virtual void Initialize() = 0;
-		virtual void Run() = 0;
+		virtual ~Application();
+
+		void Initialize();
+		void Run();
 
 		static Application* GetInstance() { return g_instance; }
+
+		friend class NanaGameWindow;
+		friend class WindowsGameWindow;
 	protected:
+		Application(const ApplicationParameters& paramteres);
+
+		virtual void OnInitialize() = 0;
+		virtual void OnInitializeWindow(const GameWindowParameters& windowParameters) = 0;
+		virtual void OnRun() = 0;
+		virtual void OnPostRun() {}
+
+		virtual void OnResize() {}
+		virtual void OnActivated() {}
+		virtual void OnDeactivated() {}
+		virtual void OnResizeMoveStarted() {}
+		virtual void OnResizeMoveFinished() {}
+
+		virtual void OnMouseDown(MouseButtonState btnState, int x, int y) {}
+		virtual void OnMouseMove(MouseButtonState btnState, int x, int y) {}
+		virtual void OnMouseUp(MouseButtonState btnState, int x, int y) {}
+		virtual void OnMouseWheel(MouseButtonState btnState, int x, int y, int wheelDelta) {}
+		virtual void OnKeyPressed(KeyCode key, KeyboardState state) {}
+		virtual void OnKeyReleased(KeyCode key, KeyboardState state) {}
+
 		std::unique_ptr<GameWindow> m_gameWindow;
 		ApplicationParameters m_parameters;
 

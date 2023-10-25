@@ -5,16 +5,13 @@
 #include <Bruno/Content/ContentTypeReaderManager.h>
 #include <nana/gui/widgets/button.hpp>
 
-#include <thread>
-#include <atomic>
-
 namespace Bruno
 {
-	void RenderTask(Game& game, std::atomic<bool>& exitRequested)
+	void RenderTask(EditorGame& editor, std::atomic<bool>& exitRequested)
 	{
 		while (!exitRequested.load())
 		{
-			game.OnTick();
+			editor.OnTick();
 			//std::this_thread::sleep_for(std::chrono::milliseconds(16));
 		}
 	}
@@ -30,12 +27,32 @@ namespace Bruno
 		workerThread.join();
 	*/
 	EditorGame::EditorGame(const ApplicationParameters& parameters) :
-		Game(parameters)
+		UIApplication(parameters)
 	{
 	}
 
 	EditorGame::~EditorGame()
 	{
+		m_exitRequested.store(true);
+		m_workerThread.join();
+
+		m_device->WaitForIdle();
+
+		m_timer.Stop();
+		m_gameWindow.reset();
+
+#if BR_PLATFORM_WINDOWS
+		CoUninitialize();
+#endif
+
+		ContentTypeReaderManager::Shutdown();
+	}
+
+	void EditorGame::OnTick()
+	{
+		m_timer.Tick();
+
+		OnGameLoop(m_timer);
 	}
 
 	void EditorGame::OnGameLoop(const GameTimer& timer)
@@ -54,16 +71,24 @@ namespace Bruno
 		}
 	}
 
-	void EditorGame::OnInitialize(const GameWindowParameters& windowParameters)
+	void EditorGame::OnInitializeWindow(const GameWindowParameters& windowParameters)
 	{
 		m_gameWindow = std::make_unique<NanaGameWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
+	}
 
-		ContentTypeReaderManager::Initialize();
+	void EditorGame::OnRun()
+	{
+		m_timer.Reset();
 
-		InitializeUI();
+		m_exitRequested.store(false);
+		m_workerThread = std::thread(RenderTask, std::ref(*this), std::ref(m_exitRequested));
+	}
 
-		m_gameWindow->Show();
+	void EditorGame::OnPostRun()
+	{
+		m_exitRequested.store(true);
+		m_workerThread.join();
 	}
 
 	void EditorGame::AddScenePanel(ScenePanel* panel)
@@ -230,6 +255,24 @@ namespace Bruno
 		});
 
 		//AddScenePanel(panel);
+	}
+	void EditorGame::OnInitialize()
+	{
+#if BR_PLATFORM_WINDOWS
+		HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED); //To be used by DirectXTex.
+		if (FAILED(hr))
+		{
+			BR_CORE_ERROR << "CoInitialize failed." << std::endl;
+			throw std::exception("CoInitialize failed.");
+		}
+#endif
+
+		m_device = GraphicsDevice::Create();
+		Bruno::Graphics::GetDevice() = m_device.get();
+
+		ContentTypeReaderManager::Initialize();
+
+		InitializeUI();
 	}
 	//void EditorGame::InitializeUI()
 	//{

@@ -106,6 +106,7 @@
     <ClInclude Include="Source\Bruno\Content\Readers\ModelReader.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\ShaderReader.h" />
     <ClInclude Include="Source\Bruno\Core\Application.h" />
+    <ClInclude Include="Source\Bruno\Core\UIApplication.h" />
     <ClInclude Include="Source\Bruno\Core\Buffer.h" />
     <ClInclude Include="Source\Bruno\Core\Compressor.h" />
     <ClInclude Include="Source\Bruno\Core\FileStream.h" />
@@ -168,6 +169,7 @@
     <ClCompile Include="Source\Bruno\Content\Readers\ModelReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\ShaderReader.cpp" />
     <ClCompile Include="Source\Bruno\Core\Application.cpp" />
+    <ClCompile Include="Source\Bruno\Core\UIApplication.cpp" />
     <ClCompile Include="Source\Bruno\Core\Compressor.cpp" />
     <ClCompile Include="Source\Bruno\Core\FileStream.cpp" />
     <ClCompile Include="Source\Bruno\Core\GameTimer.cpp" />

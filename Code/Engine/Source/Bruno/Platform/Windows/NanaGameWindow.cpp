@@ -1,16 +1,15 @@
 #include "brpch.h"
 #include "NanaGameWindow.h"
 
-#include "Bruno/Core/Game.h"
-
+#include "Bruno/Core/Application.h"
 
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(NanaGameWindow);
 
-	Bruno::NanaGameWindow::NanaGameWindow(const GameWindowParameters& parameters, Game* game) :
+	Bruno::NanaGameWindow::NanaGameWindow(const GameWindowParameters& parameters, Application* application) :
 		m_parameters(parameters),
-		m_game(game),
+		m_application(application),
 		m_form(nullptr)
 	{
 		m_data.Width = parameters.Width;
@@ -36,27 +35,27 @@ namespace Bruno
 		{
 			m_data.Height = args.height;
 			m_data.Width = args.width;
-			m_game->OnResize();
+			m_application->OnResize();
 		});
 		
 		m_form->events().activate([this](const nana::arg_activate& args)
 		{	
 			if (args.activated)
 			{
-				m_game->OnActivated();
+				m_application->OnActivated();
 				return;
 			}
-			m_game->OnDeactivated();
+			m_application->OnDeactivated();
 		});
 
 		m_form->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
-			m_game->OnResizeMoveStarted();
+			m_application->OnResizeMoveStarted();
 		});
 
 		m_form->events().exit_size_move([this](const nana::arg_size_move& args)
 		{
-			m_game->OnResizeMoveFinished();
+			m_application->OnResizeMoveFinished();
 		});
 
 		m_form->events().mouse_down([this](const nana::arg_mouse& args)
@@ -66,7 +65,7 @@ namespace Bruno
 			btnState.RightButton = args.right_button;
 			btnState.MiddleButton = args.mid_button;
 
-			m_game->OnMouseDown(btnState, args.pos.x, args.pos.y);
+			m_application->OnMouseDown(btnState, args.pos.x, args.pos.y);
 		});
 
 		m_form->events().mouse_move([this](const nana::arg_mouse& args)
@@ -76,7 +75,7 @@ namespace Bruno
 			btnState.RightButton = args.right_button;
 			btnState.MiddleButton = args.mid_button;
 
-			m_game->OnMouseMove(btnState, args.pos.x, args.pos.y);
+			m_application->OnMouseMove(btnState, args.pos.x, args.pos.y);
 		});
 
 		m_form->events().mouse_up([this](const nana::arg_mouse& args)
@@ -86,7 +85,7 @@ namespace Bruno
 			btnState.RightButton = args.right_button;
 			btnState.MiddleButton = args.mid_button;
 
-			m_game->OnMouseUp(btnState, args.pos.x, args.pos.y);
+			m_application->OnMouseUp(btnState, args.pos.x, args.pos.y);
 		});
 	}
 

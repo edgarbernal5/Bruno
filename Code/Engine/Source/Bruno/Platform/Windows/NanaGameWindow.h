@@ -8,14 +8,14 @@
 
 namespace Bruno
 {
-	class Game;
+	class Application;
 
 	class NanaGameWindow : public GameWindow
 	{
 		BR_RTTI_DECLARATION(NanaGameWindow, GameWindow);
 
 	public:
-		NanaGameWindow(const GameWindowParameters& parameters, Game* game);
+		NanaGameWindow(const GameWindowParameters& parameters, Application* game);
 		~NanaGameWindow() = default;
 
 		nana::form& GetForm();
@@ -28,6 +28,6 @@ namespace Bruno
 	private:
 		std::unique_ptr<nana::form> m_form;
 		GameWindowParameters m_parameters;
-		Game* m_game;
+		Application* m_application;
 	};
 }

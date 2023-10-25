@@ -219,6 +219,9 @@
     <ClInclude Include="Source\Bruno\Core\Application.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\UIApplication.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -369,6 +372,9 @@
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\Application.cpp">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\UIApplication.cpp">
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
   </ItemGroup>

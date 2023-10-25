@@ -23,7 +23,6 @@ namespace Bruno
 
 	Game::~Game()
 	{
-		//TODO: Flush command queue before changing any resources.
 		m_device->WaitForIdle();
 
 		m_timer.Stop();
@@ -36,7 +35,7 @@ namespace Bruno
 		ContentTypeReaderManager::Shutdown();
 	}
 
-	void Game::Initialize()
+	void Game::OnInitialize()
 	{
 #if BR_PLATFORM_WINDOWS
 		HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED); //To be used by DirectXTex.
@@ -50,20 +49,12 @@ namespace Bruno
 		m_device = GraphicsDevice::Create();
 		Bruno::Graphics::GetDevice() = m_device.get();
 
-		GameWindowParameters windowParameters;
-		windowParameters.Width = m_parameters.WindowWidth;
-		windowParameters.Height = m_parameters.WindowHeight;
-		windowParameters.Title = m_parameters.Name;
-		OnInitialize(windowParameters);
-
 		ContentTypeReaderManager::Initialize();
 	}
 
-	void Game::Run()
+	void Game::OnRun()
 	{
 		m_timer.Reset();
-
-		m_gameWindow->Run();
 	}
 
 	void Game::OnTick()

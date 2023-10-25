@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Bruno.h>
+#include <Bruno/Core/Game.h>
 #include <Bruno/Platform/DirectX/Surface.h>
 #include <Bruno/Platform/DirectX/Shader.h>
 #include <Bruno/Platform/DirectX/RootSignature.h>
@@ -21,7 +21,8 @@ namespace Bruno
 		PlayerGame(const ApplicationParameters& parameters);
 
 	protected:
-		void OnInitialize(const GameWindowParameters& windowParameters) override;
+		void OnInitialize() override;
+		void OnInitializeWindow(const GameWindowParameters& windowParameters) override;
 		void OnResize() override;
 		void OnGameLoop(const GameTimer& timer) override;
 		void OnUpdate(const GameTimer& timer);
@@ -39,7 +40,7 @@ namespace Bruno
 		void InitializeCamera();
 		void InitializeGraphicsContext();
 		void InitializeMeshAndTexture();
-		void InitializeShaderAndPipeline(const SurfaceWindowParameters& surfaceParameters);
+		void InitializeShaderAndPipeline();
 		void UpdateCBs(const GameTimer& timer);
 
 		std::unique_ptr<Surface> m_surface;

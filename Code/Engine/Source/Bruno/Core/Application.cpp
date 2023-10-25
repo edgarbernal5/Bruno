@@ -15,4 +15,28 @@ namespace Bruno
 			std::filesystem::current_path(parameters.WorkingDirectory);
 		}
 	}
+
+	Application::~Application()
+	{
+	}
+
+	void Application::Initialize()
+	{
+		GameWindowParameters windowParameters;
+		windowParameters.Width = m_parameters.WindowWidth;
+		windowParameters.Height = m_parameters.WindowHeight;
+		windowParameters.Title = m_parameters.Name;
+		OnInitializeWindow(windowParameters);
+
+		OnInitialize();
+	}
+
+	void Application::Run()
+	{
+		m_gameWindow->Show();
+
+		OnRun();
+		m_gameWindow->Run();
+		OnPostRun();
+	}
 }

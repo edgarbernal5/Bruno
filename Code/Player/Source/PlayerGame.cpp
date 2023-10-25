@@ -68,27 +68,30 @@ namespace Bruno
 	{
 	}
 
-	void PlayerGame::OnInitialize(const GameWindowParameters& windowParameters)
+	void PlayerGame::OnInitialize()
+	{
+		Game::OnInitialize();
+
+		ContentTypeReaderManager::Initialize();
+
+		InitializeMeshAndTexture();
+		InitializeShaderAndPipeline();
+		InitializeCamera();
+		InitializeGraphicsContext();
+	}
+
+	void PlayerGame::OnInitializeWindow(const GameWindowParameters& windowParameters)
 	{
 		m_gameWindow = std::make_unique<WindowsGameWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
 
-		ContentTypeReaderManager::Initialize();
-
 		SurfaceWindowParameters surfaceParameters;
-		surfaceParameters.Width = m_parameters.WindowWidth;
-		surfaceParameters.Height = m_parameters.WindowHeight;
+		surfaceParameters.Width = windowParameters.Width;
+		surfaceParameters.Height = windowParameters.Height;
 		surfaceParameters.WindowHandle = reinterpret_cast<HWND>(m_gameWindow->GetHandle());
 
 		m_surface = std::make_unique<Surface>(surfaceParameters);
 		m_surface->Initialize();
-
-		InitializeMeshAndTexture();
-		InitializeShaderAndPipeline(surfaceParameters);
-		InitializeCamera();
-		InitializeGraphicsContext();
-
-		m_gameWindow->Show();
 	}
 
 	void PlayerGame::OnResize()
@@ -275,7 +278,7 @@ namespace Bruno
 		m_texture = std::make_shared<Texture>(L"Textures/Mona_Lisa.jpg");
 	}
 
-	void PlayerGame::InitializeShaderAndPipeline(const SurfaceWindowParameters& surfaceParameters)
+	void PlayerGame::InitializeShaderAndPipeline()
 	{
 		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
 		//m_rootSignature = m_opaqueShader->CreateRootSignature();
@@ -301,10 +304,10 @@ namespace Bruno
 		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
 		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
 		meshPipelineDesc.PixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = surfaceParameters.DepthBufferFormat;
+		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = m_surface->GetDepthBufferFormat();
 		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
 		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = surfaceParameters.BackBufferFormat;
+		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = m_surface->GetSurfaceFormat();
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 
 		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);

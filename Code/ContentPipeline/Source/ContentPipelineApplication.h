@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Bruno.h>
+#include <Bruno/Core/UIApplication.h>
 
 #include <nana/gui/widgets/menubar.hpp>
 #include <nana/gui/place.hpp>
@@ -14,7 +14,7 @@ namespace Bruno
 {
 	class NanaGameWindow;
 
-	class ContentPipelineApplication : public Application
+	class ContentPipelineApplication : public UIApplication
 	{
 	public:
 		ContentPipelineApplication(const ApplicationParameters& parameters);
@@ -22,7 +22,9 @@ namespace Bruno
 		
 	protected:
 		void InitializeUI();
-		void OnInitialize(const GameWindowParameters& windowParameters) override;
+		void OnInitialize() override;
+		void OnInitializeWindow(const GameWindowParameters& windowParameters) override;
+		void OnRun() override;
 
 	private:
 		nana::menubar		m_menubar;
