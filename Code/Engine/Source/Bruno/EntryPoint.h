@@ -12,11 +12,11 @@ namespace Bruno
 	{
 		InitializeCore();
 		{
-			Bruno::Application* game = Bruno::CreateApplication(argc, argv);
-			BR_ASSERT(game, "Client game is null!");
-			game->Initialize();
-			game->Run();
-			delete game;
+			Bruno::Application* application = Bruno::CreateApplication(argc, argv);
+			BR_ASSERT(application, "Client application is null!");
+			application->Initialize();
+			application->Run();
+			delete application;
 		}
 		ShutdownCore();
 

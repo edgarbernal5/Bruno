@@ -3,21 +3,10 @@
 
 #include "Bruno/Core/Game.h"
 
-#include <thread>
-#include <atomic>
 
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(NanaGameWindow);
-
-	void RenderTask(Game& game, std::atomic<bool>& exitRequested)
-	{
-		while (!exitRequested.load())
-		{
-			game.OnTick();
-			//std::this_thread::sleep_for(std::chrono::milliseconds(16));
-		}
-	}
 
 	Bruno::NanaGameWindow::NanaGameWindow(const GameWindowParameters& parameters, Game* game) :
 		m_parameters(parameters),
@@ -103,14 +92,7 @@ namespace Bruno
 
 	int NanaGameWindow::Run()
 	{
-		std::atomic<bool> exitRequested;
-		exitRequested.store(false);
-		std::thread workerThread(RenderTask, std::ref(*m_game), std::ref(exitRequested));
-
 		nana::exec();
-
-		exitRequested.store(true);
-		workerThread.join();
 
 		return 0;
 	}

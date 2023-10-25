@@ -24,7 +24,7 @@
     <ClCompile Include="Source\Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ContentPipelineGame.cpp">
+    <ClCompile Include="Source\ContentPipelineApplication.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Pipeline\Processors\TextureProcessor.cpp">
@@ -101,7 +101,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\ContentPipelineGame.h">
+    <ClInclude Include="Source\ContentPipelineApplication.h">
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\Pipeline\Processors\TextureProcessor.h">

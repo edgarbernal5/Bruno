@@ -1,4 +1,4 @@
-#include "ContentPipelineGame.h"
+#include "ContentPipelineApplication.h"
 #include <Bruno/EntryPoint.h>
 
 Bruno::Application* Bruno::CreateApplication(int argc, char** argv)
@@ -8,5 +8,5 @@ Bruno::Application* Bruno::CreateApplication(int argc, char** argv)
 	parameters.WindowHeight = 768;
 	parameters.WindowWidth = 1024;
 
-	return new ContentPipelineGame(parameters);
+	return new ContentPipelineApplication(parameters);
 }

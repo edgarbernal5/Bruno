@@ -14,16 +14,15 @@ namespace Bruno
 {
 	class NanaGameWindow;
 
-	class ContentPipelineGame : public Game
+	class ContentPipelineApplication : public Application
 	{
 	public:
-		ContentPipelineGame(const ApplicationParameters& parameters);
-		~ContentPipelineGame();
+		ContentPipelineApplication(const ApplicationParameters& parameters);
+		~ContentPipelineApplication();
 		
 	protected:
 		void InitializeUI();
 		void OnInitialize(const GameWindowParameters& windowParameters) override;
-		void OnGameLoop(const GameTimer& timer) override;
 
 	private:
 		nana::menubar		m_menubar;

@@ -161,7 +161,7 @@
     <ClCompile Include="Source\Pipeline\GameContentBuilder.cpp" />
     <ClCompile Include="Source\Pipeline\AbstractProcessor.cpp" />
     <ClCompile Include="Source\Pipeline\ProcessorManager.cpp" />
-    <ClCompile Include="Source\ContentPipelineGame.cpp" />
+    <ClCompile Include="Source\ContentPipelineApplication.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Pipeline\Processors\ShaderProcessor.cpp" />
     <ClCompile Include="Source\Pipeline\Processors\TextureProcessor.cpp" />
@@ -176,7 +176,7 @@
     <ClCompile Include="Source\Pipeline\TimestampCache.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\ContentPipelineGame.h" />
+    <ClInclude Include="Source\ContentPipelineApplication.h" />
     <ClInclude Include="Source\Pipeline\ContentItem.h" />
     <ClInclude Include="Source\Pipeline\ContentProcessorContext.h" />
     <ClInclude Include="Source\Pipeline\ExternalReferenceContentItem.h" />

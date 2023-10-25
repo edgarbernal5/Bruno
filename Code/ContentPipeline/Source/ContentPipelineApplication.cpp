@@ -1,4 +1,4 @@
-#include "ContentPipelineGame.h"
+#include "ContentPipelineApplication.h"
 
 #include "Pipeline/ProcessorManager.h"
 #include "Pipeline/Serialization/ContentTypeWriterManager.h"
@@ -13,16 +13,16 @@
 
 namespace Bruno
 {
-	ContentPipelineGame::ContentPipelineGame(const ApplicationParameters& parameters) :
+	ContentPipelineApplication::ContentPipelineApplication(const ApplicationParameters& parameters) :
 		Game(parameters)
 	{
 	}
 
-	ContentPipelineGame::~ContentPipelineGame()
+	ContentPipelineApplication::~ContentPipelineApplication()
 	{
 	}
 
-	void ContentPipelineGame::InitializeUI()
+	void ContentPipelineApplication::InitializeUI()
 	{
 		auto nanaGameWindow = m_gameWindow->As<NanaGameWindow>();
 		nana::form& form = nanaGameWindow->GetForm();
@@ -95,7 +95,7 @@ namespace Bruno
 		m_place.collocate();
 	}
 
-	void ContentPipelineGame::OnInitialize(const GameWindowParameters& windowParameters)
+	void ContentPipelineApplication::OnInitialize(const GameWindowParameters& windowParameters)
 	{
 		m_gameWindow = std::make_unique<NanaGameWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
@@ -106,9 +106,5 @@ namespace Bruno
 		InitializeUI();
 
 		m_gameWindow->Show();
-	}
-
-	void ContentPipelineGame::OnGameLoop(const GameTimer& timer)
-	{
 	}
 }

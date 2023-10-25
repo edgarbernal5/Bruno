@@ -5,8 +5,30 @@
 #include <Bruno/Content/ContentTypeReaderManager.h>
 #include <nana/gui/widgets/button.hpp>
 
+#include <thread>
+#include <atomic>
+
 namespace Bruno
 {
+	void RenderTask(Game& game, std::atomic<bool>& exitRequested)
+	{
+		while (!exitRequested.load())
+		{
+			game.OnTick();
+			//std::this_thread::sleep_for(std::chrono::milliseconds(16));
+		}
+	}
+	/*
+	
+		std::atomic<bool> exitRequested;
+		exitRequested.store(false);
+		std::thread workerThread(RenderTask, std::ref(*m_game), std::ref(exitRequested));
+
+		nana::exec();
+
+		exitRequested.store(true);
+		workerThread.join();
+	*/
 	EditorGame::EditorGame(const ApplicationParameters& parameters) :
 		Game(parameters)
 	{
