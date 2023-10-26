@@ -1,6 +1,6 @@
 #include "EditorGame.h"
 
-#include "Bruno/Platform/Windows/NanaGameWindow.h"
+#include "Bruno/Platform/Windows/NanaWindow.h"
 #include "Panels/ScenePanel.h"
 #include <Bruno/Content/ContentTypeReaderManager.h>
 #include <nana/gui/widgets/button.hpp>
@@ -14,20 +14,11 @@ namespace Bruno
 			editor.OnTick();
 			//std::this_thread::sleep_for(std::chrono::milliseconds(16));
 		}
+		BR_CORE_TRACE << "Exiting editor game loop..." << std::endl;
 	}
-	/*
-	
-		std::atomic<bool> exitRequested;
-		exitRequested.store(false);
-		std::thread workerThread(RenderTask, std::ref(*m_game), std::ref(exitRequested));
 
-		nana::exec();
-
-		exitRequested.store(true);
-		workerThread.join();
-	*/
 	EditorGame::EditorGame(const ApplicationParameters& parameters) :
-		UIApplication(parameters)
+		Game(parameters)
 	{
 	}
 
@@ -35,24 +26,6 @@ namespace Bruno
 	{
 		m_exitRequested.store(true);
 		m_workerThread.join();
-
-		m_device->WaitForIdle();
-
-		m_timer.Stop();
-		m_gameWindow.reset();
-
-#if BR_PLATFORM_WINDOWS
-		CoUninitialize();
-#endif
-
-		ContentTypeReaderManager::Shutdown();
-	}
-
-	void EditorGame::OnTick()
-	{
-		m_timer.Tick();
-
-		OnGameLoop(m_timer);
 	}
 
 	void EditorGame::OnGameLoop(const GameTimer& timer)
@@ -73,22 +46,16 @@ namespace Bruno
 
 	void EditorGame::OnInitializeWindow(const GameWindowParameters& windowParameters)
 	{
-		m_gameWindow = std::make_unique<NanaGameWindow>(windowParameters, this);
+		m_gameWindow = std::make_unique<NanaWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
 	}
 
 	void EditorGame::OnRun()
 	{
-		m_timer.Reset();
+		Game::OnRun();
 
 		m_exitRequested.store(false);
 		m_workerThread = std::thread(RenderTask, std::ref(*this), std::ref(m_exitRequested));
-	}
-
-	void EditorGame::OnPostRun()
-	{
-		m_exitRequested.store(true);
-		m_workerThread.join();
 	}
 
 	void EditorGame::AddScenePanel(ScenePanel* panel)
@@ -118,7 +85,7 @@ namespace Bruno
 
 	//void EditorGame::InitializeUI()
 	//{
-	//	auto nanaGameWindow = reinterpret_cast<NanaGameWindow*>(m_gameWindow.get());
+	//	auto nanaGameWindow = reinterpret_cast<NanaWindow*>(m_gameWindow.get());
 
 	//	nana::form& form = nanaGameWindow->GetForm();
 	//	m_place.bind(form.handle());
@@ -168,7 +135,7 @@ namespace Bruno
 	void EditorGame::InitializeUI()
 	{
 		static int panelIdxx = 0;
-		auto nanaGameWindow = m_gameWindow->As<NanaGameWindow>();
+		auto nanaGameWindow = m_gameWindow->As<NanaWindow>();
 		
 		nana::form& form = nanaGameWindow->GetForm();
 		m_place.bind(form.handle());
@@ -216,7 +183,8 @@ namespace Bruno
 
 		m_place.collocate();
 
-		form.events().key_release([this](const nana::arg_keyboard& args) {
+		form.events().key_release([this](const nana::arg_keyboard& args)
+		{
 			if (args.key == 'O')
 			{
 				if (panelIdxx % 2 == 0) {
@@ -258,25 +226,13 @@ namespace Bruno
 	}
 	void EditorGame::OnInitialize()
 	{
-#if BR_PLATFORM_WINDOWS
-		HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED); //To be used by DirectXTex.
-		if (FAILED(hr))
-		{
-			BR_CORE_ERROR << "CoInitialize failed." << std::endl;
-			throw std::exception("CoInitialize failed.");
-		}
-#endif
-
-		m_device = GraphicsDevice::Create();
-		Bruno::Graphics::GetDevice() = m_device.get();
-
-		ContentTypeReaderManager::Initialize();
+		Game::OnInitialize();
 
 		InitializeUI();
 	}
 	//void EditorGame::InitializeUI()
 	//{
-	//	auto nanaGameWindow = reinterpret_cast<NanaGameWindow*>(m_gameWindow.get());
+	//	auto nanaGameWindow = reinterpret_cast<NanaWindow*>(m_gameWindow.get());
 
 	//	nana::form& form = nanaGameWindow->GetForm();
 	//	m_dockPlace.bind(form.handle());
@@ -328,7 +284,7 @@ namespace Bruno
 
 	//void EditorGame::InitializeUI()
 	//{
-	//	auto nanaGameWindow = reinterpret_cast<NanaGameWindow*>(m_gameWindow.get());
+	//	auto nanaGameWindow = reinterpret_cast<NanaWindow*>(m_gameWindow.get());
 
 	//	nana::form& form = nanaGameWindow->GetForm();
 	//	m_place.bind(form.handle());

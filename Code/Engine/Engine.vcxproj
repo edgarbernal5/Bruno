@@ -106,7 +106,6 @@
     <ClInclude Include="Source\Bruno\Content\Readers\ModelReader.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\ShaderReader.h" />
     <ClInclude Include="Source\Bruno\Core\Application.h" />
-    <ClInclude Include="Source\Bruno\Core\UIApplication.h" />
     <ClInclude Include="Source\Bruno\Core\Buffer.h" />
     <ClInclude Include="Source\Bruno\Core\Compressor.h" />
     <ClInclude Include="Source\Bruno\Core\FileStream.h" />
@@ -135,7 +134,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCommon.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h" />
-    <ClInclude Include="Source\Bruno\Core\GameWindow.h" />
+    <ClInclude Include="Source\Bruno\Core\Window.h" />
     <ClInclude Include="Source\brpch.h" />
     <ClInclude Include="Source\Bruno.h" />
     <ClInclude Include="Source\Bruno\Core\Game.h" />
@@ -148,7 +147,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\TextureHelpers.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexTypes.h" />
-    <ClInclude Include="Source\Bruno\Platform\Windows\NanaGameWindow.h" />
+    <ClInclude Include="Source\Bruno\Platform\Windows\NanaWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
@@ -169,7 +168,6 @@
     <ClCompile Include="Source\Bruno\Content\Readers\ModelReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\ShaderReader.cpp" />
     <ClCompile Include="Source\Bruno\Core\Application.cpp" />
-    <ClCompile Include="Source\Bruno\Core\UIApplication.cpp" />
     <ClCompile Include="Source\Bruno\Core\Compressor.cpp" />
     <ClCompile Include="Source\Bruno\Core\FileStream.cpp" />
     <ClCompile Include="Source\Bruno\Core\GameTimer.cpp" />
@@ -191,7 +189,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\D3DCore.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsDevice.cpp" />
-    <ClCompile Include="Source\Bruno\Core\GameWindow.cpp" />
+    <ClCompile Include="Source\Bruno\Core\Window.cpp" />
     <ClCompile Include="Source\brpch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -205,7 +203,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexTypes.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\Windows\NanaGameWindow.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\Windows\NanaWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Camera.cpp" />

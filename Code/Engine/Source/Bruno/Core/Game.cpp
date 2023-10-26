@@ -2,7 +2,7 @@
 #include "Game.h"
 
 #include "Bruno/Platform/Windows/WindowsGameWindow.h"
-#include "Bruno/Platform/Windows/NanaGameWindow.h"
+#include "Bruno/Platform/Windows/NanaWindow.h"
 
 #include "Bruno/Platform/DirectX/GraphicsAdapter.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"

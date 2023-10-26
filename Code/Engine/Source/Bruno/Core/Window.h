@@ -22,11 +22,11 @@ namespace Bruno
 	using WindowHandle = void*;
 #endif
 
-	class GameWindow : public RTTI
+	class Window : public RTTI
 	{
-		BR_RTTI_DECLARATION(GameWindow, RTTI);
+		BR_RTTI_DECLARATION(Window, RTTI);
 	public:
-		virtual ~GameWindow() {}
+		virtual ~Window() {}
 
 		virtual WindowHandle GetHandle() = 0;
 		virtual void Initialize() = 0;

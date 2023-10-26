@@ -1,13 +1,13 @@
 #include "brpch.h"
-#include "NanaGameWindow.h"
+#include "NanaWindow.h"
 
 #include "Bruno/Core/Application.h"
 
 namespace Bruno
 {
-	BR_RTTI_DEFINITIONS(NanaGameWindow);
+	BR_RTTI_DEFINITIONS(NanaWindow);
 
-	Bruno::NanaGameWindow::NanaGameWindow(const GameWindowParameters& parameters, Application* application) :
+	Bruno::NanaWindow::NanaWindow(const GameWindowParameters& parameters, Application* application) :
 		m_parameters(parameters),
 		m_application(application),
 		m_form(nullptr)
@@ -16,17 +16,17 @@ namespace Bruno
 		m_data.Height = parameters.Height;
 	}
 
-	nana::form& NanaGameWindow::GetForm()
+	nana::form& NanaWindow::GetForm()
 	{
 		return *m_form;
 	}
 
-	WindowHandle NanaGameWindow::GetHandle()
+	WindowHandle NanaWindow::GetHandle()
 	{
 		return reinterpret_cast<WindowHandle>(m_form->native_handle());
 	}
 
-	void NanaGameWindow::Initialize()
+	void NanaWindow::Initialize()
 	{
 		m_form = std::make_unique<nana::form>(nana::API::make_center(m_parameters.Width, m_parameters.Height));
 		m_form->caption(m_parameters.Title);
@@ -89,14 +89,14 @@ namespace Bruno
 		});
 	}
 
-	int NanaGameWindow::Run()
+	int NanaWindow::Run()
 	{
 		nana::exec();
 
 		return 0;
 	}
 
-	void NanaGameWindow::Show()
+	void NanaWindow::Show()
 	{
 		m_form->show();
 	}

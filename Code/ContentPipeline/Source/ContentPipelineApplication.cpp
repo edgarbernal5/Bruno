@@ -3,7 +3,7 @@
 #include "Pipeline/ProcessorManager.h"
 #include "Pipeline/Serialization/ContentTypeWriterManager.h"
 
-#include <Bruno/Platform/Windows/NanaGameWindow.h>
+#include <Bruno/Platform/Windows/NanaWindow.h>
 #include <Bruno/Platform/DirectX/Shader.h>
 #include <Bruno/Platform/DirectX/Texture.h>
 #include <Bruno/Renderer/Model.h>
@@ -14,7 +14,7 @@
 namespace Bruno
 {
 	ContentPipelineApplication::ContentPipelineApplication(const ApplicationParameters& parameters) :
-		UIApplication(parameters)
+		Application(parameters)
 	{
 	}
 
@@ -24,7 +24,7 @@ namespace Bruno
 
 	void ContentPipelineApplication::InitializeUI()
 	{
-		auto nanaGameWindow = m_gameWindow->As<NanaGameWindow>();
+		auto nanaGameWindow = m_gameWindow->As<NanaWindow>();
 		nana::form& form = nanaGameWindow->GetForm();
 		m_place.bind(form.handle());
 		m_menubar.create(form.handle());
@@ -105,7 +105,7 @@ namespace Bruno
 
 	void ContentPipelineApplication::OnInitializeWindow(const GameWindowParameters& windowParameters)
 	{
-		m_gameWindow = std::make_unique<NanaGameWindow>(windowParameters, this);
+		m_gameWindow = std::make_unique<NanaWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
 	}
 

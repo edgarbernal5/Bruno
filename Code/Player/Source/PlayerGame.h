@@ -41,6 +41,7 @@ namespace Bruno
 		void InitializeGraphicsContext();
 		void InitializeMeshAndTexture();
 		void InitializeShaderAndPipeline();
+		void InitializeSurface();
 		void UpdateCBs(const GameTimer& timer);
 
 		std::unique_ptr<Surface> m_surface;

@@ -37,6 +37,5 @@ namespace Bruno
 
 		OnRun();
 		m_gameWindow->Run();
-		OnPostRun();
 	}
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Bruno/Core/Base.h"
-#include "Bruno/Core/GameWindow.h"
+#include "Bruno/Core/Window.h"
 
 namespace Bruno
 {
@@ -23,7 +23,7 @@ namespace Bruno
 
 		static Application* GetInstance() { return g_instance; }
 
-		friend class NanaGameWindow;
+		friend class NanaWindow;
 		friend class WindowsGameWindow;
 	protected:
 		Application(const ApplicationParameters& paramteres);
@@ -31,7 +31,6 @@ namespace Bruno
 		virtual void OnInitialize() = 0;
 		virtual void OnInitializeWindow(const GameWindowParameters& windowParameters) = 0;
 		virtual void OnRun() = 0;
-		virtual void OnPostRun() {}
 
 		virtual void OnResize() {}
 		virtual void OnActivated() {}
@@ -46,7 +45,7 @@ namespace Bruno
 		virtual void OnKeyPressed(KeyCode key, KeyboardState state) {}
 		virtual void OnKeyReleased(KeyCode key, KeyboardState state) {}
 
-		std::unique_ptr<GameWindow> m_gameWindow;
+		std::unique_ptr<Window> m_gameWindow;
 		ApplicationParameters m_parameters;
 
 	private:

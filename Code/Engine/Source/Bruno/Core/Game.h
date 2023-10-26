@@ -25,7 +25,7 @@ namespace Bruno
 		virtual void OnTick();
 
 		friend class WindowsGameWindow;
-		friend class NanaGameWindow;
+		friend class NanaWindow;
 	protected:
 		virtual void OnInitialize() override;
 		virtual void OnInitializeWindow(const GameWindowParameters& windowParameters) = 0;

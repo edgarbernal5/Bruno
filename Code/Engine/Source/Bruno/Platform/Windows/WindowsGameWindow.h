@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Bruno/Core/GameWindow.h"
+#include "Bruno/Core/Window.h"
 
 #ifdef BR_PLATFORM_WINDOWS
 
@@ -12,9 +12,9 @@ namespace Bruno
 {
 	class Game;
 
-	class WindowsGameWindow : public GameWindow
+	class WindowsGameWindow : public Window
 	{
-		BR_RTTI_DECLARATION(WindowsGameWindow, GameWindow);
+		BR_RTTI_DECLARATION(WindowsGameWindow, Window);
 
 	public:
 		WindowsGameWindow(const GameWindowParameters& parameters, Game* game);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Bruno/Core/UIApplication.h>
+#include <Bruno/Core/Application.h>
 
 #include <nana/gui/widgets/menubar.hpp>
 #include <nana/gui/place.hpp>
@@ -12,9 +12,9 @@
 
 namespace Bruno
 {
-	class NanaGameWindow;
+	class NanaWindow;
 
-	class ContentPipelineApplication : public UIApplication
+	class ContentPipelineApplication : public Application
 	{
 	public:
 		ContentPipelineApplication(const ApplicationParameters& parameters);

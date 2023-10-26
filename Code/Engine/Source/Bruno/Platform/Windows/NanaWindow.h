@@ -10,13 +10,13 @@ namespace Bruno
 {
 	class Application;
 
-	class NanaGameWindow : public GameWindow
+	class NanaWindow : public Window
 	{
-		BR_RTTI_DECLARATION(NanaGameWindow, GameWindow);
+		BR_RTTI_DECLARATION(NanaWindow, Window);
 
 	public:
-		NanaGameWindow(const GameWindowParameters& parameters, Application* game);
-		~NanaGameWindow() = default;
+		NanaWindow(const GameWindowParameters& parameters, Application* application);
+		~NanaWindow() = default;
 
 		nana::form& GetForm();
 		virtual WindowHandle GetHandle() override;

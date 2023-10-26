@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Bruno.h>
-#include <Bruno/Core/UIApplication.h>
+#include <Bruno/Core/Game.h>
 #include "Bruno/Core/GameTimer.h"
 
 #include <nana/gui/widgets/menubar.hpp>
@@ -15,17 +15,15 @@
 
 namespace Bruno
 {
-	class NanaGameWindow;
+	class NanaWindow;
 	class GraphicsDevice;
 	class ScenePanel;
 
-	class EditorGame : public UIApplication
+	class EditorGame : public Game
 	{
 	public:
 		EditorGame(const ApplicationParameters& parameters);
 		~EditorGame();
-
-		virtual void OnTick();
 
 		friend class ScenePanel;
 	protected:
@@ -33,8 +31,7 @@ namespace Bruno
 		void OnInitialize() override;
 		void OnInitializeWindow(const GameWindowParameters& windowParameters) override;
 		void OnRun() override;
-		void OnPostRun() override;
-		void OnGameLoop(const GameTimer& timer);
+		void OnGameLoop(const GameTimer& timer) override;
 
 	private:
 		void AddScenePanel(ScenePanel* panel);

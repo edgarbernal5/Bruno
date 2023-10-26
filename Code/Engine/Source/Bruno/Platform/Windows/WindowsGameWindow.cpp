@@ -13,6 +13,7 @@ namespace Bruno
 		m_parameters(parameters),
 		m_game(game),
 		m_hwnd(nullptr),
+		m_hModuleInstance(nullptr),
 		m_fullScreen(false),
 		m_prevClientWidth(0),
 		m_prevClientHeight(0),

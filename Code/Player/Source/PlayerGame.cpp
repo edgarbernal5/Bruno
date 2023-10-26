@@ -72,8 +72,7 @@ namespace Bruno
 	{
 		Game::OnInitialize();
 
-		ContentTypeReaderManager::Initialize();
-
+		InitializeSurface();
 		InitializeMeshAndTexture();
 		InitializeShaderAndPipeline();
 		InitializeCamera();
@@ -84,14 +83,6 @@ namespace Bruno
 	{
 		m_gameWindow = std::make_unique<WindowsGameWindow>(windowParameters, this);
 		m_gameWindow->Initialize();
-
-		SurfaceWindowParameters surfaceParameters;
-		surfaceParameters.Width = windowParameters.Width;
-		surfaceParameters.Height = windowParameters.Height;
-		surfaceParameters.WindowHandle = reinterpret_cast<HWND>(m_gameWindow->GetHandle());
-
-		m_surface = std::make_unique<Surface>(surfaceParameters);
-		m_surface->Initialize();
 	}
 
 	void PlayerGame::OnResize()
@@ -311,6 +302,17 @@ namespace Bruno
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 
 		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
+	}
+
+	void PlayerGame::InitializeSurface()
+	{
+		SurfaceWindowParameters surfaceParameters;
+		surfaceParameters.Width = m_parameters.WindowWidth;
+		surfaceParameters.Height = m_parameters.WindowHeight;
+		surfaceParameters.WindowHandle = reinterpret_cast<HWND>(m_gameWindow->GetHandle());
+
+		m_surface = std::make_unique<Surface>(surfaceParameters);
+		m_surface->Initialize();
 	}
 
 	void PlayerGame::UpdateCBs(const GameTimer& timer)

@@ -54,10 +54,7 @@
     <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h">
       <Filter>Source\Bruno\Platform\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Core\GameWindow.h">
-      <Filter>Source\Bruno\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Platform\Windows\NanaGameWindow.h">
+    <ClInclude Include="Source\Bruno\Platform\Windows\NanaWindow.h">
       <Filter>Source\Bruno\Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h">
@@ -219,7 +216,7 @@
     <ClInclude Include="Source\Bruno\Core\Application.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Core\UIApplication.h">
+    <ClInclude Include="Source\Bruno\Core\Window.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -233,10 +230,7 @@
     <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp">
       <Filter>Source\Bruno\Platform\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Bruno\Core\GameWindow.cpp">
-      <Filter>Source\Bruno\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Platform\Windows\NanaGameWindow.cpp">
+    <ClCompile Include="Source\Bruno\Platform\Windows\NanaWindow.cpp">
       <Filter>Source\Bruno\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsDevice.cpp">
@@ -374,7 +368,7 @@
     <ClCompile Include="Source\Bruno\Core\Application.cpp">
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Bruno\Core\UIApplication.cpp">
+    <ClCompile Include="Source\Bruno\Core\Window.cpp">
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
   </ItemGroup>
