@@ -17,7 +17,7 @@ namespace Bruno
 		BR_RTTI_DECLARATION(WindowsGameWindow, Window);
 
 	public:
-		WindowsGameWindow(const GameWindowParameters& parameters, Game* game);
+		WindowsGameWindow(const WindowParameters& parameters, Game* game);
 		virtual ~WindowsGameWindow();
 
 		virtual WindowHandle GetHandle() override;
@@ -31,7 +31,7 @@ namespace Bruno
 		void BeginScreenDeviceChange();
 		void EndScreenDeviceChange(int clientWidth, int clientHeight);
 
-		GameWindowParameters m_parameters;
+		WindowParameters m_parameters;
 		HWND m_hwnd;
 		HINSTANCE m_hModuleInstance;
 		Game* m_game;

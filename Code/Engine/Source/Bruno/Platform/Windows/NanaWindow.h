@@ -15,7 +15,7 @@ namespace Bruno
 		BR_RTTI_DECLARATION(NanaWindow, Window);
 
 	public:
-		NanaWindow(const GameWindowParameters& parameters, Application* application);
+		NanaWindow(const WindowParameters& parameters, Application* application);
 		~NanaWindow() = default;
 
 		nana::form& GetForm();
@@ -27,7 +27,7 @@ namespace Bruno
 
 	private:
 		std::unique_ptr<nana::form> m_form;
-		GameWindowParameters m_parameters;
+		WindowParameters m_parameters;
 		Application* m_application;
 	};
 }

@@ -9,7 +9,7 @@ namespace Bruno
 	BR_RTTI_DEFINITIONS(WindowsGameWindow);
 	//TODO: eliminar la dependencia con la clase Game. Implementar eventos!
 
-	WindowsGameWindow::WindowsGameWindow(const GameWindowParameters& parameters, Game* game) :
+	WindowsGameWindow::WindowsGameWindow(const WindowParameters& parameters, Game* game) :
 		m_parameters(parameters),
 		m_game(game),
 		m_hwnd(nullptr),

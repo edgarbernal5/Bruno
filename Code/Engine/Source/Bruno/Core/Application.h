@@ -29,7 +29,7 @@ namespace Bruno
 		Application(const ApplicationParameters& paramteres);
 
 		virtual void OnInitialize() = 0;
-		virtual void OnInitializeWindow(const GameWindowParameters& windowParameters) = 0;
+		virtual void OnInitializeWindow(const WindowParameters& windowParameters) = 0;
 		virtual void OnRun() = 0;
 
 		virtual void OnResize() {}

@@ -9,7 +9,7 @@
 
 namespace Bruno
 {
-	struct GameWindowParameters
+	struct WindowParameters
 	{
 		std::string Title;
 		uint32_t Width = 800;

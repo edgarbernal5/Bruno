@@ -7,7 +7,7 @@ namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(NanaWindow);
 
-	Bruno::NanaWindow::NanaWindow(const GameWindowParameters& parameters, Application* application) :
+	Bruno::NanaWindow::NanaWindow(const WindowParameters& parameters, Application* application) :
 		m_parameters(parameters),
 		m_application(application),
 		m_form(nullptr)

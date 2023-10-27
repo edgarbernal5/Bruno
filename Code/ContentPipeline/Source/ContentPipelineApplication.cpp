@@ -103,7 +103,7 @@ namespace Bruno
 		InitializeUI();
 	}
 
-	void ContentPipelineApplication::OnInitializeWindow(const GameWindowParameters& windowParameters)
+	void ContentPipelineApplication::OnInitializeWindow(const WindowParameters& windowParameters)
 	{
 		m_gameWindow = std::make_unique<NanaWindow>(windowParameters, this);
 		m_gameWindow->Initialize();

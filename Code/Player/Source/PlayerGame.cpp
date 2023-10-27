@@ -79,7 +79,7 @@ namespace Bruno
 		InitializeGraphicsContext();
 	}
 
-	void PlayerGame::OnInitializeWindow(const GameWindowParameters& windowParameters)
+	void PlayerGame::OnInitializeWindow(const WindowParameters& windowParameters)
 	{
 		m_gameWindow = std::make_unique<WindowsGameWindow>(windowParameters, this);
 		m_gameWindow->Initialize();

@@ -22,7 +22,7 @@ namespace Bruno
 
 	void Application::Initialize()
 	{
-		GameWindowParameters windowParameters;
+		WindowParameters windowParameters;
 		windowParameters.Width = m_parameters.WindowWidth;
 		windowParameters.Height = m_parameters.WindowHeight;
 		windowParameters.Title = m_parameters.Name;

@@ -29,7 +29,7 @@ namespace Bruno
 	protected:
 		void InitializeUI();
 		void OnInitialize() override;
-		void OnInitializeWindow(const GameWindowParameters& windowParameters) override;
+		void OnInitializeWindow(const WindowParameters& windowParameters) override;
 		void OnRun() override;
 		void OnGameLoop(const GameTimer& timer) override;
 
