@@ -260,20 +260,25 @@ namespace Bruno
 		{
 			m_settings.RootDirectory = std::filesystem::current_path();
 		}
+		m_settings.RootDirectory = std::filesystem::absolute(m_settings.RootDirectory);
 
 		if (m_settings.IntermediateDirectory.empty())
 		{
 			m_settings.IntermediateDirectory = std::filesystem::path(m_settings.RootDirectory) / "tempObjects";
 		}
+		m_settings.IntermediateDirectory = std::filesystem::absolute(m_settings.IntermediateDirectory);
+
 		if (!std::filesystem::exists(m_settings.IntermediateDirectory))
 		{
 			std::filesystem::create_directory(m_settings.IntermediateDirectory);
-		}			
+		}
 		
 		if (m_settings.OutputDirectory.empty())
 		{
 			m_settings.OutputDirectory = std::filesystem::path(m_settings.RootDirectory) / "outputObjects";
 		}
+		m_settings.OutputDirectory = std::filesystem::absolute(m_settings.OutputDirectory);
+
 		if (!std::filesystem::exists(m_settings.OutputDirectory))
 		{
 			std::filesystem::create_directory(m_settings.OutputDirectory);
