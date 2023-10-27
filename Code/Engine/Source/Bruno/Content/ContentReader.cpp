@@ -10,7 +10,8 @@ namespace Bruno
 {
     ContentReader::ContentReader(ContentManager* contentManager, Stream& stream, const std::wstring& assetName) :
         m_contentManager(contentManager),
-        m_stream(stream)
+        m_stream(stream),
+        m_assetName(assetName)
     {
         m_currentStream = &m_stream;
 
