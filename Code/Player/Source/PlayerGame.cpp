@@ -81,16 +81,16 @@ namespace Bruno
 
 	void PlayerGame::OnInitializeWindow(const WindowParameters& windowParameters)
 	{
-		m_gameWindow = std::make_unique<WindowsGameWindow>(windowParameters, this);
-		m_gameWindow->Initialize();
+		m_window = std::make_unique<WindowsGameWindow>(windowParameters, this);
+		m_window->Initialize();
 	}
 
 	void PlayerGame::OnResize()
 	{
 		// Resize screen dependent resources.
-		m_surface->Resize(m_gameWindow->GetWidth(), m_gameWindow->GetHeight());
+		m_surface->Resize(m_window->GetWidth(), m_window->GetHeight());
 		
-		m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)m_gameWindow->GetWidth(), (float)m_gameWindow->GetHeight()));
+		m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)m_window->GetWidth(), (float)m_window->GetHeight()));
 		m_camera.UpdateMatrices();
 	}
 	
@@ -125,9 +125,10 @@ namespace Bruno
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
 
-		if (m_texture->IsReady()) {
-			for (auto& item : m_renderItems)
-			{
+		for (auto& item : m_renderItems)
+		{
+			auto texture = item->Material->TexturesByName["Texture"];
+			if (texture != nullptr && texture->IsReady()) {
 				if (!item->IndexBuffer->IsReady() || !item->VertexBuffer->IsReady())
 					continue;
 
@@ -136,7 +137,7 @@ namespace Bruno
 
 				PipelineResourceBinding textureBinding;
 				textureBinding.BindingIndex = 0;
-				textureBinding.Resource = m_texture.get();
+				textureBinding.Resource = texture.get();
 
 				mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[m_device->GetFrameId()].get());
 				mMeshPerObjectResourceSpace.SetSRV(textureBinding);
@@ -171,7 +172,7 @@ namespace Bruno
 	{
 		m_lastMousePosition = Math::Int2(x, y);
 
-		SetCapture(m_gameWindow->GetHandle());
+		SetCapture(m_window->GetHandle());
 	}
 
 	void PlayerGame::OnMouseMove(MouseButtonState btnState, int x, int y)
@@ -251,14 +252,25 @@ namespace Bruno
 
 	void PlayerGame::InitializeMeshAndTexture()
 	{
-		ContentManager manager(L"");
+		ContentManager manager(m_applicationParameters.WorkingDirectory);
 
-		//auto model = manager.Load<Model>(L"Models/Mona_Lisa.jpg");
-		auto boxRenderItem = std::make_shared<RenderItem>();
+		m_model = manager.Load<Model>(L"Models\\Car\\Car.fbx");
+
+		auto& meshes = m_model->GetMeshes();
+		for (auto& mesh : meshes) {
+			auto boxRenderItem = std::make_shared<RenderItem>();
+			boxRenderItem->IndexCount = mesh->GetIndexBuffer()->GetElementCount();
+			boxRenderItem->IndexBuffer = mesh->GetIndexBuffer();
+			boxRenderItem->VertexBuffer = mesh->GetVertexBuffer();
+			boxRenderItem->Material = mesh->GetMaterial();
+			m_renderItems.push_back(boxRenderItem);
+		}
+
+		/*auto boxRenderItem = std::make_shared<RenderItem>();
 		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
 		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices) * sizeof(uint16_t), g_Indices, (uint32_t)sizeof(uint16_t));
 		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices) * sizeof(VertexPositionNormalTexture), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
-		m_renderItems.push_back(boxRenderItem);
+		m_renderItems.push_back(boxRenderItem);*/
 
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
@@ -271,9 +283,7 @@ namespace Bruno
 
 	void PlayerGame::InitializeShaderAndPipeline()
 	{
-		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
-		//m_rootSignature = m_opaqueShader->CreateRootSignature();
-
+		m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
 		//m_rootSignature = m_opaqueShader->CreateRootSignature();
 
 		PipelineResourceBinding textureBinding;
@@ -288,9 +298,7 @@ namespace Bruno
 		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &mMeshPerObjectResourceSpace;
 
 		PipelineResourceMapping resourceMapping;
-
 		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
-
 
 		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
 		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
@@ -307,9 +315,9 @@ namespace Bruno
 	void PlayerGame::InitializeSurface()
 	{
 		SurfaceWindowParameters surfaceParameters;
-		surfaceParameters.Width = m_parameters.WindowWidth;
-		surfaceParameters.Height = m_parameters.WindowHeight;
-		surfaceParameters.WindowHandle = reinterpret_cast<HWND>(m_gameWindow->GetHandle());
+		surfaceParameters.Width = m_applicationParameters.WindowWidth;
+		surfaceParameters.Height = m_applicationParameters.WindowHeight;
+		surfaceParameters.WindowHandle = reinterpret_cast<HWND>(m_window->GetHandle());
 
 		m_surface = std::make_unique<Surface>(surfaceParameters);
 		m_surface->Initialize();

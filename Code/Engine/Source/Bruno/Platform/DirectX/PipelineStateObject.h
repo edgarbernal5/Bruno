@@ -112,7 +112,7 @@ namespace Bruno
 	{
         GraphicsPipelineDesc desc;
         desc.RasterDesc.FillMode = D3D12_FILL_MODE_SOLID;
-        desc.RasterDesc.CullMode = D3D12_CULL_MODE_BACK;
+        desc.RasterDesc.CullMode = D3D12_CULL_MODE_BACK; //D3D12_CULL_MODE_FRONT
         desc.RasterDesc.FrontCounterClockwise = false;
         desc.RasterDesc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
         desc.RasterDesc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;

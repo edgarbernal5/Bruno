@@ -27,7 +27,7 @@ namespace Bruno
 		m_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 		m_stride = creationDesc.Stride;
 
-        uint32_t numElements = static_cast<uint32_t>(m_stride > 0 ? creationDesc.Size / m_stride : 1);
+        m_numElements = static_cast<uint32_t>(m_stride > 0 ? creationDesc.Size / m_stride : 1);
         bool isHostVisible = ((creationDesc.AccessFlags & BufferAccessFlags::HostWritable) == BufferAccessFlags::HostWritable);
         bool hasCBV = ((creationDesc.ViewFlags & BufferViewFlags::Cbv) == BufferViewFlags::Cbv);
         bool hasSRV = ((creationDesc.ViewFlags & BufferViewFlags::Srv) == BufferViewFlags::Srv);
@@ -65,7 +65,7 @@ namespace Bruno
             srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
             srvDesc.Format = creationDesc.IsRawAccess ? DXGI_FORMAT_R32_TYPELESS : DXGI_FORMAT_UNKNOWN;
             srvDesc.Buffer.FirstElement = 0;
-            srvDesc.Buffer.NumElements = static_cast<uint32_t>(creationDesc.IsRawAccess ? (creationDesc.Size / 4) : numElements);
+            srvDesc.Buffer.NumElements = static_cast<uint32_t>(creationDesc.IsRawAccess ? (creationDesc.Size / 4) : m_numElements);
             srvDesc.Buffer.StructureByteStride = creationDesc.IsRawAccess ? 0 : m_stride;
             srvDesc.Buffer.Flags = creationDesc.IsRawAccess ? D3D12_BUFFER_SRV_FLAG_RAW : D3D12_BUFFER_SRV_FLAG_NONE;
 
@@ -84,7 +84,7 @@ namespace Bruno
             uavDesc.Format = creationDesc.IsRawAccess ? DXGI_FORMAT_R32_TYPELESS : DXGI_FORMAT_UNKNOWN;
             uavDesc.Buffer.CounterOffsetInBytes = 0;
             uavDesc.Buffer.FirstElement = 0;
-            uavDesc.Buffer.NumElements = static_cast<uint32_t>(creationDesc.IsRawAccess ? (creationDesc.Size / 4) : numElements);
+            uavDesc.Buffer.NumElements = static_cast<uint32_t>(creationDesc.IsRawAccess ? (creationDesc.Size / 4) : m_numElements);
             uavDesc.Buffer.StructureByteStride = creationDesc.IsRawAccess ? 0 : m_stride;
             uavDesc.Buffer.Flags = creationDesc.IsRawAccess ? D3D12_BUFFER_UAV_FLAG_RAW : D3D12_BUFFER_UAV_FLAG_NONE;
 

@@ -6,7 +6,7 @@ namespace Bruno
 	Application* Application::g_instance{ nullptr };
 
 	Application::Application(const ApplicationParameters& parameters) :
-		m_parameters(parameters)
+		m_applicationParameters(parameters)
 	{
 		g_instance = this;
 
@@ -23,9 +23,9 @@ namespace Bruno
 	void Application::Initialize()
 	{
 		WindowParameters windowParameters;
-		windowParameters.Width = m_parameters.WindowWidth;
-		windowParameters.Height = m_parameters.WindowHeight;
-		windowParameters.Title = m_parameters.Name;
+		windowParameters.Width = m_applicationParameters.WindowWidth;
+		windowParameters.Height = m_applicationParameters.WindowHeight;
+		windowParameters.Title = m_applicationParameters.Name;
 		OnInitializeWindow(windowParameters);
 
 		OnInitialize();
@@ -33,9 +33,9 @@ namespace Bruno
 
 	void Application::Run()
 	{
-		m_gameWindow->Show();
+		m_window->Show();
 
 		OnRun();
-		m_gameWindow->Run();
+		m_window->Run();
 	}
 }

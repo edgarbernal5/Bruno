@@ -41,7 +41,7 @@ namespace Bruno
 			//aiProcess_SortByPType | 
 			aiProcess_FindInvalidData |
 			aiProcess_FindDegenerates |
-			aiProcess_FlipWindingOrder |
+			//aiProcess_FlipWindingOrder |
 			aiProcess_FlipUVs;
 
 		importer.SetPropertyInteger(AI_CONFIG_PP_FD_REMOVE, true);

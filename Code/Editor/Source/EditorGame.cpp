@@ -46,8 +46,8 @@ namespace Bruno
 
 	void EditorGame::OnInitializeWindow(const WindowParameters& windowParameters)
 	{
-		m_gameWindow = std::make_unique<NanaWindow>(windowParameters, this);
-		m_gameWindow->Initialize();
+		m_window = std::make_unique<NanaWindow>(windowParameters, this);
+		m_window->Initialize();
 	}
 
 	void EditorGame::OnRun()
@@ -135,9 +135,9 @@ namespace Bruno
 	void EditorGame::InitializeUI()
 	{
 		static int panelIdxx = 0;
-		auto nanaGameWindow = m_gameWindow->As<NanaWindow>();
+		auto nanaWindow = m_window->As<NanaWindow>();
 		
-		nana::form& form = nanaGameWindow->GetForm();
+		nana::form& form = nanaWindow->GetForm();
 		m_place.bind(form.handle());
 		m_menubar.create(form.handle());
 		////////// VIEW

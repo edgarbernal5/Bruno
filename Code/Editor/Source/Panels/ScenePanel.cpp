@@ -216,7 +216,7 @@ namespace Bruno
 		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices) * sizeof(VertexPositionNormalTexture), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
 		m_renderItems.push_back(boxRenderItem);
 
-		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
+		m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
 
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{

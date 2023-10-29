@@ -17,7 +17,9 @@ namespace Bruno
 
 	public:
 		Model(std::vector<std::shared_ptr<Mesh>>&& meshes);
-
+		const std::vector<std::shared_ptr<Mesh>>& GetMeshes() {
+			return m_meshes;
+		}
 	private:
 		std::vector<std::shared_ptr<Mesh>> m_meshes;
 	};
@@ -28,12 +30,15 @@ namespace Bruno
 		Mesh() = default;
 		Mesh(Mesh&&) = default;
 		Mesh(std::vector<Math::Vector3> && vertices, std::vector<Math::Vector3>&& normals, std::vector<std::vector<Math::Vector3>>&& texCoords);
-
 		//Mesh(std::vector<Math::Vector3> && vertices, std::vector<Math::Vector3>&& normals, std::vector<Math::Vector3>&& tangets, std::vector<Math::Vector3>&& birnormals, std::vector < std::vector<Math::Vector3>> && textureCoordinates);
 
 		void SetIndexBuffer(std::shared_ptr<IndexBuffer> buffer);
 		void SetMaterial(std::shared_ptr<Material> material);
 		void SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer);
+
+		const std::shared_ptr<IndexBuffer>& GetIndexBuffer() { return m_indexBuffer; }
+		const std::shared_ptr<VertexBuffer>& GetVertexBuffer() { return m_vertexBuffer; }
+		Material* GetMaterial() { return m_material.get(); }
 
 		Mesh& operator=(Mesh&&) = default;
 	private:

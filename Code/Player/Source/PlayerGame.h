@@ -14,6 +14,7 @@ namespace Bruno
 {
 	struct RenderItem;
 	class GraphicsContext;
+	class Model;
 
 	class PlayerGame : public Game
 	{
@@ -46,6 +47,7 @@ namespace Bruno
 
 		std::unique_ptr<Surface> m_surface;
 		std::shared_ptr<Texture> m_texture;
+		std::shared_ptr<Model> m_model;
 		std::shared_ptr<RootSignature> m_rootSignature;
 
 		std::unique_ptr<Shader> m_opaqueShader;

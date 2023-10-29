@@ -129,7 +129,7 @@ namespace Bruno
 			input.ReadUInt32(faceCount);
 
 			input.ReadUInt64(count);
-			std::vector< uint32_t> indices;
+			std::vector<uint32_t> indices;
 			indices.reserve(count);
 
 			for (size_t j = 0; j < count; j++)
@@ -152,8 +152,8 @@ namespace Bruno
 				vertex.Texture.y = texCoord3D.y;
 			}
 
-			auto indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(count), indices.data(), sizeof(uint32_t));
-			auto vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(vertices.size()), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
+			auto indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(count * sizeof(uint32_t)), indices.data(), sizeof(uint32_t));
+			auto vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(vertices.size() * sizeof(VertexPositionNormalTexture)), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
 
 			//auto mesh = std::make_shared<Mesh>(vertices, normals, tangents, binormals, texCoords);
 			auto mesh = std::make_shared<Mesh>(std::move(vertices), std::move(normals), std::move(texCoords));

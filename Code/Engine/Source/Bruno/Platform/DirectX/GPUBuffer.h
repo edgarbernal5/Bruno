@@ -77,13 +77,16 @@ namespace Bruno
 
 		virtual void SetMappedData(const void* data, size_t dataSize);
 
+		uint32_t GetElementCount() { return m_numElements; }
+
 		friend class UploadContext;
 		friend class GraphicsContext;
 		friend class GraphicsDevice;
 
 	protected:
 		uint8_t* m_mappedResource = nullptr;
-		uint32_t m_stride = 0;
+		uint32_t m_stride = 0; 
+		uint32_t m_numElements = 0;
 		DescriptorHandle m_cbvDescriptor{};
 		DescriptorHandle m_srvDescriptor{};
 		DescriptorHandle m_uavDescriptor{};

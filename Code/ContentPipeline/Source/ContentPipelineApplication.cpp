@@ -9,6 +9,8 @@
 #include <Bruno/Renderer/Model.h>
 #include <Bruno/Content/ContentManager.h>
 
+#include "Bruno/Platform/DirectX/GraphicsDevice.h"
+#include <Bruno/Content/ContentTypeReaderManager.h>
 #include <nana/gui/filebox.hpp>
 
 namespace Bruno
@@ -24,8 +26,8 @@ namespace Bruno
 
 	void ContentPipelineApplication::InitializeUI()
 	{
-		auto nanaGameWindow = m_gameWindow->As<NanaWindow>();
-		nana::form& form = nanaGameWindow->GetForm();
+		auto nanaWindow = m_window->As<NanaWindow>();
+		nana::form& form = nanaWindow->GetForm();
 		m_place.bind(form.handle());
 		m_menubar.create(form.handle());
 		////////// VIEW
@@ -43,7 +45,7 @@ namespace Bruno
 			auto selectedFiles = fileBox();
 			if (!selectedFiles.empty())
 			{
-				std::wstring rootDirectory = selectedFiles[0].parent_path();
+				std::wstring rootDirectory = m_applicationParameters.WorkingDirectory;
 				GameContentBuilder::Settings settings{ rootDirectory };
 				settings.OutputDirectory = rootDirectory;
 
@@ -72,16 +74,14 @@ namespace Bruno
 			auto selectedFiles = fileBox();
 			if (!selectedFiles.empty())
 			{
-				std::wstring rootDirectory = selectedFiles[0].parent_path();
+				std::wstring rootDirectory = m_applicationParameters.WorkingDirectory;
 
 				for (auto& file : selectedFiles)
 				{
 					auto relativePath = std::filesystem::relative(file, rootDirectory);
 
 					ContentManager manager(rootDirectory);
-					//auto shader = manager.Load<Shader>(relativePath);
-					//auto texture = manager.Load<Texture>(relativePath);
-					//auto model= manager.Load<Model>(relativePath);
+
 					auto typelessRtti = manager.Load<RTTI>(relativePath);
 				}
 			}
@@ -99,14 +99,18 @@ namespace Bruno
 	{
 		ProcessorManager::Initialize();
 		ContentTypeWriterManager::Initialize();
+		ContentTypeReaderManager::Initialize();
+
+		m_device = GraphicsDevice::Create();
+		Bruno::Graphics::GetDevice() = m_device.get();
 
 		InitializeUI();
 	}
 
 	void ContentPipelineApplication::OnInitializeWindow(const WindowParameters& windowParameters)
 	{
-		m_gameWindow = std::make_unique<NanaWindow>(windowParameters, this);
-		m_gameWindow->Initialize();
+		m_window = std::make_unique<NanaWindow>(windowParameters, this);
+		m_window->Initialize();
 	}
 
 	void ContentPipelineApplication::OnRun()

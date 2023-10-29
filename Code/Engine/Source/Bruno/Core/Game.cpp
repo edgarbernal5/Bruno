@@ -26,7 +26,7 @@ namespace Bruno
 		m_device->WaitForIdle();
 
 		m_timer.Stop();
-		m_gameWindow.reset();
+		m_window.reset();
 
 #if BR_PLATFORM_WINDOWS
 		CoUninitialize();

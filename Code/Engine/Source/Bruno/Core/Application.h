@@ -10,7 +10,7 @@ namespace Bruno
 		std::string Name = "Bruno";
 		uint32_t WindowWidth = 800;
 		uint32_t WindowHeight = 600;
-		std::string WorkingDirectory;
+		std::wstring WorkingDirectory;
 	};
 
 	class Application
@@ -45,8 +45,8 @@ namespace Bruno
 		virtual void OnKeyPressed(KeyCode key, KeyboardState state) {}
 		virtual void OnKeyReleased(KeyCode key, KeyboardState state) {}
 
-		std::unique_ptr<Window> m_gameWindow;
-		ApplicationParameters m_parameters;
+		std::unique_ptr<Window> m_window;
+		ApplicationParameters m_applicationParameters;
 
 	private:
 		static Application* g_instance;
