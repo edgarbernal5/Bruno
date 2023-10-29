@@ -46,7 +46,6 @@ namespace Bruno
 		void UpdateCBs(const GameTimer& timer);
 
 		std::unique_ptr<Surface> m_surface;
-		std::shared_ptr<Texture> m_texture;
 		std::shared_ptr<Model> m_model;
 		std::shared_ptr<RootSignature> m_rootSignature;
 
@@ -56,11 +55,12 @@ namespace Bruno
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
 
 		std::vector<std::shared_ptr<RenderItem>> m_renderItems;
-		PipelineResourceSpace mMeshPerObjectResourceSpace;
+		PipelineResourceSpace m_meshPerObjectResourceSpace;
 
 		struct ObjectBuffer
 		{
 			Math::Matrix World;
+			//Math::Matrix InverseModelView;
 		};
 		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
 

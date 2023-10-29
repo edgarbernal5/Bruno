@@ -19,6 +19,7 @@
 
 namespace Bruno
 {
+	class Model;
 	class Surface;
 	class EditorGame;
 	class GraphicsContext;
@@ -37,6 +38,10 @@ namespace Bruno
 		std::mutex& GetMutex() { return m_mutex; }
 
 	private:
+		void InitializeCamera();
+		void InitializeGraphicsContext();
+		void InitializeMeshAndTexture();
+		void InitializeShaderAndPipeline();
 		void UpdateCBs(const GameTimer& timer);
 
 		//std::unique_ptr<nana::nested_form> m_form;
@@ -48,16 +53,14 @@ namespace Bruno
 		EditorGame* m_editorGame;
 		//Scene* m_scene;
 
-		std::unique_ptr<IndexBuffer> m_indexBuffer;
-		std::unique_ptr<VertexBuffer> m_vertexBuffer;
 		std::unique_ptr<RootSignature> m_rootSignature;
 
 		std::unique_ptr<Shader> m_opaqueShader;
 
 		std::unique_ptr<PipelineStateObject> m_pipelineState;
-		std::shared_ptr<Texture> m_texture;
+		std::shared_ptr<Model> m_model;
 		
-		PipelineResourceSpace mMeshPerObjectResourceSpace;
+		PipelineResourceSpace m_meshPerObjectResourceSpace;
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
 		
 		std::mutex m_mutex{};

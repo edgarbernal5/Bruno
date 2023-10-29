@@ -41,8 +41,12 @@ namespace Bruno
 			//aiProcess_SortByPType | 
 			aiProcess_FindInvalidData |
 			aiProcess_FindDegenerates |
-			//aiProcess_FlipWindingOrder |
+			aiProcess_ConvertToLeftHanded |
 			aiProcess_FlipUVs;
+
+		//TODO: sort by primitive type (i.e. aiProcess_SortByPType)
+		//Look at AssimpMeshImporter.cpp in Hazel
+		//aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_ConvertToLeftHanded
 
 		importer.SetPropertyInteger(AI_CONFIG_PP_FD_REMOVE, true);
 

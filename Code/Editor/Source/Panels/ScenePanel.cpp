@@ -9,6 +9,7 @@
 #include <Bruno/Platform/DirectX/VertexTypes.h>
 #include <Bruno/Platform/DirectX/GraphicsContext.h>
 #include <Bruno/Content/ContentManager.h>
+#include <Bruno/Renderer/Model.h>
 #include "EditorGame.h"
 
 #include <nana/gui.hpp>
@@ -17,53 +18,6 @@
 
 namespace Bruno
 {
-	static VertexPositionNormalTexture g_Vertices[24] = {
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(1.0f, 1.0f) },
-
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(1.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(+1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(0.0f, 1.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(1.0f, 0.0f) },
-
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(1.0f, 1.0f) },
-
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(1.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(0.0f, 1.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
-
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, 1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, 1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, -1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 1.0f) },
-
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, -1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, -1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, 1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, 1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 1.0f) },
-
-	};
-
-	static uint16_t g_Indices[36] = { 0, 1, 2,
-		0, 2, 3,
-		4, 5, 6,
-		4, 6, 7,
-		8, 9, 10,
-		8, 10, 11,
-		12, 13, 14,
-		12, 14, 15,
-		16, 17, 18,
-		16, 18, 19,
-		20, 21, 22,
-		20, 22, 23
-	};
-
 	ScenePanel::ScenePanel(nana::window window, EditorGame *editorGame, DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat) :
 		nana::nested_form(window, nana::appear::bald<>()),
 		//nana::panel<true>(window),
@@ -204,66 +158,6 @@ namespace Bruno
 			m_isResizing = false;
 		});
 
-		/*m_indexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices), g_Indices, (uint32_t)sizeof(uint16_t));
-		m_vertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices), g_Vertices, (uint32_t)sizeof(VertexPositionColor));*/
-
-		//m_vertexShader = std::make_unique<ShaderProgram>(L"VertexShader.hlsl", "main", "vs_5_1");
-		//m_pixelShader = std::make_unique<ShaderProgram>(L"PixelShader.hlsl", "main", "ps_5_1");
-
-		auto boxRenderItem = std::make_shared<RenderItem>();
-		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
-		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices) * sizeof(uint16_t), g_Indices, (uint32_t)sizeof(uint16_t));
-		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices) * sizeof(VertexPositionNormalTexture), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
-		m_renderItems.push_back(boxRenderItem);
-
-		m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
-
-		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-		{
-			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
-		}
-		//ContentManager manager(L"");
-		//m_texture = manager.Load<Texture>(L"Textures/Mona_Lisa.jpg.bruno");
-		//m_texture.reset(sharedTexture.get());
-		m_texture = std::make_unique<Texture>(L"Textures/Mona_Lisa.jpg");
-
-		GraphicsDevice* device = Graphics::GetDevice();
-
-		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
-
-		m_opaqueShader = std::make_unique<Shader>(L"Opaque.hlsl");
-
-		PipelineResourceBinding textureBinding;
-		textureBinding.BindingIndex = 0;
-		textureBinding.Resource = m_texture.get();
-
-		mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
-		mMeshPerObjectResourceSpace.SetSRV(textureBinding);
-		mMeshPerObjectResourceSpace.Lock();
-
-		PipelineResourceLayout meshResourceLayout;
-		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &mMeshPerObjectResourceSpace;
-
-		PipelineResourceMapping resourceMapping;
-
-		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
-
-		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
-
-		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
-		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-		meshPipelineDesc.PixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = depthBufferFormat;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
-		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = backBufferFormat;
-		//meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-
-		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
-
-		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
-		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 0.1f, 100.0f);
-
 		m_form->events().mouse_down([this](const nana::arg_mouse& args)
 		{
 			m_lastMousePosition.x = args.pos.x;
@@ -332,6 +226,11 @@ namespace Bruno
 			}
 		});
 
+		InitializeMeshAndTexture();
+		InitializeShaderAndPipeline();
+		InitializeCamera();
+		InitializeGraphicsContext();
+
 		editorGame->AddScenePanel(this);
 		m_form->show();
 		//m_isExposed = true;
@@ -393,9 +292,10 @@ namespace Bruno
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
 
-		if (m_texture->IsReady()) {
-			for (auto& item : m_renderItems)
-			{
+		for (auto& item : m_renderItems)
+		{
+			auto texture = item->Material->TexturesByName["Texture"];
+			if (texture != nullptr && texture->IsReady()) {
 				if (!item->IndexBuffer->IsReady() || !item->VertexBuffer->IsReady())
 					continue;
 
@@ -404,10 +304,10 @@ namespace Bruno
 
 				PipelineResourceBinding textureBinding;
 				textureBinding.BindingIndex = 0;
-				textureBinding.Resource = m_texture.get();
+				textureBinding.Resource = texture.get();
 
-				mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[device->GetFrameId()].get());
-				mMeshPerObjectResourceSpace.SetSRV(textureBinding);
+				m_meshPerObjectResourceSpace.SetCBV(m_objectBuffer[device->GetFrameId()].get());
+				m_meshPerObjectResourceSpace.SetSRV(textureBinding);
 
 				PipelineInfo pipeline;
 				pipeline.Pipeline = m_pipelineState.get();
@@ -415,7 +315,7 @@ namespace Bruno
 				pipeline.DepthStencilTarget = &depthBuffer;
 
 				m_graphicsContext->SetPipeline(pipeline);
-				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, mMeshPerObjectResourceSpace);
+				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
 
 				m_graphicsContext->SetPrimitiveTopology(item->PrimitiveType);
 				m_graphicsContext->DrawIndexedInstanced(item->IndexCount,
@@ -440,6 +340,71 @@ namespace Bruno
 		std::lock_guard lock{ m_mutex };
 
 		return (m_isExposed && !m_isResizing && !m_isSizingMoving);
+	}
+
+	void ScenePanel::InitializeCamera()
+	{
+		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
+		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 0.1f, 100.0f);
+	}
+
+	void ScenePanel::InitializeGraphicsContext()
+	{
+		GraphicsDevice* device = Graphics::GetDevice();
+		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
+	}
+
+	void ScenePanel::InitializeMeshAndTexture()
+	{
+		ContentManager manager(m_editorGame->m_applicationParameters.WorkingDirectory);
+
+		m_model = manager.Load<Model>(L"Models\\Car\\Car.fbx");
+
+		auto& meshes = m_model->GetMeshes();
+		for (auto& mesh : meshes)
+		{
+			auto boxRenderItem = std::make_shared<RenderItem>();
+			boxRenderItem->IndexCount = mesh->GetIndexBuffer()->GetElementCount();
+			boxRenderItem->IndexBuffer = mesh->GetIndexBuffer();
+			boxRenderItem->VertexBuffer = mesh->GetVertexBuffer();
+			boxRenderItem->Material = mesh->GetMaterial();
+			m_renderItems.push_back(boxRenderItem);
+		}
+
+		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
+		{
+			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		}
+	}
+
+	void ScenePanel::InitializeShaderAndPipeline()
+	{
+		m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
+		PipelineResourceBinding textureBinding;
+		textureBinding.BindingIndex = 0;
+
+		m_meshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
+		m_meshPerObjectResourceSpace.SetSRV(textureBinding);
+		m_meshPerObjectResourceSpace.Lock();
+
+		PipelineResourceLayout meshResourceLayout;
+		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &m_meshPerObjectResourceSpace;
+
+		PipelineResourceMapping resourceMapping;
+
+		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
+
+		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
+		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
+		meshPipelineDesc.PixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
+		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = m_depthBufferFormat;
+		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
+		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
+		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = m_backBufferFormat;
+		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+
+		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
+
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)

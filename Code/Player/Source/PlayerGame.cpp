@@ -139,8 +139,8 @@ namespace Bruno
 				textureBinding.BindingIndex = 0;
 				textureBinding.Resource = texture.get();
 
-				mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[m_device->GetFrameId()].get());
-				mMeshPerObjectResourceSpace.SetSRV(textureBinding);
+				m_meshPerObjectResourceSpace.SetCBV(m_objectBuffer[m_device->GetFrameId()].get());
+				m_meshPerObjectResourceSpace.SetSRV(textureBinding);
 
 				PipelineInfo pipeline;
 				pipeline.Pipeline = m_pipelineState.get();
@@ -148,7 +148,7 @@ namespace Bruno
 				pipeline.DepthStencilTarget = &depthBuffer;
 
 				m_graphicsContext->SetPipeline(pipeline);
-				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, mMeshPerObjectResourceSpace);
+				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
 
 				m_graphicsContext->SetPrimitiveTopology(item->PrimitiveType);
 				m_graphicsContext->DrawIndexedInstanced(item->IndexCount,
@@ -257,7 +257,8 @@ namespace Bruno
 		m_model = manager.Load<Model>(L"Models\\Car\\Car.fbx");
 
 		auto& meshes = m_model->GetMeshes();
-		for (auto& mesh : meshes) {
+		for (auto& mesh : meshes)
+		{
 			auto boxRenderItem = std::make_shared<RenderItem>();
 			boxRenderItem->IndexCount = mesh->GetIndexBuffer()->GetElementCount();
 			boxRenderItem->IndexBuffer = mesh->GetIndexBuffer();
@@ -266,19 +267,10 @@ namespace Bruno
 			m_renderItems.push_back(boxRenderItem);
 		}
 
-		/*auto boxRenderItem = std::make_shared<RenderItem>();
-		boxRenderItem->IndexCount = (uint32_t)_countof(g_Indices);
-		boxRenderItem->IndexBuffer = std::make_unique<IndexBuffer>((uint32_t)_countof(g_Indices) * sizeof(uint16_t), g_Indices, (uint32_t)sizeof(uint16_t));
-		boxRenderItem->VertexBuffer = std::make_unique<VertexBuffer>((uint32_t)_countof(g_Vertices) * sizeof(VertexPositionNormalTexture), g_Vertices, (uint32_t)sizeof(VertexPositionNormalTexture));
-		m_renderItems.push_back(boxRenderItem);*/
-
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
 			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
 		}
-
-		//m_texture = manager.Load<Texture>(L"Textures/Mona_Lisa.jpg");
-		m_texture = std::make_shared<Texture>(L"Textures/Mona_Lisa.jpg");
 	}
 
 	void PlayerGame::InitializeShaderAndPipeline()
@@ -288,14 +280,13 @@ namespace Bruno
 
 		PipelineResourceBinding textureBinding;
 		textureBinding.BindingIndex = 0;
-		textureBinding.Resource = m_texture.get();
-
-		mMeshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
-		mMeshPerObjectResourceSpace.SetSRV(textureBinding);
-		mMeshPerObjectResourceSpace.Lock();
+		
+		m_meshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
+		m_meshPerObjectResourceSpace.SetSRV(textureBinding);
+		m_meshPerObjectResourceSpace.Lock();
 
 		PipelineResourceLayout meshResourceLayout;
-		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &mMeshPerObjectResourceSpace;
+		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &m_meshPerObjectResourceSpace;
 
 		PipelineResourceMapping resourceMapping;
 		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
@@ -334,9 +325,12 @@ namespace Bruno
 		TotalTime += timer.GetDeltaTime();
 
 		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
+		//Math::Matrix inverseModelView = modelMatrix * m_camera.GetView();
+		//inverseModelView.Invert();
 
 		ObjectBuffer objectBuffer;
 		objectBuffer.World = mvpMatrix;
+		//objectBuffer.InverseModelView = inverseModelView;
 
 		uint32_t frameIndex = m_device->GetFrameId();
 		m_objectBuffer[frameIndex]->SetMappedData(objectBuffer);
