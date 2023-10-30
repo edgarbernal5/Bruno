@@ -35,9 +35,10 @@
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
 
-
 namespace Bruno::Math
 {
+    using BoundingBox = DirectX::BoundingBox;
+
     constexpr float ConvertToRadians(float degrees) noexcept { return degrees * (DirectX::XM_PI / 180.0f); }
     constexpr float ConvertToDegrees(float radians) noexcept { return radians * (180.0f / DirectX::XM_PI); }
     constexpr float Sign(float s) noexcept

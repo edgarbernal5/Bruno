@@ -92,11 +92,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\EditorGame.cpp" />
+    <ClCompile Include="Source\Gizmos\GizmoService.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Panels\ScenePanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\EditorGame.h" />
+    <ClInclude Include="Source\Gizmos\GizmoService.h" />
     <ClInclude Include="Source\Panels\ScenePanel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

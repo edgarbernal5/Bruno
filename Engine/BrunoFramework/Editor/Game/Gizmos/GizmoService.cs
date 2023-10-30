@@ -121,7 +121,7 @@ namespace BrunoFramework.Editor.Game.Gizmos
             get
             {
                 var min = new Vector3(-SINGLE_AXIS_THICKNESS * 0.5f, -SINGLE_AXIS_THICKNESS * 0.5f, m_gizmoConfig.LINE_OFFSET);
-                var max = new Vector3(SINGLE_AXIS_THICKNESS, SINGLE_AXIS_THICKNESS, m_gizmoConfig.GIZMO_LENGTH);
+                var max = new Vector3(SINGLE_AXIS_THICKNESS * 0.5f, SINGLE_AXIS_THICKNESS * 0.5f, m_gizmoConfig.GIZMO_LENGTH);
 
                 return new BoundingBox((max + min) * 0.5f,
                                        (max - min) * 0.5f);
