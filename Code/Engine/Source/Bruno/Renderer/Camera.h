@@ -17,6 +17,7 @@ namespace Bruno
 		void LookAt(const Math::Vector3& position, const Math::Vector3& target, const Math::Vector3& up);
 		void SetLens(float fovY, const Math::Viewport& viewport, float nearPlane, float farPlane);
 
+		//TODO: these methods should be in camera controller (!?).
 		void HandTool(const Math::Int2& mousePosition, const Math::Int2& previousPosition);
 		void Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition);
 		void PitchYaw(const Math::Int2& mousePosition, const Math::Int2& previousPosition);
