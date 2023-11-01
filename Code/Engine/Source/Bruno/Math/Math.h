@@ -281,6 +281,7 @@ namespace Bruno::Math
         Vector3() noexcept : DirectX::XMFLOAT3(0.f, 0.f, 0.f) {}
         constexpr explicit Vector3(float ix) noexcept : DirectX::XMFLOAT3(ix, ix, ix) {}
         constexpr Vector3(float ix, float iy, float iz) noexcept : DirectX::XMFLOAT3(ix, iy, iz) {}
+        constexpr Vector3(const Vector2& xy, float iz) noexcept : DirectX::XMFLOAT3(xy.x, xy.y, iz) {}
         explicit Vector3(_In_reads_(3) const float* pArray) noexcept : DirectX::XMFLOAT3(pArray) {}
         Vector3(DirectX::FXMVECTOR V) noexcept { XMStoreFloat3(this, V); }
         Vector3(const DirectX::XMFLOAT3& V) noexcept { this->x = V.x; this->y = V.y; this->z = V.z; }

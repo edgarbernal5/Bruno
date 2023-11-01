@@ -119,8 +119,8 @@ namespace Bruno
 		
 		const Math::Vector3 m_unaryDirections[3]{ Math::Vector3::UnitX, Math::Vector3::UnitY, Math::Vector3::UnitZ };
 
+		Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
 		GizmoAxis GetAxis(const Math::Vector2& mousePosition);
-		
 		bool GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
 
 		Camera& m_camera;
@@ -129,6 +129,7 @@ namespace Bruno
 		PivotType m_pivotType = PivotType::SelectionCenter;
 		GizmoAxis m_currentGizmoAxis = GizmoAxis::None;
 
+		Math::Vector3 m_currentDelta;
 		SelectionState m_selectionState;
 	};
 }

@@ -2,6 +2,7 @@
 
 #ifdef BR_PLATFORM_WINDOWS
 
+//#define NOMINMAX
 #include <Windows.h>
 //#include "Bruno/Platform/DirectX/DX12.h"
 
