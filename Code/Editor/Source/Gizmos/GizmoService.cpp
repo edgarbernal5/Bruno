@@ -24,6 +24,13 @@ namespace Bruno
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
             SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
 
+        Math::Vector3 intersectionPoint;
+        if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
+        {
+            m_selectionState.m_prevMousePosition = mousePosition;
+            m_selectionState.m_prevIntersectionPosition = intersectionPoint;
+        }
+
         return true;
     }
 
@@ -190,6 +197,56 @@ namespace Bruno
 
     bool GizmoService::GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint)
     {
+        intersectionPoint = Math::Vector3::Zero;
+        if (m_currentGizmoType == GizmoType::None || !m_isActive)
+            return false;
+
+        if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
+        {
+            auto gizmoWorldInverse = m_selectionState.m_rotationMatrix;
+            gizmoWorldInverse.Transpose();
+
+            auto ray = ConvertMousePositionToRay(mousePosition);
+            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
+            ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+
+            SetGizmoHandlePlaneFor(m_currentGizmoAxis, ray);
+
+            float intersection;
+            if (ray.Intersects(m_selectionState.m_currentGizmoPlane, intersection))
+            {
+                intersectionPoint = ray.position + (ray.direction * intersection);
+                return true;
+            }
+        }
+        else
+        {
+            if (m_currentGizmoAxis == GizmoAxis::XYZ)
+            {
+                return true;
+            }
+
+            Math::Vector3 planeNormals[3]{ m_selectionState.m_rotationMatrix.Right(), m_selectionState.m_rotationMatrix.Up(), m_selectionState.m_rotationMatrix.Forward() };
+
+            int planeIndex = ((int)m_currentGizmoAxis) - 1;
+            auto gizmoWorldInverse = m_selectionState.m_gizmoAxisAlignedWorld;
+            gizmoWorldInverse.Invert();
+
+            auto ray = ConvertMousePositionToRay(mousePosition);
+            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
+            ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+
+            Math::Plane plane(planeNormals[planeIndex], 0);
+
+            float intersection;
+            if (ray.Intersects(plane, intersection))
+            {
+                intersectionPoint = ray.position + (ray.direction * intersection);
+                intersectionPoint.Normalize();
+                return true;
+            }
+        }
+
         return false;
     }
 

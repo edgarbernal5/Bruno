@@ -126,7 +126,6 @@ namespace Bruno
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
 
-
 		Camera& m_camera;
 		bool m_isActive = true;
 		GizmoType m_currentGizmoType = GizmoType::None;
