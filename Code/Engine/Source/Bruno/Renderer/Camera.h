@@ -13,6 +13,7 @@ namespace Bruno
 		const Math::Matrix& GetProjection() const { return m_projection; }
 		const Math::Matrix& GetViewProjection() const { return m_viewProjection; }
 
+		Math::Vector3 GetPosition() { return m_position; }
 		Math::Viewport GetViewport() { return m_viewport; }
 		void SetViewport(const Math::Viewport& viewport);
 

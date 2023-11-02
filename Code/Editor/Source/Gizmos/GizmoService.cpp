@@ -21,6 +21,9 @@ namespace Bruno
         if (m_currentGizmoAxis == GizmoAxis::None)
             return false;
 
+        if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
+            SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
+
         return true;
     }
 
@@ -188,5 +191,84 @@ namespace Bruno
     bool GizmoService::GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint)
     {
         return false;
+    }
+
+    void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition)
+    {
+        auto ray = ConvertMousePositionToRay(mousePosition);
+        auto toLocal = m_selectionState.m_rotationMatrix;
+        toLocal.Invert();
+
+        ray.position = Math::Vector3::Transform(ray.position, toLocal);
+        ray.direction = Math::Vector3::TransformNormal(ray.direction, toLocal);
+
+        SetGizmoHandlePlaneFor(selectedAxis, ray);
+    }
+
+    void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray)
+    {
+        auto toLocal = m_selectionState.m_rotationMatrix;
+        toLocal.Transpose();
+
+        Math::Vector3 gizmoPositionInLocal = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, toLocal);
+        Math::Plane plane;
+        Math::Vector3 planeNormal;
+        float planeD=0.0f;
+
+        switch (selectedAxis)
+        {
+        case GizmoAxis::XY:
+            planeNormal = Math::Vector3::Forward;
+            planeD = gizmoPositionInLocal.z;
+            break;
+        case GizmoAxis::YZ:
+            planeNormal = Math::Vector3::Left;
+            planeD = gizmoPositionInLocal.x;
+            break;
+        case GizmoAxis::XZ:
+            planeNormal = Math::Vector3::Down;
+            planeD = gizmoPositionInLocal.y;
+            break;
+
+        case GizmoAxis::X:
+        case GizmoAxis::Y:
+        case GizmoAxis::Z:
+        {
+            auto cameraToGizmo = m_selectionState.m_gizmoPosition - m_camera.GetPosition();
+            cameraToGizmo.Normalize();
+            cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, toLocal);
+
+            int axisIndex = (int)selectedAxis - 1;
+
+            Math::Vector3 perpendicularRayVector;
+            m_unaryDirections[axisIndex].Cross(cameraToGizmo, perpendicularRayVector);
+            perpendicularRayVector.Cross(cameraToGizmo);
+            
+            perpendicularRayVector = m_unaryDirections[axisIndex].Cross(perpendicularRayVector);
+            perpendicularRayVector.Normalize();
+
+            float newD = -perpendicularRayVector.Dot(gizmoPositionInLocal);
+
+            planeNormal = perpendicularRayVector;
+            planeD = newD;
+        }
+        break;
+
+        case GizmoAxis::XYZ:
+        {
+            auto cameraToGizmo = m_camera.GetPosition() - m_selectionState.m_gizmoPosition;
+            cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, toLocal);
+
+            float zCamera = cameraToGizmo.Length();
+            cameraToGizmo.Normalize();
+
+            planeNormal = cameraToGizmo;
+            planeD = zCamera;
+        }
+        break;
+        }
+
+        //Logger.Debug(string.Format("selected plane normal = {0}; Axis = {1}", plane.Normal, selectedAxis.ToString()));
+        m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormal, planeD);
     }
 }
