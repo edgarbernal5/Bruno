@@ -36,6 +36,28 @@ namespace Bruno
 
     void GizmoService::Drag(const Math::Vector2& mousePosition)
     {
+        switch (m_currentGizmoType)
+        {
+        case GizmoType::Translation:
+        {
+            auto translationDelta = GetDeltaMovement(mousePosition);
+            translationDelta = ApplySnapAndPrecisionMode(translationDelta);
+
+            translationDelta = Math::Vector3::Transform(translationDelta, m_selectionState.m_rotationMatrix);
+
+            break;
+        }
+        case GizmoType::Rotation:
+        {
+
+            break;
+        }
+        case GizmoType::Scale:
+        {
+
+            break;
+        }
+        }
     }
 
     void GizmoService::OnMouseMove(const Math::Vector2& mousePosition)
@@ -50,9 +72,42 @@ namespace Bruno
     {
     }
 
+    Math::Vector3 GizmoService::ApplySnapAndPrecisionMode(Math::Vector3 delta)
+    {
+        return delta;
+    }
+
     void GizmoService::InitializeGizmos()
     {
 
+    }
+
+    Math::Vector3 GizmoService::GetDeltaMovement(const Math::Vector2& mousePosition)
+    {
+        Math::Vector3 delta = Math::Vector3::Zero;
+        Math::Vector3 intersectionPoint;
+        if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
+        {
+            m_selectionState.m_intersectionPosition = intersectionPoint;
+            m_currentDelta = intersectionPoint - m_selectionState.m_prevIntersectionPosition;
+
+            if (m_currentGizmoAxis == GizmoAxis::X || m_currentGizmoAxis == GizmoAxis::XY || m_currentGizmoAxis == GizmoAxis::XZ || m_currentGizmoAxis == GizmoAxis::XYZ)
+            {
+                delta.x = m_currentDelta.x;
+            }
+            if (m_currentGizmoAxis == GizmoAxis::Y || m_currentGizmoAxis == GizmoAxis::XY || m_currentGizmoAxis == GizmoAxis::YZ || m_currentGizmoAxis == GizmoAxis::XYZ)
+            {
+                delta.y = m_currentDelta.y;
+            }
+            if (m_currentGizmoAxis == GizmoAxis::Z || m_currentGizmoAxis == GizmoAxis::XZ || m_currentGizmoAxis == GizmoAxis::YZ || m_currentGizmoAxis == GizmoAxis::XYZ)
+            {
+                delta.z = m_currentDelta.z;
+            }
+        }
+
+        m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
+
+        return delta;
     }
 
     Math::Ray GizmoService::ConvertMousePositionToRay(const Math::Vector2& mousePosition)

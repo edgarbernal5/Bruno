@@ -67,7 +67,9 @@ namespace Bruno
 			Math::Matrix m_objectRotation;
 		};
 
+		Math::Vector3 ApplySnapAndPrecisionMode(Math::Vector3 delta);
 		void InitializeGizmos();
+		Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
 
 		const float LINE_LENGTH = 3.0f;
 		const float CONE_HEIGHT = 0.5f;
