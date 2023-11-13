@@ -1,5 +1,7 @@
+#include "brpch.h"
 #include "GizmoService.h"
 
+#include "Bruno/Math/Math.h"
 #include <limits>
 
 namespace Bruno
@@ -44,17 +46,21 @@ namespace Bruno
             translationDelta = ApplySnapAndPrecisionMode(translationDelta);
 
             translationDelta = Math::Vector3::Transform(translationDelta, m_selectionState.m_rotationMatrix);
-
+            m_dragTranslationCallback(translationDelta);
             break;
         }
         case GizmoType::Rotation:
         {
-
+            auto rotationDelta = GetRotationDelta(mousePosition);
+            //TODO: Apply snap and precision mode
+            m_dragRotationCallback(rotationDelta);
             break;
         }
         case GizmoType::Scale:
         {
-
+            auto scaleDelta = GetDeltaMovement(mousePosition);
+            scaleDelta = ApplySnapAndPrecisionMode(scaleDelta);
+            m_dragScaleCallback(scaleDelta);
             break;
         }
         }
@@ -66,6 +72,20 @@ namespace Bruno
 
     void GizmoService::Update()
     {
+        auto gizmoPositionViewSpace = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, m_camera.GetView());
+        m_selectionState.m_screenScaleFactor = Math::Abs(gizmoPositionViewSpace.z) * GIZMO_SCREEN_SCALE;
+
+        if (m_selectionState.m_screenScaleFactor < 0.0001f)
+        {
+            m_selectionState.m_invScreenScaleFactor = 1.0f;
+        }
+        else
+        {
+            m_selectionState.m_invScreenScaleFactor = 1.0f / m_selectionState.m_screenScaleFactor;
+        }
+        m_selectionState.m_screenScaleMatrix = Math::Matrix::CreateScale(m_selectionState.m_screenScaleFactor);
+
+        m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
     }
 
     void GizmoService::EndDrag()
@@ -108,6 +128,76 @@ namespace Bruno
         m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
 
         return delta;
+    }
+
+    Math::Quaternion GizmoService::GetRotationDelta(const Math::Vector2& mousePosition)
+    {
+        Math::Quaternion rotationDelta;
+
+        if (m_currentGizmoAxis == GizmoAxis::XYZ)
+        {
+            auto gizmoScreenPosition = GetScreenPosition(m_selectionState.m_gizmoPosition);
+            auto gizmoScreenPosition2 = GetScreenPosition(m_selectionState.m_gizmoPosition + m_camera.GetView().Right() * GIZMO_LENGTH);
+            auto length = 3.0f * (gizmoScreenPosition2 - gizmoScreenPosition).Length() / DirectX::XM_2PI;
+            Math::Vector2 deltaAngles(1.0f / length);
+
+            Math::Vector2 mouseVelocity(mousePosition.x - m_selectionState.m_prevMousePosition.x, mousePosition.y - m_selectionState.m_prevMousePosition.y);
+
+            auto angles = mouseVelocity * deltaAngles;
+
+            rotationDelta = Math::Quaternion::CreateFromYawPitchRoll(angles.x, 0, 0) * Math::Quaternion::CreateFromYawPitchRoll(0, angles.y, 0);
+        }
+        else {
+            Math::Vector3 planeNormals[3]{ m_selectionState.m_rotationMatrix.Right(), m_selectionState.m_rotationMatrix.Up(), m_selectionState.m_rotationMatrix.Forward()};
+            int planeIndex = ((int)m_currentGizmoAxis) - 1;
+
+            Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoAxisAlignedWorld;
+            gizmoWorldInverse.Invert();
+
+            auto ray = ConvertMousePositionToRay(mousePosition);
+            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
+            ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+
+            Math::Plane plane(planeNormals[planeIndex], 0);
+
+            float delta = 0.0f;
+            float intersection;
+            if (ray.Intersects(plane, intersection))
+            {
+                auto positionOnPlane = ray.position + (ray.direction * intersection);
+
+                auto newIntersectionPoint = positionOnPlane;
+                newIntersectionPoint.Normalize();
+                m_selectionState.m_intersectionPosition = newIntersectionPoint;
+
+                float dotP = newIntersectionPoint.Dot(m_selectionState.m_prevIntersectionPosition);
+                float acosAngle = Math::Clamp(dotP, -1.0f, 1.0f);
+                float angle = Math::Acos(acosAngle);
+
+                auto perpendicularVector = m_selectionState.m_prevIntersectionPosition;
+                perpendicularVector.Cross(newIntersectionPoint);
+                perpendicularVector.Normalize();
+
+                float sign = perpendicularVector.Dot(planeNormals[planeIndex]);
+                
+                delta = sign * angle;
+            }
+
+            switch (m_currentGizmoAxis)
+            {
+            case GizmoAxis::X:
+                rotationDelta *= Math::Quaternion::CreateFromAxisAngle(m_selectionState.m_rotationMatrix.Right(), delta);
+                break;
+            case GizmoAxis::Y:
+                rotationDelta *= Math::Quaternion::CreateFromAxisAngle(m_selectionState.m_rotationMatrix.Up(), delta);
+                break;
+            case GizmoAxis::Z:
+                rotationDelta *= Math::Quaternion::CreateFromAxisAngle(m_selectionState.m_rotationMatrix.Forward(), delta);
+                break;
+            }
+        }
+
+        return rotationDelta;
     }
 
     Math::Ray GizmoService::ConvertMousePositionToRay(const Math::Vector2& mousePosition)
@@ -303,6 +393,16 @@ namespace Bruno
         }
 
         return false;
+    }
+
+    Math::Vector2 GizmoService::GetScreenPosition(const Math::Vector3& worldPosition)
+    {
+        auto point = m_camera.GetViewport().Project(worldPosition,
+            m_camera.GetProjection(),
+            m_camera.GetView(),
+            Math::Matrix::Identity);
+
+        return Math::Vector2(point.x, point.y);
     }
 
     void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition)

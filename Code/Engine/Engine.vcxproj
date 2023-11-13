@@ -120,6 +120,7 @@
     <ClInclude Include="Source\Bruno\Core\RTTI.h" />
     <ClInclude Include="Source\Bruno\Core\Stream.h" />
     <ClInclude Include="Source\Bruno\Core\StringHelpers.h" />
+    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoService.h" />
     <ClInclude Include="Source\Bruno\Math\Math.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Context.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="Source\Bruno\Renderer\Model.h" />
     <ClInclude Include="Source\Bruno\Renderer\RenderItem.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
+    <ClInclude Include="Source\Bruno\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.cpp" />
@@ -177,6 +179,7 @@
     <ClCompile Include="Source\Bruno\Core\MemoryStream.cpp" />
     <ClCompile Include="Source\Bruno\Core\Stream.cpp" />
     <ClCompile Include="Source\Bruno\Core\StringHelpers.cpp" />
+    <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoService.cpp" />
     <ClCompile Include="Source\Bruno\Math\Math.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Context.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
@@ -211,6 +214,7 @@
     <ClCompile Include="Source\Bruno\Renderer\Model.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp" />
+    <ClCompile Include="Source\Bruno\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Bruno\Math\Math.inl" />

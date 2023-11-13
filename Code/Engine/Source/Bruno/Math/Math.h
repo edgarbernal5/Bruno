@@ -46,6 +46,21 @@ namespace Bruno::Math
         if (s < 0) return -1.0f;
         return 1.0f;
     }
+    inline constexpr float Clamp(float s, float min, float max)
+    {
+        if (s < min) return min;
+        if (s > max) return max;
+        return s;
+    }
+
+    float Acos(float angle);
+
+    inline constexpr float Abs(float x)
+    {
+        if (x < 0)
+            return -x;
+        return x;
+    }
 
     struct Int2;
     struct Vector2;

@@ -10,9 +10,6 @@
     <ClCompile Include="Source\Panels\ScenePanel.cpp">
       <Filter>Source\Panels</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Gizmos\GizmoService.cpp">
-      <Filter>Source\Gizmos</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -21,9 +18,6 @@
     <Filter Include="Source\Panels">
       <UniqueIdentifier>{f96ed092-813a-4f60-8ae2-a3aa81445bd2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Gizmos">
-      <UniqueIdentifier>{f60759d0-6d1e-4195-9c40-bc748248805e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\EditorGame.h">
@@ -31,9 +25,6 @@
     </ClInclude>
     <ClInclude Include="Source\Panels\ScenePanel.h">
       <Filter>Source\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Gizmos\GizmoService.h">
-      <Filter>Source\Gizmos</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

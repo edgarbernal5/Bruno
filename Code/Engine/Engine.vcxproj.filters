@@ -37,6 +37,15 @@
     <Filter Include="Dependencies\D3D12MemoryAllocator">
       <UniqueIdentifier>{8651c2ab-da49-418c-bb27-d727f973b23b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Bruno\Editor">
+      <UniqueIdentifier>{76b1d155-efd6-4f55-9227-4cf0ced6783c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Bruno\Editor\Gizmos">
+      <UniqueIdentifier>{4e51a54e-0d5b-4641-9e84-ca598fb079ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Bruno\Scene">
+      <UniqueIdentifier>{af5f88d4-6c15-4449-9890-88ebdba121db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -219,6 +228,12 @@
     <ClInclude Include="Source\Bruno\Core\Window.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoService.h">
+      <Filter>Source\Bruno\Editor\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Scene\Scene.h">
+      <Filter>Source\Bruno\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -370,6 +385,12 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\Window.cpp">
       <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoService.cpp">
+      <Filter>Source\Bruno\Editor\Gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Scene\Scene.cpp">
+      <Filter>Source\Bruno\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

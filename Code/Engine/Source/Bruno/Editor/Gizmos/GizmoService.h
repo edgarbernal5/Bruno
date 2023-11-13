@@ -1,14 +1,24 @@
 #pragma once
 
-#include "Bruno/Math/Math.h"
 #include "Bruno/Renderer/Camera.h"
 
+namespace Bruno::Math {
+	struct Vector2;
+	struct Vector3;
+	struct Quaternion;
+	struct Matrix;
+	struct Ray;
+	struct Plane;
+}
 namespace Bruno
 {
 	class GizmoService
 	{
 	public:
 		GizmoService(Camera& camera);
+
+		using DragTranslationScaleCallback = std::function<void(const Math::Vector3&)>;
+		using DragRotationCallback = std::function<void(const Math::Quaternion&)>;
 
 		enum class GizmoType
 		{
@@ -47,6 +57,16 @@ namespace Bruno
 		void Update();
 		void EndDrag();
 
+		void SetTranslationCallback(DragTranslationScaleCallback callback) {
+			m_dragTranslationCallback = callback;
+		}
+		void SetScaleCallback(DragTranslationScaleCallback callback) {
+			m_dragScaleCallback = callback;
+		}
+		void SetRotationCallback(DragRotationCallback callback) {
+			m_dragRotationCallback = callback;
+		}
+
 	private:
 		struct SelectionState
 		{
@@ -70,6 +90,7 @@ namespace Bruno
 		Math::Vector3 ApplySnapAndPrecisionMode(Math::Vector3 delta);
 		void InitializeGizmos();
 		Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
+		Math::Quaternion GetRotationDelta(const Math::Vector2& mousePosition);
 
 		const float LINE_LENGTH = 3.0f;
 		const float CONE_HEIGHT = 0.5f;
@@ -124,6 +145,7 @@ namespace Bruno
 		Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
 		GizmoAxis GetAxis(const Math::Vector2& mousePosition);
 		bool GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
+		Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);
 
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
@@ -136,6 +158,9 @@ namespace Bruno
 
 		Math::Vector3 m_currentDelta;
 		SelectionState m_selectionState;
+		DragTranslationScaleCallback m_dragTranslationCallback;
+		DragTranslationScaleCallback m_dragScaleCallback;
+		DragRotationCallback m_dragRotationCallback;
 	};
 }
 
