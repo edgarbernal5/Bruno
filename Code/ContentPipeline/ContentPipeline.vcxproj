@@ -113,7 +113,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_DEBUG;BR_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\nana\include;..\Engine\Dependencies\directx\include;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\nana\include;..\Engine\Dependencies\directx\include;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\assimp\include;..\Engine\Dependencies\DirectXTK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>

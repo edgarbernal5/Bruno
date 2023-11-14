@@ -59,7 +59,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\D3D12MemoryAllocator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\D3D12MemoryAllocator\include;Dependencies\DirectXTK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -97,6 +97,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.h" />
+    <ClInclude Include="Dependencies\DirectXTK\include\SimpleMath.h" />
     <ClInclude Include="Source\Bruno\Content\ContentManager.h" />
     <ClInclude Include="Source\Bruno\Content\ContentReader.h" />
     <ClInclude Include="Source\Bruno\Content\ContentTypeReader.h" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.cpp" />
+    <ClCompile Include="Dependencies\DirectXTK\include\SimpleMath.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentTypeReader.cpp" />

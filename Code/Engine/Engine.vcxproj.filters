@@ -37,6 +37,9 @@
     <Filter Include="Dependencies\D3D12MemoryAllocator">
       <UniqueIdentifier>{8651c2ab-da49-418c-bb27-d727f973b23b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dependencies\DirectXTK">
+      <UniqueIdentifier>{d2218a2f-55c4-48d5-9c8c-4b5de27aca18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -219,6 +222,9 @@
     <ClInclude Include="Source\Bruno\Core\Window.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Dependencies\DirectXTK\include\SimpleMath.h">
+      <Filter>Dependencies\DirectXTK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -289,9 +295,6 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\GameTimer.cpp">
       <Filter>Source\Bruno\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Math\Math.cpp">
-      <Filter>Source\Bruno\Math</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\Camera.cpp">
       <Filter>Source\Bruno\Renderer</Filter>
@@ -370,6 +373,12 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\Window.cpp">
       <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\DirectXTK\include\SimpleMath.cpp">
+      <Filter>Dependencies\DirectXTK</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Math\Math.cpp">
+      <Filter>Source\Bruno\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
