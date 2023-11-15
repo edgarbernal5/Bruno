@@ -18,11 +18,17 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\D3D12MemAlloc.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\D3D12MemAlloc.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{9ec28ad7-835a-4f19-8f1e-43c297e0b600}</ProjectGuid>
-    <RootNamespace>ContentPipeline</RootNamespace>
+    <ProjectGuid>{5cc781d5-b16b-442c-96d6-bc66f00cd6ba}</ProjectGuid>
+    <RootNamespace>D3D12MA</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -40,7 +46,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -71,12 +77,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\Output\$(Configuration)_$(Platform)\$(ProjectName)\</OutDir>
-    <IntDir>..\..\Output\$(Configuration)_$(Platform)_tmp\$(ProjectName)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\Output\$(Configuration)_$(Platform)\$(ProjectName)\</OutDir>
-    <IntDir>..\..\Output\$(Configuration)_$(Platform)_tmp\$(ProjectName)\</IntDir>
+    <OutDir>Output\$(Configuration)_$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>Output\$(Configuration)_$(Platform)_tmp\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,16 +112,15 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_DEBUG;BR_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\nana\include;..\Engine\Dependencies\d3dx12\include;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\assimp\include;..\Engine\Dependencies\SimpleMath\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\Engine\Dependencies\assimp\bin\assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -128,80 +129,16 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\nana\include;..\Engine\Dependencies\directx\include;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\assimp\include;..\Engine\Dependencies\D3D12MemoryAllocator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\Engine\Dependencies\assimp\bin\assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Engine\Engine.vcxproj">
-      <Project>{dac3ea76-d07c-4464-b6c7-fee2496aa7e3}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Source\Pipeline\ContentItem.cpp" />
-    <ClCompile Include="Source\Pipeline\ContentProcessorContext.cpp" />
-    <ClCompile Include="Source\Pipeline\ExternalReferenceContentItem.cpp" />
-    <ClCompile Include="Source\Pipeline\Graphics\MaterialContentItem.cpp" />
-    <ClCompile Include="Source\Pipeline\Graphics\ModelContentItem.cpp" />
-    <ClCompile Include="Source\Pipeline\Graphics\ShaderContentItem.cpp" />
-    <ClCompile Include="Source\Pipeline\Graphics\TextureContentItem.cpp" />
-    <ClCompile Include="Source\Pipeline\Processors\MaterialProcessor.cpp" />
-    <ClCompile Include="Source\Pipeline\Processors\ModelProcessor.cpp" />
-    <ClCompile Include="Source\Pipeline\Serialization\ContentTypeWriter.cpp" />
-    <ClCompile Include="Source\Pipeline\GameContentBuilder.cpp" />
-    <ClCompile Include="Source\Pipeline\AbstractProcessor.cpp" />
-    <ClCompile Include="Source\Pipeline\ProcessorManager.cpp" />
-    <ClCompile Include="Source\ContentPipelineApplication.cpp" />
-    <ClCompile Include="Source\Main.cpp" />
-    <ClCompile Include="Source\Pipeline\Processors\ShaderProcessor.cpp" />
-    <ClCompile Include="Source\Pipeline\Processors\TextureProcessor.cpp" />
-    <ClCompile Include="Source\Pipeline\Serialization\ContentCompiler.cpp" />
-    <ClCompile Include="Source\Pipeline\Serialization\ContentTypeWriterManager.cpp" />
-    <ClCompile Include="Source\Pipeline\Serialization\ContentWriter.cpp" />
-    <ClCompile Include="Source\Pipeline\Serialization\Writers\ExternalReferenceWriter.cpp" />
-    <ClCompile Include="Source\Pipeline\Serialization\Writers\MaterialWriter.cpp" />
-    <ClCompile Include="Source\Pipeline\Serialization\Writers\ModelWriter.cpp" />
-    <ClCompile Include="Source\Pipeline\Serialization\Writers\ShaderWriter.cpp" />
-    <ClCompile Include="Source\Pipeline\Serialization\Writers\TextureWriter.cpp" />
-    <ClCompile Include="Source\Pipeline\TimestampCache.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Source\ContentPipelineApplication.h" />
-    <ClInclude Include="Source\Pipeline\ContentItem.h" />
-    <ClInclude Include="Source\Pipeline\ContentProcessorContext.h" />
-    <ClInclude Include="Source\Pipeline\ExternalReferenceContentItem.h" />
-    <ClInclude Include="Source\Pipeline\GameContentBuilder.h" />
-    <ClInclude Include="Source\Pipeline\AbstractProcessor.h" />
-    <ClInclude Include="Source\Pipeline\Graphics\MaterialContentItem.h" />
-    <ClInclude Include="Source\Pipeline\Graphics\ModelContentItem.h" />
-    <ClInclude Include="Source\Pipeline\Graphics\ShaderContentItem.h" />
-    <ClInclude Include="Source\Pipeline\Graphics\TextureContentItem.h" />
-    <ClInclude Include="Source\Pipeline\ProcessorManager.h" />
-    <ClInclude Include="Source\Pipeline\Processors\MaterialProcessor.h" />
-    <ClInclude Include="Source\Pipeline\Processors\ModelProcessor.h" />
-    <ClInclude Include="Source\Pipeline\Processors\ShaderProcessor.h" />
-    <ClInclude Include="Source\Pipeline\Processors\TextureProcessor.h" />
-    <ClInclude Include="Source\Pipeline\Serialization\ContentTypeWriter.h" />
-    <ClInclude Include="Source\Pipeline\Serialization\ContentCompiler.h" />
-    <ClInclude Include="Source\Pipeline\Serialization\ContentTypeWriterManager.h" />
-    <ClInclude Include="Source\Pipeline\Serialization\ContentWriter.h" />
-    <ClInclude Include="Source\Pipeline\Serialization\Writers\ExternalReferenceWriter.h" />
-    <ClInclude Include="Source\Pipeline\Serialization\Writers\MaterialWriter.h" />
-    <ClInclude Include="Source\Pipeline\Serialization\Writers\ModelWriter.h" />
-    <ClInclude Include="Source\Pipeline\Serialization\Writers\ShaderWriter.h" />
-    <ClInclude Include="Source\Pipeline\Serialization\Writers\TextureWriter.h" />
-    <ClInclude Include="Source\Pipeline\TimestampCache.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -57,13 +57,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\directx\include;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\DirectXTK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\D3D12\Include\directx;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\SimpleMath\Include;..\Engine\Dependencies\D3D12MA\Include;..\Engine\Dependencies\D3D12\Include;..\Engine\Dependencies\D3D12\Include\d3dx12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>C:\repos\BrunoEngine\Output\Debug_x64\Engine\Engine.lib;C:\repos\BrunoEngine\Code\Engine\Dependencies\D3D12\Output\Debug_x64\D3D12\D3D12.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -90,12 +91,15 @@
     <ClCompile Include="Source\PlayerGame.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\PlayerGame.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Dependencies\D3D12\D3D12.vcxproj">
+      <Project>{39811466-986c-4eb0-bc18-c92ffcb5ae90}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
       <Project>{dac3ea76-d07c-4464-b6c7-fee2496aa7e3}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Source\PlayerGame.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

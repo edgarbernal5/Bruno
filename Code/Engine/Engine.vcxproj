@@ -59,7 +59,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\D3D12MemoryAllocator\include;Dependencies\DirectXTK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\D3D12\Include\directx;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath\Include;Dependencies\D3D12MA\Include;Dependencies\D3D12\Include\d3dx12;Dependencies\D3D12\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -68,7 +68,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\build\bin\nana_v143_Debug_x64.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Dependencies\D3D12\Output\Debug_x64\D3D12\D3D12.lib;d3dcompiler.lib;Dependencies\nana\build\bin\nana_v143_Debug_x64.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -96,8 +96,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.h" />
-    <ClInclude Include="Dependencies\DirectXTK\include\SimpleMath.h" />
     <ClInclude Include="Source\Bruno\Content\ContentManager.h" />
     <ClInclude Include="Source\Bruno\Content\ContentReader.h" />
     <ClInclude Include="Source\Bruno\Content\ContentTypeReader.h" />
@@ -159,8 +157,6 @@
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.cpp" />
-    <ClCompile Include="Dependencies\DirectXTK\include\SimpleMath.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentTypeReader.cpp" />
@@ -216,6 +212,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Bruno\Math\Math.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Dependencies\D3D12MA\D3D12MA.vcxproj">
+      <Project>{5cc781d5-b16b-442c-96d6-bc66f00cd6ba}</Project>
+    </ProjectReference>
+    <ProjectReference Include="Dependencies\D3D12\D3D12.vcxproj">
+      <Project>{39811466-986c-4eb0-bc18-c92ffcb5ae90}</Project>
+    </ProjectReference>
+    <ProjectReference Include="Dependencies\SimpleMath\SimpleMath.vcxproj">
+      <Project>{f93bef93-29e0-4811-999c-a83a320e5df5}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

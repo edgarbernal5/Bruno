@@ -34,12 +34,6 @@
     <Filter Include="Dependencies">
       <UniqueIdentifier>{348897c2-af42-46d0-b0b1-5a6f204dd12b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dependencies\D3D12MemoryAllocator">
-      <UniqueIdentifier>{8651c2ab-da49-418c-bb27-d727f973b23b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Dependencies\DirectXTK">
-      <UniqueIdentifier>{d2218a2f-55c4-48d5-9c8c-4b5de27aca18}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -204,9 +198,6 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.h">
-      <Filter>Dependencies\D3D12MemoryAllocator</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\GPUBuffer.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
@@ -221,9 +212,6 @@
     </ClInclude>
     <ClInclude Include="Source\Bruno\Core\Window.h">
       <Filter>Source\Bruno\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\DirectXTK\include\SimpleMath.h">
-      <Filter>Dependencies\DirectXTK</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -362,9 +350,6 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.cpp">
-      <Filter>Dependencies\D3D12MemoryAllocator</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\GPUBuffer.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
@@ -373,9 +358,6 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\Window.cpp">
       <Filter>Source\Bruno\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Dependencies\DirectXTK\include\SimpleMath.cpp">
-      <Filter>Dependencies\DirectXTK</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Math\Math.cpp">
       <Filter>Source\Bruno\Math</Filter>

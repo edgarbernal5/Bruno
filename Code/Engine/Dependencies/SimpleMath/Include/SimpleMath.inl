@@ -147,9 +147,9 @@ inline RECT Rectangle::Union(const RECT& rcta, const RECT& rctb) noexcept
  *
  ****************************************************************************/
 
-//------------------------------------------------------------------------------
-// Comparision operators
-//------------------------------------------------------------------------------
+ //------------------------------------------------------------------------------
+ // Comparision operators
+ //------------------------------------------------------------------------------
 
 inline bool Vector2::operator == (const Vector2& V) const noexcept
 {
@@ -483,7 +483,7 @@ inline void Vector2::SmoothStep(const Vector2& v1, const Vector2& v2, float t, V
 {
     using namespace DirectX;
     t = (t > 1.0f) ? 1.0f : ((t < 0.0f) ? 0.0f : t);  // Clamp value to 0 to 1
-    t = t * t*(3.f - 2.f*t);
+    t = t * t * (3.f - 2.f * t);
     const XMVECTOR x1 = XMLoadFloat2(&v1);
     const XMVECTOR x2 = XMLoadFloat2(&v2);
     const XMVECTOR X = XMVectorLerp(x1, x2, t);
@@ -494,7 +494,7 @@ inline Vector2 Vector2::SmoothStep(const Vector2& v1, const Vector2& v2, float t
 {
     using namespace DirectX;
     t = (t > 1.0f) ? 1.0f : ((t < 0.0f) ? 0.0f : t);  // Clamp value to 0 to 1
-    t = t * t*(3.f - 2.f*t);
+    t = t * t * (3.f - 2.f * t);
     const XMVECTOR x1 = XMLoadFloat2(&v1);
     const XMVECTOR x2 = XMLoadFloat2(&v2);
     const XMVECTOR X = XMVectorLerp(x1, x2, t);
@@ -722,9 +722,9 @@ inline void Vector2::TransformNormal(const Vector2* varray, size_t count, const 
  *
  ****************************************************************************/
 
-//------------------------------------------------------------------------------
-// Comparision operators
-//------------------------------------------------------------------------------
+ //------------------------------------------------------------------------------
+ // Comparision operators
+ //------------------------------------------------------------------------------
 
 inline bool Vector3::operator == (const Vector3& V) const noexcept
 {
@@ -1072,7 +1072,7 @@ inline void Vector3::SmoothStep(const Vector3& v1, const Vector3& v2, float t, V
 {
     using namespace DirectX;
     t = (t > 1.0f) ? 1.0f : ((t < 0.0f) ? 0.0f : t);  // Clamp value to 0 to 1
-    t = t * t*(3.f - 2.f*t);
+    t = t * t * (3.f - 2.f * t);
     const XMVECTOR x1 = XMLoadFloat3(&v1);
     const XMVECTOR x2 = XMLoadFloat3(&v2);
     const XMVECTOR X = XMVectorLerp(x1, x2, t);
@@ -1083,7 +1083,7 @@ inline Vector3 Vector3::SmoothStep(const Vector3& v1, const Vector3& v2, float t
 {
     using namespace DirectX;
     t = (t > 1.0f) ? 1.0f : ((t < 0.0f) ? 0.0f : t);  // Clamp value to 0 to 1
-    t = t * t*(3.f - 2.f*t);
+    t = t * t * (3.f - 2.f * t);
     const XMVECTOR x1 = XMLoadFloat3(&v1);
     const XMVECTOR x2 = XMLoadFloat3(&v2);
     const XMVECTOR X = XMVectorLerp(x1, x2, t);
@@ -1311,9 +1311,9 @@ inline void Vector3::TransformNormal(const Vector3* varray, size_t count, const 
  *
  ****************************************************************************/
 
-//------------------------------------------------------------------------------
-// Comparision operators
-//------------------------------------------------------------------------------
+ //------------------------------------------------------------------------------
+ // Comparision operators
+ //------------------------------------------------------------------------------
 
 inline bool Vector4::operator == (const Vector4& V) const noexcept
 {
@@ -1663,7 +1663,7 @@ inline void Vector4::SmoothStep(const Vector4& v1, const Vector4& v2, float t, V
 {
     using namespace DirectX;
     t = (t > 1.0f) ? 1.0f : ((t < 0.0f) ? 0.0f : t);  // Clamp value to 0 to 1
-    t = t * t*(3.f - 2.f*t);
+    t = t * t * (3.f - 2.f * t);
     const XMVECTOR x1 = XMLoadFloat4(&v1);
     const XMVECTOR x2 = XMLoadFloat4(&v2);
     const XMVECTOR X = XMVectorLerp(x1, x2, t);
@@ -1674,7 +1674,7 @@ inline Vector4 Vector4::SmoothStep(const Vector4& v1, const Vector4& v2, float t
 {
     using namespace DirectX;
     t = (t > 1.0f) ? 1.0f : ((t < 0.0f) ? 0.0f : t);  // Clamp value to 0 to 1
-    t = t * t*(3.f - 2.f*t);
+    t = t * t * (3.f - 2.f * t);
     const XMVECTOR x1 = XMLoadFloat4(&v1);
     const XMVECTOR x2 = XMLoadFloat4(&v2);
     const XMVECTOR X = XMVectorLerp(x1, x2, t);
@@ -1904,9 +1904,9 @@ inline void Vector4::Transform(const Vector4* varray, size_t count, const Matrix
  *
  ****************************************************************************/
 
-//------------------------------------------------------------------------------
-// Comparision operators
-//------------------------------------------------------------------------------
+ //------------------------------------------------------------------------------
+ // Comparision operators
+ //------------------------------------------------------------------------------
 
 inline bool Matrix::operator == (const Matrix& M) const noexcept
 {
@@ -2902,9 +2902,9 @@ inline Plane Plane::Transform(const Plane& plane, const Quaternion& rotation) no
  *
  ****************************************************************************/
 
-//------------------------------------------------------------------------------
-// Comparision operators
-//------------------------------------------------------------------------------
+ //------------------------------------------------------------------------------
+ // Comparision operators
+ //------------------------------------------------------------------------------
 
 inline bool Quaternion::operator == (const Quaternion& q) const noexcept
 {
@@ -3636,9 +3636,9 @@ inline Color Color::Lerp(const Color& c1, const Color& c2, float t) noexcept
  *
  ****************************************************************************/
 
-//-----------------------------------------------------------------------------
-// Comparision operators
-//------------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------
+ // Comparision operators
+ //------------------------------------------------------------------------------
 inline bool Ray::operator == (const Ray& r) const noexcept
 {
     using namespace DirectX;
@@ -3720,9 +3720,9 @@ inline bool Ray::Intersects(const Plane& plane, _Out_ float& Dist) const noexcep
  *
  ****************************************************************************/
 
-//------------------------------------------------------------------------------
-// Comparision operators
-//------------------------------------------------------------------------------
+ //------------------------------------------------------------------------------
+ // Comparision operators
+ //------------------------------------------------------------------------------
 
 #if (__cplusplus < 202002L)
 inline bool Viewport::operator == (const Viewport& vp) const noexcept
