@@ -24,6 +24,11 @@
   <ItemGroup>
     <ClInclude Include="Include\D3D12MemAlloc.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\D3D12\D3D12.vcxproj">
+      <Project>{39811466-986c-4eb0-bc18-c92ffcb5ae90}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

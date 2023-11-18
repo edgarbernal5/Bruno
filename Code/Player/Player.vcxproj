@@ -64,7 +64,6 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>C:\repos\BrunoEngine\Output\Debug_x64\Engine\Engine.lib;C:\repos\BrunoEngine\Code\Engine\Dependencies\D3D12\Output\Debug_x64\D3D12\D3D12.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

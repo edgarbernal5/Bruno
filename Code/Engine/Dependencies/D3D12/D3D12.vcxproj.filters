@@ -49,7 +49,7 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\Users\User\Downloads\Adria-DX12-master\packages\Microsoft.Direct3D.D3D12.1.610.5\build\native\src\d3dx12\d3dx12_property_format_table.cpp">
+    <ClCompile Include="Source\d3dx12\d3dx12_property_format_table.cpp">
       <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>
