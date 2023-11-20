@@ -5,7 +5,7 @@
 #include <queue>
 #include <vector>
 
-#include <Bruno/Core/MemoryStream.h>
+#include "Bruno/Core/MemoryStream.h"
 #include "Pipeline/AbstractProcessor.h"
 #include "Pipeline/ExternalReferenceContentItem.h"
 

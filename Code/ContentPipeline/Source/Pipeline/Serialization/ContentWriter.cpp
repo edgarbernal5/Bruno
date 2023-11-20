@@ -4,7 +4,7 @@
 #include <filesystem>
 
 #include "Bruno/Core/Compressor.h"
-#include <Bruno/Core/Log.h>
+#include "Bruno/Core/Log.h"
 
 namespace Bruno
 {

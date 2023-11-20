@@ -1,8 +1,9 @@
 #pragma once
 
-#include "D3DCommon.h"
+#include <dxgi1_6.h>
 #include "Resources.h"
 #include "DepthBuffer.h"
+#include <wrl/client.h>
 
 namespace Bruno
 {

@@ -177,4 +177,7 @@
       <Filter>Source\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

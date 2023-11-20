@@ -1,6 +1,5 @@
 #pragma once
 
-#include "D3DCommon.h"
 #include "Resource.h"
 #include "Resources.h"
 #include "Bruno/Core/Base.h"

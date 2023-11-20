@@ -1,8 +1,8 @@
 #include "ShaderProcessor.h"
 
 #include "Pipeline/Graphics/ShaderContentItem.h"
-#include <Bruno/Core/Log.h>
-#include <Bruno/Core/FileStream.h>
+#include "Bruno/Core/Log.h"
+#include "Bruno/Core/FileStream.h"
 
 namespace Bruno
 {

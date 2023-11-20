@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -59,16 +60,16 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\D3D12\Include\directx;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath\Include;Dependencies\D3D12MA\Include;Dependencies\D3D12\Include\d3dx12;Dependencies\D3D12\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>Dependencies\D3D12\Output\Debug_x64\D3D12\D3D12.lib;d3dcompiler.lib;Dependencies\nana\build\bin\nana_v143_Debug_x64.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\bin\Debug_x64\nana.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -80,8 +81,8 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\directx\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\D3D12MemoryAllocator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -92,10 +93,23 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\build\bin\nana_v143_Release_x64.lib;Dependencies\DirectXTex\bin\DirectXTex.lib;Dependencies\zlib\bin\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\bin\Release_x64\nana.lib;Dependencies\DirectXTex\bin\DirectXTex.lib;Dependencies\zlib\bin\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_barriers.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_check_feature_support.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_core.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_default.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_pipeline_state_stream.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_property_format_table.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_render_pass.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_resource_helpers.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_root_signature.h" />
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_state_object.h" />
+    <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h" />
     <ClInclude Include="Source\Bruno\Content\ContentManager.h" />
     <ClInclude Include="Source\Bruno\Content\ContentReader.h" />
     <ClInclude Include="Source\Bruno\Content\ContentTypeReader.h" />
@@ -122,6 +136,8 @@
     <ClInclude Include="Source\Bruno\Math\Math.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Context.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DConstants.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DHelpers.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GPUBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext.h" />
@@ -131,7 +147,6 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCore.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCommon.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h" />
     <ClInclude Include="Source\Bruno\Core\Window.h" />
     <ClInclude Include="Source\brpch.h" />
@@ -157,6 +172,8 @@
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp" />
+    <ClCompile Include="Dependencies\SimpleMath\SimpleMath.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentTypeReader.cpp" />
@@ -211,20 +228,19 @@
     <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Dependencies\SimpleMath\SimpleMath.inl" />
+    <None Include="packages.config" />
     <None Include="Source\Bruno\Math\Math.inl" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Dependencies\D3D12MA\D3D12MA.vcxproj">
-      <Project>{5cc781d5-b16b-442c-96d6-bc66f00cd6ba}</Project>
-    </ProjectReference>
-    <ProjectReference Include="Dependencies\D3D12\D3D12.vcxproj">
-      <Project>{39811466-986c-4eb0-bc18-c92ffcb5ae90}</Project>
-    </ProjectReference>
-    <ProjectReference Include="Dependencies\SimpleMath\SimpleMath.vcxproj">
-      <Project>{f93bef93-29e0-4811-999c-a83a320e5df5}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets'))" />
+  </Target>
 </Project>

@@ -2,10 +2,10 @@
 
 #include "Pipeline/Graphics/TextureContentItem.h"
 
-#include <Bruno/Platform/DirectX/D3DCommon.h>
-#include <Bruno/Platform/DirectX/GraphicsDevice.h>
+#include "Bruno/Core/Memory.h"
+#include "Bruno/Platform/DirectX/D3DHelpers.h"
 #include <filesystem>
-#include <Bruno/Core/Memory.h>
+#include <DirectXTex.h>
 
 namespace Bruno
 {
@@ -51,20 +51,18 @@ namespace Bruno
 		DXGI_FORMAT textureFormat = metadata.format;
 		bool is3DTexture = metadata.dimension == DirectX::TEX_DIMENSION_TEXTURE3D;
 
-		D3D12_RESOURCE_DESC resourceDesc{};
-		resourceDesc.Format = textureFormat;
-		resourceDesc.Width = metadata.width;
-		resourceDesc.Height = static_cast<uint32_t>(metadata.height);
-		resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-		resourceDesc.DepthOrArraySize = static_cast<uint16_t>(is3DTexture ? metadata.depth : metadata.arraySize);
-		resourceDesc.MipLevels = static_cast<uint16_t>(metadata.mipLevels);
-		resourceDesc.SampleDesc.Count = 1;
-		resourceDesc.SampleDesc.Quality = 0;
-		resourceDesc.Dimension = is3DTexture ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-		resourceDesc.Alignment = 0;
-
-		auto device = Graphics::GetDevice();
+		//D3D12_RESOURCE_DESC resourceDesc{};
+		//resourceDesc.Format = textureFormat;
+		//resourceDesc.Width = metadata.width;
+		//resourceDesc.Height = static_cast<uint32_t>(metadata.height);
+		//resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+		//resourceDesc.DepthOrArraySize = static_cast<uint16_t>(is3DTexture ? metadata.depth : metadata.arraySize);
+		//resourceDesc.MipLevels = static_cast<uint16_t>(metadata.mipLevels);
+		//resourceDesc.SampleDesc.Count = 1;
+		//resourceDesc.SampleDesc.Quality = 0;
+		//resourceDesc.Dimension = is3DTexture ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		//resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+		//resourceDesc.Alignment = 0;
 
 		size_t rowPitch, slicePitch;
 		DirectX::ComputePitch(textureFormat, metadata.width, metadata.height, rowPitch, slicePitch);
@@ -76,7 +74,7 @@ namespace Bruno
 		// 
 		//int textureHeapSize = ((((width * numBytesPerPixel) + 255) & ~255) * (height - 1)) + (width * numBytesPerPixel);
 		//https://www.braynzarsoft.net/viewtutorial/q16390-directx-12-textures-from-file
-		outputContentItem->DataSizeInBytes = AlignU64(rowPitch, 256) * (resourceDesc.Height - 1) + (rowPitch);
+		outputContentItem->DataSizeInBytes = AlignU64(rowPitch, 256) * (metadata.height - 1) + (rowPitch);
 
 		outputContentItem->Pixels.resize(outputContentItem->DataSizeInBytes);
 

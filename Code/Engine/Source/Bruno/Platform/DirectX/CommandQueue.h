@@ -1,6 +1,7 @@
 #pragma once
 
-#include "D3DCore.h"
+#include <d3d12.h>
+#include <wrl/client.h>
 #include <mutex>
 
 namespace Bruno

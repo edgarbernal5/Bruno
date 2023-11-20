@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <Bruno/Core/RTTI.h>
+#include "Bruno/Core/RTTI.h"
 #include "AbstractProcessor.h"
 
 namespace Bruno

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "D3DCommon.h"
+#include "Bruno/Math/Math.h"
 #include <unordered_map>
 #include <vector>
 

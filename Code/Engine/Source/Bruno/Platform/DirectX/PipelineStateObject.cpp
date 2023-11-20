@@ -1,6 +1,7 @@
 #include "brpch.h"
 #include "PipelineStateObject.h"
 
+#include "D3DHelpers.h"
 #include "GraphicsDevice.h"
 #include "ShaderProgram.h"
 #include "RootSignature.h"

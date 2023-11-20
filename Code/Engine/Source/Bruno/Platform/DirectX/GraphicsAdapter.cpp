@@ -1,6 +1,8 @@
 #include "brpch.h"
 #include "GraphicsAdapter.h"
 
+#include "D3DHelpers.h"
+
 namespace Bruno
 {
 	GraphicsAdapterList GraphicsAdapter::GetAdapters(DXGI_GPU_PREFERENCE gpuPreference)

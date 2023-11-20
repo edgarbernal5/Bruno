@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Bruno/Content/ContentTypeReader.h>
-#include <Bruno/Platform/DirectX/Texture.h>
+#include "Bruno/Content/ContentTypeReader.h"
+#include "Bruno/Platform/DirectX/Texture.h"
 
 namespace Bruno
 {

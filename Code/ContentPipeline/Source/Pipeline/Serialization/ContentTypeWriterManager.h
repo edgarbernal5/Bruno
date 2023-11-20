@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ContentTypeWriter.h"
-#include <Bruno/Core/RTTI.h>
+#include "Bruno/Core/RTTI.h"
 
 #include <map>
 

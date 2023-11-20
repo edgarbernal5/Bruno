@@ -4,7 +4,7 @@
 
 #include <nana/gui.hpp>
 
-#include <Bruno/Core/GameTimer.h>
+#include "Bruno/Core/GameTimer.h"
 
 namespace Bruno
 {

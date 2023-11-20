@@ -1,6 +1,9 @@
 #pragma once
 
-#include "D3DCommon.h"
+#include <d3d12.h>
+#pragma comment(lib, "dxcompiler.lib")
+#include <d3dcompiler.h>
+#include <wrl.h>
 #include "Bruno/Core/RTTI.h"
 
 namespace Bruno

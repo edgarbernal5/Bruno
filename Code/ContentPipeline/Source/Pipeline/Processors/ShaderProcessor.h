@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Pipeline/AbstractProcessor.h"
-#include <Bruno/Platform/DirectX/D3DCore.h>
+#include "Bruno/Platform/DirectX/D3DCore.h"
+#include "Bruno/Platform/DirectX/D3DConstants.h"
 
 #include <wrl/client.h>
 #include <d3dcompiler.h>

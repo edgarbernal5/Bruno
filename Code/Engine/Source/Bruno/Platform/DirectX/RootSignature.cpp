@@ -1,6 +1,7 @@
 #include "brpch.h"
 #include "RootSignature.h"
 
+#include "D3DHelpers.h"
 #include "GraphicsDevice.h"
 #include "Shader.h"
 #include "ShaderProgram.h"

@@ -1,6 +1,10 @@
 #include "brpch.h"
 #include "GraphicsDevice.h"
 
+#ifdef BR_DEBUG
+#include <dxgidebug.h>
+#endif
+#include "D3DHelpers.h"
 #include "GraphicsAdapter.h"
 #include "CommandQueue.h"
 #include "UploadContext.h"
@@ -13,8 +17,8 @@
 
 #include <numeric>
 
-//extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = D3D12_SDK_VERSION; }
-//extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
+extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = D3D12_SDK_VERSION; }
+extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
 
 namespace Bruno
 {

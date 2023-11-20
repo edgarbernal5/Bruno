@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Bruno/Core/RTTI.h>
+#include "Bruno/Core/RTTI.h"
 #include "Pipeline/ContentItem.h"
 #include "Pipeline/ContentProcessorContext.h"
 #include <string>
