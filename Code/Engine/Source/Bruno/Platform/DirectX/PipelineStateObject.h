@@ -1,9 +1,10 @@
 #pragma once
 
-#include "D3DCommon.h"
-#include "D3DCore.h"
+#include <d3d12.h>
+#include "D3DConstants.h"
 #include <array>
 #include <optional>
+#include <wrl/client.h>
 
 namespace Bruno
 {

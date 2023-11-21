@@ -1,11 +1,10 @@
 #pragma once
 
-#include "D3DCommon.h"
 #include "Resources.h"
 #include "Resource.h"
 
 #include "Bruno/Core/Base.h"
-#include <Bruno/Core/RTTI.h>
+#include "Bruno/Core/RTTI.h"
 
 namespace Bruno
 {

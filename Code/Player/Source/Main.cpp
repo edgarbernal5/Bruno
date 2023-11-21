@@ -1,5 +1,5 @@
 #include "PlayerGame.h"
-#include <Bruno/EntryPoint.h>
+#include "Bruno/EntryPoint.h"
 #include <filesystem>
 
 Bruno::Application* Bruno::CreateApplication(int argc, char** argv)

@@ -1,6 +1,9 @@
 #include "brpch.h"
 #include "Texture.h"
 
+#include "D3DHelpers.h"
+#include "DirectXTex.h"
+
 #include "GraphicsDevice.h"
 #include "UploadContext.h"
 

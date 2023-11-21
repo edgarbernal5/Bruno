@@ -1,6 +1,9 @@
 #include "brpch.h"
 #include "D3DCore.h"
 
+#include <d3d12.h>
+#include <wrl/client.h>
+
 namespace Bruno::Device::Core
 {
     void EnableDebugLayer()

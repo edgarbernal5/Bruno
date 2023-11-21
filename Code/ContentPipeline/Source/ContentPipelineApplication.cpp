@@ -5,12 +5,12 @@
 
 #include <Bruno/Platform/Windows/NanaWindow.h>
 #include <Bruno/Platform/DirectX/Shader.h>
-#include <Bruno/Platform/DirectX/Texture.h>
-#include <Bruno/Renderer/Model.h>
-#include <Bruno/Content/ContentManager.h>
-
+#include "Bruno/Platform/DirectX/Texture.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
-#include <Bruno/Content/ContentTypeReaderManager.h>
+#include "Bruno/Renderer/Model.h"
+#include "Bruno/Content/ContentManager.h"
+#include "Bruno/Content/ContentTypeReaderManager.h"
+
 #include <nana/gui/filebox.hpp>
 
 namespace Bruno

@@ -1,9 +1,8 @@
 #pragma once
 
-#include <Bruno/Platform/DirectX/D3DCommon.h>
-#include <Bruno/Platform/DirectX/IndexBuffer.h>
-#include <Bruno/Platform/DirectX/VertexBuffer.h>
-#include <Bruno/Renderer/Material.h>
+#include "Bruno/Platform/DirectX/IndexBuffer.h"
+#include "Bruno/Platform/DirectX/VertexBuffer.h"
+#include "Bruno/Renderer/Material.h"
 
 namespace Bruno
 {

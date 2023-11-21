@@ -3,6 +3,7 @@
 #include "Bruno/Core/RTTI.h"
 #include "Bruno/Platform/DirectX/IndexBuffer.h"
 #include "Bruno/Platform/DirectX/VertexBuffer.h"
+#include "Bruno/Math/Math.h"
 
 #include <string>
 

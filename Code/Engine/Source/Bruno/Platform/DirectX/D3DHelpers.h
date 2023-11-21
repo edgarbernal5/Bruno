@@ -1,20 +1,8 @@
 #pragma once
 
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <d3dcompiler.h>
-#include <d3dx12.h>
-#include <Bruno/Math/Math.h>
-#include <DirectXTex.h>
-
-#ifdef BR_DEBUG
-#include <dxgidebug.h>
-#endif
-
+#include <exception>
 #include <wrl.h>
-
-//#pragma comment(lib, "dxgi.lib")
-//#pragma comment(lib, "d3d12.lib")
+#include <stdio.h>
 
 namespace Bruno
 {

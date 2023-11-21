@@ -1,6 +1,7 @@
 #include "brpch.h"
 #include "Resources.h"
 
+#include "D3DHelpers.h"
 #include "GraphicsDevice.h"
 
 namespace Bruno

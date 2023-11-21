@@ -1,6 +1,7 @@
 #include "brpch.h"
 #include "CommandQueue.h"
 
+#include "D3DHelpers.h"
 #include "GraphicsDevice.h"
 #include "Surface.h"
 

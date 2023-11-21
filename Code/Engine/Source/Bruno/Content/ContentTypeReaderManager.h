@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ContentTypeReader.h"
-#include <Bruno/Core/RTTI.h>
+#include "Bruno/Core/RTTI.h"
 
 #include <map>
 

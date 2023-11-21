@@ -4,7 +4,6 @@
 #include "Pipeline/Graphics/MaterialContentItem.h"
 #include "Pipeline/ExternalReferenceContentItem.h"
 
-#include <Bruno/Platform/DirectX/D3DCommon.h>
 #include <filesystem>
 #include <sstream>
 #include <Bruno/Core/StringHelpers.h>

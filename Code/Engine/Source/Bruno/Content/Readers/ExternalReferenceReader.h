@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Bruno/Content/ContentTypeReader.h>
+#include "Bruno/Content/ContentTypeReader.h"
 
 namespace Bruno
 {

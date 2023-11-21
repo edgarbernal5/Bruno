@@ -4,8 +4,8 @@
 #include <Windows.h>
 #endif
 
-#include <Bruno/Core/KeyCodes.h>
-#include <Bruno/Core/RTTI.h>
+#include "Bruno/Core/KeyCodes.h"
+#include "Bruno/Core/RTTI.h"
 
 namespace Bruno
 {

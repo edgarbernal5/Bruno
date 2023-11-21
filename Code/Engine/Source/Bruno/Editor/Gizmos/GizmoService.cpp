@@ -202,8 +202,8 @@ namespace Bruno
 
     Math::Ray GizmoService::ConvertMousePositionToRay(const Math::Vector2& mousePosition)
     {
-        Math::Vector3 nearPoint(mousePosition, 0.0f);
-        Math::Vector3 farPoint(mousePosition, 1.0f);
+        Math::Vector3 nearPoint(mousePosition.x, mousePosition.y, 0.0f);
+        Math::Vector3 farPoint(mousePosition.x, mousePosition.y, 1.0f);
 
         nearPoint = m_camera.GetViewport().Unproject(nearPoint,
             m_camera.GetProjection(),

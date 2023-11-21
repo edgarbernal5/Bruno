@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Bruno/Core/Application.h>
+#include "Bruno/Core/Application.h"
 
 #include <nana/gui/widgets/menubar.hpp>
 #include <nana/gui/place.hpp>

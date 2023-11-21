@@ -1,6 +1,5 @@
 #pragma once
 
-#include "D3DCommon.h"
 #include "GPUBuffer.h"
 
 namespace Bruno

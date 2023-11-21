@@ -1,6 +1,5 @@
 #pragma once
 
-#include "D3DCommon.h"
 #include "Resources.h"
 #include "Texture.h"
 

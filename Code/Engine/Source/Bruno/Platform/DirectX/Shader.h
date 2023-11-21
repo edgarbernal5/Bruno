@@ -1,8 +1,10 @@
 #pragma once
 
-#include "D3DCommon.h"
+#include <d3d12.h>
+#include "d3dx12.h"
+#include "D3DConstants.h"
+
 #include "Bruno/Core/RTTI.h"
-#include "D3DCore.h"
 #include <vector>
 #include <string>
 #include <map>

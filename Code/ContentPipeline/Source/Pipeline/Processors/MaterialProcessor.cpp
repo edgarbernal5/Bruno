@@ -2,7 +2,6 @@
 
 #include "Pipeline/Graphics/MaterialContentItem.h"
 
-#include <Bruno/Platform/DirectX/D3DCommon.h>
 #include <filesystem>
 
 namespace Bruno

@@ -1,7 +1,8 @@
 #include "ShaderWriter.h"
 
 #include "Pipeline/Graphics/ShaderContentItem.h"
-#include <Bruno/Platform/DirectX/D3DCore.h>
+#include "Bruno/Platform/DirectX/D3DCore.h"
+#include "Bruno/Platform/DirectX/D3DConstants.h"
 
 namespace Bruno
 {

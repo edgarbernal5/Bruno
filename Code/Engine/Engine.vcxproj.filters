@@ -34,8 +34,14 @@
     <Filter Include="Dependencies">
       <UniqueIdentifier>{348897c2-af42-46d0-b0b1-5a6f204dd12b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dependencies\D3D12MemoryAllocator">
-      <UniqueIdentifier>{8651c2ab-da49-418c-bb27-d727f973b23b}</UniqueIdentifier>
+    <Filter Include="Dependencies\SimpleMath">
+      <UniqueIdentifier>{616d2e28-f73b-4084-80f8-0392b9ef2369}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\D3D12MA">
+      <UniqueIdentifier>{58b49e62-ebdd-4827-9785-1d7283b2fecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\d3dx12">
+      <UniqueIdentifier>{31fafd15-a38d-4a81-9935-14a1d05d344c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Bruno\Editor">
       <UniqueIdentifier>{76b1d155-efd6-4f55-9227-4cf0ced6783c}</UniqueIdentifier>
@@ -67,9 +73,6 @@
       <Filter>Source\Bruno\Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h">
-      <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCommon.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.h">
@@ -210,9 +213,6 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.h">
-      <Filter>Dependencies\D3D12MemoryAllocator</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\GPUBuffer.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
@@ -233,6 +233,51 @@
     </ClInclude>
     <ClInclude Include="Source\Bruno\Scene\Scene.h">
       <Filter>Source\Bruno\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h">
+      <Filter>Dependencies\D3D12MA</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h">
+      <Filter>Dependencies\SimpleMath</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_barriers.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_check_feature_support.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_core.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_default.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_pipeline_state_stream.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_property_format_table.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_render_pass.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_resource_helpers.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_root_signature.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\d3dx12\d3dx12_state_object.h">
+      <Filter>Dependencies\d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DHelpers.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DConstants.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -305,9 +350,6 @@
     <ClCompile Include="Source\Bruno\Core\GameTimer.cpp">
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Bruno\Math\Math.cpp">
-      <Filter>Source\Bruno\Math</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\Camera.cpp">
       <Filter>Source\Bruno\Renderer</Filter>
     </ClCompile>
@@ -374,9 +416,6 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="Dependencies\D3D12MemoryAllocator\include\D3D12MemAlloc.cpp">
-      <Filter>Dependencies\D3D12MemoryAllocator</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\GPUBuffer.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
@@ -392,10 +431,23 @@
     <ClCompile Include="Source\Bruno\Scene\Scene.cpp">
       <Filter>Source\Bruno\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Bruno\Math\Math.cpp">
+      <Filter>Source\Bruno\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp">
+      <Filter>Dependencies\D3D12MA</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\SimpleMath\SimpleMath.cpp">
+      <Filter>Dependencies\SimpleMath</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Bruno\Math\Math.inl">
       <Filter>Source\Bruno\Math</Filter>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Dependencies\SimpleMath\SimpleMath.inl">
+      <Filter>Dependencies\SimpleMath</Filter>
     </None>
   </ItemGroup>
 </Project>

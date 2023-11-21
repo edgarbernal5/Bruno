@@ -1,6 +1,7 @@
 #include "brpch.h"
 #include "Game.h"
 
+#include "Bruno/Platform/DirectX/D3DCore.h"
 #include "Bruno/Platform/Windows/WindowsGameWindow.h"
 #include "Bruno/Platform/Windows/NanaWindow.h"
 

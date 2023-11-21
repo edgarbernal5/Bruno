@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Bruno/Content/ContentTypeReader.h>
-#include <Bruno/Renderer/Model.h>
+#include "Bruno/Content/ContentTypeReader.h"
+#include "Bruno/Renderer/Model.h"
 
 namespace Bruno
 {

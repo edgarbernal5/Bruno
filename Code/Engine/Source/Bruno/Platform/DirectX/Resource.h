@@ -1,7 +1,7 @@
 #pragma once
 
-#include "D3DCommon.h"
-#include "D3DCore.h"
+#include <d3d12.h>
+#include "D3DConstants.h"
 #include "Bruno/Core/RTTI.h"
 
 namespace D3D12MA

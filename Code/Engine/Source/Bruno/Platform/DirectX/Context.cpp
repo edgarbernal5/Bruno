@@ -1,6 +1,7 @@
 #include "brpch.h"
 #include "Context.h"
 
+#include "D3DHelpers.h"
 #include "GraphicsDevice.h"
 #include "Resource.h"
 

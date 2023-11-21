@@ -2,14 +2,6 @@
 
 #include "Bruno/Renderer/Camera.h"
 
-namespace Bruno::Math {
-	struct Vector2;
-	struct Vector3;
-	struct Quaternion;
-	struct Matrix;
-	struct Ray;
-	struct Plane;
-}
 namespace Bruno
 {
 	class GizmoService

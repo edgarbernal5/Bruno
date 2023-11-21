@@ -1,14 +1,14 @@
 #pragma once
 
-#include <Bruno/Core/Game.h>
-#include <Bruno/Platform/DirectX/Surface.h>
-#include <Bruno/Platform/DirectX/Shader.h>
-#include <Bruno/Platform/DirectX/RootSignature.h>
-#include <Bruno/Platform/DirectX/PipelineStateObject.h>
-#include <Bruno/Platform/DirectX/ConstantBuffer.h>
-#include <Bruno/Platform/DirectX/Texture.h>
+#include "Bruno/Core/Game.h"
+#include "Bruno/Platform/DirectX/Surface.h"
+#include "Bruno/Platform/DirectX/Shader.h"
+#include "Bruno/Platform/DirectX/RootSignature.h"
+#include "Bruno/Platform/DirectX/PipelineStateObject.h"
+#include "Bruno/Platform/DirectX/ConstantBuffer.h"
+#include "Bruno/Platform/DirectX/Texture.h"
 
-#include <Bruno/Renderer/Camera.h>
+#include "Bruno/Renderer/Camera.h"
 
 namespace Bruno
 {

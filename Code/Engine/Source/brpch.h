@@ -4,8 +4,8 @@
 
 //#define NOMINMAX
 #include <Windows.h>
-//#include "Bruno/Platform/DirectX/DX12.h"
 
+//#include <wrl/client.h>
 #endif
 
 //STL Headers
@@ -15,8 +15,8 @@
 #include <mutex>
 #include <iostream>
 
-#include <Bruno/Core/Game.h>
-#include <Bruno/Core/Log.h>
-#include <Bruno/Core/Assert.h>
+#include "Bruno/Core/Game.h"
+#include "Bruno/Core/Log.h"
+#include "Bruno/Core/Assert.h"
 
-//#include <Bruno/Math/Math.h>
+//#include "Bruno/Math/Math.h"

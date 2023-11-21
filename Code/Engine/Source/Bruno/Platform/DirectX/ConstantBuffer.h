@@ -1,6 +1,5 @@
 #pragma once
 
-#include "D3DCommon.h"
 #include "GraphicsDevice.h"
 #include "Bruno/Core/Memory.h"
 #include "GPUBuffer.h"
