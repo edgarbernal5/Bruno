@@ -213,7 +213,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Platform\DirectX\GPUBuffer.h">
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GpuBuffer.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Core\Memory.h">
@@ -278,6 +278,9 @@
     </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DConstants.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\SceneRenderer.h">
+      <Filter>Source\Bruno\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -416,7 +419,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Bruno\Platform\DirectX\GPUBuffer.cpp">
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GpuBuffer.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\Application.cpp">
@@ -439,6 +442,9 @@
     </ClCompile>
     <ClCompile Include="Dependencies\SimpleMath\SimpleMath.cpp">
       <Filter>Dependencies\SimpleMath</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\SceneRenderer.cpp">
+      <Filter>Source\Bruno\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

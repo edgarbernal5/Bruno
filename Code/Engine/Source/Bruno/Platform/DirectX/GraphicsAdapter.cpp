@@ -11,7 +11,6 @@ namespace Bruno
 #ifdef BR_DEBUG
 		createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
 #endif
-
 		GraphicsAdapterList adapters;
 
 		Microsoft::WRL::ComPtr<IDXGIFactory6> dxgiFactory6;

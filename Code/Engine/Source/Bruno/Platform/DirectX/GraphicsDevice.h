@@ -25,7 +25,7 @@ namespace Bruno
 	class UploadContext;
 	class Surface;
 	class PipelineStateObject;
-	class GPUBuffer;
+	class GpuBuffer;
 	class Texture;
 
     struct ContextSubmissionResult
@@ -95,7 +95,7 @@ namespace Bruno
 
 		struct DestructionQueue
 		{
-			std::vector<std::unique_ptr<GPUBuffer>> BuffersToDestroy;
+			std::vector<std::unique_ptr<GpuBuffer>> BuffersToDestroy;
 			std::vector<std::unique_ptr<Texture>> TexturesToDestroy;
 			std::vector<std::unique_ptr<PipelineStateObject>> PipelinesToDestroy;
 			std::vector<std::unique_ptr<Context>> ContextsToDestroy;

@@ -140,7 +140,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DConstants.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DHelpers.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\GPUBuffer.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GpuBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\PipelineStateObject.h" />
@@ -171,6 +171,7 @@
     <ClInclude Include="Source\Bruno\Renderer\Model.h" />
     <ClInclude Include="Source\Bruno\Renderer\RenderItem.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
+    <ClInclude Include="Source\Bruno\Renderer\SceneRenderer.h" />
     <ClInclude Include="Source\Bruno\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
@@ -198,7 +199,7 @@
     <ClCompile Include="Source\Bruno\Math\Math.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Context.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\GPUBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GpuBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\PipelineStateObject.cpp" />
@@ -229,6 +230,7 @@
     <ClCompile Include="Source\Bruno\Renderer\Model.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\SceneRenderer.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>

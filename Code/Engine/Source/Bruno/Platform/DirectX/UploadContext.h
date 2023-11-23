@@ -5,7 +5,7 @@
 
 namespace Bruno
 {
-	class GPUBuffer;
+	class GpuBuffer;
 	struct BufferUpload;
 	struct TextureUpload;
 	class Texture;
@@ -13,7 +13,7 @@ namespace Bruno
 	class UploadContext : public Context
 	{
 	public:
-		UploadContext(GraphicsDevice& device, std::unique_ptr<GPUBuffer> bufferUploadHeap, std::unique_ptr<GPUBuffer> textureUploadHeap);
+		UploadContext(GraphicsDevice& device, std::unique_ptr<GpuBuffer> bufferUploadHeap, std::unique_ptr<GpuBuffer> textureUploadHeap);
 		~UploadContext();
 
 		void AddBufferUpload(std::unique_ptr<BufferUpload> bufferUpload);
@@ -23,13 +23,13 @@ namespace Bruno
 		void ResolveProcessedUploads();
 
 	private:
-		std::unique_ptr<GPUBuffer> m_bufferUploadHeap;
-		std::unique_ptr<GPUBuffer> m_textureUploadHeap;
+		std::unique_ptr<GpuBuffer> m_bufferUploadHeap;
+		std::unique_ptr<GpuBuffer> m_textureUploadHeap;
 
 		std::vector<std::unique_ptr<BufferUpload>> m_bufferUploads;
 		std::vector<std::unique_ptr<TextureUpload>> m_textureUploads;
 
-		std::vector<GPUBuffer*> m_bufferUploadsInProgress;
+		std::vector<GpuBuffer*> m_bufferUploadsInProgress;
 		std::vector<Texture*> m_textureUploadsInProgress;
 	};
 }

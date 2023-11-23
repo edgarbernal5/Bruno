@@ -7,7 +7,7 @@
 namespace Bruno
 {
 	VertexBuffer::VertexBuffer(uint32_t sizeInBytes, const void* bufferData, uint32_t vertexStride) :
-		GPUBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(sizeInBytes, vertexStride, BufferViewFlags::Srv, BufferAccessFlags::GpuOnly)),
+		GpuBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(sizeInBytes, vertexStride, BufferViewFlags::Srv, BufferAccessFlags::GpuOnly)),
 		m_vertexBufferView{}
 	{
 		auto bufferUpload = std::make_unique<BufferUpload>();

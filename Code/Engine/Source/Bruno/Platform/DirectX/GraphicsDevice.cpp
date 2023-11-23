@@ -8,7 +8,7 @@
 #include "GraphicsAdapter.h"
 #include "CommandQueue.h"
 #include "UploadContext.h"
-#include "GPUBuffer.h"
+#include "GpuBuffer.h"
 #include "PipelineStateObject.h"
 #include "RootSignature.h"
 #include "Surface.h"
@@ -164,7 +164,7 @@ namespace Bruno
 
         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
         {
-            m_uploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GPUBuffer>(*this, uploadBufferDesc), std::make_unique<GPUBuffer>(*this, uploadTextureDesc));
+            m_uploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GpuBuffer>(*this, uploadBufferDesc), std::make_unique<GpuBuffer>(*this, uploadTextureDesc));
         }
 
         //D3D12_SAMPLER_DESC samplerDescs[Graphics::Core::SAMPLER_DESCRIPTORS_COUNT]{};

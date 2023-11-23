@@ -12,7 +12,7 @@ namespace Bruno
 	class RootSignature;
 	class Resource;
 	class Texture;
-	class GPUBuffer;
+	class GpuBuffer;
 	class PipelineStateObject;
 
     enum class PipelineType : uint8_t
@@ -37,12 +37,12 @@ namespace Bruno
 	class PipelineResourceSpace
 	{
 	public:
-		void SetCBV(GPUBuffer* resource);
+		void SetCBV(GpuBuffer* resource);
 		void SetSRV(const PipelineResourceBinding& binding);
 		void SetUAV(const PipelineResourceBinding& binding);
 		void Lock();
 
-		const GPUBuffer* GetCBV() const { return m_cbv; }
+		const GpuBuffer* GetCBV() const { return m_cbv; }
 		const std::vector<PipelineResourceBinding>& GetUAVs() const { return m_uavs; }
 		const std::vector<PipelineResourceBinding>& GetSRVs() const { return m_srvs; }
 
@@ -54,7 +54,7 @@ namespace Bruno
 		//If a resource space needs more than one CBV, it is likely a design flaw, as you want to consolidate these as much
 		//as possible if they have the same update frequency (which is contained by a PipelineResourceSpace). Of course,
 		//you can freely change this to a vector like the others if you want.
-		GPUBuffer* m_cbv = nullptr;
+		GpuBuffer* m_cbv = nullptr;
 		std::vector<PipelineResourceBinding> m_uavs;
 		std::vector<PipelineResourceBinding> m_srvs;
 		bool m_isLocked = false;

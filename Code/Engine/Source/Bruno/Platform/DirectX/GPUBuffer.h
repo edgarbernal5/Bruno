@@ -8,7 +8,7 @@
 namespace Bruno
 {
 	class GrapicsDevice;
-	class GPUBuffer;
+	class GpuBuffer;
 
 	enum class BufferAccessFlags : uint8_t
 	{
@@ -61,18 +61,18 @@ namespace Bruno
 
 	struct BufferUpload
 	{
-		GPUBuffer* Buffer = nullptr;
+		GpuBuffer* Buffer = nullptr;
 		std::unique_ptr<uint8_t[]> BufferData;
 		size_t BufferDataSize = 0;
 	};
 
-	class GPUBuffer : public Resource
+	class GpuBuffer : public Resource
 	{
-		BR_RTTI_DECLARATION(GPUBuffer, Resource);
+		BR_RTTI_DECLARATION(GpuBuffer, Resource);
 
 	public:
-		GPUBuffer(GraphicsDevice& device, const BufferCreationDesc& desc);
-		virtual ~GPUBuffer();
+		GpuBuffer(GraphicsDevice& device, const BufferCreationDesc& desc);
+		virtual ~GpuBuffer();
 
 		virtual void SetMappedData(const void* data, size_t dataSize);
 

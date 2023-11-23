@@ -9,7 +9,7 @@ namespace Bruno
 	class Resource;
 	class Texture;
 	class DepthBuffer;
-	class GPUBuffer;
+	class GpuBuffer;
 	class IndexBuffer;
 	class VertexBuffer;
 	class PipelineStateObject;

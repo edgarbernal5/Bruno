@@ -101,8 +101,8 @@ namespace Bruno
 		ContentTypeWriterManager::Initialize();
 		ContentTypeReaderManager::Initialize();
 
-		m_device = GraphicsDevice::Create();
-		Bruno::Graphics::GetDevice() = m_device.get();
+		/*m_device = GraphicsDevice::Create();
+		Bruno::Graphics::GetDevice() = m_device.get();*/
 
 		InitializeUI();
 	}

@@ -10,7 +10,7 @@
 namespace Bruno
 {
     IndexBuffer::IndexBuffer(uint32_t sizeInBytes, const void* bufferData, uint32_t stride) :
-		GPUBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(sizeInBytes, stride, BufferViewFlags::Srv, BufferAccessFlags::GpuOnly)),
+		GpuBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(sizeInBytes, stride, BufferViewFlags::Srv, BufferAccessFlags::GpuOnly)),
 		m_indexBufferView{}
 	{
 		auto bufferUpload = std::make_unique<BufferUpload>();

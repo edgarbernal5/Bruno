@@ -1,10 +1,10 @@
 #pragma once
 
-#include "GPUBuffer.h"
+#include "GpuBuffer.h"
 
 namespace Bruno
 {
-	class VertexBuffer : public GPUBuffer
+	class VertexBuffer : public GpuBuffer
 	{
 	public:
 		VertexBuffer(uint32_t numVertices, const void* bufferData, uint32_t vertexStride);

@@ -1,5 +1,5 @@
 #include "brpch.h"
-#include "GPUBuffer.h"
+#include "GpuBuffer.h"
 
 #include "GraphicsDevice.h"
 
@@ -8,9 +8,9 @@
 
 namespace Bruno
 {
-	BR_RTTI_DEFINITIONS(GPUBuffer);
+	BR_RTTI_DEFINITIONS(GpuBuffer);
 
-	GPUBuffer::GPUBuffer(GraphicsDevice& device, const BufferCreationDesc& creationDesc)
+	GpuBuffer::GpuBuffer(GraphicsDevice& device, const BufferCreationDesc& creationDesc)
 	{
 		m_resourceType = GPUResourceType::Buffer;
 
@@ -98,7 +98,7 @@ namespace Bruno
         }
 	}
 
-    GPUBuffer::~GPUBuffer()
+    GpuBuffer::~GpuBuffer()
     {
         auto device = Graphics::GetDevice();
         //TODO: add a new request to device to destroy the resource. we shouldn't do this here.
@@ -113,7 +113,7 @@ namespace Bruno
             device->GetSrvDescriptionHeap().Free(m_uavDescriptor);
     }
 
-	void GPUBuffer::SetMappedData(const void* data, size_t dataSize)
+	void GpuBuffer::SetMappedData(const void* data, size_t dataSize)
 	{
 		BR_ASSERT(m_mappedResource != nullptr && data != nullptr && dataSize > 0 && dataSize <= m_desc.Width);
 		memcpy_s(m_mappedResource, m_desc.Width, data, dataSize);

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "GPUBuffer.h"
+#include "GpuBuffer.h"
 
 namespace Bruno
 {
 	class GraphicsDevice;
 
-	class IndexBuffer : public GPUBuffer
+	class IndexBuffer : public GpuBuffer
 	{
 	public:
 		IndexBuffer(uint32_t sizeInBytes, const void* bufferData, uint32_t stride);

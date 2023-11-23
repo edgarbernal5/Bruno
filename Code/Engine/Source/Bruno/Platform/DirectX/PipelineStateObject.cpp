@@ -60,7 +60,7 @@ namespace Bruno
 		m_pipelineResourceMapping = pipelineResourceMapping;
 	}
 
-	void PipelineResourceSpace::SetCBV(GPUBuffer* resource)
+	void PipelineResourceSpace::SetCBV(GpuBuffer* resource)
 	{
 		if (m_isLocked)
 		{

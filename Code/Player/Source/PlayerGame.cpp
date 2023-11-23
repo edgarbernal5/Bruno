@@ -13,6 +13,8 @@
 #include "Bruno/Content/ContentTypeReaderManager.h"
 #include <iostream>
 #include "Bruno/Renderer/Model.h"
+#include "Bruno/Scene/Scene.h"
+#include "Bruno/Renderer/SceneRenderer.h"
 
 namespace Bruno
 {
@@ -124,40 +126,8 @@ namespace Bruno
 
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
-
-		for (auto& item : m_renderItems)
-		{
-			auto texture = item->Material->TexturesByName["Texture"];
-			if (texture != nullptr && texture->IsReady()) {
-				if (!item->IndexBuffer->IsReady() || !item->VertexBuffer->IsReady())
-					continue;
-
-				m_graphicsContext->SetVertexBuffer(*item->VertexBuffer);
-				m_graphicsContext->SetIndexBuffer(*item->IndexBuffer);
-
-				PipelineResourceBinding textureBinding;
-				textureBinding.BindingIndex = 0;
-				textureBinding.Resource = texture.get();
-
-				m_meshPerObjectResourceSpace.SetCBV(m_objectBuffer[m_device->GetFrameId()].get());
-				m_meshPerObjectResourceSpace.SetSRV(textureBinding);
-
-				PipelineInfo pipeline;
-				pipeline.Pipeline = m_pipelineState.get();
-				pipeline.RenderTargets.push_back(&backBuffer);
-				pipeline.DepthStencilTarget = &depthBuffer;
-
-				m_graphicsContext->SetPipeline(pipeline);
-				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
-
-				m_graphicsContext->SetPrimitiveTopology(item->PrimitiveType);
-				m_graphicsContext->DrawIndexedInstanced(item->IndexCount,
-					1,
-					item->StartIndexLocation,
-					item->BaseVertexLocation,
-					0);
-			}
-		}
+		
+		m_sceneRenderer->OnRender(m_graphicsContext.get());
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();
@@ -240,7 +210,7 @@ namespace Bruno
 
 	void PlayerGame::InitializeCamera()
 	{
-		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
+		m_camera.LookAt(Math::Vector3(0, 0, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
 	}
 
@@ -252,55 +222,19 @@ namespace Bruno
 
 	void PlayerGame::InitializeMeshAndTexture()
 	{
+		m_scene = std::make_shared<Scene>(m_camera);
+
 		ContentManager manager(m_applicationParameters.WorkingDirectory);
+		auto model = manager.Load<Model>(L"Models\\Car\\Car.fbx");		
 
-		m_model = manager.Load<Model>(L"Models\\Car\\Car.fbx");
+		m_scene->AddModel(model);
 
-		auto& meshes = m_model->GetMeshes();
-		for (auto& mesh : meshes)
-		{
-			auto boxRenderItem = std::make_shared<RenderItem>();
-			boxRenderItem->IndexCount = mesh->GetIndexBuffer()->GetElementCount();
-			boxRenderItem->IndexBuffer = mesh->GetIndexBuffer();
-			boxRenderItem->VertexBuffer = mesh->GetVertexBuffer();
-			boxRenderItem->Material = mesh->GetMaterial();
-			m_renderItems.push_back(boxRenderItem);
-		}
-
-		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-		{
-			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
-		}
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
 	}
 
 	void PlayerGame::InitializeShaderAndPipeline()
 	{
-		m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
-		//m_rootSignature = m_opaqueShader->CreateRootSignature();
 
-		PipelineResourceBinding textureBinding;
-		textureBinding.BindingIndex = 0;
-		
-		m_meshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
-		m_meshPerObjectResourceSpace.SetSRV(textureBinding);
-		m_meshPerObjectResourceSpace.Lock();
-
-		PipelineResourceLayout meshResourceLayout;
-		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &m_meshPerObjectResourceSpace;
-
-		PipelineResourceMapping resourceMapping;
-		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
-
-		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
-		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-		meshPipelineDesc.PixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = m_surface->GetDepthBufferFormat();
-		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
-		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = m_surface->GetSurfaceFormat();
-		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-
-		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 	}
 
 	void PlayerGame::InitializeSurface()
@@ -316,23 +250,6 @@ namespace Bruno
 
 	void PlayerGame::UpdateCBs(const GameTimer& timer)
 	{
-		static float TotalTime = 0.0f;
-		float angle = static_cast<float>(0.0);
-		//float angle = static_cast<float>(TotalTime * 45.0);
-		
-		Math::Matrix modelMatrix = Math::Matrix::Identity;
-		//Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
-		TotalTime += timer.GetDeltaTime();
-
-		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
-		//Math::Matrix inverseModelView = modelMatrix * m_camera.GetView();
-		//inverseModelView.Invert();
-
-		ObjectBuffer objectBuffer;
-		objectBuffer.World = mvpMatrix;
-		//objectBuffer.InverseModelView = inverseModelView;
-
-		uint32_t frameIndex = m_device->GetFrameId();
-		m_objectBuffer[frameIndex]->SetMappedData(objectBuffer);
+		m_scene->OnUpdate(timer);
 	}
 }

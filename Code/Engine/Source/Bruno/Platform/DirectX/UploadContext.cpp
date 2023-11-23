@@ -1,13 +1,13 @@
 #include "brpch.h"
 #include "UploadContext.h"
 
-#include "GPUBuffer.h"
+#include "GpuBuffer.h"
 #include "Texture.h"
 #include "Bruno/Core/Memory.h"
 
 namespace Bruno
 {
-	UploadContext::UploadContext(GraphicsDevice& device, std::unique_ptr<GPUBuffer> bufferUploadHeap, std::unique_ptr<GPUBuffer> textureUploadHeap) :
+	UploadContext::UploadContext(GraphicsDevice& device, std::unique_ptr<GpuBuffer> bufferUploadHeap, std::unique_ptr<GpuBuffer> textureUploadHeap) :
 		Context(device, D3D12_COMMAND_LIST_TYPE_COPY),
         m_bufferUploadHeap(std::move(bufferUploadHeap)),
         m_textureUploadHeap(std::move(textureUploadHeap))

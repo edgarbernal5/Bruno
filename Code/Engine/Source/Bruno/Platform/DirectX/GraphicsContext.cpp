@@ -5,7 +5,7 @@
 #include "PipelineStateObject.h"
 #include "Texture.h"
 #include "DepthBuffer.h"
-#include "GPUBuffer.h"
+#include "GpuBuffer.h"
 #include "GraphicsDevice.h"
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
@@ -110,7 +110,7 @@ namespace Bruno
 		static const uint32_t maxNumHandlesPerBinding = 16;
 		static const uint32_t singleDescriptorRangeCopyArray[maxNumHandlesPerBinding]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ,1 };
 
-		const GPUBuffer* cbv = resources.GetCBV();
+		const GpuBuffer* cbv = resources.GetCBV();
 		const auto& uavs = resources.GetUAVs();
 		const auto& srvs = resources.GetSRVs();
 		const uint32_t numTableHandles = static_cast<uint32_t>(uavs.size() + srvs.size());
@@ -146,7 +146,7 @@ namespace Bruno
 		{
 			if (uav.Resource->m_resourceType == GPUResourceType::Buffer)
 			{
-				handles[currentHandleIndex++] = static_cast<GPUBuffer*>(uav.Resource)->m_uavDescriptor.Cpu;
+				handles[currentHandleIndex++] = static_cast<GpuBuffer*>(uav.Resource)->m_uavDescriptor.Cpu;
 			}
 			else if (uav.Resource->m_resourceType == GPUResourceType::Texture)
 			{
@@ -158,7 +158,7 @@ namespace Bruno
 		{
 			if (srv.Resource->m_resourceType == GPUResourceType::Buffer)
 			{
-				handles[currentHandleIndex++] = static_cast<GPUBuffer*>(srv.Resource)->m_srvDescriptor.Cpu;
+				handles[currentHandleIndex++] = static_cast<GpuBuffer*>(srv.Resource)->m_srvDescriptor.Cpu;
 			}
 			else if (srv.Resource->m_resourceType == GPUResourceType::Texture)
 			{

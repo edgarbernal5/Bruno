@@ -2,12 +2,12 @@
 
 #include "GraphicsDevice.h"
 #include "Bruno/Core/Memory.h"
-#include "GPUBuffer.h"
+#include "GpuBuffer.h"
 
 namespace Bruno
 {
 	template<typename T>
-	class ConstantBuffer : public GPUBuffer
+	class ConstantBuffer : public GpuBuffer
 	{
 	public:
 		ConstantBuffer();
@@ -25,7 +25,7 @@ namespace Bruno
 
 		void SetMappedData(const T& data)
 		{
-			GPUBuffer::SetMappedData(&data, sizeof(T));
+			GpuBuffer::SetMappedData(&data, sizeof(T));
 		}
 
 	private:
@@ -34,7 +34,7 @@ namespace Bruno
 
 	template<typename T>
 	inline ConstantBuffer<T>::ConstantBuffer() :
-		GPUBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(AlignU32(sizeof(T), 256), BufferViewFlags::Cbv, BufferAccessFlags::HostWritable))
+		GpuBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(AlignU32(sizeof(T), 256), BufferViewFlags::Cbv, BufferAccessFlags::HostWritable))
 	{
 		m_elementSizeInBytes = AlignU32(sizeof(T), 256);
 	}

@@ -69,7 +69,7 @@ namespace Bruno
 
             if (currentSpace)
             {
-                const GPUBuffer* cbv = currentSpace->GetCBV();
+                const GpuBuffer* cbv = currentSpace->GetCBV();
                 auto& uavs = currentSpace->GetUAVs();
                 auto& srvs = currentSpace->GetSRVs();
 
