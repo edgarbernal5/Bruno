@@ -24,8 +24,9 @@ namespace Bruno
 
 	public:
 		virtual ~Resource();
-		constexpr ID3D12Resource* GetResource() { return m_resource; }
 
+		D3D12_GPU_VIRTUAL_ADDRESS GetGpuAddress() { return m_virtualAddress; }
+		constexpr ID3D12Resource* GetResource() { return m_resource; }
 		bool IsReady() { return m_isReady; }
 
 		friend class Surface;

@@ -20,3 +20,4 @@
 #include "Bruno/Core/Assert.h"
 
 //#include "Bruno/Math/Math.h"
+#include "Bruno/Renderer/PrimitiveBatch.h"

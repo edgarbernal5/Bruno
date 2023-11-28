@@ -15,6 +15,7 @@
 #include "Bruno/Renderer/Model.h"
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Renderer/SceneRenderer.h"
+#include "Bruno/Renderer/PrimitiveBatch.h"
 
 namespace Bruno
 {
@@ -129,6 +130,11 @@ namespace Bruno
 		
 		m_sceneRenderer->OnRender(m_graphicsContext.get());
 
+		m_primitiveBatch->Begin(m_graphicsContext.get());
+		m_primitiveBatch->DrawLine(VertexPositionColor(Math::Vector3(0, 0, 0), Math::Color(1, 0, 0, 1)),
+			VertexPositionColor(Math::Vector3(3, 0, 0), Math::Color(1, 0, 0, 1)));
+		m_primitiveBatch->End();
+
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();
 
@@ -234,7 +240,7 @@ namespace Bruno
 
 	void PlayerGame::InitializeShaderAndPipeline()
 	{
-
+		m_primitiveBatch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(Graphics::GetDevice(), 4096 * 3, 4096);
 	}
 
 	void PlayerGame::InitializeSurface()

@@ -167,28 +167,6 @@ namespace Bruno
             m_uploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GpuBuffer>(*this, uploadBufferDesc), std::make_unique<GpuBuffer>(*this, uploadTextureDesc));
         }
 
-        //D3D12_SAMPLER_DESC samplerDescs[Graphics::Core::SAMPLER_DESCRIPTORS_COUNT]{};
-        //samplerDescs[0].Filter = D3D12_FILTER_ANISOTROPIC;
-        //samplerDescs[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        //samplerDescs[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        //samplerDescs[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        //samplerDescs[0].BorderColor[0] = samplerDescs[0].BorderColor[1] = samplerDescs[0].BorderColor[2] = samplerDescs[0].BorderColor[3] = 0.0f;
-        //samplerDescs[0].MipLODBias = 0.0f;
-        //samplerDescs[0].MaxAnisotropy = 16;
-        //samplerDescs[0].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-        //samplerDescs[0].MinLOD = 0;
-        //samplerDescs[0].MaxLOD = D3D12_FLOAT32_MAX;
-
-        //DescriptorHandle samplerDescriptorBlock = m_samplerRenderPassDescriptorHeap->Allocate(Graphics::Core::SAMPLER_DESCRIPTORS_COUNT);
-        //D3D12_CPU_DESCRIPTOR_HANDLE currentSamplerDescriptor = samplerDescriptorBlock.Cpu;
-        //for (uint32_t samplerIndex = 0; samplerIndex < Graphics::Core::SAMPLER_DESCRIPTORS_COUNT; samplerIndex++)
-        //{
-        //    m_d3dDevice->CreateSampler(&samplerDescs[samplerIndex], currentSamplerDescriptor);
-        //    //currentSamplerDescriptor.ptr += m_samplerRenderPassDescriptorHeap->GetDescriptorSize();
-        //}
-
-        //CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
-
         m_freeReservedDescriptorIndices.resize(Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT);
         for (size_t i = 0; i < m_freeReservedDescriptorIndices.size(); i++)
         {

@@ -61,6 +61,11 @@ namespace Bruno
 		m_commandList->IASetIndexBuffer(&indexBuffer.GetView());
 	}
 
+	void GraphicsContext::SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& indexBufferView)
+	{
+		m_commandList->IASetIndexBuffer(&indexBufferView);
+	}
+
 	void GraphicsContext::SetTargets(uint32_t numRenderTargets, const D3D12_CPU_DESCRIPTOR_HANDLE renderTargets[], D3D12_CPU_DESCRIPTOR_HANDLE depthStencil)
 	{
 		m_commandList->OMSetRenderTargets(numRenderTargets, renderTargets, false, depthStencil.ptr != 0 ? &depthStencil : nullptr);
@@ -189,6 +194,11 @@ namespace Bruno
 	void GraphicsContext::SetVertexBuffer(VertexBuffer& vertexBuffer)
 	{
 		m_commandList->IASetVertexBuffers(0, 1, &vertexBuffer.GetView());
+	}
+
+	void GraphicsContext::SetVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW& vertexBufferView)
+	{
+		m_commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	}
 
 	void GraphicsContext::SetViewport(const D3D12_VIEWPORT& viewport)

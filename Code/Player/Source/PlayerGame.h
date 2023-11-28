@@ -7,6 +7,7 @@
 #include "Bruno/Platform/DirectX/PipelineStateObject.h"
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
 #include "Bruno/Platform/DirectX/Texture.h"
+#include "Bruno/Platform/DirectX/VertexTypes.h"
 
 #include "Bruno/Renderer/Camera.h"
 
@@ -16,6 +17,8 @@ namespace Bruno
 	class GraphicsContext;
 	class Scene;
 	class SceneRenderer;
+	template<typename TVertex>
+	class PrimitiveBatch;
 
 	class PlayerGame : public Game
 	{
@@ -51,6 +54,7 @@ namespace Bruno
 		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
 		
 		std::unique_ptr<GraphicsContext>	m_graphicsContext;
+		std::unique_ptr<PrimitiveBatch<VertexPositionColor>>	m_primitiveBatch;
 
 		Math::Int2	m_lastMousePosition;
 		Camera		m_camera;

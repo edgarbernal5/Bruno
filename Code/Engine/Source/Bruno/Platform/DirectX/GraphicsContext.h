@@ -32,9 +32,11 @@ namespace Bruno
 
 		void SetBlendFactor(Math::Color blendFactor);
 		void SetIndexBuffer(IndexBuffer& indexBuffer);
+		void SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& indexBufferView);
 		void SetPipeline(const PipelineInfo& pipelineBinding);
 		void SetPipelineResources(uint32_t spaceId, const PipelineResourceSpace& resources);
 		void SetVertexBuffer(VertexBuffer& vertexBuffer);
+		void SetVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW& vertexBufferView);
 		void SetViewport(const D3D12_VIEWPORT& viewPort);
 		void SetScissorRect(const D3D12_RECT& rect);
 		void SetStencilRef(uint32_t stencilRef);
