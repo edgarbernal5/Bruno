@@ -169,6 +169,7 @@
     <ClInclude Include="Source\Bruno\Renderer\Camera.h" />
     <ClInclude Include="Source\Bruno\Renderer\Material.h" />
     <ClInclude Include="Source\Bruno\Renderer\Model.h" />
+    <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch.h" />
     <ClInclude Include="Source\Bruno\Renderer\RenderItem.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
     <ClInclude Include="Source\Bruno\Renderer\SceneRenderer.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="Source\Bruno\Renderer\Camera.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Material.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Model.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\PrimitiveBatch.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\SceneRenderer.cpp" />

@@ -282,6 +282,9 @@
     <ClInclude Include="Source\Bruno\Renderer\SceneRenderer.h">
       <Filter>Source\Bruno\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch.h">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -444,6 +447,9 @@
       <Filter>Dependencies\SimpleMath</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\SceneRenderer.cpp">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\PrimitiveBatch.cpp">
       <Filter>Source\Bruno\Renderer</Filter>
     </ClCompile>
   </ItemGroup>

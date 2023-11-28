@@ -15,6 +15,7 @@ namespace Bruno
 	{
 	public:
 		Scene(Camera& camera);
+
 		void AddModel(std::shared_ptr<Model> model);
 		const std::vector<std::shared_ptr<RenderItem>>& GetRenderItems() { return m_renderItems; }
 		void OnUpdate(const GameTimer& timer);
