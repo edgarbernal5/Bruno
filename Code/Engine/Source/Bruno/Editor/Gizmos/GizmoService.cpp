@@ -1,14 +1,19 @@
 #include "brpch.h"
 #include "GizmoService.h"
 
+#include "GizmoTranslationRenderer.h"
+
+#include "Bruno/Platform/DirectX/GraphicsDevice.h"
+#include "Bruno/Platform/DirectX/GraphicsContext.h"
 #include "Bruno/Math/Math.h"
 #include <limits>
 
 namespace Bruno
 {
-    GizmoService::GizmoService(Camera& camera) :
+    GizmoService::GizmoService(GraphicsDevice* device, Camera& camera) :
         m_camera(camera)
     {
+        m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device);
     }
 
     bool GizmoService::BeginDrag(const Math::Vector2& mousePosition)
@@ -68,6 +73,25 @@ namespace Bruno
 
     void GizmoService::OnMouseMove(const Math::Vector2& mousePosition)
     {
+    }
+
+    void GizmoService::OnRender(GraphicsContext* context)
+    {
+        if (m_currentGizmoType == GizmoType::None)
+            return;
+
+        switch (m_currentGizmoType)
+        {
+        case Bruno::GizmoService::GizmoType::Translation:
+            m_gizmoTranslationRenderer->Render(context);
+            break;
+        case Bruno::GizmoService::GizmoType::Rotation:
+            break;
+        case Bruno::GizmoService::GizmoType::Scale:
+            break;
+        default:
+            break;
+        }
     }
 
     void GizmoService::Update()

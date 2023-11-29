@@ -51,6 +51,12 @@ namespace Bruno
 		Texture& backBuffer = m_surface->GetBackBuffer();
 		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
 
+		PipelineInfo pipeline;
+		pipeline.Pipeline = m_pipelineState.get();
+		pipeline.RenderTargets.push_back(&backBuffer);
+		pipeline.DepthStencilTarget = &depthBuffer;
+		graphicsContext->SetPipeline(pipeline);
+
 		for (auto& item : m_scene->GetRenderItems()) {
 			auto texture = item->Material->TexturesByName["Texture"];
 			if (texture != nullptr && texture->IsReady()) {
@@ -67,12 +73,6 @@ namespace Bruno
 				m_meshPerObjectResourceSpace.SetCBV(m_scene->m_objectBuffer[device->GetFrameId()].get());
 				m_meshPerObjectResourceSpace.SetSRV(textureBinding);
 
-				PipelineInfo pipeline;
-				pipeline.Pipeline = m_pipelineState.get();
-				pipeline.RenderTargets.push_back(&backBuffer);
-				pipeline.DepthStencilTarget = &depthBuffer;
-
-				graphicsContext->SetPipeline(pipeline);
 				graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
 
 				graphicsContext->SetPrimitiveTopology(item->PrimitiveType);

@@ -33,7 +33,7 @@ namespace Bruno
 		void SetBlendFactor(Math::Color blendFactor);
 		void SetIndexBuffer(IndexBuffer& indexBuffer);
 		void SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& indexBufferView);
-		void SetPipeline(const PipelineInfo& pipelineBinding);
+		void SetPipeline(const PipelineInfo& pipelineBinding, bool bindRenderTargets = true);
 		void SetPipelineResources(uint32_t spaceId, const PipelineResourceSpace& resources);
 		void SetVertexBuffer(VertexBuffer& vertexBuffer);
 		void SetVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW& vertexBufferView);

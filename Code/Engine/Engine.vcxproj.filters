@@ -285,6 +285,9 @@
     <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch.h">
       <Filter>Source\Bruno\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoTranslationRenderer.h">
+      <Filter>Source\Bruno\Editor\Gizmos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -451,6 +454,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\PrimitiveBatch.cpp">
       <Filter>Source\Bruno\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoTranslationRenderer.cpp">
+      <Filter>Source\Bruno\Editor\Gizmos</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

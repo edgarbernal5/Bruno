@@ -4,10 +4,14 @@
 
 namespace Bruno
 {
+	class GizmoTranslationRenderer;
+	class GraphicsContext;
+	class GraphicsDevice;
+
 	class GizmoService
 	{
 	public:
-		GizmoService(Camera& camera);
+		GizmoService(GraphicsDevice* device, Camera& camera);
 
 		using DragTranslationScaleCallback = std::function<void(const Math::Vector3&)>;
 		using DragRotationCallback = std::function<void(const Math::Quaternion&)>;
@@ -46,6 +50,7 @@ namespace Bruno
 		bool BeginDrag(const Math::Vector2& mousePosition);
 		void Drag(const Math::Vector2& mousePosition);
 		void OnMouseMove(const Math::Vector2& mousePosition);
+		void OnRender(GraphicsContext* context);
 		void Update();
 		void EndDrag();
 
@@ -130,7 +135,7 @@ namespace Bruno
 		const Math::BoundingBox XYZBox{
 			DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 			DirectX::XMFLOAT3(LINE_LENGTH * 0.25f, LINE_LENGTH * 0.25f, LINE_LENGTH * 0.25f)
-		}; 
+		};
 		
 		const Math::Vector3 m_unaryDirections[3]{ Math::Vector3::UnitX, Math::Vector3::UnitY, Math::Vector3::UnitZ };
 
@@ -153,6 +158,8 @@ namespace Bruno
 		DragTranslationScaleCallback m_dragTranslationCallback;
 		DragTranslationScaleCallback m_dragScaleCallback;
 		DragRotationCallback m_dragRotationCallback;
+
+		std::shared_ptr<GizmoTranslationRenderer> m_gizmoTranslationRenderer;
 	};
 }
 

@@ -71,7 +71,7 @@ namespace Bruno
 		m_commandList->OMSetRenderTargets(numRenderTargets, renderTargets, false, depthStencil.ptr != 0 ? &depthStencil : nullptr);
 	}
 
-	void GraphicsContext::SetPipeline(const PipelineInfo& pipelineBinding)
+	void GraphicsContext::SetPipeline(const PipelineInfo& pipelineBinding, bool bindTargets)
 	{
 		if (pipelineBinding.Pipeline->m_pipelineType == PipelineType::Compute)
 		{
@@ -86,7 +86,7 @@ namespace Bruno
 
 		m_currentPipeline = pipelineBinding.Pipeline;
 
-		if (m_currentPipeline->m_pipelineType == PipelineType::Graphics)
+		if (bindTargets && m_currentPipeline->m_pipelineType == PipelineType::Graphics)
 		{
 			D3D12_CPU_DESCRIPTOR_HANDLE renderTargetHandles[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
 			D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle{ 0 };

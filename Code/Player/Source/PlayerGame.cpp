@@ -128,7 +128,7 @@ namespace Bruno
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
 		
-		//m_sceneRenderer->OnRender(m_graphicsContext.get());
+		m_sceneRenderer->OnRender(m_graphicsContext.get());
 
 		//test
 		m_meshPerObjectResourceSpace.SetCBV(m_gizmoBuffer[m_device->GetFrameId()].get());
@@ -138,13 +138,14 @@ namespace Bruno
 		pipeline.RenderTargets.push_back(&backBuffer);
 		pipeline.DepthStencilTarget = &depthBuffer;
 
-		m_graphicsContext->SetPipeline(pipeline);
+		m_graphicsContext->SetPipeline(pipeline, false);
 		m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
 
 		m_primitiveBatch->Begin(m_graphicsContext.get());
 
 		m_primitiveBatch->DrawLine(VertexPositionColor(Math::Vector3(0, 0, 0), Math::Color(1, 0, 0, 1)),
 			VertexPositionColor(Math::Vector3(3, 0, 0), Math::Color(1, 0, 0, 1)));
+
 		m_primitiveBatch->End();
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);

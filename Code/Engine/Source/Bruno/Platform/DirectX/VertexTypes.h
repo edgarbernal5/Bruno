@@ -33,7 +33,7 @@ namespace Bruno
         VertexPositionColor() = default;
 
         explicit VertexPositionColor(const Math::Vector3& position, 
-            const Math::Vector3& color)
+            const Math::Vector4& color)
             : Position(position),
               Color(color)
         {}
@@ -41,11 +41,11 @@ namespace Bruno
         explicit VertexPositionColor(DirectX::FXMVECTOR position, DirectX::FXMVECTOR color)
         {
             DirectX::XMStoreFloat3(&(this->Position), position);
-            DirectX::XMStoreFloat3(&(this->Color), color);
+            DirectX::XMStoreFloat4(&(this->Color), color);
         }
 
         Math::Vector3 Position;
-        Math::Vector3 Color;
+        Math::Vector4 Color;
 
         static const D3D12_INPUT_LAYOUT_DESC& InputLayout;
         static const size_t HashId;
@@ -75,6 +75,35 @@ namespace Bruno
         Math::Vector3 Position;
         Math::Vector3 Normal;
         Math::Vector2 Texture;
+
+        static const D3D12_INPUT_LAYOUT_DESC& InputLayout;
+        static const size_t HashId;
+    private:
+        static const int                      InputElementCount = 3;
+        static const D3D12_INPUT_ELEMENT_DESC InputElements[InputElementCount];
+    };
+
+    struct VertexPositionNormalColor
+    {
+        VertexPositionNormalColor() = default;
+
+        explicit VertexPositionNormalColor(const Math::Vector3& position,
+            const Math::Vector3& normal, const Math::Vector4& color)
+            : Position(position),
+            Normal(normal),
+            Color(color)
+        {}
+
+        explicit VertexPositionNormalColor(DirectX::FXMVECTOR position, DirectX::FXMVECTOR normal, DirectX::FXMVECTOR color)
+        {
+            DirectX::XMStoreFloat3(&(this->Position), position);
+            DirectX::XMStoreFloat3(&(this->Normal), normal);
+            DirectX::XMStoreFloat4(&(this->Color), color);
+        }
+
+        Math::Vector3 Position;
+        Math::Vector3 Normal;
+        Math::Vector4 Color;
 
         static const D3D12_INPUT_LAYOUT_DESC& InputLayout;
         static const size_t HashId;

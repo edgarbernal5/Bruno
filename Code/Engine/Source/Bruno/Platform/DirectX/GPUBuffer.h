@@ -73,8 +73,9 @@ namespace Bruno
 	public:
 		GpuBuffer(GraphicsDevice& device, const BufferCreationDesc& desc);
 		virtual ~GpuBuffer();
+
 		uint32_t GetElementCount() { return m_numElements; }
-		void* GetMappedResource() { return m_mappedResource; }
+		uint8_t* GetMappedResource() { return m_mappedResource; }
 
 		virtual void SetMappedData(const void* data, size_t dataSize);
 

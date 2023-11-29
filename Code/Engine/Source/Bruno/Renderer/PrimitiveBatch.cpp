@@ -61,7 +61,7 @@ namespace Bruno
 
 		if (isIndexed)
 		{
-			auto outputIndices = static_cast<uint16_t*>(m_indexBuffer->GetMappedResource()) + m_indexCount;
+			auto outputIndices = reinterpret_cast<uint16_t*>(m_indexBuffer->GetMappedResource()) + m_indexCount;
 
 			for (size_t i = 0; i < indexCount; i++)
 			{
@@ -70,7 +70,7 @@ namespace Bruno
 
 			m_indexCount += indexCount;
 		}
-		*pMappedVertices = static_cast<uint8_t*>(m_vertexBuffer->GetMappedResource()) + m_vertexSize * m_vertexCount;
+		*pMappedVertices = reinterpret_cast<uint8_t*>(m_vertexBuffer->GetMappedResource()) + m_vertexSize * m_vertexCount;
 
 		m_vertexCount += vertexCount;
 	}

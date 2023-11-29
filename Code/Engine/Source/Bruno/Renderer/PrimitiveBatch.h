@@ -47,8 +47,6 @@ namespace Bruno
 	template<typename TVertex>
 	class PrimitiveBatch : public PrimitiveBatchBase
 	{
-		static constexpr size_t DefaultBatchSize = 4096;
-
 	public:
 		PrimitiveBatch(GraphicsDevice* device, uint64_t maxIndices, uint64_t maxVertices) :
 			PrimitiveBatchBase(device, maxIndices, maxVertices, sizeof(TVertex))
