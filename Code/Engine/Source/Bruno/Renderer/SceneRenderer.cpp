@@ -18,7 +18,6 @@ namespace Bruno
 		m_surface(surface)
 	{
 		m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
-		//m_rootSignature = m_opaqueShader->CreateRootSignature();
 
 		PipelineResourceBinding textureBinding;
 		textureBinding.BindingIndex = 0;

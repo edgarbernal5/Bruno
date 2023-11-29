@@ -52,11 +52,22 @@ namespace Bruno
 		std::unique_ptr<Surface>		m_surface;
 		std::shared_ptr<Scene>			m_scene;
 		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
+
+		std::shared_ptr<Shader>			m_gizmoShader;
+		std::shared_ptr<RootSignature>	m_rootSignature;
+		std::shared_ptr<PipelineStateObject>	m_pipelineObject;
+		PipelineResourceSpace			m_meshPerObjectResourceSpace;
 		
 		std::unique_ptr<GraphicsContext>	m_graphicsContext;
 		std::unique_ptr<PrimitiveBatch<VertexPositionColor>>	m_primitiveBatch;
 
 		Math::Int2	m_lastMousePosition;
 		Camera		m_camera;
+
+		struct ObjectBuffer
+		{
+			Math::Matrix World;
+		};
+		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_gizmoBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
 	};
 }

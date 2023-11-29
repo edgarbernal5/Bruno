@@ -128,9 +128,21 @@ namespace Bruno
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
 		
-		m_sceneRenderer->OnRender(m_graphicsContext.get());
+		//m_sceneRenderer->OnRender(m_graphicsContext.get());
+
+		//test
+		m_meshPerObjectResourceSpace.SetCBV(m_gizmoBuffer[m_device->GetFrameId()].get());
+
+		PipelineInfo pipeline;
+		pipeline.Pipeline = m_pipelineObject.get();
+		pipeline.RenderTargets.push_back(&backBuffer);
+		pipeline.DepthStencilTarget = &depthBuffer;
+
+		m_graphicsContext->SetPipeline(pipeline);
+		m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
 
 		m_primitiveBatch->Begin(m_graphicsContext.get());
+
 		m_primitiveBatch->DrawLine(VertexPositionColor(Math::Vector3(0, 0, 0), Math::Color(1, 0, 0, 1)),
 			VertexPositionColor(Math::Vector3(3, 0, 0), Math::Color(1, 0, 0, 1)));
 		m_primitiveBatch->End();
@@ -236,6 +248,39 @@ namespace Bruno
 		m_scene->AddModel(model);
 
 		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
+
+		///test
+
+		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
+		{
+			m_gizmoBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+		}
+
+		m_gizmoShader = std::make_shared<Shader>(L"Shaders/UnlitColor.hlsl");
+
+		PipelineResourceBinding textureBinding;
+		textureBinding.BindingIndex = 0;
+
+		m_meshPerObjectResourceSpace.SetCBV(m_gizmoBuffer[0].get());
+		m_meshPerObjectResourceSpace.Lock();
+
+		PipelineResourceLayout meshResourceLayout;
+		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &m_meshPerObjectResourceSpace;
+
+		PipelineResourceMapping resourceMapping;
+		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
+
+		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
+		meshPipelineDesc.VertexShader = m_gizmoShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
+		meshPipelineDesc.PixelShader = m_gizmoShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
+		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = m_surface->GetDepthBufferFormat();
+		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
+		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
+		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = m_surface->GetSurfaceFormat();
+		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		meshPipelineDesc.Topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+
+		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 	}
 
 	void PlayerGame::InitializeShaderAndPipeline()
@@ -257,5 +302,14 @@ namespace Bruno
 	void PlayerGame::UpdateCBs(const GameTimer& timer)
 	{
 		m_scene->OnUpdate(timer);
+
+		auto device = Graphics::GetDevice();
+		Math::Matrix mvpMatrix = m_camera.GetViewProjection();
+
+		ObjectBuffer objectBuffer;
+		objectBuffer.World = mvpMatrix;
+
+		uint32_t frameIndex = device->GetFrameId();
+		m_gizmoBuffer[frameIndex]->SetMappedData(objectBuffer);
 	}
 }
