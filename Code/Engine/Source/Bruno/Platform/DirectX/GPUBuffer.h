@@ -77,8 +77,8 @@ namespace Bruno
 		uint32_t GetElementCount() { return m_numElements; }
 		uint8_t* GetMappedResource() { return m_mappedResource; }
 
+		void Reset();
 		virtual void SetMappedData(const void* data, size_t dataSize);
-
 
 		friend class UploadContext;
 		friend class GraphicsContext;

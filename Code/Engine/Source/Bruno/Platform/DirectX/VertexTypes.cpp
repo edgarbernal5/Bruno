@@ -61,6 +61,7 @@ namespace Bruno
     std::unordered_map<size_t, const D3D12_INPUT_LAYOUT_DESC> VertexTypesGetter::g_vertexTypesByElementCount = {
         {VertexPosition::HashId, { VertexPosition::InputLayout} },
         {VertexPositionColor::HashId, {VertexPositionColor::InputLayout} },
+        {VertexPositionNormalColor::HashId, {VertexPositionNormalColor::InputLayout} },
         {VertexPositionNormalTexture::HashId, {VertexPositionNormalTexture::InputLayout} }
     };
     

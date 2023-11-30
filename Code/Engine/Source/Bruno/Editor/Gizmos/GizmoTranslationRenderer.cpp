@@ -35,10 +35,8 @@ namespace Bruno
 		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = surface->GetDepthBufferFormat();
 		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
 		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
-		meshPipelineDesc.RasterDesc.CullMode = D3D12_CULL_MODE_NONE;
 		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = surface->GetSurfaceFormat();
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		meshPipelineDesc.Topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 	}
@@ -59,7 +57,6 @@ namespace Bruno
 		CreateCylinder(2, 5, 20, 10, vertices, indices, Math::Vector4(1, 0, 0, 1));
 		
 		m_meshPerObjectResourceSpace.SetCBV(m_constantBuffers[frameIndex].get());
-
 
 		Texture& backBuffer = m_surface->GetBackBuffer();
 		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
@@ -86,25 +83,25 @@ namespace Bruno
 		float stackHeight = height / static_cast<float>(stackCount);
 		float radiusStep = radius / static_cast<float>(stackCount);
 
-		for (UINT i = 0; i <= stackCount; ++i)
+		for (uint32_t i = 0; i <= stackCount; ++i)
 		{
 			float y = -0.5f * height + i * stackHeight;
-			float r = radius - i * radiusStep;
 
-			for (UINT j = 0; j <= sliceCount; ++j)
+			for (uint32_t j = 0; j <= sliceCount; ++j)
 			{
 				float phi = DirectX::XM_2PI * static_cast<float>(j) / static_cast<float>(sliceCount);
 
 				VertexPositionNormalColor vertex;
-				vertex.Position.x = r * cosf(phi);
+				vertex.Position.x = radius * std::cosf(phi);
 				vertex.Position.y = y;
-				vertex.Position.z = r * sinf(phi);
+				vertex.Position.z = radius * std::sinf(phi);
 
 				Math::Vector3 tangent(-std::sinf(phi), 0.0f, std::cosf(phi));
 				Math::Vector3 bitangent(std::cosf(phi), 0.0f, std::sinf(phi));
 				Math::Vector3 normal = tangent.Cross(bitangent);
-				
-				XMStoreFloat3(&vertex.Normal, normal);
+				//Math::Vector3 normal = bitangent.Cross(tangent);
+
+				vertex.Normal = normal;
 				//vertex.TexCoord.x = static_cast<float>(j) / static_cast<float>(sliceCount);
 				//vertex.TexCoord.y = 1.0f - static_cast<float>(i) / static_cast<float>(stackCount);
 
@@ -114,11 +111,11 @@ namespace Bruno
 		}
 
 		// Create indices
-		for (UINT i = 0; i < stackCount; ++i)
+		for (uint32_t i = 0; i < stackCount; ++i)
 		{
-			for (UINT j = 0; j < sliceCount; ++j)
+			for (uint32_t j = 0; j < sliceCount; ++j)
 			{
-				UINT baseIndex = i * (sliceCount + 1) + j;
+				uint32_t baseIndex = i * (sliceCount + 1) + j;
 				indices.push_back(baseIndex);
 				indices.push_back(baseIndex + 1);
 				indices.push_back(baseIndex + sliceCount + 1);
@@ -127,6 +124,25 @@ namespace Bruno
 				indices.push_back(baseIndex + sliceCount + 2);
 				indices.push_back(baseIndex + sliceCount + 1);
 			}
+		}
+
+		// Create indices for the top face
+		for (uint32_t i = 0; i < sliceCount; ++i)
+		{
+			indices.push_back((i + 1) % sliceCount + 1);  // Next top vertex
+			indices.push_back(i + 1);              // Current top vertex
+			indices.push_back(0);                  // Apex
+		}
+
+		// Calculate the baseVertex for the bottom face
+		uint32_t baseVertex = static_cast<uint32_t>(vertices.size()) - (sliceCount + 1);
+
+		// Create indices for the bottom face
+		for (uint32_t i = 0; i < sliceCount; ++i)
+		{
+			indices.push_back(baseVertex + i + 1);   // Current bottom vertex
+			indices.push_back(baseVertex + (i + 1) % sliceCount + 1);   // Next bottom vertex
+			indices.push_back(baseVertex);           // Center of the bottom face
 		}
 	}
 }

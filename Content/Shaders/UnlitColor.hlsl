@@ -6,6 +6,7 @@ cbuffer cbPerObject : register(b0)
 struct VertexPosColorTex
 {
     float3 Position : POSITION;
+    float3 Normal    : NORMAL;
     float4 Color     : COLOR0;
 };
 

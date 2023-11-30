@@ -113,7 +113,13 @@ namespace Bruno
             device->GetSrvDescriptionHeap().Free(m_uavDescriptor);
     }
 
-	void GpuBuffer::SetMappedData(const void* data, size_t dataSize)
+    void GpuBuffer::Reset()
+    {
+        if (m_resource != nullptr)
+        	m_resource->Unmap(0, nullptr);
+    }
+
+    void GpuBuffer::SetMappedData(const void* data, size_t dataSize)
 	{
 		BR_ASSERT(m_mappedResource != nullptr && data != nullptr && dataSize > 0 && dataSize <= m_desc.Width);
 		memcpy_s(m_mappedResource, m_desc.Width, data, dataSize);

@@ -261,7 +261,7 @@ namespace Bruno
 			m_gizmoBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
 		}
 
-		m_gizmoShader = std::make_shared<Shader>(L"Shaders/UnlitColor.hlsl");
+		/*m_gizmoShader = std::make_shared<Shader>(L"Shaders/UnlitColor.hlsl");
 
 		PipelineResourceBinding textureBinding;
 		textureBinding.BindingIndex = 0;
@@ -285,7 +285,7 @@ namespace Bruno
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 		meshPipelineDesc.Topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 
-		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
+		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);*/
 
 		m_gizmoService = std::make_unique<GizmoService>(m_device.get(), m_camera, m_surface.get());
 	}

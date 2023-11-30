@@ -82,6 +82,8 @@ namespace Bruno
 
 		Flush();
 		m_inBeginEndPair = false;
+		//m_vertexBuffer->Reset();
+		//m_vertexBuffer->Reset();
 	}
 
 	void PrimitiveBatchBase::Flush()
@@ -100,7 +102,7 @@ namespace Bruno
 		if (m_isIndexed)
 		{
 			D3D12_INDEX_BUFFER_VIEW ibv;
-			ibv.BufferLocation = m_vertexBuffer->GetGpuAddress();
+			ibv.BufferLocation = m_indexBuffer->GetGpuAddress();
 			ibv.Format = DXGI_FORMAT_R16_UINT;
 			ibv.SizeInBytes = static_cast<uint32_t>(m_indexCount - m_baseIndex) * sizeof(uint16_t);
 			m_graphicsContext->SetIndexBuffer(ibv);
