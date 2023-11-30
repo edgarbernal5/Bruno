@@ -31,6 +31,7 @@ namespace Bruno
 		nana::menubar		m_menubar;
 		nana::place			m_place;
 
+		std::shared_ptr<GraphicsDevice>	m_device;
 		GameContentBuilder	m_contentBuilder;
 	};
 }

@@ -17,6 +17,7 @@ namespace Bruno
 	class GraphicsContext;
 	class Scene;
 	class SceneRenderer;
+	class GizmoService;
 	template<typename TVertex>
 	class PrimitiveBatch;
 
@@ -58,6 +59,7 @@ namespace Bruno
 		std::shared_ptr<PipelineStateObject>	m_pipelineObject;
 		PipelineResourceSpace			m_meshPerObjectResourceSpace;
 		
+		std::unique_ptr<GizmoService>	m_gizmoService;
 		std::unique_ptr<GraphicsContext>	m_graphicsContext;
 		std::unique_ptr<PrimitiveBatch<VertexPositionColor>>	m_primitiveBatch;
 

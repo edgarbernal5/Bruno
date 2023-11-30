@@ -16,6 +16,7 @@
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Renderer/SceneRenderer.h"
 #include "Bruno/Renderer/PrimitiveBatch.h"
+#include "Bruno/Editor/Gizmos/GizmoService.h"
 
 namespace Bruno
 {
@@ -128,25 +129,28 @@ namespace Bruno
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
 		
-		m_sceneRenderer->OnRender(m_graphicsContext.get());
+		//m_sceneRenderer->OnRender(m_graphicsContext.get());
 
-		//test
-		m_meshPerObjectResourceSpace.SetCBV(m_gizmoBuffer[m_device->GetFrameId()].get());
+		////test gizmo
+		m_gizmoService->OnRender(m_graphicsContext.get());
 
-		PipelineInfo pipeline;
-		pipeline.Pipeline = m_pipelineObject.get();
-		pipeline.RenderTargets.push_back(&backBuffer);
-		pipeline.DepthStencilTarget = &depthBuffer;
+		////test
+		//m_meshPerObjectResourceSpace.SetCBV(m_gizmoBuffer[m_device->GetFrameId()].get());
 
-		m_graphicsContext->SetPipeline(pipeline, false);
-		m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
+		//PipelineInfo pipeline;
+		//pipeline.Pipeline = m_pipelineObject.get();
+		//pipeline.RenderTargets.push_back(&backBuffer);
+		//pipeline.DepthStencilTarget = &depthBuffer;
 
-		m_primitiveBatch->Begin(m_graphicsContext.get());
+		//m_graphicsContext->SetPipeline(pipeline, false);
+		//m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
 
-		m_primitiveBatch->DrawLine(VertexPositionColor(Math::Vector3(0, 0, 0), Math::Color(1, 0, 0, 1)),
-			VertexPositionColor(Math::Vector3(3, 0, 0), Math::Color(1, 0, 0, 1)));
+		//m_primitiveBatch->Begin(m_graphicsContext.get());
 
-		m_primitiveBatch->End();
+		//m_primitiveBatch->DrawLine(VertexPositionColor(Math::Vector3(0, 0, 0), Math::Color(1, 0, 0, 1)),
+		//	VertexPositionColor(Math::Vector3(3, 0, 0), Math::Color(1, 0, 0, 1)));
+
+		//m_primitiveBatch->End();
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();
@@ -282,6 +286,8 @@ namespace Bruno
 		meshPipelineDesc.Topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 
 		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
+
+		m_gizmoService = std::make_unique<GizmoService>(m_device.get(), m_camera, m_surface.get());
 	}
 
 	void PlayerGame::InitializeShaderAndPipeline()

@@ -10,10 +10,10 @@
 
 namespace Bruno
 {
-    GizmoService::GizmoService(GraphicsDevice* device, Camera& camera) :
+    GizmoService::GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface) :
         m_camera(camera)
     {
-        m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device);
+        m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface);
     }
 
     bool GizmoService::BeginDrag(const Math::Vector2& mousePosition)

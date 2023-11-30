@@ -7,11 +7,12 @@ namespace Bruno
 	class GizmoTranslationRenderer;
 	class GraphicsContext;
 	class GraphicsDevice;
+	class Surface;
 
 	class GizmoService
 	{
 	public:
-		GizmoService(GraphicsDevice* device, Camera& camera);
+		GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface);
 
 		using DragTranslationScaleCallback = std::function<void(const Math::Vector3&)>;
 		using DragRotationCallback = std::function<void(const Math::Quaternion&)>;
@@ -149,7 +150,7 @@ namespace Bruno
 
 		Camera& m_camera;
 		bool m_isActive = true;
-		GizmoType m_currentGizmoType = GizmoType::None;
+		GizmoType m_currentGizmoType = GizmoType::Translation;
 		PivotType m_pivotType = PivotType::SelectionCenter;
 		GizmoAxis m_currentGizmoAxis = GizmoAxis::None;
 
@@ -160,6 +161,7 @@ namespace Bruno
 		DragRotationCallback m_dragRotationCallback;
 
 		std::shared_ptr<GizmoTranslationRenderer> m_gizmoTranslationRenderer;
+		Surface* m_surface;
 	};
 }
 
