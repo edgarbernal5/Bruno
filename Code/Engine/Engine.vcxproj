@@ -133,6 +133,7 @@
     <ClInclude Include="Source\Bruno\Core\RTTI.h" />
     <ClInclude Include="Source\Bruno\Core\Stream.h" />
     <ClInclude Include="Source\Bruno\Core\StringHelpers.h" />
+    <ClInclude Include="Source\Bruno\Editor\Gizmos\Constants.h" />
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoService.h" />
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoTranslationRenderer.h" />
     <ClInclude Include="Source\Bruno\Math\Math.h" />

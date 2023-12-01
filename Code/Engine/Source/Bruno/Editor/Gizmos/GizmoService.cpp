@@ -97,7 +97,7 @@ namespace Bruno
     void GizmoService::Update()
     {
         auto gizmoPositionViewSpace = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, m_camera.GetView());
-        m_selectionState.m_screenScaleFactor = Math::Abs(gizmoPositionViewSpace.z) * GIZMO_SCREEN_SCALE;
+        m_selectionState.m_screenScaleFactor = Math::Abs(gizmoPositionViewSpace.z) * Gizmo::GIZMO_SCREEN_SCALE;
 
         if (m_selectionState.m_screenScaleFactor < 0.0001f)
         {
@@ -161,7 +161,7 @@ namespace Bruno
         if (m_currentGizmoAxis == GizmoAxis::XYZ)
         {
             auto gizmoScreenPosition = GetScreenPosition(m_selectionState.m_gizmoPosition);
-            auto gizmoScreenPosition2 = GetScreenPosition(m_selectionState.m_gizmoPosition + m_camera.GetView().Right() * GIZMO_LENGTH);
+            auto gizmoScreenPosition2 = GetScreenPosition(m_selectionState.m_gizmoPosition + m_camera.GetView().Right() * Gizmo::GIZMO_LENGTH);
             auto length = 3.0f * (gizmoScreenPosition2 - gizmoScreenPosition).Length() / DirectX::XM_2PI;
             Math::Vector2 deltaAngles(1.0f / length);
 
@@ -333,7 +333,7 @@ namespace Bruno
                 if (ray.Intersects(plane, intersection))
                 {
                     auto positionOnPlane = ray.position + (ray.direction * intersection);
-                    if (positionOnPlane.Length() > GIZMO_LENGTH)
+                    if (positionOnPlane.Length() > Gizmo::GIZMO_LENGTH)
                     {
                         continue;
                     }
@@ -351,7 +351,7 @@ namespace Bruno
             }
             if (selectedAxis != GizmoAxis::None)
             {
-                if (currentPointOnPlane.Length() < GIZMO_LENGTH * 0.8f)
+                if (currentPointOnPlane.Length() < Gizmo::GIZMO_LENGTH * 0.8f)
                 {
                     selectedAxis = GizmoAxis::XYZ;
                 }

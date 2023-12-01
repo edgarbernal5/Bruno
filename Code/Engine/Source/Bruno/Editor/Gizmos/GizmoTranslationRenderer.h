@@ -25,7 +25,7 @@ namespace Bruno
 		void Render(GraphicsContext* context);
 
 	private:
-		void CreateCylinder(float radius, float height, uint32_t sliceCount, uint32_t stackCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color);
+		void CreateCylinder(float radius, float height, uint32_t sliceCount, uint32_t stackCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
 
 		Camera& m_camera;
 		Surface* m_surface;
@@ -43,6 +43,8 @@ namespace Bruno
 		PipelineResourceSpace			m_meshPerObjectResourceSpace;
 
 
+		std::vector<VertexPositionNormalColor> m_vertices;
+		std::vector<uint16_t> m_indices;
 	};
 }
 

@@ -288,6 +288,9 @@
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoTranslationRenderer.h">
       <Filter>Source\Bruno\Editor\Gizmos</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Editor\Gizmos\Constants.h">
+      <Filter>Source\Bruno\Editor\Gizmos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">

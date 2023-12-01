@@ -4,6 +4,7 @@
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
 #include "Bruno/Platform/DirectX/Surface.h"
 #include "Bruno/Renderer/Camera.h"
+#include "GizmoService.h"
 
 namespace Bruno
 {
@@ -39,6 +40,16 @@ namespace Bruno
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 
 		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
+
+		Math::Matrix world;
+		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
+		CreateCylinder(0.25f, 5.0f, 4, 3, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
+
+		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
+		CreateCylinder(0.25f, 5.0f, 4, 3, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+
+		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Backward * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
+		CreateCylinder(0.25f, 5.0f, 4, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
 	}
 
 	void GizmoTranslationRenderer::Render(GraphicsContext* context)
@@ -52,9 +63,6 @@ namespace Bruno
 		uint32_t frameIndex = device->GetFrameId();
 		m_constantBuffers[frameIndex]->SetMappedData(objectBuffer);
 
-		std::vector<VertexPositionNormalColor> vertices;
-		std::vector<uint16_t> indices;
-		CreateCylinder(2, 5, 20, 10, vertices, indices, Math::Vector4(1, 0, 0, 1));
 		
 		m_meshPerObjectResourceSpace.SetCBV(m_constantBuffers[frameIndex].get());
 
@@ -70,19 +78,17 @@ namespace Bruno
 		context->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
 
 		m_batch->Begin(context);
-		m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices.data(), indices.size(), vertices.data(), vertices.size());
+		m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, m_indices.data(), m_indices.size(), m_vertices.data(), m_vertices.size());
 		m_batch->End();
 	}
 
-	void GizmoTranslationRenderer::CreateCylinder(float radius, float height, uint32_t sliceCount, uint32_t stackCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color)
+	void GizmoTranslationRenderer::CreateCylinder(float radius, float height, uint32_t sliceCount, uint32_t stackCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
 	{
-		vertices.clear();
-		indices.clear();
-
 		// Create vertices
 		float stackHeight = height / static_cast<float>(stackCount);
 		float radiusStep = radius / static_cast<float>(stackCount);
 
+		uint32_t shapeIndexOffset = vertices.size();
 		for (uint32_t i = 0; i <= stackCount; ++i)
 		{
 			float y = -0.5f * height + i * stackHeight;
@@ -95,6 +101,8 @@ namespace Bruno
 				vertex.Position.x = radius * std::cosf(phi);
 				vertex.Position.y = y;
 				vertex.Position.z = radius * std::sinf(phi);
+
+				vertex.Position = Math::Vector3::Transform(vertex.Position, world);
 
 				Math::Vector3 tangent(-std::sinf(phi), 0.0f, std::cosf(phi));
 				Math::Vector3 bitangent(std::cosf(phi), 0.0f, std::sinf(phi));
@@ -109,13 +117,14 @@ namespace Bruno
 				vertices.push_back(vertex);
 			}
 		}
+		uint32_t shapeVertexOffset = vertices.size();
 
 		// Create indices
 		for (uint32_t i = 0; i < stackCount; ++i)
 		{
 			for (uint32_t j = 0; j < sliceCount; ++j)
 			{
-				uint32_t baseIndex = i * (sliceCount + 1) + j;
+				uint32_t baseIndex = shapeIndexOffset + i * (sliceCount + 1) + j;
 				indices.push_back(baseIndex);
 				indices.push_back(baseIndex + 1);
 				indices.push_back(baseIndex + sliceCount + 1);
@@ -129,13 +138,13 @@ namespace Bruno
 		// Create indices for the top face
 		for (uint32_t i = 0; i < sliceCount; ++i)
 		{
-			indices.push_back((i + 1) % sliceCount + 1);  // Next top vertex
-			indices.push_back(i + 1);              // Current top vertex
-			indices.push_back(0);                  // Apex
+			indices.push_back(shapeIndexOffset + (i + 1) % sliceCount + 1);  // Next top vertex
+			indices.push_back(shapeIndexOffset + i + 1);              // Current top vertex
+			indices.push_back(shapeIndexOffset);                  // Apex
 		}
 
 		// Calculate the baseVertex for the bottom face
-		uint32_t baseVertex = static_cast<uint32_t>(vertices.size()) - (sliceCount + 1);
+		uint32_t baseVertex = static_cast<uint32_t>(shapeVertexOffset) - (sliceCount + 1);
 
 		// Create indices for the bottom face
 		for (uint32_t i = 0; i < sliceCount; ++i)

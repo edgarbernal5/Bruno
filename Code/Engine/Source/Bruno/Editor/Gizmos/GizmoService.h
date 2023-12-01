@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Bruno/Renderer/Camera.h"
+#include "Constants.h"
 
 namespace Bruno
 {
@@ -64,7 +65,6 @@ namespace Bruno
 		void SetRotationCallback(DragRotationCallback callback) {
 			m_dragRotationCallback = callback;
 		}
-
 	private:
 		struct SelectionState
 		{
@@ -90,52 +90,39 @@ namespace Bruno
 		Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
 		Math::Quaternion GetRotationDelta(const Math::Vector2& mousePosition);
 
-		const float LINE_LENGTH = 3.0f;
-		const float CONE_HEIGHT = 0.5f;
-		const float CONE_RADIUS = 0.25f;
-		const float LINE_OFFSET = 1.0f;
-		const float GIZMO_LENGTH = LINE_LENGTH + CONE_HEIGHT;
-
-		const float GIZMO_SCREEN_SCALE = 0.075f;
-		const float GIZMO_SIZE_CLIP_SPACE = 2.3f;
-		const float CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS = 60.0f;
-
-		const float MULTI_AXIS_THICKNESS = 0.05f;
-		const float SINGLE_AXIS_THICKNESS = 0.35f;
-
 		const Math::BoundingBox XAxisBox{
-			DirectX::XMFLOAT3((GIZMO_LENGTH + LINE_OFFSET) * 0.5f, 0.0f, 0.0f),
-			DirectX::XMFLOAT3((GIZMO_LENGTH - LINE_OFFSET) * 0.5f, SINGLE_AXIS_THICKNESS * 0.5f, SINGLE_AXIS_THICKNESS * 0.5f)
+			DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f, 0.0f, 0.0f),
+			DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH - Gizmo::LINE_OFFSET) * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f)
 		};
 
 		const Math::BoundingBox YAxisBox{
-			DirectX::XMFLOAT3(0.0f, (GIZMO_LENGTH + LINE_OFFSET) * 0.5f, 0.0f),
-			DirectX::XMFLOAT3(SINGLE_AXIS_THICKNESS * 0.5f, (GIZMO_LENGTH - LINE_OFFSET) * 0.5f, SINGLE_AXIS_THICKNESS * 0.5f)
+			DirectX::XMFLOAT3(0.0f, (Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f, 0.0f),
+			DirectX::XMFLOAT3(Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, (Gizmo::GIZMO_LENGTH - Gizmo::LINE_OFFSET) * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f)
 		};
 
 		const Math::BoundingBox ZAxisBox{
-			DirectX::XMFLOAT3(0.0f, 0.0f, (GIZMO_LENGTH + LINE_OFFSET) * 0.5f),
-			DirectX::XMFLOAT3(SINGLE_AXIS_THICKNESS * 0.5f, SINGLE_AXIS_THICKNESS * 0.5f, (GIZMO_LENGTH - LINE_OFFSET) * 0.5f)
+			DirectX::XMFLOAT3(0.0f, 0.0f, (Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f),
+			DirectX::XMFLOAT3(Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, (Gizmo::GIZMO_LENGTH - Gizmo::LINE_OFFSET) * 0.5f)
 		};
 
 		const Math::BoundingBox XZAxisBox{
-			DirectX::XMFLOAT3(LINE_OFFSET * 0.5f, MULTI_AXIS_THICKNESS * 0.5f, LINE_OFFSET * 0.5f),
-			DirectX::XMFLOAT3(LINE_OFFSET * 0.5f, MULTI_AXIS_THICKNESS * 0.5f, LINE_OFFSET * 0.5f)
+			DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f),
+			DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f)
 		};
 
 		const Math::BoundingBox XYBox{
-			DirectX::XMFLOAT3(LINE_OFFSET * 0.5f, LINE_OFFSET * 0.5f, MULTI_AXIS_THICKNESS * 0.5f),
-			DirectX::XMFLOAT3(LINE_OFFSET * 0.5f, LINE_OFFSET * 0.5f, MULTI_AXIS_THICKNESS * 0.5f)
+			DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f),
+			DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f)
 		};
 
 		const Math::BoundingBox YZBox{
-			DirectX::XMFLOAT3(MULTI_AXIS_THICKNESS * 0.5f, LINE_OFFSET * 0.5f, LINE_OFFSET * 0.5f),
-			DirectX::XMFLOAT3(MULTI_AXIS_THICKNESS * 0.5f, LINE_OFFSET * 0.5f, LINE_OFFSET * 0.5f)
+			DirectX::XMFLOAT3(Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f),
+			DirectX::XMFLOAT3(Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f)
 		};
 
 		const Math::BoundingBox XYZBox{
 			DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
-			DirectX::XMFLOAT3(LINE_LENGTH * 0.25f, LINE_LENGTH * 0.25f, LINE_LENGTH * 0.25f)
+			DirectX::XMFLOAT3(Gizmo::LINE_LENGTH * 0.25f, Gizmo::LINE_LENGTH * 0.25f, Gizmo::LINE_LENGTH * 0.25f)
 		};
 		
 		const Math::Vector3 m_unaryDirections[3]{ Math::Vector3::UnitX, Math::Vector3::UnitY, Math::Vector3::UnitZ };
