@@ -11,7 +11,8 @@
 namespace Bruno
 {
     GizmoService::GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface) :
-        m_camera(camera)
+        m_camera(camera),
+        m_surface(surface)
     {
         m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface);
     }

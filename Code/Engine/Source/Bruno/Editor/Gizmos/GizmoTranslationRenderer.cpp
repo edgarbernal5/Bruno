@@ -42,14 +42,20 @@ namespace Bruno
 		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 
 		Math::Matrix world;
-		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
-		CreateCylinder(0.25f, 5.0f, 4, 3, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
+		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * Gizmo::LINE_LENGTH * 0.5f);
+		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, 4, 3, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (Gizmo::LINE_LENGTH) * 0.5f);
+		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, 4, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
 
-		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
-		CreateCylinder(0.25f, 5.0f, 4, 3, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * Gizmo::LINE_LENGTH * 0.5f);
+		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, 4, 3, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
+		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, 4, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
 
-		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Backward * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
-		CreateCylinder(0.25f, 5.0f, 4, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
+		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * Gizmo::LINE_LENGTH * 0.5f);
+		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, 4, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
+		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, 4, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
 	}
 
 	void GizmoTranslationRenderer::Render(GraphicsContext* context)
@@ -80,6 +86,75 @@ namespace Bruno
 		m_batch->Begin(context);
 		m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, m_indices.data(), m_indices.size(), m_vertices.data(), m_vertices.size());
 		m_batch->End();
+	}
+
+	void GizmoTranslationRenderer::CreateCone(float radius, float height, uint32_t sliceCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
+	{
+		//ver DirectX::ComputeCone
+		size_t verticesOffset = vertices.size();
+		
+		height *= 0.5f;
+
+		Math::Vector3 topOffset(0, height, 0);
+
+		const size_t stride = sliceCount + 1;
+
+		// Create the base vertices
+		for (uint32_t i = 0; i <= sliceCount; ++i)
+		{
+			float phi = 2.0f * DirectX::XM_PI * i / sliceCount;
+
+			VertexPositionNormalColor vertex;
+			Math::Vector3 pt = Math::Vector3(radius * std::sinf(phi), -height * 0.5f, radius * std::cosf(phi));
+			
+			float phi2 = phi + DirectX::XM_PIDIV2;
+			Math::Vector3 tangent(std::sinf(phi2), 0.0f, std::cosf(phi2));
+			Math::Vector3 bitangent = topOffset - pt;
+			Math::Vector3 normal = tangent.Cross(bitangent);
+
+			//vertex.TexCoord = DirectX::XMFLOAT2((cosf(phi) + 1.0f) * 0.5f, (sinf(phi) + 1.0f) * 0.5f);
+			vertex.Color = color;
+
+			vertex.Position = topOffset;
+			vertex.Position = Math::Vector3::Transform(vertex.Position, world);
+			vertices.push_back(vertex);
+
+			vertex.Position = pt;
+			vertex.Position = Math::Vector3::Transform(vertex.Position, world);
+			vertices.push_back(vertex);
+
+			indices.push_back(verticesOffset + i * 2);
+			indices.push_back(verticesOffset + (i * 2 + 3) % (stride * 2));
+			indices.push_back(verticesOffset + (i * 2 + 1) % (stride * 2));
+		}
+
+		// Create cap indices.
+		for (size_t i = 0; i < sliceCount - 2; i++)
+		{
+			size_t i1 = (i + 1) % sliceCount;
+			size_t i2 = (i + 2) % sliceCount;
+
+			const size_t vbase = vertices.size();
+			indices.push_back(vbase);
+			indices.push_back(vbase + i1);
+			indices.push_back(vbase + i2);
+		}
+
+		Math::Vector3 normal = Math::Vector3::Down;
+		// Create cap vertices.
+		for (size_t i = 0; i < sliceCount; i++)
+		{
+			float phi = 2.0f * DirectX::XM_PI * i / sliceCount;
+
+			VertexPositionNormalColor vertex;
+			Math::Vector3 pt = Math::Vector3(radius * std::sinf(phi), normal.y * height * 0.5f, radius * std::cosf(phi));
+
+			vertex.Position = pt;
+			vertex.Normal = normal;
+			vertex.Color = color;
+			vertex.Position = Math::Vector3::Transform(vertex.Position, world);
+			vertices.push_back(vertex);
+		}
 	}
 
 	void GizmoTranslationRenderer::CreateCylinder(float radius, float height, uint32_t sliceCount, uint32_t stackCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
