@@ -105,7 +105,7 @@ namespace Bruno
 			float phi = 2.0f * DirectX::XM_PI * i / sliceCount;
 
 			VertexPositionNormalColor vertex;
-			Math::Vector3 pt = Math::Vector3(radius * std::sinf(phi), -height * 0.5f, radius * std::cosf(phi));
+			Math::Vector3 pt = Math::Vector3(radius * std::sinf(phi), -height, radius * std::cosf(phi));
 			
 			float phi2 = phi + DirectX::XM_PIDIV2;
 			Math::Vector3 tangent(std::sinf(phi2), 0.0f, std::cosf(phi2));
@@ -115,12 +115,11 @@ namespace Bruno
 			//vertex.TexCoord = DirectX::XMFLOAT2((cosf(phi) + 1.0f) * 0.5f, (sinf(phi) + 1.0f) * 0.5f);
 			vertex.Color = color;
 
-			vertex.Position = topOffset;
-			vertex.Position = Math::Vector3::Transform(vertex.Position, world);
+			vertex.Normal = normal;
+			vertex.Position = Math::Vector3::Transform(topOffset, world);
 			vertices.push_back(vertex);
 
-			vertex.Position = pt;
-			vertex.Position = Math::Vector3::Transform(vertex.Position, world);
+			vertex.Position = Math::Vector3::Transform(pt, world);
 			vertices.push_back(vertex);
 
 			indices.push_back(verticesOffset + i * 2);
@@ -147,7 +146,7 @@ namespace Bruno
 			float phi = 2.0f * DirectX::XM_PI * i / sliceCount;
 
 			VertexPositionNormalColor vertex;
-			Math::Vector3 pt = Math::Vector3(radius * std::sinf(phi), normal.y * height * 0.5f, radius * std::cosf(phi));
+			Math::Vector3 pt = Math::Vector3(radius * std::sinf(phi), normal.y * height, radius * std::cosf(phi));
 
 			vertex.Position = pt;
 			vertex.Normal = normal;
