@@ -66,6 +66,7 @@ namespace Bruno
 		Math::Int2	m_lastMousePosition;
 		Camera		m_camera;
 
+		bool m_isGizmoing = false;
 		struct ObjectBuffer
 		{
 			Math::Matrix World;

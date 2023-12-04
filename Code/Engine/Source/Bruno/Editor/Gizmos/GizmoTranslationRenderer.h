@@ -23,7 +23,9 @@ namespace Bruno
 		GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface);
 
 		void Render(GraphicsContext* context);
-
+		void SetWorld(Math::Matrix world) {
+			m_gizmoWorld = world;
+		}
 	private:
 		void CreateCone(float radius, float height, uint32_t sliceCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
 		void CreateCylinder(float radius, float height, uint32_t sliceCount, uint32_t stackCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
@@ -32,6 +34,7 @@ namespace Bruno
 		Surface* m_surface;
 		std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> m_batch;
 
+		Math::Matrix m_gizmoWorld;
 		struct ObjectBuffer
 		{
 			Math::Matrix World;

@@ -61,7 +61,7 @@ namespace Bruno
 	void GizmoTranslationRenderer::Render(GraphicsContext* context)
 	{
 		auto device = Graphics::GetDevice();
-		Math::Matrix mvpMatrix = m_camera.GetViewProjection();
+		Math::Matrix mvpMatrix = m_gizmoWorld * m_camera.GetViewProjection();
 
 		ObjectBuffer objectBuffer;
 		objectBuffer.World = mvpMatrix;

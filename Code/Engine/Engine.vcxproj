@@ -136,6 +136,7 @@
     <ClInclude Include="Source\Bruno\Editor\Gizmos\Constants.h" />
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoService.h" />
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoTranslationRenderer.h" />
+    <ClInclude Include="Source\Bruno\Editor\ObjectSelector.h" />
     <ClInclude Include="Source\Bruno\Math\Math.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Context.h" />
@@ -200,6 +201,7 @@
     <ClCompile Include="Source\Bruno\Core\StringHelpers.cpp" />
     <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoService.cpp" />
     <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoTranslationRenderer.cpp" />
+    <ClCompile Include="Source\Bruno\Editor\ObjectSelector.cpp" />
     <ClCompile Include="Source\Bruno\Math\Math.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Context.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
