@@ -173,6 +173,10 @@ namespace Bruno
 
     void GizmoService::EndDrag()
     {
+        m_selectionState.m_prevIntersectionPosition = Math::Vector3::Zero;
+        m_selectionState.m_intersectionPosition = Math::Vector3::Zero;
+        m_selectionState.m_prevMousePosition = Math::Vector2::Zero;
+        m_currentDelta = Math::Vector3::Zero;
     }
 
     Math::Vector3 GizmoService::ApplySnapAndPrecisionMode(Math::Vector3 delta)
