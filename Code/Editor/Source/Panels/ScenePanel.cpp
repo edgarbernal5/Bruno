@@ -123,7 +123,6 @@ namespace Bruno
 				m_surface->Resize(this->size().width, this->size().height);
 			}
 			m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)this->size().width, (float)this->size().height));
-			m_camera.UpdateMatrices();
 			m_isSizingMoving = false;
 		});
 
@@ -154,7 +153,6 @@ namespace Bruno
 				m_surface->Initialize();
 			}
 			m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.width, (float)args.height));
-			m_camera.UpdateMatrices();
 			m_isResizing = false;
 		});
 
@@ -172,17 +170,14 @@ namespace Bruno
 			if (args.left_button)
 			{
 				m_camera.Rotate(currentPosition, m_lastMousePosition);
-				m_camera.UpdateMatrices();
 			}
 			else if (args.mid_button)
 			{
 				m_camera.HandTool(currentPosition, m_lastMousePosition);
-				m_camera.UpdateMatrices();
 			}
 			else if (args.right_button)
 			{
 				m_camera.PitchYaw(currentPosition, m_lastMousePosition);
-				m_camera.UpdateMatrices();
 			}
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
@@ -199,7 +194,6 @@ namespace Bruno
 			if (!args.upwards) zoom = -zoom;
 
 			m_camera.Zoom(zoom);
-			m_camera.UpdateMatrices();
 		});
 
 		m_form->events().key_press([this](const nana::arg_keyboard& args)
@@ -207,22 +201,18 @@ namespace Bruno
 			if (args.key == 'A')
 			{
 				m_camera.Strafe(-0.25f);
-				m_camera.UpdateMatrices();
 			}
 			else if (args.key == 'D')
 			{
 				m_camera.Strafe(0.25f);
-				m_camera.UpdateMatrices();
 			}
 			else if (args.key == 'W')
 			{
 				m_camera.Walk(0.25f);
-				m_camera.UpdateMatrices();
 			}
 			else if (args.key == 'S')
 			{
 				m_camera.Walk(-0.25f);
-				m_camera.UpdateMatrices();
 			}
 		});
 

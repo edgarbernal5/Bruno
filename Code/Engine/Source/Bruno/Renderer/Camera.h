@@ -32,8 +32,6 @@ namespace Bruno
 		void Strafe(float delta);
 		void Walk(float delta);
 
-		void UpdateMatrices();
-
 	private:
 		Math::Vector3 m_position;
 		Math::Vector3 m_target;

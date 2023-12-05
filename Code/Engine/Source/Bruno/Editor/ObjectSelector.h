@@ -1,15 +1,18 @@
 #pragma once
 
 #include <vector>
+#include "Bruno/Math/Math.h"
 
 namespace Bruno
 {
 	class ObjectSelector
 	{
 	public:
-		std::vector<int>& GetSelectedObjects() { return m_objects; }
+		ObjectSelector();
+		std::vector<Math::Matrix>& GetSelectedObjects() { return m_objects; }
+
 	private:
-		std::vector<int> m_objects;
+		std::vector<Math::Matrix> m_objects;
 	};
 }
 

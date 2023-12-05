@@ -21,53 +21,6 @@
 
 namespace Bruno
 {
-	static VertexPositionNormalTexture g_Vertices[24] = {
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, 0.0f, -1.0f), Math::Vector2(1.0f, 1.0f) },
-
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(1.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(+1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(0.0f, 1.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 0.0f, 1.0f), Math::Vector2(1.0f, 0.0f) },
-
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, 1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, -1.0f), Math::Vector3(0.0f, 1.0f, 0.0f), Math::Vector2(1.0f, 1.0f) },
-
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(1.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, -1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(0.0f, 1.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, 1.0f), Math::Vector3(0.0f, -1.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
-
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, 1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, 1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, 1.0f, -1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(-1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 1.0f) },
-
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, -1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 1.0f)},
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, -1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(0.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, 1.0f, 1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 0.0f) },
-	VertexPositionNormalTexture{ Math::Vector3(1.0f, -1.0f, 1.0f), Math::Vector3(1.0f, 0.0f, 0.0f), Math::Vector2(1.0f, 1.0f) },
-
-	};
-
-	static uint16_t g_Indices[36] = { 0, 1, 2,
-		0, 2, 3,
-		4, 5, 6, 
-		4, 6, 7,
-		8, 9, 10, 
-		8, 10, 11,
-		12, 13, 14, 
-		12, 14, 15, 
-		16, 17, 18, 
-		16, 18, 19, 
-		20, 21, 22,
-		20, 22, 23 
-	};
-
 	PlayerGame::PlayerGame(const ApplicationParameters& parameters)
 		: Game(parameters)
 	{
@@ -96,7 +49,6 @@ namespace Bruno
 		m_surface->Resize(m_window->GetWidth(), m_window->GetHeight());
 		
 		m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)m_window->GetWidth(), (float)m_window->GetHeight()));
-		m_camera.UpdateMatrices();
 	}
 	
 	void PlayerGame::OnGameLoop(const GameTimer& timer)
@@ -136,24 +88,6 @@ namespace Bruno
 		////test gizmo
 		m_gizmoService->OnRender(m_graphicsContext.get());
 
-		////test
-		//m_meshPerObjectResourceSpace.SetCBV(m_gizmoBuffer[m_device->GetFrameId()].get());
-
-		//PipelineInfo pipeline;
-		//pipeline.Pipeline = m_pipelineObject.get();
-		//pipeline.RenderTargets.push_back(&backBuffer);
-		//pipeline.DepthStencilTarget = &depthBuffer;
-
-		//m_graphicsContext->SetPipeline(pipeline, false);
-		//m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
-
-		//m_primitiveBatch->Begin(m_graphicsContext.get());
-
-		//m_primitiveBatch->DrawLine(VertexPositionColor(Math::Vector3(0, 0, 0), Math::Color(1, 0, 0, 1)),
-		//	VertexPositionColor(Math::Vector3(3, 0, 0), Math::Color(1, 0, 0, 1)));
-
-		//m_primitiveBatch->End();
-
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();
 
@@ -186,17 +120,14 @@ namespace Bruno
 			if (btnState.LeftButton)
 			{
 				m_camera.Rotate(currentPosition, m_lastMousePosition);
-				m_camera.UpdateMatrices();
 			}
 			else if (btnState.MiddleButton)
 			{
 				m_camera.HandTool(currentPosition, m_lastMousePosition);
-				m_camera.UpdateMatrices();
 			}
 			else if (btnState.RightButton)
 			{
 				m_camera.PitchYaw(currentPosition, m_lastMousePosition);
-				m_camera.UpdateMatrices();
 			}
 		}
 		m_lastMousePosition = currentPosition;
@@ -216,7 +147,6 @@ namespace Bruno
 	{
 		float zoom = wheelDelta * 0.0025f;
 		m_camera.Zoom(zoom);
-		m_camera.UpdateMatrices();
 	}
 
 	void PlayerGame::OnKeyPressed(KeyCode key, KeyboardState state)
@@ -225,22 +155,18 @@ namespace Bruno
 		if (key == KeyCode::A)
 		{
 			m_camera.Strafe(-0.25f);
-			m_camera.UpdateMatrices();
 		}
 		else if (key == KeyCode::D)
 		{
 			m_camera.Strafe(0.25f);
-			m_camera.UpdateMatrices();
 		}
 		else if (key == KeyCode::W)
 		{
 			m_camera.Walk(0.25f);
-			m_camera.UpdateMatrices();
 		}
 		else if (key == KeyCode::S)
 		{
 			m_camera.Walk(-0.25f);
-			m_camera.UpdateMatrices();
 		}
 		m_shiftPressed = (state.Shift);
 	}
@@ -280,45 +206,10 @@ namespace Bruno
 		m_scene->AddModel(model);
 
 		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
-
-		///test
-
-		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-		{
-			m_gizmoBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
-		}
-
-		/*m_gizmoShader = std::make_shared<Shader>(L"Shaders/UnlitColor.hlsl");
-
-		PipelineResourceBinding textureBinding;
-		textureBinding.BindingIndex = 0;
-
-		m_meshPerObjectResourceSpace.SetCBV(m_gizmoBuffer[0].get());
-		m_meshPerObjectResourceSpace.Lock();
-
-		PipelineResourceLayout meshResourceLayout;
-		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &m_meshPerObjectResourceSpace;
-
-		PipelineResourceMapping resourceMapping;
-		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
-
-		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
-		meshPipelineDesc.VertexShader = m_gizmoShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-		meshPipelineDesc.PixelShader = m_gizmoShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = m_surface->GetDepthBufferFormat();
-		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
-		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = m_surface->GetSurfaceFormat();
-		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		meshPipelineDesc.Topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
-
-		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);*/
-
 	}
 
 	void PlayerGame::InitializeShaderAndPipeline()
 	{
-		m_primitiveBatch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(Graphics::GetDevice(), 4096 * 3, 4096);
 	}
 
 	void PlayerGame::InitializeSurface()

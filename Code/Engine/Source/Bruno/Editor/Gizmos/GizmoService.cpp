@@ -18,7 +18,6 @@ namespace Bruno
     {
         m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface);
 
-        camera.UpdateMatrices();
         for (size_t i = 0; i < 3; i++)
         {
             m_activeAxisColors[i] = m_axisColors[i];
@@ -29,7 +28,8 @@ namespace Bruno
         m_selectionState.m_screenScaleMatrix = Math::Matrix::Identity;
         m_selectionState.m_objectRotation = Math::Matrix::Identity;
         m_selectionState.m_gizmoPosition = Math::Vector3::Zero;
-        Update();
+
+        UpdateLocalState();
     }
 
     bool GizmoService::BeginDrag(const Math::Vector2& mousePosition)
@@ -41,7 +41,6 @@ namespace Bruno
         m_currentGizmoAxis = selectedAxis;
         m_currentDelta = Math::Vector3::Zero;
 
-        BR_CORE_TRACE << "selectedAxis = " << (int)selectedAxis << std::endl;
         if (m_currentGizmoAxis == GizmoAxis::None)
             return false;
 
@@ -68,9 +67,12 @@ namespace Bruno
             translationDelta = ApplySnapAndPrecisionMode(translationDelta);
 
             translationDelta = Math::Vector3::Transform(translationDelta, m_selectionState.m_rotationMatrix);
-            m_dragTranslationCallback(translationDelta);
+            
             m_selectionState.m_gizmoPosition += translationDelta;
             BR_CORE_TRACE << "gizmo position x = " << m_selectionState.m_gizmoPosition.x << "; y = " << m_selectionState.m_gizmoPosition.y << "; z = " << m_selectionState.m_gizmoPosition.z << std::endl;
+
+            m_dragTranslationCallback(translationDelta);
+            
             break;
         }
         case GizmoType::Rotation:
@@ -89,7 +91,7 @@ namespace Bruno
         }
         }
 
-        Update();
+        UpdateLocalState();
     }
 
     void GizmoService::OnMouseMove(const Math::Vector2& mousePosition)
@@ -150,7 +152,6 @@ namespace Bruno
         switch (m_currentGizmoType)
         {
         case Bruno::GizmoService::GizmoType::Translation:
-            m_gizmoTranslationRenderer->SetWorld(m_selectionState.m_gizmoObjectOrientedWorld);
             m_gizmoTranslationRenderer->Render(context);
             break;
         case Bruno::GizmoService::GizmoType::Rotation:
@@ -163,6 +164,28 @@ namespace Bruno
     }
 
     void GizmoService::Update()
+    {
+        if (m_currentGizmoType == GizmoType::None || !m_isActive)
+            return;
+
+        UpdateLocalState();
+
+        switch (m_currentGizmoType)
+        {
+        case Bruno::GizmoService::GizmoType::Translation:
+            m_gizmoTranslationRenderer->SetWorld(m_selectionState.m_gizmoObjectOrientedWorld);
+            m_gizmoTranslationRenderer->Update();
+            break;
+        case Bruno::GizmoService::GizmoType::Rotation:
+            break;
+        case Bruno::GizmoService::GizmoType::Scale:
+            break;
+        default:
+            break;
+        }
+    }
+
+    void GizmoService::UpdateLocalState()
     {
         auto gizmoPositionViewSpace = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, m_camera.GetView());
         m_selectionState.m_screenScaleFactor = Math::Abs(gizmoPositionViewSpace.z) * Gizmo::GIZMO_SCREEN_SCALE;
@@ -177,9 +200,9 @@ namespace Bruno
         }
         m_selectionState.m_screenScaleMatrix = Math::Matrix::CreateScale(m_selectionState.m_screenScaleFactor);
 
-        //if (m_objectSelector->GetSelectedObjects().size() == 0)
+        if (m_objectSelector->GetSelectedObjects().size() == 0)
         {
-            //return;
+            return;
         }
         m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
 
@@ -205,25 +228,25 @@ namespace Bruno
         }
         else
         {
-            //var selectedObject = m_objectSelector.SelectedObjects[0];
-            //var localRotationMatrix = selectedObject.WorldMatrix;
-            //var localForward = localRotationMatrix.Forward;
-            //var localUp = localRotationMatrix.Up;
+            //auto selectedObject = m_objectSelector->GetSelectedObjects()[0];
+            auto localRotationMatrix = m_objectSelector->GetSelectedObjects()[0];
+            auto localForward = localRotationMatrix.Forward();
+            auto localUp = localRotationMatrix.Up();
 
-            //localForward.Normalize();
-            //var localRight = Vector3.Cross(localForward, localUp);
-            //localUp = Vector3.Cross(localRight, localForward);
-            //localRight.Normalize();
-            //localUp.Normalize();
+            localForward.Normalize();
+            auto localRight = localForward.Cross(localUp);
+            localUp = localRight.Cross(localForward);
+            localRight.Normalize();
+            localUp.Normalize();
 
-            //m_selectionState.m_gizmoObjectOrientedWorld = m_selectionState.m_screenScaleMatrix *
-            //    Matrix.CreateWorld(m_selectionState.m_gizmoPosition, localForward, localUp);
+            m_selectionState.m_gizmoObjectOrientedWorld = m_selectionState.m_screenScaleMatrix *
+                Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, localForward, localUp);
 
-            //m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_gizmoObjectOrientedWorld;
+            m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_gizmoObjectOrientedWorld;
 
-            //m_selectionState.m_rotationMatrix.Forward = localForward;
-            //m_selectionState.m_rotationMatrix.Up = localUp;
-            //m_selectionState.m_rotationMatrix.Right = localRight;
+            m_selectionState.m_rotationMatrix.Forward(localForward);
+            m_selectionState.m_rotationMatrix.Up(localUp);
+            m_selectionState.m_rotationMatrix.Right(localRight);
         }
 
     }
@@ -300,6 +323,7 @@ namespace Bruno
             auto ray = ConvertMousePositionToRay(mousePosition);
             ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
             ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+            ray.direction.Normalize();
 
             Math::Plane plane(planeNormals[planeIndex], 0);
 
@@ -406,7 +430,7 @@ namespace Bruno
                 if (closestIntersection >= (std::numeric_limits<float>::max)())
                     closestIntersection = (std::numeric_limits<float>::min)();
 
-                if (XYBox.Intersects(ray.position, ray.direction, intersection)) {
+                if (XYAxisBox.Intersects(ray.position, ray.direction, intersection)) {
                     if (intersection > closestIntersection)
                     {
                         selectedAxis = GizmoAxis::XY;
@@ -420,7 +444,7 @@ namespace Bruno
                         closestIntersection = intersection;
                     }
                 }
-                if (YZBox.Intersects(ray.position, ray.direction, intersection)) {
+                if (YZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
                     if (intersection > closestIntersection)
                     {
                         selectedAxis = GizmoAxis::YZ;
@@ -430,7 +454,7 @@ namespace Bruno
             }
             else if (m_currentGizmoType == GizmoType::Scale)
             {
-                if (XYZBox.Intersects(ray.position, ray.direction, intersection)) {
+                if (XYZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
                     if (intersection < closestIntersection)
                     {
                         selectedAxis = GizmoAxis::XYZ;
@@ -521,6 +545,7 @@ namespace Bruno
             auto ray = ConvertMousePositionToRay(mousePosition);
             ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
             ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+            ray.direction.Normalize();
 
             Math::Plane plane(planeNormals[planeIndex], 0);
 

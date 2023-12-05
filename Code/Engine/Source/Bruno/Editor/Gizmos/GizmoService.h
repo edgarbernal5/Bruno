@@ -86,6 +86,8 @@ namespace Bruno
 			Math::Matrix m_objectRotation;
 		};
 
+		void UpdateLocalState();
+
 		Math::Vector3 ApplySnapAndPrecisionMode(Math::Vector3 delta);
 		void InitializeGizmos();
 		Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
@@ -99,7 +101,6 @@ namespace Bruno
 
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
-
 
 		const Math::BoundingBox XAxisBox{
 			DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f, 0.0f, 0.0f),
@@ -121,17 +122,17 @@ namespace Bruno
 			DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f)
 		};
 
-		const Math::BoundingBox XYBox{
+		const Math::BoundingBox XYAxisBox{
 			DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f),
 			DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f)
 		};
 
-		const Math::BoundingBox YZBox{
+		const Math::BoundingBox YZAxisBox{
 			DirectX::XMFLOAT3(Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f),
 			DirectX::XMFLOAT3(Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f)
 		};
 
-		const Math::BoundingBox XYZBox{
+		const Math::BoundingBox XYZAxisBox{
 			DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 			DirectX::XMFLOAT3(Gizmo::LINE_LENGTH * 0.25f, Gizmo::LINE_LENGTH * 0.25f, Gizmo::LINE_LENGTH * 0.25f)
 		};

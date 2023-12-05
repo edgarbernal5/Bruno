@@ -64,18 +64,6 @@ namespace Bruno
 
 	void GizmoTranslationRenderer::Render(GraphicsContext* context)
 	{
-		auto device = Graphics::GetDevice();
-		Math::Matrix mvpMatrix = m_gizmoWorld * m_camera.GetViewProjection();
-
-		ObjectBuffer objectBuffer;
-		objectBuffer.World = mvpMatrix;
-
-		uint32_t frameIndex = device->GetFrameId();
-		m_constantBuffers[frameIndex]->SetMappedData(objectBuffer);
-
-		
-		m_meshPerObjectResourceSpace.SetCBV(m_constantBuffers[frameIndex].get());
-
 		Texture& backBuffer = m_surface->GetBackBuffer();
 		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
 
@@ -92,7 +80,7 @@ namespace Bruno
 		m_batch->End();
 	}
 
-	void GizmoTranslationRenderer::SetColors(Math::Color colors[3])
+	void GizmoTranslationRenderer::SetColors(const Math::Color colors[3])
 	{
 		for (size_t i = 0; i < m_xUpperBound; i++)
 		{
@@ -108,9 +96,22 @@ namespace Bruno
 		}
 	}
 
+	void GizmoTranslationRenderer::Update()
+	{
+		auto device = Graphics::GetDevice();
+		Math::Matrix mvpMatrix = m_gizmoWorld * m_camera.GetViewProjection();
+
+		ObjectBuffer objectBuffer;
+		objectBuffer.World = mvpMatrix;
+
+		uint32_t frameIndex = device->GetFrameId();
+		m_constantBuffers[frameIndex]->SetMappedData(objectBuffer);
+
+		m_meshPerObjectResourceSpace.SetCBV(m_constantBuffers[frameIndex].get());
+	}
+
 	void GizmoTranslationRenderer::CreateCone(float radius, float height, uint32_t sliceCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
 	{
-		//ver DirectX::ComputeCone
 		size_t verticesOffset = vertices.size();
 		
 		height *= 0.5f;

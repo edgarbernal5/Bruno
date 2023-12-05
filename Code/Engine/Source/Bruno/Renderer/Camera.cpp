@@ -200,27 +200,4 @@ namespace Bruno
 		m_farPlane = farPlane;
 		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
 	}
-
-	void Camera::UpdateMatrices()
-	{
-		if (m_states.ViewDirty)
-		{
-			m_view = Math::Matrix::CreateLookAt(m_position, m_target, m_up);
-			
-			m_inverseView = m_view.Invert();
-			m_states.ViewDirty = false;
-		}
-
-		if (m_states.ProjectionDirty)
-		{
-			m_projection = Math::Matrix::CreatePerspectiveFieldOfView(m_fovY, m_viewport.AspectRatio(), m_nearPlane, m_farPlane);
-			m_states.ProjectionDirty = false;
-		}
-
-		if (m_states.ViewProjectionDirty)
-		{
-			m_viewProjection = m_view * m_projection;
-			m_states.ViewProjectionDirty = false;
-		}
-	}
 }
