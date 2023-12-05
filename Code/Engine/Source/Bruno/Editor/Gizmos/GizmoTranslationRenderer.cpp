@@ -43,23 +43,23 @@ namespace Bruno
 
 		Math::Matrix world;
 		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * Gizmo::LINE_LENGTH * 0.5f);
-		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, 4, 3, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
+		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
 		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (Gizmo::LINE_LENGTH) * 0.5f);
-		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, 4, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
+		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, Gizmo::TESSELLATION, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
 
 		m_xUpperBound = m_vertices.size();
 
 		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * Gizmo::LINE_LENGTH * 0.5f);
-		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, 4, 3, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
 		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
-		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, 4, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, Gizmo::TESSELLATION, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
 
 		m_yUpperBound = m_vertices.size();
 
 		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * Gizmo::LINE_LENGTH * 0.5f);
-		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, 4, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
+		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
 		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
-		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, 4, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
+		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, Gizmo::TESSELLATION, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
 	}
 
 	void GizmoTranslationRenderer::Render(GraphicsContext* context)
