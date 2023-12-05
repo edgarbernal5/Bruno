@@ -47,10 +47,14 @@ namespace Bruno
 		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (Gizmo::LINE_LENGTH) * 0.5f);
 		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, 4, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
 
+		m_xUpperBound = m_vertices.size();
+
 		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * Gizmo::LINE_LENGTH * 0.5f);
 		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, 4, 3, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
 		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
 		CreateCone(Gizmo::CONE_RADIUS, Gizmo::CONE_HEIGHT, 4, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+
+		m_yUpperBound = m_vertices.size();
 
 		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * Gizmo::LINE_LENGTH * 0.5f);
 		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, 4, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
@@ -86,6 +90,22 @@ namespace Bruno
 		m_batch->Begin(context);
 		m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, m_indices.data(), m_indices.size(), m_vertices.data(), m_vertices.size());
 		m_batch->End();
+	}
+
+	void GizmoTranslationRenderer::SetColors(Math::Color colors[3])
+	{
+		for (size_t i = 0; i < m_xUpperBound; i++)
+		{
+			m_vertices[i].Color = colors[0];
+		}
+		for (size_t i = m_xUpperBound; i < m_yUpperBound; i++)
+		{
+			m_vertices[i].Color = colors[1];
+		}
+		for (size_t i = m_yUpperBound; i < m_vertices.size(); i++)
+		{
+			m_vertices[i].Color = colors[2];
+		}
 	}
 
 	void GizmoTranslationRenderer::CreateCone(float radius, float height, uint32_t sliceCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)

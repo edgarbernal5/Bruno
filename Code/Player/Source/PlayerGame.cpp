@@ -111,6 +111,7 @@ namespace Bruno
 		m_device->BeginFrame();
 
 		UpdateCBs(timer);
+		m_gizmoService->Update();
 	}
 
 	void PlayerGame::OnDraw()
@@ -174,12 +175,15 @@ namespace Bruno
 	{
 		Math::Int2 currentPosition = Math::Int2(x, y);
 
-		if (m_isGizmoing) {
+		if (!m_isGizmoing && !btnState.LeftButton) {
+			m_gizmoService->OnMouseMove(Math::Vector2(x, y));
+		}
+		if (btnState.LeftButton && m_isGizmoing) {
 			m_gizmoService->Drag(Math::Vector2(x, y));
 		}
-		else {
-
-			/*if (btnState.LeftButton)
+		else if (m_shiftPressed){
+			
+			if (btnState.LeftButton)
 			{
 				m_camera.Rotate(currentPosition, m_lastMousePosition);
 				m_camera.UpdateMatrices();
@@ -193,7 +197,7 @@ namespace Bruno
 			{
 				m_camera.PitchYaw(currentPosition, m_lastMousePosition);
 				m_camera.UpdateMatrices();
-			}*/
+			}
 		}
 		m_lastMousePosition = currentPosition;
 	}
@@ -238,21 +242,25 @@ namespace Bruno
 			m_camera.Walk(-0.25f);
 			m_camera.UpdateMatrices();
 		}
+		m_shiftPressed = (state.Shift);
 	}
 
 	void PlayerGame::OnKeyReleased(KeyCode key, KeyboardState state)
 	{
 		//BR_CORE_TRACE << "key released: " << (uint8_t)key << ". alt " << state.Alt << ". ctrl " << state.Ctrl << ". shift " << state.Shift << std::endl;
+
+		m_shiftPressed = (state.Shift);
 	}
 
 	void PlayerGame::InitializeCamera()
 	{
-		m_camera.LookAt(Math::Vector3(0, 0, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
+		m_camera.LookAt(Math::Vector3(0, 8, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
 
 		m_gizmoService = std::make_unique<GizmoService>(m_device.get(), m_camera, m_surface.get(), new ObjectSelector());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta) {
 			//m_gizmoService->SetPosition()
+			
 		});
 	}
 
@@ -328,13 +336,13 @@ namespace Bruno
 	{
 		m_scene->OnUpdate(timer);
 
-		auto device = Graphics::GetDevice();
-		Math::Matrix mvpMatrix = m_camera.GetViewProjection();
+		//auto device = Graphics::GetDevice();
+		//Math::Matrix mvpMatrix = m_camera.GetViewProjection();
 
-		ObjectBuffer objectBuffer;
-		objectBuffer.World = mvpMatrix;
+		//ObjectBuffer objectBuffer;
+		//objectBuffer.World = mvpMatrix;
 
-		uint32_t frameIndex = device->GetFrameId();
-		m_gizmoBuffer[frameIndex]->SetMappedData(objectBuffer);
+		//uint32_t frameIndex = device->GetFrameId();
+		//m_gizmoBuffer[frameIndex]->SetMappedData(objectBuffer);
 	}
 }

@@ -26,6 +26,8 @@ namespace Bruno
 		void SetWorld(Math::Matrix world) {
 			m_gizmoWorld = world;
 		}
+
+		void SetColors(Math::Color colors[3]);
 	private:
 		void CreateCone(float radius, float height, uint32_t sliceCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
 		void CreateCylinder(float radius, float height, uint32_t sliceCount, uint32_t stackCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
@@ -46,6 +48,8 @@ namespace Bruno
 		std::shared_ptr<PipelineStateObject>	m_pipelineObject;
 		PipelineResourceSpace			m_meshPerObjectResourceSpace;
 
+		size_t m_xUpperBound;
+		size_t m_yUpperBound;
 
 		std::vector<VertexPositionNormalColor> m_vertices;
 		std::vector<uint16_t> m_indices;

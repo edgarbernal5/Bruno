@@ -13,6 +13,38 @@ namespace Bruno
 	{
 	}
 
+	const Math::Matrix& Camera::GetView()
+	{
+		if (m_states.ViewDirty)
+		{
+			m_view = Math::Matrix::CreateLookAt(m_position, m_target, m_up);
+
+			m_inverseView = m_view.Invert();
+			m_states.ViewDirty = false;
+		}
+		return m_view;
+	}
+
+	const Math::Matrix& Camera::GetProjection()
+	{
+		if (m_states.ProjectionDirty)
+		{
+			m_projection = Math::Matrix::CreatePerspectiveFieldOfView(m_fovY, m_viewport.AspectRatio(), m_nearPlane, m_farPlane);
+			m_states.ProjectionDirty = false;
+		}
+		return m_projection;
+	}
+
+	const Math::Matrix& Camera::GetViewProjection()
+	{
+		if (m_states.ViewProjectionDirty)
+		{
+			m_viewProjection = GetView() * GetProjection();
+			m_states.ViewProjectionDirty = false;
+		}
+		return m_viewProjection;
+	}
+
 	void Camera::Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
 	{
 		Math::Vector2 deltaAngles(2.0f * DirectX::XM_PI / m_viewport.width, DirectX::XM_PI / m_viewport.height);

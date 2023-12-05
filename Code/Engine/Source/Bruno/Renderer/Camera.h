@@ -9,9 +9,13 @@ namespace Bruno
 	public:
 		Camera();
 
-		const Math::Matrix& GetView() const { return m_view; }
+		const Math::Matrix& GetView();
+		const Math::Matrix& GetProjection();
+		const Math::Matrix& GetViewProjection();
+
+		/*const Math::Matrix& GetView() const { return m_view; }
 		const Math::Matrix& GetProjection() const { return m_projection; }
-		const Math::Matrix& GetViewProjection() const { return m_viewProjection; }
+		const Math::Matrix& GetViewProjection() const { return m_viewProjection; }*/
 
 		Math::Vector3 GetPosition() { return m_position; }
 		Math::Viewport GetViewport() { return m_viewport; }

@@ -91,6 +91,16 @@ namespace Bruno
 		Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
 		Math::Quaternion GetRotationDelta(const Math::Vector2& mousePosition);
 
+
+		Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
+		GizmoAxis GetAxis(const Math::Vector2& mousePosition);
+		bool GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
+		Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);
+
+		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
+		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
+
+
 		const Math::BoundingBox XAxisBox{
 			DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f, 0.0f, 0.0f),
 			DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH - Gizmo::LINE_OFFSET) * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f)
@@ -127,14 +137,9 @@ namespace Bruno
 		};
 		
 		const Math::Vector3 m_unaryDirections[3]{ Math::Vector3::UnitX, Math::Vector3::UnitY, Math::Vector3::UnitZ };
-
-		Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
-		GizmoAxis GetAxis(const Math::Vector2& mousePosition);
-		bool GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
-		Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);
-
-		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
-		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
+		Math::Color m_activeAxisColors[3];
+		Math::Color m_axisColors[3]{ Math::Color(1.0f,0,0,1),Math::Color(0,1.0f,0,1) , Math::Color(0,0,1.0f,1) };
+		Math::Color m_axisSelectionColor = Math::Color(0.5f, 0.5f, 0.25f, 1);
 
 		Camera& m_camera;
 		bool m_isActive = true;
