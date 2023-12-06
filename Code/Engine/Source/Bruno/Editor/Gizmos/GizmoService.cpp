@@ -198,8 +198,11 @@ namespace Bruno
 
     void GizmoService::UpdateLocalState()
     {
-        auto gizmoPositionViewSpace = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, m_camera.GetView());
-        m_selectionState.m_screenScaleFactor = Math::Abs(gizmoPositionViewSpace.z) * Gizmo::GIZMO_SCREEN_SCALE;
+        float cameraDistance = GetCameraDistance();
+        if (cameraDistance <= 0.0f)
+            cameraDistance = 25.0f;
+
+        m_selectionState.m_screenScaleFactor = cameraDistance * Gizmo::GIZMO_SCREEN_SCALE;
 
         if (m_selectionState.m_screenScaleFactor < 0.0001f)
         {
@@ -571,6 +574,17 @@ namespace Bruno
         }
 
         return false;
+    }
+
+    float GizmoService::GetCameraDistance()
+    {
+        auto gizmoPositionViewSpace = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, m_camera.GetView());
+        if (Math::Abs(gizmoPositionViewSpace.z) > m_camera.GetNearPlane())
+        {
+            return Math::Abs(gizmoPositionViewSpace.z);
+            //return m_camera.IsOrthographic() ? Math::Abs(gizmoPositionViewSpace.z) : gizmoPositionViewSpace.Length();
+        }
+        return 0.0f;
     }
 
     Math::Vector2 GizmoService::GetScreenPosition(const Math::Vector3& worldPosition)

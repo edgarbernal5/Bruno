@@ -99,6 +99,7 @@ namespace Bruno
 		Math::Quaternion GetRotationDelta(const Math::Vector2& mousePosition);
 		GizmoAxis GetAxis(const Math::Vector2& mousePosition);
 		bool GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
+		float GetCameraDistance();
 		Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);
 		void InitializeGizmos();
 

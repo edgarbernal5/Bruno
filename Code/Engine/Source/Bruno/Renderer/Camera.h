@@ -10,13 +10,12 @@ namespace Bruno
 		Camera();
 
 		const Math::Matrix& GetView();
+		const Math::Matrix& GetInverseView();
 		const Math::Matrix& GetProjection();
 		const Math::Matrix& GetViewProjection();
 
-		/*const Math::Matrix& GetView() const { return m_view; }
-		const Math::Matrix& GetProjection() const { return m_projection; }
-		const Math::Matrix& GetViewProjection() const { return m_viewProjection; }*/
-
+		bool IsOrthographic() { return m_isOrthographic; }
+		float GetNearPlane() { return m_nearPlane; }
 		Math::Vector3 GetPosition() { return m_position; }
 		Math::Viewport GetViewport() { return m_viewport; }
 		void SetViewport(const Math::Viewport& viewport);
@@ -46,6 +45,7 @@ namespace Bruno
 		Math::Matrix m_inverseView;
 		Math::Matrix m_projection;
 		Math::Matrix m_viewProjection;
+		bool m_isOrthographic{ false };
 
 		struct States
 		{

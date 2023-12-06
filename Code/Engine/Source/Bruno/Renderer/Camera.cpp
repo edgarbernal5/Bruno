@@ -25,6 +25,18 @@ namespace Bruno
 		return m_view;
 	}
 
+	const Math::Matrix& Camera::GetInverseView()
+	{
+		if (m_states.ViewDirty)
+		{
+			m_view = Math::Matrix::CreateLookAt(m_position, m_target, m_up);
+
+			m_inverseView = m_view.Invert();
+			m_states.ViewDirty = false;
+		}
+		return m_inverseView;
+	}
+
 	const Math::Matrix& Camera::GetProjection()
 	{
 		if (m_states.ProjectionDirty)
