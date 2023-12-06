@@ -203,7 +203,6 @@ namespace Bruno
             cameraDistance = 25.0f;
 
         m_selectionState.m_screenScaleFactor = cameraDistance * Gizmo::GIZMO_SCREEN_SCALE;
-
         if (m_selectionState.m_screenScaleFactor < 0.0001f)
         {
             m_selectionState.m_invScreenScaleFactor = 1.0f;

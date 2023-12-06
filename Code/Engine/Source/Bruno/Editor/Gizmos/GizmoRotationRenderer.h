@@ -28,6 +28,7 @@ namespace Bruno
 		void Update();
 
 	private:
+		void CreateTorus(float diameter, float thickness, size_t tessellation, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
 
 		Camera& m_camera;
 		Surface* m_surface;

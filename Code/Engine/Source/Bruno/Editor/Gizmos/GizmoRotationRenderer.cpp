@@ -80,4 +80,56 @@ namespace Bruno
 
 		m_meshPerObjectResourceSpace.SetCBV(m_constantBuffers[frameIndex].get());
 	}
+
+	void GizmoRotationRenderer::CreateTorus(float diameter, float thickness, size_t tessellation, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
+	{
+		using namespace DirectX;
+
+		const size_t stride = tessellation + 1;
+		// First we loop around the main ring of the torus.
+		for (size_t i = 0; i <= tessellation; i++)
+		{
+			const float u = float(i) / float(tessellation);
+
+			const float outerAngle = float(i) * XM_2PI / float(tessellation) - XM_PIDIV2;
+
+			// Create a transform matrix that will align geometry to
+			// slice perpendicularly though the current ring position.
+			const XMMATRIX transform = XMMatrixTranslation(diameter / 2, 0, 0) * XMMatrixRotationY(outerAngle);
+
+			// Now we loop along the other axis, around the side of the tube.
+			for (size_t j = 0; j <= tessellation; j++)
+			{
+				const float v = 1 - float(j) / float(tessellation);
+
+				const float innerAngle = float(j) * XM_2PI / float(tessellation) + XM_PI;
+				float dx, dy;
+
+				XMScalarSinCos(&dy, &dx, innerAngle);
+
+				// Create a vertex.
+				XMVECTOR normal = XMVectorSet(dx, dy, 0, 0);
+				XMVECTOR position = XMVectorScale(normal, thickness / 2);
+				//const XMVECTOR textureCoordinate = XMVectorSet(u, v, 0, 0);
+
+				position = XMVector3Transform(position, transform);
+				normal = XMVector3TransformNormal(normal, transform);
+				Math::Vector3 positionV3 = Math::Vector3::Transform(position, world);
+
+				vertices.push_back(VertexPositionNormalColor(positionV3, Math::Vector3(normal), color));
+
+				// And create indices for two triangles.
+				const size_t nextI = (i + 1) % stride;
+				const size_t nextJ = (j + 1) % stride;
+
+				indices.push_back(i * stride + j);
+				indices.push_back(i * stride + nextJ);
+				indices.push_back(nextI * stride + j);
+
+				indices.push_back(i * stride + nextJ);
+				indices.push_back(nextI * stride + nextJ);
+				indices.push_back(nextI * stride + j);
+			}
+		}
+	}
 }

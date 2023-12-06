@@ -136,7 +136,7 @@ namespace Bruno
 			//vertex.TexCoord = DirectX::XMFLOAT2((cosf(phi) + 1.0f) * 0.5f, (sinf(phi) + 1.0f) * 0.5f);
 			vertex.Color = color;
 
-			vertex.Normal = normal;
+			vertex.Normal = Math::Vector3::TransformNormal(normal, world);
 			vertex.Position = Math::Vector3::Transform(topOffset, world);
 			vertices.push_back(vertex);
 
@@ -161,6 +161,8 @@ namespace Bruno
 		}
 
 		Math::Vector3 normal = Math::Vector3::Down;
+		//Math::Vector3 normal = Math::Vector3::TransformNormal(Math::Vector3::Down, world);
+
 		// Create cap vertices.
 		for (size_t i = 0; i < sliceCount; i++)
 		{
@@ -169,10 +171,9 @@ namespace Bruno
 			VertexPositionNormalColor vertex;
 			Math::Vector3 pt = Math::Vector3(radius * std::sinf(phi), normal.y * height, radius * std::cosf(phi));
 
-			vertex.Position = pt;
+			vertex.Position = Math::Vector3::Transform(pt, world);
 			vertex.Normal = normal;
 			vertex.Color = color;
-			vertex.Position = Math::Vector3::Transform(vertex.Position, world);
 			vertices.push_back(vertex);
 		}
 	}
@@ -204,7 +205,7 @@ namespace Bruno
 				Math::Vector3 normal = tangent.Cross(bitangent);
 				//Math::Vector3 normal = bitangent.Cross(tangent);
 
-				vertex.Normal = normal;
+				vertex.Normal = Math::Vector3::TransformNormal(normal, world);
 				//vertex.TexCoord.x = static_cast<float>(j) / static_cast<float>(sliceCount);
 				//vertex.TexCoord.y = 1.0f - static_cast<float>(i) / static_cast<float>(stackCount);
 
