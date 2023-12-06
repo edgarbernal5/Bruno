@@ -2,6 +2,7 @@
 #include "GizmoService.h"
 
 #include "GizmoTranslationRenderer.h"
+#include "GizmoRotationRenderer.h"
 #include "Bruno/Editor/ObjectSelector.h"
 
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
@@ -17,6 +18,7 @@ namespace Bruno
         m_objectSelector(objectSelector)
     {
         m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface);
+        m_gizmoRotationRenderer = std::make_shared<GizmoRotationRenderer>(device, camera, surface);
 
         for (size_t i = 0; i < 3; i++)
         {
@@ -79,7 +81,8 @@ namespace Bruno
         {
             auto rotationDelta = GetRotationDelta(mousePosition);
             //TODO: Apply snap and precision mode
-            m_dragRotationCallback(rotationDelta);
+            
+            //m_dragRotationCallback(rotationDelta);
             break;
         }
         case GizmoType::Scale:
@@ -141,6 +144,11 @@ namespace Bruno
             m_gizmoTranslationRenderer->SetColors(m_activeAxisColors);
         }
         break;
+        case GizmoType::Rotation:
+        {
+            m_gizmoRotationRenderer->SetColors(m_activeAxisColors);
+        }
+        break;
         }
     }
 
@@ -155,6 +163,7 @@ namespace Bruno
             m_gizmoTranslationRenderer->Render(context);
             break;
         case Bruno::GizmoService::GizmoType::Rotation:
+            m_gizmoRotationRenderer->Render(context);
             break;
         case Bruno::GizmoService::GizmoType::Scale:
             break;
@@ -177,6 +186,8 @@ namespace Bruno
             m_gizmoTranslationRenderer->Update();
             break;
         case Bruno::GizmoService::GizmoType::Rotation:
+            m_gizmoRotationRenderer->SetWorld(m_selectionState.m_gizmoObjectOrientedWorld);
+            m_gizmoRotationRenderer->Update();
             break;
         case Bruno::GizmoService::GizmoType::Scale:
             break;
@@ -321,8 +332,8 @@ namespace Bruno
             Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoAxisAlignedWorld.Invert();
             
             auto ray = ConvertMousePositionToRay(mousePosition);
-            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
             ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
             ray.direction.Normalize();
 
             Math::Plane plane(planeNormals[planeIndex], 0);
@@ -396,8 +407,8 @@ namespace Bruno
         Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoObjectOrientedWorld.Invert();
         
         Math::Ray ray = ConvertMousePositionToRay(mousePosition);
-        ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
         ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+        ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
         ray.direction.Normalize();
 
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
@@ -518,8 +529,9 @@ namespace Bruno
             auto gizmoWorldInverse = m_selectionState.m_rotationMatrix.Transpose();
 
             auto ray = ConvertMousePositionToRay(mousePosition);
-            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
             ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
+            ray.direction.Normalize();
 
             SetGizmoHandlePlaneFor(m_currentGizmoAxis, ray);
 
@@ -594,7 +606,7 @@ namespace Bruno
         switch (selectedAxis)
         {
         case GizmoAxis::XY:
-            planeNormal = Math::Vector3::Forward;
+            planeNormal = Math::Vector3::Backward;
             planeD = gizmoPositionInLocal.z;
             break;
         case GizmoAxis::YZ:

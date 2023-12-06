@@ -168,6 +168,19 @@ namespace Bruno
 		{
 			m_camera.Walk(-0.25f);
 		}
+		else if (key == KeyCode::D1)
+		{
+			m_gizmoService->SetGizmoType(GizmoService::GizmoType::Translation);
+		}
+		else if (key == KeyCode::D2)
+		{
+			m_gizmoService->SetGizmoType(GizmoService::GizmoType::Rotation);
+		}
+		else if (key == KeyCode::D3)
+		{
+			m_gizmoService->SetGizmoType(GizmoService::GizmoType::Scale);
+		}
+		
 		m_shiftPressed = (state.Shift);
 	}
 
@@ -226,14 +239,5 @@ namespace Bruno
 	void PlayerGame::UpdateCBs(const GameTimer& timer)
 	{
 		m_scene->OnUpdate(timer);
-
-		//auto device = Graphics::GetDevice();
-		//Math::Matrix mvpMatrix = m_camera.GetViewProjection();
-
-		//ObjectBuffer objectBuffer;
-		//objectBuffer.World = mvpMatrix;
-
-		//uint32_t frameIndex = device->GetFrameId();
-		//m_gizmoBuffer[frameIndex]->SetMappedData(objectBuffer);
 	}
 }

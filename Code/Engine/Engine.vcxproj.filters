@@ -294,6 +294,9 @@
     <ClInclude Include="Source\Bruno\Editor\ObjectSelector.h">
       <Filter>Source\Bruno\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoRotationRenderer.h">
+      <Filter>Source\Bruno\Editor\Gizmos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -466,6 +469,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Editor\ObjectSelector.cpp">
       <Filter>Source\Bruno\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoRotationRenderer.cpp">
+      <Filter>Source\Bruno\Editor\Gizmos</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

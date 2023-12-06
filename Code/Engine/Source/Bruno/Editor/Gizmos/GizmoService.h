@@ -6,6 +6,7 @@
 namespace Bruno
 {
 	class GizmoTranslationRenderer;
+	class GizmoRotationRenderer;
 	class GraphicsContext;
 	class GraphicsDevice;
 	class Surface;
@@ -66,6 +67,10 @@ namespace Bruno
 		void SetRotationCallback(DragRotationCallback callback) {
 			m_dragRotationCallback = callback;
 		}
+
+		void SetGizmoType(GizmoType type) {
+			m_currentGizmoType = type;
+		}
 	private:
 		struct SelectionState
 		{
@@ -89,15 +94,13 @@ namespace Bruno
 		void UpdateLocalState();
 
 		Math::Vector3 ApplySnapAndPrecisionMode(Math::Vector3 delta);
-		void InitializeGizmos();
+		Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
 		Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
 		Math::Quaternion GetRotationDelta(const Math::Vector2& mousePosition);
-
-
-		Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
 		GizmoAxis GetAxis(const Math::Vector2& mousePosition);
 		bool GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
 		Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);
+		void InitializeGizmos();
 
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
@@ -156,6 +159,7 @@ namespace Bruno
 		DragRotationCallback m_dragRotationCallback;
 
 		std::shared_ptr<GizmoTranslationRenderer> m_gizmoTranslationRenderer;
+		std::shared_ptr<GizmoRotationRenderer> m_gizmoRotationRenderer;
 		Surface* m_surface;
 		ObjectSelector* m_objectSelector;
 	};

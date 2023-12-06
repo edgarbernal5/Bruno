@@ -134,6 +134,7 @@
     <ClInclude Include="Source\Bruno\Core\Stream.h" />
     <ClInclude Include="Source\Bruno\Core\StringHelpers.h" />
     <ClInclude Include="Source\Bruno\Editor\Gizmos\Constants.h" />
+    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoRotationRenderer.h" />
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoService.h" />
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoTranslationRenderer.h" />
     <ClInclude Include="Source\Bruno\Editor\ObjectSelector.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="Source\Bruno\Core\MemoryStream.cpp" />
     <ClCompile Include="Source\Bruno\Core\Stream.cpp" />
     <ClCompile Include="Source\Bruno\Core\StringHelpers.cpp" />
+    <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoRotationRenderer.cpp" />
     <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoService.cpp" />
     <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoTranslationRenderer.cpp" />
     <ClCompile Include="Source\Bruno\Editor\ObjectSelector.cpp" />
