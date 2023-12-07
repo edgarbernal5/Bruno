@@ -40,8 +40,20 @@ namespace Bruno
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 
 		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
+		
+		Math::Matrix world;
+		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(90.0f));
+		CreateTorus(Gizmo::GIZMO_LENGTH, Gizmo::CONE_RADIUS * 0.5f, Gizmo::RING_TESSELLATION, m_vertices, m_indices, Math::Color(1, 0, 0, 1), world);
 
+		m_xUpperBound = m_vertices.size();
 
+		world = world.Identity;
+		CreateTorus(Gizmo::GIZMO_LENGTH, Gizmo::CONE_RADIUS * 0.5f, Gizmo::RING_TESSELLATION, m_vertices, m_indices, Math::Color(0, 1, 0, 1), world);
+		
+		m_yUpperBound = m_vertices.size();
+
+		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f));
+		CreateTorus(Gizmo::GIZMO_LENGTH, Gizmo::CONE_RADIUS * 0.5f, Gizmo::RING_TESSELLATION, m_vertices, m_indices, Math::Color(0, 0, 1, 1), world);
 	}
 
 	void GizmoRotationRenderer::Render(GraphicsContext* context)
@@ -64,7 +76,18 @@ namespace Bruno
 
 	void GizmoRotationRenderer::SetColors(const Math::Color colors[3])
 	{
-
+		for (size_t i = 0; i < m_xUpperBound; i++)
+		{
+			m_vertices[i].Color = colors[0];
+		}
+		for (size_t i = m_xUpperBound; i < m_yUpperBound; i++)
+		{
+			m_vertices[i].Color = colors[1];
+		}
+		for (size_t i = m_yUpperBound; i < m_vertices.size(); i++)
+		{
+			m_vertices[i].Color = colors[2];
+		}
 	}
 
 	void GizmoRotationRenderer::Update()
@@ -84,6 +107,8 @@ namespace Bruno
 	void GizmoRotationRenderer::CreateTorus(float diameter, float thickness, size_t tessellation, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
 	{
 		using namespace DirectX;
+
+		int verticesOffset = m_vertices.size();
 
 		const size_t stride = tessellation + 1;
 		// First we loop around the main ring of the torus.
@@ -115,20 +140,24 @@ namespace Bruno
 				position = XMVector3Transform(position, transform);
 				normal = XMVector3TransformNormal(normal, transform);
 				Math::Vector3 positionV3 = Math::Vector3::Transform(position, world);
+				Math::Vector3 normalV3 = normal;
 
-				vertices.push_back(VertexPositionNormalColor(positionV3, Math::Vector3(normal), color));
+				normalV3 = Math::Vector3::TransformNormal(normalV3, world);
+				normalV3.Normalize();
+
+				vertices.push_back(VertexPositionNormalColor(positionV3, normalV3, color));
 
 				// And create indices for two triangles.
 				const size_t nextI = (i + 1) % stride;
 				const size_t nextJ = (j + 1) % stride;
 
-				indices.push_back(i * stride + j);
-				indices.push_back(i * stride + nextJ);
-				indices.push_back(nextI * stride + j);
+				indices.push_back(verticesOffset + i * stride + j);
+				indices.push_back(verticesOffset + i * stride + nextJ);
+				indices.push_back(verticesOffset + nextI * stride + j);
 
-				indices.push_back(i * stride + nextJ);
-				indices.push_back(nextI * stride + nextJ);
-				indices.push_back(nextI * stride + j);
+				indices.push_back(verticesOffset + i * stride + nextJ);
+				indices.push_back(verticesOffset + nextI * stride + nextJ);
+				indices.push_back(verticesOffset + nextI * stride + j);
 			}
 		}
 	}

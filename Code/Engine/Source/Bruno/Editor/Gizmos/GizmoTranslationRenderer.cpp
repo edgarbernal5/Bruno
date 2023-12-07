@@ -206,6 +206,7 @@ namespace Bruno
 				//Math::Vector3 normal = bitangent.Cross(tangent);
 
 				vertex.Normal = Math::Vector3::TransformNormal(normal, world);
+				vertex.Normal.Normalize();
 				//vertex.TexCoord.x = static_cast<float>(j) / static_cast<float>(sliceCount);
 				//vertex.TexCoord.y = 1.0f - static_cast<float>(i) / static_cast<float>(stackCount);
 

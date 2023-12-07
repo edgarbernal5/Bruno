@@ -81,7 +81,6 @@ namespace Bruno
         {
             auto rotationDelta = GetRotationDelta(mousePosition);
             //TODO: Apply snap and precision mode
-            
             //m_dragRotationCallback(rotationDelta);
             break;
         }
