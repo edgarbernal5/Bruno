@@ -37,6 +37,8 @@ namespace Bruno
 	void PrimitiveBatchBase::Draw(D3D_PRIMITIVE_TOPOLOGY topology, bool isIndexed, uint16_t const* indices, size_t indexCount, size_t vertexCount, void** pMappedVertices)
 	{
 		BR_ASSERT(pMappedVertices != nullptr);
+		BR_ASSERT(indexCount < m_maxIndices, "Too many indices");
+		BR_ASSERT(vertexCount < m_maxVertices, "Too many vertices");
 
 		const bool wrapIndexBuffer = (m_indexCount + indexCount > m_maxIndices);
 		const bool wrapVertexBuffer = (m_vertexCount + vertexCount > m_maxVertices);
