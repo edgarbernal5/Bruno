@@ -7,7 +7,7 @@ namespace Bruno::Gizmo
 	constexpr float CONE_RADIUS = 0.25f * 0.5f;
 	constexpr float LINE_OFFSET = 1.0f;
 	constexpr int TESSELLATION = 8;
-	constexpr int RING_TESSELLATION = 24;
+	constexpr int RING_TESSELLATION = 32;
 	constexpr float GIZMO_LENGTH = LINE_LENGTH + CONE_HEIGHT;
 
 	constexpr float GIZMO_SCREEN_SCALE = 0.075f;

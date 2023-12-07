@@ -85,9 +85,10 @@ namespace Bruno
 		friend class GraphicsDevice;
 
 	protected:
-		uint8_t* m_mappedResource = nullptr;
+		uint8_t* m_mappedResource{ nullptr };
 		uint32_t m_stride = 0; 
 		uint32_t m_numElements = 0;
+		bool m_isHostVisible{ false };
 		DescriptorHandle m_cbvDescriptor{};
 		DescriptorHandle m_srvDescriptor{};
 		DescriptorHandle m_uavDescriptor{};

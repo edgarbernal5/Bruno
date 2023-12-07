@@ -20,7 +20,7 @@ namespace Bruno
 	class GizmoTranslationRenderer
 	{
 	public:
-		GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface);
+		GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch);
 
 		void Render(GraphicsContext* context);
 		void SetColors(const Math::Color colors[3]);

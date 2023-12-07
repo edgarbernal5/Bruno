@@ -83,7 +83,7 @@ namespace Bruno
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
 		
-		//m_sceneRenderer->OnRender(m_graphicsContext.get());
+		m_sceneRenderer->OnRender(m_graphicsContext.get());
 
 		////test gizmo
 		m_gizmoService->OnRender(m_graphicsContext.get());

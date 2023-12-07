@@ -96,6 +96,7 @@ namespace Bruno
         {
             m_resource->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedResource));
         }
+        m_isHostVisible = isHostVisible;
 	}
 
     GpuBuffer::~GpuBuffer()
@@ -115,8 +116,13 @@ namespace Bruno
 
     void GpuBuffer::Reset()
     {
-        if (m_resource != nullptr)
-        	m_resource->Unmap(0, nullptr);
+        if (m_isHostVisible) {
+
+            if (m_resource != nullptr)
+                m_resource->Unmap(0, nullptr);
+
+            m_resource->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedResource));
+        }
     }
 
     void GpuBuffer::SetMappedData(const void* data, size_t dataSize)

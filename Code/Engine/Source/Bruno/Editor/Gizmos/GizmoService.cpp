@@ -17,8 +17,9 @@ namespace Bruno
         m_surface(surface),
         m_objectSelector(objectSelector)
     {
-        m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface);
-        m_gizmoRotationRenderer = std::make_shared<GizmoRotationRenderer>(device, camera, surface);
+        auto batch = std::make_shared<PrimitiveBatch<VertexPositionNormalColor>>(device, 4096 * 3*3, 4096*3);
+        m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface, batch);
+        m_gizmoRotationRenderer = std::make_shared<GizmoRotationRenderer>(device, camera, surface, batch);
 
         for (size_t i = 0; i < 3; i++)
         {

@@ -8,12 +8,11 @@
 
 namespace Bruno
 {
-	GizmoTranslationRenderer::GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface) :
+	GizmoTranslationRenderer::GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch) :
 		m_camera(camera),
-		m_surface(surface)
+		m_surface(surface),
+		m_batch(batch)
 	{
-		m_batch = std::make_shared<PrimitiveBatch<VertexPositionNormalColor>>(device, 4096 * 3, 4096);
-
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
 			m_constantBuffers[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();

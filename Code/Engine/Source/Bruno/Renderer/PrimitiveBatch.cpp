@@ -82,8 +82,8 @@ namespace Bruno
 
 		Flush();
 		m_inBeginEndPair = false;
-		//m_vertexBuffer->Reset();
-		//m_vertexBuffer->Reset();
+		m_vertexBuffer->Reset();
+		m_indexBuffer->Reset();
 	}
 
 	void PrimitiveBatchBase::Flush()

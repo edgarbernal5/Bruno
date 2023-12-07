@@ -147,12 +147,12 @@ namespace Bruno
         }
         m_highestRootSignatureVersion = featureData.HighestVersion;
 
-        D3D12MA::ALLOCATOR_DESC desc = {};
-        desc.Flags = D3D12MA::ALLOCATOR_FLAG_NONE;
-        desc.pDevice = m_d3dDevice.Get();
-        desc.pAdapter = m_adapter.get()->GetHandle();
+        D3D12MA::ALLOCATOR_DESC allocatorDesc = {};
+        allocatorDesc.Flags = D3D12MA::ALLOCATOR_FLAG_NONE;
+        allocatorDesc.pDevice = m_d3dDevice.Get();
+        allocatorDesc.pAdapter = m_adapter->GetHandle();
 
-        D3D12MA::CreateAllocator(&desc, &m_allocator);
+        D3D12MA::CreateAllocator(&allocatorDesc, &m_allocator);
 
         BufferCreationDesc uploadBufferDesc;
         uploadBufferDesc.Size = AlignU32(10 * 1024 * 1024, 256);
