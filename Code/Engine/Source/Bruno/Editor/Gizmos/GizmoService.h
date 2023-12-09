@@ -51,6 +51,13 @@ namespace Bruno
 			World
 		};
 
+		struct SnapConfig
+		{
+			float Translation{ 1.0f };
+			float Scale{ 0.5f };
+			float PrecisionScale{ 0.1f };
+		};
+
 		bool BeginDrag(const Math::Vector2& mousePosition);
 		void Drag(const Math::Vector2& mousePosition);
 		void OnMouseMove(const Math::Vector2& mousePosition);
@@ -147,7 +154,7 @@ namespace Bruno
 		Math::Color m_axisSelectionColor = Math::Color(0.5f, 0.5f, 0.25f, 1);
 
 		Camera& m_camera;
-		bool m_isActive = true;
+		bool m_isActive{ true };
 		GizmoType m_currentGizmoType = GizmoType::Rotation;
 		PivotType m_pivotType = PivotType::SelectionCenter;
 		GizmoAxis m_currentGizmoAxis = GizmoAxis::None;
@@ -163,6 +170,11 @@ namespace Bruno
 		std::shared_ptr<GizmoRotationRenderer> m_gizmoRotationRenderer;
 		Surface* m_surface;
 		ObjectSelector* m_objectSelector;
+
+		bool m_isSnapEnabled{ false };
+		bool m_precisionModeEnabled{ false };
+		SnapConfig m_snapConfig;
+		Math::Vector3 m_translationScaleSnapDelta;
 	};
 }
 

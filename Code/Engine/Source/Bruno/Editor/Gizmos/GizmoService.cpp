@@ -16,11 +16,11 @@ namespace Bruno
         m_camera(camera),
         m_surface(surface),
         m_objectSelector(objectSelector)
-    {
+    {        
         auto batch = std::make_shared<PrimitiveBatch<VertexPositionNormalColor>>(device, 4096 * 3*3, 4096*3);
         m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface, batch);
         m_gizmoRotationRenderer = std::make_shared<GizmoRotationRenderer>(device, camera, surface, batch);
-
+        
         for (size_t i = 0; i < 3; i++)
         {
             m_activeAxisColors[i] = m_axisColors[i];
@@ -31,6 +31,7 @@ namespace Bruno
         m_selectionState.m_screenScaleMatrix = Math::Matrix::Identity;
         m_selectionState.m_objectRotation = Math::Matrix::Identity;
         m_selectionState.m_gizmoPosition = Math::Vector3::Zero;
+        m_translationScaleSnapDelta = Math::Vector3::Zero;
 
         UpdateLocalState();
     }
@@ -199,10 +200,14 @@ namespace Bruno
     void GizmoService::UpdateLocalState()
     {
         float cameraDistance = GetCameraDistance();
-        if (cameraDistance <= 0.0f)
-            cameraDistance = 25.0f;
-
-        m_selectionState.m_screenScaleFactor = cameraDistance * Gizmo::GIZMO_SCREEN_SCALE;
+        if (cameraDistance > 0.0f)
+        {
+            m_selectionState.m_screenScaleFactor = cameraDistance * Gizmo::GIZMO_SCREEN_SCALE;
+        }
+        else {
+            m_selectionState.m_screenScaleFactor = 1.0f;
+        }
+        
         if (m_selectionState.m_screenScaleFactor < 0.0001f)
         {
             m_selectionState.m_invScreenScaleFactor = 1.0f;
@@ -274,6 +279,30 @@ namespace Bruno
 
     Math::Vector3 GizmoService::ApplySnapAndPrecisionMode(Math::Vector3 delta)
     {
+        if (m_isSnapEnabled)
+        {
+            auto snapValue = m_currentGizmoType == GizmoType::Scale ?
+                m_snapConfig.Scale :
+                m_snapConfig.Translation;
+
+            if (m_precisionModeEnabled)
+            {
+                delta *= m_snapConfig.PrecisionScale;
+                snapValue *= m_snapConfig.PrecisionScale;
+            }
+            m_translationScaleSnapDelta += delta;
+
+            delta = Math::Vector3((int)(m_translationScaleSnapDelta.x / snapValue) * snapValue,
+                (int)(m_translationScaleSnapDelta.y / snapValue) * snapValue,
+                (int)(m_translationScaleSnapDelta.z / snapValue) * snapValue);
+
+            m_translationScaleSnapDelta -= delta;
+        }
+        else if (m_precisionModeEnabled)
+        {
+            delta *= m_snapConfig.PrecisionScale;
+        }
+
         return delta;
     }
 
@@ -577,6 +606,9 @@ namespace Bruno
 
     float GizmoService::GetCameraDistance()
     {
+        if (m_camera.IsOrthographic()) {
+            return 25.0f;
+        }
         auto gizmoPositionViewSpace = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, m_camera.GetView());
         if (Math::Abs(gizmoPositionViewSpace.z) > m_camera.GetNearPlane())
         {

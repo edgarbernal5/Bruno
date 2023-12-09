@@ -23,6 +23,12 @@ namespace Bruno
 		void LookAt(const Math::Vector3& position, const Math::Vector3& target, const Math::Vector3& up);
 		void SetLens(float fovY, const Math::Viewport& viewport, float nearPlane, float farPlane);
 
+		void SetIsOrthographic(bool isOrthographic, float size) {
+			m_isOrthographic = isOrthographic;
+			m_size = size;
+			m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
+			
+		}
 		//TODO: these methods should be in camera controller (!?).
 		void HandTool(const Math::Int2& mousePosition, const Math::Int2& previousPosition);
 		void Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition);
@@ -39,6 +45,7 @@ namespace Bruno
 		float m_nearPlane;
 		float m_farPlane;
 		float m_fovY;
+		float m_size;
 		Math::Viewport m_viewport;
 
 		Math::Matrix m_view;

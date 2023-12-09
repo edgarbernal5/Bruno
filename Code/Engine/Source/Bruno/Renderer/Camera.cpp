@@ -41,7 +41,16 @@ namespace Bruno
 	{
 		if (m_states.ProjectionDirty)
 		{
-			m_projection = Math::Matrix::CreatePerspectiveFieldOfView(m_fovY, m_viewport.AspectRatio(), m_nearPlane, m_farPlane);
+			if (m_isOrthographic) {
+				float aspectRatio = m_viewport.width / m_viewport.height;
+				float halfHeight = m_size * 0.5f;
+				float halfWidth = halfHeight * aspectRatio;
+				m_projection = Math::Matrix::CreateOrthographicOffCenter(-halfWidth, halfWidth, -halfHeight, halfHeight, m_nearPlane, m_farPlane);
+			}
+			else {
+				m_projection = Math::Matrix::CreatePerspectiveFieldOfView(m_fovY, m_viewport.AspectRatio(), m_nearPlane, m_farPlane);
+			}
+			
 			m_states.ProjectionDirty = false;
 		}
 		return m_projection;

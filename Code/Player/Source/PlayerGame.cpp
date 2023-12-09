@@ -194,7 +194,7 @@ namespace Bruno
 	void PlayerGame::InitializeCamera()
 	{
 		m_camera.LookAt(Math::Vector3(0, 8, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
-		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 0.1f, 100.0f);
+		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 1.0f, 1000.0f);
 
 		m_gizmoService = std::make_unique<GizmoService>(m_device.get(), m_camera, m_surface.get(), new ObjectSelector());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta) {
