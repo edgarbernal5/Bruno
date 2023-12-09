@@ -115,8 +115,8 @@ namespace Bruno
 		if (btnState.LeftButton && m_isGizmoing) {
 			m_gizmoService->Drag(Math::Vector2(x, y));
 		}
-		else if (m_shiftPressed){
-			
+		else if (m_shiftPressed)
+		{
 			if (btnState.LeftButton)
 			{
 				m_camera.Rotate(currentPosition, m_lastMousePosition);
