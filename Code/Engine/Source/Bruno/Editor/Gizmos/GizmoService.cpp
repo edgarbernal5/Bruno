@@ -72,10 +72,12 @@ namespace Bruno
 
             translationDelta = Math::Vector3::Transform(translationDelta, m_selectionState.m_rotationMatrix);
             
+            //TODO: se debe modificar el gizmoPosition siempre y no depender de los clientes (externos) por su posicion
             m_selectionState.m_gizmoPosition += translationDelta;
             BR_CORE_TRACE << "gizmo position x = " << m_selectionState.m_gizmoPosition.x << "; y = " << m_selectionState.m_gizmoPosition.y << "; z = " << m_selectionState.m_gizmoPosition.z << std::endl;
 
-            m_dragTranslationCallback(translationDelta);
+            if (m_dragTranslationCallback)
+                m_dragTranslationCallback(translationDelta);
             
             break;
         }
@@ -83,14 +85,20 @@ namespace Bruno
         {
             auto rotationDelta = GetRotationDelta(mousePosition);
             //TODO: Apply snap and precision mode
-            //m_dragRotationCallback(rotationDelta);
+            
+            if(m_dragRotationCallback)
+                m_dragRotationCallback(rotationDelta);
+
             break;
         }
         case GizmoType::Scale:
         {
             auto scaleDelta = GetDeltaMovement(mousePosition);
             scaleDelta = ApplySnapAndPrecisionMode(scaleDelta);
-            m_dragScaleCallback(scaleDelta);
+
+            if (m_dragScaleCallback)
+                m_dragScaleCallback(scaleDelta);
+
             break;
         }
         }
