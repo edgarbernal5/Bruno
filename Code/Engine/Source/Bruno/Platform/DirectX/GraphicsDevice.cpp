@@ -170,7 +170,7 @@ namespace Bruno
         m_freeReservedDescriptorIndices.resize(Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT);
         for (size_t i = 0; i < m_freeReservedDescriptorIndices.size(); i++)
         {
-            m_freeReservedDescriptorIndices[i] = i;
+            m_freeReservedDescriptorIndices[i] = static_cast<uint32_t>(i);
         }
 	}
 

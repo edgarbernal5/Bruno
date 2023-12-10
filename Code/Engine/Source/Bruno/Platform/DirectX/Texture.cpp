@@ -144,9 +144,9 @@ namespace Bruno
             auto& image = assetPipelineInitData.Images[i];
             textureUpload->SubResourceLayouts[i].Footprint.Depth = 1;
             textureUpload->SubResourceLayouts[i].Footprint.Format = textureFormat;
-            textureUpload->SubResourceLayouts[i].Footprint.Height = assetPipelineInitData.Height;
-            textureUpload->SubResourceLayouts[i].Footprint.Width = assetPipelineInitData.Width;
-            textureUpload->SubResourceLayouts[i].Footprint.RowPitch = image.RowPitch;
+            textureUpload->SubResourceLayouts[i].Footprint.Height = static_cast<uint32_t>(assetPipelineInitData.Height);
+            textureUpload->SubResourceLayouts[i].Footprint.Width = static_cast<uint32_t>(assetPipelineInitData.Width);
+            textureUpload->SubResourceLayouts[i].Footprint.RowPitch = static_cast<uint32_t>(image.RowPitch);
             textureUpload->SubResourceLayouts[i].Offset = image.Offset;
         }
 

@@ -103,11 +103,11 @@ namespace Bruno
 		m_meshPerObjectResourceSpace.SetCBV(m_constantBuffers[frameIndex].get());
 	}
 
-	void GizmoRotationRenderer::CreateTorus(float diameter, float thickness, size_t tessellation, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
+	void GizmoRotationRenderer::CreateTorus(float radius, float thickness, size_t tessellation, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
 	{
 		using namespace DirectX;
 
-		int verticesOffset = m_vertices.size();
+		size_t verticesOffset = m_vertices.size();
 
 		const size_t stride = tessellation + 1;
 		// First we loop around the main ring of the torus.
@@ -119,7 +119,7 @@ namespace Bruno
 
 			// Create a transform matrix that will align geometry to
 			// slice perpendicularly though the current ring position.
-			const XMMATRIX transform = XMMatrixTranslation(diameter / 2, 0, 0) * XMMatrixRotationY(outerAngle);
+			const XMMATRIX transform = XMMatrixTranslation(radius, 0, 0) * XMMatrixRotationY(outerAngle);
 
 			// Now we loop along the other axis, around the side of the tube.
 			for (size_t j = 0; j <= tessellation; j++)
