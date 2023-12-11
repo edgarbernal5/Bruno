@@ -3,6 +3,7 @@
 
 #include "GizmoTranslationRenderer.h"
 #include "GizmoRotationRenderer.h"
+#include "GizmoScaleRenderer.h"
 #include "Bruno/Editor/ObjectSelector.h"
 
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
@@ -20,6 +21,7 @@ namespace Bruno
         auto batch = std::make_shared<PrimitiveBatch<VertexPositionNormalColor>>(device, 4096 * 3*3, 4096*3);
         m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface, batch);
         m_gizmoRotationRenderer = std::make_shared<GizmoRotationRenderer>(device, camera, surface, batch);
+        m_gizmoScaleRenderer = std::make_shared<GizmoScaleRenderer>(device, camera, surface, batch);
         
         for (size_t i = 0; i < 3; i++)
         {
@@ -158,6 +160,11 @@ namespace Bruno
             m_gizmoRotationRenderer->SetColors(m_activeAxisColors);
         }
         break;
+        case GizmoType::Scale:
+        {
+            m_gizmoScaleRenderer->SetColors(m_activeAxisColors);
+        }
+        break;
         }
     }
 
@@ -175,6 +182,7 @@ namespace Bruno
             m_gizmoRotationRenderer->Render(context);
             break;
         case Bruno::GizmoService::GizmoType::Scale:
+            m_gizmoScaleRenderer->Render(context);
             break;
         default:
             break;
@@ -199,6 +207,8 @@ namespace Bruno
             m_gizmoRotationRenderer->Update();
             break;
         case Bruno::GizmoService::GizmoType::Scale:
+            m_gizmoScaleRenderer->SetWorld(m_selectionState.m_gizmoObjectOrientedWorld);
+            m_gizmoScaleRenderer->Update();
             break;
         default:
             break;

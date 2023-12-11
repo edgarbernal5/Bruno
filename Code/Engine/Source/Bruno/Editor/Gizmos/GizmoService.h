@@ -7,6 +7,7 @@ namespace Bruno
 {
 	class GizmoTranslationRenderer;
 	class GizmoRotationRenderer;
+	class GizmoScaleRenderer;
 	class GraphicsContext;
 	class GraphicsDevice;
 	class Surface;
@@ -168,6 +169,7 @@ namespace Bruno
 
 		std::shared_ptr<GizmoTranslationRenderer> m_gizmoTranslationRenderer;
 		std::shared_ptr<GizmoRotationRenderer> m_gizmoRotationRenderer;
+		std::shared_ptr<GizmoScaleRenderer> m_gizmoScaleRenderer;
 		Surface* m_surface;
 		ObjectSelector* m_objectSelector;
 

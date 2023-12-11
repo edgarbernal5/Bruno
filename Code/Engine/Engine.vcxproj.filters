@@ -297,6 +297,9 @@
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoRotationRenderer.h">
       <Filter>Source\Bruno\Editor\Gizmos</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoScaleRenderer.h">
+      <Filter>Source\Bruno\Editor\Gizmos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -471,6 +474,9 @@
       <Filter>Source\Bruno\Editor</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoRotationRenderer.cpp">
+      <Filter>Source\Bruno\Editor\Gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoScaleRenderer.cpp">
       <Filter>Source\Bruno\Editor\Gizmos</Filter>
     </ClCompile>
   </ItemGroup>
