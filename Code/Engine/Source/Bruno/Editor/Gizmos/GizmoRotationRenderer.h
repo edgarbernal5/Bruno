@@ -7,6 +7,8 @@
 #include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/PipelineStateObject.h"
 
+#include "Bruno/Editor/Gizmos/GizmoConfig.h"
+
 namespace Bruno
 {
 	template<typename TVertex>
@@ -20,7 +22,16 @@ namespace Bruno
 	class GizmoRotationRenderer
 	{
 	public:
-		GizmoRotationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch);
+		struct RenderConfig
+		{
+			float Radius = Gizmo::GIZMO_LENGTH;
+			uint32_t RingTessellation = Gizmo::RING_TESSELLATION;
+			float Thickness = Gizmo::CONE_RADIUS * 0.5f;
+
+			RenderConfig() {}
+			RenderConfig(const GizmoConfig& gizmoConfig);
+		};
+		GizmoRotationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
 
 		void Render(GraphicsContext* context);
 		void SetColors(const Math::Color colors[3]);

@@ -6,6 +6,9 @@
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/PipelineStateObject.h"
+#include "Bruno/Editor/Gizmos/Constants.h"
+
+#include "Bruno/Editor/Gizmos/GizmoConfig.h"
 
 namespace Bruno
 {
@@ -20,7 +23,20 @@ namespace Bruno
 	class GizmoTranslationRenderer
 	{
 	public:
-		GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch);
+		struct RenderConfig
+		{
+			float StickRadius = Gizmo::CONE_RADIUS * 0.25f;
+			float StickHeight = Gizmo::LINE_LENGTH;
+			float ArrowheadRadius = Gizmo::CONE_RADIUS;
+			float ArrowheadHeight = Gizmo::CONE_HEIGHT;
+			uint32_t Tessellation = Gizmo::TESSELLATION;
+			uint32_t StackCount = 3;
+
+			RenderConfig(){}
+			RenderConfig(const GizmoConfig& gizmoConfig);
+		};
+
+		GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
 
 		void Render(GraphicsContext* context);
 		void SetColors(const Math::Color colors[3]);

@@ -2,6 +2,7 @@
 
 #include "Bruno/Renderer/Camera.h"
 #include "Constants.h"
+#include "GizmoConfig.h"
 
 namespace Bruno
 {
@@ -16,7 +17,7 @@ namespace Bruno
 	class GizmoService
 	{
 	public:
-		GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface, ObjectSelector* objectSelector);
+		GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface, ObjectSelector* objectSelector, GizmoConfig gizmoConfig = GizmoConfig());
 
 		using DragTranslationScaleCallback = std::function<void(const Math::Vector3&)>;
 		using DragRotationCallback = std::function<void(const Math::Quaternion&)>;
@@ -114,6 +115,8 @@ namespace Bruno
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
 
+		void RenderCameraGizmo(GraphicsContext* context);
+
 		const Math::BoundingBox XAxisBox{
 			DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f, 0.0f, 0.0f),
 			DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH - Gizmo::LINE_OFFSET) * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f)
@@ -155,8 +158,9 @@ namespace Bruno
 		Math::Color m_axisSelectionColor = Math::Color(0.5f, 0.5f, 0.25f, 1);
 
 		Camera& m_camera;
+		Camera m_sceneGizmoCamera;
 		bool m_isActive{ true };
-		GizmoType m_currentGizmoType = GizmoType::Scale;
+		GizmoType m_currentGizmoType = GizmoType::Translation;
 		PivotType m_pivotType = PivotType::SelectionCenter;
 		GizmoAxis m_currentGizmoAxis = GizmoAxis::None;
 		TransformSpace m_transformSpace = TransformSpace::World;
@@ -170,6 +174,7 @@ namespace Bruno
 		std::shared_ptr<GizmoTranslationRenderer> m_gizmoTranslationRenderer;
 		std::shared_ptr<GizmoRotationRenderer> m_gizmoRotationRenderer;
 		std::shared_ptr<GizmoScaleRenderer> m_gizmoScaleRenderer;
+		std::shared_ptr<GizmoTranslationRenderer> m_gizmoCameraRenderer;
 		Surface* m_surface;
 		ObjectSelector* m_objectSelector;
 

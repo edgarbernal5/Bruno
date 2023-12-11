@@ -8,6 +8,7 @@ namespace Bruno
 		m_nearPlane{ 0.1f },
 		m_farPlane{ 100.0f },
 		m_fovY{ 100.0f },
+		m_size{ 1.0f },
 
 		m_viewport{ 0, 0, 1, 1 }
 	{
@@ -219,6 +220,29 @@ namespace Bruno
 		m_viewport = viewport;
 		m_nearPlane = nearPlane;
 		m_farPlane = farPlane;
+		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
+	}
+
+	void Camera::SetView(const Math::Matrix& viewMatrix)
+	{
+		m_view = viewMatrix;
+
+		m_inverseView = m_view.Invert();
+		m_states.ViewDirty = false;
+		m_states.ViewProjectionDirty = true;
+	}
+
+	void Camera::SetLens(float nearPlane, float farPlane)
+	{
+		m_nearPlane = nearPlane;
+		m_farPlane = farPlane;
+		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
+	}
+
+	void Camera::SetLens(float fovY, const Math::Viewport& viewport)
+	{
+		m_fovY = fovY;
+		m_viewport = viewport;
 		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
 	}
 }

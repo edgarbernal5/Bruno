@@ -300,6 +300,9 @@
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoScaleRenderer.h">
       <Filter>Source\Bruno\Editor\Gizmos</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoConfig.h">
+      <Filter>Source\Bruno\Editor\Gizmos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">

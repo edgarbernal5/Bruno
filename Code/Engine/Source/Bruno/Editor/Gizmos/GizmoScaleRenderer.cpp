@@ -8,7 +8,7 @@
 
 namespace Bruno
 {
-	GizmoScaleRenderer::GizmoScaleRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch) :
+	GizmoScaleRenderer::GizmoScaleRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig) :
 		m_camera(camera),
 		m_surface(surface),
 		m_batch(batch)
@@ -41,24 +41,24 @@ namespace Bruno
 		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 
 		Math::Matrix world;
-		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * Gizmo::LINE_LENGTH * 0.5f);
-		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
-		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (Gizmo::CONE_HEIGHT * 0.85f + Gizmo::LINE_LENGTH) * 0.5f);
-		CreateBox(Math::Vector3(Gizmo::CONE_HEIGHT * 0.85f), m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
+		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * renderConfig.StickHeight * 0.5f);
+		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (renderConfig.StickHeight + renderConfig.ArrowheadHeight) * 0.5f);
+		CreateBox(Math::Vector3(renderConfig.ArrowheadHeight * 0.85f), m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
 
 		m_xUpperBound = m_vertices.size();
 
-		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * Gizmo::LINE_LENGTH * 0.5f);
-		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
-		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (Gizmo::CONE_HEIGHT * 0.85f + Gizmo::LINE_LENGTH) * 0.5f);
-		CreateBox(Math::Vector3(Gizmo::CONE_HEIGHT * 0.85f), m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * renderConfig.StickHeight * 0.5f);
+		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (renderConfig.StickHeight + renderConfig.ArrowheadHeight * 0.85f) * 0.5f);
+		CreateBox(Math::Vector3(renderConfig.ArrowheadHeight * 0.85f), m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
 
 		m_yUpperBound = m_vertices.size();
 
-		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * Gizmo::LINE_LENGTH * 0.5f);
-		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
-		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (Gizmo::CONE_HEIGHT*0.85f + Gizmo::LINE_LENGTH) * 0.5f);
-		CreateBox(Math::Vector3(Gizmo::CONE_HEIGHT * 0.85f), m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
+		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * renderConfig.StickHeight * 0.5f);
+		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight, renderConfig.Tessellation, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (renderConfig.StickHeight + renderConfig.ArrowheadHeight * 0.85f) * 0.5f);
+		CreateBox(Math::Vector3(renderConfig.ArrowheadHeight * 0.85f), m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
 	}
 
 	void GizmoScaleRenderer::Render(GraphicsContext* context)
@@ -251,5 +251,15 @@ namespace Bruno
 			indices.push_back(baseVertex + (i + 1) % sliceCount + 1);   // Next bottom vertex
 			indices.push_back(baseVertex);           // Center of the bottom face
 		}
+	}
+
+	GizmoScaleRenderer::RenderConfig::RenderConfig(const GizmoConfig& gizmoConfig)
+	{
+		StickRadius = gizmoConfig.StickRadius;
+		StickHeight = gizmoConfig.StickHeight;
+		ArrowheadRadius = gizmoConfig.ArrowheadRadius;
+		ArrowheadHeight = gizmoConfig.ArrowheadHeight;
+		Tessellation = gizmoConfig.Tessellation;
+		StackCount = gizmoConfig.StackCount;
 	}
 }

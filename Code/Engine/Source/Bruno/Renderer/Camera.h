@@ -16,12 +16,17 @@ namespace Bruno
 
 		bool IsOrthographic() { return m_isOrthographic; }
 		float GetNearPlane() { return m_nearPlane; }
+		float GetFieldOfView() { return m_fovY; }
 		Math::Vector3 GetPosition() { return m_position; }
 		Math::Viewport GetViewport() { return m_viewport; }
 		void SetViewport(const Math::Viewport& viewport);
 
 		void LookAt(const Math::Vector3& position, const Math::Vector3& target, const Math::Vector3& up);
+		void SetLens(float nearPlane, float farPlane);
+		void SetLens(float fovY, const Math::Viewport& viewport);
 		void SetLens(float fovY, const Math::Viewport& viewport, float nearPlane, float farPlane);
+
+		void SetView(const Math::Matrix& viewMatrix);
 
 		void SetIsOrthographic(bool isOrthographic, float size) {
 			m_isOrthographic = isOrthographic;

@@ -8,7 +8,7 @@
 
 namespace Bruno
 {
-	GizmoRotationRenderer::GizmoRotationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch) :
+	GizmoRotationRenderer::GizmoRotationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig) :
 		m_camera(camera),
 		m_surface(surface),
 		m_batch(batch)
@@ -42,17 +42,17 @@ namespace Bruno
 		
 		Math::Matrix world;
 		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(90.0f));
-		CreateTorus(Gizmo::GIZMO_LENGTH, Gizmo::CONE_RADIUS * 0.5f, Gizmo::RING_TESSELLATION, m_vertices, m_indices, Math::Color(1, 0, 0, 1), world);
+		CreateTorus(renderConfig.Radius, renderConfig.Thickness, renderConfig.RingTessellation, m_vertices, m_indices, Math::Color(1, 0, 0, 1), world);
 
 		m_xUpperBound = m_vertices.size();
 
 		world = world.Identity;
-		CreateTorus(Gizmo::GIZMO_LENGTH, Gizmo::CONE_RADIUS * 0.5f, Gizmo::RING_TESSELLATION, m_vertices, m_indices, Math::Color(0, 1, 0, 1), world);
+		CreateTorus(renderConfig.Radius, renderConfig.Thickness, renderConfig.RingTessellation, m_vertices, m_indices, Math::Color(0, 1, 0, 1), world);
 		
 		m_yUpperBound = m_vertices.size();
 
 		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f));
-		CreateTorus(Gizmo::GIZMO_LENGTH, Gizmo::CONE_RADIUS * 0.5f, Gizmo::RING_TESSELLATION, m_vertices, m_indices, Math::Color(0, 0, 1, 1), world);
+		CreateTorus(renderConfig.Radius, renderConfig.Thickness, renderConfig.RingTessellation, m_vertices, m_indices, Math::Color(0, 0, 1, 1), world);
 	}
 
 	void GizmoRotationRenderer::Render(GraphicsContext* context)
@@ -159,5 +159,12 @@ namespace Bruno
 				indices.push_back(verticesOffset + nextI * stride + j);
 			}
 		}
+	}
+
+	GizmoRotationRenderer::RenderConfig::RenderConfig(const GizmoConfig& gizmoConfig)
+	{
+		Radius = gizmoConfig.StickHeight + gizmoConfig.ArrowheadHeight;
+		RingTessellation = gizmoConfig.RingTessellation;
+		Thickness = gizmoConfig.RingThickness;
 	}
 }

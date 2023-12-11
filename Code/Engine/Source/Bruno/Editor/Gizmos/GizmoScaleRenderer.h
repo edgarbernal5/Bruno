@@ -7,6 +7,8 @@
 #include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/PipelineStateObject.h"
 
+#include "Bruno/Editor/Gizmos/GizmoConfig.h"
+
 namespace Bruno
 {
 	template<typename TVertex>
@@ -20,7 +22,19 @@ namespace Bruno
 	class GizmoScaleRenderer
 	{
 	public:
-		GizmoScaleRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch);
+		struct RenderConfig
+		{
+			float StickRadius = Gizmo::CONE_RADIUS * 0.25f;
+			float StickHeight = Gizmo::LINE_LENGTH;
+			float ArrowheadRadius = Gizmo::CONE_RADIUS;
+			float ArrowheadHeight = Gizmo::CONE_HEIGHT;
+			uint32_t Tessellation = Gizmo::TESSELLATION;
+			uint32_t StackCount = 3;
+
+			RenderConfig() {}
+			RenderConfig(const GizmoConfig& gizmoConfig);
+		};
+		GizmoScaleRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
 
 		void Render(GraphicsContext* context);
 		void SetColors(const Math::Color colors[3]);

@@ -8,21 +8,32 @@
 
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
+#include "Bruno/Platform/DirectX/Surface.h"
 #include "Bruno/Math/Math.h"
 #include <limits>
 
 namespace Bruno
 {
-    GizmoService::GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface, ObjectSelector* objectSelector) :
+    GizmoService::GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface, ObjectSelector* objectSelector, GizmoConfig gizmoConfig) :
         m_camera(camera),
         m_surface(surface),
         m_objectSelector(objectSelector)
     {        
-        auto batch = std::make_shared<PrimitiveBatch<VertexPositionNormalColor>>(device, 4096 * 3*3, 4096*3);
-        m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface, batch);
-        m_gizmoRotationRenderer = std::make_shared<GizmoRotationRenderer>(device, camera, surface, batch);
-        m_gizmoScaleRenderer = std::make_shared<GizmoScaleRenderer>(device, camera, surface, batch);
+        auto batch = std::make_shared<PrimitiveBatch<VertexPositionNormalColor>>(device, 4096 * 3 * 3, 4096 * 3);
         
+        m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface, batch, GizmoTranslationRenderer::RenderConfig(gizmoConfig));
+        m_gizmoRotationRenderer = std::make_shared<GizmoRotationRenderer>(device, camera, surface, batch, GizmoRotationRenderer::RenderConfig(gizmoConfig));
+        m_gizmoScaleRenderer = std::make_shared<GizmoScaleRenderer>(device, camera, surface, batch, GizmoScaleRenderer::RenderConfig(gizmoConfig));
+        
+        auto cameraBatch = std::make_shared<PrimitiveBatch<VertexPositionNormalColor>>(device, 4096 * 3, 4096);
+        GizmoTranslationRenderer::RenderConfig cameraGizmoRenderConfig(gizmoConfig);
+        cameraGizmoRenderConfig.StickHeight = 1.5f;
+        cameraGizmoRenderConfig.StickRadius = 0.15f;
+        cameraGizmoRenderConfig.ArrowheadHeight = 0.25f;
+
+        m_gizmoCameraRenderer = std::make_shared<GizmoTranslationRenderer>(device, m_sceneGizmoCamera, surface, cameraBatch, cameraGizmoRenderConfig);
+        m_gizmoCameraRenderer->SetColors(m_axisColors);
+
         for (size_t i = 0; i < 3; i++)
         {
             m_activeAxisColors[i] = m_axisColors[i];
@@ -35,6 +46,8 @@ namespace Bruno
         m_selectionState.m_gizmoPosition = Math::Vector3::Zero;
         m_translationScaleSnapDelta = Math::Vector3::Zero;
 
+        m_sceneGizmoCamera = m_camera;
+        m_sceneGizmoCamera.SetLens(1.0f, 10.0f);
         UpdateLocalState();
     }
 
@@ -170,6 +183,7 @@ namespace Bruno
 
     void GizmoService::OnRender(GraphicsContext* context)
     {
+        RenderCameraGizmo(context);
         if (m_currentGizmoType == GizmoType::None)
             return;
 
@@ -191,6 +205,7 @@ namespace Bruno
 
     void GizmoService::Update()
     {
+        m_gizmoCameraRenderer->Update();
         if (m_currentGizmoType == GizmoType::None || !m_isActive)
             return;
 
@@ -218,14 +233,8 @@ namespace Bruno
     void GizmoService::UpdateLocalState()
     {
         float cameraDistance = GetCameraDistance();
-        if (cameraDistance > 0.0f)
-        {
-            m_selectionState.m_screenScaleFactor = cameraDistance * Gizmo::GIZMO_SCREEN_SCALE;
-        }
-        else {
-            m_selectionState.m_screenScaleFactor = 1.0f;
-        }
-        
+        m_selectionState.m_screenScaleFactor = cameraDistance > 0.0f ? cameraDistance * Gizmo::GIZMO_SCREEN_SCALE : 1.0f;
+                
         if (m_selectionState.m_screenScaleFactor < 0.0001f)
         {
             m_selectionState.m_invScreenScaleFactor = 1.0f;
@@ -289,6 +298,8 @@ namespace Bruno
 
     void GizmoService::EndDrag()
     {
+        OnMouseMove(m_selectionState.m_prevMousePosition);
+
         m_selectionState.m_prevIntersectionPosition = Math::Vector3::Zero;
         m_selectionState.m_intersectionPosition = Math::Vector3::Zero;
         m_selectionState.m_prevMousePosition = Math::Vector2::Zero;
@@ -721,5 +732,22 @@ namespace Bruno
 
         //Logger.Debug(string.Format("selected plane normal = {0}; Axis = {1}", plane.Normal, selectedAxis.ToString()));
         m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormal, planeD);
+    }
+
+    void GizmoService::RenderCameraGizmo(GraphicsContext* context)
+    {
+        auto savedViewport = m_surface->GetViewport();
+        Math::Viewport newViewport(savedViewport.Width - Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS, 0, Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS, Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS);
+        context->SetViewport(newViewport);
+
+        //m_sceneGizmoCamera = m_camera;
+        m_sceneGizmoCamera.SetLens(m_camera.GetFieldOfView(), newViewport);
+
+        auto cameraOrientation = Math::Matrix::CreateFromQuaternion(Math::Quaternion::CreateFromRotationMatrix(m_camera.GetView()));
+        m_sceneGizmoCamera.SetView(cameraOrientation * Math::Matrix::CreateLookAt(Math::Vector3(0, 0, 1.5f + 3.0f), Math::Vector3::Zero, Math::Vector3::Up));
+        
+        m_gizmoCameraRenderer->Render(context);
+
+        context->SetViewport(savedViewport);        
     }
 }
