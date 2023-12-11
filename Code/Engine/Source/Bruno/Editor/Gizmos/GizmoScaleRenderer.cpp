@@ -43,22 +43,22 @@ namespace Bruno
 		Math::Matrix world;
 		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * Gizmo::LINE_LENGTH * 0.5f);
 		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
-		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (Gizmo::LINE_LENGTH) * 0.5f);
-		CreateBox(Math::Vector3(Gizmo::CONE_HEIGHT ), m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (Gizmo::CONE_HEIGHT * 0.85f + Gizmo::LINE_LENGTH) * 0.5f);
+		CreateBox(Math::Vector3(Gizmo::CONE_HEIGHT * 0.85f), m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
 
 		m_xUpperBound = m_vertices.size();
 
-		//world = Math::Matrix::CreateTranslation(Math::Vector3::Up * Gizmo::LINE_LENGTH * 0.5f);
-		//CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
-		//world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
-		////CreateBox(Math::Vector3(Gizmo::CONE_HEIGHT), m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * Gizmo::LINE_LENGTH * 0.5f);
+		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (Gizmo::CONE_HEIGHT * 0.85f + Gizmo::LINE_LENGTH) * 0.5f);
+		CreateBox(Math::Vector3(Gizmo::CONE_HEIGHT * 0.85f), m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
 
 		m_yUpperBound = m_vertices.size();
 
-		//world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * Gizmo::LINE_LENGTH * 0.5f);
-		//CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
-		//world = world * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (Gizmo::CONE_HEIGHT + Gizmo::LINE_LENGTH) * 0.5f);
-		////CreateBox(Math::Vector3(Gizmo::CONE_HEIGHT), m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
+		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * Gizmo::LINE_LENGTH * 0.5f);
+		CreateCylinder(Gizmo::CONE_RADIUS * 0.25f, Gizmo::LINE_LENGTH, Gizmo::TESSELLATION, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (Gizmo::CONE_HEIGHT*0.85f + Gizmo::LINE_LENGTH) * 0.5f);
+		CreateBox(Math::Vector3(Gizmo::CONE_HEIGHT * 0.85f), m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
 	}
 
 	void GizmoScaleRenderer::Render(GraphicsContext* context)
@@ -118,14 +118,14 @@ namespace Bruno
 
 		static const Math::Vector3 faceNormals[FaceCount] =
 		{
-			{Math::Vector3 {   0,  0,  1  } },
-			{Math::Vector3 {   0,  0,  -1  } },
+			{Math::Vector3 {0, 0, 1} },
+			{Math::Vector3 {0, 0, -1} },
 
-			{Math::Vector3 {   1,  0,  0  } },
-			{Math::Vector3 {   -1,  0, 0  } },
+			{Math::Vector3 {1, 0, 0} },
+			{Math::Vector3 {-1, 0, 0} },
 
-			{Math::Vector3 {   0,  1,  0  } },
-			{Math::Vector3 {   0,  -1, 0  } },
+			{Math::Vector3 {0, 1,  0} },
+			{Math::Vector3 {0, -1, 0} },
 		};
 
 		//static const XMVECTORF32 textureCoordinates[4] =
@@ -139,27 +139,26 @@ namespace Bruno
 		XMVECTOR tsize = XMLoadFloat3(&size);
 		tsize = XMVectorDivide(tsize, g_XMTwo);
 
-		uint32_t shapeIndexOffset = vertices.size();
 		// Create each face in turn.
 		for (int i = 0; i < FaceCount; i++)
 		{
-			const Math::Vector3 normal = faceNormals[i];
+			const Math::Vector3 normal = Math::Vector3::TransformNormal(faceNormals[i], world);
 
 			// Get two vectors perpendicular both to the face normal and to each other.
-			const XMVECTOR basis = (i >= 4) ? g_XMIdentityR2 : g_XMIdentityR1;
-
+			XMVECTOR basis = (i >= 4) ? g_XMIdentityR2 : g_XMIdentityR1;
+			basis=Math::Vector3::TransformNormal(basis, world);
 			const XMVECTOR side1 = XMVector3Cross(normal, basis);
 			const XMVECTOR side2 = XMVector3Cross(normal, side1);
 
 			// Six indices (two triangles) per face.
 			const size_t vbase = vertices.size();
-			indices.push_back(shapeIndexOffset + vbase + 0);
-			indices.push_back(shapeIndexOffset + vbase + 1);
-			indices.push_back(shapeIndexOffset + vbase + 2);
+			indices.push_back(vbase + 0);
+			indices.push_back(vbase + 1);
+			indices.push_back(vbase + 2);
 
-			indices.push_back(shapeIndexOffset + vbase + 0);
-			indices.push_back(shapeIndexOffset + vbase + 2);
-			indices.push_back(shapeIndexOffset + vbase + 3);
+			indices.push_back(vbase + 0);
+			indices.push_back(vbase + 2);
+			indices.push_back( vbase + 3);
 
 			// Four vertices per face.
 			// (normal - side1 - side2) * tsize // normal // t0
@@ -206,7 +205,6 @@ namespace Bruno
 				Math::Vector3 tangent(-std::sinf(phi), 0.0f, std::cosf(phi));
 				Math::Vector3 bitangent(std::cosf(phi), 0.0f, std::sinf(phi));
 				Math::Vector3 normal = tangent.Cross(bitangent);
-				//Math::Vector3 normal = bitangent.Cross(tangent);
 
 				vertex.Normal = Math::Vector3::TransformNormal(normal, world);
 				vertex.Normal.Normalize();

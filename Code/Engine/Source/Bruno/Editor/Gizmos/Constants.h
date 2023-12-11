@@ -10,7 +10,7 @@ namespace Bruno::Gizmo
 	constexpr int RING_TESSELLATION = 32;
 	constexpr float GIZMO_LENGTH = LINE_LENGTH + CONE_HEIGHT;
 
-	constexpr float GIZMO_SCREEN_SCALE = 0.075f;
+	constexpr float GIZMO_SCREEN_SCALE = 0.05f;
 	constexpr float GIZMO_SIZE_CLIP_SPACE = 2.3f;
 	constexpr float CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS = 60.0f;
 

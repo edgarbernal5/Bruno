@@ -156,7 +156,7 @@ namespace Bruno
 
 		Camera& m_camera;
 		bool m_isActive{ true };
-		GizmoType m_currentGizmoType = GizmoType::Rotation;
+		GizmoType m_currentGizmoType = GizmoType::Scale;
 		PivotType m_pivotType = PivotType::SelectionCenter;
 		GizmoAxis m_currentGizmoAxis = GizmoAxis::None;
 		TransformSpace m_transformSpace = TransformSpace::World;
