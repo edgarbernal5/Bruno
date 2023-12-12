@@ -67,19 +67,14 @@ namespace Bruno
 		void Update();
 		void EndDrag();
 
-		void SetTranslationCallback(DragTranslationScaleCallback callback) {
-			m_dragTranslationCallback = callback;
-		}
-		void SetScaleCallback(DragTranslationScaleCallback callback) {
-			m_dragScaleCallback = callback;
-		}
-		void SetRotationCallback(DragRotationCallback callback) {
-			m_dragRotationCallback = callback;
-		}
+		TransformSpace GetTransformSpace() { return m_transformSpace; }
 
-		void SetGizmoType(GizmoType type) {
-			m_currentGizmoType = type;
-		}
+		void SetTranslationCallback(DragTranslationScaleCallback callback) { m_dragTranslationCallback = callback; }
+		void SetScaleCallback(DragTranslationScaleCallback callback) { m_dragScaleCallback = callback; }
+		void SetRotationCallback(DragRotationCallback callback) { m_dragRotationCallback = callback; }
+
+		void SetGizmoType(GizmoType type){ m_currentGizmoType = type; }
+		void SetTransformSpace(TransformSpace space){ m_transformSpace = space; }
 	private:
 		struct SelectionState
 		{
@@ -97,7 +92,7 @@ namespace Bruno
 			Math::Vector2 m_prevMousePosition;
 
 			Math::Plane m_currentGizmoPlane;
-			Math::Matrix m_objectRotation;
+			//Math::Matrix m_objectRotation;
 		};
 
 		void UpdateLocalState();

@@ -180,6 +180,13 @@ namespace Bruno
 		{
 			m_gizmoService->SetGizmoType(GizmoService::GizmoType::Scale);
 		}
+		else if (key == KeyCode::D4)
+		{
+			if (m_gizmoService->GetTransformSpace() == GizmoService::TransformSpace::World)
+				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::Local);
+			else
+				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::World);
+		}
 		
 		m_shiftPressed = (state.Shift);
 	}
@@ -195,18 +202,22 @@ namespace Bruno
 	{
 		m_camera.LookAt(Math::Vector3(0, 8, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 1.0f, 1000.0f);
+		
+		m_objectSelector = std::make_shared<ObjectSelector>(m_scene);
 
-		m_gizmoService = std::make_unique<GizmoService>(m_device.get(), m_camera, m_surface.get(), new ObjectSelector());
+		m_gizmoService = std::make_unique<GizmoService>(m_device.get(), m_camera, m_surface.get(), m_objectSelector.get());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta) {			
-			m_scene->m_position += delta;
+			m_objectSelector->GetSelectedObjects()[0]->Position += delta;
 		});
 		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta) {
-			auto newRotation = m_scene->m_rotation * delta;
+			auto newRotation = m_objectSelector->GetSelectedObjects()[0]->Rotation * delta;
 			newRotation.Normalize();
-			m_scene->m_rotation = newRotation;
+			m_objectSelector->GetSelectedObjects()[0]->Rotation = newRotation;
 		});
 		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta) {			
-			m_scene->m_scale += delta;
+			auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale + delta;
+			if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+				m_objectSelector->GetSelectedObjects()[0]->Scale += delta;
 		});
 	}
 

@@ -5,14 +5,18 @@
 
 namespace Bruno
 {
+	struct Transformable;
+	class Scene;
+
 	class ObjectSelector
 	{
 	public:
-		ObjectSelector();
-		std::vector<Math::Matrix>& GetSelectedObjects() { return m_objects; }
+		ObjectSelector(std::shared_ptr<Scene> scene);
+		std::vector<std::shared_ptr<Transformable>>& GetSelectedObjects();
 
 	private:
-		std::vector<Math::Matrix> m_objects;
+		std::shared_ptr<Scene> m_scene;
+		//std::vector<Transformable*> m_objects;
 	};
 }
 

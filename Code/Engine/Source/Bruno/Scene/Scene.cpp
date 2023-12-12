@@ -14,9 +14,6 @@ namespace Bruno
 		{
 			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
 		}
-		m_position = Math::Vector3::Zero;
-		m_rotation = Math::Quaternion::Identity;
-		m_scale = Math::Vector3::One;
 	}
 
 	void Scene::AddModel(std::shared_ptr<Model> model)
@@ -31,6 +28,7 @@ namespace Bruno
 			boxRenderItem->Material = mesh->GetMaterial();
 			m_renderItems.push_back(boxRenderItem);
 		}
+		m_transformableObjects.push_back(std::make_shared<Transformable>());
 
 		m_models.push_back(model);
 	}
@@ -38,7 +36,10 @@ namespace Bruno
 	void Scene::OnUpdate(const GameTimer& timer)
 	{
 		auto device = Graphics::GetDevice();
-		auto world = Math::Matrix::CreateScale(m_scale) * Math::Matrix::CreateFromQuaternion(m_rotation) * Math::Matrix::CreateTranslation(m_position);
+		auto& objectSelected = m_transformableObjects[0];
+		auto world = Math::Matrix::CreateScale(objectSelected->Scale) * Math::Matrix::CreateFromQuaternion(objectSelected->Rotation) * Math::Matrix::CreateTranslation(objectSelected->Position);
+		objectSelected->WorldTransform = world;
+
 		Math::Matrix mvpMatrix = world * m_camera.GetViewProjection();
 
 		ObjectBuffer objectBuffer;

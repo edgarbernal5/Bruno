@@ -11,6 +11,15 @@ namespace Bruno
 	class Model;
 	struct RenderItem;
 
+	struct Transformable {
+		Math::Vector3 Position;
+		Math::Quaternion Rotation;
+		Math::Vector3 Scale;
+		Math::Matrix WorldTransform;
+
+		Transformable():Scale(Math::Vector3::One){}
+	};
+
 	class Scene
 	{
 	public:
@@ -20,11 +29,8 @@ namespace Bruno
 		const std::vector<std::shared_ptr<RenderItem>>& GetRenderItems() { return m_renderItems; }
 		void OnUpdate(const GameTimer& timer);
 
-		Math::Vector3 m_position;
-		Math::Quaternion m_rotation;
-		Math::Vector3 m_scale;
-
 		friend class SceneRenderer;
+		friend class ObjectSelector;
 
 	private:
 		Camera& m_camera;
@@ -36,6 +42,8 @@ namespace Bruno
 			Math::Matrix World;
 		};
 		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
+
+		std::vector<std::shared_ptr<Transformable>>	m_transformableObjects;
 	};
 }
 

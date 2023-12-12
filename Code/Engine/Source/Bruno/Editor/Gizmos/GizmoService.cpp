@@ -10,6 +10,7 @@
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
 #include "Bruno/Platform/DirectX/Surface.h"
 #include "Bruno/Math/Math.h"
+#include "Bruno/Scene/Scene.h"
 #include <limits>
 
 namespace Bruno
@@ -42,7 +43,6 @@ namespace Bruno
         m_selectionState.m_gizmoObjectOrientedWorld = Math::Matrix::Identity;
         m_selectionState.m_gizmoAxisAlignedWorld = Math::Matrix::Identity;
         m_selectionState.m_screenScaleMatrix = Math::Matrix::Identity;
-        m_selectionState.m_objectRotation = Math::Matrix::Identity;
         m_selectionState.m_gizmoPosition = Math::Vector3::Zero;
         m_translationScaleSnapDelta = Math::Vector3::Zero;
 
@@ -250,6 +250,7 @@ namespace Bruno
             return;
         }
         m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
+        auto localObjectRotationMatrix = m_objectSelector->GetSelectedObjects()[0]->WorldTransform;
 
         if (m_currentGizmoType == GizmoType::Translation ||
             m_currentGizmoType == GizmoType::Rotation)
@@ -258,7 +259,7 @@ namespace Bruno
 
             if (m_transformSpace == TransformSpace::Local)
             {
-                world = m_selectionState.m_objectRotation;
+                world = localObjectRotationMatrix;
             }
 
             m_selectionState.m_gizmoObjectOrientedWorld = m_selectionState.m_screenScaleMatrix *
@@ -273,10 +274,8 @@ namespace Bruno
         }
         else
         {
-            //auto selectedObject = m_objectSelector->GetSelectedObjects()[0];
-            auto localRotationMatrix = m_objectSelector->GetSelectedObjects()[0];
-            auto localForward = localRotationMatrix.Forward();
-            auto localUp = localRotationMatrix.Up();
+            auto localForward = localObjectRotationMatrix.Forward();
+            auto localUp = localObjectRotationMatrix.Up();
 
             localForward.Normalize();
             auto localRight = localForward.Cross(localUp);

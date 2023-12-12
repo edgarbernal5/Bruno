@@ -1,10 +1,16 @@
 #include "brpch.h"
 #include "ObjectSelector.h"
 
+#include "Bruno/Scene/Scene.h"
+
 namespace Bruno
 {
-	ObjectSelector::ObjectSelector()
+	ObjectSelector::ObjectSelector(std::shared_ptr<Scene> scene) : m_scene(scene)
 	{
-		m_objects.push_back(Math::Matrix::Identity);
+
+	}
+
+	std::vector<std::shared_ptr<Transformable>>& ObjectSelector::GetSelectedObjects() {
+		return m_scene->m_transformableObjects;
 	}
 }
