@@ -261,16 +261,24 @@ namespace Bruno
             {
                 world = localObjectRotationMatrix;
             }
+            auto localForward = world.Forward();
+            localForward.Normalize();
+            
+            auto localUp = world.Up();
+            localUp.Normalize();
+
+            auto localRight = world.Right();
+            localRight.Normalize();
 
             m_selectionState.m_gizmoObjectOrientedWorld = m_selectionState.m_screenScaleMatrix *
-                Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, world.Forward(), world.Up());
+                Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, localForward, localUp);
 
             m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_screenScaleMatrix *
                 Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, Math::Vector3::Forward, Math::Vector3::Up);
 
-            m_selectionState.m_rotationMatrix.Forward(world.Forward());
-            m_selectionState.m_rotationMatrix.Up(world.Up());
-            m_selectionState.m_rotationMatrix.Right(world.Right());
+            m_selectionState.m_rotationMatrix.Forward(localForward);
+            m_selectionState.m_rotationMatrix.Up(localUp);
+            m_selectionState.m_rotationMatrix.Right(localRight);
         }
         else
         {
