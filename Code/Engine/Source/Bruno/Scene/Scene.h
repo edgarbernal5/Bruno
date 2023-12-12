@@ -20,6 +20,10 @@ namespace Bruno
 		const std::vector<std::shared_ptr<RenderItem>>& GetRenderItems() { return m_renderItems; }
 		void OnUpdate(const GameTimer& timer);
 
+		Math::Vector3 m_position;
+		Math::Quaternion m_rotation;
+		Math::Vector3 m_scale;
+
 		friend class SceneRenderer;
 
 	private:

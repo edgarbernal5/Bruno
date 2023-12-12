@@ -14,6 +14,9 @@ namespace Bruno
 		{
 			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
 		}
+		m_position = Math::Vector3::Zero;
+		m_rotation = Math::Quaternion::Identity;
+		m_scale = Math::Vector3::One;
 	}
 
 	void Scene::AddModel(std::shared_ptr<Model> model)
@@ -35,7 +38,8 @@ namespace Bruno
 	void Scene::OnUpdate(const GameTimer& timer)
 	{
 		auto device = Graphics::GetDevice();
-		Math::Matrix mvpMatrix = m_camera.GetViewProjection();
+		auto world = Math::Matrix::CreateScale(m_scale) * Math::Matrix::CreateFromQuaternion(m_rotation) * Math::Matrix::CreateTranslation(m_position);
+		Math::Matrix mvpMatrix = world * m_camera.GetViewProjection();
 
 		ObjectBuffer objectBuffer;
 		objectBuffer.World = mvpMatrix;

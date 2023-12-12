@@ -197,9 +197,16 @@ namespace Bruno
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 1.0f, 1000.0f);
 
 		m_gizmoService = std::make_unique<GizmoService>(m_device.get(), m_camera, m_surface.get(), new ObjectSelector());
-		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta) {
-			//m_gizmoService->SetPosition()
-			
+		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta) {			
+			m_scene->m_position += delta;
+		});
+		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta) {
+			auto newRotation = m_scene->m_rotation * delta;
+			newRotation.Normalize();
+			m_scene->m_rotation = newRotation;
+		});
+		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta) {			
+			m_scene->m_scale += delta;
 		});
 	}
 

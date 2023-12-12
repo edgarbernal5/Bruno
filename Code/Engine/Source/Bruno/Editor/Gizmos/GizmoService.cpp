@@ -412,12 +412,11 @@ namespace Bruno
                 float acosAngle = Math::Clamp(dotP, -1.0f, 1.0f);
                 float angle = Math::Acos(acosAngle);
 
-                auto perpendicularVector = m_selectionState.m_prevIntersectionPosition;
-                perpendicularVector.Cross(newIntersectionPoint);
+                auto perpendicularVector = m_selectionState.m_prevIntersectionPosition.Cross(newIntersectionPoint);
                 perpendicularVector.Normalize();
 
                 float sign = perpendicularVector.Dot(planeNormals[planeIndex]);
-                
+                //BR_CORE_TRACE << "angle = " << angle <<"; sign = " << sign << std::endl;
                 delta = sign * angle;
             }
 
@@ -435,6 +434,8 @@ namespace Bruno
             }
         }
 
+        m_selectionState.m_prevMousePosition = mousePosition;
+        m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
         return rotationDelta;
     }
 
