@@ -39,7 +39,7 @@ namespace Bruno
 		void Update();
 
 	private:
-		void CreateTorus(float radius, float thickness, size_t tessellation, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
+		void CreateHalfTorus(float radius, float thickness, size_t tessellation, float angleStart, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
 
 		Camera& m_camera;
 		Surface* m_surface;
@@ -56,7 +56,7 @@ namespace Bruno
 		std::shared_ptr<RootSignature>			m_rootSignature;
 		std::shared_ptr<PipelineStateObject>	m_pipelineObject;
 		PipelineResourceSpace					m_meshPerObjectResourceSpace;
-
+		RenderConfig m_renderConfig;
 		size_t m_xUpperBound;
 		size_t m_yUpperBound;
 

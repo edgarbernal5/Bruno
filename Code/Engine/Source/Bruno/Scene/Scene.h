@@ -17,7 +17,7 @@ namespace Bruno
 		Math::Vector3 Scale;
 		Math::Matrix WorldTransform;
 
-		Transformable():Scale(Math::Vector3::One){}
+		Transformable():Scale(Math::Vector3::One*0.2f){}
 	};
 
 	class Scene

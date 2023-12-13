@@ -92,7 +92,6 @@ namespace Bruno
 			Math::Vector2 m_prevMousePosition;
 
 			Math::Plane m_currentGizmoPlane;
-			//Math::Matrix m_objectRotation;
 		};
 
 		void UpdateLocalState();
@@ -155,7 +154,7 @@ namespace Bruno
 		Camera& m_camera;
 		Camera m_sceneGizmoCamera;
 		bool m_isActive{ true };
-		GizmoType m_currentGizmoType = GizmoType::Translation;
+		GizmoType m_currentGizmoType = GizmoType::Rotation;
 		PivotType m_pivotType = PivotType::SelectionCenter;
 		GizmoAxis m_currentGizmoAxis = GizmoAxis::None;
 		TransformSpace m_transformSpace = TransformSpace::World;

@@ -11,7 +11,10 @@ namespace Bruno
 	GizmoRotationRenderer::GizmoRotationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig) :
 		m_camera(camera),
 		m_surface(surface),
-		m_batch(batch)
+		m_batch(batch),
+		m_xUpperBound(0),
+		m_yUpperBound(0),
+		m_renderConfig(renderConfig)
 	{
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
@@ -40,19 +43,7 @@ namespace Bruno
 
 		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 		
-		Math::Matrix world;
-		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(90.0f));
-		CreateTorus(renderConfig.Radius, renderConfig.Thickness, renderConfig.RingTessellation, m_vertices, m_indices, Math::Color(1, 0, 0, 1), world);
-
-		m_xUpperBound = m_vertices.size();
-
-		world = world.Identity;
-		CreateTorus(renderConfig.Radius, renderConfig.Thickness, renderConfig.RingTessellation, m_vertices, m_indices, Math::Color(0, 1, 0, 1), world);
 		
-		m_yUpperBound = m_vertices.size();
-
-		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f));
-		CreateTorus(renderConfig.Radius, renderConfig.Thickness, renderConfig.RingTessellation, m_vertices, m_indices, Math::Color(0, 0, 1, 1), world);
 	}
 
 	void GizmoRotationRenderer::Render(GraphicsContext* context)
@@ -91,6 +82,35 @@ namespace Bruno
 
 	void GizmoRotationRenderer::Update()
 	{
+		Math::Vector3 cameraToModelNormalized = m_camera.GetTarget() - m_camera.GetPosition();
+		//cameraToModelNormalized = Math::Vector3::TransformNormal(cameraToModelNormalized, m_camera.GetView());
+		cameraToModelNormalized.Normalize();
+		
+		m_vertices.clear();
+		m_indices.clear();
+		//float angleStart = atan2f(cameraToModelNormalized[(4 - axis) % 3], cameraToModelNormalized[(3 - axis) % 3]) + ZPI * 0.5f;
+
+		Math::Matrix world;
+		float angleStart;
+		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f));
+		//angleStart = std::atan2f(cameraToModelNormalized.y, cameraToModelNormalized.x);// -DirectX::XM_PI * 0.5f;;
+		////BR_CORE_TRACE << "angleStart X = " << angleStart << std::endl;
+		////BR_CORE_TRACE << "cameraToModelNormalized X = " << cameraToModelNormalized.x << " Y = " << cameraToModelNormalized.y << " Z = " << cameraToModelNormalized.z << std::endl;
+		//CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness * 2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, Math::Color(1, 0, 0, 1), world);
+
+		m_xUpperBound = m_vertices.size();
+
+		world = world.Identity;
+		angleStart = std::atan2f(cameraToModelNormalized.x, cameraToModelNormalized.z)+ DirectX::XM_PI * 0.5f;
+		//BR_CORE_TRACE << "angleStart Y = " << angleStart << std::endl;
+		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness * 2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, Math::Color(0, 1, 0, 1), world);
+
+		m_yUpperBound = m_vertices.size();
+
+		/*world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f));
+		angleStart = std::atan2f(cameraToModelNormalized.z, cameraToModelNormalized.y);
+		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness*2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, Math::Color(0, 0, 1, 1), world);*/
+
 		auto device = Graphics::GetDevice();
 		Math::Matrix mvpMatrix = m_gizmoWorld * m_camera.GetViewProjection();
 
@@ -103,37 +123,37 @@ namespace Bruno
 		m_meshPerObjectResourceSpace.SetCBV(m_constantBuffers[frameIndex].get());
 	}
 
-	void GizmoRotationRenderer::CreateTorus(float radius, float thickness, size_t tessellation, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
+	void GizmoRotationRenderer::CreateHalfTorus(float radius, float thickness, size_t tessellation, float angleStart, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
 	{
 		using namespace DirectX;
 
 		size_t verticesOffset = m_vertices.size();
 
-		const size_t stride = tessellation + 1;
+		size_t halfTessellation = tessellation / 2 - 1;
+		const size_t stride = halfTessellation + 1;
 		// First we loop around the main ring of the torus.
-		for (size_t i = 0; i <= tessellation; i++)
+		for (size_t i = 0; i <= halfTessellation; i++)
 		{
-			const float u = float(i) / float(tessellation);
-
-			const float outerAngle = float(i) * XM_2PI / float(tessellation) - XM_PIDIV2;
+			//const float u = float(i) / float(halfTessellation);
+			const float outerAngle = angleStart + XM_PI * (float)i / halfTessellation;
 
 			// Create a transform matrix that will align geometry to
 			// slice perpendicularly though the current ring position.
 			const XMMATRIX transform = XMMatrixTranslation(radius, 0, 0) * XMMatrixRotationY(outerAngle);
 
 			// Now we loop along the other axis, around the side of the tube.
-			for (size_t j = 0; j <= tessellation; j++)
+			for (size_t j = 0; j <= halfTessellation; j++)
 			{
-				const float v = 1 - float(j) / float(tessellation);
+				//const float v = 1.0f - float(j) / float(tessellation);
 
-				const float innerAngle = float(j) * XM_2PI / float(tessellation) + XM_PI;
+				const float innerAngle = float(j) * XM_PI / float(halfTessellation);
 				float dx, dy;
 
 				XMScalarSinCos(&dy, &dx, innerAngle);
 
 				// Create a vertex.
 				XMVECTOR normal = XMVectorSet(dx, dy, 0, 0);
-				XMVECTOR position = XMVectorScale(normal, thickness / 2);
+				XMVECTOR position = XMVectorScale(normal, thickness * 0.5f);
 				//const XMVECTOR textureCoordinate = XMVectorSet(u, v, 0, 0);
 
 				position = XMVector3Transform(position, transform);
@@ -146,19 +166,23 @@ namespace Bruno
 
 				vertices.push_back(VertexPositionNormalColor(positionV3, normalV3, color));
 
-				// And create indices for two triangles.
-				const size_t nextI = (i + 1) % stride;
-				const size_t nextJ = (j + 1) % stride;
+				if (i <= halfTessellation - 1)
+				{
+					// And create indices for two triangles.
+					const size_t nextI = (i + 1) % stride;
+					const size_t nextJ = (j + 1) % stride;
 
-				indices.push_back(verticesOffset + i * stride + j);
-				indices.push_back(verticesOffset + i * stride + nextJ);
-				indices.push_back(verticesOffset + nextI * stride + j);
+					indices.push_back(verticesOffset + i * stride + j);
+					indices.push_back(verticesOffset + i * stride + nextJ);
+					indices.push_back(verticesOffset + nextI * stride + j);
 
-				indices.push_back(verticesOffset + i * stride + nextJ);
-				indices.push_back(verticesOffset + nextI * stride + nextJ);
-				indices.push_back(verticesOffset + nextI * stride + j);
+					indices.push_back(verticesOffset + i * stride + nextJ);
+					indices.push_back(verticesOffset + nextI * stride + nextJ);
+					indices.push_back(verticesOffset + nextI * stride + j);
+				}
 			}
 		}
+
 	}
 
 	GizmoRotationRenderer::RenderConfig::RenderConfig(const GizmoConfig& gizmoConfig)
