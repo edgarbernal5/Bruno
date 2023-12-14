@@ -387,7 +387,7 @@ namespace Bruno
             auto length = 4.0f * (gizmoScreenPosition2 - gizmoScreenPosition).Length() / DirectX::XM_2PI;
             Math::Vector2 deltaAngles(1.0f / length);
 
-            Math::Vector2 mouseVelocity(mousePosition.x - m_selectionState.m_prevMousePosition.x, mousePosition.y - m_selectionState.m_prevMousePosition.y);
+            Math::Vector2 mouseVelocity(mousePosition.x - m_selectionState.m_prevMousePosition.x, m_selectionState.m_prevMousePosition.y - mousePosition.y);
 
             auto angles = mouseVelocity * deltaAngles;
 
@@ -434,13 +434,13 @@ namespace Bruno
             switch (m_currentGizmoAxis)
             {
             case GizmoAxis::X:
-                rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[0], delta);
+                rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[0], -delta);
                 break;
             case GizmoAxis::Y:
                 rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[1], delta);
                 break;
             case GizmoAxis::Z:
-                rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[2], delta);
+                rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[2], -delta);
                 break;
             }
         }
