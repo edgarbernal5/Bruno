@@ -654,7 +654,7 @@ namespace Bruno
         if (Math::Abs(gizmoPositionViewSpace.z) > m_camera.GetNearPlane())
         {
             return Math::Abs(gizmoPositionViewSpace.z);
-            //return m_camera.IsOrthographic() ? Math::Abs(gizmoPositionViewSpace.z) : gizmoPositionViewSpace.Length();
+            //return gizmoPositionViewSpace.Length();
         }
         return 0.0f;
     }
@@ -716,7 +716,6 @@ namespace Bruno
 
             Math::Vector3 perpendicularRayVector;
             m_unaryDirections[axisIndex].Cross(cameraToGizmo, perpendicularRayVector);
-            perpendicularRayVector.Cross(cameraToGizmo);
             
             perpendicularRayVector = m_unaryDirections[axisIndex].Cross(perpendicularRayVector);
             perpendicularRayVector.Normalize();
@@ -752,7 +751,6 @@ namespace Bruno
         Math::Viewport newViewport(savedViewport.Width - Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS, 0, Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS, Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS);
         context->SetViewport(newViewport);
 
-        //m_sceneGizmoCamera = m_camera;
         m_sceneGizmoCamera.SetLens(m_camera.GetFieldOfView(), newViewport);
 
         auto cameraOrientation = Math::Matrix::CreateFromQuaternion(Math::Quaternion::CreateFromRotationMatrix(m_camera.GetView()));
