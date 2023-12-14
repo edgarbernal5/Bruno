@@ -42,8 +42,6 @@ namespace Bruno
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 
 		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
-		
-		
 	}
 
 	void GizmoRotationRenderer::Render(GraphicsContext* context)
@@ -66,50 +64,36 @@ namespace Bruno
 
 	void GizmoRotationRenderer::SetColors(const Math::Color colors[3])
 	{
-		for (size_t i = 0; i < m_xUpperBound; i++)
-		{
-			m_vertices[i].Color = colors[0];
-		}
-		for (size_t i = m_xUpperBound; i < m_yUpperBound; i++)
-		{
-			m_vertices[i].Color = colors[1];
-		}
-		for (size_t i = m_yUpperBound; i < m_vertices.size(); i++)
-		{
-			m_vertices[i].Color = colors[2];
-		}
+		m_axisColors[0] = colors[0];
+		m_axisColors[1] = colors[1];
+		m_axisColors[2] = colors[2];
 	}
 
 	void GizmoRotationRenderer::Update()
 	{
 		Math::Vector3 cameraToModelNormalized = m_camera.GetTarget() - m_camera.GetPosition();
-		//cameraToModelNormalized = Math::Vector3::TransformNormal(cameraToModelNormalized, m_camera.GetView());
 		cameraToModelNormalized.Normalize();
 		
 		m_vertices.clear();
 		m_indices.clear();
-		//float angleStart = atan2f(cameraToModelNormalized[(4 - axis) % 3], cameraToModelNormalized[(3 - axis) % 3]) + ZPI * 0.5f;
 
 		Math::Matrix world;
 		float angleStart;
 		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f));
-		//angleStart = std::atan2f(cameraToModelNormalized.y, cameraToModelNormalized.x);// -DirectX::XM_PI * 0.5f;;
-		////BR_CORE_TRACE << "angleStart X = " << angleStart << std::endl;
-		////BR_CORE_TRACE << "cameraToModelNormalized X = " << cameraToModelNormalized.x << " Y = " << cameraToModelNormalized.y << " Z = " << cameraToModelNormalized.z << std::endl;
-		//CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness * 2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, Math::Color(1, 0, 0, 1), world);
+		angleStart = std::atan2f(cameraToModelNormalized.z, cameraToModelNormalized.y) - DirectX::XM_PI * 0.5f;
+		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness * 2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, m_axisColors[0], world);
 
 		m_xUpperBound = m_vertices.size();
 
 		world = world.Identity;
-		angleStart = std::atan2f(cameraToModelNormalized.x, cameraToModelNormalized.z)+ DirectX::XM_PI * 0.5f;
-		//BR_CORE_TRACE << "angleStart Y = " << angleStart << std::endl;
-		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness * 2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, Math::Color(0, 1, 0, 1), world);
+		angleStart = std::atan2f(cameraToModelNormalized.x, cameraToModelNormalized.z);
+		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness * 2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, m_axisColors[1], world);
 
 		m_yUpperBound = m_vertices.size();
 
-		/*world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f));
-		angleStart = std::atan2f(cameraToModelNormalized.z, cameraToModelNormalized.y);
-		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness*2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, Math::Color(0, 0, 1, 1), world);*/
+		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f));
+		angleStart = std::atan2f(cameraToModelNormalized.y, cameraToModelNormalized.x) + DirectX::XM_PI * 0.5f;
+		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness*2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, m_axisColors[2], world);
 
 		auto device = Graphics::GetDevice();
 		Math::Matrix mvpMatrix = m_gizmoWorld * m_camera.GetViewProjection();
@@ -129,7 +113,7 @@ namespace Bruno
 
 		size_t verticesOffset = m_vertices.size();
 
-		size_t halfTessellation = tessellation / 2 - 1;
+		size_t halfTessellation = tessellation / 2;
 		const size_t stride = halfTessellation + 1;
 		// First we loop around the main ring of the torus.
 		for (size_t i = 0; i <= halfTessellation; i++)
@@ -182,7 +166,6 @@ namespace Bruno
 				}
 			}
 		}
-
 	}
 
 	GizmoRotationRenderer::RenderConfig::RenderConfig(const GizmoConfig& gizmoConfig)

@@ -59,6 +59,7 @@ namespace Bruno
 		RenderConfig m_renderConfig;
 		size_t m_xUpperBound;
 		size_t m_yUpperBound;
+		Math::Color m_axisColors[3]{ Math::Color(1.0f,0.0f,0.0f,1.0f),Math::Color(0.0f,1.0f,0.0f,1.0f), Math::Color(0.0f,0.0f,1.0f,1.0f) };
 
 		std::vector<VertexPositionNormalColor>	m_vertices;
 		std::vector<uint16_t>					m_indices;

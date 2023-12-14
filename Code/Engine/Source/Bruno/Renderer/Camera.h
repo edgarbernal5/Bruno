@@ -19,6 +19,7 @@ namespace Bruno
 		float GetFieldOfView() { return m_fovY; }
 		Math::Vector3 GetPosition() { return m_position; }
 		Math::Vector3 GetTarget() { return m_target; }
+		Math::Vector3 GetUp() { return m_up; }
 		Math::Viewport GetViewport() { return m_viewport; }
 		void SetViewport(const Math::Viewport& viewport);
 

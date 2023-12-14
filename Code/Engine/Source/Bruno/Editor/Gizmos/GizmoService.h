@@ -148,7 +148,7 @@ namespace Bruno
 		
 		const Math::Vector3 m_unaryDirections[3]{ Math::Vector3::UnitX, Math::Vector3::UnitY, Math::Vector3::UnitZ };
 		Math::Color m_activeAxisColors[3];
-		Math::Color m_axisColors[3]{ Math::Color(1.0f,0,0,1),Math::Color(0,1.0f,0,1) , Math::Color(0,0,1.0f,1) };
+		Math::Color m_axisColors[3]{ Math::Color(1.0f,0.0f,0.0f,1.0f),Math::Color(0.0f,1.0f,0.0f,1.0f), Math::Color(0.0f,0.0f,1.0f,1.0f) };
 		Math::Color m_axisSelectionColor = Math::Color(0.5f, 0.5f, 0.25f, 1);
 
 		Camera& m_camera;
