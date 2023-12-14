@@ -559,7 +559,7 @@ namespace Bruno
                 if (ray.Intersects(plane, intersection))
                 {
                     auto positionOnPlane = ray.position + (ray.direction * intersection);
-                    if (positionOnPlane.Length() > (Gizmo::GIZMO_LENGTH + m_gizmoConfig.RingThickness))
+                    if (positionOnPlane.Length() > (Gizmo::GIZMO_LENGTH + m_gizmoConfig.RingThickness * 1.5f))
                     {
                         continue;
                     }
@@ -577,7 +577,7 @@ namespace Bruno
             }
             if (selectedAxis != GizmoAxis::None)
             {
-                if (currentPointOnPlane.Length() < (Gizmo::GIZMO_LENGTH - m_gizmoConfig.RingThickness))
+                if (currentPointOnPlane.Length() < (Gizmo::GIZMO_LENGTH - m_gizmoConfig.RingThickness * 1.5f))
                 {
                     selectedAxis = GizmoAxis::XYZ;
                 }
