@@ -1,6 +1,7 @@
 #include "brpch.h"
 #include "Compressor.h"
 
+#include "zlib.h"
 #include "MemoryStream.h"
 
 namespace Bruno

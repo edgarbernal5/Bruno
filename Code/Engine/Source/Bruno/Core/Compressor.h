@@ -1,6 +1,5 @@
 #pragma once
 
-#include <zlib.h>
 #include "Stream.h"
 
 namespace Bruno

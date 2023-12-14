@@ -52,6 +52,9 @@
     <Filter Include="Source\Bruno\Scene">
       <UniqueIdentifier>{af5f88d4-6c15-4449-9890-88ebdba121db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dependencies\zlib">
+      <UniqueIdentifier>{4c854dbe-818a-4442-877e-735d41a80aba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -302,6 +305,12 @@
     </ClInclude>
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoConfig.h">
       <Filter>Source\Bruno\Editor\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\zlib\include\zlib.h">
+      <Filter>Dependencies\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\zlib\include\zconf.h">
+      <Filter>Dependencies\zlib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
