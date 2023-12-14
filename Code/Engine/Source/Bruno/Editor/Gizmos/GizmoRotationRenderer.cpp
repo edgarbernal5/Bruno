@@ -81,19 +81,19 @@ namespace Bruno
 		float angleStart;
 		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f));
 		angleStart = std::atan2f(cameraToModelNormalized.z, cameraToModelNormalized.y) - DirectX::XM_PI * 0.5f;
-		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness * 2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, m_axisColors[0], world);
+		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, m_axisColors[0], world);
 
 		m_xUpperBound = m_vertices.size();
 
 		world = world.Identity;
 		angleStart = std::atan2f(cameraToModelNormalized.x, cameraToModelNormalized.z);
-		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness * 2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, m_axisColors[1], world);
+		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, m_axisColors[1], world);
 
 		m_yUpperBound = m_vertices.size();
 
 		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f));
 		angleStart = std::atan2f(cameraToModelNormalized.y, cameraToModelNormalized.x) + DirectX::XM_PI * 0.5f;
-		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness*2, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, m_axisColors[2], world);
+		CreateHalfTorus(m_renderConfig.Radius, m_renderConfig.Thickness, m_renderConfig.RingTessellation, angleStart, m_vertices, m_indices, m_axisColors[2], world);
 
 		auto device = Graphics::GetDevice();
 		Math::Matrix mvpMatrix = m_gizmoWorld * m_camera.GetViewProjection();

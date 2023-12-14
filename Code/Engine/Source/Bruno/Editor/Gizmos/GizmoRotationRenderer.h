@@ -26,7 +26,7 @@ namespace Bruno
 		{
 			float Radius = Gizmo::GIZMO_LENGTH;
 			uint32_t RingTessellation = Gizmo::RING_TESSELLATION;
-			float Thickness = Gizmo::CONE_RADIUS * 0.5f;
+			float Thickness = Gizmo::CONE_RADIUS;
 
 			RenderConfig() {}
 			RenderConfig(const GizmoConfig& gizmoConfig);

@@ -158,6 +158,7 @@ namespace Bruno
 		PivotType m_pivotType = PivotType::SelectionCenter;
 		GizmoAxis m_currentGizmoAxis = GizmoAxis::None;
 		TransformSpace m_transformSpace = TransformSpace::World;
+		GizmoConfig m_gizmoConfig;
 
 		Math::Vector3 m_currentDelta;
 		SelectionState m_selectionState;
