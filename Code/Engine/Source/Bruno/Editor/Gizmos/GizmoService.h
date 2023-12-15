@@ -87,6 +87,8 @@ namespace Bruno
 			Math::Matrix m_gizmoAxisAlignedWorld;
 
 			Math::Matrix m_rotationMatrix;
+			Math::Quaternion m_cameraViewInverseRotation;
+			Math::Quaternion m_cameraViewInverseRotationConjugate;
 
 			Math::Vector3 m_intersectionPosition, m_prevIntersectionPosition;
 			Math::Vector2 m_prevMousePosition;

@@ -223,8 +223,7 @@ namespace Bruno
 
 	void PlayerGame::InitializeGraphicsContext()
 	{
-		GraphicsDevice* device = Graphics::GetDevice();
-		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
+		m_graphicsContext = std::make_unique<GraphicsContext>(*m_device);
 	}
 
 	void PlayerGame::InitializeMeshAndTexture()

@@ -74,6 +74,25 @@ namespace Bruno
             m_selectionState.m_prevIntersectionPosition = intersectionPoint;
         }
 
+        if (m_currentGizmoType == GizmoType::Rotation)
+        {
+            auto localObjectRotationMatrix = m_camera.GetInverseView();
+            auto forward = localObjectRotationMatrix.Forward();
+            forward.Normalize();
+
+            auto up = localObjectRotationMatrix.Up();
+            up.Normalize();
+
+            auto right = localObjectRotationMatrix.Right();
+            right.Normalize();
+
+            localObjectRotationMatrix.Forward(forward);
+            localObjectRotationMatrix.Up(up);
+            localObjectRotationMatrix.Right(right);
+            m_selectionState.m_cameraViewInverseRotation = Math::Quaternion::CreateFromRotationMatrix(localObjectRotationMatrix);
+            m_selectionState.m_cameraViewInverseRotationConjugate = m_selectionState.m_cameraViewInverseRotation;
+            m_selectionState.m_cameraViewInverseRotationConjugate.Conjugate();
+        }
         return true;
     }
 
@@ -384,16 +403,18 @@ namespace Bruno
         {
             auto gizmoScreenPosition = GetScreenPosition(m_selectionState.m_gizmoPosition);
             auto gizmoScreenPosition2 = GetScreenPosition(m_selectionState.m_gizmoPosition + m_camera.GetView().Right() * Gizmo::GIZMO_LENGTH);
-            auto length = 4.0f * (gizmoScreenPosition2 - gizmoScreenPosition).Length() / DirectX::XM_2PI;
+            auto length = 4.0f * (gizmoScreenPosition2 - gizmoScreenPosition).Length() / DirectX::XM_PI;
             Math::Vector2 deltaAngles(1.0f / length);
 
-            Math::Vector2 mouseVelocity(mousePosition.x - m_selectionState.m_prevMousePosition.x, m_selectionState.m_prevMousePosition.y - mousePosition.y);
+            Math::Vector2 mouseVelocity(mousePosition.x - m_selectionState.m_prevMousePosition.x, mousePosition.y - m_selectionState.m_prevMousePosition.y);
 
             auto angles = mouseVelocity * deltaAngles;
 
-            rotationDelta = Math::Quaternion::CreateFromYawPitchRoll(angles.x, 0, 0) * Math::Quaternion::CreateFromYawPitchRoll(0, angles.y, 0);
+            auto localRotationDelta = Math::Quaternion::CreateFromYawPitchRoll(angles.x, 0, 0) * Math::Quaternion::CreateFromYawPitchRoll(0, angles.y, 0);
+            rotationDelta = m_selectionState.m_cameraViewInverseRotationConjugate * localRotationDelta * m_selectionState.m_cameraViewInverseRotation;
         }
-        else {
+        else
+        {
             Math::Vector3 planeNormals[3]{ m_selectionState.m_rotationMatrix.Right(), m_selectionState.m_rotationMatrix.Up(), m_selectionState.m_rotationMatrix.Forward()};
             planeNormals[0].Normalize();
             planeNormals[1].Normalize();
