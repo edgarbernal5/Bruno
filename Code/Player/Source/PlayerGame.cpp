@@ -214,10 +214,17 @@ namespace Bruno
 			newRotation.Normalize();
 			m_objectSelector->GetSelectedObjects()[0]->Rotation = newRotation;
 		});
-		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta) {			
-			auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale + delta;
+		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform) {
+			auto newDelta = delta * 0.1f;
+			if (isUniform)
+			{
+				float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
+				m_objectSelector->GetSelectedObjects()[0]->Scale *= uniformDelta;
+				return;
+			}
+			auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale + newDelta;
 			if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
-				m_objectSelector->GetSelectedObjects()[0]->Scale += delta;
+				m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
 		});
 	}
 

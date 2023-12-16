@@ -45,6 +45,7 @@ namespace Bruno
         m_selectionState.m_gizmoAxisAlignedWorld = Math::Matrix::Identity;
         m_selectionState.m_screenScaleMatrix = Math::Matrix::Identity;
         m_selectionState.m_gizmoPosition = Math::Vector3::Zero;
+        m_selectionState.m_isDragging = false;
         m_translationScaleSnapDelta = Math::Vector3::Zero;
 
         m_sceneGizmoCamera = m_camera;
@@ -93,6 +94,7 @@ namespace Bruno
             m_selectionState.m_cameraViewInverseRotationConjugate = m_selectionState.m_cameraViewInverseRotation;
             m_selectionState.m_cameraViewInverseRotationConjugate.Conjugate();
         }
+        m_selectionState.m_isDragging = true;
         return true;
     }
 
@@ -132,7 +134,7 @@ namespace Bruno
             scaleDelta = ApplySnapAndPrecisionMode(scaleDelta);
 
             if (m_dragScaleCallback)
-                m_dragScaleCallback(scaleDelta);
+                m_dragScaleCallback(scaleDelta, m_currentGizmoAxis == GizmoAxis::XYZ);
 
             break;
         }
@@ -282,6 +284,10 @@ namespace Bruno
             {
                 world = localObjectRotationMatrix;
             }
+            else if (m_currentGizmoType == GizmoType::Rotation && m_selectionState.m_isDragging)
+            {
+                //world = localObjectRotationMatrix;
+            }
             auto localForward = world.Forward();
             localForward.Normalize();
             
@@ -331,6 +337,8 @@ namespace Bruno
         m_selectionState.m_intersectionPosition = Math::Vector3::Zero;
         m_selectionState.m_prevMousePosition = Math::Vector2::Zero;
         m_currentDelta = Math::Vector3::Zero;
+
+        m_selectionState.m_isDragging = false;
     }
 
     Math::Vector3 GizmoService::ApplySnapAndPrecisionMode(Math::Vector3 delta)

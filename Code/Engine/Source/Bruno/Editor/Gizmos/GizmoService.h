@@ -19,7 +19,8 @@ namespace Bruno
 	public:
 		GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface, ObjectSelector* objectSelector, GizmoConfig gizmoConfig = GizmoConfig());
 
-		using DragTranslationScaleCallback = std::function<void(const Math::Vector3&)>;
+		using DragTranslationCallback = std::function<void(const Math::Vector3&)>;
+		using DragScaleCallback = std::function<void(const Math::Vector3&, bool isUniform)>;
 		using DragRotationCallback = std::function<void(const Math::Quaternion&)>;
 
 		enum class GizmoType
@@ -69,8 +70,8 @@ namespace Bruno
 
 		TransformSpace GetTransformSpace() { return m_transformSpace; }
 
-		void SetTranslationCallback(DragTranslationScaleCallback callback) { m_dragTranslationCallback = callback; }
-		void SetScaleCallback(DragTranslationScaleCallback callback) { m_dragScaleCallback = callback; }
+		void SetTranslationCallback(DragTranslationCallback callback) { m_dragTranslationCallback = callback; }
+		void SetScaleCallback(DragScaleCallback callback) { m_dragScaleCallback = callback; }
 		void SetRotationCallback(DragRotationCallback callback) { m_dragRotationCallback = callback; }
 
 		void SetGizmoType(GizmoType type){ m_currentGizmoType = type; }
@@ -94,6 +95,7 @@ namespace Bruno
 			Math::Vector2 m_prevMousePosition;
 
 			Math::Plane m_currentGizmoPlane;
+			bool m_isDragging;
 		};
 
 		void UpdateLocalState();
@@ -164,8 +166,8 @@ namespace Bruno
 
 		Math::Vector3 m_currentDelta;
 		SelectionState m_selectionState;
-		DragTranslationScaleCallback m_dragTranslationCallback;
-		DragTranslationScaleCallback m_dragScaleCallback;
+		DragTranslationCallback m_dragTranslationCallback;
+		DragScaleCallback m_dragScaleCallback;
 		DragRotationCallback m_dragRotationCallback;
 
 		std::shared_ptr<GizmoTranslationRenderer> m_gizmoTranslationRenderer;
