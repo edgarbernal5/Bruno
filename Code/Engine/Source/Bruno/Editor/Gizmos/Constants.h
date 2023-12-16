@@ -5,6 +5,8 @@ namespace Bruno::Gizmo
 	constexpr float		LINE_LENGTH = 3.0f;
 	constexpr float		CONE_HEIGHT = 0.5f;
 	constexpr float		CONE_RADIUS = 0.25f * 0.85f;
+	constexpr float		STICK_RADIUS = CONE_RADIUS * 0.5f;
+	
 	constexpr float		LINE_OFFSET = 1.0f;
 	constexpr uint32_t	TESSELLATION = 8;
 	constexpr uint32_t	RING_TESSELLATION = 32;

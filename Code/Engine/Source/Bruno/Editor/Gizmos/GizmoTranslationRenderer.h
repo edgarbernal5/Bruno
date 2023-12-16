@@ -25,7 +25,7 @@ namespace Bruno
 	public:
 		struct RenderConfig
 		{
-			float StickRadius = Gizmo::CONE_RADIUS * 0.25f;
+			float StickRadius = Gizmo::CONE_RADIUS * 0.5f;
 			float StickHeight = Gizmo::LINE_LENGTH;
 			float ArrowheadRadius = Gizmo::CONE_RADIUS;
 			float ArrowheadHeight = Gizmo::CONE_HEIGHT;

@@ -181,6 +181,7 @@ namespace Bruno
             m_activeAxisColors[1] = m_axisColors[1];
             m_activeAxisColors[2] = m_axisSelectionColor;
         }
+
         switch (m_currentGizmoType)
         {
         case GizmoType::Translation:
@@ -320,7 +321,6 @@ namespace Bruno
             m_selectionState.m_rotationMatrix.Up(localUp);
             m_selectionState.m_rotationMatrix.Right(localRight);
         }
-
     }
 
     void GizmoService::EndDrag()
