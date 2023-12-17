@@ -59,10 +59,11 @@ namespace Bruno
             return false;
 
         auto selectedAxis = GetAxis(mousePosition);
-        m_currentGizmoAxis = selectedAxis;
+        m_currentAxis = selectedAxis;
         m_currentDelta = Math::Vector3::Zero;
 
-        if (m_currentGizmoAxis == GizmoAxis::None)
+        BR_CORE_TRACE << "selectedAxis = " << (int)selectedAxis << std::endl;
+        if (m_currentAxis == GizmoAxis::None)
             return false;
 
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
@@ -77,20 +78,20 @@ namespace Bruno
 
         if (m_currentGizmoType == GizmoType::Rotation)
         {
-            auto localObjectRotationMatrix = m_camera.GetInverseView();
-            auto forward = localObjectRotationMatrix.Forward();
+            auto cameraViewInverse = m_camera.GetInverseView();
+            auto forward = cameraViewInverse.Forward();
             forward.Normalize();
 
-            auto up = localObjectRotationMatrix.Up();
+            auto up = cameraViewInverse.Up();
             up.Normalize();
 
-            auto right = localObjectRotationMatrix.Right();
+            auto right = cameraViewInverse.Right();
             right.Normalize();
 
-            localObjectRotationMatrix.Forward(forward);
-            localObjectRotationMatrix.Up(up);
-            localObjectRotationMatrix.Right(right);
-            m_selectionState.m_cameraViewInverseRotation = Math::Quaternion::CreateFromRotationMatrix(localObjectRotationMatrix);
+            cameraViewInverse.Forward(forward);
+            cameraViewInverse.Up(up);
+            cameraViewInverse.Right(right);
+            m_selectionState.m_cameraViewInverseRotation = Math::Quaternion::CreateFromRotationMatrix(cameraViewInverse);
             m_selectionState.m_cameraViewInverseRotationConjugate = m_selectionState.m_cameraViewInverseRotation;
             m_selectionState.m_cameraViewInverseRotationConjugate.Conjugate();
         }
@@ -134,7 +135,7 @@ namespace Bruno
             scaleDelta = ApplySnapAndPrecisionMode(scaleDelta);
 
             if (m_dragScaleCallback)
-                m_dragScaleCallback(scaleDelta, m_currentGizmoAxis == GizmoAxis::XYZ);
+                m_dragScaleCallback(scaleDelta, m_currentAxis == GizmoAxis::XYZ);
 
             break;
         }
@@ -384,15 +385,15 @@ namespace Bruno
             m_selectionState.m_intersectionPosition = intersectionPoint;
             m_currentDelta = intersectionPoint - m_selectionState.m_prevIntersectionPosition;
 
-            if (m_currentGizmoAxis == GizmoAxis::X || m_currentGizmoAxis == GizmoAxis::XY || m_currentGizmoAxis == GizmoAxis::XZ || m_currentGizmoAxis == GizmoAxis::XYZ)
+            if (m_currentAxis == GizmoAxis::X || m_currentAxis == GizmoAxis::XY || m_currentAxis == GizmoAxis::XZ || m_currentAxis == GizmoAxis::XYZ)
             {
                 delta.x = m_currentDelta.x;
             }
-            if (m_currentGizmoAxis == GizmoAxis::Y || m_currentGizmoAxis == GizmoAxis::XY || m_currentGizmoAxis == GizmoAxis::YZ || m_currentGizmoAxis == GizmoAxis::XYZ)
+            if (m_currentAxis == GizmoAxis::Y || m_currentAxis == GizmoAxis::XY || m_currentAxis == GizmoAxis::YZ || m_currentAxis == GizmoAxis::XYZ)
             {
                 delta.y = m_currentDelta.y;
             }
-            if (m_currentGizmoAxis == GizmoAxis::Z || m_currentGizmoAxis == GizmoAxis::XZ || m_currentGizmoAxis == GizmoAxis::YZ || m_currentGizmoAxis == GizmoAxis::XYZ)
+            if (m_currentAxis == GizmoAxis::Z || m_currentAxis == GizmoAxis::XZ || m_currentAxis == GizmoAxis::YZ || m_currentAxis == GizmoAxis::XYZ)
             {
                 delta.z = m_currentDelta.z;
             }
@@ -407,7 +408,7 @@ namespace Bruno
     {
         Math::Quaternion rotationDelta;
 
-        if (m_currentGizmoAxis == GizmoAxis::XYZ)
+        if (m_currentAxis == GizmoAxis::XYZ)
         {
             auto gizmoScreenPosition = GetScreenPosition(m_selectionState.m_gizmoPosition);
             auto gizmoScreenPosition2 = GetScreenPosition(m_selectionState.m_gizmoPosition + m_camera.GetView().Right() * Gizmo::GIZMO_LENGTH);
@@ -427,7 +428,7 @@ namespace Bruno
             planeNormals[0].Normalize();
             planeNormals[1].Normalize();
             planeNormals[2].Normalize();
-            int planeIndex = ((int)m_currentGizmoAxis) - 1;
+            int planeIndex = ((int)m_currentAxis) - 1;
 
             Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoAxisAlignedWorld.Invert();
             
@@ -455,22 +456,27 @@ namespace Bruno
                 auto perpendicularVector = m_selectionState.m_prevIntersectionPosition.Cross(newIntersectionPoint);
                 perpendicularVector.Normalize();
 
+                //float sign2 = perpendicularVector.Dot(planeNormals[planeIndex]) < 0.0f ? -1.0f : 1.0f;
+                
                 float sign = perpendicularVector.Dot(planeNormals[planeIndex]);
-                //BR_CORE_TRACE << "angle = " << angle <<"; sign = " << sign << std::endl;
+                BR_CORE_TRACE << "plane normal: x = " << planeNormals[planeIndex].x << " y = " << planeNormals[planeIndex].y << " z =" << planeNormals[planeIndex].z << std::endl;
+                BR_CORE_TRACE << "angle = " << angle << "; sign = " << sign << std::endl;
                 delta = sign * angle;
-            }
-            //TODO: invertir en X y Z la axis
-            switch (m_currentGizmoAxis)
-            {
-            case GizmoAxis::X:
-                rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[0], -delta);
-                break;
-            case GizmoAxis::Y:
-                rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[1], delta);
-                break;
-            case GizmoAxis::Z:
-                rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[2], -delta);
-                break;
+
+                //TODO: invertir en X y Z la axis
+                switch (m_currentAxis)
+                {
+                case GizmoAxis::X:
+                    rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[0], delta);
+                    break;
+                case GizmoAxis::Y:
+                    rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[1], delta);
+                    break;
+                case GizmoAxis::Z:
+                    rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[2], delta);
+                    break;
+                }
+                //rotationDelta = m_selectionState.m_cameraViewInverseRotationConjugate * rotationDelta * m_selectionState.m_cameraViewInverseRotation;
             }
         }
 
@@ -634,7 +640,7 @@ namespace Bruno
             ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
             ray.direction.Normalize();
 
-            SetGizmoHandlePlaneFor(m_currentGizmoAxis, ray);
+            SetGizmoHandlePlaneFor(m_currentAxis, ray);
 
             float intersection;
             if (ray.Intersects(m_selectionState.m_currentGizmoPlane, intersection))
@@ -645,14 +651,14 @@ namespace Bruno
         }
         else
         {
-            if (m_currentGizmoAxis == GizmoAxis::XYZ)
+            if (m_currentAxis == GizmoAxis::XYZ)
             {
                 return true;
             }
 
             Math::Vector3 planeNormals[3]{ m_selectionState.m_rotationMatrix.Right(), m_selectionState.m_rotationMatrix.Up(), m_selectionState.m_rotationMatrix.Forward() };
 
-            int planeIndex = ((int)m_currentGizmoAxis) - 1;
+            int planeIndex = ((int)m_currentAxis) - 1;
             auto gizmoWorldInverse = m_selectionState.m_gizmoAxisAlignedWorld.Invert();
 
             auto ray = ConvertMousePositionToRay(mousePosition);

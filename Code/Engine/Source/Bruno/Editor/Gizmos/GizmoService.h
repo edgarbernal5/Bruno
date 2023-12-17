@@ -160,7 +160,7 @@ namespace Bruno
 		bool m_isActive{ true };
 		GizmoType m_currentGizmoType = GizmoType::Rotation;
 		PivotType m_pivotType = PivotType::SelectionCenter;
-		GizmoAxis m_currentGizmoAxis = GizmoAxis::None;
+		GizmoAxis m_currentAxis = GizmoAxis::None;
 		TransformSpace m_transformSpace = TransformSpace::World;
 		GizmoConfig m_gizmoConfig;
 
