@@ -111,6 +111,7 @@ namespace Bruno
 		void InitializeGizmos();
 
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
+		void SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
 
 		void RenderCameraGizmo(GraphicsContext* context);

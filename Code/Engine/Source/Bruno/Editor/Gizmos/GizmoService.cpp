@@ -68,6 +68,8 @@ namespace Bruno
 
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
             SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
+        else if (m_currentGizmoType == GizmoType::Rotation)
+            SetGizmoHandlePlaneForRotation(selectedAxis, mousePosition);
 
         Math::Vector3 intersectionPoint;
         if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
@@ -424,11 +426,11 @@ namespace Bruno
         }
         else
         {
-            Math::Vector3 planeNormals[3]{ m_selectionState.m_rotationMatrix.Right(), m_selectionState.m_rotationMatrix.Up(), m_selectionState.m_rotationMatrix.Forward()};
-            planeNormals[0].Normalize();
-            planeNormals[1].Normalize();
-            planeNormals[2].Normalize();
-            int planeIndex = ((int)m_currentAxis) - 1;
+            //Math::Vector3 planeNormals[3]{ m_selectionState.m_rotationMatrix.Right(), m_selectionState.m_rotationMatrix.Up(), m_selectionState.m_rotationMatrix.Forward()};
+            //planeNormals[0].Normalize();
+            //planeNormals[1].Normalize();
+            //planeNormals[2].Normalize();
+            //int planeIndex = ((int)m_currentAxis) - 1;
 
             Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoAxisAlignedWorld.Invert();
             
@@ -437,7 +439,8 @@ namespace Bruno
             ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
             ray.direction.Normalize();
 
-            Math::Plane plane(planeNormals[planeIndex], 0);
+            //Math::Plane plane(planeNormals[planeIndex], 0);
+            Math::Plane plane = m_selectionState.m_currentGizmoPlane;
 
             float delta = 0.0f;
             float intersection;
@@ -458,8 +461,8 @@ namespace Bruno
 
                 //float sign2 = perpendicularVector.Dot(planeNormals[planeIndex]) < 0.0f ? -1.0f : 1.0f;
                 
-                float sign = perpendicularVector.Dot(planeNormals[planeIndex]);
-                BR_CORE_TRACE << "plane normal: x = " << planeNormals[planeIndex].x << " y = " << planeNormals[planeIndex].y << " z =" << planeNormals[planeIndex].z << std::endl;
+                float sign = perpendicularVector.Dot(plane.Normal());
+                BR_CORE_TRACE << "plane normal: x = " << plane.Normal().x << " y = " << plane.Normal().y << " z =" << plane.Normal().z << std::endl;
                 BR_CORE_TRACE << "angle = " << angle << "; sign = " << sign << std::endl;
                 delta = sign * angle;
 
@@ -467,13 +470,13 @@ namespace Bruno
                 switch (m_currentAxis)
                 {
                 case GizmoAxis::X:
-                    rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[0], delta);
+                    rotationDelta = Math::Quaternion::CreateFromAxisAngle(plane.Normal(), delta);
                     break;
                 case GizmoAxis::Y:
-                    rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[1], delta);
+                    rotationDelta = Math::Quaternion::CreateFromAxisAngle(plane.Normal(), delta);
                     break;
                 case GizmoAxis::Z:
-                    rotationDelta = Math::Quaternion::CreateFromAxisAngle(planeNormals[2], delta);
+                    rotationDelta = Math::Quaternion::CreateFromAxisAngle(plane.Normal(), delta);
                     break;
                 }
                 //rotationDelta = m_selectionState.m_cameraViewInverseRotationConjugate * rotationDelta * m_selectionState.m_cameraViewInverseRotation;
@@ -713,6 +716,33 @@ namespace Bruno
         ray.direction = Math::Vector3::TransformNormal(ray.direction, toLocal);
 
         SetGizmoHandlePlaneFor(selectedAxis, ray);
+    }
+
+    void GizmoService::SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition)
+    {
+        if (selectedAxis == GizmoAxis::XYZ)
+            return;
+
+        Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
+        if (m_transformSpace == TransformSpace::Local) {
+
+            auto localObjectRotationMatrix = m_objectSelector->GetSelectedObjects()[0]->WorldTransform;
+            auto localForward = localObjectRotationMatrix.Forward();
+            localForward.Normalize();
+
+            auto localUp = localObjectRotationMatrix.Up();
+            localUp.Normalize();
+
+            auto localRight = localObjectRotationMatrix.Right();
+            localRight.Normalize();
+
+            planeNormals[0] = localRight;
+            planeNormals[1] = localUp;
+            planeNormals[2] = localForward;
+        }
+        int planeIndex = (int)selectedAxis - 1;
+
+        m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormals[planeIndex], 0);
     }
 
     void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray)
