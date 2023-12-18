@@ -209,11 +209,13 @@ namespace Bruno
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta) {			
 			m_objectSelector->GetSelectedObjects()[0]->Position += delta;
 		});
+
 		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta) {
 			auto newRotation = m_objectSelector->GetSelectedObjects()[0]->Rotation * delta;
 			newRotation.Normalize();
 			m_objectSelector->GetSelectedObjects()[0]->Rotation = newRotation;
 		});
+
 		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform) {
 			auto newDelta = delta * 0.1f;
 			if (isUniform)

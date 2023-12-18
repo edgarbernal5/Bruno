@@ -304,7 +304,7 @@ namespace Bruno
                 Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, localForward, localUp);
 
             m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_screenScaleMatrix *
-                Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, Math::Vector3::Forward, Math::Vector3::Up);
+                Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, Math::Vector3::Backward, Math::Vector3::Up);
 
             m_selectionState.m_rotationMatrix.Forward(localForward);
             m_selectionState.m_rotationMatrix.Up(localUp);
@@ -655,8 +655,8 @@ namespace Bruno
             auto gizmoWorldInverse = m_selectionState.m_gizmoAxisAlignedWorld.Invert();
 
             auto ray = ConvertMousePositionToRay(mousePosition);
-            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
             ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
             ray.direction.Normalize();
 
             //Math::Plane plane(planeNormals[planeIndex],0);
@@ -719,7 +719,6 @@ namespace Bruno
         Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
         if (m_transformSpace == TransformSpace::Local)
         {
-
             auto localObjectRotationMatrix = m_objectSelector->GetSelectedObjects()[0]->WorldTransform;
             auto localForward = localObjectRotationMatrix.Forward();
             localForward.Normalize();
