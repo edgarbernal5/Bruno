@@ -260,22 +260,14 @@ namespace Bruno
     {
         float cameraDistance = GetCameraDistance();
         m_selectionState.m_screenScaleFactor = cameraDistance > 0.0f ? cameraDistance * Gizmo::GIZMO_SCREEN_SCALE : 1.0f;
-                
-        if (m_selectionState.m_screenScaleFactor < 0.0001f)
-        {
-            m_selectionState.m_invScreenScaleFactor = 1.0f;
-        }
-        else
-        {
-            m_selectionState.m_invScreenScaleFactor = 1.0f / m_selectionState.m_screenScaleFactor;
-        }
-        m_selectionState.m_screenScaleMatrix = Math::Matrix::CreateScale(m_selectionState.m_screenScaleFactor);
-
+        
+        m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
         if (m_objectSelector->GetSelectedObjects().size() == 0)
         {
             return;
         }
-        m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
+        m_selectionState.m_screenScaleMatrix = Math::Matrix::CreateScale(m_selectionState.m_screenScaleFactor);
+
         auto localObjectRotationMatrix = m_objectSelector->GetSelectedObjects()[0]->WorldTransform;
 
         if (m_currentGizmoType == GizmoType::Translation ||
@@ -300,11 +292,11 @@ namespace Bruno
             auto localRight = world.Right();
             localRight.Normalize();
 
-            m_selectionState.m_gizmoObjectOrientedWorld = m_selectionState.m_screenScaleMatrix *
-                Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, localForward, localUp);
+            auto gizmoWorld = Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, localForward, localUp);
+            m_selectionState.m_gizmoObjectOrientedWorld = m_selectionState.m_screenScaleMatrix * gizmoWorld;
 
-            m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_screenScaleMatrix *
-                Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, Math::Vector3::Backward, Math::Vector3::Up);
+            auto gizmoAxisAlignedWorld = Math::Matrix::CreateWorld(m_selectionState.m_gizmoPosition, Math::Vector3::Backward, Math::Vector3::Up);
+            m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_screenScaleMatrix * gizmoAxisAlignedWorld;
 
             m_selectionState.m_rotationMatrix.Forward(localForward);
             m_selectionState.m_rotationMatrix.Up(localUp);
@@ -650,8 +642,6 @@ namespace Bruno
                 return true;
             }
 
-            //Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
-            //int planeIndex = ((int)m_currentAxis) - 1;
             auto gizmoWorldInverse = m_selectionState.m_gizmoAxisAlignedWorld.Invert();
 
             auto ray = ConvertMousePositionToRay(mousePosition);
@@ -659,10 +649,7 @@ namespace Bruno
             ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
             ray.direction.Normalize();
 
-            //Math::Plane plane(planeNormals[planeIndex],0);
-            //Math::Vector3 planeNormal = planeNormals[planeIndex];
             Math::Plane plane = m_selectionState.m_currentGizmoPlane;
-            Math::Vector3 planeNormal = plane.Normal();
 
             float intersection;
             if (ray.Intersects(plane, intersection))

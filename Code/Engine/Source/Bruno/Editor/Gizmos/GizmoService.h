@@ -81,7 +81,7 @@ namespace Bruno
 		{
 			Math::Vector3 m_gizmoPosition;
 
-			float m_screenScaleFactor, m_invScreenScaleFactor;
+			float m_screenScaleFactor;
 			Math::Matrix m_screenScaleMatrix;
 
 			Math::Matrix m_gizmoObjectOrientedWorld;
@@ -109,7 +109,6 @@ namespace Bruno
 		float GetCameraDistance();
 		Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);
 		void InitializeGizmos();
-
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);

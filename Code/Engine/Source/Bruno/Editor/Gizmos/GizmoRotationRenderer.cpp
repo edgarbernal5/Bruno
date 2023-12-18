@@ -71,7 +71,6 @@ namespace Bruno
 
 	void GizmoRotationRenderer::Update()
 	{
-		//Math::Vector3 cameraToModelNormalized = m_camera.GetTarget() - m_camera.GetPosition();
 		Math::Vector3 cameraToModelNormalized = m_gizmoWorld.Translation() - m_camera.GetPosition();
 		cameraToModelNormalized.Normalize();
 		auto worldInverse = m_gizmoWorld.Invert();
