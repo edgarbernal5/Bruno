@@ -21,7 +21,7 @@ namespace Bruno
 		ThrowIfFailed(d3d12Device->CreatePipelineState(&desc, IID_PPV_ARGS(&m_d3d12PipelineState)));
 	}
 
-	PipelineStateObject::PipelineStateObject(const GraphicsPipelineDesc& desc, RootSignature* rootSignature, PipelineResourceMapping& pipelineResourceMapping) :
+	PipelineStateObject::PipelineStateObject(const GraphicsPipelineDesc& desc, std::shared_ptr<RootSignature> rootSignature, PipelineResourceMapping& pipelineResourceMapping) :
 		m_rootSignature(rootSignature)
 	{
 		auto d3d12Device = Graphics::GetDevice()->GetD3DDevice();

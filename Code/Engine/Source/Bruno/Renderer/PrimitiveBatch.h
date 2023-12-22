@@ -41,7 +41,6 @@ namespace Bruno
 
 		std::unique_ptr<GpuBuffer> m_indexBuffer;
 		std::unique_ptr<GpuBuffer> m_vertexBuffer;
-
 	};
 
 	template<typename TVertex>

@@ -86,7 +86,7 @@ namespace Bruno
 		m_sceneRenderer->OnRender(m_graphicsContext.get());
 
 		////test gizmo
-		m_gizmoService->OnRender(m_graphicsContext.get());
+		//m_gizmoService->Render(m_graphicsContext.get());
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();
@@ -241,7 +241,10 @@ namespace Bruno
 			if (isUniform)
 			{
 				float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
-				m_objectSelector->GetSelectedObjects()[0]->Scale *= uniformDelta;
+				auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale * newDelta;
+				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+					m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
+
 				return;
 			}
 			auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale + newDelta;

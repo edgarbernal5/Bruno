@@ -99,11 +99,13 @@ namespace Bruno
         uint32_t newHandleID = 0;
         uint32_t blockEnd = m_currentDescriptorIndex + count;
 
-        if (blockEnd <= m_maxDescriptors) {
+        if (blockEnd <= m_maxDescriptors)
+        {
             newHandleID = m_currentDescriptorIndex;
             m_currentDescriptorIndex = blockEnd;
         }
-        else {
+        else
+        {
             BR_ASSERT_ERROR("Need to increase heap size.");
         }
 

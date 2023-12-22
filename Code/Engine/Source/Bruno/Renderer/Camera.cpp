@@ -7,7 +7,7 @@ namespace Bruno
 		m_position{},
 		m_nearPlane{ 0.1f },
 		m_farPlane{ 100.0f },
-		m_fovY{ 100.0f },
+		m_fovY{ 45.0f },
 		m_size{ 1.0f },
 
 		m_viewport{ 0, 0, 1, 1 }
@@ -42,13 +42,15 @@ namespace Bruno
 	{
 		if (m_states.ProjectionDirty)
 		{
-			if (m_isOrthographic) {
+			if (m_isOrthographic)
+			{
 				float aspectRatio = m_viewport.width / m_viewport.height;
 				float halfHeight = m_size * 0.5f;
 				float halfWidth = halfHeight * aspectRatio;
 				m_projection = Math::Matrix::CreateOrthographicOffCenter(-halfWidth, halfWidth, -halfHeight, halfHeight, m_nearPlane, m_farPlane);
 			}
-			else {
+			else
+			{
 				m_projection = Math::Matrix::CreatePerspectiveFieldOfView(m_fovY, m_viewport.AspectRatio(), m_nearPlane, m_farPlane);
 			}
 			

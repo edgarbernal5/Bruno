@@ -2,6 +2,7 @@
 
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
+#include "Bruno/Platform/DirectX/RenderObjectBinding.h"
 
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
@@ -19,6 +20,8 @@ namespace Bruno
 	class GraphicsContext;
 	class Camera;
 	class Surface;
+	class GizmoService;
+	struct GizmoObjectBuffer;
 
 	class GizmoTranslationRenderer
 	{
@@ -36,7 +39,8 @@ namespace Bruno
 			RenderConfig(const GizmoConfig& gizmoConfig);
 		};
 
-		GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
+		GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, 
+			std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
 
 		void Render(GraphicsContext* context);
 		void SetColors(const Math::Color colors[3]);
@@ -52,16 +56,7 @@ namespace Bruno
 		std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> m_batch;
 
 		Math::Matrix m_gizmoWorld;
-		struct ObjectBuffer
-		{
-			Math::Matrix World;
-		};
-		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_constantBuffers[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
-
-		std::shared_ptr<Shader>					m_shader;
-		std::shared_ptr<RootSignature>			m_rootSignature;
-		std::shared_ptr<PipelineStateObject>	m_pipelineObject;
-		PipelineResourceSpace					m_meshPerObjectResourceSpace;
+		RenderObjectBinding<GizmoObjectBuffer> m_renderObjectBindingDesc;
 
 		size_t m_xUpperBound;
 		size_t m_yUpperBound;

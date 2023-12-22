@@ -41,7 +41,7 @@ namespace Bruno
 		meshPipelineDesc.DepthStencilDesc.DepthEnable = false;
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 
-		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
+		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature, resourceMapping);
 	}
 
 	void GizmoRotationRenderer::Render(GraphicsContext* context)

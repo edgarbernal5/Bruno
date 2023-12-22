@@ -27,7 +27,7 @@ namespace Bruno
 		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &m_meshPerObjectResourceSpace;
 
 		PipelineResourceMapping resourceMapping;
-		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
+		m_rootSignature = std::make_shared<RootSignature>(meshResourceLayout, resourceMapping);
 
 		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
 		meshPipelineDesc.VertexShader = m_shader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
@@ -38,7 +38,7 @@ namespace Bruno
 		meshPipelineDesc.DepthStencilDesc.DepthEnable = false;
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 
-		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
+		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature, resourceMapping);
 
 		Math::Matrix world;
 		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * renderConfig.StickHeight * 0.5f);

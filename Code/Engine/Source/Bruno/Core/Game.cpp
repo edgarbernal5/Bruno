@@ -51,6 +51,8 @@ namespace Bruno
 		Bruno::Graphics::GetDevice() = m_device.get();
 
 		ContentTypeReaderManager::Initialize();
+
+		m_shaderCache.Initialize();
 	}
 
 	void Game::OnRun()

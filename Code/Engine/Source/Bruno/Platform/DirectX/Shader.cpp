@@ -87,8 +87,6 @@ namespace Bruno
 		};
 
 		return std::make_shared<RootSignature>(versionedRootSignature);
-
-		//return std::make_shared<RootSignature>(this);
 	}
 
 	ShaderProgram* Shader::GetShaderProgram(ShaderProgramType type)
@@ -113,7 +111,9 @@ namespace Bruno
 		for (size_t i = 0; i < Graphics::Core::SHADER_PROGRAMS_COUNT; i++)
 		{
 			if (m_programs[i])
+			{
 				InitializeParameters(m_programs[i].get());
+			}
 		}
 	}
 

@@ -48,8 +48,8 @@ namespace Bruno
 		std::unique_ptr<Window> m_window;
 		ApplicationParameters m_applicationParameters;
 
-	private:
 		static Application* g_instance;
+	private:
 	};
 
 	Application* CreateApplication(int argc, char** argv);

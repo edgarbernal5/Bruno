@@ -112,6 +112,7 @@
     <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h" />
     <ClInclude Include="Dependencies\zlib\include\zconf.h" />
     <ClInclude Include="Dependencies\zlib\include\zlib.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\RenderObjectBinding.h" />
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoConfig.h" />
     <ClInclude Include="Source\Bruno\Content\ContentManager.h" />
     <ClInclude Include="Source\Bruno\Content\ContentReader.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="Source\Bruno\Renderer\RenderItem.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
     <ClInclude Include="Source\Bruno\Renderer\SceneRenderer.h" />
+    <ClInclude Include="Source\Bruno\Renderer\ShaderCache.h" />
     <ClInclude Include="Source\Bruno\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
@@ -245,6 +247,7 @@
     <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\SceneRenderer.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\ShaderCache.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>

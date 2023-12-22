@@ -3,6 +3,7 @@
 #include "Bruno/Core/Base.h"
 #include "Bruno/Core/Application.h"
 #include "Bruno/Core/GameTimer.h"
+#include "Bruno/Renderer/ShaderCache.h"
 
 #include "Bruno/Core/KeyCodes.h"
 
@@ -21,7 +22,8 @@ namespace Bruno
 		virtual ~Game();
 
 		inline GraphicsDevice* GetDevice() { return m_device.get(); }
-
+		static Game* GetInstance() { return (Game*)g_instance; }
+		inline ShaderCache& GetShaderCache() { return m_shaderCache; }
 		virtual void OnTick();
 
 		friend class WindowsGameWindow;
@@ -40,6 +42,7 @@ namespace Bruno
 
 		GameTimer m_timer;
 		std::shared_ptr<GraphicsDevice> m_device;
+		ShaderCache m_shaderCache;
 
 		int m_framesThisSecond = 0;
 		int m_framesPerSecond = 0;
@@ -49,4 +52,12 @@ namespace Bruno
 
 	};
 
+}
+
+namespace Bruno
+{
+	inline ShaderCache& GetShaderCache()
+	{
+		return Game::GetInstance()->GetShaderCache();
+	}
 }

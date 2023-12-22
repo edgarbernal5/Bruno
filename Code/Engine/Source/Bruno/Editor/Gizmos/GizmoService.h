@@ -3,6 +3,7 @@
 #include "Bruno/Renderer/Camera.h"
 #include "Constants.h"
 #include "GizmoConfig.h"
+#include "Bruno/Platform/DirectX/RenderObjectBinding.h"
 
 namespace Bruno
 {
@@ -13,6 +14,17 @@ namespace Bruno
 	class GraphicsDevice;
 	class Surface;
 	class ObjectSelector;
+	class Shader;
+
+	struct GizmoObjectBuffer
+	{
+		Math::Matrix World;
+	};
+
+	struct GizmoGraphicsBinding
+	{
+		std::shared_ptr<Shader> Shader;
+	};
 
 	class GizmoService
 	{
@@ -64,7 +76,7 @@ namespace Bruno
 		bool BeginDrag(const Math::Vector2& mousePosition);
 		void Drag(const Math::Vector2& mousePosition);
 		void OnMouseMove(const Math::Vector2& mousePosition);
-		void OnRender(GraphicsContext* context);
+		void Render(GraphicsContext* context);
 		void Update();
 		void EndDrag();
 
@@ -158,7 +170,7 @@ namespace Bruno
 		Camera& m_camera;
 		Camera m_sceneGizmoCamera;
 		bool m_isActive{ true };
-		GizmoType m_currentGizmoType = GizmoType::Rotation;
+		GizmoType m_currentGizmoType = GizmoType::Translation;
 		PivotType m_pivotType = PivotType::SelectionCenter;
 		GizmoAxis m_currentAxis = GizmoAxis::None;
 		TransformSpace m_transformSpace = TransformSpace::World;
@@ -169,6 +181,9 @@ namespace Bruno
 		DragTranslationCallback m_dragTranslationCallback;
 		DragScaleCallback m_dragScaleCallback;
 		DragRotationCallback m_dragRotationCallback;
+
+		GizmoGraphicsBinding m_gizmoGraphicsBinding; 
+		RenderObjectBinding<GizmoObjectBuffer> m_renderObjectDesc;
 
 		std::shared_ptr<GizmoTranslationRenderer> m_gizmoTranslationRenderer;
 		std::shared_ptr<GizmoRotationRenderer> m_gizmoRotationRenderer;

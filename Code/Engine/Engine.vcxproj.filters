@@ -312,6 +312,12 @@
     <ClInclude Include="Dependencies\zlib\include\zconf.h">
       <Filter>Dependencies\zlib</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\ShaderCache.h">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\RenderObjectBinding.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -490,6 +496,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoScaleRenderer.cpp">
       <Filter>Source\Bruno\Editor\Gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\ShaderCache.cpp">
+      <Filter>Source\Bruno\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

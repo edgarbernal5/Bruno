@@ -30,7 +30,7 @@ namespace Bruno
 		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &m_meshPerObjectResourceSpace;
 
 		PipelineResourceMapping resourceMapping;
-		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
+		m_rootSignature = std::make_shared<RootSignature>(meshResourceLayout, resourceMapping);
 
 		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
 		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
@@ -41,7 +41,7 @@ namespace Bruno
 		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = surface->GetSurfaceFormat();
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 
-		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
+		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature, resourceMapping);
 	}
 
 	void SceneRenderer::OnRender(GraphicsContext* graphicsContext)
@@ -59,7 +59,8 @@ namespace Bruno
 
 		for (auto& item : m_scene->GetRenderItems()) {
 			auto texture = item->Material->TexturesByName["Texture"];
-			if (texture != nullptr && texture->IsReady()) {
+			if (texture != nullptr && texture->IsReady())
+			{
 				if (!item->IndexBuffer->IsReady() || !item->VertexBuffer->IsReady())
 					continue;
 

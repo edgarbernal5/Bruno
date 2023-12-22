@@ -94,18 +94,18 @@ namespace Bruno
 	{
 	public:
 		PipelineStateObject(const D3D12_PIPELINE_STATE_STREAM_DESC& desc);
-		PipelineStateObject(const GraphicsPipelineDesc& desc, RootSignature* rootSignature, PipelineResourceMapping& pipelineResourceMapping);
+		PipelineStateObject(const GraphicsPipelineDesc& desc, std::shared_ptr<RootSignature> rootSignature, PipelineResourceMapping& pipelineResourceMapping);
 		virtual ~PipelineStateObject() = default;
 		
 		ID3D12PipelineState* GetD3D12PipelineState() const { return m_d3d12PipelineState.Get(); }
-        RootSignature* GetRootSignature() const { return m_rootSignature; }
+        RootSignature* GetRootSignature() const { return m_rootSignature.get(); }
 	    
         friend class GraphicsContext;
         friend class GraphicsDevice;
     private:
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_d3d12PipelineState;
-        RootSignature* m_rootSignature;
-        PipelineType m_pipelineType = PipelineType::Graphics;
+		std::shared_ptr<RootSignature> m_rootSignature;
+		PipelineType m_pipelineType = PipelineType::Graphics;
 		PipelineResourceMapping m_pipelineResourceMapping;
 	};
 
