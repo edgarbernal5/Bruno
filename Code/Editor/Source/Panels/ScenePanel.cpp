@@ -10,6 +10,9 @@
 #include <Bruno/Platform/DirectX/GraphicsContext.h>
 #include <Bruno/Content/ContentManager.h>
 #include <Bruno/Renderer/Model.h>
+#include <Bruno/Scene/Scene.h>
+#include <Bruno/Renderer/SceneRenderer.h>
+#include <Bruno/Editor/ObjectSelector.h>
 #include "EditorGame.h"
 
 #include <nana/gui.hpp>
@@ -151,6 +154,10 @@ namespace Bruno
 
 				m_surface = std::make_unique<Surface>(parameters);
 				m_surface->Initialize();
+
+				//TODO: esta inicialización está acá porque depende del surface. Esto está mal, arreglarlo!
+				InitializeMeshAndTexture();
+				InitializeGizmoService();
 			}
 			m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.width, (float)args.height));
 			m_isResizing = false;
@@ -161,23 +168,34 @@ namespace Bruno
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
 
+			m_isGizmoing = m_gizmoService->BeginDrag(Math::Vector2(args.pos.x, args.pos.y));
 			m_form->set_capture(true);
 		});
 
 		m_form->events().mouse_move([this](const nana::arg_mouse& args)
 		{
 			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
-			if (args.left_button)
-			{
-				m_camera.Rotate(currentPosition, m_lastMousePosition);
+		
+			if (!m_isGizmoing && !args.left_button) {
+				m_gizmoService->OnMouseMove(Math::Vector2(args.pos.x, args.pos.y));
 			}
-			else if (args.mid_button)
-			{
-				m_camera.HandTool(currentPosition, m_lastMousePosition);
+			if (args.left_button && m_isGizmoing) {
+				m_gizmoService->Drag(Math::Vector2(args.pos.x, args.pos.y));
 			}
-			else if (args.right_button)
+			else if (args.shift)
 			{
-				m_camera.PitchYaw(currentPosition, m_lastMousePosition);
+				if (args.left_button)
+				{
+					m_camera.Rotate(currentPosition, m_lastMousePosition);
+				}
+				else if (args.mid_button)
+				{
+					m_camera.HandTool(currentPosition, m_lastMousePosition);
+				}
+				else if (args.right_button)
+				{
+					m_camera.PitchYaw(currentPosition, m_lastMousePosition);
+				}
 			}
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
@@ -185,6 +203,11 @@ namespace Bruno
 
 		m_form->events().mouse_up([this](const nana::arg_mouse& args)
 		{
+			if (m_isGizmoing)
+			{
+				m_gizmoService->EndDrag();
+				m_isGizmoing = false;
+			}
 			m_form->release_capture();
 		});
 
@@ -216,7 +239,6 @@ namespace Bruno
 			}
 		});
 
-		InitializeMeshAndTexture();
 		InitializeShaderAndPipeline();
 		InitializeCamera();
 		InitializeGraphicsContext();
@@ -249,6 +271,7 @@ namespace Bruno
 		device->BeginFrame();
 
 		UpdateCBs(timer);
+		m_gizmoService->Update();
 	}
 
 	void ScenePanel::OnDraw()
@@ -256,7 +279,7 @@ namespace Bruno
 		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
-		auto device = Bruno::Graphics::GetDevice();
+		auto device = Graphics::GetDevice();
 		Math::Color clearColor{ 1.0f, 1.0f, 0.0f, 1.0f };
 		if (idxx == 2) {
 			clearColor.R(0.0f);
@@ -282,39 +305,10 @@ namespace Bruno
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
 
-		for (auto& item : m_renderItems)
-		{
-			auto texture = item->Material->TexturesByName["Texture"];
-			if (texture != nullptr && texture->IsReady()) {
-				if (!item->IndexBuffer->IsReady() || !item->VertexBuffer->IsReady())
-					continue;
+		m_sceneRenderer->OnRender(m_graphicsContext.get());
 
-				m_graphicsContext->SetVertexBuffer(*item->VertexBuffer);
-				m_graphicsContext->SetIndexBuffer(*item->IndexBuffer);
-
-				PipelineResourceBinding textureBinding;
-				textureBinding.BindingIndex = 0;
-				textureBinding.Resource = texture.get();
-
-				m_meshPerObjectResourceSpace.SetCBV(m_objectBuffer[device->GetFrameId()].get());
-				m_meshPerObjectResourceSpace.SetSRV(textureBinding);
-
-				PipelineInfo pipeline;
-				pipeline.Pipeline = m_pipelineState.get();
-				pipeline.RenderTargets.push_back(&backBuffer);
-				pipeline.DepthStencilTarget = &depthBuffer;
-
-				m_graphicsContext->SetPipeline(pipeline);
-				m_graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
-
-				m_graphicsContext->SetPrimitiveTopology(item->PrimitiveType);
-				m_graphicsContext->DrawIndexedInstanced(item->IndexCount,
-					1,
-					item->StartIndexLocation,
-					item->BaseVertexLocation,
-					0);
-			}
-		}
+		////test gizmo
+		m_gizmoService->OnRender(m_graphicsContext.get());
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();
@@ -338,6 +332,36 @@ namespace Bruno
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 0.1f, 100.0f);
 	}
 
+	void ScenePanel::InitializeGizmoService()
+	{
+		auto device = Graphics::GetDevice();
+		m_objectSelector = std::make_shared<ObjectSelector>(m_scene);
+
+		m_gizmoService = std::make_unique<GizmoService>(device, m_camera, m_surface.get(), m_objectSelector.get());
+		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta) {			
+			m_objectSelector->GetSelectedObjects()[0]->Position += delta;
+		});
+
+		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta) {
+			auto newRotation = m_objectSelector->GetSelectedObjects()[0]->Rotation * delta;
+			newRotation.Normalize();
+			m_objectSelector->GetSelectedObjects()[0]->Rotation = newRotation;
+		});
+
+		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform) {
+			auto newDelta = delta * 0.1f;
+			if (isUniform)
+			{
+				float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
+				m_objectSelector->GetSelectedObjects()[0]->Scale *= uniformDelta;
+				return;
+			}
+			auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale + newDelta;
+			if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+				m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
+		});
+	}
+
 	void ScenePanel::InitializeGraphicsContext()
 	{
 		GraphicsDevice* device = Graphics::GetDevice();
@@ -350,70 +374,34 @@ namespace Bruno
 
 		m_model = manager.Load<Model>(L"Models\\Car\\Car.fbx");
 
-		auto& meshes = m_model->GetMeshes();
-		for (auto& mesh : meshes)
-		{
-			auto boxRenderItem = std::make_shared<RenderItem>();
-			boxRenderItem->IndexCount = mesh->GetIndexBuffer()->GetElementCount();
-			boxRenderItem->IndexBuffer = mesh->GetIndexBuffer();
-			boxRenderItem->VertexBuffer = mesh->GetVertexBuffer();
-			boxRenderItem->Material = mesh->GetMaterial();
-			m_renderItems.push_back(boxRenderItem);
-		}
-
-		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-		{
-			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
-		}
+		m_scene = std::make_shared<Scene>(m_camera);
+		m_scene->AddModel(m_model);
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
 	}
 
 	void ScenePanel::InitializeShaderAndPipeline()
 	{
-		m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
-		PipelineResourceBinding textureBinding;
-		textureBinding.BindingIndex = 0;
-
-		m_meshPerObjectResourceSpace.SetCBV(m_objectBuffer[0].get());
-		m_meshPerObjectResourceSpace.SetSRV(textureBinding);
-		m_meshPerObjectResourceSpace.Lock();
-
-		PipelineResourceLayout meshResourceLayout;
-		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &m_meshPerObjectResourceSpace;
-
-		PipelineResourceMapping resourceMapping;
-
-		m_rootSignature = std::make_unique<RootSignature>(meshResourceLayout, resourceMapping);
-
-		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
-		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-		meshPipelineDesc.PixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = m_depthBufferFormat;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
-		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = m_backBufferFormat;
-		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-
-		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature.get(), resourceMapping);
 
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
 	{
-		auto device = Bruno::Graphics::GetDevice();
-		static float TotalTime = 0.0f;
-		float angle = static_cast<float>(0.0);
-		//float angle = static_cast<float>(TotalTime * 45.0);
+		//auto device = Bruno::Graphics::GetDevice();
+		//static float TotalTime = 0.0f;
+		//float angle = static_cast<float>(0.0);
+		////float angle = static_cast<float>(TotalTime * 45.0);
 
-		Math::Matrix modelMatrix = Math::Matrix::Identity;
-		//Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
-		TotalTime += timer.GetDeltaTime();
+		//Math::Matrix modelMatrix = Math::Matrix::Identity;
+		////Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
+		//TotalTime += timer.GetDeltaTime();
 
-		Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
+		//Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
 
-		ObjectBuffer objectBuffer;
-		objectBuffer.World = mvpMatrix;
+		//ObjectBuffer objectBuffer;
+		//objectBuffer.World = mvpMatrix;
 
-		uint32_t frameIndex = device->GetFrameId();
-		m_objectBuffer[frameIndex]->SetMappedData(objectBuffer);
+		//uint32_t frameIndex = device->GetFrameId();
+		//m_objectBuffer[frameIndex]->SetMappedData(objectBuffer);
+		m_scene->OnUpdate(timer);
 	}
 }

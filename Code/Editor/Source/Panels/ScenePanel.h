@@ -16,6 +16,7 @@
 #include <mutex>
 #include <Bruno/Platform/DirectX/Texture.h>
 #include <Bruno/Renderer/Camera.h>
+#include <Bruno/Editor/Gizmos/GizmoService.h>
 
 namespace Bruno
 {
@@ -23,6 +24,10 @@ namespace Bruno
 	class Surface;
 	class EditorGame;
 	class GraphicsContext;
+	class GizmoService;
+	class ObjectSelector;
+	class Scene;
+	class SceneRenderer;
 
 	//class ScenePanel : public nana::panel<true>
 	class ScenePanel : public nana::nested_form
@@ -39,6 +44,7 @@ namespace Bruno
 
 	private:
 		void InitializeCamera();
+		void InitializeGizmoService();
 		void InitializeGraphicsContext();
 		void InitializeMeshAndTexture();
 		void InitializeShaderAndPipeline();
@@ -51,27 +57,19 @@ namespace Bruno
 		DXGI_FORMAT m_backBufferFormat;
 		DXGI_FORMAT m_depthBufferFormat;
 		EditorGame* m_editorGame;
-		//Scene* m_scene;
+		std::shared_ptr<Scene>			m_scene;
+		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
 
-		std::unique_ptr<RootSignature> m_rootSignature;
 
-		std::unique_ptr<Shader> m_opaqueShader;
-
-		std::unique_ptr<PipelineStateObject> m_pipelineState;
 		std::shared_ptr<Model> m_model;
 		
-		PipelineResourceSpace m_meshPerObjectResourceSpace;
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
 		
 		std::mutex m_mutex{};
 
-		std::vector<std::shared_ptr<RenderItem>> m_renderItems;
+		std::shared_ptr<ObjectSelector>	m_objectSelector;
+		std::unique_ptr<GizmoService>	m_gizmoService;
 
-		struct ObjectBuffer
-		{
-			Math::Matrix World;
-		};
-		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
 
 		Camera m_camera;
 
@@ -79,6 +77,9 @@ namespace Bruno
 		bool m_isResizing = false;
 		bool m_isSizingMoving = false;
 		bool m_isExposed = false;
+
+		bool m_shiftPressed = false;
+		bool m_isGizmoing = false;
 
 		float m_totalTime = 0.0f;
 	};

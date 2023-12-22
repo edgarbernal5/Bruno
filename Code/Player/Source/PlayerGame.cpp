@@ -32,8 +32,8 @@ namespace Bruno
 
 		InitializeSurface();
 		InitializeMeshAndTexture();
-		InitializeShaderAndPipeline();
 		InitializeCamera();
+		InitializeGizmoService();
 		InitializeGraphicsContext();
 	}
 
@@ -202,7 +202,27 @@ namespace Bruno
 	{
 		m_camera.LookAt(Math::Vector3(0, 0, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 1.0f, 1000.0f);
-		
+	}
+
+	void PlayerGame::InitializeGraphicsContext()
+	{
+		m_graphicsContext = std::make_unique<GraphicsContext>(*m_device);
+	}
+
+	void PlayerGame::InitializeMeshAndTexture()
+	{
+		m_scene = std::make_shared<Scene>(m_camera);
+
+		ContentManager manager(m_applicationParameters.WorkingDirectory);
+		auto model = manager.Load<Model>(L"Models\\Car\\Car.fbx");		
+
+		m_scene->AddModel(model);
+
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
+	}
+
+	void PlayerGame::InitializeGizmoService()
+	{
 		m_objectSelector = std::make_shared<ObjectSelector>(m_scene);
 
 		m_gizmoService = std::make_unique<GizmoService>(m_device.get(), m_camera, m_surface.get(), m_objectSelector.get());
@@ -228,27 +248,6 @@ namespace Bruno
 			if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 				m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
 		});
-	}
-
-	void PlayerGame::InitializeGraphicsContext()
-	{
-		m_graphicsContext = std::make_unique<GraphicsContext>(*m_device);
-	}
-
-	void PlayerGame::InitializeMeshAndTexture()
-	{
-		m_scene = std::make_shared<Scene>(m_camera);
-
-		ContentManager manager(m_applicationParameters.WorkingDirectory);
-		auto model = manager.Load<Model>(L"Models\\Car\\Car.fbx");		
-
-		m_scene->AddModel(model);
-
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
-	}
-
-	void PlayerGame::InitializeShaderAndPipeline()
-	{
 	}
 
 	void PlayerGame::InitializeSurface()

@@ -47,14 +47,14 @@ namespace Bruno
 		void InitializeCamera();
 		void InitializeGraphicsContext();
 		void InitializeMeshAndTexture();
-		void InitializeShaderAndPipeline();
+		void InitializeGizmoService();
 		void InitializeSurface();
 		void UpdateCBs(const GameTimer& timer);
 
 		std::unique_ptr<Surface>		m_surface;
 		std::shared_ptr<Scene>			m_scene;
 		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
-				
+
 		std::unique_ptr<GizmoService>	m_gizmoService;
 		std::shared_ptr<ObjectSelector>	m_objectSelector;
 		std::unique_ptr<GraphicsContext>	m_graphicsContext;
