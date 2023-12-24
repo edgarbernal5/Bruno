@@ -112,6 +112,7 @@
     <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h" />
     <ClInclude Include="Dependencies\zlib\include\zconf.h" />
     <ClInclude Include="Dependencies\zlib\include\zlib.h" />
+    <ClInclude Include="Source\Bruno\Renderer\PipelineStateObjectCache.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\RenderObjectBinding.h" />
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoConfig.h" />
     <ClInclude Include="Source\Bruno\Content\ContentManager.h" />
@@ -188,6 +189,7 @@
   <ItemGroup>
     <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp" />
     <ClCompile Include="Dependencies\SimpleMath\SimpleMath.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\PipelineStateObjectCache.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentTypeReader.cpp" />

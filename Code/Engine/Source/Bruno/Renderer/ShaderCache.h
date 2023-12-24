@@ -6,8 +6,6 @@
 namespace Bruno
 {
 	class Shader;
-	class PipelineStateObject;
-
 	enum class RenderShaderId : uint8_t
 	{
 		UnlitColored,
@@ -27,14 +25,5 @@ namespace Bruno
 		std::shared_ptr<Shader> Load(const std::wstring& filename);
 
 		std::unordered_map<std::wstring, std::shared_ptr<Shader>> m_cache;
-	};
-
-	class PipelineStateObjectCache
-	{
-	public:
-		void Initialize();
-
-	private:
-		std::unordered_map<RenderShaderId, std::shared_ptr<PipelineStateObject>> m_cache;
 	};
 }

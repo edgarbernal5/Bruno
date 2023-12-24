@@ -59,7 +59,7 @@ namespace Bruno
 		return D3D12_INPUT_LAYOUT_DESC();
 	}
 
-	std::shared_ptr<RootSignature> Shader::CreateRootSignature()
+	std::shared_ptr<RootSignature> Shader::CreateRootSignature(PipelineResourceMapping& resourceMapping)
 	{
 		//CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC versionRootSignatureDesc;
 		//versionRootSignatureDesc.Init_1_1(static_cast<uint32_t>(m_rootParameters.size()),
@@ -67,6 +67,15 @@ namespace Bruno
 
 		//std::reverse(m_rootParameters.begin(), m_rootParameters.end());
 		
+		for (size_t i = 0; i < m_rootParameters.size(); i++)
+		{
+			auto& parameter = m_rootParameters[i];
+			uint32_t spaceId = parameter.Descriptor.RegisterSpace;
+			resourceMapping.CbvMapping[spaceId] = static_cast<uint32_t>(i);
+
+			resourceMapping.TableMapping[spaceId] = static_cast<uint32_t>(i);
+		}
+
 		std::vector<D3D12_STATIC_SAMPLER_DESC> samplers;
 		samplers.resize(m_samplers.size());
 		

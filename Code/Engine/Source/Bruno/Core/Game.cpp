@@ -11,6 +11,7 @@
 #include "Bruno/Content/ContentTypeReaderManager.h"
 
 #include <filesystem>
+#include <Bruno/Platform/DirectX/Surface.h>
 
 namespace Bruno
 {
@@ -51,8 +52,10 @@ namespace Bruno
 		Bruno::Graphics::GetDevice() = m_device.get();
 
 		ContentTypeReaderManager::Initialize();
+		SurfaceWindowParameters surfaceParameters;
 
 		m_shaderCache.Initialize();
+		m_psoCache.Initialize(surfaceParameters.BackBufferFormat, surfaceParameters.DepthBufferFormat);
 	}
 
 	void Game::OnRun()

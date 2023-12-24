@@ -26,33 +26,6 @@ namespace Bruno
 
         auto batch = std::make_shared<PrimitiveBatch<VertexPositionNormalColor>>(device, 4096 * 3 * 3, 4096 * 3);
 
-        /*auto renderObjectDesc = std::make_shared<RenderObjectBinding<GizmoObjectBuffer>>();
-        renderObjectDesc->Shader = m_gizmoGraphicsBinding.Shader;
-        
-        for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-        {
-            renderObjectDesc->Buffers[i] = std::make_shared<ConstantBuffer<GizmoObjectBuffer>>();
-        }
-        renderObjectDesc->Space.SetCBV(renderObjectDesc->Buffers[0].get());
-        renderObjectDesc->Space.Lock();
-
-        PipelineResourceLayout meshResourceLayout;
-        meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &renderObjectDesc->Space;
-
-        PipelineResourceMapping resourceMapping;
-        auto rootSignature = std::make_shared<RootSignature>(meshResourceLayout, resourceMapping);
-
-        GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
-        meshPipelineDesc.VertexShader = renderObjectDesc->Shader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-        meshPipelineDesc.PixelShader = renderObjectDesc->Shader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-        meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = surface->GetDepthBufferFormat();
-        meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
-        meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = surface->GetSurfaceFormat();
-        meshPipelineDesc.DepthStencilDesc.DepthEnable = false;
-        meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-
-        renderObjectDesc->PipelineObject = std::make_shared<PipelineStateObject>(meshPipelineDesc, rootSignature, resourceMapping);*/
-
         m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, surface, batch, GizmoTranslationRenderer::RenderConfig(gizmoConfig));
         m_gizmoRotationRenderer = std::make_shared<GizmoRotationRenderer>(device, camera, surface, batch, GizmoRotationRenderer::RenderConfig(gizmoConfig));
         m_gizmoScaleRenderer = std::make_shared<GizmoScaleRenderer>(device, camera, surface, batch, GizmoScaleRenderer::RenderConfig(gizmoConfig));
@@ -62,34 +35,7 @@ namespace Bruno
         cameraGizmoRenderConfig.StickHeight = 1.5f;
         cameraGizmoRenderConfig.StickRadius = 0.15f;
         cameraGizmoRenderConfig.ArrowheadHeight = 0.25f;
-
-        //auto renderObjectDesc2 = std::make_shared<RenderObjectBinding<GizmoObjectBuffer>>();
-        //renderObjectDesc2->Shader = renderObjectDesc->Shader;
-
-        //for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-        //{
-        //    renderObjectDesc2->Buffers[i] = std::make_shared<ConstantBuffer<GizmoObjectBuffer>>();
-        //}
-        //renderObjectDesc2->Space.SetCBV(renderObjectDesc2->Buffers[0].get());
-        //renderObjectDesc2->Space.Lock();
-
-        //PipelineResourceLayout meshResourceLayout2;
-        //meshResourceLayout2.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &renderObjectDesc2->Space;
-
-        //PipelineResourceMapping resourceMapping2;
-        //auto rootSignature2 = std::make_shared<RootSignature>(meshResourceLayout2, resourceMapping2);
-
-        //GraphicsPipelineDesc meshPipelineDesc2 = GetDefaultGraphicsPipelineDesc();
-        //meshPipelineDesc2.VertexShader = renderObjectDesc2->Shader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-        //meshPipelineDesc2.PixelShader = renderObjectDesc2->Shader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-        //meshPipelineDesc2.RenderTargetDesc.DepthStencilFormat = surface->GetDepthBufferFormat();
-        //meshPipelineDesc2.RenderTargetDesc.RenderTargetsCount = 1;
-        //meshPipelineDesc2.RenderTargetDesc.RenderTargetFormats[0] = surface->GetSurfaceFormat();
-        //meshPipelineDesc2.DepthStencilDesc.DepthEnable = false;
-        //meshPipelineDesc2.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-
-        //renderObjectDesc2->PipelineObject = std::make_shared<PipelineStateObject>(meshPipelineDesc2, rootSignature2, resourceMapping2);
-        //renderObjectDesc2->PipelineObject=renderObjectDesc->PipelineObject;
+        cameraGizmoRenderConfig.LineOffset = 0.1f;
 
         m_gizmoCameraRenderer = std::make_shared<GizmoTranslationRenderer>(device, m_sceneGizmoCamera, surface, cameraBatch, cameraGizmoRenderConfig);
         m_gizmoCameraRenderer->SetColors(m_axisColors);

@@ -7,6 +7,7 @@
 #include "GizmoService.h"
 #include "Bruno/Core/Game.h"
 #include "Bruno/Renderer/ShaderCache.h"
+#include "Bruno/Renderer/PipelineStateObjectCache.h"
 
 namespace Bruno
 {
@@ -21,27 +22,28 @@ namespace Bruno
 			m_renderObjectBindingDesc.CBuffers[i] = std::make_shared<ConstantBuffer<GizmoObjectBuffer>>();
 		}
 		m_renderObjectBindingDesc.Space.SetCBV(m_renderObjectBindingDesc.CBuffers[0].get());
-		m_renderObjectBindingDesc.Shader = GetShaderCache().Get(L"Shaders/UnlitColor.hlsl").get();
-		//m_renderObjectBindingDesc.Pipeline = Game::GetInstance()->GetShaderCache().Get(L"Shaders/UnlitColor.hlsl").get();
+		m_renderObjectBindingDesc.Space.Lock();
+		m_renderObjectBindingDesc.Shader = Graphics::GetShaderCache().Get(L"Shaders/UnlitColor.hlsl").get();
+		m_renderObjectBindingDesc.Pipeline = Graphics::GetPsoCache().Get(RenderPsoId::UnlitColored).get();
 
 		Math::Matrix world;
-		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * renderConfig.StickHeight * 0.5f);
-		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
-		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (renderConfig.StickHeight + renderConfig.ArrowheadHeight) * 0.5f);
+		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * (renderConfig.StickHeight + renderConfig.LineOffset) * 0.5f);
+		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight - renderConfig.LineOffset, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (renderConfig.StickHeight - renderConfig.LineOffset + renderConfig.ArrowheadHeight) * 0.5f);
 		CreateCone(renderConfig.ArrowheadRadius, renderConfig.ArrowheadHeight, renderConfig.Tessellation, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
 
 		m_xUpperBound = m_vertices.size();
 
-		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * renderConfig.StickHeight * 0.5f);
-		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
-		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (renderConfig.StickHeight + renderConfig.ArrowheadHeight) * 0.5f);
+		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * (renderConfig.StickHeight + renderConfig.LineOffset) * 0.5f);
+		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight - renderConfig.LineOffset, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (renderConfig.StickHeight - renderConfig.LineOffset + renderConfig.ArrowheadHeight) * 0.5f);
 		CreateCone(renderConfig.ArrowheadRadius, renderConfig.ArrowheadHeight, renderConfig.Tessellation, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
 
 		m_yUpperBound = m_vertices.size();
 
-		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * renderConfig.StickHeight * 0.5f);
-		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
-		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (renderConfig.StickHeight + renderConfig.ArrowheadHeight) * 0.5f);
+		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (renderConfig.StickHeight + renderConfig.LineOffset) * 0.5f);
+		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight - renderConfig.LineOffset, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (renderConfig.StickHeight - renderConfig.LineOffset + renderConfig.ArrowheadHeight) * 0.5f);
 		CreateCone(renderConfig.ArrowheadRadius, renderConfig.ArrowheadHeight, renderConfig.Tessellation, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
 	}
 

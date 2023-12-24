@@ -4,6 +4,7 @@
 #include "d3dx12.h"
 #include "D3DConstants.h"
 
+#include "PipelineStateObject.h"
 #include "Bruno/Core/RTTI.h"
 #include <vector>
 #include <string>
@@ -39,7 +40,7 @@ namespace Bruno
 		Shader(const std::wstring& sourceFilename);
 		
 		D3D12_INPUT_LAYOUT_DESC GetInputLayout();
-		std::shared_ptr<RootSignature> CreateRootSignature();
+		std::shared_ptr<RootSignature> CreateRootSignature(PipelineResourceMapping& resourceMapping);
 
 		ShaderProgram* GetShaderProgram(ShaderProgramType type);
 		uint32_t GetIndexMap(const std::wstring& name);

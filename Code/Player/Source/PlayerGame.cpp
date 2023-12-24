@@ -86,7 +86,7 @@ namespace Bruno
 		m_sceneRenderer->OnRender(m_graphicsContext.get());
 
 		////test gizmo
-		//m_gizmoService->Render(m_graphicsContext.get());
+		m_gizmoService->Render(m_graphicsContext.get());
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();

@@ -49,21 +49,4 @@ namespace Bruno
 		return std::make_shared<Shader>(filename);
 	}
 
-	void  PipelineStateObjectCache::Initialize()
-	{
-		//auto unlitColoredShader = 
-		/*PipelineResourceMapping resourceMapping;
-		auto rootSignature = std::make_shared<RootSignature>(meshResourceLayout, resourceMapping);
-
-		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
-		meshPipelineDesc.VertexShader = renderObjectDesc->Shader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-		meshPipelineDesc.PixelShader = renderObjectDesc->Shader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = surface->GetDepthBufferFormat();
-		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = surface->GetSurfaceFormat();
-		meshPipelineDesc.DepthStencilDesc.DepthEnable = false;
-		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-
-		renderObjectDesc->PipelineObject = std::make_shared<PipelineStateObject>(meshPipelineDesc, rootSignature, resourceMapping); */
-	}
 }
