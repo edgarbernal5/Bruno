@@ -15,49 +15,31 @@ namespace Bruno
 	{
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
-			m_constantBuffers[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+			m_renderObjectBindingDesc.CBuffers[i] = std::make_shared<ConstantBuffer<GizmoObjectBuffer>>();
 		}
-
-		m_shader = std::make_shared<Shader>(L"Shaders/UnlitColor.hlsl");
-
-		m_meshPerObjectResourceSpace.SetCBV(m_constantBuffers[0].get());
-		m_meshPerObjectResourceSpace.Lock();
-
-		PipelineResourceLayout meshResourceLayout;
-		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &m_meshPerObjectResourceSpace;
-
-		PipelineResourceMapping resourceMapping;
-		m_rootSignature = std::make_shared<RootSignature>(meshResourceLayout, resourceMapping);
-
-		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
-		meshPipelineDesc.VertexShader = m_shader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-		meshPipelineDesc.PixelShader = m_shader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = surface->GetDepthBufferFormat();
-		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = surface->GetSurfaceFormat();
-		meshPipelineDesc.DepthStencilDesc.DepthEnable = false;
-		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-
-		m_pipelineObject = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature, resourceMapping);
+		m_renderObjectBindingDesc.Space.SetCBV(m_renderObjectBindingDesc.CBuffers[0].get());
+		m_renderObjectBindingDesc.Space.Lock();
+		m_renderObjectBindingDesc.Shader = Graphics::GetShaderCache().Get(L"Shaders/UnlitColor.hlsl").get();
+		m_renderObjectBindingDesc.Pipeline = Graphics::GetPsoCache().Get(RenderPsoId::UnlitColored).get();
 
 		Math::Matrix world;
-		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * renderConfig.StickHeight * 0.5f);
-		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
-		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (renderConfig.StickHeight + renderConfig.ArrowheadHeight) * 0.5f);
+		world = Math::Matrix::CreateRotationZ(Math::ConvertToRadians(-90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Right * (renderConfig.StickHeight + renderConfig.LineOffset) * 0.5f);
+		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight - renderConfig.LineOffset, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Right * (renderConfig.StickHeight - renderConfig.LineOffset + renderConfig.ArrowheadHeight) * 0.5f);
 		CreateBox(Math::Vector3(renderConfig.ArrowheadHeight * 0.85f), m_vertices, m_indices, Math::Vector4(1, 0, 0, 1), world);
 
 		m_xUpperBound = m_vertices.size();
 
-		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * renderConfig.StickHeight * 0.5f);
-		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
-		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (renderConfig.StickHeight + renderConfig.ArrowheadHeight * 0.85f) * 0.5f);
+		world = Math::Matrix::CreateTranslation(Math::Vector3::Up * (renderConfig.StickHeight + renderConfig.LineOffset) * 0.5f);
+		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight - renderConfig.LineOffset, renderConfig.Tessellation, renderConfig.StackCount, m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Up * (renderConfig.StickHeight - renderConfig.LineOffset + renderConfig.ArrowheadHeight * 0.85f) * 0.5f);
 		CreateBox(Math::Vector3(renderConfig.ArrowheadHeight * 0.85f), m_vertices, m_indices, Math::Vector4(0, 1, 0, 1), world);
 
 		m_yUpperBound = m_vertices.size();
 
-		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * renderConfig.StickHeight * 0.5f);
+		world = Math::Matrix::CreateRotationX(Math::ConvertToRadians(90.0f)) * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (renderConfig.StickHeight + renderConfig.LineOffset) * 0.5f);
 		CreateCylinder(renderConfig.StickRadius, renderConfig.StickHeight, renderConfig.Tessellation, 3, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
-		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (renderConfig.StickHeight + renderConfig.ArrowheadHeight * 0.85f) * 0.5f);
+		world = world * Math::Matrix::CreateTranslation(Math::Vector3::Forward * (renderConfig.StickHeight - renderConfig.LineOffset + renderConfig.ArrowheadHeight * 0.85f) * 0.5f);
 		CreateBox(Math::Vector3(renderConfig.ArrowheadHeight * 0.85f), m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
 	}
 
@@ -67,12 +49,12 @@ namespace Bruno
 		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
 
 		PipelineInfo pipeline;
-		pipeline.Pipeline = m_pipelineObject.get();
+		pipeline.Pipeline = m_renderObjectBindingDesc.Pipeline;
 		pipeline.RenderTargets.push_back(&backBuffer);
 		pipeline.DepthStencilTarget = &depthBuffer;
 
 		context->SetPipeline(pipeline);
-		context->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
+		context->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_renderObjectBindingDesc.Space);
 
 		m_batch->Begin(context);
 		m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, m_indices.data(), m_indices.size(), m_vertices.data(), m_vertices.size());
@@ -100,13 +82,11 @@ namespace Bruno
 		auto device = Graphics::GetDevice();
 		Math::Matrix mvpMatrix = m_gizmoWorld * m_camera.GetViewProjection();
 
-		ObjectBuffer objectBuffer;
+		GizmoObjectBuffer objectBuffer;
 		objectBuffer.World = mvpMatrix;
 
 		uint32_t frameIndex = device->GetFrameId();
-		m_constantBuffers[frameIndex]->SetMappedData(objectBuffer);
-
-		m_meshPerObjectResourceSpace.SetCBV(m_constantBuffers[frameIndex].get());
+		m_renderObjectBindingDesc.CBuffers[frameIndex]->SetMappedData(objectBuffer);
 	}
 
 	void GizmoScaleRenderer::CreateBox(const Math::Vector3& size, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world)
@@ -261,5 +241,6 @@ namespace Bruno
 		ArrowheadHeight = gizmoConfig.ArrowheadHeight;
 		Tessellation = gizmoConfig.Tessellation;
 		StackCount = gizmoConfig.StackCount;
+		LineOffset = gizmoConfig.LineOffset;
 	}
 }

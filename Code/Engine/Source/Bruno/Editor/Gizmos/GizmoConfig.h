@@ -10,6 +10,7 @@ namespace Bruno
 		float		StickHeight{ Gizmo::LINE_LENGTH };
 		float		ArrowheadRadius{ Gizmo::CONE_RADIUS };
 		float		ArrowheadHeight{ Gizmo::CONE_HEIGHT };
+		float		LineOffset{ Gizmo::LINE_OFFSET };
 		uint32_t	Tessellation{ Gizmo::TESSELLATION };
 		uint32_t	StackCount{ 3 };
 

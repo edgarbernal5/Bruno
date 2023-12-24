@@ -89,8 +89,8 @@ namespace Bruno
 			else
 				m_form->hide();
 
-			/*if (args.exposed)
-				this->focus();*/
+			//if (args.exposed)
+			//	this->focus();
 		});
 
 		//m_form->events().expose([this](const nana::arg_expose& args)
@@ -237,6 +237,25 @@ namespace Bruno
 			{
 				m_camera.Walk(-0.25f);
 			}
+			else if (args.key == '1')
+			{
+				m_gizmoService->SetGizmoType(GizmoService::GizmoType::Translation);
+			}
+			else if (args.key == '2')
+			{
+				m_gizmoService->SetGizmoType(GizmoService::GizmoType::Rotation);
+			}
+			else if (args.key == '3')
+			{
+				m_gizmoService->SetGizmoType(GizmoService::GizmoType::Scale);
+			}
+			else if (args.key == '4')
+			{
+				if (m_gizmoService->GetTransformSpace() == GizmoService::TransformSpace::World)
+					m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::Local);
+				else
+					m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::World);
+			}
 		});
 
 		InitializeShaderAndPipeline();
@@ -309,7 +328,7 @@ namespace Bruno
 		m_sceneRenderer->OnRender(m_graphicsContext.get());
 
 		////test gizmo
-		//m_gizmoService->Render(m_graphicsContext.get());
+		m_gizmoService->Render(m_graphicsContext.get());
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();
@@ -329,7 +348,7 @@ namespace Bruno
 
 	void ScenePanel::InitializeCamera()
 	{
-		m_camera.LookAt(Math::Vector3(0, 0, -10), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
+		m_camera.LookAt(Math::Vector3(0, 0, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
 		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 0.1f, 100.0f);
 	}
 
@@ -339,28 +358,34 @@ namespace Bruno
 		m_objectSelector = std::make_shared<ObjectSelector>(m_scene);
 
 		m_gizmoService = std::make_unique<GizmoService>(device, m_camera, m_surface.get(), m_objectSelector.get());
-		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta) {
+		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
+		{
 			m_objectSelector->GetSelectedObjects()[0]->Position += delta;
-			});
+		});
 
-		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta) {
+		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
+		{
 			auto newRotation = m_objectSelector->GetSelectedObjects()[0]->Rotation * delta;
 			newRotation.Normalize();
 			m_objectSelector->GetSelectedObjects()[0]->Rotation = newRotation;
-			});
+		});
 
-		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform) {
+		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
+		{
 			auto newDelta = delta * 0.1f;
 			if (isUniform)
 			{
 				float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
-				m_objectSelector->GetSelectedObjects()[0]->Scale *= uniformDelta;
+				auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale * uniformDelta;
+				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+					m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
+
 				return;
 			}
 			auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale + newDelta;
 			if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 				m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
-			});
+		});
 	}
 
 	void ScenePanel::InitializeGraphicsContext()

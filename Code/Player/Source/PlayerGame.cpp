@@ -241,7 +241,7 @@ namespace Bruno
 			if (isUniform)
 			{
 				float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
-				auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale * newDelta;
+				auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale * uniformDelta;
 				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 					m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
 

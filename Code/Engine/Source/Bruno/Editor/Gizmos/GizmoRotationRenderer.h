@@ -2,6 +2,7 @@
 
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
+#include "Bruno/Platform/DirectX/RenderObjectBinding.h"
 
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
@@ -18,6 +19,7 @@ namespace Bruno
 	class GraphicsContext;
 	class Camera;
 	class Surface;
+	struct GizmoObjectBuffer;
 
 	class GizmoRotationRenderer
 	{
@@ -46,16 +48,8 @@ namespace Bruno
 		std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> m_batch;
 
 		Math::Matrix m_gizmoWorld;
-		struct ObjectBuffer
-		{
-			Math::Matrix World;
-		};
-		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_constantBuffers[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
+		RenderObjectBinding<GizmoObjectBuffer> m_renderObjectBindingDesc;
 
-		std::shared_ptr<Shader>					m_shader;
-		std::shared_ptr<RootSignature>			m_rootSignature;
-		std::shared_ptr<PipelineStateObject>	m_pipelineObject;
-		PipelineResourceSpace					m_meshPerObjectResourceSpace;
 		RenderConfig m_renderConfig;
 		size_t m_xUpperBound;
 		size_t m_yUpperBound;
