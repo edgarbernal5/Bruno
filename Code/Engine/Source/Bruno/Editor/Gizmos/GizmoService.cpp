@@ -788,8 +788,8 @@ namespace Bruno
         auto savedViewport = m_surface->GetViewport();
         Math::Viewport newViewport(savedViewport.Width - Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS, 0, Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS, Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS);
         context->SetViewport(newViewport);
-        D3D12_RECT scissorRect = { (int32_t)newViewport.x, (int32_t)newViewport.y, (int32_t)(newViewport.width+ newViewport.x), (int32_t)(newViewport.height+ newViewport.y) };
-        context->SetScissorRect(scissorRect);
+        //D3D12_RECT scissorRect = { (int32_t)newViewport.x, (int32_t)newViewport.y, (int32_t)(newViewport.width+ newViewport.x), (int32_t)(newViewport.height+ newViewport.y) };
+        //context->SetScissorRect(scissorRect);
         m_sceneGizmoCamera.SetLens(m_camera.GetFieldOfView(), newViewport);
 
         auto cameraOrientation = Math::Matrix::CreateFromQuaternion(Math::Quaternion::CreateFromRotationMatrix(m_camera.GetView()));
@@ -798,7 +798,7 @@ namespace Bruno
         m_gizmoCameraRenderer->Render(context);
 
         context->SetViewport(savedViewport);  
-        scissorRect = { 0, 0, (int32_t)savedViewport.Width, (int32_t)savedViewport.Height };
-        context->SetScissorRect(scissorRect);
+        //scissorRect = { 0, 0, (int32_t)savedViewport.Width, (int32_t)savedViewport.Height };
+        //context->SetScissorRect(scissorRect);
     }
 }
