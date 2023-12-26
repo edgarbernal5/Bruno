@@ -57,6 +57,9 @@ namespace Bruno
 		pipeline.RenderTargets.push_back(&backBuffer);
 		pipeline.DepthStencilTarget = &depthBuffer;
 
+		auto device = Graphics::GetDevice();
+		m_renderObjectBindingDesc.Space.SetCBV(m_renderObjectBindingDesc.CBuffers[device->GetFrameId()].get());
+
 		context->SetPipeline(pipeline);
 		context->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_renderObjectBindingDesc.Space);
 
