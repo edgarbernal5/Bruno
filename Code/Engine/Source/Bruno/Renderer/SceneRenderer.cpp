@@ -57,6 +57,7 @@ namespace Bruno
 		pipeline.DepthStencilTarget = &depthBuffer;
 		graphicsContext->SetPipeline(pipeline);
 
+		VertexBuffer* currentVB = nullptr;
 		for (auto& item : m_scene->GetRenderItems()) {
 			auto texture = item->Material->TexturesByName["Texture"];
 			if (texture != nullptr && texture->IsReady())
@@ -64,8 +65,12 @@ namespace Bruno
 				if (!item->IndexBuffer->IsReady() || !item->VertexBuffer->IsReady())
 					continue;
 
-				graphicsContext->SetVertexBuffer(*item->VertexBuffer);
-				graphicsContext->SetIndexBuffer(*item->IndexBuffer);
+				if (currentVB != item->VertexBuffer.get())
+				{
+					graphicsContext->SetVertexBuffer(*item->VertexBuffer);
+					graphicsContext->SetIndexBuffer(*item->IndexBuffer);
+					currentVB = item->VertexBuffer.get();
+				}
 
 				PipelineResourceBinding textureBinding;
 				textureBinding.BindingIndex = 0;

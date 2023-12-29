@@ -68,11 +68,11 @@ namespace Bruno
 		Mesh(const std::string& name, uint32_t baseVertex, uint32_t baseIndex, uint32_t vertexCount, uint32_t indexCount, uint32_t materialIndex, const Math::Matrix& transform, const Math::Matrix& localTransform, const Math::BoundingBox& bbox);
 		//Mesh(std::vector<Math::Vector3> && vertices, std::vector<Math::Vector3>&& normals, std::vector<Math::Vector3>&& tangets, std::vector<Math::Vector3>&& birnormals, std::vector < std::vector<Math::Vector3>> && textureCoordinates);
 
-		uint32_t GetBaseVertex() { return m_baseVertex; }
-		uint32_t GetBaseIndex() { return m_baseIndex; }
-		uint32_t GetIndexCount() { return m_indexCount; }
-		uint32_t GetVertexCount() { return m_vertexCount; }
-		uint32_t GetMaterialIndex() { return m_materialIndex; }
+		uint32_t GetBaseVertex() const { return m_baseVertex; }
+		uint32_t GetBaseIndex() const { return m_baseIndex; }
+		uint32_t GetIndexCount() const { return m_indexCount; }
+		uint32_t GetVertexCount() const { return m_vertexCount; }
+		uint32_t GetMaterialIndex() const { return m_materialIndex; }
 
 		Mesh& operator=(Mesh&&) = default;
 	private:

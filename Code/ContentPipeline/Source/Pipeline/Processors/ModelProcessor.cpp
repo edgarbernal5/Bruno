@@ -8,6 +8,8 @@
 #include <sstream>
 #include <Bruno/Core/StringHelpers.h>
 
+#include "Bruno/Core/Assert.h"
+
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(ModelProcessor);
@@ -123,7 +125,7 @@ namespace Bruno
 			}
 
 			if (aiMesh->HasTextureCoords(0))
-				vertex.Texcoord = { aiMesh->mTextureCoords[0][i].x, aiMesh->mTextureCoords[0][i].y,0.0f };
+				vertex.Texcoord = { aiMesh->mTextureCoords[0][i].x, aiMesh->mTextureCoords[0][i].y, aiMesh->mTextureCoords[0][i].z };
 		}
 
 		/*uint32_t colorChannelCount = aiMesh->GetNumColorChannels();
@@ -144,12 +146,15 @@ namespace Bruno
 		{
 			for (uint32_t i = 0; i < aiMesh->mNumFaces; i++)
 			{
-				aiFace* face = &aiMesh->mFaces[i];
+				BR_ASSERT(aiMesh->mFaces[i].mNumIndices == 3, "Must have 3 indices!");
 
-				for (uint32_t j = 0; j < face->mNumIndices; j++)
-				{
-					indices.push_back(face->mIndices[j]);
-				}
+				uint32_t index0 = aiMesh->mFaces[i].mIndices[0];
+				uint32_t index1 = aiMesh->mFaces[i].mIndices[1];
+				uint32_t index2 = aiMesh->mFaces[i].mIndices[2];
+
+				indices.push_back(index0);
+				indices.push_back(index1);
+				indices.push_back(index2);
 			}
 		}
 
