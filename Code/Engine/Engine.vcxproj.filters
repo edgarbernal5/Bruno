@@ -321,6 +321,12 @@
     <ClInclude Include="Source\Bruno\Renderer\PipelineStateObjectCache.h">
       <Filter>Source\Bruno\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Scene\Entity.h">
+      <Filter>Source\Bruno\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Components.h">
+      <Filter>Source\Bruno\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">

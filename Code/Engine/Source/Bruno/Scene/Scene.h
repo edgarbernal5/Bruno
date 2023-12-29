@@ -1,5 +1,8 @@
 #pragma once
 
+
+#include <entt/entt.hpp>
+
 #include <vector>
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
 #include <Bruno/Renderer/Camera.h>
@@ -17,7 +20,7 @@ namespace Bruno
 		Math::Vector3 Scale;
 		Math::Matrix WorldTransform;
 
-		Transformable():Scale(Math::Vector3::One*0.5f){}
+		Transformable() :Scale(Math::Vector3::One * 0.5f) {}
 	};
 
 	class Scene
@@ -31,8 +34,11 @@ namespace Bruno
 
 		friend class SceneRenderer;
 		friend class ObjectSelector;
+		friend class Entity;
 
 	private:
+		entt::registry m_registry;
+		entt::entity m_sceneEntity{ entt::null };
 		Camera& m_camera;
 		std::vector<std::shared_ptr<Model>>			m_models;
 		std::vector<std::shared_ptr<RenderItem>>	m_renderItems;

@@ -174,6 +174,22 @@ namespace Bruno
         m_currentStream->ReadRaw<Math::Vector4>(output);
     }
 
+    void ContentReader::ReadMatrix(Math::Matrix& output)
+    {
+        m_currentStream->ReadRaw<Math::Matrix>(output);
+    }
+
+    void ContentReader::ReadBoundingBox(Math::BoundingBox& output)
+    {
+        Math::Vector3 center;
+        m_currentStream->ReadRaw<Math::Vector3>(center);
+        Math::Vector3 extents;
+        m_currentStream->ReadRaw<Math::Vector3>(extents);
+
+        output.Center = center;
+        output.Extents = extents;
+    }
+
     void ContentReader::ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action)
     {
         uint32_t index;

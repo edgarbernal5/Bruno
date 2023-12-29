@@ -16,7 +16,7 @@ namespace Bruno
 
 		D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-		Material* Material;
+		Material* Material{ nullptr };
 		std::shared_ptr<IndexBuffer> IndexBuffer;
 		std::shared_ptr<VertexBuffer> VertexBuffer;
 	};

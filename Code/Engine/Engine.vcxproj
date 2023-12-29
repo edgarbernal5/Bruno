@@ -47,6 +47,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\Output\$(Configuration)_$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>..\..\Output\$(Configuration)_$(Platform)_tmp\$(ProjectName)\</IntDir>
+    <ExternalIncludePath>Dependencies\entt\include;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\Output\$(Configuration)_$(Platform)\$(ProjectName)\</OutDir>
@@ -97,6 +98,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Components.h" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
     <ClInclude Include="Dependencies\d3dx12\d3dx12.h" />
     <ClInclude Include="Dependencies\d3dx12\d3dx12_barriers.h" />
@@ -184,6 +186,7 @@
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
     <ClInclude Include="Source\Bruno\Renderer\SceneRenderer.h" />
     <ClInclude Include="Source\Bruno\Renderer\ShaderCache.h" />
+    <ClInclude Include="Source\Bruno\Scene\Entity.h" />
     <ClInclude Include="Source\Bruno\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>

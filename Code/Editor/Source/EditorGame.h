@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Bruno.h>
-#include <Bruno/Core/Game.h>
+#include "Bruno.h"
 #include "Bruno/Core/GameTimer.h"
 
 #include <nana/gui/widgets/menubar.hpp>

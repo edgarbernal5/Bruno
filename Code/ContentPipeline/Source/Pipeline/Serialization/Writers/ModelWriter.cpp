@@ -31,57 +31,37 @@ namespace Bruno
 			}
 		}
 
+		//Vertices.
+		output.WriteUInt64(modelContentItem->Vertices.size());
+		for (size_t i = 0; i < modelContentItem->Vertices.size(); i++)
+		{
+			output.WriteVector3(modelContentItem->Vertices[i].Position);
+			output.WriteVector3(modelContentItem->Vertices[i].Normal);
+			output.WriteVector3(modelContentItem->Vertices[i].Tangent);
+			output.WriteVector3(modelContentItem->Vertices[i].Binormal);
+			output.WriteVector3(modelContentItem->Vertices[i].Texcoord);
+		}
+
 		output.WriteUInt64(modelContentItem->Meshes.size());
 		for (size_t i = 0; i < modelContentItem->Meshes.size(); i++)
 		{
-			output.WriteString(modelContentItem->Meshes[i]->Name);
+			output.WriteString(modelContentItem->Meshes[i]->MeshName);
+			output.WriteString(modelContentItem->Meshes[i]->NodeName);
+			output.WriteUInt32(modelContentItem->Meshes[i]->BaseVertex);
+			output.WriteUInt32(modelContentItem->Meshes[i]->BaseIndex);
+			output.WriteUInt32(modelContentItem->Meshes[i]->VertexCount);
+			output.WriteUInt32(modelContentItem->Meshes[i]->IndexCount);
 			output.WriteUInt32(modelContentItem->Meshes[i]->MaterialIndex);
+			output.WriteMatrix(modelContentItem->Meshes[i]->Transform);
+			output.WriteMatrix(modelContentItem->Meshes[i]->LocalTransform);
+			output.WriteBoundingBox(modelContentItem->Meshes[i]->BBox);
 			
-			//vertices.
-			output.WriteUInt64(modelContentItem->Meshes[i]->Vertices.size());
-			for (size_t j = 0; j < modelContentItem->Meshes[i]->Vertices.size(); j++)
-			{
-				output.WriteVector3(modelContentItem->Meshes[i]->Vertices[j]);
-			}
-
-			//normals.
-			output.WriteUInt64(modelContentItem->Meshes[i]->Normals.size());
-			for (size_t j = 0; j < modelContentItem->Meshes[i]->Normals.size(); j++)
-			{
-				output.WriteVector3(modelContentItem->Meshes[i]->Normals[j]);
-			}
-			
-			//tangents.
-			output.WriteUInt64(modelContentItem->Meshes[i]->Tangents.size());
-			for (size_t j = 0; j < modelContentItem->Meshes[i]->Tangents.size(); j++)
-			{
-				output.WriteVector3(modelContentItem->Meshes[i]->Tangents[j]);
-			}
-			
-			//binormals.
-			output.WriteUInt64(modelContentItem->Meshes[i]->BiNormals.size());
-			for (size_t j = 0; j < modelContentItem->Meshes[i]->BiNormals.size(); j++)
-			{
-				output.WriteVector3(modelContentItem->Meshes[i]->BiNormals[j]);
-			}
-			
-			//texture coordinates.
-			output.WriteUInt64(modelContentItem->Meshes[i]->TextureCoordinates.size());
-			for (size_t j = 0; j < modelContentItem->Meshes[i]->TextureCoordinates.size(); j++)
-			{
-				output.WriteUInt64(modelContentItem->Meshes[i]->TextureCoordinates[j].size());
-				for (size_t k = 0; k < modelContentItem->Meshes[i]->TextureCoordinates[j].size(); k++)
-				{
-					output.WriteVector3(modelContentItem->Meshes[i]->TextureCoordinates[j][k]);
-				}
-			}
-			
-			output.WriteUInt32(modelContentItem->Meshes[i]->FaceCount);
-			output.WriteUInt64(modelContentItem->Meshes[i]->Indices.size());
-			for (size_t j = 0; j < modelContentItem->Meshes[i]->Indices.size(); j++)
-			{
-				output.WriteUInt32(modelContentItem->Meshes[i]->Indices[j]);
-			}
+		}
+		//Indices.
+		output.WriteUInt64(modelContentItem->Indices.size());
+		for (size_t j = 0; j < modelContentItem->Indices.size(); j++)
+		{
+			output.WriteUInt32(modelContentItem->Indices[j]);
 		}
 	}
 }

@@ -9,7 +9,7 @@
 
 namespace Bruno
 {
-    IndexBuffer::IndexBuffer(uint32_t sizeInBytes, const void* bufferData, uint32_t stride) :
+	IndexBuffer::IndexBuffer(uint32_t sizeInBytes, const void* bufferData, uint32_t stride) :
 		GpuBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(sizeInBytes, stride, BufferViewFlags::Srv, BufferAccessFlags::GpuOnly)),
 		m_indexBufferView{}
 	{
@@ -23,7 +23,7 @@ namespace Bruno
 		Graphics::GetDevice()->GetUploadContext().AddBufferUpload(std::move(bufferUpload));
 
 		m_indexBufferView.BufferLocation = m_resource->GetGPUVirtualAddress();
-        m_indexBufferView.Format = stride == sizeof(uint16_t) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
-        m_indexBufferView.SizeInBytes = static_cast<uint32_t>(m_desc.Width);
+		m_indexBufferView.Format = stride == sizeof(uint16_t) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+		m_indexBufferView.SizeInBytes = static_cast<uint32_t>(m_desc.Width);
 	}
 }

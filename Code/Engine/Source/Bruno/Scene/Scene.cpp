@@ -10,6 +10,8 @@ namespace Bruno
 	Scene::Scene(Camera& camera) :
 		m_camera(camera)
 	{
+		m_sceneEntity = m_registry.create();
+
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
 			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
@@ -22,10 +24,12 @@ namespace Bruno
 		for (auto& mesh : meshes)
 		{
 			auto boxRenderItem = std::make_shared<RenderItem>();
-			boxRenderItem->IndexCount = mesh->GetIndexBuffer()->GetElementCount();
-			boxRenderItem->IndexBuffer = mesh->GetIndexBuffer();
-			boxRenderItem->VertexBuffer = mesh->GetVertexBuffer();
-			boxRenderItem->Material = mesh->GetMaterial();
+			boxRenderItem->IndexCount = mesh->GetIndexCount();
+			boxRenderItem->BaseVertexLocation = mesh->GetBaseVertex();
+			boxRenderItem->StartIndexLocation = mesh->GetBaseIndex();
+			boxRenderItem->Material = model->GetMaterial(mesh->GetMaterialIndex()).get();
+			boxRenderItem->IndexBuffer = model->GetIndexBuffer();
+			boxRenderItem->VertexBuffer = model->GetVertexBuffer();
 			m_renderItems.push_back(boxRenderItem);
 		}
 		m_transformableObjects.push_back(std::make_shared<Transformable>());

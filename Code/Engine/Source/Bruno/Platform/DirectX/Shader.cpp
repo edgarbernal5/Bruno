@@ -64,9 +64,7 @@ namespace Bruno
 		//CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC versionRootSignatureDesc;
 		//versionRootSignatureDesc.Init_1_1(static_cast<uint32_t>(m_rootParameters.size()),
 		//	m_rootParameters.data(), 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
-		//std::reverse(m_rootParameters.begin(), m_rootParameters.end());
-		
+				
 		for (size_t i = 0; i < m_rootParameters.size(); i++)
 		{
 			auto& parameter = m_rootParameters[i];

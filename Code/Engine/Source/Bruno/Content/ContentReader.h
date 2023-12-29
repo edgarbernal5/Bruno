@@ -35,6 +35,8 @@ namespace Bruno
 		void ReadVector2(Math::Vector2& output);
 		void ReadVector3(Math::Vector3& output);
 		void ReadVector4(Math::Vector4& output);
+		void ReadMatrix(Math::Matrix& output);
+		void ReadBoundingBox(Math::BoundingBox& output);
 
 	private:
 		void ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action);

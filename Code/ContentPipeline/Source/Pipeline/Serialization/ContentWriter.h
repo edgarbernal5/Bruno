@@ -39,6 +39,8 @@ namespace Bruno
 		void WriteVector2(const Math::Vector2& vector2);
 		void WriteVector3(const Math::Vector3& vector3);
 		void WriteVector4(const Math::Vector4& vector4);
+		void WriteMatrix(const Math::Matrix& matrix);
+		void WriteBoundingBox(const Math::BoundingBox& box);
 
 	private:
 		AbstractContentTypeWriter* GetTypeWriter(RTTI::IdType writerTypeId, int& typeIndex);

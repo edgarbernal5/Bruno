@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Bruno/Core/Game.h"
+#include "Bruno.h"
+
 #include "Bruno/Platform/DirectX/Surface.h"
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
@@ -9,7 +10,6 @@
 #include "Bruno/Platform/DirectX/Texture.h"
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 
-#include "Bruno/Renderer/Camera.h"
 
 namespace Bruno
 {

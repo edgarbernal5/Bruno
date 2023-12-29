@@ -47,7 +47,6 @@ namespace Bruno
 		void InitializeGizmoService();
 		void InitializeGraphicsContext();
 		void InitializeMeshAndTexture();
-		void InitializeShaderAndPipeline();
 		void UpdateCBs(const GameTimer& timer);
 
 		//std::unique_ptr<nana::nested_form> m_form;

@@ -258,7 +258,6 @@ namespace Bruno
 			}
 		});
 
-		InitializeShaderAndPipeline();
 		InitializeCamera();
 		InitializeGraphicsContext();
 
@@ -405,29 +404,8 @@ namespace Bruno
 		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
 	}
 
-	void ScenePanel::InitializeShaderAndPipeline()
-	{
-
-	}
-
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
 	{
-		//auto device = Bruno::Graphics::GetDevice();
-		//static float TotalTime = 0.0f;
-		//float angle = static_cast<float>(0.0);
-		////float angle = static_cast<float>(TotalTime * 45.0);
-
-		//Math::Matrix modelMatrix = Math::Matrix::Identity;
-		////Math::Matrix modelMatrix = Math::Matrix::CreateFromAxisAngle(Math::Vector3(0, 1, 1), Math::ConvertToRadians(angle));
-		//TotalTime += timer.GetDeltaTime();
-
-		//Math::Matrix mvpMatrix = modelMatrix * m_camera.GetViewProjection();
-
-		//ObjectBuffer objectBuffer;
-		//objectBuffer.World = mvpMatrix;
-
-		//uint32_t frameIndex = device->GetFrameId();
-		//m_objectBuffer[frameIndex]->SetMappedData(objectBuffer);
 		m_scene->OnUpdate(timer);
 	}
 }

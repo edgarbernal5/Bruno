@@ -43,6 +43,21 @@ namespace Bruno
 			materials.emplace_back(std::move(material));
 		}
 
+		size_t verticesCount;
+		input.ReadUInt64(verticesCount);
+		std::vector<ModelVertex> vertices;
+		vertices.reserve(verticesCount);
+
+		for (size_t j = 0; j < verticesCount; j++)
+		{
+			auto& vertex = vertices.emplace_back();
+			input.ReadVector3(vertex.Position);
+			input.ReadVector3(vertex.Normal);
+			input.ReadVector3(vertex.Tangent);
+			input.ReadVector3(vertex.Binormal);
+			input.ReadVector3(vertex.Texcoord);
+		}
+
 		size_t meshesCount;
 		input.ReadUInt64(meshesCount);
 
@@ -51,119 +66,71 @@ namespace Bruno
 
 		for (size_t i = 0; i < meshesCount; i++)
 		{
-			std::string name;
-			input.ReadString(name);
-			
+			std::string meshName;
+			input.ReadString(meshName);
+
+			std::string nodeName;
+			input.ReadString(nodeName);
+
+			uint32_t baseVertex;
+			input.ReadUInt32(baseVertex);
+
+			uint32_t baseIndex;
+			input.ReadUInt32(baseIndex);
+
+			uint32_t vertexCount;
+			input.ReadUInt32(vertexCount);
+
+			uint32_t indexCount;
+			input.ReadUInt32(indexCount);
+
 			uint32_t materialIndex;
 			input.ReadUInt32(materialIndex);
 
-			size_t count;
-			input.ReadUInt64(count);
-			std::vector<Math::Vector3> vertices;
-			vertices.reserve(count);
+			Math::Matrix transform;
+			input.ReadMatrix(transform);
 
-			for (size_t j = 0; j < count; j++)
-			{
-				Math::Vector3 vertex;
-				input.ReadVector3(vertex);
+			Math::Matrix localTransform;
+			input.ReadMatrix(localTransform);
 
-				vertices.push_back(vertex);
-			}
+			Math::BoundingBox bbox;
+			input.ReadBoundingBox(bbox);			
 
-			input.ReadUInt64(count);
-			std::vector<Math::Vector3> normals;
-			normals.reserve(count);
-
-			for (size_t j = 0; j < count; j++)
-			{
-				Math::Vector3 normal;
-				input.ReadVector3(normal);
-
-				normals.push_back(normal);
-			}
-
-			input.ReadUInt64(count);
-			std::vector<Math::Vector3> tangents;
-			tangents.reserve(count);
-
-			for (size_t j = 0; j < count; j++)
-			{
-				Math::Vector3 tangent;
-				input.ReadVector3(tangent);
-
-				tangents.push_back(tangent);
-			}
-
-			input.ReadUInt64(count);
-			std::vector<Math::Vector3> binormals;
-			binormals.reserve(count);
-
-			for (size_t j = 0; j < count; j++)
-			{
-				Math::Vector3 binormal;
-				input.ReadVector3(binormal);
-
-				binormals.push_back(binormal);
-			}
-
-			std::vector < std::vector<Math::Vector3>> texCoords;
-			input.ReadUInt64(count);
-			for (size_t j = 0; j < count; j++)
-			{
-				size_t textureCount;
-				input.ReadUInt64(textureCount);
-				std::vector<Math::Vector3> texCoordsChannel;
-				texCoordsChannel.reserve(textureCount);
-
-				for (size_t k = 0; k < textureCount; k++)
-				{
-					Math::Vector3 texCoord;
-					input.ReadVector3(texCoord);
-
-					texCoordsChannel.push_back(texCoord);
-				}
-
-				texCoords.emplace_back(std::move(texCoordsChannel));
-			}
-			uint32_t faceCount;
-			input.ReadUInt32(faceCount);
-
-			input.ReadUInt64(count);
-			std::vector<uint32_t> indices;
-			indices.reserve(count);
-
-			for (size_t j = 0; j < count; j++)
-			{
-				uint32_t index;
-				input.ReadUInt32(index);
-
-				indices.push_back(index);
-			}
-
-			std::vector<VertexPositionNormalTexture> verticesPNT;
-			verticesPNT.reserve(vertices.size());
-			for (size_t j = 0; j < vertices.size(); j++)
-			{
-				auto& vertex = verticesPNT.emplace_back();
-				vertex.Position = vertices[j];
-				vertex.Normal = normals[j];
-				auto& texCoord3D = texCoords.at(0).at(j);
-				vertex.Texture.x = texCoord3D.x;
-				vertex.Texture.y = texCoord3D.y;
-			}
-
-			auto indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(count * sizeof(uint32_t)), indices.data(), sizeof(uint32_t));
-			auto vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(vertices.size() * sizeof(VertexPositionNormalTexture)), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
-
-			//auto mesh = std::make_shared<Mesh>(vertices, normals, tangents, binormals, texCoords);
-			auto mesh = std::make_shared<Mesh>(std::move(vertices), std::move(normals), std::move(texCoords));
-			mesh->SetMaterial(materials[materialIndex]);
-			mesh->SetIndexBuffer(indexBuffer);
-			mesh->SetVertexBuffer(vertexBuffer);
-
+			auto mesh = std::make_shared<Mesh>(meshName, baseVertex, baseIndex, vertexCount, indexCount, materialIndex, transform, localTransform, bbox);
 			meshes.emplace_back(std::move(mesh));
 		}
-		auto model = std::make_shared<Model>(std::move(meshes));
+
+		size_t indicesCount;
+		input.ReadUInt64(indicesCount);
+		std::vector<uint32_t> indices;
+		indices.reserve(indicesCount);
+
+		for (size_t i = 0; i < indicesCount; i++)
+		{
+			uint32_t index;
+			input.ReadUInt32(index);
+
+			indices.push_back(index);
+		}
+			
+		std::vector<VertexPositionNormalTexture> verticesPNT;
+		verticesPNT.reserve(vertices.size());
+		for (size_t j = 0; j < vertices.size(); j++)
+		{
+			auto& vertex = verticesPNT.emplace_back();
+			vertex.Position = vertices[j].Position;
+			vertex.Normal = vertices[j].Normal;
+			auto& texCoord3D = vertices[j].Texcoord;
+			vertex.Texture.x = texCoord3D.x;
+			vertex.Texture.y = texCoord3D.y;
+		}
+
+		auto indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(indicesCount * sizeof(uint32_t)), indices.data(), sizeof(uint32_t));
+		auto vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(vertices.size() * sizeof(VertexPositionNormalTexture)), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
+				
+		auto model = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes));
+		model->SetIndexBuffer(indexBuffer);
+		model->SetVertexBuffer(vertexBuffer);
 		return model;
 	}
 }
