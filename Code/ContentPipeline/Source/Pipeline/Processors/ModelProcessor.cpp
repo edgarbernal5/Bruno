@@ -109,9 +109,9 @@ namespace Bruno
 			aabbMin.x = std::min<float>(aabbMin.x, vertex.Position.x);
 			aabbMin.y = std::min<float>(aabbMin.y, vertex.Position.y);
 			aabbMin.z = std::min<float>(aabbMin.z, vertex.Position.z);
-			aabbMax.x = std::min<float>(aabbMax.x, vertex.Position.x);
-			aabbMax.y = std::min<float>(aabbMax.y, vertex.Position.y);
-			aabbMax.z = std::min<float>(aabbMax.z, vertex.Position.z);
+			aabbMax.x = std::max<float>(aabbMax.x, vertex.Position.x);
+			aabbMax.y = std::max<float>(aabbMax.y, vertex.Position.y);
+			aabbMax.z = std::max<float>(aabbMax.z, vertex.Position.z);
 
 			if (aiMesh->HasNormals())
 				vertex.Normal = { aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z };
