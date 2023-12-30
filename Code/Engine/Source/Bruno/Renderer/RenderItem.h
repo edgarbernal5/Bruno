@@ -10,11 +10,11 @@ namespace Bruno
 	{
 		RenderItem() = default;
 
-		uint32_t IndexCount = 0;
-		uint32_t StartIndexLocation = 0;
-		int BaseVertexLocation = 0;
+		uint32_t IndexCount{ 0 };
+		uint32_t StartIndexLocation{ 0 };
+		int BaseVertexLocation{ 0 };
 
-		D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		D3D12_PRIMITIVE_TOPOLOGY PrimitiveType{ D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST };
 
 		Material* Material{ nullptr };
 		std::shared_ptr<IndexBuffer> IndexBuffer;

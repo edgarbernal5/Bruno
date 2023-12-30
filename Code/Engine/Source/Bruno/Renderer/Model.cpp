@@ -7,11 +7,12 @@ namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(Model);
 
-	Model::Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes) :
+	Model::Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes) :
 		m_vertices(std::move(vertices)),
 		m_indices(std::move(indices)),
 		m_materials(std::move(materials)),
-		m_meshes(std::move(meshes))
+		m_meshes(std::move(meshes)),
+		m_modelNodes(std::move(modelNodes))
 	{
 	}
 
@@ -29,11 +30,6 @@ namespace Bruno
 	{
 		return m_materials[materialIndex];
 	}
-
-	//Model::Model(std::vector<std::shared_ptr<Mesh>>&& meshes) :
-	//	m_meshes(std::move(meshes))
-	//{
-	//}
 
 	Mesh::Mesh(const std::string& meshName, uint32_t baseVertex, uint32_t baseIndex, uint32_t vertexCount, uint32_t indexCount, uint32_t materialIndex, const Math::Matrix& transform, const Math::Matrix& localTransform, const Math::BoundingBox& bbox) :
 		m_meshName(meshName),

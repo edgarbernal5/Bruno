@@ -98,7 +98,6 @@ namespace Bruno
 		mesh->VertexCount = aiMesh->mNumVertices;
 		mesh->IndexCount = aiMesh->mNumFaces * 3;
 		mesh->MaterialIndex = aiMesh->mMaterialIndex;
-		//vertices.reserve(aiMesh->mNumVertices);
 
 		Math::Vector3 aabbMin = { FLT_MAX, FLT_MAX, FLT_MAX };
 		Math::Vector3 aabbMax = { -FLT_MAX, -FLT_MAX, -FLT_MAX };

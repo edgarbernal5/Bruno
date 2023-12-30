@@ -112,7 +112,41 @@ namespace Bruno
 
 			indices.push_back(index);
 		}
-			
+
+		size_t modelNodesCount;
+		input.ReadUInt64(modelNodesCount);
+		std::vector<ModelNode> modelNodes;
+		modelNodes.reserve(modelNodesCount);
+		for (size_t i = 0; i < modelNodesCount; i++)
+		{
+			auto& modelNode = modelNodes.emplace_back();
+			input.ReadUInt32(modelNode.Parent);
+
+			size_t childrenCount;
+			input.ReadUInt64(childrenCount);
+
+			modelNode.Children.reserve(childrenCount);
+			for (size_t j = 0; j < childrenCount; j++)
+			{
+				uint32_t child;
+				input.ReadUInt32(child);
+				modelNode.Children.push_back(child);
+			}
+			size_t meshesCount;
+			input.ReadUInt64(meshesCount);
+
+			modelNode.Meshes.reserve(meshesCount);
+			for (size_t j = 0; j < meshesCount; j++)
+			{
+				uint32_t meshIndex;
+				input.ReadUInt32(meshIndex);
+				modelNode.Meshes.push_back(meshIndex);
+			}
+
+			input.ReadString(modelNode.Name);
+			input.ReadMatrix(modelNode.LocalTransform);
+		}
+
 		std::vector<VertexPositionNormalTexture> verticesPNT;
 		verticesPNT.reserve(vertices.size());
 		for (size_t j = 0; j < vertices.size(); j++)
@@ -128,9 +162,10 @@ namespace Bruno
 		auto indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(indicesCount * sizeof(uint32_t)), indices.data(), sizeof(uint32_t));
 		auto vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(vertices.size() * sizeof(VertexPositionNormalTexture)), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
 				
-		auto model = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes));
+		auto model = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
 		model->SetIndexBuffer(indexBuffer);
 		model->SetVertexBuffer(vertexBuffer);
+
 		return model;
 	}
 }

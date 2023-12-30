@@ -57,11 +57,33 @@ namespace Bruno
 			output.WriteBoundingBox(modelContentItem->Meshes[i]->BBox);
 			
 		}
+
 		//Indices.
 		output.WriteUInt64(modelContentItem->Indices.size());
-		for (size_t j = 0; j < modelContentItem->Indices.size(); j++)
+		for (size_t i = 0; i < modelContentItem->Indices.size(); i++)
 		{
-			output.WriteUInt32(modelContentItem->Indices[j]);
+			output.WriteUInt32(modelContentItem->Indices[i]);
 		}
+
+		//Model nodes.
+		output.WriteUInt64(modelContentItem->ModelNodes.size());
+		for (size_t i = 0; i < modelContentItem->ModelNodes.size(); i++)
+		{
+			output.WriteUInt32(modelContentItem->ModelNodes[i]->Parent);
+			output.WriteUInt64(modelContentItem->ModelNodes[i]->Children.size());
+			for (size_t j = 0; j < modelContentItem->ModelNodes[i]->Children.size(); j++)
+			{
+				output.WriteUInt32(modelContentItem->ModelNodes[i]->Children[j]);
+			}
+
+			output.WriteUInt64(modelContentItem->ModelNodes[i]->Meshes.size());
+			for (size_t j = 0; j < modelContentItem->ModelNodes[i]->Meshes.size(); j++)
+			{
+				output.WriteUInt32(modelContentItem->ModelNodes[i]->Meshes[j]);
+			}
+			output.WriteString(modelContentItem->ModelNodes[i]->Name);
+			output.WriteMatrix(modelContentItem->ModelNodes[i]->LocalTransform);
+		}
+
 	}
 }
