@@ -17,5 +17,7 @@ namespace Bruno
 	{
 	}
 
+	BR_RTTI_DEFINITIONS(ModelNodeContentItem);
+
 	BR_RTTI_DEFINITIONS(MeshContentItem);
 }

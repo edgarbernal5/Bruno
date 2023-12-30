@@ -34,8 +34,11 @@ namespace Bruno
 		std::vector<std::shared_ptr<ModelNodeContentItem>> ModelNodes;
 	};
 
-	struct ModelNodeContentItem
+	struct ModelNodeContentItem : public ContentItem
 	{
+		BR_RTTI_DECLARATION(ModelNodeContentItem, ContentItem);
+
+	public:
 		uint32_t Parent;
 		std::vector<uint32_t> Children;
 		std::vector<uint32_t> Meshes;
