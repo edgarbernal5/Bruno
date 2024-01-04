@@ -66,7 +66,7 @@ namespace Bruno
         m_currentAxis = selectedAxis;
         m_currentDelta = Math::Vector3::Zero;
 
-        BR_CORE_TRACE << "selectedAxis = " << (int)selectedAxis << std::endl;
+        //BR_CORE_TRACE << "selectedAxis = " << (int)selectedAxis << std::endl;
         if (m_currentAxis == GizmoAxis::None)
             return false;
 

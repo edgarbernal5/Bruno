@@ -36,7 +36,7 @@ namespace Bruno
 			void Setup();
 		};
 
-		Shader(std::vector<std::vector<uint8_t>>&& programsData);
+		Shader(std::array<std::vector<uint8_t>, Graphics::Core::SHADER_PROGRAMS_COUNT>&& programsData);
 		Shader(const std::wstring& sourceFilename);
 		
 		D3D12_INPUT_LAYOUT_DESC GetInputLayout();
@@ -56,7 +56,7 @@ namespace Bruno
 		void InitializeParameters();
 		void InitializeParameters(ShaderProgram* program);
 
-		std::shared_ptr<ShaderProgram> m_programs[Graphics::Core::SHADER_PROGRAMS_COUNT]{};
+		std::array<std::shared_ptr<ShaderProgram>, Graphics::Core::SHADER_PROGRAMS_COUNT> m_programs;
 		std::shared_ptr<RootSignature> m_rootSignature;
 		std::map<std::wstring, uint32_t> m_rootParameterIndexMap;
 

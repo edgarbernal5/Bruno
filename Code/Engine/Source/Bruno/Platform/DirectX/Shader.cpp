@@ -15,7 +15,7 @@ namespace Bruno
 	
 	const Shader::ShaderTypeDesc Shader::ShaderTypes[] = {Shader::VS, Shader::PS};
 
-	Shader::Shader(std::vector<std::vector<uint8_t>>&& programsData)
+	Shader::Shader(std::array<std::vector<uint8_t>, Graphics::Core::SHADER_PROGRAMS_COUNT>&& programsData)
 	{
 		BR_ASSERT(programsData.size() <= Graphics::Core::SHADER_PROGRAMS_COUNT);
 		
