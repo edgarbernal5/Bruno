@@ -10,7 +10,14 @@ namespace Bruno
 		return (m_entityHandle != entt::null) && m_scene && m_scene->m_registry.valid(m_entityHandle);
 	}
 
+	Entity Entity::GetParent() const
+	{
+
+		return {};
+	}
+
 	void Entity::SetParent(Entity parent)
 	{
+
 	}
 }

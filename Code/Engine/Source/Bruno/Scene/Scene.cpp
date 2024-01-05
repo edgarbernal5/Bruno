@@ -36,8 +36,12 @@ namespace Bruno
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<HierarchyComponent>();
 
-		//if (parent)
-		//	entity.SetParent(parent);
+		if (parent)
+		{
+			entity.SetParent(parent);
+		}
+
+		m_entityIdMap[idComponent.Id] = entity;
 
 		return entity;
 	}

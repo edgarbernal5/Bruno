@@ -40,6 +40,8 @@ namespace Bruno
 	private:
 		entt::registry m_registry;
 		entt::entity m_sceneEntity{ entt::null };
+		std::unordered_map<UUID, Entity> m_entityIdMap;
+
 		Camera& m_camera;
 		std::vector<std::shared_ptr<Model>>			m_models;
 		std::vector<std::shared_ptr<RenderItem>>	m_renderItems;

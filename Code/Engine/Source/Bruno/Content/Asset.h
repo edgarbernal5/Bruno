@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Bruno/Core/RTTI.h"
+#include "Bruno/Core/UUID.h"
 
 namespace Bruno
 {
-	using AssetHandle = uint64_t;
+	using AssetHandle = UUID;
 
 	class Asset : public RTTI
 	{
@@ -13,12 +14,12 @@ namespace Bruno
 	public:
 		virtual ~Asset() {}
 
-		virtual bool operator==(const Asset& other) const
+		bool operator==(const Asset& other) const
 		{
 			return m_assetHandle == other.m_assetHandle;
 		}
 
-		virtual bool operator!=(const Asset& other) const
+		bool operator!=(const Asset& other) const
 		{
 			return !(*this == other);
 		}

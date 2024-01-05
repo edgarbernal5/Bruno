@@ -14,6 +14,7 @@
 #include <exception>
 #include <mutex>
 #include <iostream>
+#include <unordered_map>
 
 #include "Bruno/Core/Game.h"
 #include "Bruno/Core/Log.h"

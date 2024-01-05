@@ -30,6 +30,7 @@ namespace Bruno
 		template<typename... T>
 		bool HasComponent() const;
 
+		Entity GetParent() const;
 		void SetParent(Entity parent);
 	private:
 		entt::entity m_entityHandle{ entt::null };
