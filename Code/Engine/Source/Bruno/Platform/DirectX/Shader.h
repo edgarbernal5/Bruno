@@ -6,6 +6,7 @@
 
 #include "PipelineStateObject.h"
 #include "Bruno/Core/RTTI.h"
+#include "Bruno/Content/Asset.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -15,9 +16,9 @@ namespace Bruno
 	class ShaderProgram;
 	class RootSignature;
 
-	class Shader : public RTTI
+	class Shader : public Asset
 	{
-		BR_RTTI_DECLARATION(Shader, RTTI);
+		BR_RTTI_DECLARATION(Shader, Asset);
 
 	public:
 		enum class ShaderProgramType : uint8_t

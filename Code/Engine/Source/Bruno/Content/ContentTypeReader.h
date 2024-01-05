@@ -1,11 +1,13 @@
 #pragma once
 
 #include "Bruno/Core/RTTI.h"
+//#include "Asset.h"
 
 namespace Bruno
 {
 	class Game;
 	class ContentReader;
+	class Asset;
 
 	class AbstractContentTypeReader : public RTTI
 	{
@@ -15,7 +17,7 @@ namespace Bruno
 		virtual ~AbstractContentTypeReader() = default;
 
 		RTTI::IdType GetTargetTypeId() const;
-		virtual std::shared_ptr<RTTI> Read(ContentReader& input) = 0;
+		virtual std::shared_ptr<Asset> Read(ContentReader& input) = 0;
 	protected:
 		AbstractContentTypeReader(const RTTI::IdType targetTypeId);
 
@@ -28,7 +30,7 @@ namespace Bruno
 	public:
 		virtual ~ContentTypeReader() = default;
 
-		virtual std::shared_ptr<RTTI> Read(ContentReader& input) override;
+		virtual std::shared_ptr<Asset> Read(ContentReader& input) override;
 
 	protected:
 		ContentTypeReader(const RTTI::IdType targetTypeId);
@@ -43,8 +45,8 @@ namespace Bruno
 	}
 
 	template<typename T>
-	inline std::shared_ptr<RTTI> ContentTypeReader<T>::Read(ContentReader& input)
+	inline std::shared_ptr<Asset> ContentTypeReader<T>::Read(ContentReader& input)
 	{
-		return ReadInternal(input);
+		return std::static_pointer_cast<Asset>(ReadInternal(input));
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Bruno/Core/RTTI.h"
+#include "Bruno/Content/Asset.h"
 #include "Bruno/Platform/DirectX/IndexBuffer.h"
 #include "Bruno/Platform/DirectX/VertexBuffer.h"
 #include "Bruno/Math/Math.h"
@@ -33,9 +34,9 @@ namespace Bruno
 		inline bool IsRoot() const { return Parent == 0xFFFFFFFF; }
 	};
 
-	class Model : public RTTI
+	class Model : public Asset
 	{
-		BR_RTTI_DECLARATION(Model, RTTI);
+		BR_RTTI_DECLARATION(Model, Asset);
 
 	public:
 		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes);

@@ -12,6 +12,6 @@ namespace Bruno
 		ExternalReferenceReader();
 		~ExternalReferenceReader() = default;
 
-		virtual std::shared_ptr<RTTI> Read(ContentReader& input) override;
+		virtual std::shared_ptr<Asset> Read(ContentReader& input) override;
 	};
 }

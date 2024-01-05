@@ -12,7 +12,7 @@ namespace Bruno
 	{
 	}
 
-	std::shared_ptr<RTTI> ExternalReferenceReader::Read(ContentReader& input)
+	std::shared_ptr<Asset> ExternalReferenceReader::Read(ContentReader& input)
 	{
 		return input.ReadExternalReference();
 	}

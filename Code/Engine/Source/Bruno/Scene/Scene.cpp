@@ -1,9 +1,13 @@
 #include "brpch.h"
 #include "Scene.h"
 
+#include "Components.h"
+
 #include "Bruno/Renderer/Model.h"
 #include <Bruno/Renderer/RenderItem.h>
 #include <Bruno/Core/GameTimer.h>
+
+#include "Bruno/Scene/Entity.h"
 
 namespace Bruno
 {
@@ -18,8 +22,30 @@ namespace Bruno
 		}
 	}
 
-	void Scene::AddModel(std::shared_ptr<Model> model)
+	Entity Scene::CreateEntity(const std::string& name)
 	{
+		return CreateEntity({}, name);
+	}
+
+	Entity Scene::CreateEntity(Entity parent, const std::string& name)
+	{
+		auto entity = Entity{ m_registry.create(), this };
+		auto& idComponent = entity.AddComponent<IdComponent>();
+		idComponent.Id = {};
+
+		entity.AddComponent<TransformComponent>();
+		entity.AddComponent<HierarchyComponent>();
+
+		//if (parent)
+		//	entity.SetParent(parent);
+
+		return entity;
+	}
+
+	void Scene::InstantiateModel(std::shared_ptr<Model> model)
+	{
+
+
 		auto& meshes = model->GetMeshes();
 		for (auto& mesh : meshes)
 		{

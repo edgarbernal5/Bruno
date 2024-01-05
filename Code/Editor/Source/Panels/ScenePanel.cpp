@@ -400,7 +400,7 @@ namespace Bruno
 		m_model = manager.Load<Model>(L"Models\\Car\\Car.fbx");
 
 		m_scene = std::make_shared<Scene>(m_camera);
-		m_scene->AddModel(m_model);
+		m_scene->InstantiateModel(m_model);
 		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
 	}
 

@@ -324,9 +324,19 @@
     <ClInclude Include="Source\Bruno\Scene\Entity.h">
       <Filter>Source\Bruno\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Components.h">
+    <ClInclude Include="Source\Bruno\Scene\Components.h">
       <Filter>Source\Bruno\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\Asset.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\AssetMetadata.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\UUID.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Scene\EntityExtensions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -511,6 +521,15 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\PipelineStateObjectCache.cpp">
       <Filter>Source\Bruno\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\Asset.cpp">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\UUID.cpp">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Scene\Entity.cpp">
+      <Filter>Source\Bruno\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

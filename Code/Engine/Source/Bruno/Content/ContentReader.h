@@ -12,6 +12,7 @@ namespace Bruno
 {
 	class ContentManager;
 	class MemoryStream;
+	class Asset;
 
 	class ContentReader
 	{
@@ -19,10 +20,10 @@ namespace Bruno
 		ContentReader(ContentManager* contentManager, Stream& stream, const std::wstring& assetName);
 		~ContentReader();
 
-		std::shared_ptr<RTTI> ReadAsset();
+		std::shared_ptr<Asset> ReadAsset();
 
 		void ReadChar(char& output);
-		std::shared_ptr<RTTI> ReadExternalReference();
+		std::shared_ptr<Asset> ReadExternalReference();
 		void ReadInt32(int32_t &output);
 		void ReadInt64(int64_t &output);
 		void ReadUInt8(uint8_t& output);
@@ -39,9 +40,9 @@ namespace Bruno
 		void ReadBoundingBox(Math::BoundingBox& output);
 
 	private:
-		void ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action);
+		void ReadSharedResource(std::function<void(std::shared_ptr<Asset>)> action);
 		uint32_t ReadHeader();
-		std::shared_ptr<RTTI> ReadObject();
+		std::shared_ptr<Asset> ReadObject();
 
 		ContentManager* m_contentManager;
 		Stream& m_stream;
@@ -50,8 +51,7 @@ namespace Bruno
 
 		std::wstring m_assetName;
 		std::vector<AbstractContentTypeReader*> m_readers;
-		std::vector<std::vector<std::function<void(std::shared_ptr<RTTI>)> > > m_sharedResourceFixups;
-
+		std::vector<std::vector<std::function<void(std::shared_ptr<Asset>)> > > m_sharedResourceFixups;
 	};
 }
 

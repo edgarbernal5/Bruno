@@ -1,10 +1,12 @@
 #pragma once
 
 #include <map>
-#include "Bruno/Core/RTTI.h"
+#include "Asset.h"
 
 namespace Bruno
 {
+	//class Asset;
+
 	class ContentManager
 	{
 	public:
@@ -13,10 +15,10 @@ namespace Bruno
 		template <typename T>
 		std::shared_ptr<T> Load(const std::wstring& assetName, bool forceReload = false);
 	private:
-		std::shared_ptr<RTTI> ReadAsset(const std::wstring& assetName);
+		std::shared_ptr<Asset> ReadAsset(const std::wstring& assetName);
 
 		std::wstring m_rootDirectory;
-		std::map<std::wstring, std::shared_ptr<RTTI>> m_loadedAssets;
+		std::map<std::wstring, std::shared_ptr<Asset>> m_loadedAssets;
 
 		static const std::wstring DefaultRootDirectory;
 	};
@@ -35,6 +37,8 @@ namespace Bruno
 
 		std::filesystem::path assetPath = m_rootDirectory;
 		assetPath /= assetName;
+
+		//TODO: AssetMetadata. Separar content manager en runtime y editor
 
 		auto asset = ReadAsset(assetPath);
 		m_loadedAssets[assetName] = asset;

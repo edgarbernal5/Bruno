@@ -1,12 +1,11 @@
 #pragma once
 
 #include "Bruno/Math/Math.h"
+#include "Bruno/Core/UUID.h"
 #include <vector>
 
 namespace Bruno
 {
-	using UUID = uint64_t;
-
 	struct IdComponent
 	{
 		UUID Id{ 0 };

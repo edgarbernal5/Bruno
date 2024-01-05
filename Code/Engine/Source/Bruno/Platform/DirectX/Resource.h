@@ -3,6 +3,7 @@
 #include <d3d12.h>
 #include "D3DConstants.h"
 #include "Bruno/Core/RTTI.h"
+#include "Bruno/Content/Asset.h"
 
 namespace D3D12MA
 {
@@ -18,9 +19,9 @@ namespace Bruno
 		Texture
 	};
 
-	class Resource : public RTTI
+	class Resource : public Asset
 	{
-		BR_RTTI_DECLARATION(Resource, RTTI);
+		BR_RTTI_DECLARATION(Resource, Asset);
 
 	public:
 		virtual ~Resource();

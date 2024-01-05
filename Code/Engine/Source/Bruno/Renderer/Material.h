@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Bruno/Core/RTTI.h"
+#include "Bruno/Content/Asset.h"
 #include <string>
 #include <map>
 
@@ -9,9 +9,9 @@ namespace Bruno
 {
 	class Texture;
 
-	class Material : public RTTI
+	class Material : public Asset
 	{
-		BR_RTTI_DECLARATION(Material, RTTI);
+		BR_RTTI_DECLARATION(Material, Asset);
 
 	public:
 		std::string Name;

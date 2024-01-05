@@ -14,7 +14,7 @@ namespace Bruno
 	{
 	}
 
-	std::shared_ptr<RTTI> ContentManager::ReadAsset(const std::wstring& assetName)
+	std::shared_ptr<Asset> ContentManager::ReadAsset(const std::wstring& assetName)
 	{
 		std::filesystem::path cleanPath(m_rootDirectory);
 		cleanPath /= assetName + L".bruno";

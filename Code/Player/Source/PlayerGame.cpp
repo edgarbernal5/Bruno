@@ -216,7 +216,7 @@ namespace Bruno
 		ContentManager manager(m_applicationParameters.WorkingDirectory);
 		auto model = manager.Load<Model>(L"Models\\Car\\Car.fbx");
 
-		m_scene->AddModel(model);
+		m_scene->InstantiateModel(model);
 
 		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
 	}

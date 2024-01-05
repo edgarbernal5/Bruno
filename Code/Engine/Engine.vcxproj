@@ -98,7 +98,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Components.h" />
+    <ClInclude Include="Source\Bruno\Core\UUID.h" />
+    <ClInclude Include="Source\Bruno\Scene\Components.h" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
     <ClInclude Include="Dependencies\d3dx12\d3dx12.h" />
     <ClInclude Include="Dependencies\d3dx12\d3dx12_barriers.h" />
@@ -114,6 +115,8 @@
     <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h" />
     <ClInclude Include="Dependencies\zlib\include\zconf.h" />
     <ClInclude Include="Dependencies\zlib\include\zlib.h" />
+    <ClInclude Include="Source\Bruno\Content\Asset.h" />
+    <ClInclude Include="Source\Bruno\Content\AssetMetadata.h" />
     <ClInclude Include="Source\Bruno\Renderer\PipelineStateObjectCache.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\RenderObjectBinding.h" />
     <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoConfig.h" />
@@ -187,11 +190,14 @@
     <ClInclude Include="Source\Bruno\Renderer\SceneRenderer.h" />
     <ClInclude Include="Source\Bruno\Renderer\ShaderCache.h" />
     <ClInclude Include="Source\Bruno\Scene\Entity.h" />
+    <ClInclude Include="Source\Bruno\Scene\EntityExtensions.h" />
     <ClInclude Include="Source\Bruno\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp" />
     <ClCompile Include="Dependencies\SimpleMath\SimpleMath.cpp" />
+    <ClCompile Include="Source\Bruno\Content\Asset.cpp" />
+    <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\PipelineStateObjectCache.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
@@ -253,6 +259,7 @@
     <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\SceneRenderer.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\ShaderCache.cpp" />
+    <ClCompile Include="Source\Bruno\Scene\Entity.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>

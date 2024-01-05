@@ -1,7 +1,6 @@
 #pragma once
 
-
-#include <entt/entt.hpp>
+#include "Entity.h"
 
 #include <vector>
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
@@ -13,6 +12,7 @@ namespace Bruno
 	class GameTimer;
 	class Model;
 	struct RenderItem;
+	class Entity;
 
 	struct Transformable {
 		Math::Vector3 Position;
@@ -28,7 +28,9 @@ namespace Bruno
 	public:
 		Scene(Camera& camera);
 
-		void AddModel(std::shared_ptr<Model> model);
+		Entity CreateEntity(const std::string& name = "Empty-name");
+		Entity CreateEntity(Entity parent, const std::string& name);
+		void InstantiateModel(std::shared_ptr<Model> model);
 		const std::vector<std::shared_ptr<RenderItem>>& GetRenderItems() { return m_renderItems; }
 		void OnUpdate(const GameTimer& timer);
 
@@ -53,3 +55,4 @@ namespace Bruno
 	};
 }
 
+#include "EntityExtensions.h"

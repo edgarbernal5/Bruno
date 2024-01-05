@@ -1,6 +1,7 @@
 #include "brpch.h"
 #include "ContentReader.h"
 
+#include "Asset.h"
 #include "ContentManager.h"
 #include "ContentTypeReaderManager.h"
 #include "Bruno/Core/MemoryStream.h"
@@ -63,7 +64,7 @@ namespace Bruno
         }
     }
 
-    std::shared_ptr<RTTI> ContentReader::ReadAsset()
+    std::shared_ptr<Asset> ContentReader::ReadAsset()
     {
         uint32_t sharedResourceCount = ReadHeader();
         auto object = ReadObject();
@@ -77,7 +78,7 @@ namespace Bruno
         m_currentStream->ReadRaw<char>(output);
     }
 
-    std::shared_ptr<RTTI> ContentReader::ReadExternalReference()
+    std::shared_ptr<Asset> ContentReader::ReadExternalReference()
     {
         std::wstring referenceName;
         ReadWString(referenceName);
@@ -96,7 +97,7 @@ namespace Bruno
         std::filesystem::path cleanPath(path);
         cleanPath /= referenceName;
 
-        return m_contentManager->Load<RTTI>(cleanPath);
+        return m_contentManager->Load<Asset>(cleanPath);
     }
 
     void ContentReader::ReadInt32(int32_t& output)
@@ -143,7 +144,7 @@ namespace Bruno
     {
         if (sharedResourceCount > 0)
         {
-            std::vector<std::shared_ptr<RTTI>> objects(sharedResourceCount, nullptr);
+            std::vector<std::shared_ptr<Asset>> objects(sharedResourceCount, nullptr);
             for (uint32_t i = 0; i < sharedResourceCount; i++)
             {
                 objects[i] = ReadObject();
@@ -190,7 +191,7 @@ namespace Bruno
         output.Extents = extents;
     }
 
-    void ContentReader::ReadSharedResource(std::function<void(std::shared_ptr<RTTI>)> action)
+    void ContentReader::ReadSharedResource(std::function<void(std::shared_ptr<Asset>)> action)
     {
         uint32_t index;
         ReadUInt32(index);
@@ -231,7 +232,7 @@ namespace Bruno
         return sharedResources;
     }
 
-    std::shared_ptr<RTTI> ContentReader::ReadObject()
+    std::shared_ptr<Asset> ContentReader::ReadObject()
     {
         int readerIndex;
         ReadInt32(readerIndex);
