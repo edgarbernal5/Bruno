@@ -11,3 +11,4 @@
 
 // --- Scenes
 #include "Bruno/Scene/Scene.h"
+#include "Bruno/Scene/Components.h"

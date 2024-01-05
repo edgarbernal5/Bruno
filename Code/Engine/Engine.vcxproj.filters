@@ -336,7 +336,9 @@
     <ClInclude Include="Source\Bruno\Core\UUID.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Scene\EntityExtensions.h" />
+    <ClInclude Include="Source\Bruno\Scene\Entity.inl">
+      <Filter>Source\Bruno\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">

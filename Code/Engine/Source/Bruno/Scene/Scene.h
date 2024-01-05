@@ -12,7 +12,6 @@ namespace Bruno
 	class GameTimer;
 	class Model;
 	struct RenderItem;
-	class Entity;
 
 	struct Transformable {
 		Math::Vector3 Position;
@@ -55,4 +54,4 @@ namespace Bruno
 	};
 }
 
-#include "EntityExtensions.h"
+#include "Entity.inl"

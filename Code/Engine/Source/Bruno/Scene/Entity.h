@@ -13,7 +13,7 @@ namespace Bruno
 		Entity(entt::entity handle, Scene* scene) : m_entityHandle(handle), m_scene(scene){}
 		~Entity() {}
 
-		//operator bool() const;
+		operator bool() const;
 		
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args);

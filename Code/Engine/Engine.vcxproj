@@ -190,7 +190,7 @@
     <ClInclude Include="Source\Bruno\Renderer\SceneRenderer.h" />
     <ClInclude Include="Source\Bruno\Renderer\ShaderCache.h" />
     <ClInclude Include="Source\Bruno\Scene\Entity.h" />
-    <ClInclude Include="Source\Bruno\Scene\EntityExtensions.h" />
+    <ClInclude Include="Source\Bruno\Scene\Entity.inl" />
     <ClInclude Include="Source\Bruno\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
