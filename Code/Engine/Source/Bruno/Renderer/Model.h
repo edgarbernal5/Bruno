@@ -49,6 +49,9 @@ namespace Bruno
 
 		const std::vector<std::shared_ptr<Mesh>>& GetMeshes() { return m_meshes; }
 		std::shared_ptr<Material>& GetMaterial(uint32_t materialIndex);
+
+		const ModelNode& GetRootNode() const { return m_modelNodes[0]; }
+		const std::vector<ModelNode>& GetNodes() const { return m_modelNodes; }
 	
 	private:
 		std::vector<std::shared_ptr<Material>> m_materials;

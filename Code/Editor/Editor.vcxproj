@@ -93,12 +93,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Panels\SceneHierarchyPanel.cpp" />
     <ClCompile Include="Source\EditorGame.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Panels\ScenePanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\EditorGame.h" />
+    <ClInclude Include="Source\Panels\SceneHierarchyPanel.h" />
     <ClInclude Include="Source\Panels\ScenePanel.h" />
   </ItemGroup>
   <ItemGroup>

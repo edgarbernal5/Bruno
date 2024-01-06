@@ -48,7 +48,8 @@ namespace Bruno
 
 	void Scene::InstantiateModel(std::shared_ptr<Model> model)
 	{
-
+		Entity rootEntity = CreateEntity("Mesh test");
+		CreateModelEntityHierarchy(rootEntity, model, model->GetRootNode());
 
 		auto& meshes = model->GetMeshes();
 		for (auto& mesh : meshes)
@@ -81,5 +82,49 @@ namespace Bruno
 
 		uint32_t frameIndex = device->GetFrameId();
 		m_objectBuffer[frameIndex]->SetMappedData(objectBuffer);
+	}
+
+	Entity Scene::TryGetEntityWithUUID(UUID id) const
+	{
+		auto it = m_entityIdMap.find(id);
+		if (it != m_entityIdMap.end())
+			return it->second;
+
+		return Entity{};
+	}
+
+	void Scene::CreateModelEntityHierarchy(Entity parent, std::shared_ptr<Model> model, const ModelNode& node)
+	{
+		const auto& nodes = model->GetNodes();
+
+		if (node.IsRoot() && node.Meshes.size() == 0)
+		{
+			for (uint32_t child : node.Children)
+				CreateModelEntityHierarchy(parent, model, nodes[child]);
+
+			return;
+		}
+		Entity nodeEntity = CreateEntity(parent, node.Name);
+		//nodeEntity.Transform().SetTransform(node.LocalTransform);
+
+		if (node.Meshes.size() == 1)
+		{
+			uint32_t submeshIndex = node.Meshes[0];
+			auto& mc = nodeEntity.AddComponent<ModelComponent>(model->Handle(), submeshIndex);
+
+		}
+		else if (node.Meshes.size() > 1)
+		{
+			for (size_t i = 0; i < node.Meshes.size(); i++)
+			{
+				uint32_t submeshIndex = node.Meshes[i]; 
+
+				Entity childEntity = CreateEntity(nodeEntity, node.Name);
+				childEntity.AddComponent<ModelComponent>(model->Handle(), submeshIndex);
+
+			}
+		}
+		for (uint32_t child : node.Children)
+			CreateModelEntityHierarchy(nodeEntity, model, nodes[child]);
 	}
 }

@@ -10,6 +10,9 @@
     <ClCompile Include="Source\Panels\ScenePanel.cpp">
       <Filter>Source\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Panels\SceneHierarchyPanel.cpp">
+      <Filter>Source\Panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -24,6 +27,9 @@
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\Panels\ScenePanel.h">
+      <Filter>Source\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\SceneHierarchyPanel.h">
       <Filter>Source\Panels</Filter>
     </ClInclude>
   </ItemGroup>

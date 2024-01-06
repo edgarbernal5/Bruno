@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Components.h"
 #include <entt/entt.hpp>
 
 namespace Bruno
@@ -30,7 +31,12 @@ namespace Bruno
 		template<typename... T>
 		bool HasComponent() const;
 
+		std::vector<UUID>& GetChildren();
+		UUID GetUUID() const;
 		Entity GetParent() const;
+		UUID GetParentUUID() const;
+		void SetParentUUID(UUID parent);
+		bool RemoveChild(Entity child);
 		void SetParent(Entity parent);
 	private:
 		entt::entity m_entityHandle{ entt::null };

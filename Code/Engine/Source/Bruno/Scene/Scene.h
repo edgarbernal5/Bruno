@@ -11,6 +11,7 @@ namespace Bruno
 	class Camera;
 	class GameTimer;
 	class Model;
+	struct ModelNode;
 	struct RenderItem;
 
 	struct Transformable {
@@ -33,11 +34,21 @@ namespace Bruno
 		const std::vector<std::shared_ptr<RenderItem>>& GetRenderItems() { return m_renderItems; }
 		void OnUpdate(const GameTimer& timer);
 
+		template<typename... Components>
+		auto GetAllEntitiesWith()
+		{
+			return m_registry.view<Components...>();
+		}
+
+		Entity TryGetEntityWithUUID(UUID id) const;
+
 		friend class SceneRenderer;
 		friend class ObjectSelector;
 		friend class Entity;
 
 	private:
+		void CreateModelEntityHierarchy(Entity parent, std::shared_ptr<Model> model, const ModelNode& node);
+
 		entt::registry m_registry;
 		entt::entity m_sceneEntity{ entt::null };
 		std::unordered_map<UUID, Entity> m_entityIdMap;

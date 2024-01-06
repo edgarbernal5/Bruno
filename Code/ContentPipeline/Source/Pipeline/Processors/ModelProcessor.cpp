@@ -82,6 +82,7 @@ namespace Bruno
 
 		std::vector<std::shared_ptr<ModelNodeContentItem>> modelNodes;
 		auto rootNode = std::make_shared<ModelNodeContentItem>();
+		rootNode->Parent = 0xFFFFFFFF;
 		modelNodes.emplace_back(rootNode);
 		ProcessNode(aiScene->mRootNode, 0, modelNodes, meshes, Math::Matrix::Identity);
 

@@ -24,6 +24,8 @@ namespace Bruno
 			return !(*this == other);
 		}
 
+		AssetHandle Handle() const { return m_assetHandle; }
+
 	private:
 		AssetHandle m_assetHandle{ 0 };
 	};
