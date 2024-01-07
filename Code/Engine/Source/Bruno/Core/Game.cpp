@@ -16,7 +16,8 @@
 namespace Bruno
 {
 	Game::Game(const ApplicationParameters& parameters) :
-		Application(parameters)
+		Application(parameters),
+		m_contentManager(parameters.WorkingDirectory)
 	{
 #if BR_DEBUG
 		Device::Core::EnableDebugLayer();

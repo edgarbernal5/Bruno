@@ -9,6 +9,6 @@ namespace Bruno
 		BR_RTTI_DECLARATION(ContentItem, RTTI);
 
 	public:
-		~ContentItem() = default;
+		virtual ~ContentItem() = default;
 	};
 }

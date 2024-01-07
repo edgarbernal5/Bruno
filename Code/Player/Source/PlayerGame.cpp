@@ -211,7 +211,7 @@ namespace Bruno
 
 	void PlayerGame::InitializeMeshAndTexture()
 	{
-		m_scene = std::make_shared<Scene>(m_camera);
+		m_scene = std::make_shared<Scene>();
 
 		ContentManager manager(m_applicationParameters.WorkingDirectory);
 		auto model = manager.Load<Model>(L"Models\\Car\\Car.fbx");
@@ -266,6 +266,6 @@ namespace Bruno
 
 	void PlayerGame::UpdateCBs(const GameTimer& timer)
 	{
-		m_scene->OnUpdate(timer);
+		m_scene->OnUpdate(timer, m_camera);
 	}
 }

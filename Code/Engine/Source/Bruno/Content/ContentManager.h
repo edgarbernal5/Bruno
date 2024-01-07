@@ -5,8 +5,6 @@
 
 namespace Bruno
 {
-	//class Asset;
-
 	class ContentManager
 	{
 	public:

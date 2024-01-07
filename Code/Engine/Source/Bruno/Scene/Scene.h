@@ -4,7 +4,7 @@
 
 #include <vector>
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
-#include <Bruno/Renderer/Camera.h>
+#include "Bruno/Renderer/Camera.h"
 
 namespace Bruno
 {
@@ -14,7 +14,8 @@ namespace Bruno
 	struct ModelNode;
 	struct RenderItem;
 
-	struct Transformable {
+	struct Transformable
+	{
 		Math::Vector3 Position;
 		Math::Quaternion Rotation;
 		Math::Vector3 Scale;
@@ -23,16 +24,22 @@ namespace Bruno
 		Transformable() :Scale(Math::Vector3::One * 1.0f) {}
 	};
 
+	enum class ActionMode
+	{
+		Add,
+		Delete,
+		Modify
+	};
+	using SceneHierarchyChangeCallback = std::function<void(Entity&, ActionMode)>;
+
 	class Scene
 	{
 	public:
-		Scene(Camera& camera);
+		Scene();
 
-		Entity CreateEntity(const std::string& name = "Empty-name");
+		Entity CreateEntity(const std::string& name = "Unnamed");
 		Entity CreateEntity(Entity parent, const std::string& name);
-		void InstantiateModel(std::shared_ptr<Model> model);
-		const std::vector<std::shared_ptr<RenderItem>>& GetRenderItems() { return m_renderItems; }
-		void OnUpdate(const GameTimer& timer);
+		Entity InstantiateModel(std::shared_ptr<Model> model);
 
 		template<typename... Components>
 		auto GetAllEntitiesWith()
@@ -41,6 +48,11 @@ namespace Bruno
 		}
 
 		Entity TryGetEntityWithUUID(UUID id) const;
+
+		const std::vector<std::shared_ptr<RenderItem>>& GetRenderItems() { return m_renderItems; }
+		void OnUpdate(const GameTimer& timer, Camera& camera);
+
+		void SetHierarchyChangeCallback(SceneHierarchyChangeCallback callback);
 
 		friend class SceneRenderer;
 		friend class ObjectSelector;
@@ -53,7 +65,8 @@ namespace Bruno
 		entt::entity m_sceneEntity{ entt::null };
 		std::unordered_map<UUID, Entity> m_entityIdMap;
 
-		Camera& m_camera;
+		SceneHierarchyChangeCallback m_hierarchyChangeCallback;
+		
 		std::vector<std::shared_ptr<Model>>			m_models;
 		std::vector<std::shared_ptr<RenderItem>>	m_renderItems;
 

@@ -5,6 +5,7 @@
 #include "Bruno/Core/GameTimer.h"
 #include "Bruno/Renderer/ShaderCache.h"
 #include "Bruno/Renderer/PipelineStateObjectCache.h"
+#include "Bruno/Content/ContentManager.h"
 
 #include "Bruno/Core/KeyCodes.h"
 
@@ -43,6 +44,7 @@ namespace Bruno
 		virtual void OnResizeMoveFinished() override;
 
 		GameTimer m_timer;
+		ContentManager m_contentManager;
 		std::shared_ptr<GraphicsDevice> m_device;
 		ShaderCache m_shaderCache;
 		PipelineStateObjectCache m_psoCache;
@@ -52,7 +54,6 @@ namespace Bruno
 		float m_elapsedTime = 0.0f;
 	private:
 		bool m_gamePaused = false;
-
 	};
 
 }
@@ -63,6 +64,7 @@ namespace Bruno::Graphics
 	{
 		return Game::GetInstance()->GetShaderCache();
 	}
+
 	inline PipelineStateObjectCache& GetPsoCache()
 	{
 		return Game::GetInstance()->GetPsoCache();

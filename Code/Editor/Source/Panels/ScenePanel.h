@@ -33,7 +33,7 @@ namespace Bruno
 	class ScenePanel : public nana::nested_form
 	{
 	public:
-		ScenePanel(nana::window window, EditorGame* editorGame, DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D32_FLOAT);
+		ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<Scene> scene, DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D32_FLOAT);
 		~ScenePanel();
 
 		void OnUpdate(const GameTimer& timer);
@@ -59,7 +59,6 @@ namespace Bruno
 		std::shared_ptr<Scene>			m_scene;
 		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
 
-
 		std::shared_ptr<Model> m_model;
 		
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
@@ -68,7 +67,6 @@ namespace Bruno
 
 		std::shared_ptr<ObjectSelector>	m_objectSelector;
 		std::unique_ptr<GizmoService>	m_gizmoService;
-
 
 		Camera m_camera;
 

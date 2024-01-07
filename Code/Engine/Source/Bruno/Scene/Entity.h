@@ -11,10 +11,21 @@ namespace Bruno
 	{
 	public:
 		Entity() = default;
-		Entity(entt::entity handle, Scene* scene) : m_entityHandle(handle), m_scene(scene){}
-		~Entity() {}
+		Entity(entt::entity handle, Scene* scene) : m_entityHandle(handle), m_scene(scene) { }
+		~Entity() = default;
 
+		operator uint32_t () const { return (uint32_t)m_entityHandle; }
 		operator bool() const;
+
+		bool operator==(const Entity& other) const
+		{
+			return m_entityHandle == other.m_entityHandle && m_scene == other.m_scene;
+		}
+
+		bool operator!=(const Entity& other) const
+		{
+			return !(*this == other);
+		}
 		
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args);
@@ -38,6 +49,7 @@ namespace Bruno
 		void SetParentUUID(UUID parent);
 		bool RemoveChild(Entity child);
 		void SetParent(Entity parent);
+
 	private:
 		entt::entity m_entityHandle{ entt::null };
 		Scene* m_scene{ nullptr };

@@ -11,8 +11,7 @@
 
 namespace Bruno
 {
-	Scene::Scene(Camera& camera) :
-		m_camera(camera)
+	Scene::Scene()
 	{
 		m_sceneEntity = m_registry.create();
 
@@ -35,6 +34,7 @@ namespace Bruno
 
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<HierarchyComponent>();
+		entity.AddComponent<NameComponent>().Name = name;
 
 		if (parent)
 		{
@@ -46,10 +46,15 @@ namespace Bruno
 		return entity;
 	}
 
-	void Scene::InstantiateModel(std::shared_ptr<Model> model)
+	Entity Scene::InstantiateModel(std::shared_ptr<Model> model)
 	{
 		Entity rootEntity = CreateEntity("Mesh test");
 		CreateModelEntityHierarchy(rootEntity, model, model->GetRootNode());
+
+		if (m_hierarchyChangeCallback)
+		{
+			m_hierarchyChangeCallback(rootEntity, ActionMode::Add);
+		}
 
 		auto& meshes = model->GetMeshes();
 		for (auto& mesh : meshes)
@@ -66,22 +71,29 @@ namespace Bruno
 		m_transformableObjects.push_back(std::make_shared<Transformable>());
 
 		m_models.push_back(model);
+
+		return rootEntity;
 	}
 
-	void Scene::OnUpdate(const GameTimer& timer)
+	void Scene::OnUpdate(const GameTimer& timer, Camera& camera)
 	{
 		auto device = Graphics::GetDevice();
 		auto& objectSelected = m_transformableObjects[0];
 		auto world = Math::Matrix::CreateScale(objectSelected->Scale) * Math::Matrix::CreateFromQuaternion(objectSelected->Rotation) * Math::Matrix::CreateTranslation(objectSelected->Position);
 		objectSelected->WorldTransform = world;
 
-		Math::Matrix mvpMatrix = world * m_camera.GetViewProjection();
+		Math::Matrix mvpMatrix = world * camera.GetViewProjection();
 
 		ObjectBuffer objectBuffer;
 		objectBuffer.World = mvpMatrix;
 
 		uint32_t frameIndex = device->GetFrameId();
 		m_objectBuffer[frameIndex]->SetMappedData(objectBuffer);
+	}
+
+	void Scene::SetHierarchyChangeCallback(SceneHierarchyChangeCallback callback)
+	{
+		m_hierarchyChangeCallback = callback;
 	}
 
 	Entity Scene::TryGetEntityWithUUID(UUID id) const
@@ -100,7 +112,9 @@ namespace Bruno
 		if (node.IsRoot() && node.Meshes.size() == 0)
 		{
 			for (uint32_t child : node.Children)
+			{
 				CreateModelEntityHierarchy(parent, model, nodes[child]);
+			}
 
 			return;
 		}
@@ -111,7 +125,6 @@ namespace Bruno
 		{
 			uint32_t submeshIndex = node.Meshes[0];
 			auto& mc = nodeEntity.AddComponent<ModelComponent>(model->Handle(), submeshIndex);
-
 		}
 		else if (node.Meshes.size() > 1)
 		{
@@ -121,10 +134,12 @@ namespace Bruno
 
 				Entity childEntity = CreateEntity(nodeEntity, node.Name);
 				childEntity.AddComponent<ModelComponent>(model->Handle(), submeshIndex);
-
 			}
 		}
+
 		for (uint32_t child : node.Children)
+		{
 			CreateModelEntityHierarchy(nodeEntity, model, nodes[child]);
+		}
 	}
 }

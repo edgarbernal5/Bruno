@@ -2,7 +2,10 @@
 
 #include "Bruno/Platform/Windows/NanaWindow.h"
 #include "Panels/ScenePanel.h"
-#include <Bruno/Content/ContentTypeReaderManager.h>
+#include "Panels/SceneHierarchyPanel.h"
+#include "Bruno/Renderer/Model.h"
+#include "Bruno/Scene/Scene.h"
+#include "Bruno/Content/ContentTypeReaderManager.h"
 #include <nana/gui/widgets/button.hpp>
 
 namespace Bruno
@@ -80,7 +83,9 @@ namespace Bruno
 
 		auto it = std::find(m_scenePanels.begin(), m_scenePanels.end(), panel);
 		if (it != m_scenePanels.end())
+		{
 			m_scenePanels.erase(it);
+		}
 	}
 
 	//void EditorGame::InitializeUI()
@@ -155,10 +160,9 @@ namespace Bruno
 		{
 			if (panelIdxx % 2 == 0) {
 				auto panel = m_place.add_pane<nana::button>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, std::string("A new pane is created."));
-
 			}
 			else {
-				auto panel = m_place.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
+				//auto panel = m_place.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
 
 			}
 			//auto panel = m_dockPlace.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
@@ -178,8 +182,14 @@ namespace Bruno
 			m_place.enable_print_debug(!m_place.is_enabled_print_debug());
 		});
 
-		//auto panel = m_dockPlace.add_pane<nana::button>("pane1", "Scene main", "", nana::dock_position::right, std::string("This is the main scene\nEnjoy!"));
-		auto panel = m_place.add_pane<ScenePanel>("pane1", "", nana::dock_position::right, this);
+		auto scene = std::make_shared<Scene>();
+		
+		auto scenePanel = m_place.add_pane<ScenePanel>("pane1", "", nana::dock_position::right, this, scene);
+		auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane2", "pane1", nana::dock_position::right, scene);
+
+		auto model = m_contentManager.Load<Model>(L"Models\\Car\\Car.fbx");
+
+		scene->InstantiateModel(model);
 
 		m_place.collocate();
 
@@ -191,7 +201,7 @@ namespace Bruno
 					auto panel = m_place.add_pane<nana::button>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : (panelIdxx == 2 ? "pane4" : "pane5")), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, std::string("A new pane is created."));
 				}
 				else {
-					auto panel = m_place.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : (panelIdxx == 2 ? "pane4" : "pane5")), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
+					//auto panel = m_place.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : (panelIdxx == 2 ? "pane4" : "pane5")), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
 				}
 				//auto panel = m_dockPlace.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
 				m_place.collocate();

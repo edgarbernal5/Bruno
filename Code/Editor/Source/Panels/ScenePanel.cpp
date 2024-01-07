@@ -21,10 +21,11 @@
 
 namespace Bruno
 {
-	ScenePanel::ScenePanel(nana::window window, EditorGame* editorGame, DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat) :
+	ScenePanel::ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<Scene> scene, DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat) :
 		nana::nested_form(window, nana::appear::bald<>()),
 		//nana::panel<true>(window),
 		m_backBufferFormat(backBufferFormat),
+		m_scene(scene),
 		m_depthBufferFormat(depthBufferFormat),
 
 		m_editorGame(editorGame)
@@ -377,13 +378,17 @@ namespace Bruno
 				float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
 				auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale * uniformDelta;
 				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+				{
 					m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
+				}
 
 				return;
 			}
 			auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale + newDelta;
 			if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+			{
 				m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
+			}
 		});
 	}
 
@@ -395,17 +400,11 @@ namespace Bruno
 
 	void ScenePanel::InitializeMeshAndTexture()
 	{
-		ContentManager manager(m_editorGame->m_applicationParameters.WorkingDirectory);
-
-		m_model = manager.Load<Model>(L"Models\\Car\\Car.fbx");
-
-		m_scene = std::make_shared<Scene>(m_camera);
-		m_scene->InstantiateModel(m_model);
 		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
 	{
-		m_scene->OnUpdate(timer);
+		m_scene->OnUpdate(timer, m_camera);
 	}
 }

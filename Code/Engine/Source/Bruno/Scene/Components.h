@@ -3,12 +3,21 @@
 #include "Bruno/Math/Math.h"
 #include "Bruno/Core/UUID.h"
 #include <vector>
+#include <string>
 
 namespace Bruno
 {
 	struct IdComponent
 	{
 		UUID Id{ 0 };
+	};
+
+	struct NameComponent
+	{
+		std::string Name;
+		NameComponent() = default;
+		NameComponent(const NameComponent& other) = default;
+		NameComponent(std::string name) : Name(name) { }
 	};
 
 	struct HierarchyComponent

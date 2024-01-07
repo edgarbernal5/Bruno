@@ -58,7 +58,8 @@ namespace Bruno
 		graphicsContext->SetPipeline(pipeline);
 
 		VertexBuffer* currentVB = nullptr;
-		for (auto& item : m_scene->GetRenderItems()) {
+		for (auto& item : m_scene->GetRenderItems())
+		{
 			auto texture = item->Material->TexturesByName["Texture"];
 			if (texture != nullptr && texture->IsReady())
 			{
