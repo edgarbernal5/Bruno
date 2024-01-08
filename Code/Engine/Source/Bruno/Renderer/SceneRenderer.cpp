@@ -58,7 +58,13 @@ namespace Bruno
 		graphicsContext->SetPipeline(pipeline);
 
 		VertexBuffer* currentVB = nullptr;
-		for (auto& item : m_scene->GetRenderItems())
+		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
+		for (auto& ent : entities)
+		{
+			auto [transformComponent, meshComponent] = entities.get<TransformComponent, ModelComponent>(ent);
+			//Entity entity = { ent, m_scene.get() };
+		}
+		/*for (auto& item : m_scene->GetRenderItems())
 		{
 			auto texture = item->Material->TexturesByName["Texture"];
 			if (texture != nullptr && texture->IsReady())
@@ -89,6 +95,6 @@ namespace Bruno
 					item->BaseVertexLocation,
 					0);
 			}
-		}
+		}*/
 	}
 }

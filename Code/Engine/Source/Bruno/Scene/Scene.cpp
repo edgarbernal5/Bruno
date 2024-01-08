@@ -119,7 +119,7 @@ namespace Bruno
 			return;
 		}
 		Entity nodeEntity = CreateEntity(parent, node.Name);
-		//nodeEntity.Transform().SetTransform(node.LocalTransform);
+		nodeEntity.GetComponent<TransformComponent>().SetTransform(node.LocalTransform);
 
 		if (node.Meshes.size() == 1)
 		{

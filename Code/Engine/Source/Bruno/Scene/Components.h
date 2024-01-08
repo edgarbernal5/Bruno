@@ -2,6 +2,7 @@
 
 #include "Bruno/Math/Math.h"
 #include "Bruno/Core/UUID.h"
+#include "Bruno/Renderer/MaterialMap.h"
 #include <vector>
 #include <string>
 
@@ -15,6 +16,7 @@ namespace Bruno
 	struct NameComponent
 	{
 		std::string Name;
+
 		NameComponent() = default;
 		NameComponent(const NameComponent& other) = default;
 		NameComponent(std::string name) : Name(name) { }
@@ -38,11 +40,18 @@ namespace Bruno
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
+
+		void SetTransform(const Math::Matrix& transform)
+		{
+			Math::Matrix matrix = transform;
+			matrix.Decompose(Scale, Rotation, Position);
+		}
 	};
 
 	struct ModelComponent
 	{
 		UUID ModelHandle;
 		uint32_t SubmeshIndex{ 0 };
+		MaterialMap Materials;
 	};
 }

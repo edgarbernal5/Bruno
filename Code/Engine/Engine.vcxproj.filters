@@ -339,6 +339,9 @@
     <ClInclude Include="Source\Bruno\Scene\Entity.inl">
       <Filter>Source\Bruno\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -532,6 +535,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Scene\Entity.cpp">
       <Filter>Source\Bruno\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp">
+      <Filter>Source\Bruno\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

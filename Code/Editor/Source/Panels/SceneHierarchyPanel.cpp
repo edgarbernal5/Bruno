@@ -19,7 +19,13 @@ namespace Bruno
 		m_place["tree"] << m_treebox;
 		m_place.collocate();
 
-		scene->SetHierarchyChangeCallback([&](Entity& entity, ActionMode actionMode) {
+		m_treebox.events().selected([&](const nana::arg_treebox& args)
+		{
+			BR_CORE_TRACE << "tree item selected: " << args.item.text() << ". " << args.operated << std::endl;
+		});
+
+		scene->SetHierarchyChangeCallback([&](Entity& entity, ActionMode actionMode)
+		{
 			switch (actionMode)
 			{
 			case Bruno::ActionMode::Add:
@@ -41,18 +47,18 @@ namespace Bruno
 		auto& name = entity.GetComponent<NameComponent>().Name;
 
 		std::ostringstream builder;
-		if (hierarchy.Parent)
-		{
-
-		}
 		builder << parentKey << (uint32_t)entity;
-
 		auto key = builder.str();
+
 		m_treebox.insert(key, name);
+
 		for (UUID child : hierarchy.Children)
 		{
-			auto entity = m_scene->TryGetEntityWithUUID(child);
-			OnHierarchyAdded(entity, key + "/");
+			auto childEntity = m_scene->TryGetEntityWithUUID(child);
+			if (childEntity)
+			{
+				OnHierarchyAdded(childEntity, key + "/");
+			}
 		}
 	}
 }

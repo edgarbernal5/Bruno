@@ -99,6 +99,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno\Core\UUID.h" />
+    <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
     <ClInclude Include="Dependencies\d3dx12\d3dx12.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="Dependencies\SimpleMath\SimpleMath.cpp" />
     <ClCompile Include="Source\Bruno\Content\Asset.cpp" />
     <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\PipelineStateObjectCache.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
