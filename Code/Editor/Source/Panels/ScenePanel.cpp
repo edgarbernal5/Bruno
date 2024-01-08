@@ -62,7 +62,8 @@ namespace Bruno
 		//	::InvalidateRect(hwnd, &r, FALSE);*/
 		//});
 
-		this->events().destroy([this](const nana::arg_destroy& args) {
+		this->events().destroy([this](const nana::arg_destroy& args)
+		{
 			std::lock_guard lock{ m_mutex };
 			BR_CORE_TRACE << "destroy. panel id = " << idxx << std::endl;
 

@@ -68,7 +68,9 @@ namespace Bruno
 			auto& parentChildren = parent.GetChildren();
 			UUID uuid = GetUUID();
 			if (std::find(parentChildren.begin(), parentChildren.end(), uuid) == parentChildren.end())
+			{
 				parentChildren.emplace_back(uuid);
+			}
 		}
 	}
 }

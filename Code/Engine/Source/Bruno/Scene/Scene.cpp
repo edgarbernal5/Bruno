@@ -100,7 +100,9 @@ namespace Bruno
 	{
 		auto it = m_entityIdMap.find(id);
 		if (it != m_entityIdMap.end())
+		{
 			return it->second;
+		}
 
 		return Entity{};
 	}
@@ -124,7 +126,7 @@ namespace Bruno
 		if (node.Meshes.size() == 1)
 		{
 			uint32_t submeshIndex = node.Meshes[0];
-			auto& mc = nodeEntity.AddComponent<ModelComponent>(model->Handle(), submeshIndex);
+			nodeEntity.AddComponent<ModelComponent>(model->Handle(), submeshIndex);
 		}
 		else if (node.Meshes.size() > 1)
 		{
