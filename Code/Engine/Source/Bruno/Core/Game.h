@@ -16,6 +16,7 @@
 namespace Bruno
 {
 	class GraphicsDevice;
+	class AbstractAssetManager;
 
 	class Game : public Application
 	{
@@ -46,6 +47,7 @@ namespace Bruno
 		GameTimer m_timer;
 		ContentManager m_contentManager;
 		std::shared_ptr<GraphicsDevice> m_device;
+		std::shared_ptr<AbstractAssetManager> m_assetManager;
 		ShaderCache m_shaderCache;
 		PipelineStateObjectCache m_psoCache;
 

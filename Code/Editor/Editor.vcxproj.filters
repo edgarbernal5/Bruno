@@ -13,6 +13,9 @@
     <ClCompile Include="Source\Panels\SceneHierarchyPanel.cpp">
       <Filter>Source\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Content\EditorAssetManager.cpp">
+      <Filter>Source\Content</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -20,6 +23,9 @@
     </Filter>
     <Filter Include="Source\Panels">
       <UniqueIdentifier>{f96ed092-813a-4f60-8ae2-a3aa81445bd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Content">
+      <UniqueIdentifier>{13f2f5c8-ae61-4891-a5a6-15658f8a7f0f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -31,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="Source\Panels\SceneHierarchyPanel.h">
       <Filter>Source\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Content\EditorAssetManager.h">
+      <Filter>Source\Content</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

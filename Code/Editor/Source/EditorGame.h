@@ -21,7 +21,7 @@ namespace Bruno
 	class EditorGame : public Game
 	{
 	public:
-		EditorGame(const ApplicationParameters& parameters);
+		EditorGame(const ApplicationParameters& parameters, const std::wstring& projectPath);
 		~EditorGame();
 
 		friend class ScenePanel;
@@ -50,5 +50,7 @@ namespace Bruno
 
 		std::vector<ScenePanel*> m_scenePanels;
 		std::mutex m_scenePanelsMutex{};
+
+		std::wstring m_projectPath;
 	};
 }

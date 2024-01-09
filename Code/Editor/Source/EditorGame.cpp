@@ -5,6 +5,7 @@
 #include "Panels/SceneHierarchyPanel.h"
 #include "Bruno/Renderer/Model.h"
 #include "Bruno/Scene/Scene.h"
+#include "Content/EditorAssetManager.h"
 #include "Bruno/Content/ContentTypeReaderManager.h"
 #include <nana/gui/widgets/button.hpp>
 
@@ -20,8 +21,9 @@ namespace Bruno
 		BR_CORE_TRACE << "Exiting editor game loop..." << std::endl;
 	}
 
-	EditorGame::EditorGame(const ApplicationParameters& parameters) :
-		Game(parameters)
+	EditorGame::EditorGame(const ApplicationParameters& parameters, const std::wstring& projectPath) :
+		Game(parameters),
+		m_projectPath(projectPath)
 	{
 	}
 
@@ -234,11 +236,13 @@ namespace Bruno
 
 		//AddScenePanel(panel);
 	}
+
 	void EditorGame::OnInitialize()
 	{
 		Game::OnInitialize();
 
 		InitializeUI();
+		m_assetManager = std::make_shared<EditorAssetManager>(m_applicationParameters.WorkingDirectory);
 	}
 	//void EditorGame::InitializeUI()
 	//{

@@ -342,6 +342,12 @@
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h">
       <Filter>Source\Bruno\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\AssetManager.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\AssetTable.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -538,6 +544,12 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp">
       <Filter>Source\Bruno\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\AssetManager.cpp">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\AssetTable.cpp">
+      <Filter>Source\Bruno\Content</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

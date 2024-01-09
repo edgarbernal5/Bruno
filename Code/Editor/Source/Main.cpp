@@ -11,5 +11,6 @@ Bruno::Application* Bruno::CreateApplication(int argc, char** argv)
 	auto currentPath = std::filesystem::current_path();
 	parameters.WorkingDirectory = currentPath.parent_path().parent_path() / "Content";
 
-	return new EditorGame(parameters);
+	auto projectPath = parameters.WorkingDirectory;
+	return new EditorGame(parameters, projectPath);
 }
