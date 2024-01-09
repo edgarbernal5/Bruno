@@ -17,4 +17,9 @@ namespace Bruno
 	{
 		return m_assetTable.at(handle);
 	}
+
+	bool AssetTable::Contains(const AssetHandle handle) const
+	{
+		return m_assetTable.find(handle) != m_assetTable.end();
+	}
 }

@@ -17,6 +17,8 @@ namespace Bruno
 		AssetMetadata& Get(const AssetHandle handle);
 		const AssetMetadata& Get(const AssetHandle handle) const;
 
+		bool Contains(const AssetHandle handle) const;
+
 	private:
 		std::unordered_map<AssetHandle, AssetMetadata> m_assetTable;
 	};

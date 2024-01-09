@@ -8,13 +8,32 @@ namespace Bruno
 	EditorAssetManager::EditorAssetManager(const std::wstring& projectPath) :
 		m_projectPath(projectPath)
 	{
+		m_importerManager.Initialize();
 		ProcessDirectory(projectPath);
 	}
 
 	std::shared_ptr<Asset> EditorAssetManager::GetAsset(AssetHandle assetHandle)
 	{
+		auto& metadata = GetMetadata(assetHandle);
+		if (!metadata) {
+			return nullptr;
+		}
 
-		return std::shared_ptr<Asset>();
+		std::shared_ptr<Asset> asset = nullptr;
+		if (!metadata.IsLoaded)
+		{
+			if (!m_importerManager.TryImport(metadata, asset))
+			{
+				return nullptr;
+			}
+			metadata.IsLoaded = true;
+			m_loadedAssets[assetHandle] = asset;
+		}
+		else
+		{
+			asset = m_loadedAssets[assetHandle];
+		}
+		return asset;
 	}
 
 	void EditorAssetManager::ProcessDirectory(const std::wstring& directoryPath)
@@ -41,6 +60,14 @@ namespace Bruno
 				return metadata;
 			}
 		}
+		return g_nullMetadata;
+	}
+
+	AssetMetadata& EditorAssetManager::GetMetadata(AssetHandle handle)
+	{
+		if (m_assetTable.Contains(handle))
+			return m_assetTable[handle];
+
 		return g_nullMetadata;
 	}
 

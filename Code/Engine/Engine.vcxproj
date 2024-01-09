@@ -99,9 +99,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno\Content\AssetExtensions.h" />
+    <ClInclude Include="Source\Bruno\Content\AssetImportSerializer.h" />
     <ClInclude Include="Source\Bruno\Content\AssetManager.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTable.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTypes.h" />
+    <ClInclude Include="Source\Bruno\Content\ImporterManager.h" />
     <ClInclude Include="Source\Bruno\Core\UUID.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />
@@ -202,8 +204,10 @@
     <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp" />
     <ClCompile Include="Dependencies\SimpleMath\SimpleMath.cpp" />
     <ClCompile Include="Source\Bruno\Content\Asset.cpp" />
+    <ClCompile Include="Source\Bruno\Content\AssetImportSerializer.cpp" />
     <ClCompile Include="Source\Bruno\Content\AssetManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\AssetTable.cpp" />
+    <ClCompile Include="Source\Bruno\Content\ImporterManager.cpp" />
     <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\PipelineStateObjectCache.cpp" />

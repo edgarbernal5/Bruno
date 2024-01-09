@@ -348,8 +348,18 @@
     <ClInclude Include="Source\Bruno\Content\AssetTable.h">
       <Filter>Source\Bruno\Content</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Content\AssetTypes.h" />
-    <ClInclude Include="Source\Bruno\Content\AssetExtensions.h" />
+    <ClInclude Include="Source\Bruno\Content\ImporterManager.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\AssetExtensions.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\AssetTypes.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\AssetImportSerializer.h">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -551,6 +561,12 @@
       <Filter>Source\Bruno\Content</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Content\AssetTable.cpp">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\ImporterManager.cpp">
+      <Filter>Source\Bruno\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Content\AssetImportSerializer.cpp">
       <Filter>Source\Bruno\Content</Filter>
     </ClCompile>
   </ItemGroup>
