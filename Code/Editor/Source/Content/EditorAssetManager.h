@@ -4,6 +4,7 @@
 #include "Bruno/Content/AssetMetadata.h"
 #include "Bruno/Content/AssetManager.h"
 #include "Bruno/Content/AssetTable.h"
+#include "Bruno/Content/AssetExtensions.h"
 
 namespace Bruno
 {
@@ -18,6 +19,7 @@ namespace Bruno
 		void ProcessDirectory(const std::wstring& directoryPath);
 		const AssetMetadata& GetMetadata(const std::wstring& filename);
 		AssetHandle ImportAsset(const std::wstring& filename);
+		AssetType GetAssetTypeByExtension(const std::string& fileExtension);
 
 		std::wstring m_projectPath;
 		AssetTable m_assetTable;

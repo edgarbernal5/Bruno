@@ -12,6 +12,7 @@ namespace Bruno
 {
 	class Mesh;
 	class Material;
+	class Texture;
 
 	struct ModelVertex
 	{
@@ -34,12 +35,23 @@ namespace Bruno
 		inline bool IsRoot() const { return Parent == 0xFFFFFFFF; }
 	};
 
+	class ModelMaterial : public RTTI
+	{
+	public:
+		BR_RTTI_DECLARATION(ModelMaterial, RTTI);
+
+	public:
+		std::string Name;
+		std::map<std::string, std::shared_ptr<Texture>> TexturesByName;
+	};
+
 	class Model : public Asset
 	{
 		BR_RTTI_DECLARATION(Model, Asset);
 
 	public:
-		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes);
+		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<ModelMaterial>>&& materials, 
+			std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes);
 
 		const std::shared_ptr<IndexBuffer>& GetIndexBuffer() { return m_indexBuffer; }
 		const std::shared_ptr<VertexBuffer>& GetVertexBuffer() { return m_vertexBuffer; }
@@ -48,13 +60,13 @@ namespace Bruno
 		void SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer);
 
 		const std::vector<std::shared_ptr<Mesh>>& GetMeshes() { return m_meshes; }
-		std::shared_ptr<Material>& GetMaterial(uint32_t materialIndex);
+		std::shared_ptr<ModelMaterial>& GetMaterial(uint32_t materialIndex);
 
 		const ModelNode& GetRootNode() const { return m_modelNodes[0]; }
 		const std::vector<ModelNode>& GetNodes() const { return m_modelNodes; }
 	
 	private:
-		std::vector<std::shared_ptr<Material>> m_materials;
+		std::vector<std::shared_ptr<ModelMaterial>> m_materials;
 		std::vector<std::shared_ptr<Mesh>> m_meshes;
 		std::vector<ModelVertex> m_vertices;
 		std::vector<uint32_t> m_indices;
@@ -69,7 +81,8 @@ namespace Bruno
 	public:
 		Mesh() = default;
 		Mesh(Mesh&&) = default;
-		Mesh(const std::string& name, uint32_t baseVertex, uint32_t baseIndex, uint32_t vertexCount, uint32_t indexCount, uint32_t materialIndex, const Math::Matrix& transform, const Math::Matrix& localTransform, const Math::BoundingBox& bbox);
+		Mesh(const std::string& name, uint32_t baseVertex, uint32_t baseIndex, uint32_t vertexCount, uint32_t indexCount, uint32_t materialIndex, 
+			const Math::Matrix& transform, const Math::Matrix& localTransform, const Math::BoundingBox& bbox);
 		
 		uint32_t GetBaseVertex() const { return m_baseVertex; }
 		uint32_t GetBaseIndex() const { return m_baseIndex; }

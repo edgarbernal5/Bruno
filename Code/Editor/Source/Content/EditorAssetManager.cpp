@@ -27,7 +27,7 @@ namespace Bruno
 			}
 			else
 			{
-
+				ImportAsset(entry.path());
 			}
 		}
 	}
@@ -36,6 +36,11 @@ namespace Bruno
 	{
 		std::filesystem::path relativePath = std::filesystem::relative(filename, m_projectPath);
 
+		for (auto& [handle, metadata] : m_assetTable) {
+			if (metadata.Filename == filename) {
+				return metadata;
+			}
+		}
 		return g_nullMetadata;
 	}
 
@@ -43,7 +48,30 @@ namespace Bruno
 	{
 		std::filesystem::path relativePath = std::filesystem::relative(filename, m_projectPath);
 		auto& metadata = GetMetadata(relativePath);
+		if (metadata) {
+			return metadata.Handle;
+		}
 
-		return AssetHandle();
+		AssetType assetType = GetAssetTypeByExtension(relativePath.extension().string());
+		if (assetType == AssetType::None)
+			return 0;
+
+		AssetMetadata newMetadata;
+		newMetadata.Handle = {};
+		newMetadata.Filename = filename;
+		m_assetTable[newMetadata.Handle] = newMetadata;
+
+		return newMetadata.Handle;
+	}
+
+	AssetType EditorAssetManager::GetAssetTypeByExtension(const std::string& fileExtension)
+	{
+		auto it = g_AssetExtensionMap.find(fileExtension);
+		if (it != g_AssetExtensionMap.end())
+		{
+			return it->second;
+		}
+
+		return AssetType::None;
 	}
 }

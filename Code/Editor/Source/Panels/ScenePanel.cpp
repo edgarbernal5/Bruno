@@ -287,7 +287,7 @@ namespace Bruno
 		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
-		auto device = Bruno::Graphics::GetDevice();
+		auto device = Graphics::GetDevice();
 		device->BeginFrame();
 
 		UpdateCBs(timer);

@@ -1,13 +1,15 @@
 #pragma once
 
 #include "Asset.h"
-#include <filesystem>
+#include <string>
 
 namespace Bruno
 {
 	struct AssetMetadata
 	{
 		AssetHandle Handle{ 0 };
-		std::filesystem::path Filename;
+		std::wstring Filename;
+
+		operator bool() const { return Handle != 0; }
 	};
 }

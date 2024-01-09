@@ -98,8 +98,10 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Bruno\Content\AssetExtensions.h" />
     <ClInclude Include="Source\Bruno\Content\AssetManager.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTable.h" />
+    <ClInclude Include="Source\Bruno\Content\AssetTypes.h" />
     <ClInclude Include="Source\Bruno\Core\UUID.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />

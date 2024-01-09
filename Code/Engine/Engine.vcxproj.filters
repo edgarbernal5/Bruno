@@ -348,6 +348,8 @@
     <ClInclude Include="Source\Bruno\Content\AssetTable.h">
       <Filter>Source\Bruno\Content</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Content\AssetTypes.h" />
+    <ClInclude Include="Source\Bruno\Content\AssetExtensions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">

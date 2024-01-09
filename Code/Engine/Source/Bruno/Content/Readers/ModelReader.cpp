@@ -23,10 +23,10 @@ namespace Bruno
 		size_t materialCount;
 		input.ReadUInt64(materialCount);
 
-		std::vector<std::shared_ptr<Material>> materials;
+		std::vector<std::shared_ptr<ModelMaterial>> materials;
 		for (size_t i = 0; i < materialCount; i++)
 		{
-			auto material = std::make_shared<Material>();
+			auto material = std::make_shared<ModelMaterial>();
 			input.ReadString(material->Name);
 
 			size_t texturexCount;
