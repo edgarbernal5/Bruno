@@ -16,7 +16,7 @@ namespace Bruno
 
 		bool operator==(const Asset& other) const
 		{
-			return m_assetHandle == other.m_assetHandle;
+			return m_handle == other.m_handle;
 		}
 
 		bool operator!=(const Asset& other) const
@@ -24,9 +24,9 @@ namespace Bruno
 			return !(*this == other);
 		}
 
-		AssetHandle Handle() const { return m_assetHandle; }
+		AssetHandle GetHandle() const { return m_handle; }
 
 	protected:
-		AssetHandle m_assetHandle{ 0 };
+		AssetHandle m_handle{ 0 };
 	};
 }

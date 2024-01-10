@@ -1,12 +1,18 @@
 #include "brpch.h"
 #include "ImporterManager.h"
 
-#include "AssetImportSerializer.h"
+#include "AssetImporter.h"
+#include "Importers/ModelImporter.h"
 
 namespace Bruno
 {
 	void ImporterManager::Initialize()
 	{
+		if (m_initialized)
+			return;
+
+		m_serializers[AssetType::Model] = std::make_unique<ModelImporter>();
+		m_initialized = true;
 	}
 
 	bool ImporterManager::TryImport(const AssetMetadata& metadata, std::shared_ptr<Asset>& asset)
@@ -18,6 +24,6 @@ namespace Bruno
 			return false;
 		}
 
-		return it->second->TryDeserialize(metadata, asset);
+		return it->second->TryImport(metadata, asset);
 	}
 }

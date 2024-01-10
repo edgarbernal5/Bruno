@@ -61,7 +61,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;Dependencies\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -70,7 +70,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\bin\Debug_x64\nana.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\bin\Debug_x64\nana.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;Dependencies\assimp\bin\assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -82,7 +82,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;Dependencies\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
@@ -94,16 +94,17 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\bin\Release_x64\nana.lib;Dependencies\DirectXTex\bin\DirectXTex.lib;Dependencies\zlib\bin\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\bin\Release_x64\nana.lib;Dependencies\DirectXTex\bin\DirectXTex.lib;Dependencies\zlib\bin\zlib.lib;Dependencies\assimp\bin\assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno\Content\AssetExtensions.h" />
-    <ClInclude Include="Source\Bruno\Content\AssetImportSerializer.h" />
+    <ClInclude Include="Source\Bruno\Content\AssetImporter.h" />
     <ClInclude Include="Source\Bruno\Content\AssetManager.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTable.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTypes.h" />
     <ClInclude Include="Source\Bruno\Content\ImporterManager.h" />
+    <ClInclude Include="Source\Bruno\Content\Importers\ModelImporter.h" />
     <ClInclude Include="Source\Bruno\Core\UUID.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />
@@ -204,10 +205,11 @@
     <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp" />
     <ClCompile Include="Dependencies\SimpleMath\SimpleMath.cpp" />
     <ClCompile Include="Source\Bruno\Content\Asset.cpp" />
-    <ClCompile Include="Source\Bruno\Content\AssetImportSerializer.cpp" />
+    <ClCompile Include="Source\Bruno\Content\AssetImporter.cpp" />
     <ClCompile Include="Source\Bruno\Content\AssetManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\AssetTable.cpp" />
     <ClCompile Include="Source\Bruno\Content\ImporterManager.cpp" />
+    <ClCompile Include="Source\Bruno\Content\Importers\ModelImporter.cpp" />
     <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\PipelineStateObjectCache.cpp" />

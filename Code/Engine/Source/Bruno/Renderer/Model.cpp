@@ -15,7 +15,7 @@ namespace Bruno
 		m_meshes(std::move(meshes)),
 		m_modelNodes(std::move(modelNodes))
 	{
-		m_assetHandle = {};
+		m_handle = {};
 	}
 
 	void Model::SetIndexBuffer(std::shared_ptr<IndexBuffer> buffer)

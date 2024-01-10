@@ -126,7 +126,7 @@ namespace Bruno
 		if (node.Meshes.size() == 1)
 		{
 			uint32_t submeshIndex = node.Meshes[0];
-			nodeEntity.AddComponent<ModelComponent>(model->Handle(), submeshIndex);
+			nodeEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
 		}
 		else if (node.Meshes.size() > 1)
 		{
@@ -135,7 +135,7 @@ namespace Bruno
 				uint32_t submeshIndex = node.Meshes[i]; 
 
 				Entity childEntity = CreateEntity(nodeEntity, node.Name);
-				childEntity.AddComponent<ModelComponent>(model->Handle(), submeshIndex);
+				childEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
 			}
 		}
 
