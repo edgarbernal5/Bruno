@@ -10,6 +10,7 @@ namespace Bruno
 	{
 		m_importerManager.Initialize();
 		ProcessDirectory(projectPath);
+		GetAssetsDirectory(projectPath);
 	}
 
 	std::shared_ptr<Asset> EditorAssetManager::GetAsset(AssetHandle assetHandle)
@@ -22,7 +23,8 @@ namespace Bruno
 		std::shared_ptr<Asset> asset = nullptr;
 		if (!metadata.IsLoaded)
 		{
-			if (!m_importerManager.TryImport(metadata, asset))
+			AssetImporterContext context(*this);
+			if (!m_importerManager.TryImport(metadata, context, asset))
 			{
 				return nullptr;
 			}
@@ -34,6 +36,13 @@ namespace Bruno
 			asset = m_loadedAssets[assetHandle];
 		}
 		return asset;
+	}
+
+	void EditorAssetManager::GetAssetsDirectory(const std::wstring& directoryPath)
+	{
+		for (auto& [handle, metadata] : m_assetTable) {
+			auto asset = GetAsset(handle);
+		}
 	}
 
 	void EditorAssetManager::ProcessDirectory(const std::wstring& directoryPath)
@@ -85,7 +94,8 @@ namespace Bruno
 
 		AssetMetadata newMetadata;
 		newMetadata.Handle = {};
-		newMetadata.Filename = filename;
+		newMetadata.Filename = relativePath;
+		newMetadata.Type = assetType;
 		m_assetTable[newMetadata.Handle] = newMetadata;
 
 		return newMetadata.Handle;

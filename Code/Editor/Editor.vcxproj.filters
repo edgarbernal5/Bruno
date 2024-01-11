@@ -16,6 +16,18 @@
     <ClCompile Include="Source\Content\EditorAssetManager.cpp">
       <Filter>Source\Content</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Content\AssetImporter.cpp">
+      <Filter>Source\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Content\AssetImporterContext.cpp">
+      <Filter>Source\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Content\ImporterManager.cpp">
+      <Filter>Source\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Content\Importers\ModelImporter.cpp">
+      <Filter>Source\Content\Importers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -26,6 +38,9 @@
     </Filter>
     <Filter Include="Source\Content">
       <UniqueIdentifier>{13f2f5c8-ae61-4891-a5a6-15658f8a7f0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Content\Importers">
+      <UniqueIdentifier>{073453fb-f052-482d-846c-2fc5802de582}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +55,18 @@
     </ClInclude>
     <ClInclude Include="Source\Content\EditorAssetManager.h">
       <Filter>Source\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Content\ImporterManager.h">
+      <Filter>Source\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Content\AssetImporter.h">
+      <Filter>Source\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Content\AssetImporterContext.h">
+      <Filter>Source\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Content\Importers\ModelImporter.h">
+      <Filter>Source\Content\Importers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

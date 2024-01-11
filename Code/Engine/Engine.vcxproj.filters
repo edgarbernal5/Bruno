@@ -55,9 +55,6 @@
     <Filter Include="Dependencies\zlib">
       <UniqueIdentifier>{4c854dbe-818a-4442-877e-735d41a80aba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Bruno\Content\Importers">
-      <UniqueIdentifier>{b749624c-9feb-4403-9782-622d35d372a5}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -351,20 +348,11 @@
     <ClInclude Include="Source\Bruno\Content\AssetTable.h">
       <Filter>Source\Bruno\Content</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Content\ImporterManager.h">
-      <Filter>Source\Bruno\Content</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Bruno\Content\AssetExtensions.h">
       <Filter>Source\Bruno\Content</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Content\AssetTypes.h">
       <Filter>Source\Bruno\Content</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Content\AssetImporter.h">
-      <Filter>Source\Bruno\Content</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Content\Importers\ModelImporter.h">
-      <Filter>Source\Bruno\Content\Importers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -568,15 +556,6 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Content\AssetTable.cpp">
       <Filter>Source\Bruno\Content</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Content\ImporterManager.cpp">
-      <Filter>Source\Bruno\Content</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Content\AssetImporter.cpp">
-      <Filter>Source\Bruno\Content</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Content\Importers\ModelImporter.cpp">
-      <Filter>Source\Bruno\Content\Importers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

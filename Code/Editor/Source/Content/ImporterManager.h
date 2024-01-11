@@ -1,9 +1,10 @@
 #pragma once
 
-#include "AssetMetadata.h"
-#include "AssetTypes.h"
-#include "Asset.h"
+#include "Bruno/Content/AssetMetadata.h"
+#include "Bruno/Content/AssetTypes.h"
+#include "Bruno/Content/Asset.h"
 #include "AssetImporter.h"
+#include "AssetImporterContext.h"
 
 #include <unordered_map>
 #include <memory>
@@ -16,7 +17,7 @@ namespace Bruno
 		ImporterManager() = default;
 
 		void Initialize();
-		bool TryImport(const AssetMetadata& metadata, std::shared_ptr<Asset>& asset);
+		bool TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& asset);
 
 	private:
 		bool m_initialized{ false };

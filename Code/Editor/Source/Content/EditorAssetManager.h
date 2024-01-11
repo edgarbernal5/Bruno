@@ -5,7 +5,7 @@
 #include "Bruno/Content/AssetManager.h"
 #include "Bruno/Content/AssetTable.h"
 #include "Bruno/Content/AssetExtensions.h"
-#include "Bruno/Content/ImporterManager.h"
+#include "ImporterManager.h"
 
 namespace Bruno
 {
@@ -15,8 +15,9 @@ namespace Bruno
 		EditorAssetManager(const std::wstring& projectPath);
 
 		std::shared_ptr<Asset> GetAsset(AssetHandle assetHandle) override;
-
+		const std::wstring& GetProjectPath() { return m_projectPath; }
 	private:
+		void GetAssetsDirectory(const std::wstring& directoryPath);
 		void ProcessDirectory(const std::wstring& directoryPath);
 		const AssetMetadata& GetMetadata(const std::wstring& filename);
 		AssetMetadata& GetMetadata(AssetHandle handle);
