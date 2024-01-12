@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Content/AssetImporter.h"
-#include "Bruno/Math/Math.h"
-
-#include "Bruno/Renderer/Model.h"
 #include "Content/AssetImporterContext.h"
+
+#include "Bruno/Math/Math.h"
+#include "Bruno/Renderer/Model.h"
 
 #include <vector>
 

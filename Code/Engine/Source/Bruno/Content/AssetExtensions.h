@@ -12,6 +12,8 @@ namespace Bruno
 		{ ".x", AssetType::Model },
 		{ ".obj", AssetType::Model },
 
+		{ ".dds", AssetType::Texture },
+		{ ".bmp", AssetType::Texture },
 		{ ".png", AssetType::Texture },
 		{ ".jpg", AssetType::Texture },
 		{ ".jpeg", AssetType::Texture }

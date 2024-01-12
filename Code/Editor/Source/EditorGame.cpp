@@ -241,8 +241,9 @@ namespace Bruno
 	{
 		Game::OnInitialize();
 
-		InitializeUI();
 		m_assetManager = std::make_shared<EditorAssetManager>(m_applicationParameters.WorkingDirectory);
+		
+		InitializeUI();
 	}
 	//void EditorGame::InitializeUI()
 	//{
