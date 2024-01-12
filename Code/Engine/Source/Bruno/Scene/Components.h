@@ -50,7 +50,7 @@ namespace Bruno
 
 	struct ModelComponent
 	{
-		UUID ModelHandle;
+		AssetHandle ModelHandle;
 		uint32_t SubmeshIndex{ 0 };
 		MaterialMap Materials;
 	};

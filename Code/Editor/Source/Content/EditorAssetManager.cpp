@@ -74,7 +74,7 @@ namespace Bruno
 
 		for (auto& [handle, metadata] : m_assetTable)
 		{
-			if (metadata.Filename == filename)
+			if (metadata.Filename == relativePath)
 			{
 				return metadata;
 			}

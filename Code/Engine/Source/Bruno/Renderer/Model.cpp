@@ -27,6 +27,7 @@ namespace Bruno
 			vertex.Texture = Math::Vector2(m_vertices[i].Texcoord.x, m_vertices[i].Texcoord.y);
 			vertex.Normal = m_vertices[i].Normal;
 		}
+
 		m_indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(m_indices.size() * sizeof(uint32_t)), m_indices.data(), sizeof(uint32_t));
 		m_vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(m_vertices.size() * sizeof(VertexPositionNormalTexture)), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
 	}
