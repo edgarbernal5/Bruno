@@ -78,7 +78,8 @@ namespace Bruno
 		ProcessNode(aiScene->mRootNode, 0, modelNodes, meshes, Math::Matrix::Identity);
 
 		asset = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
-		
+		asset->SetHandle(metadata.Handle);
+
 		return true;
 	}
 

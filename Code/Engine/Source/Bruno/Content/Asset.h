@@ -25,6 +25,7 @@ namespace Bruno
 		}
 
 		AssetHandle GetHandle() const { return m_handle; }
+		void SetHandle(AssetHandle handle) { m_handle = handle; }
 
 	protected:
 		AssetHandle m_handle{ 0 };

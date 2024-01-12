@@ -2,6 +2,7 @@
 #include "Model.h"
 
 #include "Material.h"
+#include <Bruno/Platform/DirectX/VertexTypes.h>
 
 namespace Bruno
 {
@@ -15,7 +16,19 @@ namespace Bruno
 		m_meshes(std::move(meshes)),
 		m_modelNodes(std::move(modelNodes))
 	{
-		m_handle = {};
+		//m_handle = {};
+
+		std::vector< VertexPositionNormalTexture> verticesPNT;
+		verticesPNT.reserve(m_vertices.size());
+		for (size_t i = 0; i < m_vertices.size(); i++)
+		{
+			auto& vertex = verticesPNT.emplace_back();
+			vertex.Position = m_vertices[i].Position;
+			vertex.Texture = Math::Vector2(m_vertices[i].Texcoord.x, m_vertices[i].Texcoord.y);
+			vertex.Normal = m_vertices[i].Normal;
+		}
+		m_indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(m_indices.size() * sizeof(uint32_t)), m_indices.data(), sizeof(uint32_t));
+		m_vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(m_vertices.size() * sizeof(VertexPositionNormalTexture)), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
 	}
 
 	void Model::SetIndexBuffer(std::shared_ptr<IndexBuffer> buffer)

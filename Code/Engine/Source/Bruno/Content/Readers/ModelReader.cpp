@@ -147,25 +147,7 @@ namespace Bruno
 			input.ReadMatrix(modelNode.LocalTransform);
 		}
 
-		std::vector<VertexPositionNormalTexture> verticesPNT;
-		verticesPNT.reserve(vertices.size());
-		for (size_t j = 0; j < vertices.size(); j++)
-		{
-			auto& vertex = verticesPNT.emplace_back();
-			vertex.Position = vertices[j].Position;
-			vertex.Normal = vertices[j].Normal;
-			auto& texCoord3D = vertices[j].Texcoord;
-			vertex.Texture.x = texCoord3D.x;
-			vertex.Texture.y = texCoord3D.y;
-		}
-
-		auto indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(indicesCount * sizeof(uint32_t)), indices.data(), sizeof(uint32_t));
-		auto vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(vertices.size() * sizeof(VertexPositionNormalTexture)), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
-				
 		auto model = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
-		model->SetIndexBuffer(indexBuffer);
-		model->SetVertexBuffer(vertexBuffer);
-
 		return model;
 	}
 }
