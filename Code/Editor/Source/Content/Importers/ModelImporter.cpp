@@ -227,10 +227,13 @@ namespace Bruno
 					{
 						std::wstringstream relativePathToTextureW;
 						relativePathToTextureW << textureRelativePath.C_Str();
+						std::string textureName = (it->second.second);
 
+						auto textureHandle = context.ImportAsset(filenameTexture);
+						materialContentItem.TexturesByName[textureName] = textureHandle;
 						//ExternalReferenceContentItem sourceTextureReference(filenameTexture);
 						//ExternalReferenceContentItem textureReference = context.BuildAsset(sourceTextureReference, "TextureProcessor", L"");
-						//std::string textureName = (it->second.second);
+						//
 
 						//materialContentItem.AddTexture(textureName, textureReference);
 					}

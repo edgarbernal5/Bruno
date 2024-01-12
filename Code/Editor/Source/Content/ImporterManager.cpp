@@ -3,6 +3,7 @@
 
 #include "AssetImporter.h"
 #include "Importers/ModelImporter.h"
+#include "Importers/TextureImporter.h"
 
 namespace Bruno
 {
@@ -12,6 +13,7 @@ namespace Bruno
 			return;
 
 		m_serializers[AssetType::Model] = std::make_unique<ModelImporter>();
+		m_serializers[AssetType::Texture] = std::make_unique<TextureImporter>();
 		m_initialized = true;
 	}
 

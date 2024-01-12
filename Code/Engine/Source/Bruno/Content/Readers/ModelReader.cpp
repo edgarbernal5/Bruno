@@ -37,7 +37,7 @@ namespace Bruno
 				input.ReadString(textureName);
 
 				auto texture = input.ReadExternalReference();
-				material->TexturesByName[textureName] = std::static_pointer_cast<Texture>(texture);
+				//material->TexturesByName[textureName] = std::static_pointer_cast<Texture>(texture);
 			}
 
 			materials.emplace_back(std::move(material));

@@ -38,9 +38,17 @@ namespace Bruno
 		return asset;
 	}
 
+	std::wstring EditorAssetManager::GetAbsolutePath(const std::wstring& path)
+	{
+		std::filesystem::path absolutePath = m_projectPath;
+		absolutePath /= path;
+		return absolutePath;
+	}
+
 	void EditorAssetManager::GetAssetsDirectory(const std::wstring& directoryPath)
 	{
-		for (auto& [handle, metadata] : m_assetTable) {
+		for (auto& [handle, metadata] : m_assetTable)
+		{
 			auto asset = GetAsset(handle);
 		}
 	}
@@ -64,8 +72,10 @@ namespace Bruno
 	{
 		std::filesystem::path relativePath = std::filesystem::relative(filename, m_projectPath);
 
-		for (auto& [handle, metadata] : m_assetTable) {
-			if (metadata.Filename == filename) {
+		for (auto& [handle, metadata] : m_assetTable)
+		{
+			if (metadata.Filename == filename)
+			{
 				return metadata;
 			}
 		}
@@ -75,7 +85,9 @@ namespace Bruno
 	AssetMetadata& EditorAssetManager::GetMetadata(AssetHandle handle)
 	{
 		if (m_assetTable.Contains(handle))
+		{
 			return m_assetTable[handle];
+		}
 
 		return g_nullMetadata;
 	}
@@ -90,7 +102,9 @@ namespace Bruno
 
 		AssetType assetType = GetAssetTypeByExtension(relativePath.extension().string());
 		if (assetType == AssetType::None)
+		{
 			return 0;
+		}
 
 		AssetMetadata newMetadata;
 		newMetadata.Handle = {};

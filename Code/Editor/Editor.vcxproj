@@ -100,6 +100,7 @@
     <ClCompile Include="Source\Content\EditorAssetManager.cpp" />
     <ClCompile Include="Source\Content\ImporterManager.cpp" />
     <ClCompile Include="Source\Content\Importers\ModelImporter.cpp" />
+    <ClCompile Include="Source\Content\Importers\TextureImporter.cpp" />
     <ClCompile Include="Source\Panels\SceneHierarchyPanel.cpp" />
     <ClCompile Include="Source\EditorGame.cpp" />
     <ClCompile Include="Source\Main.cpp" />
@@ -111,6 +112,7 @@
     <ClInclude Include="Source\Content\EditorAssetManager.h" />
     <ClInclude Include="Source\Content\ImporterManager.h" />
     <ClInclude Include="Source\Content\Importers\ModelImporter.h" />
+    <ClInclude Include="Source\Content\Importers\TextureImporter.h" />
     <ClInclude Include="Source\EditorGame.h" />
     <ClInclude Include="Source\Panels\SceneHierarchyPanel.h" />
     <ClInclude Include="Source\Panels\ScenePanel.h" />

@@ -12,8 +12,11 @@ namespace Bruno
 
 	std::wstring AssetImporterContext::GetAbsolutePath(const std::wstring& path)
 	{
-		std::filesystem::path absolutePath = m_assetManager.GetProjectPath();
-		absolutePath /= path;
-		return absolutePath;
+		return m_assetManager.GetAbsolutePath(path);
+	}
+
+	AssetHandle AssetImporterContext::ImportAsset(const std::wstring& filename)
+	{
+		return m_assetManager.ImportAsset(filename);
 	}
 }

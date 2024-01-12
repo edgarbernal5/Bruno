@@ -42,7 +42,7 @@ namespace Bruno
 
 	public:
 		std::string Name;
-		std::map<std::string, std::shared_ptr<Texture>> TexturesByName;
+		std::map<std::string, AssetHandle> TexturesByName;
 	};
 
 	class Model : public Asset

@@ -28,6 +28,9 @@
     <ClCompile Include="Source\Content\Importers\ModelImporter.cpp">
       <Filter>Source\Content\Importers</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Content\Importers\TextureImporter.cpp">
+      <Filter>Source\Content\Importers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -66,6 +69,9 @@
       <Filter>Source\Content</Filter>
     </ClInclude>
     <ClInclude Include="Source\Content\Importers\ModelImporter.h">
+      <Filter>Source\Content\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Content\Importers\TextureImporter.h">
       <Filter>Source\Content\Importers</Filter>
     </ClInclude>
   </ItemGroup>

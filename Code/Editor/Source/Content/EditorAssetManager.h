@@ -15,13 +15,15 @@ namespace Bruno
 		EditorAssetManager(const std::wstring& projectPath);
 
 		std::shared_ptr<Asset> GetAsset(AssetHandle assetHandle) override;
-		const std::wstring& GetProjectPath() { return m_projectPath; }
+		std::wstring GetAbsolutePath(const std::wstring& path);
+
+		AssetHandle ImportAsset(const std::wstring& filename);
+
 	private:
 		void GetAssetsDirectory(const std::wstring& directoryPath);
 		void ProcessDirectory(const std::wstring& directoryPath);
 		const AssetMetadata& GetMetadata(const std::wstring& filename);
 		AssetMetadata& GetMetadata(AssetHandle handle);
-		AssetHandle ImportAsset(const std::wstring& filename);
 		AssetType GetAssetTypeByExtension(const std::string& fileExtension);
 
 		std::wstring m_projectPath;
