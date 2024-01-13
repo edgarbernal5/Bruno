@@ -184,14 +184,14 @@ namespace Bruno
 			m_place.enable_print_debug(!m_place.is_enabled_print_debug());
 		});
 
-		//auto scene = std::make_shared<Scene>();
-		//
-		//auto scenePanel = m_place.add_pane<ScenePanel>("pane1", "", nana::dock_position::right, this, scene);
-		//auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane2", "pane1", nana::dock_position::right, scene);
+		auto scene = std::make_shared<Scene>();
+		
+		auto scenePanel = m_place.add_pane<ScenePanel>("pane1", "", nana::dock_position::right, this, scene);
+		auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane2", "pane1", nana::dock_position::right, scene);
 
-		//auto model = m_contentManager.Load<Model>(L"Models\\Car\\Car.fbx");
+		auto model = m_assetManager->GetAsset(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
 
-		//scene->InstantiateModel(model);
+		scene->InstantiateModel(std::static_pointer_cast<Model>(model));
 
 		m_place.collocate();
 
@@ -242,7 +242,7 @@ namespace Bruno
 		Game::OnInitialize();
 
 		m_assetManager = std::make_shared<EditorAssetManager>(m_applicationParameters.WorkingDirectory);
-		
+		m_editorAssetManager = m_assetManager->As<EditorAssetManager>();
 		InitializeUI();
 	}
 	//void EditorGame::InitializeUI()

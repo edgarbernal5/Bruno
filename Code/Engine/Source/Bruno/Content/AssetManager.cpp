@@ -3,5 +3,5 @@
 
 namespace Bruno
 {
-
+	BR_RTTI_DEFINITIONS(AbstractAssetManager);
 }

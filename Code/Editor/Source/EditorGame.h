@@ -17,6 +17,7 @@ namespace Bruno
 	class NanaWindow;
 	class GraphicsDevice;
 	class ScenePanel;
+	class EditorAssetManager;
 
 	class EditorGame : public Game
 	{
@@ -52,5 +53,6 @@ namespace Bruno
 		std::mutex m_scenePanelsMutex{};
 
 		std::wstring m_projectPath;
+		EditorAssetManager* m_editorAssetManager;
 	};
 }

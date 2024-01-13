@@ -11,19 +11,21 @@ namespace Bruno
 {
 	class EditorAssetManager : public AbstractAssetManager
 	{
+		BR_RTTI_DECLARATION(EditorAssetManager, AbstractAssetManager);
+
 	public:
 		EditorAssetManager(const std::wstring& projectPath);
 
 		std::shared_ptr<Asset> GetAsset(AssetHandle assetHandle) override;
 		std::wstring GetAbsolutePath(const std::wstring& path);
 
+		AssetMetadata& GetMetadata(AssetHandle handle);
+		const AssetMetadata& GetMetadata(const std::wstring& filename);
 		AssetHandle ImportAsset(const std::wstring& filename);
 
 	private:
 		void GetAssetsDirectory(const std::wstring& directoryPath);
 		void ProcessDirectory(const std::wstring& directoryPath);
-		const AssetMetadata& GetMetadata(const std::wstring& filename);
-		AssetMetadata& GetMetadata(AssetHandle handle);
 		AssetType GetAssetTypeByExtension(const std::string& fileExtension);
 
 		std::wstring m_projectPath;

@@ -56,7 +56,7 @@ namespace Bruno
 			m_hierarchyChangeCallback(rootEntity, ActionMode::Add);
 		}
 
-		auto& meshes = model->GetMeshes();
+		/*auto& meshes = model->GetMeshes();
 		for (auto& mesh : meshes)
 		{
 			auto boxRenderItem = std::make_shared<RenderItem>();
@@ -67,7 +67,7 @@ namespace Bruno
 			boxRenderItem->IndexBuffer = model->GetIndexBuffer();
 			boxRenderItem->VertexBuffer = model->GetVertexBuffer();
 			m_renderItems.push_back(boxRenderItem);
-		}
+		}*/
 		m_transformableObjects.push_back(std::make_shared<Transformable>());
 
 		m_models.push_back(model);

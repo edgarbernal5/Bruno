@@ -11,11 +11,14 @@
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/Surface.h"
 
+#include "Bruno/Content/AssetManager.h"
+
 namespace Bruno
 {
-	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, Surface* surface) :
+	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, Surface* surface, AbstractAssetManager* assetManager) :
 		m_scene(scene),
-		m_surface(surface)
+		m_surface(surface),
+		m_assetManager(assetManager)
 	{
 		m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
 
@@ -62,39 +65,43 @@ namespace Bruno
 		for (auto& ent : entities)
 		{
 			auto [transformComponent, meshComponent] = entities.get<TransformComponent, ModelComponent>(ent);
-			//Entity entity = { ent, m_scene.get() };
-		}
-		/*for (auto& item : m_scene->GetRenderItems())
-		{
-			auto texture = item->Material->TexturesByName["Texture"];
+			auto model = m_assetManager->GetAsset(meshComponent.ModelHandle)->As<Model>();
+
+			uint32_t meshIndex = meshComponent.MeshIndex;
+			auto& meshes = model->GetMeshes();
+			auto& mesh = meshes[meshIndex];
+			
+			auto textureHandle = model->GetMaterial(mesh->GetMaterialIndex())->TexturesByName["Texture"];
+			auto textureSPtr = m_assetManager->GetAsset(textureHandle);
+			auto texture = textureSPtr != nullptr? textureSPtr->As<Texture>() : nullptr;
 			if (texture != nullptr && texture->IsReady())
 			{
-				if (!item->IndexBuffer->IsReady() || !item->VertexBuffer->IsReady())
+				if (!model->GetIndexBuffer()->IsReady() || !model->GetVertexBuffer()->IsReady())
 					continue;
 
-				if (currentVB != item->VertexBuffer.get())
+				if (currentVB != model->GetVertexBuffer().get())
 				{
-					graphicsContext->SetVertexBuffer(*item->VertexBuffer);
-					graphicsContext->SetIndexBuffer(*item->IndexBuffer);
-					currentVB = item->VertexBuffer.get();
+					graphicsContext->SetVertexBuffer(*model->GetVertexBuffer());
+					graphicsContext->SetIndexBuffer(*model->GetIndexBuffer());
+					currentVB = model->GetVertexBuffer().get();
 				}
 
 				PipelineResourceBinding textureBinding;
 				textureBinding.BindingIndex = 0;
-				textureBinding.Resource = texture.get();
+				textureBinding.Resource = texture;
 
 				m_meshPerObjectResourceSpace.SetCBV(m_scene->m_objectBuffer[device->GetFrameId()].get());
 				m_meshPerObjectResourceSpace.SetSRV(textureBinding);
 
 				graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
 
-				graphicsContext->SetPrimitiveTopology(item->PrimitiveType);
-				graphicsContext->DrawIndexedInstanced(item->IndexCount,
+				graphicsContext->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				graphicsContext->DrawIndexedInstanced(mesh->GetIndexCount(),
 					1,
-					item->StartIndexLocation,
-					item->BaseVertexLocation,
+					mesh->GetBaseIndex(),
+					mesh->GetBaseVertex(),
 					0);
 			}
-		}*/
+		}
 	}
 }

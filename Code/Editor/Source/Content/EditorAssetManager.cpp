@@ -3,6 +3,8 @@
 
 namespace Bruno
 {
+	BR_RTTI_DEFINITIONS(EditorAssetManager);
+
 	AssetMetadata EditorAssetManager::g_nullMetadata;
 
 	EditorAssetManager::EditorAssetManager(const std::wstring& projectPath) :

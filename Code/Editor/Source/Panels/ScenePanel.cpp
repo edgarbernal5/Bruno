@@ -401,7 +401,7 @@ namespace Bruno
 
 	void ScenePanel::InitializeMeshAndTexture()
 	{
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get(), m_editorGame->m_assetManager.get());
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)

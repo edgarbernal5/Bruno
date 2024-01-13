@@ -9,16 +9,18 @@ namespace Bruno
 	class GraphicsContext;
 	class Shader;
 	class Surface;
+	class AbstractAssetManager;
 
 	class SceneRenderer
 	{
 	public:
-		SceneRenderer(std::shared_ptr<Scene> scene, Surface* surface);
+		SceneRenderer(std::shared_ptr<Scene> scene, Surface* surface, AbstractAssetManager* assetManager);
 
 		void OnRender(GraphicsContext* graphicsContext);
 	private:
 		std::shared_ptr<Scene> m_scene;
 		Surface* m_surface;
+		AbstractAssetManager* m_assetManager;
 		PipelineResourceSpace			m_meshPerObjectResourceSpace;
 
 		std::shared_ptr<RootSignature>			m_rootSignature;

@@ -218,7 +218,7 @@ namespace Bruno
 
 		m_scene->InstantiateModel(model);
 
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get());
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get(), m_assetManager.get());
 	}
 
 	void PlayerGame::InitializeGizmoService()

@@ -1,11 +1,14 @@
 #pragma once
 
 #include "Asset.h"
+#include "Bruno/Core/RTTI.h"
 
 namespace Bruno
 {
-	class AbstractAssetManager
+	class AbstractAssetManager : public RTTI
 	{
+		BR_RTTI_DECLARATION(AbstractAssetManager, RTTI);
+
 	public:
 		virtual ~AbstractAssetManager() = default;
 
