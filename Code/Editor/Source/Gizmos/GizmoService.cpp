@@ -4,7 +4,7 @@
 #include "GizmoTranslationRenderer.h"
 #include "GizmoRotationRenderer.h"
 #include "GizmoScaleRenderer.h"
-#include "Bruno/Editor/ObjectSelector.h"
+#include "Panels/Scene/SelectionService.h"
 
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
@@ -16,10 +16,10 @@
 
 namespace Bruno
 {
-    GizmoService::GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface, ObjectSelector* objectSelector, GizmoConfig gizmoConfig) :
+    GizmoService::GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface, SelectionService* selectionService, GizmoConfig gizmoConfig) :
         m_camera(camera),
         m_surface(surface),
-        m_objectSelector(objectSelector),
+        m_selectionService(selectionService),
         m_gizmoConfig(gizmoConfig)
     {
         m_gizmoGraphicsBinding.Shader = std::make_shared<Shader>(L"Shaders/UnlitColor.hlsl");
@@ -267,13 +267,13 @@ namespace Bruno
         m_selectionState.m_screenScaleFactor = cameraDistance > 0.0f ? cameraDistance * Gizmo::GIZMO_SCREEN_SCALE : 1.0f;
         
         m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
-        if (m_objectSelector->GetSelectedObjects().size() == 0)
+        if (m_selectionService->GetSelections().size() == 0)
         {
             return;
         }
         m_selectionState.m_screenScaleMatrix = Math::Matrix::CreateScale(m_selectionState.m_screenScaleFactor);
 
-        auto localObjectRotationMatrix = m_objectSelector->GetSelectedObjects()[0]->WorldTransform;
+        auto localObjectRotationMatrix = m_selectionService->GetSelectionTransform();
 
         if (m_currentGizmoType == GizmoType::Translation ||
             m_currentGizmoType == GizmoType::Rotation)
@@ -699,7 +699,7 @@ namespace Bruno
         Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
         if (m_transformSpace == TransformSpace::Local)
         {
-            auto localObjectRotationMatrix = m_objectSelector->GetSelectedObjects()[0]->WorldTransform;
+            auto localObjectRotationMatrix = m_selectionService->GetSelectionTransform();
             auto localForward = localObjectRotationMatrix.Forward();
             localForward.Normalize();
 

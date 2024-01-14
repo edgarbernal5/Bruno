@@ -41,10 +41,17 @@ namespace Bruno
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
 
-		void SetTransform(const Math::Matrix& transform)
+		void ApplyTransform(const Math::Matrix& transform)
 		{
 			Math::Matrix matrix = transform;
 			matrix.Decompose(Scale, Rotation, Position);
+		}
+
+		Math::Matrix GetTransform() const
+		{
+			return Math::Matrix::CreateScale(Scale) *
+				Math::Matrix::CreateFromQuaternion(Rotation) *
+				Math::Matrix::CreateTranslation(Position);
 		}
 	};
 

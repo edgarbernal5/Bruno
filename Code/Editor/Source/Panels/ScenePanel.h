@@ -16,7 +16,7 @@
 #include <mutex>
 #include <Bruno/Platform/DirectX/Texture.h>
 #include <Bruno/Renderer/Camera.h>
-#include <Bruno/Editor/Gizmos/GizmoService.h>
+#include "Gizmos/GizmoService.h"
 
 namespace Bruno
 {
@@ -25,7 +25,7 @@ namespace Bruno
 	class EditorGame;
 	class GraphicsContext;
 	class GizmoService;
-	class ObjectSelector;
+	class SelectionService;
 	class Scene;
 	class SceneRenderer;
 
@@ -46,8 +46,9 @@ namespace Bruno
 		void InitializeCamera();
 		void InitializeGizmoService();
 		void InitializeGraphicsContext();
-		void InitializeMeshAndTexture();
+		void InitializeSceneRenderer();
 		void UpdateCBs(const GameTimer& timer);
+		Math::Ray ConvertMousePositionToRay(const Math::Int2& mousePosition);
 
 		//std::unique_ptr<nana::nested_form> m_form;
 		nana::nested_form* m_form;
@@ -65,18 +66,19 @@ namespace Bruno
 		
 		std::mutex m_mutex{};
 
-		std::shared_ptr<ObjectSelector>	m_objectSelector;
+		std::shared_ptr<SelectionService>	m_selectionService;
 		std::unique_ptr<GizmoService>	m_gizmoService;
 
 		Camera m_camera;
 
 		Math::Int2 m_lastMousePosition;
-		bool m_isResizing = false;
-		bool m_isSizingMoving = false;
-		bool m_isExposed = false;
+		Math::Int2 m_beginMouseDownPosition;
+		bool m_isResizing{ false };
+		bool m_isSizingMoving{ false };
+		bool m_isExposed{ false };
 
-		bool m_shiftPressed = false;
-		bool m_isGizmoing = false;
+		bool m_shiftPressed{ false };
+		bool m_isGizmoing{ false };
 
 		float m_totalTime = 0.0f;
 	};

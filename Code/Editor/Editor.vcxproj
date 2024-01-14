@@ -101,10 +101,15 @@
     <ClCompile Include="Source\Content\ImporterManager.cpp" />
     <ClCompile Include="Source\Content\Importers\ModelImporter.cpp" />
     <ClCompile Include="Source\Content\Importers\TextureImporter.cpp" />
+    <ClCompile Include="Source\Gizmos\GizmoRotationRenderer.cpp" />
+    <ClCompile Include="Source\Gizmos\GizmoScaleRenderer.cpp" />
+    <ClCompile Include="Source\Gizmos\GizmoService.cpp" />
+    <ClCompile Include="Source\Gizmos\GizmoTranslationRenderer.cpp" />
     <ClCompile Include="Source\Panels\SceneHierarchyPanel.cpp" />
     <ClCompile Include="Source\EditorGame.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Panels\ScenePanel.cpp" />
+    <ClCompile Include="Source\Panels\Scene\SelectionService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Content\AssetImporter.h" />
@@ -114,8 +119,15 @@
     <ClInclude Include="Source\Content\Importers\ModelImporter.h" />
     <ClInclude Include="Source\Content\Importers\TextureImporter.h" />
     <ClInclude Include="Source\EditorGame.h" />
+    <ClInclude Include="Source\Gizmos\Constants.h" />
+    <ClInclude Include="Source\Gizmos\GizmoConfig.h" />
+    <ClInclude Include="Source\Gizmos\GizmoRotationRenderer.h" />
+    <ClInclude Include="Source\Gizmos\GizmoScaleRenderer.h" />
+    <ClInclude Include="Source\Gizmos\GizmoService.h" />
+    <ClInclude Include="Source\Gizmos\GizmoTranslationRenderer.h" />
     <ClInclude Include="Source\Panels\SceneHierarchyPanel.h" />
     <ClInclude Include="Source\Panels\ScenePanel.h" />
+    <ClInclude Include="Source\Panels\Scene\SelectionService.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

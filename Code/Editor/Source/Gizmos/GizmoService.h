@@ -13,7 +13,7 @@ namespace Bruno
 	class GraphicsContext;
 	class GraphicsDevice;
 	class Surface;
-	class ObjectSelector;
+	class SelectionService;
 	class Shader;
 
 	struct GizmoObjectBuffer
@@ -29,7 +29,7 @@ namespace Bruno
 	class GizmoService
 	{
 	public:
-		GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface, ObjectSelector* objectSelector, GizmoConfig gizmoConfig = GizmoConfig());
+		GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface, SelectionService* objectSelector, GizmoConfig gizmoConfig = GizmoConfig());
 
 		using DragTranslationCallback = std::function<void(const Math::Vector3&)>;
 		using DragScaleCallback = std::function<void(const Math::Vector3&, bool isUniform)>;
@@ -190,7 +190,7 @@ namespace Bruno
 		std::shared_ptr<GizmoScaleRenderer> m_gizmoScaleRenderer;
 		std::shared_ptr<GizmoTranslationRenderer> m_gizmoCameraRenderer;
 		Surface* m_surface;
-		ObjectSelector* m_objectSelector;
+		SelectionService* m_selectionService;
 
 		bool m_isSnapEnabled{ false };
 		bool m_precisionModeEnabled{ false };

@@ -12,7 +12,7 @@
 #include <Bruno/Renderer/Model.h>
 #include <Bruno/Scene/Scene.h>
 #include <Bruno/Renderer/SceneRenderer.h>
-#include <Bruno/Editor/ObjectSelector.h>
+#include "Panels/Scene/SelectionService.h"
 #include "EditorGame.h"
 
 #include <nana/gui.hpp>
@@ -158,7 +158,7 @@ namespace Bruno
 				m_surface->Initialize();
 
 				//TODO: esta inicialización está acá porque depende del surface. Esto está mal, arreglarlo!
-				InitializeMeshAndTexture();
+				InitializeSceneRenderer();
 				InitializeGizmoService();
 			}
 			m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.width, (float)args.height));
@@ -169,6 +169,7 @@ namespace Bruno
 		{
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
+			m_beginMouseDownPosition = m_lastMousePosition;
 
 			m_isGizmoing = m_gizmoService->BeginDrag(Math::Vector2(args.pos.x, args.pos.y));
 			m_form->set_capture(true);
@@ -178,11 +179,21 @@ namespace Bruno
 		{
 			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
 
-			if (!m_isGizmoing && !args.left_button) {
+			if (!m_isGizmoing && !args.left_button)
+			{
 				m_gizmoService->OnMouseMove(Math::Vector2(args.pos.x, args.pos.y));
 			}
-			if (args.left_button && m_isGizmoing) {
-				m_gizmoService->Drag(Math::Vector2(args.pos.x, args.pos.y));
+
+			if (args.left_button)
+			{
+				if (m_isGizmoing)
+				{
+					m_gizmoService->Drag(Math::Vector2(args.pos.x, args.pos.y));
+				}
+				else
+				{
+
+				}
 			}
 			else if (args.shift)
 			{
@@ -205,11 +216,26 @@ namespace Bruno
 
 		m_form->events().mouse_up([this](const nana::arg_mouse& args)
 		{
+			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
+			
 			if (m_isGizmoing)
 			{
 				m_gizmoService->EndDrag();
 				m_isGizmoing = false;
 			}
+			else
+			{
+				int dragLength = Math::Abs(m_beginMouseDownPosition.x - currentPosition.x) + Math::Abs(m_beginMouseDownPosition.y - currentPosition.y);
+				if (dragLength < 2) { //click
+					auto ray = ConvertMousePositionToRay(currentPosition);
+					UUID entity = m_selectionService->FindEntityWithRay(ray, 1000.0f);
+					if (entity)
+					{
+						m_selectionService->Select(entity);
+					}
+				}
+			}
+			
 			m_form->release_capture();
 		});
 
@@ -278,6 +304,27 @@ namespace Bruno
 
 		m_isExposed = false;
 		m_editorGame->RemoveScenePanel(this);
+	}
+
+	Math::Ray ScenePanel::ConvertMousePositionToRay(const Math::Int2& mousePosition)
+	{
+		Math::Vector3 nearPoint(mousePosition.x, mousePosition.y, 0.0f);
+		Math::Vector3 farPoint(mousePosition.x, mousePosition.y, 1.0f);
+
+		nearPoint = m_camera.GetViewport().Unproject(nearPoint,
+			m_camera.GetProjection(),
+			m_camera.GetView(),
+			Math::Matrix::Identity);
+
+		farPoint = m_camera.GetViewport().Unproject(farPoint,
+			m_camera.GetProjection(),
+			m_camera.GetView(),
+			Math::Matrix::Identity);
+
+		Math::Vector3 direction = farPoint - nearPoint;
+		direction.Normalize();
+
+		return Math::Ray(nearPoint, direction);
 	}
 
 	void ScenePanel::OnUpdate(const GameTimer& timer)
@@ -356,19 +403,26 @@ namespace Bruno
 	void ScenePanel::InitializeGizmoService()
 	{
 		auto device = Graphics::GetDevice();
-		m_objectSelector = std::make_shared<ObjectSelector>(m_scene);
+		m_selectionService = std::make_shared<SelectionService>(m_scene, m_editorGame->m_assetManager.get());
 
-		m_gizmoService = std::make_unique<GizmoService>(device, m_camera, m_surface.get(), m_objectSelector.get());
+		m_gizmoService = std::make_unique<GizmoService>(device, m_camera, m_surface.get(), m_selectionService.get());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
 		{
-			m_objectSelector->GetSelectedObjects()[0]->Position += delta;
-		});
+			auto& selections = m_selectionService->GetSelections();
+			for (auto& uuid : selections)
+			{
+				Entity entity = m_scene->TryGetEntityWithUUID(uuid);
+				TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
 
+				entityTransform.Position += delta;
+			}
+		});
+		/*
 		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
 		{
-			auto newRotation = m_objectSelector->GetSelectedObjects()[0]->Rotation * delta;
+			auto newRotation = m_selectionService->GetSelectedObjects()[0]->Rotation * delta;
 			newRotation.Normalize();
-			m_objectSelector->GetSelectedObjects()[0]->Rotation = newRotation;
+			m_selectionService->GetSelectedObjects()[0]->Rotation = newRotation;
 		});
 
 		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
@@ -377,20 +431,20 @@ namespace Bruno
 			if (isUniform)
 			{
 				float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
-				auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale * uniformDelta;
+				auto newScale = m_selectionService->GetSelectedObjects()[0]->Scale * uniformDelta;
 				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 				{
-					m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
+					m_selectionService->GetSelectedObjects()[0]->Scale = newScale;
 				}
 
 				return;
 			}
-			auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale + newDelta;
+			auto newScale = m_selectionService->GetSelectedObjects()[0]->Scale + newDelta;
 			if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 			{
-				m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
+				m_selectionService->GetSelectedObjects()[0]->Scale = newScale;
 			}
-		});
+		});*/
 	}
 
 	void ScenePanel::InitializeGraphicsContext()
@@ -399,7 +453,7 @@ namespace Bruno
 		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
 	}
 
-	void ScenePanel::InitializeMeshAndTexture()
+	void ScenePanel::InitializeSceneRenderer()
 	{
 		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get(), m_editorGame->m_assetManager.get());
 	}

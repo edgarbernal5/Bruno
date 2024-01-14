@@ -31,6 +31,21 @@
     <ClCompile Include="Source\Content\Importers\TextureImporter.cpp">
       <Filter>Source\Content\Importers</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Gizmos\GizmoRotationRenderer.cpp">
+      <Filter>Source\Gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Gizmos\GizmoScaleRenderer.cpp">
+      <Filter>Source\Gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Gizmos\GizmoService.cpp">
+      <Filter>Source\Gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Gizmos\GizmoTranslationRenderer.cpp">
+      <Filter>Source\Gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Panels\Scene\SelectionService.cpp">
+      <Filter>Source\Panels\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -44,6 +59,12 @@
     </Filter>
     <Filter Include="Source\Content\Importers">
       <UniqueIdentifier>{073453fb-f052-482d-846c-2fc5802de582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Gizmos">
+      <UniqueIdentifier>{e238ee9f-fde6-4042-b11d-d4643f921513}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Panels\Scene">
+      <UniqueIdentifier>{0ffc3604-6f7d-45d8-827c-f04833436388}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +94,27 @@
     </ClInclude>
     <ClInclude Include="Source\Content\Importers\TextureImporter.h">
       <Filter>Source\Content\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Gizmos\Constants.h">
+      <Filter>Source\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Gizmos\GizmoConfig.h">
+      <Filter>Source\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Gizmos\GizmoRotationRenderer.h">
+      <Filter>Source\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Gizmos\GizmoScaleRenderer.h">
+      <Filter>Source\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Gizmos\GizmoService.h">
+      <Filter>Source\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Gizmos\GizmoTranslationRenderer.h">
+      <Filter>Source\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\Scene\SelectionService.h">
+      <Filter>Source\Panels\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -232,11 +232,6 @@ namespace Bruno
 
 						auto textureHandle = context.ImportAsset(filenameTexture);
 						materialContentItem.TexturesByName[textureName] = textureHandle;
-						//ExternalReferenceContentItem sourceTextureReference(filenameTexture);
-						//ExternalReferenceContentItem textureReference = context.BuildAsset(sourceTextureReference, "TextureProcessor", L"");
-						//
-
-						//materialContentItem.AddTexture(textureName, textureReference);
 					}
 				}
 			}

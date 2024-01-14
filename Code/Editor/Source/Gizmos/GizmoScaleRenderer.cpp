@@ -1,7 +1,8 @@
-#include "brpch.h"
 #include "GizmoScaleRenderer.h"
 
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
+#include "Bruno/Core/Game.h"
+#include "Bruno/Renderer/PrimitiveBatch.h"
 #include "Bruno/Platform/DirectX/Surface.h"
 #include "Bruno/Renderer/Camera.h"
 #include "GizmoService.h"

@@ -18,7 +18,8 @@ namespace Bruno
 	std::shared_ptr<Asset> EditorAssetManager::GetAsset(AssetHandle assetHandle)
 	{
 		auto& metadata = GetMetadata(assetHandle);
-		if (!metadata) {
+		if (!metadata)
+		{
 			return nullptr;
 		}
 
@@ -44,6 +45,7 @@ namespace Bruno
 	{
 		std::filesystem::path absolutePath = m_projectPath;
 		absolutePath /= path;
+
 		return absolutePath;
 	}
 
@@ -98,7 +100,8 @@ namespace Bruno
 	{
 		std::filesystem::path relativePath = std::filesystem::relative(filename, m_projectPath);
 		auto& metadata = GetMetadata(relativePath);
-		if (metadata) {
+		if (metadata)
+		{
 			return metadata.Handle;
 		}
 

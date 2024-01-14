@@ -46,9 +46,6 @@
     <Filter Include="Source\Bruno\Editor">
       <UniqueIdentifier>{76b1d155-efd6-4f55-9227-4cf0ced6783c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Bruno\Editor\Gizmos">
-      <UniqueIdentifier>{4e51a54e-0d5b-4641-9e84-ca598fb079ff}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Bruno\Scene">
       <UniqueIdentifier>{af5f88d4-6c15-4449-9890-88ebdba121db}</UniqueIdentifier>
     </Filter>
@@ -231,9 +228,6 @@
     <ClInclude Include="Source\Bruno\Core\Window.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoService.h">
-      <Filter>Source\Bruno\Editor\Gizmos</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Bruno\Scene\Scene.h">
       <Filter>Source\Bruno\Scene</Filter>
     </ClInclude>
@@ -287,24 +281,6 @@
     </ClInclude>
     <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch.h">
       <Filter>Source\Bruno\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoTranslationRenderer.h">
-      <Filter>Source\Bruno\Editor\Gizmos</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Editor\Gizmos\Constants.h">
-      <Filter>Source\Bruno\Editor\Gizmos</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Editor\ObjectSelector.h">
-      <Filter>Source\Bruno\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoRotationRenderer.h">
-      <Filter>Source\Bruno\Editor\Gizmos</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoScaleRenderer.h">
-      <Filter>Source\Bruno\Editor\Gizmos</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Editor\Gizmos\GizmoConfig.h">
-      <Filter>Source\Bruno\Editor\Gizmos</Filter>
     </ClInclude>
     <ClInclude Include="Dependencies\zlib\include\zlib.h">
       <Filter>Dependencies\zlib</Filter>
@@ -500,9 +476,6 @@
     <ClCompile Include="Source\Bruno\Core\Window.cpp">
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoService.cpp">
-      <Filter>Source\Bruno\Editor\Gizmos</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Bruno\Scene\Scene.cpp">
       <Filter>Source\Bruno\Scene</Filter>
     </ClCompile>
@@ -520,18 +493,6 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\PrimitiveBatch.cpp">
       <Filter>Source\Bruno\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoTranslationRenderer.cpp">
-      <Filter>Source\Bruno\Editor\Gizmos</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Editor\ObjectSelector.cpp">
-      <Filter>Source\Bruno\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoRotationRenderer.cpp">
-      <Filter>Source\Bruno\Editor\Gizmos</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Editor\Gizmos\GizmoScaleRenderer.cpp">
-      <Filter>Source\Bruno\Editor\Gizmos</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\ShaderCache.cpp">
       <Filter>Source\Bruno\Renderer</Filter>

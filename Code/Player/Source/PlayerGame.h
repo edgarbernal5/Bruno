@@ -17,8 +17,7 @@ namespace Bruno
 	class GraphicsContext;
 	class Scene;
 	class SceneRenderer;
-	class GizmoService;
-	class ObjectSelector;
+
 	template<typename TVertex>
 	class PrimitiveBatch;
 
@@ -47,7 +46,6 @@ namespace Bruno
 		void InitializeCamera();
 		void InitializeGraphicsContext();
 		void InitializeMeshAndTexture();
-		void InitializeGizmoService();
 		void InitializeSurface();
 		void UpdateCBs(const GameTimer& timer);
 
@@ -55,8 +53,6 @@ namespace Bruno
 		std::shared_ptr<Scene>			m_scene;
 		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
 
-		std::unique_ptr<GizmoService>	m_gizmoService;
-		std::shared_ptr<ObjectSelector>	m_objectSelector;
 		std::unique_ptr<GraphicsContext>	m_graphicsContext;
 
 		Math::Int2	m_lastMousePosition;

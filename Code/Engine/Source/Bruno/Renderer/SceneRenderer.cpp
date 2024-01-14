@@ -64,16 +64,15 @@ namespace Bruno
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
 		for (auto& ent : entities)
 		{
-			auto [transformComponent, meshComponent] = entities.get<TransformComponent, ModelComponent>(ent);
-			auto model = m_assetManager->GetAsset(meshComponent.ModelHandle)->As<Model>();
+			auto [transformComponent, modelComponent] = entities.get<TransformComponent, ModelComponent>(ent);
+			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 
-			uint32_t meshIndex = meshComponent.MeshIndex;
+			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto& meshes = model->GetMeshes();
 			auto& mesh = meshes[meshIndex];
 			
 			auto textureHandle = model->GetMaterial(mesh->GetMaterialIndex())->TexturesByName["Texture"];
-			auto textureSPtr = m_assetManager->GetAsset(textureHandle);
-			auto texture = textureSPtr != nullptr? textureSPtr->As<Texture>() : nullptr;
+			auto texture = m_assetManager->GetAsset<Texture>(textureHandle);
 			if (texture != nullptr && texture->IsReady())
 			{
 				if (!model->GetIndexBuffer()->IsReady() || !model->GetVertexBuffer()->IsReady())
@@ -88,7 +87,7 @@ namespace Bruno
 
 				PipelineResourceBinding textureBinding;
 				textureBinding.BindingIndex = 0;
-				textureBinding.Resource = texture;
+				textureBinding.Resource = texture.get();
 
 				m_meshPerObjectResourceSpace.SetCBV(m_scene->m_objectBuffer[device->GetFrameId()].get());
 				m_meshPerObjectResourceSpace.SetSRV(textureBinding);

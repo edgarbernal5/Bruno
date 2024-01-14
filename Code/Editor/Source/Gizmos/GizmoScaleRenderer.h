@@ -7,9 +7,8 @@
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/PipelineStateObject.h"
-#include "Bruno/Editor/Gizmos/Constants.h"
 
-#include "Bruno/Editor/Gizmos/GizmoConfig.h"
+#include "Gizmos/GizmoConfig.h"
 
 namespace Bruno
 {
@@ -20,15 +19,14 @@ namespace Bruno
 	class GraphicsContext;
 	class Camera;
 	class Surface;
-	class GizmoService;
 	struct GizmoObjectBuffer;
 
-	class GizmoTranslationRenderer
+	class GizmoScaleRenderer
 	{
 	public:
 		struct RenderConfig
 		{
-			float StickRadius = Gizmo::CONE_RADIUS * 0.5f;
+			float StickRadius = Gizmo::CONE_RADIUS * 0.25f;
 			float StickHeight = Gizmo::LINE_LENGTH;
 			float ArrowheadRadius = Gizmo::CONE_RADIUS;
 			float ArrowheadHeight = Gizmo::CONE_HEIGHT;
@@ -36,12 +34,10 @@ namespace Bruno
 			uint32_t Tessellation = Gizmo::TESSELLATION;
 			uint32_t StackCount = 3;
 
-			RenderConfig(){}
+			RenderConfig() {}
 			RenderConfig(const GizmoConfig& gizmoConfig);
 		};
-
-		GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, 
-			std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
+		GizmoScaleRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
 
 		void Render(GraphicsContext* context);
 		void SetColors(const Math::Color colors[3]);
@@ -49,7 +45,7 @@ namespace Bruno
 		void Update();
 
 	private:
-		void CreateCone(float radius, float height, uint32_t sliceCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
+		void CreateBox(const Math::Vector3& size, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
 		void CreateCylinder(float radius, float height, uint32_t sliceCount, uint32_t stackCount, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
 
 		Camera& m_camera;

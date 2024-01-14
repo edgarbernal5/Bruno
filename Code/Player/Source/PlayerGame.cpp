@@ -16,8 +16,6 @@
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Renderer/SceneRenderer.h"
 #include "Bruno/Renderer/PrimitiveBatch.h"
-#include "Bruno/Editor/Gizmos/GizmoService.h"
-#include "Bruno/Editor/ObjectSelector.h"
 
 namespace Bruno
 {
@@ -33,7 +31,6 @@ namespace Bruno
 		InitializeSurface();
 		InitializeMeshAndTexture();
 		InitializeCamera();
-		InitializeGizmoService();
 		InitializeGraphicsContext();
 	}
 
@@ -63,7 +60,6 @@ namespace Bruno
 		m_device->BeginFrame();
 
 		UpdateCBs(timer);
-		m_gizmoService->Update();
 	}
 
 	void PlayerGame::OnDraw()
@@ -85,9 +81,6 @@ namespace Bruno
 		
 		m_sceneRenderer->OnRender(m_graphicsContext.get());
 
-		////test gizmo
-		m_gizmoService->Render(m_graphicsContext.get());
-
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();
 
@@ -101,7 +94,6 @@ namespace Bruno
 	{
 		m_lastMousePosition = Math::Int2(x, y);
 
-		m_isGizmoing = m_gizmoService->BeginDrag(Math::Vector2(x, y));
 		SetCapture(m_window->GetHandle());
 	}
 
@@ -109,37 +101,24 @@ namespace Bruno
 	{
 		Math::Int2 currentPosition = Math::Int2(x, y);
 
-		if (!m_isGizmoing && !btnState.LeftButton) {
-			m_gizmoService->OnMouseMove(Math::Vector2(x, y));
-		}
-		if (btnState.LeftButton && m_isGizmoing) {
-			m_gizmoService->Drag(Math::Vector2(x, y));
-		}
-		else if (m_shiftPressed)
+		if (btnState.LeftButton)
 		{
-			if (btnState.LeftButton)
-			{
-				m_camera.Rotate(currentPosition, m_lastMousePosition);
-			}
-			else if (btnState.MiddleButton)
-			{
-				m_camera.HandTool(currentPosition, m_lastMousePosition);
-			}
-			else if (btnState.RightButton)
-			{
-				m_camera.PitchYaw(currentPosition, m_lastMousePosition);
-			}
+			m_camera.Rotate(currentPosition, m_lastMousePosition);
 		}
+		else if (btnState.MiddleButton)
+		{
+			m_camera.HandTool(currentPosition, m_lastMousePosition);
+		}
+		else if (btnState.RightButton)
+		{
+			m_camera.PitchYaw(currentPosition, m_lastMousePosition);
+		}
+		
 		m_lastMousePosition = currentPosition;
 	}
 
 	void PlayerGame::OnMouseUp(MouseButtonState btnState, int x, int y)
 	{
-		if (m_isGizmoing)
-		{
-			m_gizmoService->EndDrag();
-			m_isGizmoing = false;
-		}
 		ReleaseCapture();
 	}
 
@@ -167,25 +146,6 @@ namespace Bruno
 		else if (key == KeyCode::S)
 		{
 			m_camera.Walk(-0.25f);
-		}
-		else if (key == KeyCode::D1)
-		{
-			m_gizmoService->SetGizmoType(GizmoService::GizmoType::Translation);
-		}
-		else if (key == KeyCode::D2)
-		{
-			m_gizmoService->SetGizmoType(GizmoService::GizmoType::Rotation);
-		}
-		else if (key == KeyCode::D3)
-		{
-			m_gizmoService->SetGizmoType(GizmoService::GizmoType::Scale);
-		}
-		else if (key == KeyCode::D4)
-		{
-			if (m_gizmoService->GetTransformSpace() == GizmoService::TransformSpace::World)
-				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::Local);
-			else
-				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::World);
 		}
 		
 		m_shiftPressed = (state.Shift);
@@ -219,38 +179,6 @@ namespace Bruno
 		m_scene->InstantiateModel(model);
 
 		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get(), m_assetManager.get());
-	}
-
-	void PlayerGame::InitializeGizmoService()
-	{
-		m_objectSelector = std::make_shared<ObjectSelector>(m_scene);
-
-		m_gizmoService = std::make_unique<GizmoService>(m_device.get(), m_camera, m_surface.get(), m_objectSelector.get());
-		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta) {			
-			m_objectSelector->GetSelectedObjects()[0]->Position += delta;
-		});
-
-		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta) {
-			auto newRotation = m_objectSelector->GetSelectedObjects()[0]->Rotation * delta;
-			newRotation.Normalize();
-			m_objectSelector->GetSelectedObjects()[0]->Rotation = newRotation;
-		});
-
-		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform) {
-			auto newDelta = delta * 0.1f;
-			if (isUniform)
-			{
-				float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
-				auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale * uniformDelta;
-				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
-					m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
-
-				return;
-			}
-			auto newScale = m_objectSelector->GetSelectedObjects()[0]->Scale + newDelta;
-			if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
-				m_objectSelector->GetSelectedObjects()[0]->Scale = newScale;
-		});
 	}
 
 	void PlayerGame::InitializeSurface()

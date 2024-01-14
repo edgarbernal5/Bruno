@@ -89,6 +89,7 @@ namespace Bruno
 		uint32_t GetIndexCount() const { return m_indexCount; }
 		uint32_t GetVertexCount() const { return m_vertexCount; }
 		uint32_t GetMaterialIndex() const { return m_materialIndex; }
+		Math::BoundingBox& GetBoundingBox() { return m_bBox; }
 
 		void SetNodeName(const std::string& nodename) { m_nodeName = nodename; }
 		void SetTransform(const Math::Matrix& transform) { m_transform = transform; }
