@@ -15,7 +15,7 @@ namespace Bruno
 		SelectionService(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager);
 
 		void Select(UUID selection);
-		UUID FindEntityWithRay(Math::Ray ray, float maxDistance);
+		UUID FindEntityWithRay(const Math::Ray& ray, float maxDistance);
 		Math::Matrix GetSelectionTransform();
 
 		const std::vector<UUID>& GetSelections() { return m_selections; }

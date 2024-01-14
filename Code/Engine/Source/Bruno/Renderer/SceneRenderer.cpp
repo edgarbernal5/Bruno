@@ -50,6 +50,7 @@ namespace Bruno
 	void SceneRenderer::OnRender(GraphicsContext* graphicsContext)
 	{
 		auto device = Graphics::GetDevice();
+		uint32_t frameIndex = device->GetFrameId();
 
 		Texture& backBuffer = m_surface->GetBackBuffer();
 		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
@@ -60,8 +61,11 @@ namespace Bruno
 		pipeline.DepthStencilTarget = &depthBuffer;
 		graphicsContext->SetPipeline(pipeline);
 
+		auto objectSize = AlignU32(sizeof(SceneObjectBuffer),256);
+
 		VertexBuffer* currentVB = nullptr;
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
+		uint32_t objectIndex = 0;
 		for (auto& ent : entities)
 		{
 			auto [transformComponent, modelComponent] = entities.get<TransformComponent, ModelComponent>(ent);
@@ -89,7 +93,7 @@ namespace Bruno
 				textureBinding.BindingIndex = 0;
 				textureBinding.Resource = texture.get();
 
-				m_meshPerObjectResourceSpace.SetCBV(m_scene->m_objectBuffer[device->GetFrameId()].get());
+				m_meshPerObjectResourceSpace.SetCBV(m_scene->m_objectBuffer[frameIndex].get(), objectIndex * objectSize);
 				m_meshPerObjectResourceSpace.SetSRV(textureBinding);
 
 				graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
@@ -101,6 +105,7 @@ namespace Bruno
 					mesh->GetBaseVertex(),
 					0);
 			}
+			objectIndex++;
 		}
 	}
 }

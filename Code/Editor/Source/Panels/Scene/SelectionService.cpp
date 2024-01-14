@@ -19,9 +19,11 @@ namespace Bruno
 		m_selections.push_back(selection);
 	}
 
-	UUID SelectionService::FindEntityWithRay(Math::Ray ray, float maxDistance)
+	UUID SelectionService::FindEntityWithRay(const Math::Ray& ray, float maxDistance)
 	{
 		auto entities = m_scene->GetAllEntitiesWith<IdComponent, ModelComponent>();
+		float closestDistance = FLT_MAX;
+		UUID closestId = 0;
 		for (auto& ent : entities)
 		{
 			auto [idComponent, modelComponent] = entities.get<IdComponent, ModelComponent>(ent);
@@ -33,11 +35,16 @@ namespace Bruno
 			Math::BoundingBox& bbox = mesh->GetBoundingBox();
 
 			float distance;
-			if (ray.Intersects(bbox, distance)) {
-				return idComponent.Id;
+			if (ray.Intersects(bbox, distance) && distance <= maxDistance)
+			{
+				if (closestDistance > distance)
+				{
+					closestDistance = distance;
+					closestId = idComponent.Id;
+				}
 			}
 		}
-		return UUID(0);
+		return closestId;
 	}
 
 	Math::Matrix SelectionService::GetSelectionTransform()

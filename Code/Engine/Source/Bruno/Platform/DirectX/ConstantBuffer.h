@@ -10,7 +10,7 @@ namespace Bruno
 	class ConstantBuffer : public GpuBuffer
 	{
 	public:
-		ConstantBuffer();
+		ConstantBuffer(uint32_t elementCount = 1);
 		ConstantBuffer(const ConstantBuffer& rhs) = delete;
 		ConstantBuffer& operator=(const ConstantBuffer& rhs) = delete;
 		//~ConstantBuffer()
@@ -21,11 +21,16 @@ namespace Bruno
 		//	m_mappedResource = nullptr;
 		//}
 
-		constexpr const uint32_t GetSizeInBytes() const { return m_elementSizeInBytes; }
+		constexpr const uint32_t GetElementSizeInBytes() const { return m_elementSizeInBytes; }
 
 		void SetMappedData(const T& data)
 		{
 			GpuBuffer::SetMappedData(&data, sizeof(T));
+		}
+
+		void SetMappedData(uint32_t elementIndexOffset, const T& data)
+		{
+			GpuBuffer::SetMappedData(&data, elementIndexOffset, sizeof(T));
 		}
 
 	private:
@@ -33,8 +38,8 @@ namespace Bruno
 	};
 
 	template<typename T>
-	inline ConstantBuffer<T>::ConstantBuffer() :
-		GpuBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(AlignU32(sizeof(T), 256), BufferViewFlags::Cbv, BufferAccessFlags::HostWritable))
+	inline ConstantBuffer<T>::ConstantBuffer(uint32_t elementCount) :
+		GpuBuffer(*Graphics::GetDevice(), BufferCreationDesc::Create(AlignU32(sizeof(T), 256) * elementCount, AlignU32(sizeof(T), 256), BufferViewFlags::Cbv, BufferAccessFlags::HostWritable))
 	{
 		m_elementSizeInBytes = AlignU32(sizeof(T), 256);
 	}

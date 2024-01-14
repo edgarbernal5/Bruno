@@ -130,4 +130,10 @@ namespace Bruno
 		BR_ASSERT(m_mappedResource != nullptr && data != nullptr && dataSize > 0 && dataSize <= m_desc.Width);
 		memcpy_s(m_mappedResource, m_desc.Width, data, dataSize);
 	}
+
+    void GpuBuffer::SetMappedData(const void* data, uint32_t elementOffset, size_t dataSize)
+    {
+        BR_ASSERT(m_mappedResource != nullptr && data != nullptr && dataSize > 0 && dataSize <= m_desc.Width);
+        memcpy_s(m_mappedResource + elementOffset * m_stride, m_desc.Width, data, dataSize);
+    }
 }

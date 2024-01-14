@@ -215,7 +215,7 @@ namespace Bruno
     void GizmoService::Render(GraphicsContext* context)
     {
         RenderCameraGizmo(context);
-        if (m_currentGizmoType == GizmoType::None)
+        if (m_currentGizmoType == GizmoType::None || !m_isActive)
             return;
 
         switch (m_currentGizmoType)

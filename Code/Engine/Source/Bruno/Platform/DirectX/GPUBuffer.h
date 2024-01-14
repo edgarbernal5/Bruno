@@ -79,6 +79,7 @@ namespace Bruno
 
 		void Reset();
 		virtual void SetMappedData(const void* data, size_t dataSize);
+		virtual void SetMappedData(const void* data, uint32_t elementOffset, size_t dataSize);
 
 		friend class UploadContext;
 		friend class GraphicsContext;

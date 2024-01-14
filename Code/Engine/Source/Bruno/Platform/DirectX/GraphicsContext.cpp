@@ -131,10 +131,10 @@ namespace Bruno
 			switch (m_currentPipeline->m_pipelineType)
 			{
 			case PipelineType::Graphics:
-				m_commandList->SetGraphicsRootConstantBufferView(cbvMapping.value(), cbv->m_virtualAddress);
+				m_commandList->SetGraphicsRootConstantBufferView(cbvMapping.value(), cbv->m_virtualAddress + resources.GetCbvAddressOffset());
 				break;
 			case PipelineType::Compute:
-				m_commandList->SetComputeRootConstantBufferView(cbvMapping.value(), cbv->m_virtualAddress);
+				m_commandList->SetComputeRootConstantBufferView(cbvMapping.value(), cbv->m_virtualAddress + resources.GetCbvAddressOffset());
 				break;
 			default:
 				BR_ASSERT_ERROR("Invalid pipeline type");

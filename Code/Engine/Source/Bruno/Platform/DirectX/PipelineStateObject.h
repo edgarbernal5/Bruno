@@ -37,7 +37,7 @@ namespace Bruno
 	class PipelineResourceSpace
 	{
 	public:
-		void SetCBV(GpuBuffer* resource);
+		void SetCBV(GpuBuffer* resource, uint64_t addressOffset = 0);
 		void SetSRV(const PipelineResourceBinding& binding);
 		void SetUAV(const PipelineResourceBinding& binding);
 		void Lock();
@@ -47,6 +47,7 @@ namespace Bruno
 		const std::vector<PipelineResourceBinding>& GetSRVs() const { return m_srvs; }
 
 		bool IsLocked() const { return m_isLocked; }
+		uint64_t GetCbvAddressOffset() const { return m_cbvAddressOffset; }
 
 	private:
 		uint32_t GetIndexOfBindingIndex(const std::vector<PipelineResourceBinding>& bindings, uint32_t bindingIndex);
@@ -55,6 +56,7 @@ namespace Bruno
 		//as possible if they have the same update frequency (which is contained by a PipelineResourceSpace). Of course,
 		//you can freely change this to a vector like the others if you want.
 		GpuBuffer* m_cbv = nullptr;
+		uint64_t m_cbvAddressOffset = 0;
 		std::vector<PipelineResourceBinding> m_uavs;
 		std::vector<PipelineResourceBinding> m_srvs;
 		bool m_isLocked = false;

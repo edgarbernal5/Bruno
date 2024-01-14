@@ -17,7 +17,7 @@ namespace Bruno
 
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
-			m_objectBuffer[i] = std::make_unique<ConstantBuffer<ObjectBuffer>>();
+			m_objectBuffer[i] = std::make_unique<ConstantBuffer<SceneObjectBuffer>>(10);
 		}
 	}
 
@@ -62,18 +62,22 @@ namespace Bruno
 	void Scene::OnUpdate(const GameTimer& timer, Camera& camera)
 	{
 		auto device = Graphics::GetDevice();
-		//auto& objectSelected = m_transformableObjects[0];
-		//auto world = Math::Matrix::CreateScale(objectSelected->Scale) * Math::Matrix::CreateFromQuaternion(objectSelected->Rotation) * Math::Matrix::CreateTranslation(objectSelected->Position);
-		auto world = Math::Matrix::Identity;
-		//objectSelected->WorldTransform = world;
-
-		Math::Matrix mvpMatrix = world * camera.GetViewProjection();
-
-		ObjectBuffer objectBuffer;
-		objectBuffer.World = mvpMatrix;
-
 		uint32_t frameIndex = device->GetFrameId();
-		m_objectBuffer[frameIndex]->SetMappedData(objectBuffer);
+		auto entities = GetAllEntitiesWith<IdComponent, TransformComponent>();
+		uint32_t index = 0;
+		for (auto& ent : entities) {
+			auto [idComponent, transformComponent] = entities.get<IdComponent, TransformComponent>(ent);
+
+			auto world = GetWorldSpaceMatrix(GetEntityWithUUID(idComponent.Id));
+
+			Math::Matrix mvpMatrix = world * camera.GetViewProjection();
+
+			SceneObjectBuffer objectBuffer;
+			objectBuffer.World = mvpMatrix;
+
+			m_objectBuffer[frameIndex]->SetMappedData(index, objectBuffer);
+			index++;
+		}
 	}
 
 	void Scene::SetHierarchyChangeCallback(SceneHierarchyChangeCallback callback)

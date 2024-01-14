@@ -60,7 +60,7 @@ namespace Bruno
 		m_pipelineResourceMapping = pipelineResourceMapping;
 	}
 
-	void PipelineResourceSpace::SetCBV(GpuBuffer* resource)
+	void PipelineResourceSpace::SetCBV(GpuBuffer* resource, uint64_t addressOffset)
 	{
 		if (m_isLocked)
 		{
@@ -71,11 +71,13 @@ namespace Bruno
 			else
 			{
 				m_cbv = resource;
+				m_cbvAddressOffset = addressOffset;
 			}
 		}
 		else
 		{
 			m_cbv = resource;
+			m_cbvAddressOffset = addressOffset;
 		}
 	}
 

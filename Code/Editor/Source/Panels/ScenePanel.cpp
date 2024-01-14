@@ -192,24 +192,21 @@ namespace Bruno
 				}
 				else
 				{
-
+					if (args.left_button)
+					{
+						m_camera.Rotate(currentPosition, m_lastMousePosition);
+					}
+					else if (args.mid_button)
+					{
+						m_camera.HandTool(currentPosition, m_lastMousePosition);
+					}
+					else if (args.right_button)
+					{
+						m_camera.PitchYaw(currentPosition, m_lastMousePosition);
+					}
 				}
 			}
-			else if (args.shift)
-			{
-				if (args.left_button)
-				{
-					m_camera.Rotate(currentPosition, m_lastMousePosition);
-				}
-				else if (args.mid_button)
-				{
-					m_camera.HandTool(currentPosition, m_lastMousePosition);
-				}
-				else if (args.right_button)
-				{
-					m_camera.PitchYaw(currentPosition, m_lastMousePosition);
-				}
-			}
+			
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
 		});

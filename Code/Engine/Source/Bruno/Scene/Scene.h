@@ -22,6 +22,11 @@ namespace Bruno
 	};
 	using SceneHierarchyChangeCallback = std::function<void(Entity&, ActionMode)>;
 
+	struct SceneObjectBuffer
+	{
+		Math::Matrix World;
+	};
+
 	class Scene
 	{
 	public:
@@ -55,11 +60,7 @@ namespace Bruno
 
 		SceneHierarchyChangeCallback m_hierarchyChangeCallback;
 
-		struct ObjectBuffer
-		{
-			Math::Matrix World;
-		};
-		std::unique_ptr<ConstantBuffer<ObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
+		std::unique_ptr<ConstantBuffer<SceneObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
 	};
 }
 
