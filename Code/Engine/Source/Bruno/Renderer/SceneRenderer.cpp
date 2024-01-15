@@ -61,7 +61,7 @@ namespace Bruno
 		pipeline.DepthStencilTarget = &depthBuffer;
 		graphicsContext->SetPipeline(pipeline);
 
-		auto objectSize = AlignU32(sizeof(SceneObjectBuffer),256);
+		auto objectSize = AlignU32(sizeof(SceneObjectBuffer), 256);
 
 		VertexBuffer* currentVB = nullptr;
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();

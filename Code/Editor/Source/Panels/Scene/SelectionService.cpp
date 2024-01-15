@@ -19,21 +19,47 @@ namespace Bruno
 		m_selections.push_back(selection);
 	}
 
-	UUID SelectionService::FindEntityWithRay(const Math::Ray& ray, float maxDistance)
+	void SelectionService::DeselectAll()
+	{
+		m_selections.clear();
+	}
+
+	UUID SelectionService::FindEntityUUIDWithRay(const Math::Ray& ray, float maxDistance)
 	{
 		auto entities = m_scene->GetAllEntitiesWith<IdComponent, ModelComponent>();
-		float closestDistance = FLT_MAX;
+		float closestDistance = (std::numeric_limits<float>::max)();
 		UUID closestId = 0;
 		for (auto& ent : entities)
 		{
+			Entity entity = { ent, m_scene.get() };
 			auto [idComponent, modelComponent] = entities.get<IdComponent, ModelComponent>(ent);
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 
 			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto& meshes = model->GetMeshes();
 			auto& mesh = meshes[meshIndex];
-			Math::BoundingBox& bbox = mesh->GetBoundingBox();
+			auto bbox = mesh->GetBoundingBox();
 
+			Math::Matrix transform = m_scene->GetWorldSpaceMatrix(entity);
+
+			Math::Vector3 bboxCenter = bbox.Center;
+			Math::Vector3 bboxExtents = bbox.Extents;
+
+			auto bboxMin = bboxCenter - bboxExtents;
+			auto bboxMax = bboxCenter + bboxExtents;
+			bboxMin = Math::Vector3::Transform(bboxMin, transform);
+			bboxMax = Math::Vector3::Transform(bboxMax, transform);
+
+			bboxCenter.x = std::min<float>(bboxMin.x, bboxMax.x);
+			bboxCenter.y = std::min<float>(bboxMin.y, bboxMax.y);
+			bboxCenter.z = std::min<float>(bboxMin.z, bboxMax.z);
+			bboxExtents.x = std::max<float>(bboxMin.x, bboxMax.x);
+			bboxExtents.y = std::max<float>(bboxMin.y, bboxMax.y);
+			bboxExtents.z = std::max<float>(bboxMin.z, bboxMax.z);
+
+			bbox.Center = (bboxExtents + bboxCenter) * 0.5f;
+			bbox.Extents = (bboxExtents - bboxCenter) * 0.5f;
+			
 			float distance;
 			if (ray.Intersects(bbox, distance) && distance <= maxDistance)
 			{

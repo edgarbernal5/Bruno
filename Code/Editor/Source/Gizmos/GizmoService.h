@@ -88,6 +88,9 @@ namespace Bruno
 
 		void SetGizmoType(GizmoType type){ m_currentGizmoType = type; }
 		void SetTransformSpace(TransformSpace space){ m_transformSpace = space; }
+		void SetActive(bool isActive){ m_isActive = isActive; }
+
+		void SetGizmoPosition(const Math::Vector3 position) { m_selectionState.m_gizmoPosition = position; }
 	private:
 		struct SelectionState
 		{
@@ -169,7 +172,7 @@ namespace Bruno
 
 		Camera& m_camera;
 		Camera m_sceneGizmoCamera;
-		bool m_isActive{ true };
+		bool m_isActive{ false };
 		GizmoType m_currentGizmoType = GizmoType::Translation;
 		PivotType m_pivotType = PivotType::SelectionCenter;
 		GizmoAxis m_currentAxis = GizmoAxis::None;

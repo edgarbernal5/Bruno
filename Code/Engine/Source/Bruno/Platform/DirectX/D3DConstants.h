@@ -23,4 +23,6 @@ namespace Bruno::Graphics::Core
 
     constexpr uint8_t RESOURCE_SPACES_COUNT{ 4 };
     constexpr uint8_t PER_OBJECT_SPACE{ 0 };
+
+    constexpr uint32_t SCENE_OBJECT_COUNT{ 10 }; //mover esto a otro archivo. no es una constante de d3d
 }

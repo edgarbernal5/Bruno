@@ -17,7 +17,7 @@ namespace Bruno
 
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
 		{
-			m_objectBuffer[i] = std::make_unique<ConstantBuffer<SceneObjectBuffer>>(10);
+			m_objectBuffer[i] = std::make_unique<ConstantBuffer<SceneObjectBuffer>>(Graphics::Core::SCENE_OBJECT_COUNT);
 		}
 	}
 

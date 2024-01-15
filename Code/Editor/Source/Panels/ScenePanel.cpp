@@ -223,13 +223,21 @@ namespace Bruno
 			else
 			{
 				int dragLength = Math::Abs(m_beginMouseDownPosition.x - currentPosition.x) + Math::Abs(m_beginMouseDownPosition.y - currentPosition.y);
-				if (dragLength < 2) { //click
+				if (dragLength < 2) //click
+				{
 					auto ray = ConvertMousePositionToRay(currentPosition);
-					UUID entity = m_selectionService->FindEntityWithRay(ray, 1000.0f);
-					if (entity)
+					UUID entityUUID = m_selectionService->FindEntityUUIDWithRay(ray, 1000.0f);
+					if (entityUUID)
 					{
-						m_selectionService->Select(entity);
+						m_selectionService->Select(entityUUID);
+						auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
+						m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
 					}
+					else
+					{
+						m_selectionService->DeselectAll();
+					}
+					m_gizmoService->SetActive(entityUUID);
 				}
 			}
 			
