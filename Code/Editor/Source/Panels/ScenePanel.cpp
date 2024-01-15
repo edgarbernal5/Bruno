@@ -91,8 +91,8 @@ namespace Bruno
 			else
 				m_form->hide();
 
-			//if (args.exposed)
-			//	this->focus();
+			if (args.exposed)
+				this->focus();
 		});
 
 		//m_form->events().expose([this](const nana::arg_expose& args)
@@ -171,7 +171,7 @@ namespace Bruno
 			m_lastMousePosition.y = args.pos.y;
 			m_beginMouseDownPosition = m_lastMousePosition;
 
-			m_isGizmoing = m_gizmoService->BeginDrag(Math::Vector2(args.pos.x, args.pos.y));
+			m_isGizmoing = args.left_button && m_gizmoService->BeginDrag(Math::Vector2(args.pos.x, args.pos.y));
 			m_form->set_capture(true);
 		});
 
@@ -184,26 +184,35 @@ namespace Bruno
 				m_gizmoService->OnMouseMove(Math::Vector2(args.pos.x, args.pos.y));
 			}
 
-			if (args.left_button)
+			if (m_isGizmoing)
 			{
-				if (m_isGizmoing)
+				m_gizmoService->Drag(Math::Vector2(args.pos.x, args.pos.y));
+			}
+			else
+			{
+				if (args.left_button)
 				{
-					m_gizmoService->Drag(Math::Vector2(args.pos.x, args.pos.y));
-				}
-				else
-				{
-					if (args.left_button)
+					if (args.alt)
 					{
 						m_camera.Rotate(currentPosition, m_lastMousePosition);
 					}
-					else if (args.mid_button)
+					else
 					{
-						m_camera.HandTool(currentPosition, m_lastMousePosition);
+						int dragLength = Math::Abs(m_beginMouseDownPosition.x - currentPosition.x) + Math::Abs(m_beginMouseDownPosition.y - currentPosition.y);
+
+						if (!m_dragRectangle)
+						{
+							m_dragRectangle = dragLength > 2;
+						}
 					}
-					else if (args.right_button)
-					{
-						m_camera.PitchYaw(currentPosition, m_lastMousePosition);
-					}
+				}
+				else if (args.mid_button)
+				{
+					m_camera.HandTool(currentPosition, m_lastMousePosition);
+				}
+				else if (args.right_button)
+				{
+					m_camera.PitchYaw(currentPosition, m_lastMousePosition);
 				}
 			}
 			
@@ -222,8 +231,12 @@ namespace Bruno
 			}
 			else
 			{
-				int dragLength = Math::Abs(m_beginMouseDownPosition.x - currentPosition.x) + Math::Abs(m_beginMouseDownPosition.y - currentPosition.y);
-				if (dragLength < 2) //click
+				if (m_dragRectangle)
+				{
+
+					m_dragRectangle = false;
+				}
+				else if (!args.alt)
 				{
 					auto ray = ConvertMousePositionToRay(currentPosition);
 					UUID entityUUID = m_selectionService->FindEntityUUIDWithRay(ray, 1000.0f);
@@ -422,34 +435,48 @@ namespace Bruno
 				entityTransform.Position += delta;
 			}
 		});
-		/*
+		
 		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
 		{
-			auto newRotation = m_selectionService->GetSelectedObjects()[0]->Rotation * delta;
-			newRotation.Normalize();
-			m_selectionService->GetSelectedObjects()[0]->Rotation = newRotation;
-		});
+			auto& selections = m_selectionService->GetSelections();
+			for (auto& uuid : selections)
+			{
+				Entity entity = m_scene->TryGetEntityWithUUID(uuid);
+				TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
+				auto newRotation = entityTransform.Rotation * delta;
+				newRotation.Normalize();
 
+				entityTransform.Rotation = newRotation;
+			}
+		});
+		
 		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
 		{
 			auto newDelta = delta * 0.1f;
-			if (isUniform)
+			auto& selections = m_selectionService->GetSelections();
+			for (auto& uuid : selections)
 			{
-				float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
-				auto newScale = m_selectionService->GetSelectedObjects()[0]->Scale * uniformDelta;
+				Entity entity = m_scene->TryGetEntityWithUUID(uuid);
+				TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
+				
+				if (isUniform)
+				{
+					float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
+					auto newScale = entityTransform.Scale * uniformDelta;
+					if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+					{
+						entityTransform.Scale = newScale;
+					}
+
+					continue;
+				}
+				auto newScale = entityTransform.Scale + newDelta;
 				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 				{
-					m_selectionService->GetSelectedObjects()[0]->Scale = newScale;
+					entityTransform.Scale = newScale;
 				}
-
-				return;
 			}
-			auto newScale = m_selectionService->GetSelectedObjects()[0]->Scale + newDelta;
-			if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
-			{
-				m_selectionService->GetSelectedObjects()[0]->Scale = newScale;
-			}
-		});*/
+		});
 	}
 
 	void ScenePanel::InitializeGraphicsContext()

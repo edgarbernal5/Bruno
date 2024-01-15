@@ -53,8 +53,8 @@ namespace Bruno
 		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<ModelMaterial>>&& materials, 
 			std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes);
 
-		const std::shared_ptr<IndexBuffer>& GetIndexBuffer() { return m_indexBuffer; }
-		const std::shared_ptr<VertexBuffer>& GetVertexBuffer() { return m_vertexBuffer; }
+		const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const { return m_indexBuffer; }
+		const std::shared_ptr<VertexBuffer>& GetVertexBuffer() const { return m_vertexBuffer; }
 
 		void SetIndexBuffer(std::shared_ptr<IndexBuffer> buffer);
 		void SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer);

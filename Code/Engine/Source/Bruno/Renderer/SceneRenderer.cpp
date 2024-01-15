@@ -64,8 +64,8 @@ namespace Bruno
 		auto objectSize = AlignU32(sizeof(SceneObjectBuffer), 256);
 
 		VertexBuffer* currentVB = nullptr;
-		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
 		uint32_t objectIndex = 0;
+		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
 		for (auto& ent : entities)
 		{
 			auto [transformComponent, modelComponent] = entities.get<TransformComponent, ModelComponent>(ent);
@@ -79,14 +79,16 @@ namespace Bruno
 			auto texture = m_assetManager->GetAsset<Texture>(textureHandle);
 			if (texture != nullptr && texture->IsReady())
 			{
-				if (!model->GetIndexBuffer()->IsReady() || !model->GetVertexBuffer()->IsReady())
+				auto& indexBuffer = model->GetIndexBuffer();
+				auto& vertexBuffer = model->GetVertexBuffer();
+				if (!indexBuffer->IsReady() || !vertexBuffer->IsReady())
 					continue;
 
-				if (currentVB != model->GetVertexBuffer().get())
+				if (currentVB != vertexBuffer.get())
 				{
-					graphicsContext->SetVertexBuffer(*model->GetVertexBuffer());
-					graphicsContext->SetIndexBuffer(*model->GetIndexBuffer());
-					currentVB = model->GetVertexBuffer().get();
+					graphicsContext->SetVertexBuffer(*vertexBuffer);
+					graphicsContext->SetIndexBuffer(*indexBuffer);
+					currentVB = vertexBuffer.get();
 				}
 
 				PipelineResourceBinding textureBinding;

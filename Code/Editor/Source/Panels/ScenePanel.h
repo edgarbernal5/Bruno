@@ -79,6 +79,7 @@ namespace Bruno
 
 		bool m_shiftPressed{ false };
 		bool m_isGizmoing{ false };
+		bool m_dragRectangle{ false };
 
 		float m_totalTime = 0.0f;
 	};
