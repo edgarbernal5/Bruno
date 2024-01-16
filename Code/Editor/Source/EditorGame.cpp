@@ -67,11 +67,11 @@ namespace Bruno
 	{
 		std::lock_guard lock{ m_scenePanelsMutex };
 		
-		panel->events().enter_size_move([this](const nana::arg_size_move& args)
+		panel->GetForm().events().enter_size_move([this](const nana::arg_size_move& args)
 		{
 			OnResizeMoveStarted();
 		});
-		panel->events().exit_size_move([this](const nana::arg_size_move& args)
+		panel->GetForm().events().exit_size_move([this](const nana::arg_size_move& args)
 		{
 			OnResizeMoveFinished();
 		});

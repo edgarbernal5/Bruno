@@ -22,15 +22,14 @@
 namespace Bruno
 {
 	ScenePanel::ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<Scene> scene, DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat) :
-		nana::nested_form(window, nana::appear::bald<>()),
-		//nana::panel<true>(window),
+		//nana::nested_form(window, nana::appear::bald<>()),
+		nana::panel<true>(window),
 		m_backBufferFormat(backBufferFormat),
 		m_scene(scene),
 		m_depthBufferFormat(depthBufferFormat),
 
 		m_editorGame(editorGame)
 	{
-		m_form = this;
 		static int idx = 0;
 		idx++;
 		idxx = idx;
@@ -40,7 +39,8 @@ namespace Bruno
 		this->caption(idstr.str());
 		this->bgcolor(nana::colors::dark_red);
 
-		//m_form = std::make_unique<nana::nested_form>(this->handle(), nana::appear::bald<>());
+		//m_form = this;
+		m_form = std::make_unique<nana::nested_form>(this->handle(), nana::appear::bald<>());
 
 		//TO-DO: ver si se puede agregar un evento al form o nested_form cuando llega un mensaje de WM_ACTIVATEAPP 
 		//para luego disparar un evento y saber si el panel está activado o no. Es útil para el timer y el rendering/painting.
@@ -74,16 +74,16 @@ namespace Bruno
 			m_editorGame->RemoveScenePanel(this);
 		});
 
-		//this->events().resized([this](const nana::arg_resized& args)
-		//{
-		//	nana::size newSize(args.width, args.height);
-		//	m_form->size(newSize);
-		//});
+		this->events().resized([this](const nana::arg_resized& args)
+		{
+			nana::rectangle newRect(10, 25 + 10, args.width - 20, args.height - 25 - 20);
+			m_form->move(newRect);
+		});
 
 		this->events().expose([this](const nana::arg_expose& args)
 		{
 			std::lock_guard lock{ m_mutex };
-			BR_CORE_TRACE << "Expose panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
+			BR_CORE_TRACE << "Expose of panel: panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
 
 			m_isExposed = args.exposed;
 			if (m_isExposed)
@@ -94,21 +94,6 @@ namespace Bruno
 			if (args.exposed)
 				this->focus();
 		});
-
-		//m_form->events().expose([this](const nana::arg_expose& args)
-		//{
-		//	std::lock_guard lock{ m_mutex };
-		//	BR_CORE_TRACE << "Expose panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
-
-		//	m_isExposed = args.exposed;
-		//	/*if (m_isExposed)
-		//		m_form->show();
-		//	else
-		//		m_form->hide();*/
-
-		//	/*if (args.exposed) 
-		//		this->focus();*/
-		//});
 
 		m_form->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
@@ -309,7 +294,7 @@ namespace Bruno
 
 		editorGame->AddScenePanel(this);
 		m_form->show();
-		//m_isExposed = true;
+		m_isExposed = true;
 	}
 
 	ScenePanel::~ScenePanel()

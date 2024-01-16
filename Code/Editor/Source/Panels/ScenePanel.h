@@ -29,8 +29,8 @@ namespace Bruno
 	class Scene;
 	class SceneRenderer;
 
-	//class ScenePanel : public nana::panel<true>
-	class ScenePanel : public nana::nested_form
+	class ScenePanel : public nana::panel<true>
+	//class ScenePanel : public nana::nested_form
 	{
 	public:
 		ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<Scene> scene, DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D32_FLOAT);
@@ -42,6 +42,7 @@ namespace Bruno
 		bool IsEnabled();
 		std::mutex& GetMutex() { return m_mutex; }
 
+		nana::nested_form& GetForm() { return *m_form; }
 	private:
 		void InitializeCamera();
 		void InitializeGizmoService();
@@ -50,8 +51,8 @@ namespace Bruno
 		void UpdateCBs(const GameTimer& timer);
 		Math::Ray ConvertMousePositionToRay(const Math::Int2& mousePosition);
 
-		//std::unique_ptr<nana::nested_form> m_form;
-		nana::nested_form* m_form;
+		std::unique_ptr<nana::nested_form> m_form;
+		//nana::nested_form* m_form;
 		std::unique_ptr<Surface> m_surface;
 		int idxx = 0;
 		DXGI_FORMAT m_backBufferFormat;
