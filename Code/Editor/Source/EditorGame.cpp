@@ -8,8 +8,8 @@
 #include "Content/EditorAssetManager.h"
 #include "Bruno/Content/ContentTypeReaderManager.h"
 #include <nana/gui/widgets/button.hpp>
-
 #include <nana/debugger.hpp>
+
 namespace Bruno
 {
 	void RenderTask(EditorGame& editor, std::atomic<bool>& exitRequested)
@@ -182,7 +182,7 @@ namespace Bruno
 		m_menubar.push_back("Debug");
 		m_menubar.at(2).append("Enable Printing", [this](nana::menu::item_proxy& ip)
 		{
-			nana::debugger::enabled_debug = !nana::debugger::enabled_debug;
+			nana::debugger::enable_print_debug(!nana::debugger::is_enabled_print_debug());
 		});
 
 		auto scene = std::make_shared<Scene>();
