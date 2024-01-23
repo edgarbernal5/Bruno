@@ -105,6 +105,7 @@
     <ClCompile Include="Source\Gizmos\GizmoScaleRenderer.cpp" />
     <ClCompile Include="Source\Gizmos\GizmoService.cpp" />
     <ClCompile Include="Source\Gizmos\GizmoTranslationRenderer.cpp" />
+    <ClCompile Include="Source\Panels\ContentBrowserPanel.cpp" />
     <ClCompile Include="Source\Panels\SceneHierarchyPanel.cpp" />
     <ClCompile Include="Source\EditorGame.cpp" />
     <ClCompile Include="Source\Main.cpp" />
@@ -125,6 +126,7 @@
     <ClInclude Include="Source\Gizmos\GizmoScaleRenderer.h" />
     <ClInclude Include="Source\Gizmos\GizmoService.h" />
     <ClInclude Include="Source\Gizmos\GizmoTranslationRenderer.h" />
+    <ClInclude Include="Source\Panels\ContentBrowserPanel.h" />
     <ClInclude Include="Source\Panels\SceneHierarchyPanel.h" />
     <ClInclude Include="Source\Panels\ScenePanel.h" />
     <ClInclude Include="Source\Panels\Scene\SelectionService.h" />

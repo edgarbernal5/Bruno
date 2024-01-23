@@ -14,7 +14,7 @@ namespace Bruno
 		m_treebox.create(*this);
 
 		m_place.bind(*this);
-		m_place.div("vert <tree margin=[4,4,4,4]>");
+		m_place.div("vert <tree>");
 
 		m_place["tree"] << m_treebox;
 		m_place.collocate();
