@@ -44,6 +44,7 @@ namespace Bruno
 
 	void WindowsGameWindow::Initialize()
 	{
+		SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 		HINSTANCE hInstance = GetModuleHandle(NULL);
 
 		// Register class
@@ -58,11 +59,25 @@ namespace Bruno
 		wcex.lpszClassName = ApplicationClassName;
 		wcex.hIconSm = LoadIconW(wcex.hInstance, L"IDI_ICON");
 		if (!RegisterClassExW(&wcex))
+		{
+			BR_CORE_ERROR << "RegisterClassExW Failed." << std::endl;
 			return;
+		}
+				
+		UINT dpi = GetDpiForSystem(); //GetDpiForWindow(m_hwnd);
+		float scaling_factor = static_cast<float>(dpi) / 96.0f;
+		// Actually set the appropriate window size
+		RECT scaledWindowRect;
+		scaledWindowRect.left = 0;
+		scaledWindowRect.top = 0;
+		scaledWindowRect.right = static_cast<LONG>(m_parameters.Width * scaling_factor);
+		scaledWindowRect.bottom = static_cast<LONG>(m_parameters.Height * scaling_factor);
 
-		// Compute window rectangle dimensions based on requested client area dimensions.
-		RECT windowRect = { 0, 0, (LONG)m_parameters.Width, (LONG)m_parameters.Height };
-		AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+		if (!AdjustWindowRectExForDpi(&scaledWindowRect, WS_OVERLAPPEDWINDOW, false, 0, dpi))
+		{
+			BR_CORE_ERROR << "AdjustWindowRectExForDpi Failed." << std::endl;
+			return;
+		}
 
 		std::wstring m_mainWndTitle(m_parameters.Title.begin(), m_parameters.Title.end());
 
@@ -74,8 +89,8 @@ namespace Bruno
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			windowRect.right - windowRect.left,
-			windowRect.bottom - windowRect.top,
+			scaledWindowRect.right - scaledWindowRect.left,
+			scaledWindowRect.bottom - scaledWindowRect.top,
 			nullptr,			// We have no parent window.
 			nullptr,			// We aren't using menus.
 			hInstance,
@@ -87,6 +102,7 @@ namespace Bruno
 			BR_CORE_ERROR << "CreateWindow Failed." << std::endl;
 			return;
 		}
+
 		m_hModuleInstance = hInstance;
 	}
 
@@ -169,7 +185,21 @@ namespace Bruno
 			}
 			return 0;
 		}
+		case WM_DPICHANGED:
+			{
+				auto r = reinterpret_cast<const RECT*>(lParam);
+				auto dpi_x = HIWORD(wParam);
+				auto dpi_y = LOWORD(wParam);
 
+				::SetWindowPos(hWnd,
+					NULL,
+					r->left,
+					r->top,
+					r->right - r->left,
+					r->bottom - r->top,
+					SWP_NOZORDER | SWP_NOACTIVATE);
+			}
+			return 0;
 		case WM_SIZE:
 			if (window)
 			{

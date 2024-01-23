@@ -47,7 +47,8 @@ namespace Bruno
 		return m_materials[materialIndex];
 	}
 
-	Mesh::Mesh(const std::string& meshName, uint32_t baseVertex, uint32_t baseIndex, uint32_t vertexCount, uint32_t indexCount, uint32_t materialIndex, const Math::Matrix& transform, const Math::Matrix& localTransform, const Math::BoundingBox& bbox) :
+	Mesh::Mesh(const std::string& meshName, uint32_t baseVertex, uint32_t baseIndex, uint32_t vertexCount, uint32_t indexCount, uint32_t materialIndex, 
+		const Math::Matrix& transform, const Math::Matrix& localTransform, const Math::BoundingBox& bbox) :
 		m_meshName(meshName),
 		m_baseVertex(baseVertex),
 		m_baseIndex(baseIndex),
