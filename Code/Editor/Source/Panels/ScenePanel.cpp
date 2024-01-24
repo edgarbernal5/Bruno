@@ -76,7 +76,8 @@ namespace Bruno
 
 		this->events().resized([this](const nana::arg_resized& args)
 		{
-			nana::rectangle newRect(10, 25 + 10, args.width - 20, args.height - 25 - 20);
+			int margin = 4;
+			nana::rectangle newRect(margin, 25 + margin, args.width - margin * 2, args.height - 25 - margin * 2);
 			m_form->move(newRect);
 		});
 

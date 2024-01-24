@@ -9,6 +9,7 @@
 #include "Bruno/Content/ContentTypeReaderManager.h"
 #include <nana/gui/widgets/button.hpp>
 #include <nana/debugger.hpp>
+#include "Panels/ContentBrowserPanel.h"
 
 namespace Bruno
 {
@@ -189,6 +190,7 @@ namespace Bruno
 		
 		auto scenePanel = m_place.add_pane<ScenePanel>("pane1", "", nana::dock_position::right, this, scene);
 		auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane2", "pane1", nana::dock_position::right, scene);
+		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("pane3", "pane1", nana::dock_position::down);
 
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
 
