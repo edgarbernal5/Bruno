@@ -113,6 +113,7 @@
     <ClCompile Include="Source\Panels\Scene\SelectionService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Panels\ContentBrowser\ContentBrowserItem.h" />
     <ClInclude Include="Source\Content\AssetImporter.h" />
     <ClInclude Include="Source\Content\AssetImporterContext.h" />
     <ClInclude Include="Source\Content\EditorAssetManager.h" />

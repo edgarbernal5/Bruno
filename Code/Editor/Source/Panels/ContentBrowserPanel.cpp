@@ -1,6 +1,5 @@
 #include "ContentBrowserPanel.h"
-#include <filesystem>
-
+#include "Bruno/Core/Base.h"
 
 namespace Bruno
 {
@@ -30,6 +29,9 @@ namespace Bruno
 
 		m_treebox.events().selected([&](const nana::arg_treebox& arg)
 		{
+			BR_CORE_TRACE << "tree item selected: " << arg.operated << std::endl;
+			if (!arg.operated) return;
+
 			m_listbox.auto_draw(false);
 			PopulateFileDirectory(arg.item);
 			m_listbox.auto_draw(true);
@@ -41,13 +43,18 @@ namespace Bruno
 				return;
 				
 			for (auto& item : m_listbox.selected()) {
+				auto& contentItem = m_listbox.at(item).value<ContentBrowserItem>();
 
+				if (contentItem.IsDirectory) {
+					auto path = m_treebox.make_key_path(contentItem.TreeNode, "/") + ("/") + contentItem.DirectoryEntry.path().filename().generic_string() ;
+					m_treebox.find(path).select(true);
+				}
 			}
 		});
 
-		m_fileSelectionPopup.append("Import asset", [](nana::menu::item_proxy& ip) {});
+		m_fileSelectionPopup.append("Import new asset", [](nana::menu::item_proxy& ip) {});
 		m_fileSelectionPopup.append_splitter();
-		m_fileSelectionPopup.append("Add to scene", [](nana::menu::item_proxy& ip) {});
+		m_fileSelectionPopup.append("Reimport asset", [](nana::menu::item_proxy& ip) {});
 
 		m_listbox.events().mouse_down([&](const nana::arg_mouse& args)
 		{
@@ -56,6 +63,8 @@ namespace Bruno
 
 			menu_popuper(m_fileSelectionPopup)(args);
 		});
+
+		node.select(true);
 	}
 
 	void ContentBrowserPanel::PopulateDirectory(nana::treebox::item_proxy& node, const std::wstring& directoryPath)
@@ -85,7 +94,13 @@ namespace Bruno
 		for (const auto& directoryEntry : std::filesystem::directory_iterator{ nodeDirectoryEntry.path()})
 		{
 			auto item = m_listbox.at(0).append(directoryEntry.path().filename(), true);
-			item.value(directoryEntry);
+			
+			ContentBrowserItem contentItem;
+			contentItem.DirectoryEntry = directoryEntry;
+			contentItem.IsDirectory = std::filesystem::is_directory(directoryEntry);
+			contentItem.TreeNode = node;
+
+			item.value(contentItem);
 		}
 	}
 }

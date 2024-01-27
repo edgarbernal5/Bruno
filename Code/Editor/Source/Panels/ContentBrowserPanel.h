@@ -6,6 +6,8 @@
 #include <nana/gui/widgets/listbox.hpp>
 
 #include <nana/gui/widgets/menu.hpp>
+#include "ContentBrowser/ContentBrowserItem.h"
+
 namespace Bruno
 {
 	class ContentBrowserPanel : public nana::panel<true>

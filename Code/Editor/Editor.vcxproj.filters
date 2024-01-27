@@ -69,6 +69,9 @@
     <Filter Include="Source\Panels\Scene">
       <UniqueIdentifier>{0ffc3604-6f7d-45d8-827c-f04833436388}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Panels\ContentBrowser">
+      <UniqueIdentifier>{c69672cf-b6d6-4056-b310-79f2dff29d87}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\EditorGame.h">
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="Source\Panels\ContentBrowserPanel.h">
       <Filter>Source\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\ContentBrowser\ContentBrowserItem.h">
+      <Filter>Source\Panels\ContentBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

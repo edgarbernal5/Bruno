@@ -120,7 +120,7 @@ namespace Bruno
 		m_form->events().resized([this](const nana::arg_resized& args)
 		{
 			std::lock_guard lock{ m_mutex };
-			//BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << m_form->native_handle() << ". w=" << args.width << "; h=" << args.height << std::endl;
+			BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << m_form->native_handle() << ". w=" << args.width << "; h=" << args.height << std::endl;
 
 			if (m_isSizingMoving)
 				return;
@@ -153,6 +153,7 @@ namespace Bruno
 
 		m_form->events().mouse_down([this](const nana::arg_mouse& args)
 		{
+			BR_CORE_TRACE << "Mouse down x=" << args.pos.x << "; y=" << args.pos.y << std::endl;
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
 			m_beginMouseDownPosition = m_lastMousePosition;
