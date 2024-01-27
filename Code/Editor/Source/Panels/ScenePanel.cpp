@@ -109,11 +109,12 @@ namespace Bruno
 			std::lock_guard lock{ m_mutex };
 			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
 
+			auto formSize = m_form->size();
 			if (m_surface)
 			{
-				m_surface->Resize(this->size().width, this->size().height);
+				m_surface->Resize(formSize.width, formSize.height);
 			}
-			m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)this->size().width, (float)this->size().height));
+			m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.width, (float)formSize.height));
 			m_isSizingMoving = false;
 		});
 
