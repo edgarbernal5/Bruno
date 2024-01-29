@@ -101,6 +101,7 @@
     <ClCompile Include="Source\Content\ImporterManager.cpp" />
     <ClCompile Include="Source\Content\Importers\ModelImporter.cpp" />
     <ClCompile Include="Source\Content\Importers\TextureImporter.cpp" />
+    <ClCompile Include="Source\Documents\DocumentService.cpp" />
     <ClCompile Include="Source\Gizmos\GizmoRotationRenderer.cpp" />
     <ClCompile Include="Source\Gizmos\GizmoScaleRenderer.cpp" />
     <ClCompile Include="Source\Gizmos\GizmoService.cpp" />
@@ -113,6 +114,7 @@
     <ClCompile Include="Source\Panels\Scene\SelectionService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Documents\DocumentService.h" />
     <ClInclude Include="Source\Panels\ContentBrowser\ContentBrowserItem.h" />
     <ClInclude Include="Source\Content\AssetImporter.h" />
     <ClInclude Include="Source\Content\AssetImporterContext.h" />

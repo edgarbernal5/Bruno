@@ -1,11 +1,14 @@
 #include "ContentBrowserPanel.h"
+
 #include "Bruno/Core/Base.h"
+#include "EditorGame.h"
 
 namespace Bruno
 {
-	ContentBrowserPanel::ContentBrowserPanel(nana::window window, const std::wstring& workingDirectory) : 
+	ContentBrowserPanel::ContentBrowserPanel(nana::window window, const std::wstring& workingDirectory, EditorGame* game) :
 		nana::panel<true>(window),
-		m_workingDirectory(workingDirectory)
+		m_workingDirectory(workingDirectory),
+		m_game(game)
 	{
 		this->caption("Content Browser");
 
@@ -49,6 +52,10 @@ namespace Bruno
 					auto path = m_treebox.make_key_path(contentItem.TreeNode, "/") + ("/") + contentItem.DirectoryEntry.path().filename().generic_string() ;
 					m_treebox.find(path).select(true);
 				}
+				else
+				{
+					m_game->OpenDocument(contentItem.DirectoryEntry.path());
+				}
 			}
 		});
 
@@ -60,7 +67,7 @@ namespace Bruno
 		{
 			if (m_listbox.selected().size() == 0)
 				return;
-
+			
 			menu_popuper(m_fileSelectionPopup)(args);
 		});
 

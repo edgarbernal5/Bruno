@@ -10,10 +10,12 @@
 
 namespace Bruno
 {
+	class EditorGame;
+
 	class ContentBrowserPanel : public nana::panel<true>
 	{
 	public:
-		ContentBrowserPanel(nana::window window, const std::wstring& workingDirectory);
+		ContentBrowserPanel(nana::window window, const std::wstring& workingDirectory, EditorGame* game);
 
 	private:
 		void PopulateDirectory(nana::treebox::item_proxy& node, const std::wstring& directory);
@@ -21,6 +23,7 @@ namespace Bruno
 		void PopulateFileDirectory(nana::treebox::item_proxy& node);
 
 		std::wstring m_workingDirectory;
+		EditorGame* m_game;
 		nana::place m_place;
 		nana::treebox m_treebox;
 		nana::listbox m_listbox;

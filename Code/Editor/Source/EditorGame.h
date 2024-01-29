@@ -25,6 +25,8 @@ namespace Bruno
 		EditorGame(const ApplicationParameters& parameters, const std::wstring& projectPath);
 		~EditorGame();
 
+		void OpenDocument(const std::wstring& filename);
+
 		friend class ScenePanel;
 	protected:
 		void InitializeUI();
