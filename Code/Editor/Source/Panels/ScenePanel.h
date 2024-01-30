@@ -4,6 +4,8 @@
 #include <nana/gui/place.hpp>
 #include <nana/gui/widgets/form.hpp>
 #include <nana/gui/timer.hpp>
+#include <nana/gui/widgets/combox.hpp>
+#include <nana/gui/widgets/button.hpp>
 
 #include <Bruno/Platform/DirectX/IndexBuffer.h>
 #include <Bruno/Platform/DirectX/VertexBuffer.h>
@@ -52,6 +54,10 @@ namespace Bruno
 		Math::Ray ConvertMousePositionToRay(const Math::Int2& mousePosition);
 
 		std::unique_ptr<nana::nested_form> m_form;
+		nana::place m_place;
+		nana::combox m_gizmoTypeCombobox;
+		nana::button m_gizmoTransformSpaceButton;
+
 		//nana::nested_form* m_form;
 		std::unique_ptr<Surface> m_surface;
 		int idxx = 0;

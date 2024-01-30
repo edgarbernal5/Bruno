@@ -39,6 +39,32 @@ namespace Bruno
 		this->caption(idstr.str());
 		this->bgcolor(nana::colors::dark_red);
 
+
+		m_place.bind(*this);
+
+		m_gizmoTypeCombobox.create(*this, { 0,0,150,25 });
+		m_gizmoTransformSpaceButton.create(*this);
+
+		m_place.div("vert <vert weight=25 <gizmoTypeComboBox>>");
+
+		m_place["gizmoTypeComboBox"] << m_gizmoTypeCombobox;
+		m_place.collocate();
+
+		m_gizmoTypeCombobox.push_back(("None"));
+		m_gizmoTypeCombobox.push_back(("Translation"));
+		m_gizmoTypeCombobox.push_back(("Rotation"));
+		m_gizmoTypeCombobox.push_back(("Scale"));
+
+		m_gizmoTypeCombobox.option(0);
+
+
+		m_gizmoTransformSpaceButton.events().click([&](const nana::arg_click& click)
+		{
+			if (m_gizmoService->GetTransformSpace() == GizmoService::TransformSpace::World)
+				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::Local);
+			else
+				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::World);
+		});
 		//m_form = this;
 		m_form = std::make_unique<nana::nested_form>(this->handle(), nana::appear::bald<>());
 
@@ -271,24 +297,15 @@ namespace Bruno
 			{
 				m_camera.Walk(-0.25f);
 			}
-			else if (args.key == '1')
+		});
+
+		m_gizmoTypeCombobox.events().selected([this](const nana::arg_combox& acmb) mutable
+		{
+			BR_CORE_TRACE << "Gizmo type selected: " << acmb.widget.option() << std::endl;
+
+			if (m_gizmoService)
 			{
-				m_gizmoService->SetGizmoType(GizmoService::GizmoType::Translation);
-			}
-			else if (args.key == '2')
-			{
-				m_gizmoService->SetGizmoType(GizmoService::GizmoType::Rotation);
-			}
-			else if (args.key == '3')
-			{
-				m_gizmoService->SetGizmoType(GizmoService::GizmoType::Scale);
-			}
-			else if (args.key == '4')
-			{
-				if (m_gizmoService->GetTransformSpace() == GizmoService::TransformSpace::World)
-					m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::Local);
-				else
-					m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::World);
+				m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(acmb.widget.option()));
 			}
 		});
 
@@ -355,15 +372,15 @@ namespace Bruno
 		auto device = Graphics::GetDevice();
 		Math::Color clearColor{ 1.0f, 1.0f, 0.0f, 1.0f };
 		if (idxx == 2) {
-			clearColor.R(0.0f);
+			clearColor.R(0.5f);
 		}
 		else if (idxx == 3) {
-			clearColor.R(0.0f);
+			clearColor.R(0.25f);
 			clearColor.G(0.0f);
 		}
 		else if (idxx == 4) {
 			clearColor.R(0.0f);
-			clearColor.G(0.0f);
+			clearColor.G(0.25f);
 			clearColor.B(0.5f);
 		}
 		Texture& backBuffer = m_surface->GetBackBuffer();
@@ -465,6 +482,8 @@ namespace Bruno
 				}
 			}
 		});
+
+		m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(m_gizmoTypeCombobox.option()));
 	}
 
 	void ScenePanel::InitializeGraphicsContext()
