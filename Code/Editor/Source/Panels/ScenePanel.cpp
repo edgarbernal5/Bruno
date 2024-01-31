@@ -37,34 +37,39 @@ namespace Bruno
 		std::ostringstream idstr;
 		idstr << "Scene id " << idxx;
 		this->caption(idstr.str());
-		this->bgcolor(nana::colors::dark_red);
-
 
 		m_place.bind(*this);
 
-		m_gizmoTypeCombobox.create(*this, { 0,0,150,25 });
+		m_gizmoTypeCombobox.create(*this, { 0, 0, 150, 25 });
 		m_gizmoTransformSpaceButton.create(*this);
 
-		m_place.div("vert <vert weight=25 <gizmoTypeComboBox>>");
+		m_place.div("vert <weight=25 <gizmoTypeComboBox><gizmoSpaceButton>>");
 
 		m_place["gizmoTypeComboBox"] << m_gizmoTypeCombobox;
-		m_place.collocate();
+		m_place["gizmoSpaceButton"] << m_gizmoTransformSpaceButton;
 
 		m_gizmoTypeCombobox.push_back(("None"));
 		m_gizmoTypeCombobox.push_back(("Translation"));
 		m_gizmoTypeCombobox.push_back(("Rotation"));
 		m_gizmoTypeCombobox.push_back(("Scale"));
 
-		m_gizmoTypeCombobox.option(0);
-
+		m_gizmoTypeCombobox.option(1);
+		m_gizmoTransformSpaceButton.caption("World");
 
 		m_gizmoTransformSpaceButton.events().click([&](const nana::arg_click& click)
 		{
 			if (m_gizmoService->GetTransformSpace() == GizmoService::TransformSpace::World)
+			{
 				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::Local);
+				m_gizmoTransformSpaceButton.caption("World");
+			}
 			else
+			{
 				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::World);
+				m_gizmoTransformSpaceButton.caption("Local");
+			}
 		});
+
 		//m_form = this;
 		m_form = std::make_unique<nana::nested_form>(this->handle(), nana::appear::bald<>());
 
@@ -103,7 +108,8 @@ namespace Bruno
 		this->events().resized([this](const nana::arg_resized& args)
 		{
 			int margin = 4;
-			nana::rectangle newRect(margin, 25 + margin, args.width - margin * 2, args.height - 25 - margin * 2);
+			int height = m_gizmoTypeCombobox.size().height;
+			nana::rectangle newRect(margin, height + margin, args.width - margin * 2, args.height - height - margin * 2);
 			m_form->move(newRect);
 		});
 
@@ -180,7 +186,7 @@ namespace Bruno
 
 		m_form->events().mouse_down([this](const nana::arg_mouse& args)
 		{
-			BR_CORE_TRACE << "Mouse down x=" << args.pos.x << "; y=" << args.pos.y << std::endl;
+			//BR_CORE_TRACE << "Mouse down x=" << args.pos.x << "; y=" << args.pos.y << std::endl;
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
 			m_beginMouseDownPosition = m_lastMousePosition;
@@ -201,6 +207,14 @@ namespace Bruno
 			if (m_isGizmoing)
 			{
 				m_gizmoService->Drag(Math::Vector2(args.pos.x, args.pos.y));
+
+				//auto& selections = m_selectionService->GetSelections();
+				//if (selections.size() == 1)
+				//{
+				//	auto worldMatrix = m_selectionService->GetSelectionTransform();
+
+				//	m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
+				//}
 			}
 			else
 			{
@@ -398,7 +412,6 @@ namespace Bruno
 
 		m_sceneRenderer->OnRender(m_graphicsContext.get());
 
-		////test gizmo
 		m_gizmoService->Render(m_graphicsContext.get());
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
@@ -420,7 +433,7 @@ namespace Bruno
 	void ScenePanel::InitializeCamera()
 	{
 		m_camera.LookAt(Math::Vector3(0, 0, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
-		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 0.1f, 100.0f);
+		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 1.0f, 100.0f);
 	}
 
 	void ScenePanel::InitializeGizmoService()
@@ -431,14 +444,14 @@ namespace Bruno
 		m_gizmoService = std::make_unique<GizmoService>(device, m_camera, m_surface.get(), m_selectionService.get());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
 		{
-			auto& selections = m_selectionService->GetSelections();
-			for (auto& uuid : selections)
-			{
-				Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-				TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
+			//auto& selections = m_selectionService->GetSelections();
+			//for (auto& uuid : selections)
+			//{
+			//	Entity entity = m_scene->TryGetEntityWithUUID(uuid);
+			//	TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
 
-				entityTransform.Position += delta;
-			}
+			//	entityTransform.Position += delta;
+			//}
 		});
 		
 		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
@@ -484,6 +497,7 @@ namespace Bruno
 		});
 
 		m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(m_gizmoTypeCombobox.option()));
+		m_gizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.caption() == "Local" ? GizmoService::TransformSpace::World : GizmoService::TransformSpace::Local);
 	}
 
 	void ScenePanel::InitializeGraphicsContext()

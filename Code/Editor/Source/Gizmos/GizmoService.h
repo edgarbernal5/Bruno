@@ -90,7 +90,7 @@ namespace Bruno
 		void SetTransformSpace(TransformSpace space){ m_transformSpace = space; }
 		void SetActive(bool isActive){ m_isActive = isActive; }
 
-		void SetGizmoPosition(const Math::Vector3 position) { m_selectionState.m_gizmoPosition = position; }
+		void SetGizmoPosition(const Math::Vector3& position) { m_selectionState.m_gizmoPosition = position; }
 	private:
 		struct SelectionState
 		{
@@ -127,7 +127,7 @@ namespace Bruno
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
-
+		bool GetRayIntersection(const Math::Ray& ray, const Math::Plane& plane, float& intersection);
 		void RenderCameraGizmo(GraphicsContext* context);
 
 		const Math::BoundingBox XAxisBox{
@@ -176,7 +176,7 @@ namespace Bruno
 		GizmoType m_currentGizmoType = GizmoType::Translation;
 		PivotType m_pivotType = PivotType::SelectionCenter;
 		GizmoAxis m_currentAxis = GizmoAxis::None;
-		TransformSpace m_transformSpace = TransformSpace::World;
+		TransformSpace m_transformSpace = TransformSpace::Local;
 		GizmoConfig m_gizmoConfig;
 
 		Math::Vector3 m_currentDelta;

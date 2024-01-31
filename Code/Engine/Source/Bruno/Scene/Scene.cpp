@@ -43,6 +43,7 @@ namespace Bruno
 
 		m_entityIdMap[idComponent.Id] = entity;
 
+		//SortEntities();
 		return entity;
 	}
 
@@ -149,5 +150,15 @@ namespace Bruno
 		{
 			CreateModelEntityHierarchy(nodeEntity, model, nodes[child]);
 		}
+	}
+
+	void Scene::SortEntities()
+	{
+		m_registry.sort<IdComponent>([&](const auto lhs, const auto rhs)
+		{
+			auto lhsEntity = m_entityIdMap.find(lhs.Id);
+			auto rhsEntity = m_entityIdMap.find(rhs.Id);
+			return static_cast<uint32_t>(lhsEntity->second) < static_cast<uint32_t>(rhsEntity->second);
+		});
 	}
 }

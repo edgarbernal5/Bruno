@@ -53,6 +53,7 @@ namespace Bruno
 
 	private:
 		void CreateModelEntityHierarchy(Entity parent, std::shared_ptr<Model> model, const ModelNode& node);
+		void SortEntities();
 
 		entt::registry m_registry;
 		entt::entity m_sceneEntity{ entt::null };

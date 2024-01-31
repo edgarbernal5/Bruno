@@ -397,6 +397,9 @@ namespace Bruno
                 delta.z = m_currentDelta.z;
             }
         }
+        else {
+            BR_CORE_TRACE << "No intersection point found!" << "mouse position: " << mousePosition << std::endl;
+        }
 
         m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
 
@@ -453,7 +456,7 @@ namespace Bruno
                 //float sign2 = perpendicularVector.Dot(planeNormals[planeIndex]) < 0.0f ? -1.0f : 1.0f;
                 
                 float sign = perpendicularVector.Dot(planeNormal);
-                BR_CORE_TRACE << "plane normal: x = " << planeNormal.x << " y = " << planeNormal.y << " z =" << planeNormal.z << std::endl;
+                BR_CORE_TRACE << "plane normal: " << planeNormal << std::endl;
                 BR_CORE_TRACE << "angle = " << angle << "; sign = " << sign << std::endl;
                 delta = sign * angle;
 
@@ -623,6 +626,7 @@ namespace Bruno
 
             float intersection;
             if (ray.Intersects(m_selectionState.m_currentGizmoPlane, intersection))
+            //if (GetRayIntersection(ray, m_selectionState.m_currentGizmoPlane, intersection))
             {
                 intersectionPoint = ray.position + (ray.direction * intersection);
                 return true;
@@ -781,6 +785,22 @@ namespace Bruno
 
         //Logger.Debug(string.Format("selected plane normal = {0}; Axis = {1}", plane.Normal, selectedAxis.ToString()));
         m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormal, planeD);
+    }
+
+    bool GizmoService::GetRayIntersection(const Math::Ray& ray, const Math::Plane& plane, float& intersection)
+    {
+        const float numer = plane.DotNormal(ray.position) - plane.w;
+        //const float numer = plane.Dot3(rOrigin) - plane.w;
+        const float denom = plane.DotNormal(ray.direction);
+        //const float denom = plan.Dot3(rVector);
+
+        if (fabsf(denom) < FLT_EPSILON)  // normal is orthogonal to vector, cant intersect
+        {
+            intersection= -1.0f;
+            return false;
+        }
+        intersection= -(numer / denom);
+        return true;
     }
 
     void GizmoService::RenderCameraGizmo(GraphicsContext* context)

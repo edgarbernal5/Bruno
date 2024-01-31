@@ -25,14 +25,15 @@ namespace Bruno
 
 	struct ModelNode
 	{
-		uint32_t Parent = 0xFFFFFFFF;
+		static constexpr uint32_t NullNode = 0xFFFFFFFF;
+		uint32_t Parent = NullNode;
 		std::vector<uint32_t> Children;
 		std::vector<uint32_t> Meshes;
 
 		std::string Name;
 		Math::Matrix LocalTransform;
 
-		inline bool IsRoot() const { return Parent == 0xFFFFFFFF; }
+		inline bool IsRoot() const { return Parent == NullNode; }
 	};
 
 	class ModelMaterial : public RTTI

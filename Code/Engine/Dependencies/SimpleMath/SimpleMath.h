@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <cstring>
 #include <functional>
+#include <iostream>
 
 #if (__cplusplus >= 202002L)
 #include <compare>
@@ -144,6 +145,8 @@ namespace DirectX
             Vector2 operator+ () const noexcept { return *this; }
             Vector2 operator- () const noexcept { return Vector2(-x, -y); }
 
+            friend std::ostream& operator<<(std::ostream& os, const Vector2& V);
+
             // Vector operations
             bool InBounds(const Vector2& Bounds) const noexcept;
 
@@ -256,6 +259,8 @@ namespace DirectX
             // Unary operators
             Vector3 operator+ () const noexcept { return *this; }
             Vector3 operator- () const noexcept;
+
+            friend std::ostream& operator<<(std::ostream& os, const Vector3& V);
 
             // Vector operations
             bool InBounds(const Vector3& Bounds) const noexcept;

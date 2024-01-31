@@ -41,10 +41,16 @@ namespace Bruno
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
 
-		void ApplyTransform(const Math::Matrix& transform)
+		void ApplyTransform(const Math::Matrix& localTransform)
 		{
-			Math::Matrix matrix = transform;
-			matrix.Decompose(Scale, Rotation, Position);
+			Math::Matrix matrix = localTransform;
+			bool isValid = matrix.Decompose(Scale, Rotation, Position);
+			Rotation.Normalize();
+			//Rotation = Math::Quaternion::Identity;
+			//Scale = Math::Vector3::One;
+			if (!isValid) {
+				BR_CORE_TRACE << "Matrix decompose not valid!" << std::endl;
+			}
 		}
 
 		Math::Matrix GetTransform() const

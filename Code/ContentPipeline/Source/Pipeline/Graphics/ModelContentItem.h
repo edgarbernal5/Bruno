@@ -39,7 +39,8 @@ namespace Bruno
 		BR_RTTI_DECLARATION(ModelNodeContentItem, ContentItem);
 
 	public:
-		uint32_t Parent{ 0xFFFFFFFF };
+		static constexpr uint32_t NullNode = 0xFFFFFFFF;
+		uint32_t Parent{ NullNode };
 		std::vector<uint32_t> Children;
 		std::vector<uint32_t> Meshes;
 

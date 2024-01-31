@@ -220,6 +220,13 @@ inline Vector2& Vector2::operator/= (float S) noexcept
     return *this;
 }
 
+inline std::ostream& operator<<(std::ostream& os, const Vector2& V)
+{
+    os << "{x=" << V.x << " / y=" << V.y << "}";
+    return os;
+}
+
+
 //------------------------------------------------------------------------------
 // Binary operators
 //------------------------------------------------------------------------------
@@ -885,6 +892,12 @@ inline Vector3 operator* (float S, const Vector3& V) noexcept
     Vector3 R;
     XMStoreFloat3(&R, X);
     return R;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const Vector3& V)
+{
+    os << "{x=" << V.x << " / y=" << V.y << " / z=" << V.z << "}";
+    return os;
 }
 
 //------------------------------------------------------------------------------

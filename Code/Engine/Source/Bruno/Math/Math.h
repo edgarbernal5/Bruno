@@ -74,7 +74,7 @@ namespace Bruno::Math
         Int2 operator+ () const noexcept { return *this; }
         Int2 operator- () const noexcept { return Int2(-x, -y); }
 
-        //friend std::ostream& operator<<(std::ostream& os, const Int2& V);
+        friend std::ostream& operator<<(std::ostream& os, const Int2& V);
     };
     Int2 operator+ (const Int2& V1, const Int2& V2) noexcept;
     Int2 operator- (const Int2& V1, const Int2& V2) noexcept;
