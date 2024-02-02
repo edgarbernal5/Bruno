@@ -273,7 +273,18 @@ namespace Bruno
         }
         m_selectionState.m_screenScaleMatrix = Math::Matrix::CreateScale(m_selectionState.m_screenScaleFactor);
 
-        auto localObjectRotationMatrix = m_selectionService->GetSelectionLocalTransform();
+        auto localObjectRotationMatrix = m_selectionService->GetSelectionTransform();
+        m_selectionState.m_modelLocal = localObjectRotationMatrix;
+        m_selectionState.m_modelLocal.OrthoNormalize();
+        if (m_transformSpace == TransformSpace::Local)
+        {
+            m_selectionState.m_model = m_selectionState.m_modelLocal;
+        }
+        else
+        {
+            m_selectionState.m_model = Math::Matrix::Identity;
+            m_selectionState.m_model.Translation(localObjectRotationMatrix.Translation());
+        }
 
         if (m_currentGizmoType == GizmoType::Translation ||
             m_currentGizmoType == GizmoType::Rotation)
@@ -378,30 +389,43 @@ namespace Bruno
     Math::Vector3 GizmoService::GetDeltaMovement(const Math::Vector2& mousePosition)
     {
         Math::Vector3 delta = Math::Vector3::Zero;
-        Math::Vector3 intersectionPoint;
-        if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
-        {
-            m_selectionState.m_intersectionPosition = intersectionPoint;
-            m_currentDelta = intersectionPoint - m_selectionState.m_prevIntersectionPosition;
 
-            if (m_currentAxis == GizmoAxis::X || m_currentAxis == GizmoAxis::XY || m_currentAxis == GizmoAxis::XZ || m_currentAxis == GizmoAxis::XYZ)
-            {
-                delta.x = m_currentDelta.x;
-            }
-            if (m_currentAxis == GizmoAxis::Y || m_currentAxis == GizmoAxis::XY || m_currentAxis == GizmoAxis::YZ || m_currentAxis == GizmoAxis::XYZ)
-            {
-                delta.y = m_currentDelta.y;
-            }
-            if (m_currentAxis == GizmoAxis::Z || m_currentAxis == GizmoAxis::XZ || m_currentAxis == GizmoAxis::YZ || m_currentAxis == GizmoAxis::XYZ)
-            {
-                delta.z = m_currentDelta.z;
-            }
-        }
-        else {
-            BR_CORE_TRACE << "No intersection point found!" << "mouse position: " << mousePosition << std::endl;
-        }
+        auto ray = ConvertMousePositionToRay(mousePosition);
+        float signedLength;
+        GetRayIntersection(ray, m_selectionState.m_translationPlane, signedLength);
+        float len = std::fabsf(signedLength);
+        auto newPos = ray.position + ray.direction * len;
+        auto newOrigin = newPos - m_selectionState.m_relativeOrigin * m_selectionState.m_screenScaleFactor;
+        delta = newOrigin - m_selectionState.m_model.Translation();
 
-        m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
+        int selectedAxisIndex = (int)m_currentAxis - 1;
+        Math::Vector3 axisValue = (Math::Vector3)((float*)(m_selectionState.m_model.m[selectedAxisIndex]));
+        float lengthOnAxis = axisValue.Dot(delta);
+        delta = axisValue * lengthOnAxis;
+        //Math::Vector3 intersectionPoint;
+        //if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
+        //{
+        //    m_selectionState.m_intersectionPosition = intersectionPoint;
+        //    m_currentDelta = intersectionPoint - m_selectionState.m_prevIntersectionPosition;
+
+        //    if (m_currentAxis == GizmoAxis::X || m_currentAxis == GizmoAxis::XY || m_currentAxis == GizmoAxis::XZ || m_currentAxis == GizmoAxis::XYZ)
+        //    {
+        //        delta.x = m_currentDelta.x;
+        //    }
+        //    if (m_currentAxis == GizmoAxis::Y || m_currentAxis == GizmoAxis::XY || m_currentAxis == GizmoAxis::YZ || m_currentAxis == GizmoAxis::XYZ)
+        //    {
+        //        delta.y = m_currentDelta.y;
+        //    }
+        //    if (m_currentAxis == GizmoAxis::Z || m_currentAxis == GizmoAxis::XZ || m_currentAxis == GizmoAxis::YZ || m_currentAxis == GizmoAxis::XYZ)
+        //    {
+        //        delta.z = m_currentDelta.z;
+        //    }
+        //}
+        //else {
+        //    BR_CORE_TRACE << "No intersection point found!" << "mouse position: " << mousePosition << std::endl;
+        //}
+
+        //m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
 
         return delta;
     }
@@ -687,10 +711,10 @@ namespace Bruno
     void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition)
     {
         auto ray = ConvertMousePositionToRay(mousePosition);
-        auto toLocal = m_selectionState.m_rotationMatrix.Invert();
+        //auto toLocal = m_selectionState.m_rotationMatrix.Invert();
 
-        ray.position = Math::Vector3::Transform(ray.position, toLocal);
-        ray.direction = Math::Vector3::TransformNormal(ray.direction, toLocal);
+        //ray.position = Math::Vector3::Transform(ray.position, toLocal);
+        //ray.direction = Math::Vector3::TransformNormal(ray.direction, toLocal);
 
         SetGizmoHandlePlaneFor(selectedAxis, ray);
     }
@@ -750,11 +774,32 @@ namespace Bruno
         case GizmoAxis::Y:
         case GizmoAxis::Z:
         {
+            Math::Vector3 movePlanNormals[3]{ m_selectionState.m_model.Right(), m_selectionState.m_model.Up(), m_selectionState.m_model.Forward()};
+
+            auto cameraToModelNormalized = m_selectionState.m_model.Translation() - m_camera.GetPosition();
+            cameraToModelNormalized.Normalize();
+
+            int axisIndex = (int)selectedAxis - 1;
+            for (unsigned int i = 0; i < 3; i++)
+            {
+                Math::Vector3 orthoVector;
+                orthoVector = movePlanNormals[i].Cross(cameraToModelNormalized);
+                movePlanNormals[i] = movePlanNormals[i].Cross(orthoVector);
+                movePlanNormals[i].Normalize();
+            }
+
+            m_selectionState.m_translationPlane = Math::Plane(m_selectionState.m_model.Translation(), movePlanNormals[axisIndex]);
+            float len;
+            GetRayIntersection(ray, m_selectionState.m_translationPlane, len);
+            m_selectionState.m_translationPlaneOrigin = ray.position + ray.direction * len;
+            m_selectionState.m_matrixOrigin = m_selectionState.m_model.Translation();
+            m_selectionState.m_relativeOrigin = (m_selectionState.m_translationPlaneOrigin - m_selectionState.m_model.Translation()) * (1.0f / m_selectionState.m_screenScaleFactor);
+
             auto cameraToGizmo = m_selectionState.m_gizmoPosition - m_camera.GetPosition();
             cameraToGizmo.Normalize();
             cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, toLocal);
 
-            int axisIndex = (int)selectedAxis - 1;
+            //int axisIndex = (int)selectedAxis - 1;
 
             Math::Vector3 perpendicularRayVector;
             m_unaryDirections[axisIndex].Cross(cameraToGizmo, perpendicularRayVector);
@@ -790,9 +835,7 @@ namespace Bruno
     bool GizmoService::GetRayIntersection(const Math::Ray& ray, const Math::Plane& plane, float& intersection)
     {
         const float numer = plane.DotNormal(ray.position) - plane.w;
-        //const float numer = plane.Dot3(rOrigin) - plane.w;
         const float denom = plane.DotNormal(ray.direction);
-        //const float denom = plan.Dot3(rVector);
 
         if (fabsf(denom) < FLT_EPSILON)  // normal is orthogonal to vector, cant intersect
         {

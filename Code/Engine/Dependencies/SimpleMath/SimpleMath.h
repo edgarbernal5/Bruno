@@ -563,6 +563,8 @@ namespace DirectX
 
             float Determinant() const noexcept;
 
+            void OrthoNormalize() noexcept;
+
             // Computes rotation about y-axis (y), then x-axis (x), then z-axis (z)
             Vector3 ToEuler() const noexcept;
 

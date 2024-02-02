@@ -2373,6 +2373,21 @@ inline float Matrix::Determinant() const noexcept
     return XMVectorGetX(XMMatrixDeterminant(M));
 }
 
+inline void Matrix::OrthoNormalize() noexcept
+{
+    auto right = Right();
+    auto up = Up();
+    auto forward = Forward();
+
+    right.Normalize();
+    up.Normalize();
+    forward.Normalize();
+
+    Right(right);
+    Up(up);
+    Forward(forward);
+}
+
 inline Vector3 Matrix::ToEuler() const noexcept
 {
     const float cy = sqrtf(_33 * _33 + _31 * _31);

@@ -99,6 +99,15 @@ namespace Bruno
 			float m_screenScaleFactor;
 			Math::Matrix m_screenScaleMatrix;
 
+			Math::Matrix m_modelLocal;
+			Math::Matrix m_model;
+			Math::Matrix m_modelSource;
+
+			Math::Plane m_translationPlane;
+			Math::Vector3 m_translationPlaneOrigin;
+			Math::Vector3 m_relativeOrigin;
+			Math::Vector3 m_matrixOrigin;
+
 			Math::Matrix m_gizmoObjectOrientedWorld;
 			Math::Matrix m_gizmoAxisAlignedWorld;
 
