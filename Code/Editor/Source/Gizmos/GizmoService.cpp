@@ -273,7 +273,7 @@ namespace Bruno
         }
         m_selectionState.m_screenScaleMatrix = Math::Matrix::CreateScale(m_selectionState.m_screenScaleFactor);
 
-        auto localObjectRotationMatrix = m_selectionService->GetSelectionTransform();
+        auto localObjectRotationMatrix = m_selectionService->GetSelectionLocalTransform();
 
         if (m_currentGizmoType == GizmoType::Translation ||
             m_currentGizmoType == GizmoType::Rotation)

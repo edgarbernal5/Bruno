@@ -17,6 +17,7 @@ namespace Bruno
 		void Select(UUID selection);
 		void DeselectAll();
 		UUID FindEntityUUIDWithRay(const Math::Ray& ray, float maxDistance);
+		Math::Matrix GetSelectionLocalTransform();
 		Math::Matrix GetSelectionTransform();
 		size_t GetSelectionCount() { return m_selections.size(); }
 

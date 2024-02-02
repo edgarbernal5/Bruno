@@ -73,6 +73,11 @@ namespace Bruno
 		return closestId;
 	}
 
+	Math::Matrix SelectionService::GetSelectionLocalTransform()
+	{
+		return m_scene->GetLocalSpaceMatrix(m_scene->GetEntityWithUUID(m_selections[0]));
+	}
+
 	Math::Matrix SelectionService::GetSelectionTransform()
 	{
 		return m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(m_selections[0]));

@@ -45,10 +45,11 @@ namespace Bruno
 		{
 			Math::Matrix matrix = localTransform;
 			bool isValid = matrix.Decompose(Scale, Rotation, Position);
-			Rotation.Normalize();
+			//Rotation.Normalize();
 			//Rotation = Math::Quaternion::Identity;
 			//Scale = Math::Vector3::One;
-			if (!isValid) {
+			if (!isValid)
+			{
 				BR_CORE_TRACE << "Matrix decompose not valid!" << std::endl;
 			}
 		}

@@ -40,6 +40,7 @@ namespace Bruno
 		auto GetAllEntitiesWith() { return m_registry.view<Components...>(); }
 
 		Entity GetEntityWithUUID(UUID id) const;
+		Math::Matrix GetLocalSpaceMatrix(Entity entity);
 		Math::Matrix GetWorldSpaceMatrix(Entity entity);
 		Entity TryGetEntityWithUUID(UUID id) const;
 

@@ -85,6 +85,10 @@ namespace Bruno
 	{
 		m_hierarchyChangeCallback = callback;
 	}
+	Math::Matrix Scene::GetLocalSpaceMatrix(Entity entity)
+	{
+		return entity.GetComponent<TransformComponent>().GetTransform();
+	}
 
 	Math::Matrix Scene::GetWorldSpaceMatrix(Entity entity)
 	{
