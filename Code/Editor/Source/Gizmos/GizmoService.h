@@ -5,6 +5,8 @@
 #include "GizmoConfig.h"
 #include "Bruno/Platform/DirectX/RenderObjectBinding.h"
 
+//#define AxisLineLineClosest
+
 namespace Bruno
 {
 	class GizmoTranslationRenderer;
@@ -119,7 +121,11 @@ namespace Bruno
 		Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
 		Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
 		Math::Quaternion GetRotationDelta(const Math::Vector2& mousePosition);
+#ifdef AxisLineLineClosest
+		GizmoAxis GetAxis(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
+#else
 		GizmoAxis GetAxis(const Math::Vector2& mousePosition);
+#endif
 		bool GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
 		float GetCameraDistance();
 		Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);
@@ -127,9 +133,10 @@ namespace Bruno
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
-		bool GetRayIntersection(const Math::Ray& ray, const Math::Plane& plane, float& intersection);
 		void RenderCameraGizmo(GraphicsContext* context);
-
+#ifdef AxisLineLineClosest
+		std::tuple<Math::Vector3, Math::Vector3> LineLineClosetPoints(Math::Vector3 point1, Math::Vector3 direction1, Math::Vector3 point2, Math::Vector3 direction2);
+#endif
 		const Math::BoundingBox XAxisBox{
 			DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f, 0.0f, 0.0f),
 			DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH - Gizmo::LINE_OFFSET) * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f)
@@ -180,6 +187,9 @@ namespace Bruno
 		GizmoConfig m_gizmoConfig;
 
 		Math::Vector3 m_currentDelta;
+#ifdef AxisLineLineClosest
+		Math::Vector3 m_currentIntersectionPoint;
+#endif
 		SelectionState m_selectionState;
 		DragTranslationCallback m_dragTranslationCallback;
 		DragScaleCallback m_dragScaleCallback;

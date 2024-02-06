@@ -273,6 +273,7 @@ namespace DirectX
             Vector3 Cross(const Vector3& V) const noexcept;
 
             void Normalize() noexcept;
+            void NormalizeClamp() noexcept;
             void Normalize(Vector3& result) const noexcept;
 
             void Clamp(const Vector3& vmin, const Vector3& vmax) noexcept;
@@ -658,6 +659,8 @@ namespace DirectX
 
             // Assignment operators
             Plane& operator= (const XMVECTORF32& F) noexcept { x = F.f[0]; y = F.f[1]; z = F.f[2]; w = F.f[3]; return *this; }
+
+            friend std::ostream& operator<<(std::ostream& os, const Plane& V);
 
             // Properties
             Vector3 Normal() const noexcept { return Vector3(x, y, z); }

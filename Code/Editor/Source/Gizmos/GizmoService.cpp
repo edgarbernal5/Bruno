@@ -62,7 +62,12 @@ namespace Bruno
         if (m_currentGizmoType == GizmoType::None || !m_isActive)
             return false;
 
+#ifdef AxisLineLineClosest
+        Math::Vector3 boxIntersection;
+        auto selectedAxis = GetAxis(mousePosition, boxIntersection);
+#else
         auto selectedAxis = GetAxis(mousePosition);
+#endif
         m_currentAxis = selectedAxis;
         m_currentDelta = Math::Vector3::Zero;
 
@@ -70,6 +75,18 @@ namespace Bruno
         if (m_currentAxis == GizmoAxis::None)
             return false;
 
+#ifdef AxisLineLineClosest
+        m_currentIntersectionPoint = boxIntersection;
+#endif
+
+#ifdef AxisLineLineClosest
+        Math::Vector3 intersectionPoint;
+        if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
+        {
+            m_selectionState.m_prevMousePosition = mousePosition;
+            m_selectionState.m_prevIntersectionPosition = intersectionPoint;
+    }
+#else
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
             SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
         else if (m_currentGizmoType == GizmoType::Rotation)
@@ -81,7 +98,13 @@ namespace Bruno
             m_selectionState.m_prevMousePosition = mousePosition;
             m_selectionState.m_prevIntersectionPosition = intersectionPoint;
         }
-
+        //else
+        //{
+        //    m_selectionState.m_isDragging = false;
+        //    m_currentAxis = GizmoAxis::None;
+        //    return false;
+        //}
+#endif
         if (m_currentGizmoType == GizmoType::Rotation)
         {
             auto cameraViewInverse = m_camera.GetInverseView();
@@ -102,6 +125,7 @@ namespace Bruno
             m_selectionState.m_cameraViewInverseRotationConjugate = m_selectionState.m_cameraViewInverseRotation;
             m_selectionState.m_cameraViewInverseRotationConjugate.Conjugate();
         }
+
         m_selectionState.m_isDragging = true;
         return true;
     }
@@ -119,7 +143,8 @@ namespace Bruno
             
             //TODO: se debe modificar el gizmoPosition siempre y no depender de los clientes (externos) por su posicion
             m_selectionState.m_gizmoPosition += translationDelta;
-            BR_CORE_TRACE << "gizmo position x = " << m_selectionState.m_gizmoPosition.x << "; y = " << m_selectionState.m_gizmoPosition.y << "; z = " << m_selectionState.m_gizmoPosition.z << std::endl;
+            //BR_CORE_TRACE << "delta: " << translationDelta << std::endl;
+            //BR_CORE_TRACE << "current delta: " << m_currentDelta << std::endl;
 
             if (m_dragTranslationCallback)
                 m_dragTranslationCallback(translationDelta);
@@ -153,7 +178,12 @@ namespace Bruno
 
     void GizmoService::OnMouseMove(const Math::Vector2& mousePosition)
     {
+#ifdef AxisLineLineClosest
+        Math::Vector3 boxIntersection;
+        auto selectedAxis = GetAxis(mousePosition, boxIntersection);
+#else
         auto selectedAxis = GetAxis(mousePosition);
+#endif
         if (selectedAxis == GizmoAxis::None)
         {
             m_activeAxisColors[0] = m_axisColors[0];
@@ -378,6 +408,34 @@ namespace Bruno
     Math::Vector3 GizmoService::GetDeltaMovement(const Math::Vector2& mousePosition)
     {
         Math::Vector3 delta = Math::Vector3::Zero;
+
+#ifdef AxisLineLineClosest
+        int axisIndex = (int)m_currentAxis - 1;
+
+        Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoObjectOrientedWorld.Invert();
+
+        auto ray = ConvertMousePositionToRay(mousePosition);
+        ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+        ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
+        ray.direction.Normalize();
+
+        auto [item1, item2] = LineLineClosetPoints(ray.position, ray.direction, m_currentIntersectionPoint, m_unaryDirections[axisIndex]);
+        m_currentDelta = item2 - m_currentIntersectionPoint;
+
+        if (m_currentAxis == GizmoAxis::X || m_currentAxis == GizmoAxis::XY || m_currentAxis == GizmoAxis::XZ || m_currentAxis == GizmoAxis::XYZ)
+        {
+            delta.x = m_currentDelta.x;
+        }
+        if (m_currentAxis == GizmoAxis::Y || m_currentAxis == GizmoAxis::XY || m_currentAxis == GizmoAxis::YZ || m_currentAxis == GizmoAxis::XYZ)
+        {
+            delta.y = m_currentDelta.y;
+        }
+        if (m_currentAxis == GizmoAxis::Z || m_currentAxis == GizmoAxis::XZ || m_currentAxis == GizmoAxis::YZ || m_currentAxis == GizmoAxis::XYZ)
+        {
+            delta.z = m_currentDelta.z;
+        }
+#else
+
         Math::Vector3 intersectionPoint;
         if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
         {
@@ -398,10 +456,11 @@ namespace Bruno
             }
         }
         else {
-            BR_CORE_TRACE << "No intersection point found!" << "mouse position: " << mousePosition << std::endl;
+            BR_CORE_TRACE << "No intersection point found! " << " plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
         }
 
         m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
+#endif
 
         return delta;
     }
@@ -490,9 +549,14 @@ namespace Bruno
         return Math::Ray(nearPoint, direction);
     }
 
+#ifdef AxisLineLineClosest
+    GizmoService::GizmoAxis GizmoService::GetAxis(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint)
+#else
     GizmoService::GizmoAxis GizmoService::GetAxis(const Math::Vector2& mousePosition)
+#endif
     {
         float closestIntersection = (std::numeric_limits<float>::max)();
+        Math::Vector3 currentIntersection;
         auto selectedAxis = GizmoAxis::None;
 
         Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoObjectOrientedWorld.Invert();
@@ -511,6 +575,7 @@ namespace Bruno
                 {
                     selectedAxis = GizmoAxis::X;
                     closestIntersection = intersection;
+                    currentIntersection = ray.position + (ray.direction * intersection);
                 }
             }
             if (YAxisBox.Intersects(ray.position, ray.direction, intersection)) {
@@ -518,6 +583,7 @@ namespace Bruno
                 {
                     selectedAxis = GizmoAxis::Y;
                     closestIntersection = intersection;
+                    currentIntersection = ray.position + (ray.direction * intersection);
                 }
             }
             if (ZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
@@ -525,6 +591,7 @@ namespace Bruno
                 {
                     selectedAxis = GizmoAxis::Z;
                     closestIntersection = intersection;
+                    currentIntersection = ray.position + (ray.direction * intersection);
                 }
             }
             if (m_currentGizmoType == GizmoType::Translation)
@@ -564,6 +631,10 @@ namespace Bruno
                     }
                 }
             }
+#ifdef AxisLineLineClosest
+            if (selectedAxis == GizmoAxis::X || selectedAxis == GizmoAxis::Y || selectedAxis == GizmoAxis::Z)
+                intersectionPoint = currentIntersection;
+#endif
         }
         else if (m_currentGizmoType == GizmoType::Rotation)
         {
@@ -618,6 +689,7 @@ namespace Bruno
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
         {
             auto gizmoWorldInverse = m_selectionState.m_rotationMatrix.Transpose();
+            //auto gizmoWorldInverse = m_selectionState.m_gizmoObjectOrientedWorld.Invert();
 
             auto ray = ConvertMousePositionToRay(mousePosition);
             ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
@@ -687,10 +759,11 @@ namespace Bruno
     void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition)
     {
         auto ray = ConvertMousePositionToRay(mousePosition);
-        auto toLocal = m_selectionState.m_rotationMatrix.Invert();
+        auto toLocal = m_selectionState.m_rotationMatrix.Transpose();
 
         ray.position = Math::Vector3::Transform(ray.position, toLocal);
         ray.direction = Math::Vector3::TransformNormal(ray.direction, toLocal);
+        ray.direction.Normalize();
 
         SetGizmoHandlePlaneFor(selectedAxis, ray);
     }
@@ -752,7 +825,7 @@ namespace Bruno
         {
             auto cameraToGizmo = m_selectionState.m_gizmoPosition - m_camera.GetPosition();
             cameraToGizmo.Normalize();
-            cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, toLocal);
+            cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, m_selectionState.m_rotationMatrix);
 
             int axisIndex = (int)selectedAxis - 1;
 
@@ -760,10 +833,10 @@ namespace Bruno
             m_unaryDirections[axisIndex].Cross(cameraToGizmo, perpendicularRayVector);
             
             perpendicularRayVector = m_unaryDirections[axisIndex].Cross(perpendicularRayVector);
+            
+            float newD = -perpendicularRayVector.Dot(m_selectionState.m_gizmoPosition);
+
             perpendicularRayVector.Normalize();
-
-            float newD = -perpendicularRayVector.Dot(gizmoPositionInLocal);
-
             planeNormal = perpendicularRayVector;
             planeD = newD;
         }
@@ -783,24 +856,8 @@ namespace Bruno
         break;
         }
 
-        //Logger.Debug(string.Format("selected plane normal = {0}; Axis = {1}", plane.Normal, selectedAxis.ToString()));
         m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormal, planeD);
-    }
-
-    bool GizmoService::GetRayIntersection(const Math::Ray& ray, const Math::Plane& plane, float& intersection)
-    {
-        const float numer = plane.DotNormal(ray.position) - plane.w;
-        //const float numer = plane.Dot3(rOrigin) - plane.w;
-        const float denom = plane.DotNormal(ray.direction);
-        //const float denom = plan.Dot3(rVector);
-
-        if (fabsf(denom) < FLT_EPSILON)  // normal is orthogonal to vector, cant intersect
-        {
-            intersection= -1.0f;
-            return false;
-        }
-        intersection= -(numer / denom);
-        return true;
+        BR_CORE_TRACE << "selected plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
     }
 
     void GizmoService::RenderCameraGizmo(GraphicsContext* context)
@@ -821,4 +878,29 @@ namespace Bruno
         //scissorRect = { 0, 0, (int32_t)savedViewport.Width, (int32_t)savedViewport.Height };
         //context->SetScissorRect(scissorRect);
     }
+
+#ifdef AxisLineLineClosest
+    std::tuple<Math::Vector3, Math::Vector3> GizmoService::LineLineClosetPoints(Math::Vector3 point1, Math::Vector3 direction1, Math::Vector3 point2, Math::Vector3 direction2)
+    {
+        float a = direction1.Dot(direction1);
+        float b = direction1.Dot(direction2);
+        float c = direction2.Dot(direction2);
+
+        float ac_minus_b2 = a * c - b * b;
+        if (ac_minus_b2 == 0)
+        {
+            return std::tuple<Math::Vector3, Math::Vector3>();
+        }
+
+        auto w0 = point1 - point2;
+        float d = direction1.Dot(w0);
+        float e = direction2.Dot(w0);
+
+        float t1 = (b * e - c * d) / (ac_minus_b2);
+        float t2 = (a * e - b * d) / (ac_minus_b2);
+
+        // Calculate closest points
+        return std::tuple<Math::Vector3, Math::Vector3>(point1 + t1 * direction1, point2 + t2 * direction2);
+    }
+#endif
 }

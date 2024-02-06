@@ -42,7 +42,10 @@ namespace Bruno
 		void OnDraw();
 
 		bool IsEnabled();
+
+#ifndef BR_SINGLE_THREAD_RENDERING
 		std::mutex& GetMutex() { return m_mutex; }
+#endif
 
 		nana::nested_form& GetForm() { return *m_form; }
 	private:
@@ -70,8 +73,10 @@ namespace Bruno
 		std::shared_ptr<Model> m_model;
 		
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
-		
+
+#ifndef BR_SINGLE_THREAD_RENDERING
 		std::mutex m_mutex{};
+#endif
 
 		std::shared_ptr<SelectionService>	m_selectionService;
 		std::unique_ptr<GizmoService>	m_gizmoService;

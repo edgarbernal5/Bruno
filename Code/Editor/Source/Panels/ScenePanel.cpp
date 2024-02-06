@@ -83,19 +83,23 @@ namespace Bruno
 		*/
 
 		// Single-thread rendering.
-		//auto hwnd = reinterpret_cast<HWND>(this->native_handle());
-		//this->draw_through([editorGame, hwnd, this]
-		//{
-		//	editorGame->OnTick();
+#ifdef BR_SINGLE_THREAD_RENDERING
+		auto hwnd = reinterpret_cast<HWND>(m_form->native_handle());
+		m_form->draw_through([editorGame, hwnd, this]
+		{
+			editorGame->OnTick();
 
-		//	/*RECT r;
-		//	::GetClientRect(hwnd, &r);
-		//	::InvalidateRect(hwnd, &r, FALSE);*/
-		//});
+			RECT r;
+			::GetClientRect(hwnd, &r);
+			::InvalidateRect(hwnd, &r, FALSE);
+		});
+#endif // SINGLE_THREAD_RENDERING
 
 		this->events().destroy([this](const nana::arg_destroy& args)
 		{
+#ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
+#endif
 			BR_CORE_TRACE << "destroy. panel id = " << idxx << std::endl;
 
 			auto device = Graphics::GetDevice();
@@ -115,7 +119,9 @@ namespace Bruno
 
 		this->events().expose([this](const nana::arg_expose& args)
 		{
+#ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
+#endif
 			BR_CORE_TRACE << "Expose of panel: panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
 
 			m_isExposed = args.exposed;
@@ -130,7 +136,9 @@ namespace Bruno
 
 		m_form->events().enter_size_move([this](const nana::arg_size_move& args)
 		{
+#ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
+#endif
 			BR_CORE_TRACE << "enter_size_move /panel id = " << idxx << std::endl;
 
 			m_isSizingMoving = true;
@@ -138,7 +146,9 @@ namespace Bruno
 
 		m_form->events().exit_size_move([this](const nana::arg_size_move& args)
 		{
+#ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
+#endif
 			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
 
 			auto formSize = m_form->size();
@@ -152,8 +162,10 @@ namespace Bruno
 
 		m_form->events().resized([this](const nana::arg_resized& args)
 		{
+#ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
-			BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << m_form->native_handle() << ". w=" << args.width << "; h=" << args.height << std::endl;
+#endif
+			//BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << m_form->native_handle() << ". w=" << args.width << "; h=" << args.height << std::endl;
 
 			if (m_isSizingMoving)
 				return;
@@ -333,7 +345,9 @@ namespace Bruno
 
 	ScenePanel::~ScenePanel()
 	{
+#ifndef BR_SINGLE_THREAD_RENDERING
 		std::lock_guard lock{ m_mutex };
+#endif
 		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
 
 		auto device = Graphics::GetDevice();
@@ -425,7 +439,9 @@ namespace Bruno
 
 	bool ScenePanel::IsEnabled()
 	{
+#ifndef BR_SINGLE_THREAD_RENDERING
 		std::lock_guard lock{ m_mutex };
+#endif
 
 		return (m_isExposed && !m_isResizing && !m_isSizingMoving);
 	}
@@ -433,7 +449,7 @@ namespace Bruno
 	void ScenePanel::InitializeCamera()
 	{
 		m_camera.LookAt(Math::Vector3(0, 0, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
-		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 1.0f, 100.0f);
+		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0, 0, 1, 1), 1.0f, 1000.0f);
 	}
 
 	void ScenePanel::InitializeGizmoService()

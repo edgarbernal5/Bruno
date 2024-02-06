@@ -13,6 +13,7 @@
 
 namespace Bruno
 {
+#ifndef BR_SINGLE_THREAD_RENDERING
 	void RenderTask(EditorGame& editor, std::atomic<bool>& exitRequested)
 	{
 		while (!exitRequested.load())
@@ -22,6 +23,7 @@ namespace Bruno
 		}
 		BR_CORE_TRACE << "Exiting editor game loop..." << std::endl;
 	}
+#endif
 
 	EditorGame::EditorGame(const ApplicationParameters& parameters, const std::wstring& projectPath) :
 		Game(parameters),
@@ -31,8 +33,10 @@ namespace Bruno
 
 	EditorGame::~EditorGame()
 	{
+#ifndef BR_SINGLE_THREAD_RENDERING
 		m_exitRequested.store(true);
 		m_workerThread.join();
+#endif
 	}
 
 	void EditorGame::OpenDocument(const std::wstring& filename)
@@ -56,7 +60,9 @@ namespace Bruno
 		}
 		for (auto panel : temp)
 		{
+#ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ panel->GetMutex() };
+#endif
 			panel->OnUpdate(timer);
 			panel->OnDraw();
 		}
@@ -72,8 +78,10 @@ namespace Bruno
 	{
 		Game::OnRun();
 
+#ifndef BR_SINGLE_THREAD_RENDERING
 		m_exitRequested.store(false);
 		m_workerThread = std::thread(RenderTask, std::ref(*this), std::ref(m_exitRequested));
+#endif
 	}
 
 	void EditorGame::AddScenePanel(ScenePanel* panel)
@@ -200,8 +208,8 @@ namespace Bruno
 		auto scene = std::make_shared<Scene>();
 		
 		auto scenePanel = m_place.add_pane<ScenePanel>("pane1", "", nana::dock_position::right, this, scene);
-		auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane2", "pane1", nana::dock_position::right, scene);
-		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("pane3", "pane1", nana::dock_position::down, m_applicationParameters.WorkingDirectory, this);
+		//auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane2", "pane1", nana::dock_position::right, scene);
+		//auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("pane3", "pane1", nana::dock_position::down, m_applicationParameters.WorkingDirectory, this);
 
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
 

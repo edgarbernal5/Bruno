@@ -37,7 +37,7 @@ namespace Bruno::Math
 
     inline constexpr float Abs(float x)
     {
-        if (x < 0)
+        if (x < 0.0f)
             return -x;
         return x;
     }

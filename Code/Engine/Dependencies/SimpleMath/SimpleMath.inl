@@ -966,6 +966,35 @@ inline void Vector3::Normalize() noexcept
     XMStoreFloat3(this, X);
 }
 
+inline void Vector3::NormalizeClamp() noexcept
+{
+    using namespace DirectX;
+    const XMVECTOR v1 = XMLoadFloat3(this);
+    const XMVECTOR X = XMVector3Normalize(v1);
+    XMStoreFloat3(this, X);
+
+    bool changed = false;
+    if (std::fabsf(this->x) < 0.0001f) {
+        this->x = 0.0f;
+        changed = true;
+    }
+    if (std::fabsf(this->y) < 0.0001f) {
+        this->y = 0.0f;
+        changed = true;
+    }
+    if (std::fabsf(this->z) < 0.0001f) {
+        this->z = 0.0f;
+        changed = true;
+    }
+
+    if (changed)
+    {
+        const XMVECTOR v1 = XMLoadFloat3(this);
+        const XMVECTOR X = XMVector3Normalize(v1);
+        XMStoreFloat3(this, X);
+    }
+}
+
 inline void Vector3::Normalize(Vector3& result) const noexcept
 {
     using namespace DirectX;
@@ -2860,6 +2889,13 @@ inline float Plane::DotNormal(const Vector3& normal) const noexcept
     const XMVECTOR p = XMLoadFloat4(this);
     const XMVECTOR n0 = XMLoadFloat3(&normal);
     return XMVectorGetX(XMPlaneDotNormal(p, n0));
+}
+
+
+inline std::ostream& operator<<(std::ostream& os, const Plane& V)
+{
+    os << "{ Normal: " << V.Normal() << " / D = " << V.D() << "}";
+    return os;
 }
 
 //------------------------------------------------------------------------------
