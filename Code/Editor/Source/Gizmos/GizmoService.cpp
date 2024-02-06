@@ -829,7 +829,7 @@ namespace Bruno
         {
             auto cameraToGizmo = m_selectionState.m_gizmoPosition - m_camera.GetPosition();
             cameraToGizmo.Normalize();
-            cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, m_selectionState.m_rotationMatrix);
+            cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, toLocal);
 
             int axisIndex = (int)selectedAxis - 1;
 
@@ -838,7 +838,7 @@ namespace Bruno
             
             perpendicularRayVector = m_unaryDirections[axisIndex].Cross(perpendicularRayVector);
             
-            float newD = -perpendicularRayVector.Dot(m_selectionState.m_gizmoPosition);
+            float newD = -perpendicularRayVector.Dot(gizmoPositionInLocal);
 
             perpendicularRayVector.Normalize();
             planeNormal = perpendicularRayVector;
