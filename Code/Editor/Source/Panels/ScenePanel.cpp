@@ -198,6 +198,9 @@ namespace Bruno
 
 		m_form->events().mouse_down([this](const nana::arg_mouse& args)
 		{
+#ifndef BR_SINGLE_THREAD_RENDERING
+			std::lock_guard lock{ m_mutex };
+#endif
 			//BR_CORE_TRACE << "Mouse down x=" << args.pos.x << "; y=" << args.pos.y << std::endl;
 			m_lastMousePosition.x = args.pos.x;
 			m_lastMousePosition.y = args.pos.y;
@@ -209,6 +212,9 @@ namespace Bruno
 
 		m_form->events().mouse_move([this](const nana::arg_mouse& args)
 		{
+#ifndef BR_SINGLE_THREAD_RENDERING
+			std::lock_guard lock{ m_mutex };
+#endif
 			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
 
 			if (!m_isGizmoing && !args.left_button)
@@ -262,6 +268,9 @@ namespace Bruno
 
 		m_form->events().mouse_up([this](const nana::arg_mouse& args)
 		{
+#ifndef BR_SINGLE_THREAD_RENDERING
+			std::lock_guard lock{ m_mutex };
+#endif
 			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
 			
 			if (m_isGizmoing)
