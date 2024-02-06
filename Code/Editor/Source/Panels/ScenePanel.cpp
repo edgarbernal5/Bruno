@@ -460,14 +460,14 @@ namespace Bruno
 		m_gizmoService = std::make_unique<GizmoService>(device, m_camera, m_surface.get(), m_selectionService.get());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
 		{
-			//auto& selections = m_selectionService->GetSelections();
-			//for (auto& uuid : selections)
-			//{
-			//	Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-			//	TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
+			auto& selections = m_selectionService->GetSelections();
+			for (auto& uuid : selections)
+			{
+				Entity entity = m_scene->TryGetEntityWithUUID(uuid);
+				TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
 
-			//	entityTransform.Position += delta;
-			//}
+				entityTransform.Position += delta;
+			}
 		});
 		
 		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
