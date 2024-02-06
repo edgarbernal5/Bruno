@@ -5,7 +5,7 @@
 #include "GizmoConfig.h"
 #include "Bruno/Platform/DirectX/RenderObjectBinding.h"
 
-//#define AxisLineLineClosest
+//#define BR_GIZMO_LINES_INTERSECTION
 
 namespace Bruno
 {
@@ -121,7 +121,7 @@ namespace Bruno
 		Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
 		Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
 		Math::Quaternion GetRotationDelta(const Math::Vector2& mousePosition);
-#ifdef AxisLineLineClosest
+#ifdef BR_GIZMO_LINES_INTERSECTION
 		GizmoAxis GetAxis(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
 #else
 		GizmoAxis GetAxis(const Math::Vector2& mousePosition);
@@ -134,7 +134,7 @@ namespace Bruno
 		void SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
 		void RenderCameraGizmo(GraphicsContext* context);
-#ifdef AxisLineLineClosest
+#ifdef BR_GIZMO_LINES_INTERSECTION
 		std::tuple<Math::Vector3, Math::Vector3> LineLineClosetPoints(Math::Vector3 point1, Math::Vector3 direction1, Math::Vector3 point2, Math::Vector3 direction2);
 #endif
 		const Math::BoundingBox XAxisBox{
@@ -187,7 +187,7 @@ namespace Bruno
 		GizmoConfig m_gizmoConfig;
 
 		Math::Vector3 m_currentDelta;
-#ifdef AxisLineLineClosest
+#ifdef BR_GIZMO_LINES_INTERSECTION
 		Math::Vector3 m_currentIntersectionPoint;
 #endif
 		SelectionState m_selectionState;

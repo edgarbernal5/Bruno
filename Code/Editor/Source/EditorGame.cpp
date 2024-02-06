@@ -111,55 +111,6 @@ namespace Bruno
 		}
 	}
 
-	//void EditorGame::InitializeUI()
-	//{
-	//	auto nanaGameWindow = reinterpret_cast<NanaWindow*>(m_gameWindow.get());
-
-	//	nana::form& form = nanaGameWindow->GetForm();
-	//	m_place.bind(form.handle());
-	//	////////// VIEW
-	//	m_place.div("dock<pane1>");
-
-	//	m_place.dock<ScenePanel>("pane1", "f1", this);
-	//	auto panel = reinterpret_cast<ScenePanel*>( m_place.dock_create("f1"));
-
-	//	m_place.collocate();
-
-	//	form.events().key_release([this](const nana::arg_keyboard& args) {
-	//		if (args.key == 'O')
-	//		{
-	//			//auto panel = m_dockPlace.add_pane<nana::button>("pane2", "Scene right", "pane1", nana::dock_position::right, std::string("this"));
-	//			auto panel = m_dockPlace.add_pane<ScenePanel>("pane2", "Scene right", "pane1", nana::dock_position::right, this);
-	//			m_dockPlace.collocate();
-	//			AddScenePanel(panel);
-	//		}
-	//		else if (args.key == 'P')
-	//		{
-	//			//auto panel = m_dockPlace.add_pane<nana::button>("pane1", "Scene tab", "", nana::dock_position::tab, std::string("this2"));
-	//			auto panel = m_dockPlace.add_pane<ScenePanel>("pane1", "Scene tab", "", nana::dock_position::tab, this);
-	//			m_dockPlace.collocate();
-	//			AddScenePanel(panel);
-	//		}
-	//	});
-
-	//	form.events().enter_size_move([this](const nana::arg_size_move& args)
-	//		{
-	//			//BR_CORE_TRACE << "enter_size_move / form." << std::endl;
-	//		});
-
-	//	form.events().exit_size_move([this](const nana::arg_size_move& args)
-	//		{
-	//			//BR_CORE_TRACE << "exit_size_move / form." << std::endl;
-	//		});
-
-	//	form.events().expose([this](const nana::arg_expose& args)
-	//		{
-	//			//BR_CORE_TRACE << "expose / form." << std::endl;
-	//		});
-
-	//	AddScenePanel(panel);
-	//}
-
 	void EditorGame::InitializeUI()
 	{
 		static int panelIdxx = 0;
@@ -208,8 +159,8 @@ namespace Bruno
 		auto scene = std::make_shared<Scene>();
 		
 		auto scenePanel = m_place.add_pane<ScenePanel>("pane1", "", nana::dock_position::right, this, scene);
-		//auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane2", "pane1", nana::dock_position::right, scene);
-		//auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("pane3", "pane1", nana::dock_position::down, m_applicationParameters.WorkingDirectory, this);
+		auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane2", "pane1", nana::dock_position::right, scene);
+		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("pane3", "pane1", nana::dock_position::down, m_applicationParameters.WorkingDirectory, this);
 
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
 
