@@ -85,7 +85,7 @@ namespace Bruno
         {
             m_selectionState.m_prevMousePosition = mousePosition;
             m_selectionState.m_prevIntersectionPosition = intersectionPoint;
-    }
+        }
 #else
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
             SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
@@ -98,13 +98,16 @@ namespace Bruno
             m_selectionState.m_prevMousePosition = mousePosition;
             m_selectionState.m_prevIntersectionPosition = intersectionPoint;
         }
-        //else
-        //{
-        //    m_selectionState.m_isDragging = false;
-        //    m_currentAxis = GizmoAxis::None;
-        //    return false;
-        //}
+        else
+        {
+            BR_CORE_TRACE << "No intersection point found! plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
+
+            m_selectionState.m_isDragging = false;
+            m_currentAxis = GizmoAxis::None;
+            return false;
+        }
 #endif
+
         if (m_currentGizmoType == GizmoType::Rotation)
         {
             auto cameraViewInverse = m_camera.GetInverseView();
@@ -456,7 +459,7 @@ namespace Bruno
             }
         }
         else {
-            BR_CORE_TRACE << "No intersection point found! " << " plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
+            BR_CORE_TRACE << "No intersection point found! plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
         }
 
         m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
