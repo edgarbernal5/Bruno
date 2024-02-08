@@ -342,6 +342,7 @@ namespace Bruno
 			{
 				m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(acmb.widget.option()));
 			}
+			m_gizmoTransformSpaceButton.enabled(acmb.widget.option() < 3);
 		});
 
 		InitializeCamera();

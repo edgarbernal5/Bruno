@@ -168,6 +168,7 @@ namespace Bruno
         {
             auto scaleDelta = GetDeltaMovement(mousePosition);
             scaleDelta = ApplySnapAndPrecisionMode(scaleDelta);
+            BR_CORE_TRACE << "scaleDelta: " << scaleDelta << std::endl;
 
             if (m_dragScaleCallback)
                 m_dragScaleCallback(scaleDelta, m_currentAxis == GizmoAxis::XYZ);
