@@ -18,15 +18,16 @@
 #include <nana/gui.hpp>
 #include <iostream>
 #include <Bruno/Core/Log.h>
+#include "SceneHierarchyPanel.h"
 
 namespace Bruno
 {
-	ScenePanel::ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<Scene> scene, DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat) :
+	ScenePanel::ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<Scene> scene, SceneHierarchyPanel* sceneHierarchyPanel, const SceneSurfaceParameters& surfaceParameters) :
 		//nana::nested_form(window, nana::appear::bald<>()),
 		nana::panel<true>(window),
-		m_backBufferFormat(backBufferFormat),
+		m_surfaceParameters(surfaceParameters),
 		m_scene(scene),
-		m_depthBufferFormat(depthBufferFormat),
+		m_sceneHierarchyPanel(sceneHierarchyPanel),
 
 		m_editorGame(editorGame)
 	{
@@ -181,8 +182,8 @@ namespace Bruno
 				SurfaceWindowParameters parameters;
 				parameters.Width = args.width;
 				parameters.Height = args.height;
-				parameters.BackBufferFormat = m_backBufferFormat;
-				parameters.DepthBufferFormat = m_depthBufferFormat;
+				parameters.BackBufferFormat = m_surfaceParameters.BackBufferFormat;
+				parameters.DepthBufferFormat = m_surfaceParameters.DepthBufferFormat;
 				parameters.WindowHandle = reinterpret_cast<HWND>(m_form->native_handle());
 
 				m_surface = std::make_unique<Surface>(parameters);
@@ -291,6 +292,15 @@ namespace Bruno
 					UUID entityUUID = m_selectionService->FindEntityUUIDWithRay(ray, 1000.0f);
 					if (entityUUID)
 					{
+						m_sceneHierarchyPanel->Select(entityUUID);
+					}
+					else
+					{
+						m_sceneHierarchyPanel->DeselectAll();
+					}
+
+					/*if (entityUUID)
+					{
 						m_selectionService->Select(entityUUID);
 						auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
 						m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
@@ -299,7 +309,7 @@ namespace Bruno
 					{
 						m_selectionService->DeselectAll();
 					}
-					m_gizmoService->SetActive(entityUUID);
+					m_gizmoService->SetActive(entityUUID);*/
 				}
 			}
 			
@@ -467,7 +477,7 @@ namespace Bruno
 		auto device = Graphics::GetDevice();
 		m_selectionService = std::make_shared<SelectionService>(m_scene, m_editorGame->m_assetManager.get());
 
-		m_gizmoService = std::make_unique<GizmoService>(device, m_camera, m_surface.get(), m_selectionService.get());
+		m_gizmoService = std::make_shared<GizmoService>(device, m_camera, m_surface.get(), m_selectionService.get());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
 		{
 			auto& selections = m_selectionService->GetSelections();
@@ -524,6 +534,9 @@ namespace Bruno
 
 		m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(m_gizmoTypeCombobox.option()));
 		m_gizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.caption() == "Local" ? GizmoService::TransformSpace::World : GizmoService::TransformSpace::Local);
+
+		m_sceneHierarchyPanel->m_gizmoService = m_gizmoService;
+		m_sceneHierarchyPanel->m_selectionService = m_selectionService;
 	}
 
 	void ScenePanel::InitializeGraphicsContext()

@@ -32,15 +32,15 @@ namespace Bruno
 			UUID entityUUID = args.item.value<UUID>();
 			if (entityUUID)
 			{
-				/*m_selectionService->Select(entityUUID);
+				m_selectionService->Select(entityUUID);
 				auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
-				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());*/
+				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
 			}
 			else
 			{
-				//m_selectionService->DeselectAll();
+				m_selectionService->DeselectAll();
 			}
-			//m_gizmoService->SetActive(entityUUID);
+			m_gizmoService->SetActive(entityUUID);
 		});
 
 		scene->SetHierarchyChangeCallback([&](Entity& entity, ActionMode actionMode)
@@ -60,6 +60,20 @@ namespace Bruno
 		});
 	}
 
+	void SceneHierarchyPanel::DeselectAll()
+	{
+		if (m_treebox.selected().empty())
+			return;
+
+		m_treebox.selected().select(false);
+		m_gizmoService->SetActive(false);
+	}
+
+	void SceneHierarchyPanel::Select(UUID selectionUUID)
+	{
+		m_entityToNodeMap[selectionUUID].select(true);
+	}
+
 	void SceneHierarchyPanel::OnHierarchyAdded(Entity& entity, const std::string& parentKey)
 	{
 		auto& hierarchy = entity.GetComponent<HierarchyComponent>();
@@ -72,7 +86,7 @@ namespace Bruno
 		auto node = m_treebox.insert(key, name);
 		node.value(entity.GetUUID());
 
-		m_entityTreeboxMap[entity.GetUUID()] = node;
+		m_entityToNodeMap[entity.GetUUID()] = node;
 
 		for (UUID child : hierarchy.Children)
 		{

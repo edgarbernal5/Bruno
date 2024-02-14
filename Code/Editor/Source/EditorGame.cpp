@@ -27,7 +27,8 @@ namespace Bruno
 
 	EditorGame::EditorGame(const ApplicationParameters& parameters, const std::wstring& projectPath) :
 		Game(parameters),
-		m_projectPath(projectPath)
+		m_projectPath(projectPath),
+		m_editorAssetManager(nullptr)
 	{
 	}
 
@@ -43,7 +44,7 @@ namespace Bruno
 	{
 		auto scene = std::make_shared<Scene>();
 
-		auto scenePanel = m_place.add_float_pane<ScenePanel>("pane19", { 500,500 }, this, scene);
+		auto scenePanel = m_place.add_float_pane<ScenePanel>("pane19", { 500,500 }, this, scene, nullptr);
 
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(filename).Handle);
 
@@ -157,9 +158,9 @@ namespace Bruno
 		});
 
 		auto scene = std::make_shared<Scene>();
-		
-		auto scenePanel = m_place.add_pane<ScenePanel>("pane1", "", nana::dock_position::right, this, scene);
-		auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane2", "pane1", nana::dock_position::right, scene, nullptr, nullptr);
+
+		auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane1", "", nana::dock_position::right, scene, nullptr, nullptr);
+		auto scenePanel = m_place.add_pane<ScenePanel>("pane2", "pane1", nana::dock_position::left, this, scene, sceneHierarchyPanel);
 		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("pane3", "pane1", nana::dock_position::down, m_applicationParameters.WorkingDirectory, this);
 
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);

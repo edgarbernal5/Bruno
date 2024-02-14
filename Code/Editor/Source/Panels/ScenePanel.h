@@ -30,12 +30,19 @@ namespace Bruno
 	class SelectionService;
 	class Scene;
 	class SceneRenderer;
+	class SceneHierarchyPanel;
+
+	struct SceneSurfaceParameters
+	{
+		DXGI_FORMAT BackBufferFormat{ DXGI_FORMAT_R8G8B8A8_UNORM };
+		DXGI_FORMAT DepthBufferFormat{ DXGI_FORMAT_D32_FLOAT };
+	};
 
 	class ScenePanel : public nana::panel<true>
 	//class ScenePanel : public nana::nested_form
 	{
 	public:
-		ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<Scene> scene, DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D32_FLOAT);
+		ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<Scene> scene, SceneHierarchyPanel* sceneHierarchyPanel, const SceneSurfaceParameters& surfaceParameters = SceneSurfaceParameters());
 		~ScenePanel();
 
 		void OnUpdate(const GameTimer& timer);
@@ -64,9 +71,9 @@ namespace Bruno
 		//nana::nested_form* m_form;
 		std::unique_ptr<Surface> m_surface;
 		int idxx = 0;
-		DXGI_FORMAT m_backBufferFormat;
-		DXGI_FORMAT m_depthBufferFormat;
+		SceneSurfaceParameters m_surfaceParameters;
 		EditorGame* m_editorGame;
+		SceneHierarchyPanel* m_sceneHierarchyPanel;
 		std::shared_ptr<Scene>			m_scene;
 		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
 
@@ -79,7 +86,7 @@ namespace Bruno
 #endif
 
 		std::shared_ptr<SelectionService>	m_selectionService;
-		std::unique_ptr<GizmoService>	m_gizmoService;
+		std::shared_ptr<GizmoService>	m_gizmoService;
 
 		Camera m_camera;
 
