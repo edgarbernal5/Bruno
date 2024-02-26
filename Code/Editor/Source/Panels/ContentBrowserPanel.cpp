@@ -26,9 +26,9 @@ namespace Bruno
 		m_place.collocate();
 
 		std::filesystem::directory_entry rootDirectoryEntry(m_workingDirectory);
-		auto node = m_treebox.insert("Content", "Content");
-		node.value(rootDirectoryEntry);
-		PopulateDirectory(node, workingDirectory);
+		auto rootNode = m_treebox.insert("Content", "Content");
+		rootNode.value(rootDirectoryEntry);
+		PopulateDirectory(rootNode, workingDirectory);
 
 		m_treebox.events().selected([&](const nana::arg_treebox& arg)
 		{
@@ -39,7 +39,9 @@ namespace Bruno
 			PopulateFileDirectory(arg.item);
 			m_listbox.auto_draw(true);
 		});
-
+		m_listbox.events().selected([&](const nana::arg_listbox& args) {
+			BR_CORE_TRACE << "listbox item selected: " << args.item.value<ContentBrowserItem>().DirectoryEntry.path() << std::endl;
+		});
 		m_listbox.events().dbl_click([&](const nana::arg_mouse& args)
 		{
 			if (m_listbox.selected().size() == 0)
@@ -71,7 +73,7 @@ namespace Bruno
 			menu_popuper(m_fileSelectionPopup)(args);
 		});
 
-		node.select(true);
+		rootNode.select(true);
 	}
 
 	void ContentBrowserPanel::PopulateDirectory(nana::treebox::item_proxy& node, const std::wstring& directoryPath)

@@ -535,6 +535,7 @@ namespace Bruno
 		m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(m_gizmoTypeCombobox.option()));
 		m_gizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.caption() == "Local" ? GizmoService::TransformSpace::World : GizmoService::TransformSpace::Local);
 
+		//TODO: HACK
 		m_sceneHierarchyPanel->m_gizmoService = m_gizmoService;
 		m_sceneHierarchyPanel->m_selectionService = m_selectionService;
 	}

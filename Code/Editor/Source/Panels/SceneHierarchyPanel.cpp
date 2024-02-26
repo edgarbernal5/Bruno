@@ -16,16 +16,20 @@ namespace Bruno
 		this->caption("Hierarchy");
 
 		m_treebox.create(*this);
-
+		
 		m_place.bind(*this);
 		m_place.div("vert <tree>");
 
 		m_place["tree"] << m_treebox;
 		m_place.collocate();
-
+		
 		m_treebox.events().selected([&](const nana::arg_treebox& args)
 		{
 			BR_CORE_TRACE << "tree item selected: " << args.item.text() << ". " << args.operated << std::endl;
+
+			std::vector<nana::treebox::item_proxy> node_selection;
+			m_treebox.selected(node_selection);
+
 			if (!args.operated)
 				return;
 
@@ -58,6 +62,9 @@ namespace Bruno
 				break;
 			}
 		});
+
+		m_treebox.enable_multiselection(true);
+		m_treebox.use_select_contracted_parent_node(false);
 	}
 
 	void SceneHierarchyPanel::DeselectAll()

@@ -207,7 +207,11 @@ namespace Bruno
 		{
 			//BR_CORE_TRACE << "expose / form." << std::endl;
 		});
-
+		form.events().mouse_dropfiles([](const nana::arg_dropfiles& args)
+		{
+			int a = 3;
+		});
+		form.enable_dropfiles(true);
 		//AddScenePanel(panel);
 	}
 
