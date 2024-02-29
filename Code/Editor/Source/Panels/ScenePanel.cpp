@@ -288,17 +288,7 @@ namespace Bruno
 				}
 				else if (!args.alt)
 				{
-					auto ray = ConvertMousePositionToRay(currentPosition);
-					UUID entityUUID = m_selectionService->FindEntityUUIDWithRay(ray, 1000.0f);
-					if (entityUUID)
-					{
-						m_sceneHierarchyPanel->Select(entityUUID);
-					}
-					else
-					{
-						m_sceneHierarchyPanel->DeselectAll();
-					}
-
+					m_selectionService->SelectUnderMousePosition(m_camera, currentPosition);
 					/*if (entityUUID)
 					{
 						m_selectionService->Select(entityUUID);
@@ -375,27 +365,6 @@ namespace Bruno
 
 		m_isExposed = false;
 		m_editorGame->RemoveScenePanel(this);
-	}
-
-	Math::Ray ScenePanel::ConvertMousePositionToRay(const Math::Int2& mousePosition)
-	{
-		Math::Vector3 nearPoint(mousePosition.x, mousePosition.y, 0.0f);
-		Math::Vector3 farPoint(mousePosition.x, mousePosition.y, 1.0f);
-
-		nearPoint = m_camera.GetViewport().Unproject(nearPoint,
-			m_camera.GetProjection(),
-			m_camera.GetView(),
-			Math::Matrix::Identity);
-
-		farPoint = m_camera.GetViewport().Unproject(farPoint,
-			m_camera.GetProjection(),
-			m_camera.GetView(),
-			Math::Matrix::Identity);
-
-		Math::Vector3 direction = farPoint - nearPoint;
-		direction.Normalize();
-
-		return Math::Ray(nearPoint, direction);
 	}
 
 	void ScenePanel::OnUpdate(const GameTimer& timer)

@@ -33,7 +33,7 @@ namespace Bruno
 			if (!args.operated)
 				return;
 
-			UUID entityUUID = args.item.value<UUID>();
+			/*UUID entityUUID = args.item.value<UUID>();
 			if (entityUUID)
 			{
 				m_selectionService->Select(entityUUID);
@@ -44,7 +44,7 @@ namespace Bruno
 			{
 				m_selectionService->DeselectAll();
 			}
-			m_gizmoService->SetActive(entityUUID);
+			m_gizmoService->SetActive(entityUUID);*/
 		});
 
 		scene->SetHierarchyChangeCallback([&](Entity& entity, ActionMode actionMode)

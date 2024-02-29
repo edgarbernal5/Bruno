@@ -52,6 +52,9 @@
     <Filter Include="Dependencies\zlib">
       <UniqueIdentifier>{4c854dbe-818a-4442-877e-735d41a80aba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Bruno\Events">
+      <UniqueIdentifier>{3f4a1b95-e11e-4fd1-93f8-d960b1d0a309}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -329,6 +332,9 @@
     </ClInclude>
     <ClInclude Include="Source\Bruno\Content\AssetTypes.h">
       <Filter>Source\Bruno\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\Events\Event.h">
+      <Filter>Source\Bruno\Events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

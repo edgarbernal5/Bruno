@@ -19,6 +19,18 @@ namespace Bruno
 		m_selections.push_back(selection);
 	}
 
+	void SelectionService::SelectUnderMousePosition(const Camera& camera, const Math::Int2& mousePosition)
+	{
+		m_selections.clear();
+
+		auto ray = ConvertMousePositionToRay(camera, mousePosition);
+
+		UUID entityUUID = FindEntityUUIDWithRay(ray, 1000.0f);
+		if (entityUUID) {
+			Select(entityUUID);
+		}
+	}
+
 	void SelectionService::DeselectAll()
 	{
 		m_selections.clear();
@@ -81,5 +93,26 @@ namespace Bruno
 	Math::Matrix SelectionService::GetSelectionTransform()
 	{
 		return m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(m_selections[0]));
+	}
+
+	Math::Ray SelectionService::ConvertMousePositionToRay(Camera camera, const Math::Int2& mousePosition)
+	{
+		Math::Vector3 nearPoint(mousePosition.x, mousePosition.y, 0.0f);
+		Math::Vector3 farPoint(mousePosition.x, mousePosition.y, 1.0f);
+
+		nearPoint = camera.GetViewport().Unproject(nearPoint,
+			camera.GetProjection(),
+			camera.GetView(),
+			Math::Matrix::Identity);
+
+		farPoint = camera.GetViewport().Unproject(farPoint,
+			camera.GetProjection(),
+			camera.GetView(),
+			Math::Matrix::Identity);
+
+		Math::Vector3 direction = farPoint - nearPoint;
+		direction.Normalize();
+
+		return Math::Ray(nearPoint, direction);
 	}
 }

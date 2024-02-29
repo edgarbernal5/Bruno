@@ -61,7 +61,6 @@ namespace Bruno
 		void InitializeGraphicsContext();
 		void InitializeSceneRenderer();
 		void UpdateCBs(const GameTimer& timer);
-		Math::Ray ConvertMousePositionToRay(const Math::Int2& mousePosition);
 
 		std::unique_ptr<nana::nested_form> m_form;
 		nana::place m_place;

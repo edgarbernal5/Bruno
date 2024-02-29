@@ -20,7 +20,7 @@ namespace Bruno
 		Math::Vector3 GetPosition() { return m_position; }
 		Math::Vector3 GetTarget() { return m_target; }
 		Math::Vector3 GetUp() { return m_up; }
-		Math::Viewport GetViewport() { return m_viewport; }
+		Math::Viewport GetViewport() const { return m_viewport; }
 		void SetViewport(const Math::Viewport& viewport);
 
 		void LookAt(const Math::Vector3& position, const Math::Vector3& target, const Math::Vector3& up);

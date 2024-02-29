@@ -98,6 +98,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Bruno\Core\Events\Event.h" />
     <ClInclude Include="Source\Bruno\Content\AssetExtensions.h" />
     <ClInclude Include="Source\Bruno\Content\AssetManager.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTable.h" />

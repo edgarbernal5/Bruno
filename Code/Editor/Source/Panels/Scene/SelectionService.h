@@ -2,7 +2,9 @@
 
 #include <vector>
 #include <Bruno/Core/UUID.h>
+#include <Bruno/Core/Events/Event.h>
 #include <Bruno/Math/Math.h>
+#include <Bruno/Renderer/Camera.h>
 
 namespace Bruno
 {
@@ -14,15 +16,20 @@ namespace Bruno
 	public:
 		SelectionService(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager);
 
-		void Select(UUID selection);
+		void SelectUnderMousePosition(const Camera& camera, const Math::Int2& mousePosition);
 		void DeselectAll();
-		UUID FindEntityUUIDWithRay(const Math::Ray& ray, float maxDistance);
 		Math::Matrix GetSelectionLocalTransform();
 		Math::Matrix GetSelectionTransform();
 		size_t GetSelectionCount() { return m_selections.size(); }
 
 		const std::vector<UUID>& GetSelections() { return m_selections; }
+
+		Event<std::vector<UUID>> SelectionChanged;
 	private:
+		Math::Ray ConvertMousePositionToRay(Camera camera, const Math::Int2& mousePosition);
+		UUID FindEntityUUIDWithRay(const Math::Ray& ray, float maxDistance);
+		void Select(UUID selection);
+
 		std::shared_ptr<Scene> m_scene;
 		AbstractAssetManager* m_assetManager;
 
