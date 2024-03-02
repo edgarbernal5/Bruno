@@ -28,6 +28,7 @@ namespace Bruno
 		static Game* GetInstance() { return (Game*)g_instance; }
 		inline ShaderCache& GetShaderCache() { return m_shaderCache; }
 		inline PipelineStateObjectCache& GetPsoCache() { return m_psoCache; }
+		inline AbstractAssetManager* GetAssetManager() { return m_assetManager.get(); }
 		virtual void OnTick();
 
 		friend class WindowsGameWindow;

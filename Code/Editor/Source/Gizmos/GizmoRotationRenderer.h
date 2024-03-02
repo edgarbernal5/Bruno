@@ -18,7 +18,6 @@ namespace Bruno
 	class GraphicsDevice;
 	class GraphicsContext;
 	class Camera;
-	class Surface;
 	struct GizmoObjectBuffer;
 
 	class GizmoRotationRenderer
@@ -33,9 +32,9 @@ namespace Bruno
 			RenderConfig() {}
 			RenderConfig(const GizmoConfig& gizmoConfig);
 		};
-		GizmoRotationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
+		GizmoRotationRenderer(GraphicsDevice* device, Camera& camera, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
 
-		void Render(GraphicsContext* context);
+		void Render(GraphicsContext* context, Surface* surface);
 		void SetColors(const Math::Color colors[3]);
 		void SetWorld(const Math::Matrix& world) { m_gizmoWorld = world; }
 		void Update();
@@ -44,7 +43,6 @@ namespace Bruno
 		void CreateHalfTorus(float radius, float thickness, size_t tessellation, float angleStart, std::vector<VertexPositionNormalColor>& vertices, std::vector<uint16_t>& indices, const Math::Vector4& color, const Math::Matrix& world);
 
 		Camera& m_camera;
-		Surface* m_surface;
 		std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> m_batch;
 
 		Math::Matrix m_gizmoWorld;

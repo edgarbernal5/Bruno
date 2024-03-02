@@ -52,6 +52,9 @@
     <ClCompile Include="Source\Documents\DocumentService.cpp">
       <Filter>Source\Documents</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Panels\SceneDocumentPanel.cpp">
+      <Filter>Source\Panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="Source\Documents\DocumentService.h">
       <Filter>Source\Documents</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\SceneDocumentPanel.h">
+      <Filter>Source\Panels</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -13,7 +13,14 @@ namespace Bruno
     public:
         using Handler = std::function<void(const Args &...)>;
         
-        Event() = default;
+        Event() : data(std::make_shared<Data>()) {}
+        Event(Event&& other) : Event() { *this = std::move(other); }
+        
+        Event& operator=(Event&& other)
+        {
+            std::swap(data, other.data);
+            return *this;
+        }
 
     protected:
         Event(const Event&) = default;
@@ -32,7 +39,7 @@ namespace Bruno
 
         struct Data
         {
-            HandlerId IDCounter = 0;
+            HandlerId IdCounter = 0;
             HandlerList observers;
             std::mutex observerMutex;
         };
@@ -42,20 +49,55 @@ namespace Bruno
         HandlerId AddHandler(Handler h) const
         {
             std::lock_guard<std::mutex> lock(data->observerMutex);
-            data->observers.emplace_back(StoredHandler{ data->IDCounter, std::make_shared<Handler>(h) });
-            return data->IDCounter++;
+            data->observers.emplace_back(StoredHandler{ data->IdCounter, std::make_shared<Handler>(h) });
+            return data->IdCounter++;
         }
 
     public:
 
-        HandlerId connect(const Handler& h) const { return AddHandler(h); }
+        HandlerId connect(const Handler& h) const
+        { 
+            return AddHandler(h);
+        }
 
-        void disconnect(HandlerId id) const { Observer(data, id).reset(); }
+        void disconnect(HandlerId id) const
+        {
+            std::lock_guard<std::mutex> lock(data->observerMutex);
+            auto it = std::find_if(data->observers.begin(), data->observers.end(),
+                [&](auto& o)
+                { 
+                    return o.id == id; 
+                });
+            
+            if (it != data->observers.end())
+            {
+                data->observers.erase(it);
+            }
+        }
 
         void reset() const
         {
             std::lock_guard<std::mutex> lock(data->observerMutex);
             data->observers.clear();
+        }
+
+        void emit(Args... args) const
+        {
+            std::vector<std::weak_ptr<Handler>> handlers;
+            {
+                std::lock_guard<std::mutex> lock(data->observerMutex);
+                handlers.resize(data->observers.size());
+                std::transform(data->observers.begin(), data->observers.end(), handlers.begin(),
+                    [](auto& h) { return h.callback; });
+            }
+
+            for (auto& weakCallback : handlers)
+            {
+                if (auto callback = weakCallback.lock())
+                {
+                    (*callback)(args...);
+                }
+            }
         }
     };
 }

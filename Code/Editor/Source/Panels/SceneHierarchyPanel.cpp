@@ -30,21 +30,26 @@ namespace Bruno
 			std::vector<nana::treebox::item_proxy> node_selection;
 			m_treebox.selected(node_selection);
 
-			if (!args.operated)
+			if (inProgress /* || !args.operated && node_selection.size() > 0*/)
 				return;
 
-			/*UUID entityUUID = args.item.value<UUID>();
+			if (!args.operated)
+			{
+				if (node_selection.size() == 0)
+				{
+					m_gizmoService->SetActive(false);
+				}
+				return;
+			}
+
+			UUID entityUUID = args.item.value<UUID>();
 			if (entityUUID)
 			{
 				m_selectionService->Select(entityUUID);
 				auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
 				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
 			}
-			else
-			{
-				m_selectionService->DeselectAll();
-			}
-			m_gizmoService->SetActive(entityUUID);*/
+			m_gizmoService->SetActive(entityUUID);
 		});
 
 		scene->SetHierarchyChangeCallback([&](Entity& entity, ActionMode actionMode)
@@ -65,6 +70,22 @@ namespace Bruno
 
 		m_treebox.enable_multiselection(true);
 		m_treebox.use_select_contracted_parent_node(false);
+
+		SelectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
+		{
+			inProgress = true;
+			m_treebox.deselect_all();
+			for (auto& uuid : selection)
+			{
+				m_entityToNodeMap[uuid].select(true);
+			}
+			inProgress = false;
+		});
+	}
+
+	SceneHierarchyPanel::~SceneHierarchyPanel()
+	{
+		m_selectionService->SelectionChanged.disconnect(SelectionChangedHandleId);
 	}
 
 	void SceneHierarchyPanel::DeselectAll()

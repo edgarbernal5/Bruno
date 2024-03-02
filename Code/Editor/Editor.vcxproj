@@ -75,7 +75,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_SINGLE_THREAD_RENDERING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\nana\include;..\Engine\Dependencies\d3dx12;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\SimpleMath;..\Engine\Dependencies\D3D12MA;..\Engine\Dependencies\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -95,6 +95,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Panels\SceneDocumentPanel.cpp" />
     <ClCompile Include="Source\Content\AssetImporter.cpp" />
     <ClCompile Include="Source\Content\AssetImporterContext.cpp" />
     <ClCompile Include="Source\Content\EditorAssetManager.cpp" />
@@ -114,6 +115,7 @@
     <ClCompile Include="Source\Panels\Scene\SelectionService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Panels\SceneDocumentPanel.h" />
     <ClInclude Include="Source\Documents\DocumentService.h" />
     <ClInclude Include="Source\Panels\ContentBrowser\ContentBrowserItem.h" />
     <ClInclude Include="Source\Content\AssetImporter.h" />

@@ -37,9 +37,9 @@ namespace Bruno
 			RenderConfig() {}
 			RenderConfig(const GizmoConfig& gizmoConfig);
 		};
-		GizmoScaleRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
+		GizmoScaleRenderer(GraphicsDevice* device, Camera& camera, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig = RenderConfig());
 
-		void Render(GraphicsContext* context);
+		void Render(GraphicsContext* context, Surface* surface);
 		void SetColors(const Math::Color colors[3]);
 		void SetWorld(const Math::Matrix& world) { m_gizmoWorld = world; }
 		void Update();

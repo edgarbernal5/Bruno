@@ -30,7 +30,6 @@ namespace Bruno
 	class SelectionService;
 	class Scene;
 	class SceneRenderer;
-	class SceneHierarchyPanel;
 
 	struct SceneSurfaceParameters
 	{
@@ -42,7 +41,7 @@ namespace Bruno
 	//class ScenePanel : public nana::nested_form
 	{
 	public:
-		ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<Scene> scene, SceneHierarchyPanel* sceneHierarchyPanel, const SceneSurfaceParameters& surfaceParameters = SceneSurfaceParameters());
+		ScenePanel(nana::window window, EditorGame* editorGame, Camera* camera, std::shared_ptr<Scene> scene, std::shared_ptr<SelectionService> selectionService, std::shared_ptr<GizmoService> gizmoService, const SceneSurfaceParameters& surfaceParameters = SceneSurfaceParameters());
 		~ScenePanel();
 
 		void OnUpdate(const GameTimer& timer);
@@ -56,7 +55,6 @@ namespace Bruno
 
 		nana::nested_form& GetForm() { return *m_form; }
 	private:
-		void InitializeCamera();
 		void InitializeGizmoService();
 		void InitializeGraphicsContext();
 		void InitializeSceneRenderer();
@@ -72,7 +70,6 @@ namespace Bruno
 		int idxx = 0;
 		SceneSurfaceParameters m_surfaceParameters;
 		EditorGame* m_editorGame;
-		SceneHierarchyPanel* m_sceneHierarchyPanel;
 		std::shared_ptr<Scene>			m_scene;
 		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
 
@@ -87,7 +84,7 @@ namespace Bruno
 		std::shared_ptr<SelectionService>	m_selectionService;
 		std::shared_ptr<GizmoService>	m_gizmoService;
 
-		Camera m_camera;
+		Camera* m_camera;
 
 		Math::Int2 m_lastMousePosition;
 		Math::Int2 m_beginMouseDownPosition;

@@ -23,12 +23,12 @@ namespace Bruno
 		size_t GetSelectionCount() { return m_selections.size(); }
 
 		const std::vector<UUID>& GetSelections() { return m_selections; }
+		void Select(UUID selection);
 
 		Event<std::vector<UUID>> SelectionChanged;
 	private:
 		Math::Ray ConvertMousePositionToRay(Camera camera, const Math::Int2& mousePosition);
 		UUID FindEntityUUIDWithRay(const Math::Ray& ray, float maxDistance);
-		void Select(UUID selection);
 
 		std::shared_ptr<Scene> m_scene;
 		AbstractAssetManager* m_assetManager;

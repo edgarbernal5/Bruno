@@ -17,10 +17,10 @@ namespace Bruno
 	{
 	public:
 		SceneHierarchyPanel(nana::window window, std::shared_ptr<Scene> scene, std::shared_ptr<SelectionService> selectionService, std::shared_ptr<GizmoService> gizmoService);
+		~SceneHierarchyPanel();
 
 		void DeselectAll();
 		void Select(UUID selectionUUID);
-
 		friend class ScenePanel;
 	private:
 		void OnHierarchyAdded(Entity& entity, const std::string& parentKey="");
@@ -31,6 +31,8 @@ namespace Bruno
 		std::shared_ptr<SelectionService> m_selectionService;
 		std::shared_ptr<GizmoService> m_gizmoService;
 
+		bool inProgress{ false };
 		std::unordered_map<UUID, nana::treebox::item_proxy> m_entityToNodeMap;
+		size_t SelectionChangedHandleId{ 0 };
 	};
 }

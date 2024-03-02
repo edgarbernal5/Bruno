@@ -31,7 +31,7 @@ namespace Bruno
 	class GizmoService
 	{
 	public:
-		GizmoService(GraphicsDevice* device, Camera& camera, Surface* surface, SelectionService* objectSelector, GizmoConfig gizmoConfig = GizmoConfig());
+		GizmoService(GraphicsDevice* device, Camera& camera, SelectionService* objectSelector, GizmoConfig gizmoConfig = GizmoConfig());
 
 		using DragTranslationCallback = std::function<void(const Math::Vector3&)>;
 		using DragScaleCallback = std::function<void(const Math::Vector3&, bool isUniform)>;
@@ -78,7 +78,7 @@ namespace Bruno
 		bool BeginDrag(const Math::Vector2& mousePosition);
 		void Drag(const Math::Vector2& mousePosition);
 		void OnMouseMove(const Math::Vector2& mousePosition);
-		void Render(GraphicsContext* context);
+		void Render(GraphicsContext* context, Surface* surface);
 		void Update();
 		void EndDrag();
 
@@ -133,7 +133,7 @@ namespace Bruno
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
-		void RenderCameraGizmo(GraphicsContext* context);
+		void RenderCameraGizmo(GraphicsContext* context, Surface* surface);
 #ifdef BR_GIZMO_LINES_INTERSECTION
 		std::tuple<Math::Vector3, Math::Vector3> LineLineClosetPoints(Math::Vector3 point1, Math::Vector3 direction1, Math::Vector3 point2, Math::Vector3 direction2);
 #endif

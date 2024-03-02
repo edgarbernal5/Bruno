@@ -21,14 +21,19 @@ namespace Bruno
 
 	void SelectionService::SelectUnderMousePosition(const Camera& camera, const Math::Int2& mousePosition)
 	{
-		m_selections.clear();
-
 		auto ray = ConvertMousePositionToRay(camera, mousePosition);
 
 		UUID entityUUID = FindEntityUUIDWithRay(ray, 1000.0f);
-		if (entityUUID) {
+		if (entityUUID)
+		{
 			Select(entityUUID);
 		}
+		else
+		{
+			m_selections.clear();
+		}
+
+		SelectionChanged.emit(m_selections);
 	}
 
 	void SelectionService::DeselectAll()

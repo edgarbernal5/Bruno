@@ -39,6 +39,7 @@ namespace Bruno
 			PopulateFileDirectory(arg.item);
 			m_listbox.auto_draw(true);
 		});
+
 		m_listbox.events().selected([&](const nana::arg_listbox& args) {
 			BR_CORE_TRACE << "listbox item selected: " << args.item.value<ContentBrowserItem>().DirectoryEntry.path() << std::endl;
 		});

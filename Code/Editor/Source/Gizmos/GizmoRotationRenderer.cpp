@@ -10,9 +10,8 @@
 
 namespace Bruno
 {
-	GizmoRotationRenderer::GizmoRotationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig) :
+	GizmoRotationRenderer::GizmoRotationRenderer(GraphicsDevice* device, Camera& camera, std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig) :
 		m_camera(camera),
-		m_surface(surface),
 		m_batch(batch),
 		m_xUpperBound(0),
 		m_yUpperBound(0),
@@ -28,10 +27,10 @@ namespace Bruno
 		m_renderObjectBindingDesc.Pipeline = Graphics::GetPsoCache().Get(RenderPsoId::UnlitColored).get();
 	}
 
-	void GizmoRotationRenderer::Render(GraphicsContext* context)
+	void GizmoRotationRenderer::Render(GraphicsContext* context, Surface* surface)
 	{
-		Texture& backBuffer = m_surface->GetBackBuffer();
-		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
+		Texture& backBuffer = surface->GetBackBuffer();
+		DepthBuffer& depthBuffer = surface->GetDepthBuffer();
 
 		PipelineInfo pipeline;
 		pipeline.Pipeline = m_renderObjectBindingDesc.Pipeline;

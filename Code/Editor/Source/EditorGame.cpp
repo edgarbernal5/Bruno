@@ -1,14 +1,16 @@
 #include "EditorGame.h"
 
 #include "Bruno/Platform/Windows/NanaWindow.h"
-#include "Panels/ScenePanel.h"
-#include "Panels/SceneHierarchyPanel.h"
 #include "Bruno/Renderer/Model.h"
 #include "Bruno/Scene/Scene.h"
-#include "Content/EditorAssetManager.h"
 #include "Bruno/Content/ContentTypeReaderManager.h"
+#include "Content/EditorAssetManager.h"
+
 #include <nana/gui/widgets/button.hpp>
 #include <nana/debugger.hpp>
+
+#include "Panels/ScenePanel.h"
+#include "Panels/SceneDocumentPanel.h"
 #include "Panels/ContentBrowserPanel.h"
 
 namespace Bruno
@@ -44,7 +46,7 @@ namespace Bruno
 	{
 		auto scene = std::make_shared<Scene>();
 
-		auto scenePanel = m_place.add_float_pane<ScenePanel>("pane19", { 500,500 }, this, scene, nullptr);
+		//auto scenePanel = m_place.add_float_pane<ScenePanel>("pane19", { 500,500 }, this, scene);
 
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(filename).Handle);
 
@@ -159,9 +161,10 @@ namespace Bruno
 
 		auto scene = std::make_shared<Scene>();
 
-		auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane1", "", nana::dock_position::right, scene, nullptr, nullptr);
-		auto scenePanel = m_place.add_pane<ScenePanel>("pane2", "pane1", nana::dock_position::left, this, scene, sceneHierarchyPanel);
-		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("pane3", "pane1", nana::dock_position::down, m_applicationParameters.WorkingDirectory, this);
+		//auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane1", "", nana::dock_position::right, scene, nullptr, nullptr);
+		//auto scenePanel = m_place.add_pane<ScenePanel>("pane2", "pane1", nana::dock_position::left, this, scene, sceneHierarchyPanel);
+		auto sceneDocumentPanel = m_place.add_pane<SceneDocumentPanel>("documents-pane", "", nana::dock_position::left, this, scene);
+		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("content-browser-pane", "documents-pane", nana::dock_position::down, m_applicationParameters.WorkingDirectory, this);
 
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
 

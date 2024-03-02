@@ -11,10 +11,9 @@
 
 namespace Bruno
 {
-	GizmoTranslationRenderer::GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, Surface* surface, 
+	GizmoTranslationRenderer::GizmoTranslationRenderer(GraphicsDevice* device, Camera& camera, 
 		std::shared_ptr<PrimitiveBatch<VertexPositionNormalColor>> batch, RenderConfig renderConfig) :
 		m_camera(camera),
-		m_surface(surface),
 		m_batch(batch)
 	{
 		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
@@ -47,10 +46,10 @@ namespace Bruno
 		CreateCone(renderConfig.ArrowheadRadius, renderConfig.ArrowheadHeight, renderConfig.Tessellation, m_vertices, m_indices, Math::Vector4(0, 0, 1, 1), world);
 	}
 
-	void GizmoTranslationRenderer::Render(GraphicsContext* context)
+	void GizmoTranslationRenderer::Render(GraphicsContext* context, Surface* surface)
 	{
-		Texture& backBuffer = m_surface->GetBackBuffer();
-		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
+		Texture& backBuffer = surface->GetBackBuffer();
+		DepthBuffer& depthBuffer = surface->GetDepthBuffer();
 
 		PipelineInfo pipeline;
 		pipeline.Pipeline = m_renderObjectBindingDesc.Pipeline;

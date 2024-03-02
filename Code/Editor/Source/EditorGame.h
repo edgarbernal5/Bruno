@@ -25,9 +25,14 @@ namespace Bruno
 		EditorGame(const ApplicationParameters& parameters, const std::wstring& projectPath);
 		~EditorGame();
 
+		void AddScenePanel(ScenePanel* panel);
+		void RemoveScenePanel(ScenePanel* panel);
+
 		void OpenDocument(const std::wstring& filename);
 
-		friend class ScenePanel;
+		EditorAssetManager* GetEditorAssetManager() const {
+			return m_editorAssetManager;
+		}
 	protected:
 		void InitializeUI();
 		void OnInitialize() override;
@@ -36,8 +41,6 @@ namespace Bruno
 		void OnGameLoop(const GameTimer& timer) override;
 
 	private:
-		void AddScenePanel(ScenePanel* panel);
-		void RemoveScenePanel(ScenePanel* panel);
 
 		std::shared_ptr<GraphicsDevice> m_device;
 		GameTimer m_timer;
