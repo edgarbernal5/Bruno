@@ -1,4 +1,4 @@
 [submodule "Code/Engine/Dependencies/nana"]
 	path = Code/Engine/Dependencies/nana
 	url = git@github.com:edgarbernal5/nana.git
-	branch = Feature/property_grid
+	branch = feature/property_grid
