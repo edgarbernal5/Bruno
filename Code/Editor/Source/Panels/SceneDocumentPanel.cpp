@@ -17,6 +17,7 @@ namespace Bruno
 		m_scene(scene)
 	{
 		this->caption("Scene");
+
 		InitializeCamera();
 		InitializeGizmoService();
 
@@ -32,6 +33,14 @@ namespace Bruno
 		paneInfo.show_caption = false;
 		paneInfo.id = "pane2";
 		auto scenePanel = m_place.add_pane<ScenePanel>(paneInfo, "pane1", nana::dock_position::right, editorGame, &m_camera, scene, m_selectionService, m_gizmoService);
+
+		this->events().expose([scenePanel](const nana::arg_expose& arg)
+		{
+			if (arg.exposed)
+				scenePanel->show();
+			else
+				scenePanel->hide();
+		});
 
 		m_place.collocate();
 	}
