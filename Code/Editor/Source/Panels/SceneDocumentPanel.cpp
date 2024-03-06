@@ -38,7 +38,7 @@ namespace Bruno
 		paneInfo.id = "pane2";
 		paneInfo.show_caption = true;
 		paneInfo.caption = "Properties";
-		auto propertiesPanel = m_place.add_pane<PropertiesPanel>(paneInfo, "pane1", nana::dock_position::down, m_selectionService);
+		auto propertiesPanel = m_place.add_pane<PropertiesPanel>(paneInfo, "pane1", nana::dock_position::down, scene, m_selectionService);
 
 		this->events().expose([scenePanel](const nana::arg_expose& arg)
 		{
