@@ -5,6 +5,7 @@
 
 #include "Panels/ScenePanel.h"
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/PropertiesPanel.h"
 #include "Scene/SelectionService.h"
 #include "Gizmos/GizmoService.h"
 #include "EditorGame.h"
@@ -29,10 +30,15 @@ namespace Bruno
 		paneInfo.show_close_button = false;
 		paneInfo.id = "pane1";
 		auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>(paneInfo, "", nana::dock_position::right, scene, m_selectionService, m_gizmoService);
-		
+
 		paneInfo.show_caption = false;
-		paneInfo.id = "pane2";
+		paneInfo.id = "pane3";
 		auto scenePanel = m_place.add_pane<ScenePanel>(paneInfo, "pane1", nana::dock_position::right, editorGame, &m_camera, scene, m_selectionService, m_gizmoService);
+
+		paneInfo.id = "pane2";
+		paneInfo.show_caption = true;
+		paneInfo.caption = "Properties";
+		auto propertiesPanel = m_place.add_pane<PropertiesPanel>(paneInfo, "pane1", nana::dock_position::down, m_selectionService);
 
 		this->events().expose([scenePanel](const nana::arg_expose& arg)
 		{

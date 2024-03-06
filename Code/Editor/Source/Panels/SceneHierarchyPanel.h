@@ -33,6 +33,6 @@ namespace Bruno
 
 		bool inProgress{ false };
 		std::unordered_map<UUID, nana::treebox::item_proxy> m_entityToNodeMap;
-		size_t SelectionChangedHandleId{ 0 };
+		size_t m_selectionChangedHandleId{ 0 };
 	};
 }

@@ -71,7 +71,7 @@ namespace Bruno
 		m_treebox.enable_multiselection(true);
 		m_treebox.use_select_contracted_parent_node(false);
 
-		SelectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
+		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			inProgress = true;
 			m_treebox.deselect_all();
@@ -85,7 +85,7 @@ namespace Bruno
 
 	SceneHierarchyPanel::~SceneHierarchyPanel()
 	{
-		m_selectionService->SelectionChanged.disconnect(SelectionChangedHandleId);
+		m_selectionService->SelectionChanged.disconnect(m_selectionChangedHandleId);
 	}
 
 	void SceneHierarchyPanel::DeselectAll()
