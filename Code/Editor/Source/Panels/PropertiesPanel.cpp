@@ -35,11 +35,18 @@ namespace Bruno
 			{
 				auto entity = m_scene->GetEntityWithUUID(uuid);
 
-				auto cat_idx = m_propertyGrid.find("name");
+				auto cat_idx = 0u;//m_propertyGrid.find("name");
 				auto cat = (cat_idx == nana::npos) ? m_propertyGrid.append("name") : m_propertyGrid.at(cat_idx);
 				nana::propertygrid::item_proxy ip(nullptr);
 				ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string("Name", entity.GetComponent<NameComponent>().Name)));
+
+
 			}
+		});
+
+		m_propertyGrid.events().property_changed([](const nana::arg_propertygrid& arg)
+		{
+
 		});
 	}
 
