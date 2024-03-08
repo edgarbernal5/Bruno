@@ -95,6 +95,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Panels\Properties\Property.cpp" />
     <ClCompile Include="Source\Panels\PropertiesPanel.cpp" />
     <ClCompile Include="Source\Panels\SceneDocumentPanel.cpp" />
     <ClCompile Include="Source\Content\AssetImporter.cpp" />
@@ -116,6 +117,7 @@
     <ClCompile Include="Source\Panels\Scene\SelectionService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Panels\Properties\Property.h" />
     <ClInclude Include="Source\Panels\PropertiesPanel.h" />
     <ClInclude Include="Source\Panels\SceneDocumentPanel.h" />
     <ClInclude Include="Source\Documents\DocumentService.h" />

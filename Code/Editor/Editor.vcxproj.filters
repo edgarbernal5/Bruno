@@ -56,7 +56,10 @@
       <Filter>Source\Panels</Filter>
     </ClCompile>
     <ClCompile Include="Source\Panels\PropertiesPanel.cpp">
-      <Filter>Source\Panels</Filter>
+      <Filter>Source\Panels\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Panels\Properties\Property.cpp">
+      <Filter>Source\Panels\Properties</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -83,6 +86,9 @@
     </Filter>
     <Filter Include="Source\Scene">
       <UniqueIdentifier>{0ffc3604-6f7d-45d8-827c-f04833436388}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Panels\Properties">
+      <UniqueIdentifier>{58bd5958-16e3-4512-9e81-44cf0146df21}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -147,7 +153,10 @@
       <Filter>Source\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Source\Panels\PropertiesPanel.h">
-      <Filter>Source\Panels</Filter>
+      <Filter>Source\Panels\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\Properties\Property.h">
+      <Filter>Source\Panels\Properties</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
