@@ -3,6 +3,7 @@
 #include <nana/gui/widgets/panel.hpp>
 #include <nana/gui/place.hpp>
 #include <nana/gui/widgets/property_grid.hpp>
+#include "Properties/Property.h"
 
 namespace Bruno
 {
@@ -22,5 +23,6 @@ namespace Bruno
 
 		nana::place m_place;
 		nana::propertygrid m_propertyGrid;
+		properties_collection m_properties;
 	};
 }

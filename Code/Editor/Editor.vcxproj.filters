@@ -61,6 +61,9 @@
     <ClCompile Include="Source\Panels\Properties\Property.cpp">
       <Filter>Source\Panels\Properties</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Panels\Properties\PropertyGridItems.cpp">
+      <Filter>Source\Panels\Properties</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -156,6 +159,9 @@
       <Filter>Source\Panels\Properties</Filter>
     </ClInclude>
     <ClInclude Include="Source\Panels\Properties\Property.h">
+      <Filter>Source\Panels\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\Properties\PropertyGridItems.h">
       <Filter>Source\Panels\Properties</Filter>
     </ClInclude>
   </ItemGroup>

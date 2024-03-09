@@ -4,6 +4,7 @@
 #include <Bruno/Scene/Scene.h>
 
 #include <nana/gui/widgets/pgitems.hpp>
+#include "Properties/PropertyGridItems.h"
 
 namespace Bruno
 {
@@ -26,6 +27,7 @@ namespace Bruno
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			m_propertyGrid.clear();
+			m_properties.clear();
 
 			if (selection.size() != 1)
 				return;
@@ -35,18 +37,32 @@ namespace Bruno
 			
 			auto entity = m_scene->GetEntityWithUUID(uuid);
 
+			auto& name = entity.GetComponent<NameComponent>().Name;
+
+			property_proxy prop = m_properties.append("Name");
+			prop.value(name);
+
 			auto cat_idx = 0u;//m_propertyGrid.find("name");
 			auto cat = (cat_idx == nana::npos) ? m_propertyGrid.append("name") : m_propertyGrid.at(cat_idx);
 			nana::propertygrid::item_proxy ip(nullptr);
-			ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string("Name", entity.GetComponent<NameComponent>().Name)));
+			ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string("Name", name)));
 
-			//auto& transform = entity.GetComponent<TransformComponent>();
-			
+			auto& transform = entity.GetComponent<TransformComponent>();
+			prop = m_properties.append("Transform/Position");
+			prop.value(transform.Position);
+
+			{
+				auto cat_idx = m_propertyGrid.find("Transform");
+				auto cat = (cat_idx == nana::npos) ? m_propertyGrid.append("Transform") : m_propertyGrid.at(cat_idx);
+				nana::propertygrid::item_proxy ip(nullptr);
+				ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_vector3("Position", "")));
+			}
 		});
 
 		m_propertyGrid.events().property_changed([](const nana::arg_propertygrid& arg)
 		{
 			BR_CORE_TRACE << "property_changed / grid. label = " << arg.item.label() << ". cat = " << arg.item.pos().cat << std::endl;
+
 		});
 	}
 
