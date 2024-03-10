@@ -62,6 +62,7 @@ namespace Bruno
     {
         return _prop->value;
     }
+
     property_proxy& property_proxy::value(int value)
     {
         if (_prop)
@@ -71,6 +72,7 @@ namespace Bruno
 
         return *this;
     }
+
     property_proxy& property_proxy::value(float value)
     {
         if (_prop)
@@ -80,6 +82,7 @@ namespace Bruno
 
         return *this;
     }
+
     property_proxy& property_proxy::value(Math::Vector3 value)
     {
         if (_prop)

@@ -37,7 +37,8 @@ namespace Bruno
 		virtual void create(nana::window wd) override;
 
 		virtual void draw(nana::paint::graphics* graph, nana::rectangle area, unsigned labelw, unsigned  valuew, unsigned  iboxw, const int txtoff, nana::color bgcolor, nana::color fgcolor) const override;
-
+		
+		mutable nana::textbox	xyz_[3];
 		Math::Vector3	vector3_;
 	};
 }

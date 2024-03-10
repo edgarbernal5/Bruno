@@ -45,7 +45,7 @@ namespace Bruno
 			auto cat_idx = 0u;//m_propertyGrid.find("name");
 			auto cat = (cat_idx == nana::npos) ? m_propertyGrid.append("name") : m_propertyGrid.at(cat_idx);
 			nana::propertygrid::item_proxy ip(nullptr);
-			ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string("Name", name)));
+			ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string("Name", prop.value())));
 
 			auto& transform = entity.GetComponent<TransformComponent>();
 			prop = m_properties.append("Transform/Position");
@@ -55,7 +55,7 @@ namespace Bruno
 				auto cat_idx = m_propertyGrid.find("Transform");
 				auto cat = (cat_idx == nana::npos) ? m_propertyGrid.append("Transform") : m_propertyGrid.at(cat_idx);
 				nana::propertygrid::item_proxy ip(nullptr);
-				ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_vector3("Position", "")));
+				ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_vector3("Position", prop.value())));
 			}
 		});
 
