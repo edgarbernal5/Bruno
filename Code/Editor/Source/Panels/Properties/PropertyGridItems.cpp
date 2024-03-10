@@ -6,7 +6,7 @@ namespace Bruno
 	{
 		std::stringstream ss(value);
 		std::string item;
-		std::vector<int> items;
+		std::vector<float> items;
 
 		try
 		{
@@ -40,7 +40,6 @@ namespace Bruno
 
 	void pg_vector3::create(nana::window wd)
 	{
-
 		// textboxes
 		for (auto& i : xyz_)
 		{
@@ -60,7 +59,12 @@ namespace Bruno
 			{
 				if (arg.key == nana::keyboard::enter)
 				{
-					
+					std::string col = xyz_[0].caption() + "/" + xyz_[1].caption() + "/" + xyz_[2].caption();
+					if (col != pgitem::value())
+					{
+						pg_vector3::value(xyz_[0].caption() + "/" + xyz_[1].caption() + "/" + xyz_[2].caption());
+						emit_event();
+					}
 				}
 			});
 			i.events().focus([this, &i](const nana::arg_focus& arg)
@@ -91,6 +95,44 @@ namespace Bruno
 			auto rect = area;
 			rect.width = labelw;
 			draw_label(graph, rect, txtoff, bgcolor, fgcolor);
+		}
+
+		for (auto& i : xyz_)
+			nana::API::show_window(i, true);
+
+		if (valuew)
+		{
+			auto availw = valuew;
+			auto txtsize = graph->text_extent_size("X");
+			const unsigned txtw = txtsize.width + 5;
+			const int offset = 8;
+			int y = size_ + static_cast<int>(size_ - txtsize.height) / 2;
+			int ctrly = 0;
+			const unsigned ctrlw = (availw - (3 * txtw) - (2 * offset)) / 3;
+			auto rect = area;
+			rect.x += labelw;
+
+			// X
+			graph->string(nana::point{ rect.x, rect.y }, "X", fgcolor);
+			rect.x += txtw;
+
+			xyz_[0].move(rect.x, ctrly);
+			xyz_[0].size(nana::size(ctrlw, size_ - 2 * PG_BORDER_Y));
+			rect.x += ctrlw + offset;
+
+			// Y
+			graph->string(nana::point{ rect.x, rect.y }, "Y", fgcolor);
+			rect.x += txtw;
+
+			xyz_[1].move(rect.x, ctrly);
+			xyz_[1].size(nana::size(ctrlw, size_ - 2 * PG_BORDER_Y));
+			rect.x += ctrlw + offset;
+			// Z
+			graph->string(nana::point{ rect.x, rect.y }, "Z", fgcolor);
+			rect.x += txtw;
+
+			xyz_[2].move(rect.x, ctrly);
+			xyz_[2].size(nana::size(ctrlw, size_ - 2 * PG_BORDER_Y));
 		}
 	}
 }

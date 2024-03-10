@@ -57,7 +57,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;BR_SINGLE_THREAD_RENDERING_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;BR_SINGLE_THREAD_RENDERING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\nana\include;..\Engine\Dependencies\d3dx12;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\SimpleMath;..\Engine\Dependencies\D3D12MA;..\Engine\Dependencies\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>

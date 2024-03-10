@@ -1,5 +1,6 @@
 #include "Property.h"
 #include <sstream>
+#include <iomanip>
 
 namespace Bruno
 {
@@ -88,7 +89,7 @@ namespace Bruno
         if (_prop)
         {
             std::ostringstream builder;
-            builder << value.x << "/" << value.y << "/" << value.z;
+            builder << std::to_string(value.x) << "/" << std::to_string(value.y) << "/" << std::to_string(value.z);
 
             _prop->value = builder.str();
         }
