@@ -59,10 +59,12 @@ namespace Bruno
 			}
 		});
 
-		m_propertyGrid.events().property_changed([](const nana::arg_propertygrid& arg)
+		m_propertyGrid.events().property_changed([this](const nana::arg_propertygrid& arg)
 		{
 			BR_CORE_TRACE << "property_changed / grid. label = " << arg.item.label() << ". cat = " << arg.item.pos().cat << std::endl;
+			auto property = m_properties.get(arg.item.label());
 
+			auto cat = m_propertyGrid.at(arg.item.pos().cat);
 		});
 	}
 

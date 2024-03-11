@@ -75,9 +75,10 @@ namespace Bruno
 					
 				}
 			});
-			i.set_accept([](wchar_t c) -> bool
+			i.set_accept([&i](wchar_t c) -> bool
 			{
-				return (isdigit(c) || c == nana::keyboard::cancel || c == nana::keyboard::backspace || c == nana::keyboard::tab) ? true : false;
+				return (isdigit(c) || (c == '.' && i.text().find('.') == std::string::npos) ||
+					c == nana::keyboard::cancel || c == nana::keyboard::backspace || c == nana::keyboard::tab) ? true : false;
 			});
 		}
 
