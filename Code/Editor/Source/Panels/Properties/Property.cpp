@@ -1,36 +1,38 @@
 #include "Property.h"
+
 #include <sstream>
 #include <iomanip>
+#include <Bruno/Scene/Scene.h>
 
 namespace Bruno
 {
     properties_collection::~properties_collection()
     {
-        _props.clear();
+        m_properties.clear();
     }
 
     property_proxy properties_collection::append(const std::string& name)
     {
         property_t prop;
         prop.name = name;
-        _props.push_back(prop);
-        return property_proxy{ &_props.back() };
+        m_properties.push_back(prop);
+        return property_proxy{ &m_properties.back() };
     }
 
     property_proxy properties_collection::append(const property_t& prop)
     {
-        _props.push_back(prop);
-        return property_proxy{ &_props.back() };
+        m_properties.push_back(prop);
+        return property_proxy{ &m_properties.back() };
     }
 
     void properties_collection::clear()
     {
-        _props.clear();
+        m_properties.clear();
     }
     
     property_proxy properties_collection::get(const std::string& name)
     {
-        for (auto i = _props.begin(); i < _props.end(); ++i)
+        for (auto i = m_properties.begin(); i < m_properties.end(); ++i)
             if (i->name == name)
                 return property_proxy{ &*i };
 
@@ -39,7 +41,12 @@ namespace Bruno
     
     property_proxy properties_collection::operator[](size_t index)
     {
-        return property_proxy{ &_props[index] };
+        return property_proxy{ &m_properties[index] };
+    }
+
+    size_t properties_collection::size() const
+    {
+        return m_properties.size();
     }
 
     property_proxy& property_proxy::name(const std::string& name)
@@ -51,6 +58,28 @@ namespace Bruno
     std::string property_proxy::name() const
     {
         return _prop->name;
+    }
+
+    std::string property_proxy::category() const
+    {
+        return _prop->category;
+    }
+
+    property_proxy& property_proxy::category(const std::string& category)
+    {
+        _prop->category = category;
+        return *this;
+    }
+
+    property_proxy& property_proxy::label(const std::string& label)
+    {
+        _prop->label = label;
+        return *this;
+    }
+
+    std::string property_proxy::label() const
+    {
+        return _prop->label;
     }
 
     property_proxy& property_proxy::value(const std::string& value)
@@ -93,7 +122,20 @@ namespace Bruno
 
             _prop->value = builder.str();
         }
-
         return *this;
     }
+
+    Math::Vector3 property_proxy::as_vector3(Math::Vector3 def) const
+    {
+        if (!_prop || _prop->value.empty())
+            return def;
+
+        std::istringstream builder(_prop->value);
+        Math::Vector3 result;
+        char separator;
+        builder >> result.x >> separator >> result.y >> separator >> result.z;
+
+        return result;
+    }
+
 }

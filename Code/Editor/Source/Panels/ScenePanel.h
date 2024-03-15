@@ -28,7 +28,7 @@ namespace Bruno
 	class GraphicsContext;
 	class GizmoService;
 	class SelectionService;
-	class Scene;
+	class SceneDocument;
 	class SceneRenderer;
 
 	struct SceneSurfaceParameters
@@ -41,7 +41,7 @@ namespace Bruno
 	//class ScenePanel : public nana::nested_form
 	{
 	public:
-		ScenePanel(nana::window window, EditorGame* editorGame, Camera* camera, std::shared_ptr<Scene> scene, std::shared_ptr<SelectionService> selectionService, std::shared_ptr<GizmoService> gizmoService, const SceneSurfaceParameters& surfaceParameters = SceneSurfaceParameters());
+		ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters = SceneSurfaceParameters());
 		~ScenePanel();
 
 		void OnUpdate(const GameTimer& timer);
@@ -70,7 +70,7 @@ namespace Bruno
 		int idxx = 0;
 		SceneSurfaceParameters m_surfaceParameters;
 		EditorGame* m_editorGame;
-		std::shared_ptr<Scene>			m_scene;
+		std::shared_ptr<SceneDocument>			m_sceneDocument;
 		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
 
 		std::shared_ptr<Model> m_model;
@@ -84,8 +84,6 @@ namespace Bruno
 		std::shared_ptr<SelectionService>	m_selectionService;
 		std::shared_ptr<GizmoService>	m_gizmoService;
 
-		Camera* m_camera;
-
 		Math::Int2 m_lastMousePosition;
 		Math::Int2 m_beginMouseDownPosition;
 		bool m_isResizing{ false };
@@ -96,6 +94,6 @@ namespace Bruno
 		bool m_isGizmoing{ false };
 		bool m_dragRectangle{ false };
 
-		float m_totalTime = 0.0f;
+		float m_totalTime{ 0.0f };
 	};
 }

@@ -23,6 +23,9 @@ namespace Bruno
 
 		for (size_t i = 0; i < 3; ++i)
 			xyz_[i].caption(std::to_string(items[i]));
+
+		vector3_ = Math::Vector3(items[0], items[1], items[2]);
+		pgitem::value(std::to_string(items[0]) + "/" + std::to_string(items[1]) + "/" + std::to_string(items[2]));
 	}
 
 	void pg_vector3::enabled(bool state)

@@ -52,11 +52,6 @@ namespace Bruno
 		Entity rootEntity = CreateEntity("Mesh test");
 		CreateModelEntityHierarchy(rootEntity, model, model->GetRootNode());
 
-		if (m_hierarchyChangeCallback)
-		{
-			m_hierarchyChangeCallback(rootEntity, ActionMode::Add);
-		}
-
 		return rootEntity;
 	}
 
@@ -81,10 +76,6 @@ namespace Bruno
 		}
 	}
 
-	void Scene::SetHierarchyChangeCallback(SceneHierarchyChangeCallback callback)
-	{
-		m_hierarchyChangeCallback = callback;
-	}
 	Math::Matrix Scene::GetLocalSpaceMatrix(Entity entity)
 	{
 		return entity.GetComponent<TransformComponent>().GetTransform();

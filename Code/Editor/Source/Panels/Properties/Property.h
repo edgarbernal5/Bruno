@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 #include <Bruno/Math/Math.h>
 
 namespace Bruno
@@ -23,6 +24,12 @@ namespace Bruno
 			: _prop(prop)
 		{}
 
+		property_proxy& category(const std::string& category);
+		std::string category() const;
+
+		property_proxy& label(const std::string& label);
+		std::string label() const;
+
 		property_proxy& name(const std::string& name);
 		std::string name() const;
 
@@ -33,6 +40,14 @@ namespace Bruno
 		property_proxy& value(float value);
 		property_proxy& value(Math::Vector3 value);
 
+		Math::Vector3 as_vector3(Math::Vector3 def = Math::Vector3::Zero) const;
+
+		bool operator== (const property_proxy& other) const
+		{
+			return _prop == other._prop;
+		}
+	protected:
+		
 	private:
 		property_t* _prop{ nullptr };
 	};
@@ -52,7 +67,22 @@ namespace Bruno
 
 		property_proxy operator[](size_t index);
 
+		size_t size() const;
 	protected:
-		std::vector<property_t>		_props;
+		std::vector<property_t>		m_properties;
+	};
+}
+
+namespace std
+{
+	template <>
+	struct hash<Bruno::property_proxy>
+	{
+		std::size_t operator()(const Bruno::property_proxy& key) const
+		{
+			return std::hash<std::string>{}(key.category()) ^
+				(std::hash<std::string>{}(key.name()));
+			
+		}
 	};
 }

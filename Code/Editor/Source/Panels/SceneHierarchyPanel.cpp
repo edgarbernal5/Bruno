@@ -1,19 +1,19 @@
 #include "SceneHierarchyPanel.h"
 
-#include "Bruno/Scene/Scene.h"
-#include "Bruno/Scene/Entity.h"
-#include "Panels/Scene/SelectionService.h"
-#include "Gizmos/GizmoService.h"
+#include <Bruno/Scene/Scene.h>
+#include <Bruno/Scene/Entity.h>
+#include "Scene/SceneDocument.h"
+#include "Scene/SelectionService.h"
 
 namespace Bruno
 {
-	SceneHierarchyPanel::SceneHierarchyPanel(nana::window window, std::shared_ptr<Scene> scene, std::shared_ptr<SelectionService> selectionService, std::shared_ptr<GizmoService> gizmoService) :
+	SceneHierarchyPanel::SceneHierarchyPanel(nana::window window, std::shared_ptr<SceneDocument> sceneDocument) :
 		nana::panel<true>(window),
-		m_scene(scene),
-		m_selectionService(selectionService),
-		m_gizmoService(gizmoService)
+		m_sceneDocument(sceneDocument)
 	{
 		this->caption("Hierarchy");
+
+		m_selectionService = m_sceneDocument->GetSelectionService();
 
 		m_treebox.create(*this);
 		
@@ -25,34 +25,25 @@ namespace Bruno
 		
 		m_treebox.events().selected([&](const nana::arg_treebox& args)
 		{
-			BR_CORE_TRACE << "tree item selected: " << args.item.text() << ". " << args.operated << std::endl;
+				BR_CORE_TRACE << "tree item selected: " << args.item.text() << ". " << args.operated << ". ignore events " << m_ignoreEvents << std::endl;
+
+			if (m_ignoreEvents)
+				return;
 
 			std::vector<nana::treebox::item_proxy> node_selection;
 			m_treebox.selected(node_selection);
 
-			if (inProgress /* || !args.operated && node_selection.size() > 0*/)
-				return;
-
 			if (!args.operated)
 			{
-				if (node_selection.size() == 0)
-				{
-					m_gizmoService->SetActive(false);
-				}
+				m_selectionService->Deselect(args.item.value<UUID>());
+				m_sceneDocument->UpdateSelection();
 				return;
 			}
-
-			UUID entityUUID = args.item.value<UUID>();
-			if (entityUUID)
-			{
-				m_selectionService->Select(entityUUID);
-				auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
-				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
-			}
-			m_gizmoService->SetActive(entityUUID);
+			m_selectionService->Select(args.item.value<UUID>());
+			m_sceneDocument->UpdateSelection();
 		});
 
-		scene->SetHierarchyChangeCallback([&](Entity& entity, ActionMode actionMode)
+		m_hierarchyChangedHandleId = sceneDocument->HierarchyChanged.connect([&](Entity entity, ActionMode actionMode)
 		{
 			switch (actionMode)
 			{
@@ -73,36 +64,32 @@ namespace Bruno
 
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
-			inProgress = true;
+			m_ignoreEvents = true;
 			m_treebox.deselect_all();
 			for (auto& uuid : selection)
 			{
 				m_entityToNodeMap[uuid].select(true);
 			}
-			inProgress = false;
+			m_ignoreEvents = false;
 		});
+
+		auto entities = sceneDocument->GetScene()->GetAllEntitiesWith<IdComponent, HierarchyComponent>();
+		for (auto& ent : entities) {
+			auto [idComponent, hierarchy] = entities.get<IdComponent, HierarchyComponent>(ent);
+			if (!hierarchy.Parent)
+			{
+				OnHierarchyAdded(sceneDocument->GetScene()->GetEntityWithUUID(idComponent.Id));
+			}
+		}
 	}
 
 	SceneHierarchyPanel::~SceneHierarchyPanel()
 	{
 		m_selectionService->SelectionChanged.disconnect(m_selectionChangedHandleId);
+		m_sceneDocument->HierarchyChanged.disconnect(m_hierarchyChangedHandleId);
 	}
 
-	void SceneHierarchyPanel::DeselectAll()
-	{
-		if (m_treebox.selected().empty())
-			return;
-
-		m_treebox.selected().select(false);
-		m_gizmoService->SetActive(false);
-	}
-
-	void SceneHierarchyPanel::Select(UUID selectionUUID)
-	{
-		m_entityToNodeMap[selectionUUID].select(true);
-	}
-
-	void SceneHierarchyPanel::OnHierarchyAdded(Entity& entity, const std::string& parentKey)
+	void SceneHierarchyPanel::OnHierarchyAdded(Entity entity, const std::string& parentKey)
 	{
 		auto& hierarchy = entity.GetComponent<HierarchyComponent>();
 		auto& name = entity.GetComponent<NameComponent>().Name;
@@ -118,7 +105,7 @@ namespace Bruno
 
 		for (UUID child : hierarchy.Children)
 		{
-			auto childEntity = m_scene->TryGetEntityWithUUID(child);
+			auto childEntity = m_sceneDocument->GetScene()->TryGetEntityWithUUID(child);
 			if (childEntity)
 			{
 				OnHierarchyAdded(childEntity, key + "/");

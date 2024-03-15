@@ -8,21 +8,23 @@
 namespace Bruno
 {
 	class SelectionService;
-	class Scene;
+	class SceneDocument;
+	class Entity;
 
 	class PropertiesPanel : public nana::panel<true>
 	{
 	public:
-		PropertiesPanel(nana::window window, std::shared_ptr<Scene> scene, std::shared_ptr<SelectionService> selectionService);
+		PropertiesPanel(nana::window window, std::shared_ptr<SceneDocument> sceneDocument);
 		~PropertiesPanel();
 
 	private:
-		std::shared_ptr<Scene> m_scene;
+		std::shared_ptr<SceneDocument> m_sceneDocument;
 		std::shared_ptr<SelectionService> m_selectionService;
 		size_t m_selectionChangedHandleId{ 0 };
 
 		nana::place m_place;
 		nana::propertygrid m_propertyGrid;
 		properties_collection m_properties;
+		std::unordered_map<property_proxy, std::function<void(Entity, const std::string&)>> m_propToCallbacks;
 	};
 }

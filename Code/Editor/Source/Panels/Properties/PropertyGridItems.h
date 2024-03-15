@@ -30,7 +30,7 @@ namespace Bruno
 
 		virtual unsigned size() const override
 		{
-			return  size_;
+			return size_;
 		}
 
 	protected:

@@ -9,6 +9,7 @@
 #include <nana/gui/widgets/button.hpp>
 #include <nana/debugger.hpp>
 
+#include "Panels/Scene/SceneDocument.h"
 #include "Panels/ScenePanel.h"
 #include "Panels/SceneDocumentPanel.h"
 #include "Panels/ContentBrowserPanel.h"
@@ -160,15 +161,14 @@ namespace Bruno
 		});
 
 		auto scene = std::make_shared<Scene>();
+		auto sceneDocument = std::make_shared<SceneDocument>(scene, GetAssetManager());
+		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
+		sceneDocument->InstantiateModel(model);
 
 		//auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane1", "", nana::dock_position::right, scene, nullptr, nullptr);
 		//auto scenePanel = m_place.add_pane<ScenePanel>("pane2", "pane1", nana::dock_position::left, this, scene, sceneHierarchyPanel);
-		auto sceneDocumentPanel = m_place.add_pane<SceneDocumentPanel>("documents-pane", "", nana::dock_position::left, this, scene);
+		auto sceneDocumentPanel = m_place.add_pane<SceneDocumentPanel>("documents-pane", "", nana::dock_position::left, this, sceneDocument);
 		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("content-browser-pane", "documents-pane", nana::dock_position::down, m_applicationParameters.WorkingDirectory, this);
-
-		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
-
-		scene->InstantiateModel(model);
 
 		m_place.collocate();
 

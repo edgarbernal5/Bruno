@@ -13,6 +13,7 @@
 #include <Bruno/Scene/Scene.h>
 #include <Bruno/Renderer/SceneRenderer.h>
 #include "Panels/Scene/SelectionService.h"
+#include "Scene/SceneDocument.h"
 #include "EditorGame.h"
 
 #include <nana/gui.hpp>
@@ -22,14 +23,11 @@
 
 namespace Bruno
 {
-	ScenePanel::ScenePanel(nana::window window, EditorGame* editorGame, Camera* camera, std::shared_ptr<Scene> scene, std::shared_ptr<SelectionService> selectionService, std::shared_ptr<GizmoService> gizmoService, const SceneSurfaceParameters& surfaceParameters) :
+	ScenePanel::ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters) :
 		//nana::nested_form(window, nana::appear::bald<>()),
 		nana::panel<true>(window),
-		m_camera(camera),
 		m_surfaceParameters(surfaceParameters),
-		m_scene(scene),
-		m_selectionService(selectionService),
-		m_gizmoService(gizmoService),
+		m_sceneDocument(sceneDocument),
 
 		m_editorGame(editorGame)
 	{
@@ -42,6 +40,9 @@ namespace Bruno
 		this->caption(idstr.str());
 
 		m_place.bind(*this);
+
+		m_gizmoService = m_sceneDocument->GetGizmoService();
+		m_selectionService = m_sceneDocument->GetSelectionService();
 
 		m_gizmoTypeCombobox.create(*this, { 0, 0, 150, 25 });
 		m_gizmoTransformSpaceButton.create(*this);
@@ -159,7 +160,7 @@ namespace Bruno
 			{
 				m_surface->Resize(formSize.width, formSize.height);
 			}
-			m_camera->SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.width, (float)formSize.height));
+			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.width, (float)formSize.height));
 			m_isSizingMoving = false;
 		});
 
@@ -195,7 +196,7 @@ namespace Bruno
 				InitializeSceneRenderer();
 				InitializeGizmoService();
 			}
-			m_camera->SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.width, (float)args.height));
+			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.width, (float)args.height));
 			m_isResizing = false;
 		});
 
@@ -243,7 +244,7 @@ namespace Bruno
 				{
 					if (args.alt)
 					{
-						m_camera->Rotate(currentPosition, m_lastMousePosition);
+						m_sceneDocument->GetCamera().Rotate(currentPosition, m_lastMousePosition);
 					}
 					else
 					{
@@ -257,11 +258,11 @@ namespace Bruno
 				}
 				else if (args.mid_button)
 				{
-					m_camera->HandTool(currentPosition, m_lastMousePosition);
+					m_sceneDocument->GetCamera().HandTool(currentPosition, m_lastMousePosition);
 				}
 				else if (args.right_button)
 				{
-					m_camera->PitchYaw(currentPosition, m_lastMousePosition);
+					m_sceneDocument->GetCamera().PitchYaw(currentPosition, m_lastMousePosition);
 				}
 			}
 			
@@ -290,13 +291,7 @@ namespace Bruno
 				}
 				else if (!args.alt)
 				{
-					m_selectionService->SelectUnderMousePosition(*m_camera, currentPosition);
-					auto entityUUID = m_selectionService->GetSelections().size() > 0 ? m_selectionService->GetSelections()[0] : UUID(0);
-					if (entityUUID) {
-						auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
-						m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
-					}
-					m_gizmoService->SetActive(entityUUID);
+					m_selectionService->SelectUnderMousePosition(m_sceneDocument->GetCamera(), currentPosition);
 				}
 			}
 			
@@ -308,26 +303,26 @@ namespace Bruno
 			float zoom = args.distance * 0.0025f;
 			if (!args.upwards) zoom = -zoom;
 
-			m_camera->Zoom(zoom);
+			m_sceneDocument->GetCamera().Zoom(zoom);
 		});
 
 		m_form->events().key_press([this](const nana::arg_keyboard& args)
 		{
 			if (args.key == 'A')
 			{
-				m_camera->Strafe(-0.25f);
+				m_sceneDocument->GetCamera().Strafe(-0.25f);
 			}
 			else if (args.key == 'D')
 			{
-				m_camera->Strafe(0.25f);
+				m_sceneDocument->GetCamera().Strafe(0.25f);
 			}
 			else if (args.key == 'W')
 			{
-				m_camera->Walk(0.25f);
+				m_sceneDocument->GetCamera().Walk(0.25f);
 			}
 			else if (args.key == 'S')
 			{
-				m_camera->Walk(-0.25f);
+				m_sceneDocument->GetCamera().Walk(-0.25f);
 			}
 		});
 
@@ -445,11 +440,11 @@ namespace Bruno
 
 	void ScenePanel::InitializeSceneRenderer()
 	{
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get(), m_editorGame->GetAssetManager());
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_sceneDocument->GetScene(), m_surface.get(), m_editorGame->GetAssetManager());
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
 	{
-		m_scene->OnUpdate(timer, *m_camera);
+		m_sceneDocument->GetScene()->OnUpdate(timer, m_sceneDocument->GetCamera());
 	}
 }
