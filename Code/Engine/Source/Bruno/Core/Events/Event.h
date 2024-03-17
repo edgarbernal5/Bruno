@@ -23,7 +23,6 @@ namespace Bruno
             return *this;
         }
 
-    protected:
         Event(const Event&) = default;
         Event& operator=(const Event&) = default;
 

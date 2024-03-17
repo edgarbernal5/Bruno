@@ -12,6 +12,7 @@ namespace Bruno
 	class Entity;
 	class Model;
 
+	class SceneHierarchy;
 	class SelectionService;
 	class GizmoService;
 	class AbstractAssetManager;
@@ -29,8 +30,9 @@ namespace Bruno
 		SceneDocument(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager);
 		~SceneDocument();
 
-		Entity InstantiateModel(std::shared_ptr<Model> model);
+		void InstantiateModel(std::shared_ptr<Model> model);
 		std::shared_ptr<Scene> GetScene() const { return m_scene; }
+		std::shared_ptr<SceneHierarchy> GetSceneHierarchy() const { return m_sceneHierarchy; }
 
 		Camera& GetCamera() { return m_camera; }
 		std::shared_ptr<GizmoService> GetGizmoService() { return m_gizmoService; }
@@ -43,6 +45,7 @@ namespace Bruno
 	private:
 		void InitializeCamera();
 		void InitializeGizmoService();
+		void InitializeProperties(Entity entity);
 
 		Camera m_camera;
 		std::shared_ptr<Scene> m_scene;
@@ -50,6 +53,7 @@ namespace Bruno
 
 		std::shared_ptr<SelectionService>	m_selectionService;
 		std::shared_ptr<GizmoService>	m_gizmoService;
+		std::shared_ptr<SceneHierarchy>	m_sceneHierarchy;
 
 		size_t m_selectionChangedHandleId{ 0 };
 	};

@@ -84,7 +84,10 @@ namespace Bruno
 
     property_proxy& property_proxy::value(const std::string& value)
     {
+        bool emit_event = _prop->value != value;
         _prop->value = value;
+        if (emit_event)
+            _prop->on_change.emit(value);
         return *this;
     }
 
@@ -93,11 +96,26 @@ namespace Bruno
         return _prop->value;
     }
 
+    property_proxy& property_proxy::type(const pg_type type)
+    {
+        _prop->type = type;
+        return *this;
+    }
+
+    pg_type property_proxy::type() const
+    {
+        return _prop->type;
+    }
+
     property_proxy& property_proxy::value(int value)
     {
         if (_prop)
         {
-            _prop->value = std::to_string(value);
+            auto new_value = std::to_string(value);
+            bool emit_event = _prop->value != new_value;
+            _prop->value = new_value;
+            if (emit_event)
+                _prop->on_change.emit(new_value);
         }
 
         return *this;
@@ -107,7 +125,11 @@ namespace Bruno
     {
         if (_prop)
         {
-            _prop->value = std::to_string(value);
+            auto new_value = std::to_string(value);
+            bool emit_event = _prop->value != new_value;
+            _prop->value = new_value;
+            if (emit_event)
+                _prop->on_change.emit(new_value);
         }
 
         return *this;
@@ -120,7 +142,11 @@ namespace Bruno
             std::ostringstream builder;
             builder << std::to_string(value.x) << "/" << std::to_string(value.y) << "/" << std::to_string(value.z);
 
-            _prop->value = builder.str();
+            auto new_value = builder.str();
+            bool emit_event = _prop->value != new_value;
+            _prop->value = new_value;
+            if (emit_event)
+                _prop->on_change.emit(new_value);
         }
         return *this;
     }

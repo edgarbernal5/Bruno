@@ -8,6 +8,7 @@
 namespace Bruno
 {
 	class SelectionService;
+	class SceneHierarchy;
 	class SceneDocument;
 	class Entity;
 
@@ -18,13 +19,16 @@ namespace Bruno
 		~PropertiesPanel();
 
 	private:
+		void DisposePropertyBinders();
+
 		std::shared_ptr<SceneDocument> m_sceneDocument;
+		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;
 		std::shared_ptr<SelectionService> m_selectionService;
 		size_t m_selectionChangedHandleId{ 0 };
 
 		nana::place m_place;
 		nana::propertygrid m_propertyGrid;
-		properties_collection m_properties;
-		std::unordered_map<property_proxy, std::function<void(Entity, const std::string&)>> m_propToCallbacks;
+		properties_collection m_currentProperties;
+		std::unordered_map<property_proxy, size_t> m_propOnChangedHandlers;
 	};
 }

@@ -2,8 +2,10 @@
 
 #include <Bruno/Scene/Scene.h>
 
-#include "Panels/Scene/SelectionService.h"
+#include "SelectionService.h"
+#include "SceneHierarchy.h"
 #include "Gizmos/GizmoService.h"
+#include "Panels/Properties/PropertyHelpers.h"
 
 namespace Bruno
 {
@@ -14,6 +16,7 @@ namespace Bruno
 		InitializeCamera();
 		InitializeGizmoService();
 
+		m_sceneHierarchy = std::make_shared<SceneHierarchy>(scene);
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			auto entityUUID = selection.size() > 0 ? selection[0] : UUID(0);
@@ -32,12 +35,15 @@ namespace Bruno
 		m_selectionService->SelectionChanged.disconnect(m_selectionChangedHandleId);
 	}
 
-	Entity SceneDocument::InstantiateModel(std::shared_ptr<Model> model)
+	void SceneDocument::InstantiateModel(std::shared_ptr<Model> model)
 	{
 		Entity rootEntity = m_scene->InstantiateModel(model);
 
+		m_sceneHierarchy->Load(rootEntity);
+
+		InitializeProperties(rootEntity);
+
 		HierarchyChanged.emit(rootEntity, ActionMode::Add);
-		return rootEntity;
 	}
 
 	void SceneDocument::UpdateSelection()
@@ -70,10 +76,11 @@ namespace Bruno
 			auto& selections = m_selectionService->GetSelections();
 			for (auto& uuid : selections)
 			{
-				Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-				TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
-
-				entityTransform.Position += delta;
+				auto& properties = (*m_sceneHierarchy)[uuid];
+				auto prop = properties.get("Transform/Position");
+				auto currentPosition = prop.as_vector3();
+				currentPosition += delta;
+				prop.value(currentPosition);
 			}
 		});
 
@@ -118,5 +125,31 @@ namespace Bruno
 				}
 			}
 		});
+	}
+
+	void SceneDocument::InitializeProperties(Entity entity)
+	{
+		auto& hierarchy = entity.GetComponent<HierarchyComponent>();
+		auto& name = entity.GetComponent<NameComponent>().Name;
+
+		auto uuid = entity.GetUUID();
+
+		auto properties = (*m_sceneHierarchy)[uuid];
+		properties.get("Transform/Position").on_change().connect([this, uuid](const std::string& new_value)
+		{
+			Entity entity = m_scene->TryGetEntityWithUUID(uuid);
+			TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
+
+			entityTransform.Position = Property::AsVector3(new_value);
+		});
+
+		for (UUID child : hierarchy.Children)
+		{
+			auto childEntity = m_scene->TryGetEntityWithUUID(child);
+			if (childEntity)
+			{
+				InitializeProperties(childEntity);
+			}
+		}
 	}
 }

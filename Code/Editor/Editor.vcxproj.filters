@@ -67,6 +67,10 @@
     <ClCompile Include="Source\Panels\Scene\SceneDocument.cpp">
       <Filter>Source\Panels\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Panels\Scene\SceneHierarchy.cpp">
+      <Filter>Source\Panels\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -169,6 +173,12 @@
     </ClInclude>
     <ClInclude Include="Source\Panels\Scene\SceneDocument.h">
       <Filter>Source\Panels\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\Scene\SceneHierarchy.h">
+      <Filter>Source\Panels\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\Properties\PropertyHelpers.h">
+      <Filter>Source\Panels\Properties</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

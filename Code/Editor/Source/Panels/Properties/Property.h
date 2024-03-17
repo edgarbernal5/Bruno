@@ -4,16 +4,26 @@
 #include <vector>
 #include <utility>
 #include <Bruno/Math/Math.h>
+#include <Bruno/Core/Events/Event.h>
 
 namespace Bruno
 {
+	enum class pg_type
+	{
+		string,
+		vector3
+	};
+
 	struct property_t
 	{
-		std::string		name;
-		std::string		value;
+		std::string			name;
+		std::string			value;
 
-		std::string		label;
-		std::string		category;
+		std::string			label;
+		std::string			category;
+		pg_type				type;
+
+		Event<std::string>	on_change;
 	};
 	
 	class property_proxy
@@ -36,9 +46,15 @@ namespace Bruno
 		property_proxy& value(const std::string& value);
 		std::string value() const;
 
+		property_proxy& type(const pg_type type);
+		pg_type type() const;
+
 		property_proxy& value(int value);
 		property_proxy& value(float value);
 		property_proxy& value(Math::Vector3 value);
+
+		Event<std::string>& on_change() { return _prop->on_change; }
+		const Event<std::string>& on_change() const { return _prop->on_change; }
 
 		Math::Vector3 as_vector3(Math::Vector3 def = Math::Vector3::Zero) const;
 

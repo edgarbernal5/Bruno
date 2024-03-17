@@ -3,6 +3,7 @@
 #include <Bruno/Scene/Scene.h>
 #include <Bruno/Scene/Entity.h>
 #include "Scene/SceneDocument.h"
+#include "Scene/SceneHierarchy.h"
 #include "Scene/SelectionService.h"
 
 namespace Bruno
@@ -14,6 +15,7 @@ namespace Bruno
 		this->caption("Hierarchy");
 
 		m_selectionService = m_sceneDocument->GetSelectionService();
+		m_sceneHierarchy = m_sceneDocument->GetSceneHierarchy();
 
 		m_treebox.create(*this);
 		
@@ -25,13 +27,10 @@ namespace Bruno
 		
 		m_treebox.events().selected([&](const nana::arg_treebox& args)
 		{
-				BR_CORE_TRACE << "tree item selected: " << args.item.text() << ". " << args.operated << ". ignore events " << m_ignoreEvents << std::endl;
+			BR_CORE_TRACE << "tree item selected: " << args.item.text() << ". " << args.operated << ". ignore events " << m_ignoreEvents << std::endl;
 
 			if (m_ignoreEvents)
 				return;
-
-			std::vector<nana::treebox::item_proxy> node_selection;
-			m_treebox.selected(node_selection);
 
 			if (!args.operated)
 			{
@@ -98,10 +97,17 @@ namespace Bruno
 		builder << parentKey << (uint32_t)entity;
 		auto key = builder.str();
 
+		auto uuid = entity.GetUUID();
 		auto node = m_treebox.insert(key, name);
-		node.value(entity.GetUUID());
+		node.value(uuid);
 
-		m_entityToNodeMap[entity.GetUUID()] = node;
+		m_entityToNodeMap[uuid] = node;
+		auto properties = (*m_sceneHierarchy)[uuid];
+		properties.get("Name").on_change().connect([this, uuid](const std::string& new_value)
+		{
+			auto& selected_node = m_entityToNodeMap[uuid];
+			selected_node.text(new_value);
+		});
 
 		for (UUID child : hierarchy.Children)
 		{

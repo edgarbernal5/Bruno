@@ -8,6 +8,7 @@
 namespace Bruno
 {
 	class SceneDocument;
+	class SceneHierarchy;
 	class Entity;
 	class SelectionService;
 	class GizmoService;
@@ -26,8 +27,8 @@ namespace Bruno
 		nana::place m_place;
 		nana::treebox m_treebox;
 		std::shared_ptr<SceneDocument> m_sceneDocument;
+		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;
 		std::shared_ptr<SelectionService> m_selectionService;
-		std::shared_ptr<GizmoService> m_gizmoService;
 
 		bool m_ignoreEvents{ false };
 		std::unordered_map<UUID, nana::treebox::item_proxy> m_entityToNodeMap;

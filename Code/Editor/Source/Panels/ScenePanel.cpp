@@ -91,6 +91,7 @@ namespace Bruno
 		auto hwnd = reinterpret_cast<HWND>(m_form->native_handle());
 		m_form->draw_through([editorGame, hwnd, this]
 		{
+			//TODO: esto invoca a todos los draw de ScenePanels. Fix it
 			editorGame->OnTick();
 
 			RECT r;
@@ -169,7 +170,7 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << m_form->native_handle() << ". w=" << args.width << "; h=" << args.height << std::endl;
+			//BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << m_form->native_handle() << ". w=" << args.width << "; h=" << args.height << std::endl;
 
 			if (m_isSizingMoving)
 				return;
@@ -229,14 +230,6 @@ namespace Bruno
 			if (m_isGizmoing)
 			{
 				m_gizmoService->Drag(Math::Vector2(args.pos.x, args.pos.y));
-
-				//auto& selections = m_selectionService->GetSelections();
-				//if (selections.size() == 1)
-				//{
-				//	auto worldMatrix = m_selectionService->GetSelectionTransform();
-
-				//	m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
-				//}
 			}
 			else
 			{

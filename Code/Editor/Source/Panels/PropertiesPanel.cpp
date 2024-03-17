@@ -2,6 +2,7 @@
 
 #include "Scene/SelectionService.h"
 #include "Scene/SceneDocument.h"
+#include "Scene/SceneHierarchy.h"
 #include <Bruno/Scene/Scene.h>
 
 #include <nana/gui/widgets/pgitems.hpp>
@@ -16,6 +17,7 @@ namespace Bruno
 		this->caption("Properties");
 
 		m_selectionService = sceneDocument->GetSelectionService();
+		m_sceneHierarchy = sceneDocument->GetSceneHierarchy();
 
 		m_propertyGrid.create(*this);
 
@@ -28,49 +30,38 @@ namespace Bruno
 
 		m_selectionChangedHandleId = m_sceneDocument->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
+			BR_CORE_TRACE << "selection changed / selection.size = " << selection.size() << std::endl;
+
 			m_propertyGrid.clear();
-			m_properties.clear();
-			m_propToCallbacks.clear();
+			m_currentProperties.clear();
+			DisposePropertyBinders();
 
 			if (selection.size() != 1)
 				return;
 
-			bool isMultiSelection = selection.size() > 1;
 			auto& uuid = selection[0];
+			auto& nodeProperties = (*m_sceneHierarchy)[uuid];
 			
-			auto entity = m_sceneDocument->GetScene()->GetEntityWithUUID(uuid);
-
+			for (size_t i = 0; i < nodeProperties.size(); i++)
 			{
-				auto& name = entity.GetComponent<NameComponent>().Name;
-				auto prop = m_properties.append("Name");
-				prop.value(name);
-				prop.label("Name");
-				prop.category("");
-				m_propToCallbacks[prop] = [](Entity entity, const std::string& new_value)
-				{
-					entity.GetComponent<NameComponent>().Name = new_value;
-				};
+				auto prop = nodeProperties[i];
 
-				auto cat_idx = 0u;//m_propertyGrid.find(prop.category());
-				auto cat = (cat_idx == nana::npos) ? m_propertyGrid.append(prop.category()) : m_propertyGrid.at(cat_idx);
-				nana::propertygrid::item_proxy ip(nullptr);
-				ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string(prop.label(), prop.value())));
-			}
-			{
-				auto& transform = entity.GetComponent<TransformComponent>();
-				auto prop = m_properties.append("Transform/Position");
-				prop.value(transform.Position);
-				prop.label("Position");
-				prop.category("Transform");
-				m_propToCallbacks[prop] = [prop](Entity entity, const std::string& new_value)
-				{
-					entity.GetComponent<TransformComponent>().Position = prop.as_vector3();
-				};
-				
 				auto cat_idx = m_propertyGrid.find(prop.category());
 				auto cat = (cat_idx == nana::npos) ? m_propertyGrid.append(prop.category()) : m_propertyGrid.at(cat_idx);
 				nana::propertygrid::item_proxy ip(nullptr);
-				ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_vector3(prop.label(), prop.value())));
+
+				if (prop.type() == pg_type::string) {
+					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string(prop.label(), prop.value())));
+				}
+				else if (prop.type() == pg_type::vector3) {
+					ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_vector3(prop.label(), prop.value())));
+				}
+				auto item_ptr = ip._m_pgitem();
+				auto handlerId = prop.on_change().connect([item_ptr](const std::string& new_value)
+				{
+					item_ptr->value(new_value);
+				});
+				m_propOnChangedHandlers[prop] = handlerId;
 			}
 		});
 
@@ -79,15 +70,19 @@ namespace Bruno
 			BR_CORE_TRACE << "property_changed / grid. label = " << arg.item.label() << ". cat = " << arg.item.pos().cat << std::endl;
 			
 			auto cat = m_propertyGrid.at(arg.item.pos().cat);
-			for (size_t i = 0; i < m_properties.size(); ++i)
+
+			auto& uuid = m_selectionService->GetSelections()[0];
+			auto& nodeProperties = (*m_sceneHierarchy)[uuid];
+
+			for (size_t i = 0; i < nodeProperties.size(); ++i)
 			{
-				auto property = m_properties[i];
+				auto property = nodeProperties[i];
 				if (arg.item.label() == property.label() && cat.text() == property.category())
 				{
 					property.value(arg.item.value());
-					auto uuid = m_selectionService->GetSelections()[0];
+					/*auto uuid = m_selectionService->GetSelections()[0];
 					auto entity = m_sceneDocument->GetScene()->GetEntityWithUUID(uuid);
-					m_propToCallbacks[property](entity, arg.item.value());
+					m_propToCallbacks[property](entity, arg.item.value());*/
 					break;
 				}
 			}
@@ -97,5 +92,14 @@ namespace Bruno
 	PropertiesPanel::~PropertiesPanel()
 	{
 		m_sceneDocument->SelectionChanged.disconnect(m_selectionChangedHandleId);
+		DisposePropertyBinders();
+	}
+
+	void PropertiesPanel::DisposePropertyBinders()
+	{
+		for (auto& [prop, handlerId] : m_propOnChangedHandlers) {
+			prop.on_change().disconnect(handlerId);
+		}
+		m_propOnChangedHandlers.clear();
 	}
 }
