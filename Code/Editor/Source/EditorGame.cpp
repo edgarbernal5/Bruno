@@ -79,6 +79,7 @@ namespace Bruno
 		WindowParameters newParameters = windowParameters;
 		newParameters.Width = scaling_factor * newParameters.Width;
 		newParameters.Height = scaling_factor * newParameters.Height;
+
 		m_window = std::make_unique<NanaWindow>(newParameters, this);
 		m_window->Initialize();
 	}

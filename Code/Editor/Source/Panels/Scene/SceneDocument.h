@@ -55,6 +55,6 @@ namespace Bruno
 		std::shared_ptr<GizmoService>	m_gizmoService;
 		std::shared_ptr<SceneHierarchy>	m_sceneHierarchy;
 
-		size_t m_selectionChangedHandleId{ 0 };
+		EventHandlerId m_selectionChangedHandleId{ 0 };
 	};
 }

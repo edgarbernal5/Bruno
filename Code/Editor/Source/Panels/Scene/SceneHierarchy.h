@@ -30,6 +30,7 @@ namespace Bruno
 		Iterator begin() const { m_uuidToProperties.begin(); }
 		Iterator end() const { m_uuidToProperties.end(); }
 		properties_collection& operator[](const UUID& uuid) { return m_uuidToProperties[uuid]; }
+		properties_collection& get(const UUID& uuid) { return m_uuidToProperties[uuid]; }
 	private:
 
 		std::unordered_map<UUID, properties_collection> m_uuidToProperties;

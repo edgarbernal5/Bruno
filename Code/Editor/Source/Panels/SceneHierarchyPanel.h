@@ -3,7 +3,8 @@
 #include <nana/gui/widgets/panel.hpp>
 #include <nana/gui/place.hpp>
 #include <nana/gui/widgets/treebox.hpp>
-#include "Bruno/Core/UUID.h"
+#include <Bruno/Core/UUID.h>
+#include <Bruno/Core/Events/Event.h>
 
 namespace Bruno
 {
@@ -32,7 +33,7 @@ namespace Bruno
 
 		bool m_ignoreEvents{ false };
 		std::unordered_map<UUID, nana::treebox::item_proxy> m_entityToNodeMap;
-		size_t m_selectionChangedHandleId{ 0 };
-		size_t m_hierarchyChangedHandleId{ 0 };
+		EventHandlerId m_selectionChangedHandleId{ 0 };
+		EventHandlerId m_hierarchyChangedHandleId{ 0 };
 	};
 }

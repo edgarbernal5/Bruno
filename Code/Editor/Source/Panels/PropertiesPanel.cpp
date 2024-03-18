@@ -40,7 +40,7 @@ namespace Bruno
 				return;
 
 			auto& uuid = selection[0];
-			auto& nodeProperties = (*m_sceneHierarchy)[uuid];
+			auto& nodeProperties = m_sceneHierarchy->get(uuid);
 			
 			for (size_t i = 0; i < nodeProperties.size(); i++)
 			{
@@ -72,7 +72,7 @@ namespace Bruno
 			auto cat = m_propertyGrid.at(arg.item.pos().cat);
 
 			auto& uuid = m_selectionService->GetSelections()[0];
-			auto& nodeProperties = (*m_sceneHierarchy)[uuid];
+			auto& nodeProperties = m_sceneHierarchy->get(uuid);
 
 			for (size_t i = 0; i < nodeProperties.size(); ++i)
 			{
@@ -80,9 +80,6 @@ namespace Bruno
 				if (arg.item.label() == property.label() && cat.text() == property.category())
 				{
 					property.value(arg.item.value());
-					/*auto uuid = m_selectionService->GetSelections()[0];
-					auto entity = m_sceneDocument->GetScene()->GetEntityWithUUID(uuid);
-					m_propToCallbacks[property](entity, arg.item.value());*/
 					break;
 				}
 			}

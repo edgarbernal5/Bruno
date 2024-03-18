@@ -25,11 +25,23 @@ namespace Bruno
 		}
 		{
 			auto& transform = entity.GetComponent<TransformComponent>();
-			auto prop = properties.append("Transform/Position");
-			prop.value(transform.Position);
-			prop.label("Position");
-			prop.category("Transform");
-			prop.type(pg_type::vector3);
+			auto propPosition = properties.append("Transform/Position");
+			propPosition.value(transform.Position);
+			propPosition.label("Position");
+			propPosition.category("Transform");
+			propPosition.type(pg_type::vector3);
+
+			auto propRotation = properties.append("Transform/Rotation");
+			propRotation.value(transform.Rotation.ToEuler());
+			propRotation.label("Rotation");
+			propRotation.category("Transform");
+			propRotation.type(pg_type::vector3);
+
+			auto propScale = properties.append("Transform/Scale");
+			propScale.value(transform.Scale);
+			propScale.label("Scale");
+			propScale.category("Transform");
+			propScale.type(pg_type::vector3);
 		}
 		m_uuidToProperties[entity.GetUUID()] = properties;
 

@@ -102,7 +102,7 @@ namespace Bruno
 		node.value(uuid);
 
 		m_entityToNodeMap[uuid] = node;
-		auto properties = (*m_sceneHierarchy)[uuid];
+		auto properties = m_sceneHierarchy->get(uuid);
 		properties.get("Name").on_change().connect([this, uuid](const std::string& new_value)
 		{
 			auto& selected_node = m_entityToNodeMap[uuid];

@@ -76,7 +76,7 @@ namespace Bruno
 			auto& selections = m_selectionService->GetSelections();
 			for (auto& uuid : selections)
 			{
-				auto& properties = (*m_sceneHierarchy)[uuid];
+				auto& properties = m_sceneHierarchy->get(uuid);
 				auto prop = properties.get("Transform/Position");
 				auto currentPosition = prop.as_vector3();
 				currentPosition += delta;
@@ -89,12 +89,11 @@ namespace Bruno
 			auto& selections = m_selectionService->GetSelections();
 			for (auto& uuid : selections)
 			{
-				Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-				TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
-				auto newRotation = entityTransform.Rotation * delta;
-				newRotation.Normalize();
-
-				entityTransform.Rotation = newRotation;
+				auto& properties = m_sceneHierarchy->get(uuid);
+				auto prop = properties.get("Transform/Rotation");
+				auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(prop.as_vector3());
+				currentRotation *= delta;
+				prop.value(currentRotation.ToEuler());
 			}
 		});
 
@@ -104,24 +103,25 @@ namespace Bruno
 			auto& selections = m_selectionService->GetSelections();
 			for (auto& uuid : selections)
 			{
-				Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-				TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
+				auto& properties = m_sceneHierarchy->get(uuid);
+				auto prop = properties.get("Transform/Scale");
+				auto currentScale = prop.as_vector3();
 
 				if (isUniform)
 				{
 					float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
-					auto newScale = entityTransform.Scale * uniformDelta;
+					auto newScale = currentScale * uniformDelta;
 					if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 					{
-						entityTransform.Scale = newScale;
+						prop.value(newScale);
 					}
 
 					continue;
 				}
-				auto newScale = entityTransform.Scale + newDelta;
+				auto newScale = currentScale + newDelta;
 				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 				{
-					entityTransform.Scale = newScale;
+					prop.value(newScale);
 				}
 			}
 		});
@@ -134,13 +134,27 @@ namespace Bruno
 
 		auto uuid = entity.GetUUID();
 
-		auto properties = (*m_sceneHierarchy)[uuid];
+		auto properties = m_sceneHierarchy->get(uuid);
 		properties.get("Transform/Position").on_change().connect([this, uuid](const std::string& new_value)
 		{
 			Entity entity = m_scene->TryGetEntityWithUUID(uuid);
 			TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
 
 			entityTransform.Position = Property::AsVector3(new_value);
+		});
+		properties.get("Transform/Rotation").on_change().connect([this, uuid](const std::string& new_value)
+		{
+			Entity entity = m_scene->TryGetEntityWithUUID(uuid);
+			TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
+
+			entityTransform.Rotation = Math::Quaternion::CreateFromYawPitchRoll(Property::AsVector3(new_value));
+		});
+		properties.get("Transform/Scale").on_change().connect([this, uuid](const std::string& new_value)
+		{
+			Entity entity = m_scene->TryGetEntityWithUUID(uuid);
+			TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
+
+			entityTransform.Scale = Property::AsVector3(new_value);
 		});
 
 		for (UUID child : hierarchy.Children)
