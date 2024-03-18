@@ -25,7 +25,7 @@ namespace Bruno
 		using Iterator = std::unordered_map<UUID, properties_collection>::iterator;
 		using ConstIterator = std::unordered_map<UUID, properties_collection>::const_iterator;
 
-		void Load(Entity rootEntity);
+		void LoadProperties(Entity rootEntity);
 
 		Iterator begin() const { m_uuidToProperties.begin(); }
 		Iterator end() const { m_uuidToProperties.end(); }

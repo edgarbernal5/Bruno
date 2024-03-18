@@ -39,7 +39,7 @@ namespace Bruno
 	{
 		Entity rootEntity = m_scene->InstantiateModel(model);
 
-		m_sceneHierarchy->Load(rootEntity);
+		m_sceneHierarchy->LoadProperties(rootEntity);
 
 		InitializeProperties(rootEntity);
 

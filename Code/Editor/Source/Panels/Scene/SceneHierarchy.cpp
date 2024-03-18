@@ -10,7 +10,7 @@ namespace Bruno
 	{
 	}
 
-	void SceneHierarchy::Load(Entity entity)
+	void SceneHierarchy::LoadProperties(Entity entity)
 	{
 		properties_collection properties;
 
@@ -60,7 +60,7 @@ namespace Bruno
 			auto childEntity = m_scene->TryGetEntityWithUUID(child);
 			if (childEntity)
 			{
-				Load(childEntity);
+				LoadProperties(childEntity);
 			}
 		}
 	}

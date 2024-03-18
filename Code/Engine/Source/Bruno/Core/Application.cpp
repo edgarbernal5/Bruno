@@ -26,6 +26,11 @@ namespace Bruno
 		windowParameters.Width = m_applicationParameters.WindowWidth;
 		windowParameters.Height = m_applicationParameters.WindowHeight;
 		windowParameters.Title = m_applicationParameters.Name;
+
+		uint32_t dpi = GetDpiForSystem();
+		float scaling_factor = static_cast<float>(dpi) / 96.0f;
+		windowParameters.Width = static_cast<uint32_t>(scaling_factor * windowParameters.Width);
+		windowParameters.Height = static_cast<uint32_t>(scaling_factor * windowParameters.Height);
 		OnInitializeWindow(windowParameters);
 
 		OnInitialize();

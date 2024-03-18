@@ -74,13 +74,7 @@ namespace Bruno
 
 	void EditorGame::OnInitializeWindow(const WindowParameters& windowParameters)
 	{
-		UINT dpi = GetDpiForSystem();
-		float scaling_factor = static_cast<float>(dpi) / 96.0f;
-		WindowParameters newParameters = windowParameters;
-		newParameters.Width = scaling_factor * newParameters.Width;
-		newParameters.Height = scaling_factor * newParameters.Height;
-
-		m_window = std::make_unique<NanaWindow>(newParameters, this);
+		m_window = std::make_unique<NanaWindow>(windowParameters, this);
 		m_window->Initialize();
 	}
 
