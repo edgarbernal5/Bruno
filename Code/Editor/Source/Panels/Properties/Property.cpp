@@ -151,6 +151,19 @@ namespace Bruno
         return *this;
     }
 
+    property_proxy& property_proxy::value(UUID value)
+    {
+        if (_prop)
+        {
+            auto new_value = std::to_string(value);
+            bool emit_event = _prop->value != new_value;
+            _prop->value = new_value;
+            if (emit_event)
+                _prop->on_change.emit(new_value);
+        }
+        return *this;
+    }
+
     Math::Vector3 property_proxy::as_vector3(Math::Vector3 def) const
     {
         if (!_prop || _prop->value.empty())

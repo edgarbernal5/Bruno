@@ -5,6 +5,7 @@
 #include <utility>
 #include <Bruno/Math/Math.h>
 #include <Bruno/Core/Events/Event.h>
+#include <Bruno/Core/UUID.h>
 
 namespace Bruno
 {
@@ -52,6 +53,7 @@ namespace Bruno
 		property_proxy& value(int value);
 		property_proxy& value(float value);
 		property_proxy& value(Math::Vector3 value);
+		property_proxy& value(UUID value);
 
 		Event<std::string>& on_change() { return _prop->on_change; }
 		const Event<std::string>& on_change() const { return _prop->on_change; }

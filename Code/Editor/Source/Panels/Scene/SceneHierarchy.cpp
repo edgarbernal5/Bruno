@@ -43,6 +43,16 @@ namespace Bruno
 			propScale.category("Transform");
 			propScale.type(pg_type::vector3);
 		}
+
+		if (entity.HasComponent<ModelComponent>())
+		{
+			auto& model = entity.GetComponent<ModelComponent>();
+			auto prop = properties.append("Model/Handle");
+			prop.value(model.ModelHandle);
+			prop.label("Handle");
+			prop.category("Model");
+			prop.type(pg_type::string);
+		}
 		m_uuidToProperties[entity.GetUUID()] = properties;
 
 		for (UUID child : hierarchy.Children)
