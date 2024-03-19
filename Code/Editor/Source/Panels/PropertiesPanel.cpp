@@ -32,7 +32,7 @@ namespace Bruno
 		{
 			BR_CORE_TRACE << "selection changed / selection.size = " << selection.size() << std::endl;
 
-			m_propertyGrid.clear();
+			ClearPropertyGrid();
 			m_currentProperties.clear();
 			DisposePropertyBinders();
 
@@ -90,6 +90,15 @@ namespace Bruno
 	{
 		m_sceneDocument->SelectionChanged.disconnect(m_selectionChangedHandleId);
 		DisposePropertyBinders();
+	}
+
+	void PropertiesPanel::ClearPropertyGrid()
+	{
+		m_propertyGrid.clear();
+		for (size_t i = 0; i < m_propertyGrid.size_categ(); i++)
+		{
+			m_propertyGrid.erase();
+		}
 	}
 
 	void PropertiesPanel::DisposePropertyBinders()

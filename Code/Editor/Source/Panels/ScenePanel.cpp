@@ -38,9 +38,9 @@ namespace Bruno
 		std::ostringstream idstr;
 		idstr << "Scene id " << idxx;
 		this->caption(idstr.str());
-
 		m_place.bind(*this);
 
+		m_scene = m_sceneDocument->GetScene();
 		m_gizmoService = m_sceneDocument->GetGizmoService();
 		m_selectionService = m_sceneDocument->GetSelectionService();
 
@@ -433,11 +433,11 @@ namespace Bruno
 
 	void ScenePanel::InitializeSceneRenderer()
 	{
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_sceneDocument->GetScene(), m_surface.get(), m_editorGame->GetAssetManager());
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get(), m_editorGame->GetAssetManager());
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
 	{
-		m_sceneDocument->GetScene()->OnUpdate(timer, m_sceneDocument->GetCamera());
+		m_scene->OnUpdate(timer, m_sceneDocument->GetCamera());
 	}
 }

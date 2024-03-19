@@ -19,6 +19,7 @@ namespace Bruno
 		~PropertiesPanel();
 
 	private:
+		void ClearPropertyGrid();
 		void DisposePropertyBinders();
 
 		std::shared_ptr<SceneDocument> m_sceneDocument;

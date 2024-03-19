@@ -28,6 +28,7 @@ namespace Bruno
 	class GraphicsContext;
 	class GizmoService;
 	class SelectionService;
+	class Scene;
 	class SceneDocument;
 	class SceneRenderer;
 
@@ -60,29 +61,30 @@ namespace Bruno
 		void InitializeSceneRenderer();
 		void UpdateCBs(const GameTimer& timer);
 
+		//nana::nested_form* m_form;
 		std::unique_ptr<nana::nested_form> m_form;
 		nana::place m_place;
 		nana::combox m_gizmoTypeCombobox;
 		nana::button m_gizmoTransformSpaceButton;
 
-		//nana::nested_form* m_form;
 		std::unique_ptr<Surface> m_surface;
-		int idxx = 0;
+		int idxx{ 0 };
 		SceneSurfaceParameters m_surfaceParameters;
 		EditorGame* m_editorGame;
-		std::shared_ptr<SceneDocument>			m_sceneDocument;
-		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
+		std::shared_ptr<SceneDocument>		m_sceneDocument;
+		std::shared_ptr<Scene>				m_scene;
+		std::shared_ptr<SceneRenderer>		m_sceneRenderer;
 
 		std::shared_ptr<Model> m_model;
 		
-		std::unique_ptr<GraphicsContext> m_graphicsContext;
+		std::unique_ptr<GraphicsContext>	m_graphicsContext;
 
 #ifndef BR_SINGLE_THREAD_RENDERING
 		std::mutex m_mutex{};
 #endif
 
 		std::shared_ptr<SelectionService>	m_selectionService;
-		std::shared_ptr<GizmoService>	m_gizmoService;
+		std::shared_ptr<GizmoService>		m_gizmoService;
 
 		Math::Int2 m_lastMousePosition;
 		Math::Int2 m_beginMouseDownPosition;
