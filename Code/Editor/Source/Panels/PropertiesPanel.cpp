@@ -32,12 +32,16 @@ namespace Bruno
 		{
 			BR_CORE_TRACE << "selection changed / selection.size = " << selection.size() << std::endl;
 
+			m_propertyGrid.auto_draw(false);
 			ClearPropertyGrid();
 			m_currentProperties.clear();
 			DisposePropertyBinders();
 
 			if (selection.size() != 1)
+			{
+				m_propertyGrid.auto_draw(true);
 				return;
+			}
 
 			auto& uuid = selection[0];
 			auto& nodeProperties = m_sceneHierarchy->get(uuid);
@@ -63,6 +67,7 @@ namespace Bruno
 				});
 				m_propOnChangedHandlers[prop] = handlerId;
 			}
+			m_propertyGrid.auto_draw(true);
 		});
 
 		m_propertyGrid.events().property_changed([this](const nana::arg_propertygrid& arg)
