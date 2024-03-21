@@ -56,6 +56,8 @@ namespace Bruno
 
 				if (prop.type() == pg_type::string) {
 					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string(prop.label(), prop.value())));
+				} else if (prop.type() == pg_type::uint) {
+					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string_uint(prop.label(), prop.value())));
 				}
 				else if (prop.type() == pg_type::vector3) {
 					ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_vector3(prop.label(), prop.value())));
@@ -65,6 +67,7 @@ namespace Bruno
 				{
 					item_ptr->value(new_value);
 				});
+				item_ptr->enabled(!prop.read_only());
 				m_propOnChangedHandlers[prop] = handlerId;
 			}
 			m_propertyGrid.auto_draw(true);

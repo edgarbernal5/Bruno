@@ -47,11 +47,11 @@ namespace Bruno
 		if (entity.HasComponent<ModelComponent>())
 		{
 			auto& model = entity.GetComponent<ModelComponent>();
-			auto prop = properties.append("Model/Handle");
-			prop.value(model.ModelHandle);
-			prop.label("Handle");
-			prop.category("Model");
-			prop.type(pg_type::string);
+			auto propHandle = properties.append("Model/Handle");
+			propHandle.value(model.ModelHandle).label("Handle").category("Model").type(pg_type::string).read_only(true);
+
+			auto propMeshIndex = properties.append("Model/MeshIndex");
+			propMeshIndex.value(model.MeshIndex).label("Mesh index").category("Model").type(pg_type::uint).read_only(true);
 		}
 		m_uuidToProperties[entity.GetUUID()] = properties;
 

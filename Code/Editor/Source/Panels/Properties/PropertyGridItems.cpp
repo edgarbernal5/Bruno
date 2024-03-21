@@ -39,6 +39,7 @@ namespace Bruno
 
 	void pg_vector3::value(Math::Vector3 value)
 	{
+		pgitem::value(std::to_string(value.x) + "/" + std::to_string(value.y) + "/" + std::to_string(value.z));
 	}
 
 	void pg_vector3::create(nana::window wd)
@@ -75,7 +76,12 @@ namespace Bruno
 				// on lost focus: capture the value left by the user
 				if (!arg.getting)
 				{
-					
+					std::string col = xyz_[0].caption() + "/" + xyz_[1].caption() + "/" + xyz_[2].caption();
+					if (col != pgitem::value())
+					{
+						pg_vector3::value(xyz_[0].caption() + "/" + xyz_[1].caption() + "/" + xyz_[2].caption());
+						emit_event();
+					}
 				}
 			});
 			i.set_accept([&i](wchar_t c) -> bool
@@ -138,5 +144,26 @@ namespace Bruno
 			xyz_[2].move(rect.x, ctrly);
 			xyz_[2].size(nana::size(ctrlw, size_ - 2 * PG_BORDER_Y));
 		}
+	}
+
+	void pg_asset_file::value(const std::string& value)
+	{
+		pgitem::value(value);
+	}
+
+	void pg_asset_file::create(nana::window wd)
+	{
+		pg_string_button::create(wd);
+
+		txt_.events().focus.connect_front([this](const nana::arg_focus& arg)
+		{
+			arg.stop_propagation();
+		});
+
+		value(value_);
+
+		set_button_click([this](const nana::arg_click& arg)
+		{
+		});
 	}
 }

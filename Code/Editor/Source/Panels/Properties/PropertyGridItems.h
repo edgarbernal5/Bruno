@@ -28,11 +28,6 @@ namespace Bruno
 			return vector3_;
 		}
 
-		virtual unsigned size() const override
-		{
-			return size_;
-		}
-
 	protected:
 		virtual void create(nana::window wd) override;
 
@@ -40,5 +35,22 @@ namespace Bruno
 		
 		mutable nana::textbox	xyz_[3];
 		Math::Vector3	vector3_;
+	};
+
+	class pg_asset_file
+		: public nana::pg_string_button
+	{
+	public:
+		pg_asset_file() = default;
+
+		pg_asset_file(const std::string& label, const std::string& value)
+			: pg_string_button(label, value)
+		{}
+
+		virtual void value(const std::string& value) override;
+
+	protected:
+		virtual void create(nana::window wd) override;
+
 	};
 }

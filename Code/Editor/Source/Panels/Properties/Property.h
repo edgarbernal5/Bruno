@@ -11,6 +11,7 @@ namespace Bruno
 {
 	enum class pg_type
 	{
+		uint,
 		string,
 		vector3
 	};
@@ -23,7 +24,7 @@ namespace Bruno
 		std::string			label;
 		std::string			category;
 		pg_type				type;
-
+		bool				is_read_only{ false };
 		Event<std::string>	on_change;
 	};
 	
@@ -50,8 +51,12 @@ namespace Bruno
 		property_proxy& type(const pg_type type);
 		pg_type type() const;
 
+		property_proxy& read_only(const bool read_only);
+		bool read_only() const;
+
 		property_proxy& value(int value);
 		property_proxy& value(float value);
+		property_proxy& value(uint32_t value);
 		property_proxy& value(Math::Vector3 value);
 		property_proxy& value(UUID value);
 

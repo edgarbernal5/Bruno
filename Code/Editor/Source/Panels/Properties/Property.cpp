@@ -107,6 +107,17 @@ namespace Bruno
         return _prop->type;
     }
 
+    property_proxy& property_proxy::read_only(const bool read_only)
+    {
+        _prop->is_read_only = read_only;
+        return *this;
+    }
+
+    bool property_proxy::read_only() const
+    {
+        return _prop->is_read_only;
+    }
+
     property_proxy& property_proxy::value(int value)
     {
         if (_prop)
@@ -122,6 +133,20 @@ namespace Bruno
     }
 
     property_proxy& property_proxy::value(float value)
+    {
+        if (_prop)
+        {
+            auto new_value = std::to_string(value);
+            bool emit_event = _prop->value != new_value;
+            _prop->value = new_value;
+            if (emit_event)
+                _prop->on_change.emit(new_value);
+        }
+
+        return *this;
+    }
+
+    property_proxy& property_proxy::value(uint32_t value)
     {
         if (_prop)
         {

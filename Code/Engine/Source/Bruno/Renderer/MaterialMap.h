@@ -14,7 +14,6 @@ namespace Bruno
 
 		void Clear();
 		void ClearMaterial(uint32_t index);
-		void SetMaterial(uint32_t index, AssetHandle material);
 
 		AssetHandle GetMaterial(uint32_t materialIndex) const
 		{
@@ -28,6 +27,8 @@ namespace Bruno
 		}
 		std::map<uint32_t, AssetHandle>& GetMaterials() { return m_materials; }
 		const std::map<uint32_t, AssetHandle>& GetMaterials() const { return m_materials; }
+
+		void SetMaterial(uint32_t index, AssetHandle material);
 	private:
 
 		std::map<uint32_t, AssetHandle> m_materials;
