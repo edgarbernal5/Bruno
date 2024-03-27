@@ -7,6 +7,7 @@
 #include "Bruno/Math/Math.h"
 
 #include <string>
+#include <Bruno/Content/AssetTypes.h>
 
 namespace Bruno
 {
@@ -36,6 +37,19 @@ namespace Bruno
 		inline bool IsRoot() const { return Parent == NullNode; }
 	};
 
+	enum class TextureSemantic : uint8_t
+	{
+		Unknown = 0,
+		DiffuseMap,
+		NormalMap
+	};
+
+	enum class PropertySemantic : uint8_t
+	{
+		Unknown = 0,
+		DiffuseColor
+	};
+
 	class ModelMaterial : public RTTI
 	{
 	public:
@@ -43,6 +57,8 @@ namespace Bruno
 
 	public:
 		std::string Name;
+		std::map<TextureSemantic, std::string> TexturesBySemantic;
+		std::map<PropertySemantic, std::string> Properties;
 		std::map<std::string, AssetHandle> TexturesByName;
 	};
 
@@ -51,8 +67,10 @@ namespace Bruno
 		BR_RTTI_DECLARATION(Model, Asset);
 
 	public:
-		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<ModelMaterial>>&& materials, 
+		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, 
 			std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes);
+
+		AssetType GetAssetType() const override { return AssetType::Model; }
 
 		const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const { return m_indexBuffer; }
 		const std::shared_ptr<VertexBuffer>& GetVertexBuffer() const { return m_vertexBuffer; }
@@ -61,13 +79,14 @@ namespace Bruno
 		void SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer);
 
 		const std::vector<std::shared_ptr<Mesh>>& GetMeshes() { return m_meshes; }
-		std::shared_ptr<ModelMaterial>& GetMaterial(uint32_t materialIndex);
+		std::shared_ptr<Material>& GetMaterial(uint32_t materialIndex);
+		std::vector<std::shared_ptr<Material>>& GetMaterials() { return m_materials; }
 
 		const ModelNode& GetRootNode() const { return m_modelNodes[0]; }
 		const std::vector<ModelNode>& GetNodes() const { return m_modelNodes; }
 	
 	private:
-		std::vector<std::shared_ptr<ModelMaterial>> m_materials;
+		std::vector<std::shared_ptr<Material>> m_materials;
 		std::vector<std::shared_ptr<Mesh>> m_meshes;
 		std::vector<ModelVertex> m_vertices;
 		std::vector<uint32_t> m_indices;

@@ -2,6 +2,7 @@
 
 #include "Bruno/Core/RTTI.h"
 #include "Bruno/Core/UUID.h"
+#include "Bruno/Content/AssetTypes.h"
 
 namespace Bruno
 {
@@ -24,6 +25,7 @@ namespace Bruno
 			return !(*this == other);
 		}
 
+		virtual AssetType GetAssetType() const { return AssetType::None; }
 		AssetHandle GetHandle() const { return m_handle; }
 		void SetHandle(AssetHandle handle) { m_handle = handle; }
 

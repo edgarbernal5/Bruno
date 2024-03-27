@@ -14,6 +14,8 @@
 
 namespace Bruno
 {
+	class Material;
+
 	class ModelImporter : public AbstractAssetImporter
 	{
 	public:
@@ -37,8 +39,8 @@ namespace Bruno
 
 		void ProcessMesh(aiMesh* aiMesh, std::vector<ModelVertex>& vertices, std::vector<uint32_t>& indices, std::vector<std::shared_ptr<Mesh>>& meshes, uint32_t& baseVertex, uint32_t& baseIndex);
 		void ProcessNode(aiNode* aiNode, uint32_t nodeIndex, std::vector<ModelNode>& modelNodes, std::vector<std::shared_ptr<Mesh>>& meshes, const Math::Matrix& parentTransform);
-		void ProcessMaterials(const aiScene* aiScene, const std::wstring& directory, std::vector<std::shared_ptr<ModelMaterial>>& materials, AssetImporterContext& context);
-		void ProcessTexturesForMaterial(ModelMaterial& materialContentItem, aiMaterial* aiMaterial, const std::wstring& directory, AssetImporterContext& context);
+		void ProcessMaterials(const aiScene* aiScene, const std::wstring& directory, std::vector<std::shared_ptr<Material>>& materials, AssetImporterContext& context);
+		void ProcessTexturesForMaterial(Material& materialContentItem, aiMaterial* aiMaterial, const std::wstring& directory, AssetImporterContext& context);
 		Math::Matrix ToMatrix(const aiMatrix4x4& aiMatrix);
 
 		static std::map<TextureType, std::pair<uint32_t, std::string>> g_textureTypeMappings;

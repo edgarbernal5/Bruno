@@ -9,7 +9,7 @@ namespace Bruno
 	BR_RTTI_DEFINITIONS(ModelMaterial);
 	BR_RTTI_DEFINITIONS(Model);
 
-	Model::Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<ModelMaterial>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes) :
+	Model::Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes) :
 		m_vertices(std::move(vertices)),
 		m_indices(std::move(indices)),
 		m_materials(std::move(materials)),
@@ -42,7 +42,7 @@ namespace Bruno
 		m_vertexBuffer = buffer;
 	}
 
-	std::shared_ptr<ModelMaterial>& Model::GetMaterial(uint32_t materialIndex)
+	std::shared_ptr<Material>& Model::GetMaterial(uint32_t materialIndex)
 	{
 		return m_materials[materialIndex];
 	}

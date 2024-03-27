@@ -12,6 +12,7 @@ namespace Bruno
 		AssetType Type{ AssetType::None };
 		std::wstring Filename;
 		bool IsLoaded{ false };
+		bool IsMemoryOnly{ false };
 
 		operator bool() const { return Handle != 0; }
 	};

@@ -64,6 +64,6 @@ namespace Bruno
 	{
 		AssetHandle ModelHandle;
 		uint32_t MeshIndex{ 0 };
-		MaterialMap Materials;
+		std::shared_ptr<MaterialMap> Materials = std::make_shared< MaterialMap>();
 	};
 }

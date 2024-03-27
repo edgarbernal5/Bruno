@@ -63,10 +63,10 @@ namespace Bruno
 			{
 				if (arg.key == nana::keyboard::enter)
 				{
-					std::string col = xyz_[0].caption() + "/" + xyz_[1].caption() + "/" + xyz_[2].caption();
-					if (col != pgitem::value())
+					std::string new_value = xyz_[0].caption() + "/" + xyz_[1].caption() + "/" + xyz_[2].caption();
+					if (new_value != pgitem::value())
 					{
-						pg_vector3::value(xyz_[0].caption() + "/" + xyz_[1].caption() + "/" + xyz_[2].caption());
+						pg_vector3::value(new_value);
 						emit_event();
 					}
 				}
@@ -76,10 +76,10 @@ namespace Bruno
 				// on lost focus: capture the value left by the user
 				if (!arg.getting)
 				{
-					std::string col = xyz_[0].caption() + "/" + xyz_[1].caption() + "/" + xyz_[2].caption();
-					if (col != pgitem::value())
+					std::string new_value = xyz_[0].caption() + "/" + xyz_[1].caption() + "/" + xyz_[2].caption();
+					if (new_value != pgitem::value())
 					{
-						pg_vector3::value(xyz_[0].caption() + "/" + xyz_[1].caption() + "/" + xyz_[2].caption());
+						pg_vector3::value(new_value);
 						emit_event();
 					}
 				}

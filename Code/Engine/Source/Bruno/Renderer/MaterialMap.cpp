@@ -16,7 +16,6 @@ namespace Bruno
 
 	void MaterialMap::SetMaterial(uint32_t index, AssetHandle material)
 	{
-		BR_ASSERT(index < m_materials.size());
 		m_materials[index] = material;
 	}
 }

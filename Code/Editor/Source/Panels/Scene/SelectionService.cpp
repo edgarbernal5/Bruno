@@ -105,8 +105,8 @@ namespace Bruno
 
 	Math::Ray SelectionService::ConvertMousePositionToRay(Camera camera, const Math::Int2& mousePosition)
 	{
-		Math::Vector3 nearPoint(mousePosition.x, mousePosition.y, 0.0f);
-		Math::Vector3 farPoint(mousePosition.x, mousePosition.y, 1.0f);
+		Math::Vector3 nearPoint((float)mousePosition.x, (float)mousePosition.y, 0.0f);
+		Math::Vector3 farPoint((float)mousePosition.x, (float)mousePosition.y, 1.0f);
 
 		nearPoint = camera.GetViewport().Unproject(nearPoint,
 			camera.GetProjection(),

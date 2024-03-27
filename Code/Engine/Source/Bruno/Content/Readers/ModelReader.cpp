@@ -147,7 +147,9 @@ namespace Bruno
 			input.ReadMatrix(modelNode.LocalTransform);
 		}
 
-		auto model = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
-		return model;
+		//auto model = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
+		//return model;
+		//obsolete!! TODO
+		return nullptr;
 	}
 }

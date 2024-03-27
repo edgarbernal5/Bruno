@@ -4,6 +4,7 @@
 #include "Components.h"
 
 #include "Bruno/Renderer/Model.h"
+#include "Bruno/Renderer/Material.h"
 #include <Bruno/Renderer/RenderItem.h>
 #include <Bruno/Core/GameTimer.h>
 
@@ -128,7 +129,13 @@ namespace Bruno
 		if (node.Meshes.size() == 1)
 		{
 			uint32_t submeshIndex = node.Meshes[0];
-			nodeEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
+			auto& modelComponent = nodeEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
+
+			for (size_t j = 0; j < model->GetMaterials().size(); ++j)
+			{
+				auto& material = model->GetMaterials()[j];
+				modelComponent.Materials->SetMaterial(j, material->GetHandle());
+			}
 		}
 		else if (node.Meshes.size() > 1)
 		{
@@ -137,7 +144,13 @@ namespace Bruno
 				uint32_t submeshIndex = node.Meshes[i]; 
 
 				Entity childEntity = CreateEntity(nodeEntity, node.Name);
-				childEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
+				auto& modelComponent = childEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
+
+				for (size_t j = 0; j < model->GetMaterials().size(); ++j)
+				{
+					auto& material = model->GetMaterials()[j];
+					modelComponent.Materials->SetMaterial(j, material->GetHandle());
+				}
 			}
 		}
 

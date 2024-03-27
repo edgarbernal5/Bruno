@@ -15,43 +15,40 @@ namespace Bruno
 		properties_collection properties;
 
 		auto& hierarchy = entity.GetComponent<HierarchyComponent>();
-		{
-			auto& name = entity.GetComponent<NameComponent>().Name;
-			auto prop = properties.append("Name");
-			prop.value(name);
-			prop.label("Name");
-			prop.category("");
-			prop.type(pg_type::string);
-		}
-		{
-			auto& transform = entity.GetComponent<TransformComponent>();
-			auto propPosition = properties.append("Transform/Position");
-			propPosition.value(transform.Position);
-			propPosition.label("Position");
-			propPosition.category("Transform");
-			propPosition.type(pg_type::vector3);
+		
+		auto& name = entity.GetComponent<NameComponent>().Name;
+		properties.append("Name").label("Name").category("").type(pg_type::string).value(name);
+		
+		auto& transform = entity.GetComponent<TransformComponent>();
+		properties.append("Transform/Position").label("Position").category("Transform").type(pg_type::vector3).value(transform.Position);
 
-			auto propRotation = properties.append("Transform/Rotation");
-			propRotation.value(transform.Rotation.ToEuler());
-			propRotation.label("Rotation");
-			propRotation.category("Transform");
-			propRotation.type(pg_type::vector3);
+		properties.append("Transform/Rotation").label("Rotation").category("Transform").type(pg_type::vector3).value(transform.Rotation.ToEuler());
 
-			auto propScale = properties.append("Transform/Scale");
-			propScale.value(transform.Scale);
-			propScale.label("Scale");
-			propScale.category("Transform");
-			propScale.type(pg_type::vector3);
-		}
+		properties.append("Transform/Scale").label("Scale").category("Transform").type(pg_type::vector3).value(transform.Scale);
 
 		if (entity.HasComponent<ModelComponent>())
 		{
 			auto& model = entity.GetComponent<ModelComponent>();
-			auto propHandle = properties.append("Model/Handle");
-			propHandle.value(model.ModelHandle).label("Handle").category("Model").type(pg_type::string).read_only(true);
+			properties.append("Model/Handle").label("Handle").category("Model").type(pg_type::string).read_only(true).value(model.ModelHandle);
 
-			auto propMeshIndex = properties.append("Model/MeshIndex");
-			propMeshIndex.value(model.MeshIndex).label("Mesh index").category("Model").type(pg_type::uint).read_only(true);
+			properties.append("Model/MeshIndex").label("Mesh index").category("Model").value(model.MeshIndex).type(pg_type::uint).read_only(true);
+
+			for (auto& [index, materialAsset] : model.Materials->GetMaterials())
+			{
+				std::string propName;
+				{
+					std::ostringstream oss;
+					oss << "Model/Materials/" << index;
+					propName = oss.str();
+				}
+				std::string propLabel;
+				{
+					std::ostringstream oss;
+					oss << "Material " << index;
+					propLabel = oss.str();
+				}
+				properties.append(propName).label(propLabel).category("Model").type(pg_type::asset_file).value(materialAsset);
+			}
 		}
 		m_uuidToProperties[entity.GetUUID()] = properties;
 

@@ -28,6 +28,12 @@ namespace Bruno
 		std::map<uint32_t, AssetHandle>& GetMaterials() { return m_materials; }
 		const std::map<uint32_t, AssetHandle>& GetMaterials() const { return m_materials; }
 
+		using Iterator = std::map<uint32_t, AssetHandle>::iterator;
+		using ConstIterator = std::map<uint32_t, AssetHandle>::const_iterator;
+
+		Iterator begin() const { m_materials.begin(); }
+		Iterator end() const { m_materials.end(); }
+
 		void SetMaterial(uint32_t index, AssetHandle material);
 	private:
 

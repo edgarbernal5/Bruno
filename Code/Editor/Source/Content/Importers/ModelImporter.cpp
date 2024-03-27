@@ -2,6 +2,7 @@
 #include "ModelImporter.h"
 
 #include "Bruno/Core/StringHelpers.h"
+#include "Bruno/Renderer/Material.h"
 
 namespace Bruno
 {
@@ -50,7 +51,7 @@ namespace Bruno
 			return false;
 		}
 
-		std::vector<std::shared_ptr<ModelMaterial>> materials;
+		std::vector<std::shared_ptr<Material>> materials;
 		if (aiScene->HasMaterials())
 		{
 			std::filesystem::path directory = assetFilename;
@@ -186,12 +187,12 @@ namespace Bruno
 		}
 	}
 
-	void ModelImporter::ProcessMaterials(const aiScene* aiScene, const std::wstring& directory, std::vector<std::shared_ptr<ModelMaterial>>& materials, AssetImporterContext& context)
+	void ModelImporter::ProcessMaterials(const aiScene* aiScene, const std::wstring& directory, std::vector<std::shared_ptr<Material>>& materials, AssetImporterContext& context)
 	{
 		for (uint32_t i = 0; i < aiScene->mNumMaterials; i++)
 		{
 			aiMaterial* aiMaterial = aiScene->mMaterials[i];
-			auto materialContent = std::make_shared<ModelMaterial>();
+			auto materialContent = std::make_shared<Material>();
 
 			aiString name;
 			aiMaterial->Get(AI_MATKEY_NAME, name);
@@ -199,11 +200,13 @@ namespace Bruno
 
 			ProcessTexturesForMaterial(*materialContent, aiMaterial, directory, context);
 
-			materials.emplace_back(std::move(materialContent));
+			context.AddMemoryOnlyAsset(materialContent);//TODO: HACK
+
+			materials.emplace_back(materialContent);
 		}
 	}
 
-	void ModelImporter::ProcessTexturesForMaterial(ModelMaterial& materialContentItem, aiMaterial* aiMaterial, const std::wstring& directory, AssetImporterContext& context)
+	void ModelImporter::ProcessTexturesForMaterial(Material& materialContentItem, aiMaterial* aiMaterial, const std::wstring& directory, AssetImporterContext& context)
 	{
 		for (auto it = g_textureTypeMappings.begin(); it != g_textureTypeMappings.end(); ++it)
 		{

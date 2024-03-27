@@ -8,7 +8,8 @@ namespace Bruno
 	{
 		None = 0,
 		Model,
-		Texture
+		Texture,
+		Material
 	};
 
 	inline std::string GetAssetTypeStringFrom(AssetType type)

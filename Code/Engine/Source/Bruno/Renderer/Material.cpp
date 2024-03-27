@@ -6,4 +6,9 @@
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(Material);
+
+	Material::Material()
+	{
+		m_handle = {};
+	}
 }

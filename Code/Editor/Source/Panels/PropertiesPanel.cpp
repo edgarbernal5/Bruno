@@ -54,13 +54,20 @@ namespace Bruno
 				auto cat = (cat_idx == nana::npos) ? m_propertyGrid.append(prop.category()) : m_propertyGrid.at(cat_idx);
 				nana::propertygrid::item_proxy ip(nullptr);
 
-				if (prop.type() == pg_type::string) {
+				if (prop.type() == pg_type::string)
+				{
 					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string(prop.label(), prop.value())));
-				} else if (prop.type() == pg_type::uint) {
+				} else if (prop.type() == pg_type::uint)
+				{
 					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string_uint(prop.label(), prop.value())));
 				}
-				else if (prop.type() == pg_type::vector3) {
+				else if (prop.type() == pg_type::vector3)
+				{
 					ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_vector3(prop.label(), prop.value())));
+				}
+				else if (prop.type() == pg_type::asset_file)
+				{
+					ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_asset_file(prop.label(), prop.value())));
 				}
 				auto item_ptr = ip._m_pgitem();
 				auto handlerId = prop.on_change().connect([item_ptr](const std::string& new_value)
