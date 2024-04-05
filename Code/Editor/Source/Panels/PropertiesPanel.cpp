@@ -32,6 +32,7 @@ namespace Bruno
 		{
 			BR_CORE_TRACE << "selection changed / selection.size = " << selection.size() << std::endl;
 
+			//TODO: si no hay cambios no refrescar.
 			m_propertyGrid.auto_draw(false);
 			ClearPropertyGrid();
 			m_currentProperties.clear();
@@ -67,7 +68,13 @@ namespace Bruno
 				}
 				else if (prop.type() == pg_type::asset_file)
 				{
-					ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_asset_file(prop.label(), prop.value())));
+					auto pgaf = new pg_asset_file(prop.label(), prop.value());
+					ip = cat.append(nana::propertygrid::pgitem_ptr(pgaf));
+					pgaf->set_button_click([&](const nana::arg_click& click_args)
+					{
+						//...
+						nana::menu_popuper(m_asset_file_menu_popup, nana::mouse::left_button)(*click_args.mouse_args);
+					});
 				}
 				auto item_ptr = ip._m_pgitem();
 				auto handlerId = prop.on_change().connect([item_ptr](const std::string& new_value)
@@ -79,6 +86,12 @@ namespace Bruno
 			}
 			m_propertyGrid.auto_draw(true);
 		});
+
+		m_asset_file_menu_popup.append("Select asset...", [](nana::menu::item_proxy& ip) {
+			//TODO: callback o un objeto. inyectarlo
+		});
+		m_asset_file_menu_popup.append_splitter();
+		m_asset_file_menu_popup.append("Find asset in Content Browser", [](nana::menu::item_proxy& ip) {});
 
 		m_propertyGrid.events().property_changed([this](const nana::arg_propertygrid& arg)
 		{

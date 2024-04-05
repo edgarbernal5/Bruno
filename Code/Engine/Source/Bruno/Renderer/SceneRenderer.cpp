@@ -78,10 +78,11 @@ namespace Bruno
 			
 			auto materialHandle = modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
 			auto material = m_assetManager->GetAsset<Material>(materialHandle);
-			AssetHandle textureHandle;
-			if (material->TexturesByName.find("Texture") != material->TexturesByName.end())
+			AssetHandle textureHandle{ 0 };
+			auto textIt = material->TexturesByName.find("Texture");
+			if (textIt != material->TexturesByName.end())
 			{
-				textureHandle = m_assetManager->GetAsset<Material>(materialHandle)->TexturesByName["Texture"];
+				textureHandle = textIt->second;
 			}
 			auto texture = m_assetManager->GetAsset<Texture>(textureHandle);
 			if (texture != nullptr && texture->IsReady())

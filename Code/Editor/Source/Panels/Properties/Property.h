@@ -14,7 +14,8 @@ namespace Bruno
 		uint,
 		string,
 		vector3,
-		asset_file
+		asset_file,
+		texture
 	};
 
 	struct property_t

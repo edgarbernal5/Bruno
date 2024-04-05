@@ -51,6 +51,5 @@ namespace Bruno
 
 	protected:
 		virtual void create(nana::window wd) override;
-
 	};
 }

@@ -2,6 +2,7 @@
 
 #include <nana/gui/widgets/panel.hpp>
 #include <nana/gui/place.hpp>
+#include <nana/gui/widgets/menu.hpp>
 #include <nana/gui/widgets/property_grid.hpp>
 #include "Properties/Property.h"
 
@@ -31,5 +32,6 @@ namespace Bruno
 		nana::propertygrid m_propertyGrid;
 		properties_collection m_currentProperties;
 		std::unordered_map<property_proxy, size_t> m_propOnChangedHandlers;
+		nana::menu m_asset_file_menu_popup;
 	};
 }
