@@ -16,6 +16,7 @@ namespace Bruno
 	public:
 		EditorAssetManager(const std::wstring& projectPath);
 
+		void AddMemoryOnlyAsset(std::shared_ptr<Asset> asset) override;
 		std::shared_ptr<Asset> GetAsset(AssetHandle assetHandle) override;
 		std::wstring GetAbsolutePath(const std::wstring& path);
 
@@ -27,9 +28,11 @@ namespace Bruno
 		void GetAssetsDirectory(const std::wstring& directoryPath);
 		void ProcessDirectory(const std::wstring& directoryPath);
 		AssetType GetAssetTypeByExtension(const std::string& fileExtension);
+		bool IsMemoryAsset(AssetHandle handle);
 
 		std::wstring m_projectPath;
 		std::unordered_map<AssetHandle, std::shared_ptr<Asset>> m_loadedAssets;
+		std::unordered_map<AssetHandle, std::shared_ptr<Asset>> m_memoryAssets;
 		AssetTable m_assetTable;
 		ImporterManager m_importerManager;
 

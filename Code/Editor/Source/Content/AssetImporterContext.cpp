@@ -10,6 +10,11 @@ namespace Bruno
 	{
 	}
 
+	void AssetImporterContext::AddMemoryOnlyAsset(std::shared_ptr<Asset> asset)
+	{
+		m_assetManager.AddMemoryOnlyAsset(asset);
+	}
+
 	std::wstring AssetImporterContext::GetAbsolutePath(const std::wstring& path)
 	{
 		return m_assetManager.GetAbsolutePath(path);

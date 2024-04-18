@@ -30,9 +30,7 @@ namespace Bruno
 
 		void OpenDocument(const std::wstring& filename);
 
-		EditorAssetManager* GetEditorAssetManager() const {
-			return m_editorAssetManager;
-		}
+		EditorAssetManager* GetEditorAssetManager() const { return m_editorAssetManager; }
 	protected:
 		void InitializeUI();
 		void OnInitialize() override;
@@ -41,7 +39,6 @@ namespace Bruno
 		void OnGameLoop(const GameTimer& timer) override;
 
 	private:
-
 		std::shared_ptr<GraphicsDevice> m_device;
 		GameTimer m_timer;
 

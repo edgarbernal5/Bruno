@@ -12,11 +12,26 @@ namespace Bruno
 	{
 		m_importerManager.Initialize();
 		ProcessDirectory(projectPath);
-		GetAssetsDirectory(projectPath);
+		GetAssetsDirectory(projectPath);//TODO: HACK
+	}
+
+	void EditorAssetManager::AddMemoryOnlyAsset(std::shared_ptr<Asset> asset)
+	{
+		AssetMetadata metadata;
+		metadata.Handle = asset->GetHandle();
+		metadata.IsLoaded = true;
+		metadata.Type = asset->GetAssetType();
+		metadata.IsMemoryOnly = true;
+		m_assetTable[metadata.Handle] = metadata;
+
+		m_memoryAssets[metadata.Handle] = asset;
 	}
 
 	std::shared_ptr<Asset> EditorAssetManager::GetAsset(AssetHandle assetHandle)
 	{
+		if (IsMemoryAsset(assetHandle))
+			return m_memoryAssets[assetHandle];
+
 		auto& metadata = GetMetadata(assetHandle);
 		if (!metadata)
 		{
@@ -129,5 +144,10 @@ namespace Bruno
 		}
 
 		return AssetType::None;
+	}
+
+	bool EditorAssetManager::IsMemoryAsset(AssetHandle handle)
+	{
+		return (m_memoryAssets.find(handle) != m_memoryAssets.end());
 	}
 }

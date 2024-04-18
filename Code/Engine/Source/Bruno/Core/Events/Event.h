@@ -3,10 +3,13 @@
 #include <functional>
 #include <memory>
 #include <vector>
+#include <algorithm>
 #include <mutex>
 
 namespace Bruno
 {
+    using EventHandlerId = size_t;
+
     template <typename... Args>
     class Event
     {
@@ -22,16 +25,14 @@ namespace Bruno
             return *this;
         }
 
-    protected:
         Event(const Event&) = default;
         Event& operator=(const Event&) = default;
 
     private:
-        using HandlerId = size_t;
 
         struct StoredHandler
         {
-            HandlerId id;
+            EventHandlerId id;
             std::shared_ptr<Handler> callback;
         };
 
@@ -39,14 +40,14 @@ namespace Bruno
 
         struct Data
         {
-            HandlerId IdCounter = 0;
+            EventHandlerId IdCounter = 0;
             HandlerList observers;
             std::mutex observerMutex;
         };
 
         std::shared_ptr<Data> data;
 
-        HandlerId AddHandler(Handler h) const
+        EventHandlerId AddHandler(Handler h) const
         {
             std::lock_guard<std::mutex> lock(data->observerMutex);
             data->observers.emplace_back(StoredHandler{ data->IdCounter, std::make_shared<Handler>(h) });
@@ -55,12 +56,12 @@ namespace Bruno
 
     public:
 
-        HandlerId connect(const Handler& h) const
+        EventHandlerId connect(const Handler& h) const
         { 
             return AddHandler(h);
         }
 
-        void disconnect(HandlerId id) const
+        void disconnect(EventHandlerId id) const
         {
             std::lock_guard<std::mutex> lock(data->observerMutex);
             auto it = std::find_if(data->observers.begin(), data->observers.end(),

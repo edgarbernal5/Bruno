@@ -22,8 +22,9 @@ namespace Bruno
 		Math::Matrix GetSelectionTransform();
 		size_t GetSelectionCount() { return m_selections.size(); }
 
-		const std::vector<UUID>& GetSelections() { return m_selections; }
+		const std::vector<UUID>& GetSelections() const { return m_selections; }
 		void Select(UUID selection);
+		void Deselect(UUID selection);
 
 		Event<std::vector<UUID>> SelectionChanged;
 	private:

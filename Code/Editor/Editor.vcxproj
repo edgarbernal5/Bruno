@@ -57,7 +57,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;BR_SINGLE_THREAD_RENDERING_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;BR_SINGLE_THREAD_RENDERING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\nana\include;..\Engine\Dependencies\d3dx12;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\SimpleMath;..\Engine\Dependencies\D3D12MA;..\Engine\Dependencies\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -95,6 +95,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp" />
+    <ClCompile Include="Source\Panels\Scene\SceneHierarchy.cpp" />
+    <ClCompile Include="Source\Panels\Scene\SceneDocument.cpp" />
+    <ClCompile Include="Source\Panels\Properties\Property.cpp" />
+    <ClCompile Include="Source\Panels\PropertiesPanel.cpp" />
+    <ClCompile Include="Source\Panels\Properties\PropertyGridItems.cpp" />
     <ClCompile Include="Source\Panels\SceneDocumentPanel.cpp" />
     <ClCompile Include="Source\Content\AssetImporter.cpp" />
     <ClCompile Include="Source\Content\AssetImporterContext.cpp" />
@@ -115,6 +121,12 @@
     <ClCompile Include="Source\Panels\Scene\SelectionService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Panels\Properties\PropertyHelpers.h" />
+    <ClInclude Include="Source\Panels\Scene\SceneHierarchy.h" />
+    <ClInclude Include="Source\Panels\Scene\SceneDocument.h" />
+    <ClInclude Include="Source\Panels\Properties\PropertyGridItems.h" />
+    <ClInclude Include="Source\Panels\Properties\Property.h" />
+    <ClInclude Include="Source\Panels\PropertiesPanel.h" />
     <ClInclude Include="Source\Panels\SceneDocumentPanel.h" />
     <ClInclude Include="Source\Documents\DocumentService.h" />
     <ClInclude Include="Source\Panels\ContentBrowser\ContentBrowserItem.h" />

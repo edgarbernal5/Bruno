@@ -1,4 +1,4 @@
 [submodule "Code/Engine/Dependencies/nana"]
 	path = Code/Engine/Dependencies/nana
 	url = git@github.com:edgarbernal5/nana.git
-	branch = develop-1.8
+	branch = my-develop-1.8

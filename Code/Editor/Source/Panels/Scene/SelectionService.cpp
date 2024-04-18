@@ -15,22 +15,25 @@ namespace Bruno
 
 	void SelectionService::Select(UUID selection)
 	{
-		m_selections.clear();
 		m_selections.push_back(selection);
+	}
+
+	void SelectionService::Deselect(UUID selection)
+	{
+		auto it = std::find(m_selections.begin(), m_selections.end(), selection);
+		if (it != m_selections.end())
+			m_selections.erase(it);
 	}
 
 	void SelectionService::SelectUnderMousePosition(const Camera& camera, const Math::Int2& mousePosition)
 	{
 		auto ray = ConvertMousePositionToRay(camera, mousePosition);
 
+		m_selections.clear();
 		UUID entityUUID = FindEntityUUIDWithRay(ray, 1000.0f);
 		if (entityUUID)
 		{
 			Select(entityUUID);
-		}
-		else
-		{
-			m_selections.clear();
 		}
 
 		SelectionChanged.emit(m_selections);
@@ -102,8 +105,8 @@ namespace Bruno
 
 	Math::Ray SelectionService::ConvertMousePositionToRay(Camera camera, const Math::Int2& mousePosition)
 	{
-		Math::Vector3 nearPoint(mousePosition.x, mousePosition.y, 0.0f);
-		Math::Vector3 farPoint(mousePosition.x, mousePosition.y, 1.0f);
+		Math::Vector3 nearPoint((float)mousePosition.x, (float)mousePosition.y, 0.0f);
+		Math::Vector3 farPoint((float)mousePosition.x, (float)mousePosition.y, 1.0f);
 
 		nearPoint = camera.GetViewport().Unproject(nearPoint,
 			camera.GetProjection(),

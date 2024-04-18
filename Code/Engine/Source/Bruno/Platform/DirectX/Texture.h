@@ -92,6 +92,8 @@ namespace Bruno
 		Texture(const TextureCreationDesc& textureDesc);
 		~Texture();
 
+		AssetType GetAssetType() const override { return AssetType::Texture; }
+
 		constexpr const DescriptorHandle& GetSrvHandle() const { return m_srvDescriptor; }
 		constexpr const DescriptorHandle& GetDsvHandle() const { return m_dsvDescriptor; }
 

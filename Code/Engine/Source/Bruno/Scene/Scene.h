@@ -14,14 +14,6 @@ namespace Bruno
 	struct ModelNode;
 	struct RenderItem;
 
-	enum class ActionMode
-	{
-		Add,
-		Delete,
-		Modify
-	};
-	using SceneHierarchyChangeCallback = std::function<void(Entity&, ActionMode)>;
-
 	struct SceneObjectBuffer
 	{
 		Math::Matrix World;
@@ -46,8 +38,6 @@ namespace Bruno
 
 		void OnUpdate(const GameTimer& timer, Camera& camera);
 
-		void SetHierarchyChangeCallback(SceneHierarchyChangeCallback callback);
-
 		friend class SceneRenderer;
 		friend class ObjectSelector;
 		friend class Entity;
@@ -59,8 +49,6 @@ namespace Bruno
 		entt::registry m_registry;
 		entt::entity m_sceneEntity{ entt::null };
 		std::unordered_map<UUID, Entity> m_entityIdMap;
-
-		SceneHierarchyChangeCallback m_hierarchyChangeCallback;
 
 		std::unique_ptr<ConstantBuffer<SceneObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
 	};

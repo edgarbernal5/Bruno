@@ -3,6 +3,7 @@
 
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Renderer/RenderItem.h"
+#include "Bruno/Renderer/Material.h"
 
 #include "Bruno/Platform/DirectX/Texture.h"
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
@@ -68,14 +69,21 @@ namespace Bruno
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
 		for (auto& ent : entities)
 		{
-			auto [transformComponent, modelComponent] = entities.get<TransformComponent, ModelComponent>(ent);
+			const auto& [transformComponent, modelComponent] = entities.get<TransformComponent, ModelComponent>(ent);
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 
 			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto& meshes = model->GetMeshes();
 			auto& mesh = meshes[meshIndex];
 			
-			auto textureHandle = model->GetMaterial(mesh->GetMaterialIndex())->TexturesByName["Texture"];
+			auto materialHandle = modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
+			auto material = m_assetManager->GetAsset<Material>(materialHandle);
+			AssetHandle textureHandle{ 0 };
+			auto textIt = material->TexturesByName.find("Texture");
+			if (textIt != material->TexturesByName.end())
+			{
+				textureHandle = textIt->second;
+			}
 			auto texture = m_assetManager->GetAsset<Texture>(textureHandle);
 			if (texture != nullptr && texture->IsReady())
 			{
