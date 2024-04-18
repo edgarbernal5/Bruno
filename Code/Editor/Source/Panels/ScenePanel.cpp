@@ -270,21 +270,24 @@ namespace Bruno
 #endif
 			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
 			
-			if (m_isGizmoing)
+			if (args.button == nana::mouse::left_button)
 			{
-				m_gizmoService->EndDrag();
-				m_isGizmoing = false;
-			}
-			else
-			{
-				if (m_dragRectangle)
+				if (m_isGizmoing)
 				{
-
-					m_dragRectangle = false;
+					m_gizmoService->EndDrag();
+					m_isGizmoing = false;
 				}
-				else if (!args.alt)
+				else
 				{
-					m_selectionService->SelectUnderMousePosition(m_sceneDocument->GetCamera(), currentPosition);
+					if (m_dragRectangle)
+					{
+
+						m_dragRectangle = false;
+					}
+					else if (!args.alt)
+					{
+						m_selectionService->SelectUnderMousePosition(m_sceneDocument->GetCamera(), currentPosition);
+					}
 				}
 			}
 			
