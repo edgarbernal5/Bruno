@@ -5,7 +5,6 @@
 
 #include <nana/gui/widgets/menubar.hpp>
 #include <nana/gui/place.hpp>
-#include <nana/gui/place.hpp>
 #include <nana/gui/widgets/panel.hpp>
 #include <mutex>
 
