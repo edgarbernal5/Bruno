@@ -137,22 +137,10 @@ namespace Bruno
 		m_menubar.push_back("&Edit");
 		m_menubar.at(1).append("Right panel", [this](nana::menu::item_proxy& ip)
 		{
-			if (panelIdxx % 2 == 0) {
-				auto panel = m_place.add_pane<nana::button>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, std::string("A new pane is created."));
-			}
-			else {
-				//auto panel = m_place.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
-
-			}
-			//auto panel = m_dockPlace.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
-			m_place.collocate();
-			//AddScenePanel(panel);
-			panelIdxx++;
 		});
 
 		m_menubar.at(1).append("Tab Panel", [this](nana::menu::item_proxy& ip)
 		{
-			
 		});
 
 		m_menubar.push_back("Debug");
@@ -166,8 +154,6 @@ namespace Bruno
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
 		sceneDocument->InstantiateModel(model);
 
-		//auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>("pane1", "", nana::dock_position::right, scene, nullptr, nullptr);
-		//auto scenePanel = m_place.add_pane<ScenePanel>("pane2", "pane1", nana::dock_position::left, this, scene, sceneHierarchyPanel);
 		auto sceneDocumentPanel = m_place.add_pane<SceneDocumentPanel>("documents-pane", "", nana::dock_position::left, this, sceneDocument);
 		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("content-browser-pane", "documents-pane", nana::dock_position::down, m_applicationParameters.WorkingDirectory, this);
 
@@ -175,26 +161,6 @@ namespace Bruno
 
 		form.events().key_release([this](const nana::arg_keyboard& args)
 		{
-			if (args.key == 'O')
-			{
-				if (panelIdxx % 2 == 0) {
-					auto panel = m_place.add_pane<nana::button>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : (panelIdxx == 2 ? "pane4" : "pane5")), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, std::string("A new pane is created."));
-				}
-				else {
-					//auto panel = m_place.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : (panelIdxx == 2 ? "pane4" : "pane5")), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
-				}
-				//auto panel = m_dockPlace.add_pane<ScenePanel>(panelIdxx == 0 ? "pane2" : (panelIdxx == 1 ? "pane3" : "pane4"), "pane1", panelIdxx % 2 == 0 ? nana::dock_position::down : nana::dock_position::right, this);
-				m_place.collocate();
-				//AddScenePanel(panel);
-				panelIdxx++;
-			}
-			else if (args.key == 'P')
-			{
-				auto panel = m_place.add_pane<nana::button>("pane1", "", nana::dock_position::tab, std::string("This is a scene tab!!\nTow."));
-				//auto panel = m_dockPlace.add_pane<ScenePanel>("pane1", "", nana::dock_position::tab, this);
-				m_place.collocate();
-				//AddScenePanel(panel);
-			}
 		});
 
 		form.events().enter_size_move([this](const nana::arg_size_move& args)
@@ -211,12 +177,6 @@ namespace Bruno
 		{
 			//BR_CORE_TRACE << "expose / form." << std::endl;
 		});
-		form.events().mouse_dropfiles([](const nana::arg_dropfiles& args)
-		{
-			int a = 3;
-		});
-		form.enable_dropfiles(true);
-		//AddScenePanel(panel);
 	}
 
 	void EditorGame::OnInitialize()
