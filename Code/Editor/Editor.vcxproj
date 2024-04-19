@@ -62,6 +62,8 @@
       <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\nana\include;..\Engine\Dependencies\d3dx12;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\SimpleMath;..\Engine\Dependencies\D3D12MA;..\Engine\Dependencies\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>brepch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -95,6 +97,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\brepch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\Layouts\PaneManager.cpp" />
     <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp" />
     <ClCompile Include="Source\Panels\Scene\SceneHierarchy.cpp" />
     <ClCompile Include="Source\Panels\Scene\SceneDocument.cpp" />
@@ -121,6 +127,8 @@
     <ClCompile Include="Source\Panels\Scene\SelectionService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\brepch.h" />
+    <ClInclude Include="Source\Layouts\PaneManager.h" />
     <ClInclude Include="Source\Panels\Properties\PropertyHelpers.h" />
     <ClInclude Include="Source\Panels\Scene\SceneHierarchy.h" />
     <ClInclude Include="Source\Panels\Scene\SceneDocument.h" />

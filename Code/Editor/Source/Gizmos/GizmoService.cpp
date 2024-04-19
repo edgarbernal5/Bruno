@@ -1,4 +1,4 @@
-#include "brpch.h"
+#include "brepch.h"
 #include "GizmoService.h"
 
 #include "GizmoTranslationRenderer.h"
@@ -12,6 +12,7 @@
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Math/Math.h"
 #include "Bruno/Scene/Scene.h"
+#include "Bruno/Renderer/PrimitiveBatch.h"
 #include <limits>
 
 namespace Bruno

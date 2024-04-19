@@ -1,3 +1,4 @@
+#include "brepch.h"
 #include "PropertyHelpers.h"
 
 namespace Bruno

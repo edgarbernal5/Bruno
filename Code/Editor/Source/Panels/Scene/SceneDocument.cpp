@@ -1,3 +1,4 @@
+#include "brepch.h"
 #include "SceneDocument.h"
 
 #include <Bruno/Scene/Scene.h>

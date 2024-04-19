@@ -14,6 +14,7 @@
 #include <exception>
 #include <mutex>
 #include <iostream>
+#include <memory>
 #include <unordered_map>
 
 #include "Bruno/Core/Game.h"
@@ -21,4 +22,4 @@
 #include "Bruno/Core/Assert.h"
 
 //#include "Bruno/Math/Math.h"
-#include "Bruno/Renderer/PrimitiveBatch.h"
+//#include "Bruno/Renderer/PrimitiveBatch.h"

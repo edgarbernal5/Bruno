@@ -1,4 +1,5 @@
-﻿#include "ScenePanel.h"
+﻿#include "brepch.h"
+#include "ScenePanel.h"
 
 #include "Bruno/Platform/DirectX/Surface.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"

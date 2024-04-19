@@ -1,3 +1,4 @@
+#include "brepch.h"
 #include "PropertiesPanel.h"
 
 #include "Scene/SelectionService.h"

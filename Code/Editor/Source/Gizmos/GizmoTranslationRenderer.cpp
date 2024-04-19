@@ -1,4 +1,4 @@
-#include "brpch.h"
+#include "brepch.h"
 #include "GizmoTranslationRenderer.h"
 
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
@@ -8,6 +8,7 @@
 #include "Bruno/Core/Game.h"
 #include "Bruno/Renderer/ShaderCache.h"
 #include "Bruno/Renderer/PipelineStateObjectCache.h"
+#include "Bruno/Renderer/PrimitiveBatch.h"
 
 namespace Bruno
 {

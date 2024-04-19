@@ -46,9 +46,6 @@ namespace Bruno
 
 		nana::menubar		m_menubar;
 		nana::place			m_place;
-		nana::panel<false>	m_panelMargin;
-		//nana::br_place		m_panelMarginPlace;
-		nana::panel<true>	m_panelView;
 
 		std::vector<ScenePanel*> m_scenePanels;
 		std::mutex m_scenePanelsMutex{};

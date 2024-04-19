@@ -7,6 +7,7 @@
 #include "Bruno/Math/Math.h"
 
 #include <string>
+#include <map>
 #include <Bruno/Content/AssetTypes.h>
 
 namespace Bruno

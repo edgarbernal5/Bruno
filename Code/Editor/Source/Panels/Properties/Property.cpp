@@ -1,3 +1,4 @@
+#include "brepch.h"
 #include "Property.h"
 
 #include <sstream>

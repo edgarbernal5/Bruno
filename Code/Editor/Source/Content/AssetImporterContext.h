@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <Bruno/Content/Asset.h>
 
 namespace Bruno
 {

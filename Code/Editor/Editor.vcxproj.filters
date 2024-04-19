@@ -71,6 +71,12 @@
       <Filter>Source\Panels\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp" />
+    <ClCompile Include="Source\Layouts\PaneManager.cpp">
+      <Filter>Source\Layouts</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\brepch.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -99,6 +105,9 @@
     </Filter>
     <Filter Include="Source\Panels\Scene">
       <UniqueIdentifier>{0ffc3604-6f7d-45d8-827c-f04833436388}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Layouts">
+      <UniqueIdentifier>{6ecc25b5-3aee-47ad-b885-5ad79a596b09}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +188,12 @@
     </ClInclude>
     <ClInclude Include="Source\Panels\Properties\PropertyHelpers.h">
       <Filter>Source\Panels\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Layouts\PaneManager.h">
+      <Filter>Source\Layouts</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\brepch.h">
+      <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

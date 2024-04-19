@@ -1,3 +1,4 @@
+#include "brepch.h"
 #include "SceneHierarchy.h"
 
 #include <Bruno/Scene/Entity.h>
