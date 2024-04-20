@@ -81,6 +81,8 @@ namespace Bruno
 
 #ifndef BR_SINGLE_THREAD_RENDERING
 		std::mutex m_mutex{};
+#else
+		GameTimer m_timer;
 #endif
 
 		std::shared_ptr<SelectionService>	m_selectionService;

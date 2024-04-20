@@ -55,6 +55,7 @@ namespace Bruno
 		int m_framesThisSecond = 0;
 		int m_framesPerSecond = 0;
 		float m_elapsedTime = 0.0f;
+
 	private:
 		bool m_gamePaused = false;
 	};

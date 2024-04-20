@@ -57,6 +57,7 @@ namespace Bruno
 
 	void EditorGame::OnGameLoop(const GameTimer& timer)
 	{
+#if 0
 		std::vector<ScenePanel*> temp;
 		{
 			std::lock_guard lock{ m_scenePanelsMutex };
@@ -71,6 +72,7 @@ namespace Bruno
 			panel->OnUpdate(timer);
 			panel->OnDraw();
 		}
+#endif
 	}
 
 	void EditorGame::OnInitializeWindow(const WindowParameters& windowParameters)

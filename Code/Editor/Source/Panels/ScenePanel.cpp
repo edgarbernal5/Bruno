@@ -90,10 +90,12 @@ namespace Bruno
 		// Single-thread rendering.
 #ifdef BR_SINGLE_THREAD_RENDERING
 		auto hwnd = reinterpret_cast<HWND>(m_form->native_handle());
-		m_form->draw_through([editorGame, hwnd, this]
+		m_form->draw_through([hwnd, this]
 		{
-			//TODO: esto invoca a todos los draw de ScenePanels. Fix it
-			editorGame->OnTick();
+			m_timer.Tick();
+
+			OnUpdate(m_timer);
+			OnDraw();
 
 			RECT r;
 			::GetClientRect(hwnd, &r);
@@ -338,6 +340,7 @@ namespace Bruno
 
 		editorGame->AddScenePanel(this);
 		m_form->show();
+		m_timer.Reset();
 		m_isExposed = true;
 	}
 
