@@ -3,5 +3,8 @@
 
 namespace Bruno
 {
+    void DocumentService::Open(const std::wstring& filename)
+    {
 
+    }
 }

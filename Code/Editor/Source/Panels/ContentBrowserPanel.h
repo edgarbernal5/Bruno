@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+#include <string>
 #include <nana/gui/widgets/panel.hpp>
 #include <nana/gui/place.hpp>
 #include <nana/gui/widgets/treebox.hpp>
@@ -15,7 +17,7 @@ namespace Bruno
 	class ContentBrowserPanel : public nana::panel<true>
 	{
 	public:
-		ContentBrowserPanel(nana::window window, const std::wstring& workingDirectory, EditorGame* game);
+		ContentBrowserPanel(nana::window window, const std::wstring& workingDirectory, std::function<void(const std::wstring&)> selectItemCallback);
 
 	private:
 		void PopulateDirectory(nana::treebox::item_proxy& node, const std::wstring& directory);
@@ -29,6 +31,7 @@ namespace Bruno
 		nana::listbox m_listbox;
 
 		nana::menu m_fileSelectionPopup;
+		std::function<void(const std::wstring&)> m_selectItemCallback;
 	};
 }
 

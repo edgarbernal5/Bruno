@@ -6,10 +6,10 @@
 
 namespace Bruno
 {
-	ContentBrowserPanel::ContentBrowserPanel(nana::window window, const std::wstring& workingDirectory, EditorGame* game) :
+	ContentBrowserPanel::ContentBrowserPanel(nana::window window, const std::wstring& workingDirectory, std::function<void(const std::wstring&)> selectItemCallback) :
 		nana::panel<true>(window),
 		m_workingDirectory(workingDirectory),
-		m_game(game)
+		m_selectItemCallback(selectItemCallback)
 	{
 		this->caption("Content Browser");
 
@@ -44,21 +44,24 @@ namespace Bruno
 		m_listbox.events().selected([&](const nana::arg_listbox& args) {
 			BR_CORE_TRACE << "listbox item selected: " << args.item.value<ContentBrowserItem>().DirectoryEntry.path() << std::endl;
 		});
+
 		m_listbox.events().dbl_click([&](const nana::arg_mouse& args)
 		{
 			if (m_listbox.selected().size() == 0)
 				return;
 				
-			for (auto& item : m_listbox.selected()) {
+			for (auto& item : m_listbox.selected())
+			{
 				auto& contentItem = m_listbox.at(item).value<ContentBrowserItem>();
 
-				if (contentItem.IsDirectory) {
+				if (contentItem.IsDirectory)
+				{
 					auto path = m_treebox.make_key_path(contentItem.TreeNode, "/") + ("/") + contentItem.DirectoryEntry.path().filename().generic_string() ;
 					m_treebox.find(path).select(true);
 				}
 				else
 				{
-					m_game->OpenDocument(contentItem.DirectoryEntry.path());
+					m_selectItemCallback(contentItem.DirectoryEntry.path());
 				}
 			}
 		});

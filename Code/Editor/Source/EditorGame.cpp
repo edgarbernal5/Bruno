@@ -15,6 +15,8 @@
 #include "Panels/SceneDocumentPanel.h"
 #include "Panels/ContentBrowserPanel.h"
 
+#include "Documents/DocumentService.h"
+
 namespace Bruno
 {
 #ifndef BR_SINGLE_THREAD_RENDERING
@@ -157,7 +159,11 @@ namespace Bruno
 		sceneDocument->InstantiateModel(model);
 
 		auto sceneDocumentPanel = m_place.add_pane<SceneDocumentPanel>("documents-pane", "", nana::dock_position::left, this, sceneDocument);
-		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("content-browser-pane", "documents-pane", nana::dock_position::down, m_applicationParameters.WorkingDirectory, this);
+		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("content-browser-pane", "documents-pane", nana::dock_position::down, m_applicationParameters.WorkingDirectory,
+			[](const std::wstring& filename)
+			{
+				//AssetEditor?
+			});
 
 		m_place.collocate();
 
