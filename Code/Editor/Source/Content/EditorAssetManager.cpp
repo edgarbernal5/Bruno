@@ -1,4 +1,6 @@
+#include "brepch.h"
 #include "EditorAssetManager.h"
+
 #include <filesystem>
 
 namespace Bruno
