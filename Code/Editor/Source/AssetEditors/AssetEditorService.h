@@ -1,8 +1,11 @@
 #pragma once
 
+#include <string>
+#include "AssetEditor.h"
+
 namespace Bruno
 {
-	class DocumentService
+	class AssetEditorService
 	{
 	public:
 

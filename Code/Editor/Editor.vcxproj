@@ -114,7 +114,7 @@
     <ClCompile Include="Source\Content\ImporterManager.cpp" />
     <ClCompile Include="Source\Content\Importers\ModelImporter.cpp" />
     <ClCompile Include="Source\Content\Importers\TextureImporter.cpp" />
-    <ClCompile Include="Source\Documents\DocumentService.cpp" />
+    <ClCompile Include="Source\AssetEditors\AssetEditorService.cpp" />
     <ClCompile Include="Source\Gizmos\GizmoRotationRenderer.cpp" />
     <ClCompile Include="Source\Gizmos\GizmoScaleRenderer.cpp" />
     <ClCompile Include="Source\Gizmos\GizmoService.cpp" />
@@ -127,6 +127,7 @@
     <ClCompile Include="Source\Panels\Scene\SelectionService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\AssetEditors\AssetEditor.h" />
     <ClInclude Include="Source\brepch.h" />
     <ClInclude Include="Source\Layouts\PaneManager.h" />
     <ClInclude Include="Source\Panels\Properties\PropertyHelpers.h" />
@@ -136,7 +137,7 @@
     <ClInclude Include="Source\Panels\Properties\Property.h" />
     <ClInclude Include="Source\Panels\PropertiesPanel.h" />
     <ClInclude Include="Source\Panels\SceneDocumentPanel.h" />
-    <ClInclude Include="Source\Documents\DocumentService.h" />
+    <ClInclude Include="Source\AssetEditors\AssetEditorService.h" />
     <ClInclude Include="Source\Panels\ContentBrowser\ContentBrowserItem.h" />
     <ClInclude Include="Source\Content\AssetImporter.h" />
     <ClInclude Include="Source\Content\AssetImporterContext.h" />

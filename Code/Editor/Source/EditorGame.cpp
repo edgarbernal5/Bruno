@@ -15,7 +15,7 @@
 #include "Panels/SceneDocumentPanel.h"
 #include "Panels/ContentBrowserPanel.h"
 
-#include "Documents/DocumentService.h"
+#include "AssetEditors/AssetEditorService.h"
 
 namespace Bruno
 {

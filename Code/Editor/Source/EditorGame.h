@@ -17,7 +17,7 @@ namespace Bruno
 	class GraphicsDevice;
 	class ScenePanel;
 	class EditorAssetManager;
-	class DocumentService;
+	class AssetEditorService;
 
 	class EditorGame : public Game
 	{
@@ -53,6 +53,6 @@ namespace Bruno
 
 		std::wstring m_projectPath;
 		EditorAssetManager* m_editorAssetManager;
-		std::shared_ptr<DocumentService> m_documentService;
+		std::shared_ptr<AssetEditorService> m_documentService;
 	};
 }

@@ -49,8 +49,8 @@
     <ClCompile Include="Source\Panels\ContentBrowserPanel.cpp">
       <Filter>Source\Panels</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Documents\DocumentService.cpp">
-      <Filter>Source\Documents</Filter>
+    <ClCompile Include="Source\AssetEditors\AssetEditorService.cpp">
+      <Filter>Source\AssetEditors</Filter>
     </ClCompile>
     <ClCompile Include="Source\Panels\SceneDocumentPanel.cpp">
       <Filter>Source\Panels</Filter>
@@ -97,9 +97,6 @@
     <Filter Include="Source\Panels\ContentBrowser">
       <UniqueIdentifier>{c69672cf-b6d6-4056-b310-79f2dff29d87}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Documents">
-      <UniqueIdentifier>{0da7311b-b4c2-426e-8764-e572c24c5caf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Panels\Properties">
       <UniqueIdentifier>{58bd5958-16e3-4512-9e81-44cf0146df21}</UniqueIdentifier>
     </Filter>
@@ -108,6 +105,9 @@
     </Filter>
     <Filter Include="Source\Layouts">
       <UniqueIdentifier>{6ecc25b5-3aee-47ad-b885-5ad79a596b09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\AssetEditors">
+      <UniqueIdentifier>{0da7311b-b4c2-426e-8764-e572c24c5caf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -165,8 +165,8 @@
     <ClInclude Include="Source\Panels\ContentBrowser\ContentBrowserItem.h">
       <Filter>Source\Panels\ContentBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Documents\DocumentService.h">
-      <Filter>Source\Documents</Filter>
+    <ClInclude Include="Source\AssetEditors\AssetEditorService.h">
+      <Filter>Source\AssetEditors</Filter>
     </ClInclude>
     <ClInclude Include="Source\Panels\SceneDocumentPanel.h">
       <Filter>Source\Panels</Filter>
@@ -194,6 +194,9 @@
     </ClInclude>
     <ClInclude Include="Source\brepch.h">
       <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AssetEditors\AssetEditor.h">
+      <Filter>Source\AssetEditors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
