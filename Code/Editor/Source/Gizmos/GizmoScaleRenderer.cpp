@@ -1,3 +1,4 @@
+#include "brepch.h"
 #include "GizmoScaleRenderer.h"
 
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
