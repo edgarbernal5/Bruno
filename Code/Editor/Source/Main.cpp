@@ -1,3 +1,5 @@
+#include "brepch.h"
+
 #include "EditorGame.h"
 #include <Bruno/EntryPoint.h>
 
