@@ -59,7 +59,8 @@ namespace Bruno
 				if (prop.type() == pg_type::string)
 				{
 					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string(prop.label(), prop.value())));
-				} else if (prop.type() == pg_type::uint)
+				} 
+				else if (prop.type() == pg_type::uint)
 				{
 					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string_uint(prop.label(), prop.value())));
 				}

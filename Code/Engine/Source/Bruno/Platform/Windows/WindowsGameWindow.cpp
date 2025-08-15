@@ -79,13 +79,13 @@ namespace Bruno
 			return;
 		}
 
-		std::wstring m_mainWndTitle(m_parameters.Title.begin(), m_parameters.Title.end());
+		std::wstring mainWndTitle(m_parameters.Title.begin(), m_parameters.Title.end());
 
 		m_hwnd = CreateWindowEx
 		(
 			0,
 			ApplicationClassName,
-			m_mainWndTitle.c_str(),
+			mainWndTitle.c_str(),
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
@@ -152,8 +152,27 @@ namespace Bruno
 		m_inDeviceTransition = false;
 	}
 
+
+#ifdef BR_DEBUG
+	std::map<uint32_t, std::string> g_debugWndMessages{
+		{WM_CREATE,			"WM_CREATE"},
+		{WM_SIZE,			"WM_SIZE"},
+		{WM_DESTROY,		"WM_DESTROY"},
+		{WM_SHOWWINDOW,		"WM_SHOWWINDOW"},
+		{WM_ACTIVATEAPP,	"WM_ACTIVATEAPP"},
+		//{WM_PAINT,			"WM_PAINT"}
+	};
+#endif
+
 	LRESULT CALLBACK WindowsGameWindow::WndProc(HWND hWnd, uint32_t message, WPARAM wParam, LPARAM lParam)
 	{
+#ifdef BR_DEBUG
+		auto it = g_debugWndMessages.find(message);
+		if (it != g_debugWndMessages.end())
+		{
+			BR_CORE_TRACE << "WndProc message: " << it->second << std::endl;
+		}
+#endif
 		//TODO: eliminar la dependencia con la clase Game. Implementar eventos!
 		WindowsGameWindow* window = reinterpret_cast<WindowsGameWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 		//Actualizar esto

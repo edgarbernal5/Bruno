@@ -70,12 +70,14 @@
     <ClCompile Include="Source\Panels\Scene\SceneHierarchy.cpp">
       <Filter>Source\Panels\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp" />
     <ClCompile Include="Source\Layouts\PaneManager.cpp">
       <Filter>Source\Layouts</Filter>
     </ClCompile>
     <ClCompile Include="Source\brepch.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp">
+      <Filter>Source\Panels\Properties</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

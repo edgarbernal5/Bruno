@@ -1,6 +1,6 @@
 #include "brepch.h"
-
 #include "EditorGame.h"
+
 #include <Bruno/EntryPoint.h>
 
 Bruno::Application* Bruno::CreateApplication(int argc, char** argv)
