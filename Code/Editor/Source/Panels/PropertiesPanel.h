@@ -16,7 +16,7 @@ namespace Bruno
 	class PropertiesPanel : public Berta::Panel
 	{
 	public:
-		PropertiesPanel(Berta::Window window, std::shared_ptr<SceneDocument> sceneDocument);
+		PropertiesPanel(Berta::Window* window, std::shared_ptr<SceneDocument> sceneDocument);
 		~PropertiesPanel();
 
 	private:

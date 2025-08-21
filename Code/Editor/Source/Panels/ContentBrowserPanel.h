@@ -17,7 +17,7 @@ namespace Bruno
 	class ContentBrowserPanel : public Berta::Panel
 	{
 	public:
-		ContentBrowserPanel(Berta::Window window, const std::wstring& workingDirectory, std::function<void(const std::wstring&)> selectItemCallback);
+		ContentBrowserPanel(Berta::Window* window, const std::wstring& workingDirectory, std::function<void(const std::wstring&)> selectItemCallback);
 
 	private:
 		void PopulateDirectory(Berta::TreeBoxItem node, const std::wstring& directory);

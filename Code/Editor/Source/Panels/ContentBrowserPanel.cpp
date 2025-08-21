@@ -6,7 +6,7 @@
 
 namespace Bruno
 {
-	ContentBrowserPanel::ContentBrowserPanel(Berta::Window window, const std::wstring& workingDirectory, std::function<void(const std::wstring&)> selectItemCallback) :
+	ContentBrowserPanel::ContentBrowserPanel(Berta::Window* window, const std::wstring& workingDirectory, std::function<void(const std::wstring&)> selectItemCallback) :
 		Berta::Panel(window),
 		m_workingDirectory(workingDirectory),
 		m_selectItemCallback(selectItemCallback)

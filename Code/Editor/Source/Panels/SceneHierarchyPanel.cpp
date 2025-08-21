@@ -9,7 +9,7 @@
 
 namespace Bruno
 {
-	SceneHierarchyPanel::SceneHierarchyPanel(Berta::Window window, std::shared_ptr<SceneDocument> sceneDocument) :
+	SceneHierarchyPanel::SceneHierarchyPanel(Berta::Window* window, std::shared_ptr<SceneDocument> sceneDocument) :
 		Berta::Panel(window),
 		m_sceneDocument(sceneDocument)
 	{

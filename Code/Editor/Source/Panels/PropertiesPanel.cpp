@@ -10,7 +10,7 @@
 
 namespace Bruno
 {
-	PropertiesPanel::PropertiesPanel(Berta::Window window, std::shared_ptr<SceneDocument> sceneDocument) :
+	PropertiesPanel::PropertiesPanel(Berta::Window* window, std::shared_ptr<SceneDocument> sceneDocument) :
 		Berta::Panel(window),
 		m_sceneDocument(sceneDocument)
 	{

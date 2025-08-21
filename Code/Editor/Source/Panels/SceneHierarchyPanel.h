@@ -18,7 +18,7 @@ namespace Bruno
 	class SceneHierarchyPanel : public Berta::Panel
 	{
 	public:
-		SceneHierarchyPanel(Berta::Window window, std::shared_ptr<SceneDocument> sceneDocument);
+		SceneHierarchyPanel(Berta::Window* window, std::shared_ptr<SceneDocument> sceneDocument);
 		~SceneHierarchyPanel();
 
 		friend class ScenePanel;
