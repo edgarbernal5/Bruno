@@ -1,9 +1,9 @@
 #pragma once
 
-#include <nana/gui/widgets/panel.hpp>
-#include <nana/gui/place.hpp>
-#include <nana/gui/widgets/menu.hpp>
-#include <nana/gui/widgets/property_grid.hpp>
+#include <Berta/Controls/Panel.h>
+#include <Berta/GUI/Layout.h>
+#include <Berta/Controls/Menu.h>
+#include <Berta/Controls/PropertyGrid.h>
 #include "Properties/Property.h"
 
 namespace Bruno
@@ -13,10 +13,10 @@ namespace Bruno
 	class SceneDocument;
 	class Entity;
 
-	class PropertiesPanel : public nana::panel<true>
+	class PropertiesPanel : public Berta::Panel
 	{
 	public:
-		PropertiesPanel(nana::window window, std::shared_ptr<SceneDocument> sceneDocument);
+		PropertiesPanel(Berta::Window window, std::shared_ptr<SceneDocument> sceneDocument);
 		~PropertiesPanel();
 
 	private:
@@ -28,10 +28,10 @@ namespace Bruno
 		std::shared_ptr<SelectionService> m_selectionService;
 		EventHandlerId m_selectionChangedHandleId{ 0 };
 
-		nana::place m_place;
-		nana::propertygrid m_propertyGrid;
+		Berta::Layout m_place;
+		Berta::PropertyGrid m_propertyGrid;
 		properties_collection m_currentProperties;
 		std::unordered_map<property_proxy, size_t> m_propOnChangedHandlers;
-		nana::menu m_asset_file_menu_popup;
+		Berta::Menu m_asset_file_menu_popup;
 	};
 }

@@ -9,37 +9,37 @@
 
 namespace Bruno
 {
-	SceneHierarchyPanel::SceneHierarchyPanel(nana::window window, std::shared_ptr<SceneDocument> sceneDocument) :
-		nana::panel<true>(window),
+	SceneHierarchyPanel::SceneHierarchyPanel(Berta::Window window, std::shared_ptr<SceneDocument> sceneDocument) :
+		Berta::Panel(window),
 		m_sceneDocument(sceneDocument)
 	{
-		this->caption("Hierarchy");
+		this->SetCaption("Hierarchy");
 
 		m_selectionService = m_sceneDocument->GetSelectionService();
 		m_sceneHierarchy = m_sceneDocument->GetSceneHierarchy();
 
-		m_treebox.create(*this);
+		m_treebox.Create(*this);
 		
-		m_place.bind(*this);
-		m_place.div("vert <tree>");
+		m_place.Create(*this);
+		m_place.Parse("vert <tree>");
 
-		m_place["tree"] << m_treebox;
-		m_place.collocate();
+		m_place.Attach("tree", m_treebox);
+		m_place.Apply();
 		
-		m_treebox.events().selected([&](const nana::arg_treebox& args)
+		m_treebox.GetEvents().Selected.Connect([&](const Berta::ArgTreeBoxSelection& args)
 		{
-			BR_CORE_TRACE << "tree item selected: " << args.item.text() << ". " << args.operated << ". ignore events " << m_ignoreEvents << std::endl;
+			//BR_CORE_TRACE << "tree item selected: " << args.item.text() << ". " << args.operated << ". ignore events " << m_ignoreEvents << std::endl;
 
-			if (m_ignoreEvents)
+			if (m_ignoreEvents || args.Items.empty())
 				return;
 
-			if (!args.operated)
+			/*if (!args.operated)
 			{
 				m_selectionService->Deselect(args.item.value<UUID>());
 				m_sceneDocument->UpdateSelection();
 				return;
-			}
-			m_selectionService->Select(args.item.value<UUID>());
+			}*/
+			m_selectionService->Select(args.Items[0].GetUserData<UUID>());
 			m_sceneDocument->UpdateSelection();
 		});
 
@@ -59,16 +59,16 @@ namespace Bruno
 			}
 		});
 
-		m_treebox.enable_multiselection(true);
-		m_treebox.use_select_contracted_parent_node(false);
+		m_treebox.EnableMultiselection(true);
+		//m_treebox.use_select_contracted_parent_node(false);
 
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			m_ignoreEvents = true;
-			m_treebox.deselect_all();
+			m_treebox.DeselectAll();
 			for (auto& uuid : selection)
 			{
-				m_entityToNodeMap[uuid].select(true);
+				m_entityToNodeMap[uuid].Select();
 			}
 			m_ignoreEvents = false;
 		});
@@ -99,15 +99,15 @@ namespace Bruno
 		auto key = builder.str();
 
 		auto uuid = entity.GetUUID();
-		auto node = m_treebox.insert(key, name);
-		node.value(uuid);
+		auto node = m_treebox.Insert(key, name);
+		node.SetUserData(uuid);
 
 		m_entityToNodeMap[uuid] = node;
 		auto properties = m_sceneHierarchy->get(uuid);
 		properties.get("Name").on_change().connect([this, uuid](const std::string& new_value)
 		{
 			auto& selected_node = m_entityToNodeMap[uuid];
-			selected_node.text(new_value);
+			selected_node.SetText(new_value);
 		});
 
 		for (UUID child : hierarchy.Children)

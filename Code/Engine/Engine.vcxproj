@@ -57,11 +57,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;BT_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;Dependencies\Berta\Code\Berta\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -70,7 +70,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\bin\Debug_x64\nana.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -79,10 +79,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BT_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;Dependencies\Berta\Code\Berta\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
@@ -94,7 +94,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\bin\Release_x64\nana.lib;Dependencies\DirectXTex\bin\DirectXTex.lib;Dependencies\zlib\bin\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\DirectXTex\bin\DirectXTex.lib;Dependencies\zlib\bin\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -176,7 +176,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\TextureHelpers.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexTypes.h" />
-    <ClInclude Include="Source\Bruno\Platform\Windows\NanaWindow.h" />
+    <ClInclude Include="Source\Bruno\Platform\Windows\BertaWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
@@ -245,7 +245,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexTypes.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\Windows\NanaWindow.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\Windows\BertaWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Camera.cpp" />

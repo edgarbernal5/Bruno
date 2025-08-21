@@ -72,7 +72,7 @@
     <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h">
       <Filter>Source\Bruno\Platform\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Platform\Windows\NanaWindow.h">
+    <ClInclude Include="Source\Bruno\Platform\Windows\BertaWindow.h">
       <Filter>Source\Bruno\Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h">
@@ -347,7 +347,7 @@
     <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp">
       <Filter>Source\Bruno\Platform\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Bruno\Platform\Windows\NanaWindow.cpp">
+    <ClCompile Include="Source\Bruno\Platform\Windows\BertaWindow.cpp">
       <Filter>Source\Bruno\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsDevice.cpp">

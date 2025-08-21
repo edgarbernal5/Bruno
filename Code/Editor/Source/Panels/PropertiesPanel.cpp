@@ -6,100 +6,101 @@
 #include "Scene/SceneHierarchy.h"
 #include <Bruno/Scene/Scene.h>
 
-#include <nana/gui/widgets/pgitems.hpp>
 #include "Properties/PropertyGridItems.h"
 
 namespace Bruno
 {
-	PropertiesPanel::PropertiesPanel(nana::window window, std::shared_ptr<SceneDocument> sceneDocument) :
-		nana::panel<true>(window),
+	PropertiesPanel::PropertiesPanel(Berta::Window window, std::shared_ptr<SceneDocument> sceneDocument) :
+		Berta::Panel(window),
 		m_sceneDocument(sceneDocument)
 	{
-		this->caption("Properties");
+		this->SetCaption("Properties");
 
 		m_selectionService = sceneDocument->GetSelectionService();
 		m_sceneHierarchy = sceneDocument->GetSceneHierarchy();
 
-		m_propertyGrid.create(*this);
+		m_propertyGrid.Create(*this);
 
-		m_place.bind(this->handle());
+		m_place.Create(this->Handle());
 		////////// VIEW
-		m_place.div("vert <properties>");
+		m_place.Parse("vert <properties>");
 
-		m_place["properties"] << m_propertyGrid;
-		m_place.collocate();
+		m_place.Attach("properties", m_propertyGrid);
+		m_place.Apply();
 
 		m_selectionChangedHandleId = m_sceneDocument->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			BR_CORE_TRACE << "selection changed / selection.size = " << selection.size() << std::endl;
 
 			//TODO: si no hay cambios no refrescar.
-			m_propertyGrid.auto_draw(false);
+			m_propertyGrid.SetAutoDraw(false);
 			ClearPropertyGrid();
 			m_currentProperties.clear();
 			DisposePropertyBinders();
 
 			if (selection.size() != 1)
 			{
-				m_propertyGrid.auto_draw(true);
+				m_propertyGrid.SetAutoDraw(true);
 				return;
 			}
 
 			auto& uuid = selection[0];
 			auto& nodeProperties = m_sceneHierarchy->get(uuid);
 			
-			for (size_t i = 0; i < nodeProperties.size(); i++)
-			{
-				auto prop = nodeProperties[i];
+			//TODO
+			//for (size_t i = 0; i < nodeProperties.size(); i++)
+			//{
+			//	auto prop = nodeProperties[i];
 
-				auto cat_idx = m_propertyGrid.find(prop.category());
-				auto cat = (cat_idx == nana::npos) ? m_propertyGrid.append(prop.category()) : m_propertyGrid.at(cat_idx);
-				nana::propertygrid::item_proxy ip(nullptr);
+			//	auto cat_idx = m_propertyGrid.find(prop.category());
+			//	auto cat = (cat_idx == Berta::npos) ? m_propertyGrid.append(prop.category()) : m_propertyGrid.at(cat_idx);
+			//	Berta::PropertyGrid::item_proxy ip(nullptr);
 
-				if (prop.type() == pg_type::string)
-				{
-					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string(prop.label(), prop.value())));
-				} 
-				else if (prop.type() == pg_type::uint)
-				{
-					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string_uint(prop.label(), prop.value())));
-				}
-				else if (prop.type() == pg_type::vector3)
-				{
-					ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_vector3(prop.label(), prop.value())));
-				}
-				else if (prop.type() == pg_type::asset_file)
-				{
-					auto pgaf = new pg_asset_file(prop.label(), prop.value());
-					ip = cat.append(nana::propertygrid::pgitem_ptr(pgaf));
-					pgaf->set_button_click([&](const nana::arg_click& click_args)
-					{
-						//...
-						nana::menu_popuper(m_asset_file_menu_popup, nana::mouse::left_button)(*click_args.mouse_args);
-					});
-				}
-				auto item_ptr = ip._m_pgitem();
-				auto handlerId = prop.on_change().connect([item_ptr](const std::string& new_value)
-				{
-					item_ptr->value(new_value);
-				});
-				item_ptr->enabled(!prop.read_only());
-				m_propOnChangedHandlers[prop] = handlerId;
-			}
-			m_propertyGrid.auto_draw(true);
+			//	if (prop.type() == pg_type::string)
+			//	{
+			//		ip = cat.append(Berta::propertygrid::pgitem_ptr(new Berta::pg_string(prop.label(), prop.value())));
+			//	} 
+			//	else if (prop.type() == pg_type::uint)
+			//	{
+			//		ip = cat.append(Berta::propertygrid::pgitem_ptr(new Berta::pg_string_uint(prop.label(), prop.value())));
+			//	}
+			//	else if (prop.type() == pg_type::vector3)
+			//	{
+			//		ip = cat.append(Berta::propertygrid::pgitem_ptr(new pg_vector3(prop.label(), prop.value())));
+			//	}
+			//	else if (prop.type() == pg_type::asset_file)
+			//	{
+			//		auto pgaf = new pg_asset_file(prop.label(), prop.value());
+			//		ip = cat.append(Berta::propertygrid::pgitem_ptr(pgaf));
+			//		pgaf->set_button_click([&](const Berta::arg_click& click_args)
+			//		{
+			//			//...
+			//			Berta::menu_popuper(m_asset_file_menu_popup, Berta::mouse::left_button)(*click_args.mouse_args);
+			//		});
+			//	}
+			//	auto item_ptr = ip._m_pgitem();
+			//	auto handlerId = prop.on_change().connect([item_ptr](const std::string& new_value)
+			//	{
+			//		item_ptr->value(new_value);
+			//	});
+			//	item_ptr->enabled(!prop.read_only());
+			//	m_propOnChangedHandlers[prop] = handlerId;
+			//}
+			m_propertyGrid.SetAutoDraw(true);
 		});
 
-		m_asset_file_menu_popup.append("Select asset...", [](nana::menu::item_proxy& ip) {
+		m_asset_file_menu_popup.Append("Select asset...", [](Berta::MenuItem& ip) {
 			//TODO: callback o un objeto. inyectarlo
 		});
-		m_asset_file_menu_popup.append_splitter();
-		m_asset_file_menu_popup.append("Find asset in Content Browser", [](nana::menu::item_proxy& ip) {});
+		m_asset_file_menu_popup.AppendSeparator();
+		m_asset_file_menu_popup.Append("Find asset in Content Browser", [](Berta::MenuItem& ip) {});
 
-		m_propertyGrid.events().property_changed([this](const nana::arg_propertygrid& arg)
+		m_propertyGrid.GetEvents().PropertyChanged.Connect([this](const Berta::ArgPropertyGrid& arg)
 		{
-			BR_CORE_TRACE << "property_changed / grid. label = " << arg.item.label() << ". cat = " << arg.item.pos().cat << std::endl;
+			BR_CORE_TRACE << "property_changed / grid. label = " << arg.Property.GetLabel() << ". value = " << arg.Property.GetValue() << std::endl;
 			
-			auto cat = m_propertyGrid.at(arg.item.pos().cat);
+			//TODO
+			/*auto cat = m_propertyGrid.at(arg.item.pos().cat);
 
 			auto& uuid = m_selectionService->GetSelections()[0];
 			auto& nodeProperties = m_sceneHierarchy->get(uuid);
@@ -112,7 +113,7 @@ namespace Bruno
 					property.value(arg.item.value());
 					break;
 				}
-			}
+			}*/
 		});
 	}
 
@@ -124,11 +125,7 @@ namespace Bruno
 
 	void PropertiesPanel::ClearPropertyGrid()
 	{
-		m_propertyGrid.clear();
-		for (size_t i = 0; i < m_propertyGrid.size_categ(); i++)
-		{
-			m_propertyGrid.erase();
-		}
+		m_propertyGrid.Clear();
 	}
 
 	void PropertiesPanel::DisposePropertyBinders()

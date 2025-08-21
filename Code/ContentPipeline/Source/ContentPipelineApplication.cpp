@@ -3,7 +3,7 @@
 #include "Pipeline/ProcessorManager.h"
 #include "Pipeline/Serialization/ContentTypeWriterManager.h"
 
-#include <Bruno/Platform/Windows/NanaWindow.h>
+#include <Bruno/Platform/Windows/BertaWindow.h>
 #include <Bruno/Platform/DirectX/Shader.h>
 #include "Bruno/Platform/DirectX/Texture.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
@@ -27,7 +27,7 @@ namespace Bruno
 	void ContentPipelineApplication::InitializeUI()
 	{
 		auto nanaWindow = m_window->As<NanaWindow>();
-		nana::form& form = nanaWindow->GetForm();
+		Berta::form& form = nanaWindow->GetForm();
 		m_place.bind(form.handle());
 		m_menubar.create(form.handle());
 		////////// VIEW
@@ -35,9 +35,9 @@ namespace Bruno
 		m_place["menubar"] << m_menubar;
 
 		auto& menuFile = m_menubar.push_back("&File");
-		menuFile.append("Select folder", [&form, this](nana::menu::item_proxy& ip)
+		menuFile.append("Select folder", [&form, this](Berta::menu::item_proxy& ip)
 		{
-			nana::filebox fileBox(form, true);
+			Berta::filebox fileBox(form, true);
 			fileBox.add_filter("Shader File", "*.hlsl;*.fx");
 			fileBox.add_filter("Image File", "*.bmp;*.jpg;*.dds");
 			fileBox.add_filter("All Files", "*.*");
@@ -59,14 +59,14 @@ namespace Bruno
 			}
 		});
 
-		menuFile.append("Build", [this](nana::menu::item_proxy& ip)
+		menuFile.append("Build", [this](Berta::menu::item_proxy& ip)
 		{
 			m_contentBuilder.Run();
 		});
 
-		menuFile.append("Read", [&form, this](nana::menu::item_proxy& ip)
+		menuFile.append("Read", [&form, this](Berta::menu::item_proxy& ip)
 		{
-			nana::filebox fileBox(form, true);
+			Berta::filebox fileBox(form, true);
 			fileBox.add_filter("Shader File", "*.hlsl;*.fx");
 			fileBox.add_filter("Image File", "*.bmp;*.jpg;*.dds");
 			fileBox.add_filter("All Files", "*.*");
@@ -87,9 +87,9 @@ namespace Bruno
 			}
 		});
 		menuFile.append_splitter();
-		menuFile.append("Exit", [](nana::menu::item_proxy& ip)
+		menuFile.append("Exit", [](Berta::menu::item_proxy& ip)
 		{
-			nana::API::exit_all();
+			Berta::API::exit_all();
 		});
 
 		m_place.collocate();

@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ContentPipeline", "ContentP
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{0AA333E5-91EF-4D7D-971A-0F56F78B1280}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nana", "Engine\Dependencies\nana\nana.vcxproj", "{630C9B7C-4F43-9C0D-F82F-8210E445180F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Berta", "Engine\Dependencies\Berta\Code\Berta\Berta.vcxproj", "{43F596E7-94E6-4642-98C2-AC2BE46955C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,28 +91,28 @@ Global
 		{9EC28AD7-835A-4F19-8F1E-43C297E0B600}.Release|x64.Build.0 = Release|x64
 		{9EC28AD7-835A-4F19-8F1E-43C297E0B600}.Release|x86.ActiveCfg = Release|Win32
 		{9EC28AD7-835A-4F19-8F1E-43C297E0B600}.Release|x86.Build.0 = Release|Win32
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Debug Win64|x64.ActiveCfg = Debug Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Debug Win64|x64.Build.0 = Debug Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Debug Win64|x86.ActiveCfg = Debug Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Debug Win64|x86.Build.0 = Debug Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Debug|x64.ActiveCfg = Debug Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Debug|x64.Build.0 = Debug Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Debug|x86.ActiveCfg = Debug Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Debug|x86.Build.0 = Debug Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Release Win64|x64.ActiveCfg = Release Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Release Win64|x64.Build.0 = Release Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Release Win64|x86.ActiveCfg = Release Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Release Win64|x86.Build.0 = Release Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Release|x64.ActiveCfg = Release Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Release|x64.Build.0 = Release Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Release|x86.ActiveCfg = Release Win64|x64
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F}.Release|x86.Build.0 = Release Win64|x64
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Debug Win64|x64.ActiveCfg = Debug|x64
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Debug Win64|x64.Build.0 = Debug|x64
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Debug Win64|x86.ActiveCfg = Debug|Win32
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Debug Win64|x86.Build.0 = Debug|Win32
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Debug|x64.ActiveCfg = Debug|x64
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Debug|x64.Build.0 = Debug|x64
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Debug|x86.ActiveCfg = Debug|Win32
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Debug|x86.Build.0 = Debug|Win32
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Release Win64|x64.ActiveCfg = Release|x64
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Release Win64|x64.Build.0 = Release|x64
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Release Win64|x86.ActiveCfg = Release|Win32
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Release Win64|x86.Build.0 = Release|Win32
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Release|x64.ActiveCfg = Release|x64
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Release|x64.Build.0 = Release|x64
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Release|x86.ActiveCfg = Release|Win32
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{630C9B7C-4F43-9C0D-F82F-8210E445180F} = {0AA333E5-91EF-4D7D-971A-0F56F78B1280}
+		{43F596E7-94E6-4642-98C2-AC2BE46955C0} = {0AA333E5-91EF-4D7D-971A-0F56F78B1280}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56E52B6E-43C7-4427-9148-CB8C39A9B5F2}

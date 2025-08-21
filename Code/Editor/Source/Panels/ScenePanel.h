@@ -1,11 +1,11 @@
 #pragma once
 
-#include <nana/gui/widgets/panel.hpp>
-#include <nana/gui/place.hpp>
-#include <nana/gui/widgets/form.hpp>
-#include <nana/gui/timer.hpp>
-#include <nana/gui/widgets/combox.hpp>
-#include <nana/gui/widgets/button.hpp>
+#include <Berta/Controls/Panel.h>
+#include <Berta/GUI/Layout.h>
+#include <Berta/Controls/Form.h>
+//#include <nana/gui/timer.hpp>
+#include <Berta/Controls/ComboBox.h>
+#include <Berta/Controls/Button.h>
 
 #include <Bruno/Platform/DirectX/IndexBuffer.h>
 #include <Bruno/Platform/DirectX/VertexBuffer.h>
@@ -38,11 +38,11 @@ namespace Bruno
 		DXGI_FORMAT DepthBufferFormat{ DXGI_FORMAT_D32_FLOAT };
 	};
 
-	class ScenePanel : public nana::panel<true>
-	//class ScenePanel : public nana::nested_form
+	class ScenePanel : public Berta::Panel
+	//class ScenePanel : public Berta::nested_form
 	{
 	public:
-		ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters = SceneSurfaceParameters());
+		ScenePanel(Berta::Window window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters = SceneSurfaceParameters());
 		~ScenePanel();
 
 		void OnUpdate(const GameTimer& timer);
@@ -54,18 +54,18 @@ namespace Bruno
 		std::mutex& GetMutex() { return m_mutex; }
 #endif
 
-		nana::nested_form& GetForm() { return *m_form; }
+		Berta::NestedForm& GetForm() { return *m_form; }
 	private:
 		void InitializeGizmoService();
 		void InitializeGraphicsContext();
 		void InitializeSceneRenderer();
 		void UpdateCBs(const GameTimer& timer);
 
-		//nana::nested_form* m_form;
-		std::unique_ptr<nana::nested_form> m_form;
-		nana::place m_place;
-		nana::combox m_gizmoTypeCombobox;
-		nana::button m_gizmoTransformSpaceButton;
+		//Berta::nested_form* m_form;
+		std::unique_ptr<Berta::NestedForm> m_form;
+		Berta::Layout m_place;
+		Berta::ComboBox m_gizmoTypeCombobox;
+		Berta::Button m_gizmoTransformSpaceButton;
 
 		std::unique_ptr<Surface> m_surface;
 		int idxx{ 0 };

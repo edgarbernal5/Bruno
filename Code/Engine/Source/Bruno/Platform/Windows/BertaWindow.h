@@ -2,23 +2,22 @@
 
 #include "WindowsGameWindow.h"
 
-#include <nana/gui.hpp>
-
+#include "Berta/Controls/Form.h"
 #include "Bruno/Core/GameTimer.h"
 
 namespace Bruno
 {
 	class Application;
 
-	class NanaWindow : public Window
+	class BertaWindow : public Window
 	{
-		BR_RTTI_DECLARATION(NanaWindow, Window);
+		BR_RTTI_DECLARATION(BertaWindow, Window);
 
 	public:
-		NanaWindow(const WindowParameters& parameters, Application* application);
-		~NanaWindow() = default;
+		BertaWindow(const WindowParameters& parameters, Application* application);
+		~BertaWindow() = default;
 
-		nana::form& GetForm();
+		Berta::Form& GetForm();
 		virtual WindowHandle GetHandle() override;
 		virtual void Initialize() override;
 		virtual int Run() override;
@@ -26,7 +25,7 @@ namespace Bruno
 		virtual void Show() override;
 
 	private:
-		std::unique_ptr<nana::form> m_form;
+		std::unique_ptr<Berta::Form> m_form;
 		WindowParameters m_parameters;
 		Application* m_application;
 	};

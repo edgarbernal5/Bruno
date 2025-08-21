@@ -3,7 +3,7 @@
 
 namespace Bruno
 {
-	PaneManager::PaneManager(nana::place* place) :
+	PaneManager::PaneManager(Berta::Layout* place) :
 		m_place(place)
 	{
 	}

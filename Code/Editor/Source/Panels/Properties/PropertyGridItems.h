@@ -1,15 +1,15 @@
 #pragma once
 
-#include <nana/gui/widgets/pgitems.hpp>
+//#include <nana/gui/widgets/pgitems.hpp>
 
-#include <nana/gui/widgets/button.hpp>
-#include <nana/gui/widgets/textbox.hpp>
+#include <Berta/Controls/Button.h>
+#include <Berta/Controls/InputText.h>
 #include <Bruno/Math/Math.h>
 
 namespace Bruno
 {
-	class pg_vector3
-		: public nana::pgitem
+	/*class pg_vector3
+		: public Berta::pgitem
 	{
 	public:
 		pg_vector3() = default;
@@ -29,16 +29,16 @@ namespace Bruno
 		}
 
 	protected:
-		virtual void create(nana::window wd) override;
+		virtual void create(Berta::Window wd) override;
 
-		virtual void draw(nana::paint::graphics* graph, nana::rectangle area, unsigned labelw, unsigned  valuew, unsigned  iboxw, const int txtoff, nana::color bgcolor, nana::color fgcolor) const override;
+		virtual void draw(Berta::paint::graphics* graph, Berta::rectangle area, unsigned labelw, unsigned  valuew, unsigned  iboxw, const int txtoff, Berta::color bgcolor, Berta::color fgcolor) const override;
 		
-		mutable nana::textbox	xyz_[3];
+		mutable Berta::textbox	xyz_[3];
 		Math::Vector3	vector3_;
 	};
 
 	class pg_asset_file
-		: public nana::pg_string_button
+		: public Berta::pg_string_button
 	{
 	public:
 		pg_asset_file() = default;
@@ -50,6 +50,6 @@ namespace Bruno
 		virtual void value(const std::string& value) override;
 
 	protected:
-		virtual void create(nana::window wd) override;
-	};
+		virtual void create(Berta::Window wd) override;
+	};*/
 }

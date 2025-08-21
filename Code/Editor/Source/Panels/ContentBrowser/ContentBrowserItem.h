@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nana/gui/widgets/treebox.hpp>
+#include <Berta/Controls/TreeBox.h>
 #include <filesystem>
 
 namespace Bruno
@@ -9,6 +9,6 @@ namespace Bruno
 	{
 		std::filesystem::directory_entry DirectoryEntry;
 		bool IsDirectory;
-		nana::treebox::item_proxy TreeNode;
+		Berta::TreeBoxItem TreeNode;
 	};
 }

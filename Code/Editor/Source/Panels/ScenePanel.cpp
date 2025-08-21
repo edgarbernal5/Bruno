@@ -24,9 +24,9 @@
 
 namespace Bruno
 {
-	ScenePanel::ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters) :
-		//nana::nested_form(window, nana::appear::bald<>()),
-		nana::panel<true>(window),
+	ScenePanel::ScenePanel(Berta::Window window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters) :
+		//Berta::nested_form(window, Berta::appear::bald<>()),
+		Berta::Panel(window),
 		m_surfaceParameters(surfaceParameters),
 		m_sceneDocument(sceneDocument),
 
@@ -61,7 +61,7 @@ namespace Bruno
 		m_gizmoTypeCombobox.option(1);
 		m_gizmoTransformSpaceButton.caption("World");
 
-		m_gizmoTransformSpaceButton.events().click([&](const nana::arg_click& click)
+		m_gizmoTransformSpaceButton.events().click([&](const Berta::arg_click& click)
 		{
 			if (m_gizmoService->GetTransformSpace() == GizmoService::TransformSpace::World)
 			{
@@ -76,7 +76,7 @@ namespace Bruno
 		});
 
 		//m_form = this;
-		m_form = std::make_unique<nana::nested_form>(this->handle(), nana::appear::bald<>());
+		m_form = std::make_unique<Berta::nested_form>(this->handle(), Berta::appear::bald<>());
 
 		//TO-DO: ver si se puede agregar un evento al form o nested_form cuando llega un mensaje de WM_ACTIVATEAPP 
 		//para luego disparar un evento y saber si el panel está activado o no. Es útil para el timer y el rendering/painting.
@@ -103,7 +103,7 @@ namespace Bruno
 		});
 #endif // SINGLE_THREAD_RENDERING
 
-		this->events().destroy([this](const nana::arg_destroy& args)
+		this->events().destroy([this](const Berta::arg_destroy& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
@@ -117,15 +117,15 @@ namespace Bruno
 			m_editorGame->RemoveScenePanel(this);
 		});
 
-		this->events().resized([this](const nana::arg_resized& args)
+		this->events().resized([this](const Berta::arg_resized& args)
 		{
 			int margin = 4;
 			int height = m_gizmoTypeCombobox.size().height;
-			nana::rectangle newRect(margin, height + margin, args.width - margin * 2, args.height - height - margin * 2);
+			Berta::rectangle newRect(margin, height + margin, args.width - margin * 2, args.height - height - margin * 2);
 			m_form->move(newRect);
 		});
 
-		this->events().expose([this](const nana::arg_expose& args)
+		this->events().expose([this](const Berta::arg_expose& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
@@ -142,7 +142,7 @@ namespace Bruno
 				this->focus();
 		});
 
-		m_form->events().enter_size_move([this](const nana::arg_size_move& args)
+		m_form->events().enter_size_move([this](const Berta::arg_size_move& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
@@ -152,7 +152,7 @@ namespace Bruno
 			m_isSizingMoving = true;
 		});
 
-		m_form->events().exit_size_move([this](const nana::arg_size_move& args)
+		m_form->events().exit_size_move([this](const Berta::arg_size_move& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
@@ -168,7 +168,7 @@ namespace Bruno
 			m_isSizingMoving = false;
 		});
 
-		m_form->events().resized([this](const nana::arg_resized& args)
+		m_form->events().resized([this](const Berta::arg_resized& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
@@ -204,7 +204,7 @@ namespace Bruno
 			m_isResizing = false;
 		});
 
-		m_form->events().mouse_down([this](const nana::arg_mouse& args)
+		m_form->events().mouse_down([this](const Berta::arg_mouse& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
@@ -218,7 +218,7 @@ namespace Bruno
 			m_form->set_capture(true);
 		});
 
-		m_form->events().mouse_move([this](const nana::arg_mouse& args)
+		m_form->events().mouse_move([this](const Berta::arg_mouse& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
@@ -266,14 +266,14 @@ namespace Bruno
 			m_lastMousePosition.y = args.pos.y;
 		});
 
-		m_form->events().mouse_up([this](const nana::arg_mouse& args)
+		m_form->events().mouse_up([this](const Berta::arg_mouse& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
 			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
 			
-			if (args.button == nana::mouse::left_button)
+			if (args.button == Berta::mouse::left_button)
 			{
 				if (m_isGizmoing)
 				{
@@ -297,7 +297,7 @@ namespace Bruno
 			m_form->release_capture();
 		});
 
-		m_form->events().mouse_wheel([this](const nana::arg_wheel& args)
+		m_form->events().mouse_wheel([this](const Berta::arg_wheel& args)
 		{
 			float zoom = args.distance * 0.0025f;
 			if (!args.upwards) zoom = -zoom;
@@ -305,7 +305,7 @@ namespace Bruno
 			m_sceneDocument->GetCamera().Zoom(zoom);
 		});
 
-		m_form->events().key_press([this](const nana::arg_keyboard& args)
+		m_form->events().key_press([this](const Berta::arg_keyboard& args)
 		{
 			if (args.key == 'A')
 			{
@@ -325,7 +325,7 @@ namespace Bruno
 			}
 		});
 
-		m_gizmoTypeCombobox.events().selected([this](const nana::arg_combox& acmb) mutable
+		m_gizmoTypeCombobox.events().selected([this](const Berta::arg_combox& acmb) mutable
 		{
 			BR_CORE_TRACE << "Gizmo type selected: " << acmb.widget.option() << std::endl;
 

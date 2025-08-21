@@ -6,58 +6,55 @@
 
 namespace Bruno
 {
-	ContentBrowserPanel::ContentBrowserPanel(nana::window window, const std::wstring& workingDirectory, std::function<void(const std::wstring&)> selectItemCallback) :
-		nana::panel<true>(window),
+	ContentBrowserPanel::ContentBrowserPanel(Berta::Window window, const std::wstring& workingDirectory, std::function<void(const std::wstring&)> selectItemCallback) :
+		Berta::Panel(window),
 		m_workingDirectory(workingDirectory),
 		m_selectItemCallback(selectItemCallback)
 	{
-		this->caption("Content Browser");
+		this->SetCaption("Content Browser");
 
-		m_treebox.create(*this);
-		m_listbox.create(*this);
+		m_treebox.Create(*this);
+		m_listbox.Create(*this);
 
-		m_place.bind(*this);
-		m_place.div("<tree> |70% <vert <list>");
+		m_place.Create(*this);
+		m_place.Parse("<tree> |70% <vert <list>");
 
-		m_place["tree"] << m_treebox;
-		m_place["list"] << m_listbox;
+		m_place.Attach("tree", m_treebox);
+		m_place.Attach("list", m_listbox);
 
-		m_listbox.append_header("Name", 150);
+		m_listbox.AppendHeader("Name", 150);
 
-		m_place.collocate();
+		m_place.Apply();
 
 		std::filesystem::directory_entry rootDirectoryEntry(m_workingDirectory);
-		auto rootNode = m_treebox.insert("Content", "Content");
-		rootNode.value(rootDirectoryEntry);
+		auto rootNode = m_treebox.Insert("Content", "Content");
+		rootNode.SetUserData(rootDirectoryEntry);
 		PopulateDirectory(rootNode, workingDirectory);
 
-		m_treebox.events().selected([&](const nana::arg_treebox& arg)
+		m_treebox.GetEvents().Selected.Connect([&](const Berta::ArgTreeBoxSelection& arg)
 		{
-			BR_CORE_TRACE << "tree item selected: " << arg.operated << std::endl;
-			if (!arg.operated) return;
-
-			m_listbox.auto_draw(false);
-			PopulateFileDirectory(arg.item);
-			m_listbox.auto_draw(true);
+			m_listbox.SetAutoDraw(false);
+			PopulateFileDirectory(arg.Items[0]);
+			m_listbox.SetAutoDraw(true);
 		});
 
-		m_listbox.events().selected([&](const nana::arg_listbox& args) {
-			BR_CORE_TRACE << "listbox item selected: " << args.item.value<ContentBrowserItem>().DirectoryEntry.path() << std::endl;
+		m_listbox.GetEvents().Selected.Connect([&](const Berta::ArgListBox& args) {
+			//BR_CORE_TRACE << "listbox item selected: " << args.item.value<ContentBrowserItem>().DirectoryEntry.path() << std::endl;
 		});
 
-		m_listbox.events().dbl_click([&](const nana::arg_mouse& args)
+		m_listbox.GetEvents().DblClick.Connect([&](const Berta::ArgMouse& args)
 		{
-			if (m_listbox.selected().size() == 0)
+			if (m_listbox.GetSelected().size() == 0)
 				return;
 				
-			for (auto& item : m_listbox.selected())
+			for (auto& item : m_listbox.GetSelected())
 			{
-				auto& contentItem = m_listbox.at(item).value<ContentBrowserItem>();
+				auto& contentItem = m_listbox.At(item).GetUserData<ContentBrowserItem>();
 
 				if (contentItem.IsDirectory)
 				{
-					auto path = m_treebox.make_key_path(contentItem.TreeNode, "/") + ("/") + contentItem.DirectoryEntry.path().filename().generic_string() ;
-					m_treebox.find(path).select(true);
+					auto path = m_treebox.GetKeyPath(contentItem.TreeNode, '/') + (" / ") + contentItem.DirectoryEntry.path().filename().generic_string();
+					m_treebox.Find(path).Select();
 				}
 				else
 				{
@@ -66,55 +63,56 @@ namespace Bruno
 			}
 		});
 
-		m_fileSelectionPopup.append("Import new asset", [](nana::menu::item_proxy& ip) {});
-		m_fileSelectionPopup.append_splitter();
-		m_fileSelectionPopup.append("Reimport asset", [](nana::menu::item_proxy& ip) {});
+		m_fileSelectionPopup.Append("Import new asset", [](Berta::MenuItem& ip) {});
+		m_fileSelectionPopup.AppendSeparator();
+		m_fileSelectionPopup.Append("Reimport asset", [](Berta::MenuItem& ip) {});
 
-		m_listbox.events().mouse_down([&](const nana::arg_mouse& args)
+		m_listbox.GetEvents().MouseDown.Connect([&](const Berta::ArgMouse& args)
 		{
-			if (m_listbox.selected().size() == 0)
+			if (m_listbox.GetSelected().size() == 0)
 				return;
 			
-			menu_popuper(m_fileSelectionPopup)(args);
+			//menu_popuper(m_fileSelectionPopup)(args);
 		});
 
-		rootNode.select(true);
+		rootNode.Select();
 	}
 
-	void ContentBrowserPanel::PopulateDirectory(nana::treebox::item_proxy& node, const std::wstring& directoryPath)
+	void ContentBrowserPanel::PopulateDirectory(Berta::TreeBoxItem node, const std::wstring& directoryPath)
 	{
-		m_treebox.auto_draw(false);
+		m_treebox.SetAutoDraw(false);
 		PopulateDirectoryInner(node, directoryPath);
-		m_treebox.auto_draw(true);
+		m_treebox.SetAutoDraw(true);
 	}
 
-	void ContentBrowserPanel::PopulateDirectoryInner(nana::treebox::item_proxy& node, const std::wstring& directoryPath)
+	void ContentBrowserPanel::PopulateDirectoryInner(Berta::TreeBoxItem node, const std::wstring& directoryPath)
 	{
 		for (const auto& directoryEntry : std::filesystem::directory_iterator{ directoryPath })
 		{
 			if (!std::filesystem::is_directory(directoryEntry))
 				continue;
 
-			auto child = m_treebox.insert(node, directoryEntry.path().filename().generic_string(), directoryEntry.path().filename().generic_string());
-			child.value(directoryEntry);
+			auto child = m_treebox.Insert(node, directoryEntry.path().filename().generic_string(), directoryEntry.path().filename().generic_string());
+			child.SetUserData(directoryEntry);
 			PopulateDirectoryInner(child, directoryEntry.path());
 		}
 	}
 
-	void ContentBrowserPanel::PopulateFileDirectory(nana::treebox::item_proxy& node)
+	void ContentBrowserPanel::PopulateFileDirectory(Berta::TreeBoxItem node)
 	{
-		m_listbox.clear();
-		auto& nodeDirectoryEntry = node.value<std::filesystem::directory_entry>();
+		m_listbox.Clear();
+		auto& nodeDirectoryEntry = node.GetUserData<std::filesystem::directory_entry>();
 		for (const auto& directoryEntry : std::filesystem::directory_iterator{ nodeDirectoryEntry.path()})
 		{
-			auto item = m_listbox.at(0).append(directoryEntry.path().filename(), true);
+			auto item = m_listbox.At(0);
+			item.SetText(0, directoryEntry.path().filename().string());
 			
 			ContentBrowserItem contentItem;
 			contentItem.DirectoryEntry = directoryEntry;
 			contentItem.IsDirectory = std::filesystem::is_directory(directoryEntry);
 			contentItem.TreeNode = node;
 
-			item.value(contentItem);
+			item.SetUserData(contentItem);
 		}
 	}
 }
