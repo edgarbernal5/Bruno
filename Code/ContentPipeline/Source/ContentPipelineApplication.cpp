@@ -11,8 +11,6 @@
 #include "Bruno/Content/ContentManager.h"
 #include "Bruno/Content/ContentTypeReaderManager.h"
 
-#include <nana/gui/filebox.hpp>
-
 namespace Bruno
 {
 	ContentPipelineApplication::ContentPipelineApplication(const ApplicationParameters& parameters) :
@@ -26,18 +24,18 @@ namespace Bruno
 
 	void ContentPipelineApplication::InitializeUI()
 	{
-		auto nanaWindow = m_window->As<NanaWindow>();
-		Berta::form& form = nanaWindow->GetForm();
-		m_place.bind(form.handle());
-		m_menubar.create(form.handle());
+		auto bertaWindow = m_window->As<BertaWindow>();
+		Berta::Form& form = bertaWindow->GetForm();
+		m_place.Create(form.Handle());
+		m_menubar.Create(form.Handle());
 		////////// VIEW
-		m_place.div("vert <menubar weight=45>");
-		m_place["menubar"] << m_menubar;
+		m_place.Parse("vert <menubar weight=45>");
+		m_place.Attach("menubar", m_menubar);
 
-		auto& menuFile = m_menubar.push_back("&File");
-		menuFile.append("Select folder", [&form, this](Berta::menu::item_proxy& ip)
+		auto& menuFile = m_menubar.PushBack("&File");
+		menuFile.Append("Select folder", [&form, this](Berta::MenuItem& ip)
 		{
-			Berta::filebox fileBox(form, true);
+			/*Berta::filebox fileBox(form, true);
 			fileBox.add_filter("Shader File", "*.hlsl;*.fx");
 			fileBox.add_filter("Image File", "*.bmp;*.jpg;*.dds");
 			fileBox.add_filter("All Files", "*.*");
@@ -56,17 +54,17 @@ namespace Bruno
 					auto relativePath = std::filesystem::relative(file, rootDirectory);
 					m_contentBuilder.RequestBuild(file.c_str(), relativePath);
 				}
-			}
+			}*/
 		});
 
-		menuFile.append("Build", [this](Berta::menu::item_proxy& ip)
+		menuFile.Append("Build", [this](Berta::MenuItem& ip)
 		{
 			m_contentBuilder.Run();
 		});
 
-		menuFile.append("Read", [&form, this](Berta::menu::item_proxy& ip)
+		menuFile.Append("Read", [&form, this](Berta::MenuItem& ip)
 		{
-			Berta::filebox fileBox(form, true);
+			/*Berta::filebox fileBox(form, true);
 			fileBox.add_filter("Shader File", "*.hlsl;*.fx");
 			fileBox.add_filter("Image File", "*.bmp;*.jpg;*.dds");
 			fileBox.add_filter("All Files", "*.*");
@@ -84,15 +82,15 @@ namespace Bruno
 
 					auto typelessRtti = manager.Load<RTTI>(relativePath);
 				}
-			}
+			}*/
 		});
-		menuFile.append_splitter();
-		menuFile.append("Exit", [](Berta::menu::item_proxy& ip)
+		menuFile.AppendSeparator();
+		menuFile.Append("Exit", [](Berta::MenuItem& ip)
 		{
-			Berta::API::exit_all();
+			Berta::GUI::Exit();
 		});
 
-		m_place.collocate();
+		m_place.Apply();
 	}
 
 	void ContentPipelineApplication::OnInitialize()
@@ -109,7 +107,7 @@ namespace Bruno
 
 	void ContentPipelineApplication::OnInitializeWindow(const WindowParameters& windowParameters)
 	{
-		m_window = std::make_unique<NanaWindow>(windowParameters, this);
+		m_window = std::make_unique<BertaWindow>(windowParameters, this);
 		m_window->Initialize();
 	}
 
