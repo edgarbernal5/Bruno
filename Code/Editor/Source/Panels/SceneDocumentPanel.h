@@ -12,7 +12,7 @@ namespace Bruno
 	class SceneDocumentPanel : public Berta::Panel
 	{
 	public:
-		SceneDocumentPanel(Berta::Window window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument);
+		SceneDocumentPanel(Berta::Window* window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument);
 		~SceneDocumentPanel();
 
 	private:
