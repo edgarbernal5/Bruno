@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "ModelContentItem.h"
 
 #include "MaterialContentItem.h"

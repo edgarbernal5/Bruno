@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "MaterialWriter.h"
 
 #include "Pipeline/Graphics/MaterialContentItem.h"

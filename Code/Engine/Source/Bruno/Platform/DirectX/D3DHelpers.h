@@ -1,7 +1,6 @@
 #pragma once
 
 #include <exception>
-#include <wrl.h>
 #include <stdio.h>
 
 namespace Bruno

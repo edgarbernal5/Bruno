@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "ContentPipelineApplication.h"
 #include <Bruno/EntryPoint.h>
 

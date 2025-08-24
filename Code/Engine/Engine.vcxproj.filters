@@ -40,9 +40,6 @@
     <Filter Include="Dependencies\D3D12MA">
       <UniqueIdentifier>{58b49e62-ebdd-4827-9785-1d7283b2fecd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dependencies\d3dx12">
-      <UniqueIdentifier>{31fafd15-a38d-4a81-9935-14a1d05d344c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Bruno\Editor">
       <UniqueIdentifier>{76b1d155-efd6-4f55-9227-4cf0ced6783c}</UniqueIdentifier>
     </Filter>
@@ -239,39 +236,6 @@
     </ClInclude>
     <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h">
       <Filter>Dependencies\SimpleMath</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12.h">
-      <Filter>Dependencies\d3dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_barriers.h">
-      <Filter>Dependencies\d3dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_check_feature_support.h">
-      <Filter>Dependencies\d3dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_core.h">
-      <Filter>Dependencies\d3dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_default.h">
-      <Filter>Dependencies\d3dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_pipeline_state_stream.h">
-      <Filter>Dependencies\d3dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_property_format_table.h">
-      <Filter>Dependencies\d3dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_render_pass.h">
-      <Filter>Dependencies\d3dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_resource_helpers.h">
-      <Filter>Dependencies\d3dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_root_signature.h">
-      <Filter>Dependencies\d3dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_state_object.h">
-      <Filter>Dependencies\d3dx12</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DHelpers.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
@@ -529,9 +493,9 @@
     <None Include="Source\Bruno\Math\Math.inl">
       <Filter>Source\Bruno\Math</Filter>
     </None>
-    <None Include="packages.config" />
     <None Include="Dependencies\SimpleMath\SimpleMath.inl">
       <Filter>Dependencies\SimpleMath</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "ShaderContentItem.h"
 
 namespace Bruno

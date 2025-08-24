@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "TimestampCache.h"
 
 namespace Bruno

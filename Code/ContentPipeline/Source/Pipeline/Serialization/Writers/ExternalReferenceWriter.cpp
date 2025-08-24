@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "ExternalReferenceWriter.h"
 
 #include "Pipeline/ExternalReferenceContentItem.h"

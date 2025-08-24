@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props')" />
+  <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -52,6 +52,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\Output\$(Configuration)_$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>..\..\Output\$(Configuration)_$(Platform)_tmp\$(ProjectName)\</IntDir>
+    <ExternalIncludePath>Dependencies\entt\include</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -61,7 +62,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Source;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;Dependencies\Berta\Code\Berta\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\Berta\Code\Berta\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -107,17 +108,6 @@
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_barriers.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_check_feature_support.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_core.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_default.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_pipeline_state_stream.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_property_format_table.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_render_pass.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_resource_helpers.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_root_signature.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_state_object.h" />
     <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h" />
     <ClInclude Include="Dependencies\zlib\include\zconf.h" />
     <ClInclude Include="Dependencies\zlib\include\zlib.h" />
@@ -264,15 +254,20 @@
     <None Include="packages.config" />
     <None Include="Source\Bruno\Math\Math.inl" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Dependencies\Berta\Code\Berta\Berta.vcxproj">
+      <Project>{43f596e7-94e6-4642-98c2-ac2be46955c0}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets')" />
+    <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets'))" />
   </Target>
 </Project>

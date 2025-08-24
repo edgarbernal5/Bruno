@@ -126,7 +126,7 @@ namespace Bruno
 		m_place.Create(form.Handle());
 		m_menubar.Create(form.Handle());
 		////////// VIEW
-		m_place.Parse("vert <menubar weight=25> <dock>");
+		m_place.Parse("{VerticalLayout {menubar Height=25} {Dock dockRoot}}");
 		m_place.Attach("menubar" , m_menubar);
 
 		m_menubar.PushBack("&File");

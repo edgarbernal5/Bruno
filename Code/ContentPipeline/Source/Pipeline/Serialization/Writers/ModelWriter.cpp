@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "ModelWriter.h"
 
 #include "Pipeline/Graphics/ModelContentItem.h"

@@ -75,7 +75,7 @@ namespace Bruno
 		});
 
 		//m_form = this;
-		m_form = std::make_unique<Berta::NestedForm>(this->Handle());
+		m_form = std::make_unique<Berta::NestedForm>(this->Handle(), Berta::Rectangle{});
 
 		//TO-DO: ver si se puede agregar un evento al form o nested_form cuando llega un mensaje de WM_ACTIVATEAPP 
 		//para luego disparar un evento y saber si el panel está activado o no. Es útil para el timer y el rendering/painting.

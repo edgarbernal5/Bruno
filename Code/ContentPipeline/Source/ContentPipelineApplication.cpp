@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "ContentPipelineApplication.h"
 
 #include "Pipeline/ProcessorManager.h"
@@ -29,7 +30,7 @@ namespace Bruno
 		m_place.Create(form.Handle());
 		m_menubar.Create(form.Handle());
 		////////// VIEW
-		m_place.Parse("vert <menubar weight=45>");
+		m_place.Parse("{VerticalLayout {menubar Height=45}");
 		m_place.Attach("menubar", m_menubar);
 
 		auto& menuFile = m_menubar.PushBack("&File");
