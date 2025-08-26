@@ -27,11 +27,11 @@ namespace Bruno
 	{
 		auto bertaWindow = m_window->As<BertaWindow>();
 		Berta::Form& form = bertaWindow->GetForm();
-		m_place.Create(form.Handle());
+		m_layout.Create(form.Handle());
 		m_menubar.Create(form.Handle());
 		////////// VIEW
-		m_place.Parse("{VerticalLayout {menubar Height=45}");
-		m_place.Attach("menubar", m_menubar);
+		m_layout.Parse("{VerticalLayout {menubar Height=45}");
+		m_layout.Attach("menubar", m_menubar);
 
 		auto& menuFile = m_menubar.PushBack("&File");
 		menuFile.Append("Select folder", [&form, this](Berta::MenuItem& ip)
@@ -91,7 +91,7 @@ namespace Bruno
 			Berta::GUI::Exit();
 		});
 
-		m_place.Apply();
+		m_layout.Apply();
 	}
 
 	void ContentPipelineApplication::OnInitialize()

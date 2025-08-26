@@ -20,23 +20,23 @@ namespace Bruno
 	{
 		this->SetCaption("Scene");
 
-		m_place.Create(this->Handle());
+		m_layout.Create(this->Handle());
 		////////// VIEW
-		m_place.Parse("<dock>");
+		m_layout.Parse("{Dock dockRoot}");
 
 		//Berta::pane_info paneInfo;
 		//paneInfo.show_close_button = false;
 		//paneInfo.id = "pane1";
-		//auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>(paneInfo, "", Berta::dock_position::right, m_sceneDocument);
+		//auto sceneHierarchyPanel = m_layout.add_pane<SceneHierarchyPanel>(paneInfo, "", Berta::dock_position::right, m_sceneDocument);
 
 		//paneInfo.show_caption = false;
 		//paneInfo.id = "pane3";
-		//auto scenePanel = m_place.add_pane<ScenePanel>(paneInfo, "pane1", Berta::dock_position::right, editorGame, m_sceneDocument);
+		//auto scenePanel = m_layout.add_pane<ScenePanel>(paneInfo, "pane1", Berta::dock_position::right, editorGame, m_sceneDocument);
 
 		//paneInfo.id = "pane2";
 		//paneInfo.show_caption = true;
 		//paneInfo.caption = "Properties";
-		//auto propertiesPanel = m_place.add_pane<PropertiesPanel>(paneInfo, "pane1", Berta::dock_position::down, m_sceneDocument);
+		//auto propertiesPanel = m_layout.add_pane<PropertiesPanel>(paneInfo, "pane1", Berta::dock_position::down, m_sceneDocument);
 
 		//this->GetEvents().Visibility.Connect([scenePanel](const Berta::ArgVisibility& arg)
 		//{
@@ -46,7 +46,7 @@ namespace Bruno
 		//		scenePanel->hide();
 		//});
 
-		m_place.Apply();
+		m_layout.Apply();
 	}
 
 	SceneDocumentPanel::~SceneDocumentPanel()

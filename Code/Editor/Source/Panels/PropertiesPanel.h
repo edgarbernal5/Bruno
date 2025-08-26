@@ -28,7 +28,7 @@ namespace Bruno
 		std::shared_ptr<SelectionService> m_selectionService;
 		EventHandlerId m_selectionChangedHandleId{ 0 };
 
-		Berta::Layout m_place;
+		Berta::Layout m_layout;
 		Berta::PropertyGrid m_propertyGrid;
 		properties_collection m_currentProperties;
 		std::unordered_map<property_proxy, size_t> m_propOnChangedHandlers;

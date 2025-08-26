@@ -20,11 +20,11 @@ namespace Bruno
 
 		m_treebox.Create(*this);
 		
-		m_place.Create(*this);
-		m_place.Parse("vert <tree>");
+		m_layout.Create(*this);
+		m_layout.Parse("vert <tree>");
 
-		m_place.Attach("tree", m_treebox);
-		m_place.Apply();
+		m_layout.Attach("tree", m_treebox);
+		m_layout.Apply();
 		
 		m_treebox.GetEvents().Selected.Connect([&](const Berta::ArgTreeBoxSelection& args)
 		{

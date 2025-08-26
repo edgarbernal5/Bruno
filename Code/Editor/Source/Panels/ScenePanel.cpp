@@ -38,7 +38,7 @@ namespace Bruno
 		std::ostringstream idstr;
 		idstr << "Scene id " << idxx;
 		this->SetCaption(idstr.str());
-		m_place.Create(*this);
+		m_layout.Create(*this);
 
 		m_scene = m_sceneDocument->GetScene();
 		m_gizmoService = m_sceneDocument->GetGizmoService();
@@ -47,10 +47,10 @@ namespace Bruno
 		m_gizmoTypeCombobox.Create(*this, false, { 0, 0, 150, 25 });
 		m_gizmoTransformSpaceButton.Create(*this);
 
-		m_place.Parse("vert <weight=25 <gizmoTypeComboBox><gizmoSpaceButton>>");
+		m_layout.Parse("vert <weight=25 <gizmoTypeComboBox><gizmoSpaceButton>>");
 
-		m_place.Attach("gizmoTypeComboBox", m_gizmoTypeCombobox);
-		m_place.Attach("gizmoSpaceButton", m_gizmoTransformSpaceButton);
+		m_layout.Attach("gizmoTypeComboBox", m_gizmoTypeCombobox);
+		m_layout.Attach("gizmoSpaceButton", m_gizmoTransformSpaceButton);
 
 		m_gizmoTypeCombobox.PushItem("None");
 		m_gizmoTypeCombobox.PushItem("Translation");

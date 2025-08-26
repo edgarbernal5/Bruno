@@ -4,7 +4,7 @@
 namespace Bruno
 {
 	PaneManager::PaneManager(Berta::Layout* place) :
-		m_place(place)
+		m_layout(place)
 	{
 	}
 }

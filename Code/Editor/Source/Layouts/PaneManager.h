@@ -12,10 +12,10 @@ namespace Bruno
 		//template<typename Panel, typename ...Args>
 		//Panel* AddPane(const std::string& dock_id, const std::string& relative_pane_id, Berta::dock_position dock_position, Args&& ... args)
 		//{
-		//	return m_place->add_pane(dock_id, relative_pane_id, dock_position, args);
+		//	return m_layout->add_pane(dock_id, relative_pane_id, dock_position, args);
 		//}
 
 	private:
-		Berta::Layout* m_place;
+		Berta::Layout* m_layout;
 	};
 }

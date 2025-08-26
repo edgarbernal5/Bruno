@@ -26,7 +26,7 @@ namespace Bruno
 
 		std::wstring m_workingDirectory;
 		EditorGame* m_game;
-		Berta::Layout m_place;
+		Berta::Layout m_layout;
 		Berta::TreeBox m_treebox;
 		Berta::ListBox m_listbox;
 

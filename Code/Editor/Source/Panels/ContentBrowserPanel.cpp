@@ -16,15 +16,15 @@ namespace Bruno
 		m_treebox.Create(*this);
 		m_listbox.Create(*this);
 
-		m_place.Create(*this);
-		m_place.Parse("<tree> |70% <vert <list>");
+		m_layout.Create(*this);
+		m_layout.Parse("{HorizontalLayout {tree} |70% {VerticalLayout {list}}");
 
-		m_place.Attach("tree", m_treebox);
-		m_place.Attach("list", m_listbox);
+		m_layout.Attach("tree", m_treebox);
+		m_layout.Attach("list", m_listbox);
 
 		m_listbox.AppendHeader("Name", 150);
 
-		m_place.Apply();
+		m_layout.Apply();
 
 		std::filesystem::directory_entry rootDirectoryEntry(m_workingDirectory);
 		auto rootNode = m_treebox.Insert("Content", "Content");
@@ -32,48 +32,50 @@ namespace Bruno
 		PopulateDirectory(rootNode, workingDirectory);
 
 		m_treebox.GetEvents().Selected.Connect([&](const Berta::ArgTreeBoxSelection& arg)
-		{
-			m_listbox.SetAutoDraw(false);
-			PopulateFileDirectory(arg.Items[0]);
-			m_listbox.SetAutoDraw(true);
-		});
+			{
+				m_listbox.SetAutoDraw(false);
+				PopulateFileDirectory(arg.Items[0]);
+				m_listbox.SetAutoDraw(true);
+			});
 
-		m_listbox.GetEvents().Selected.Connect([&](const Berta::ArgListBox& args) {
-			//BR_CORE_TRACE << "listbox item selected: " << args.item.value<ContentBrowserItem>().DirectoryEntry.path() << std::endl;
-		});
+		m_listbox.GetEvents().Selected.Connect([&](const Berta::ArgListBox& args)
+			{
+				//BR_CORE_TRACE << "listbox item selected: " << args.item.value<ContentBrowserItem>().DirectoryEntry.path() << std::endl;
+			});
 
 		m_listbox.GetEvents().DblClick.Connect([&](const Berta::ArgMouse& args)
-		{
-			if (m_listbox.GetSelected().size() == 0)
-				return;
-				
-			for (auto& item : m_listbox.GetSelected())
 			{
-				auto& contentItem = m_listbox.At(item).GetUserData<ContentBrowserItem>();
+				auto selectedItems = m_listbox.GetSelected();
+				if (selectedItems.size() == 0)
+					return;
 
-				if (contentItem.IsDirectory)
+				for (auto& item : selectedItems)
 				{
-					auto path = m_treebox.GetKeyPath(contentItem.TreeNode, '/') + (" / ") + contentItem.DirectoryEntry.path().filename().generic_string();
-					m_treebox.Find(path).Select();
+					auto& contentItem = item.GetUserData<ContentBrowserItem>();
+
+					if (contentItem.IsDirectory)
+					{
+						auto path = m_treebox.GetKeyPath(contentItem.TreeNode, '/') + ("/") + contentItem.DirectoryEntry.path().filename().generic_string();
+						m_treebox.Find(path).Select();
+					}
+					else
+					{
+						m_selectItemCallback(contentItem.DirectoryEntry.path());
+					}
 				}
-				else
-				{
-					m_selectItemCallback(contentItem.DirectoryEntry.path());
-				}
-			}
-		});
+			});
 
 		m_fileSelectionPopup.Append("Import new asset", [](Berta::MenuItem& ip) {});
 		m_fileSelectionPopup.AppendSeparator();
 		m_fileSelectionPopup.Append("Reimport asset", [](Berta::MenuItem& ip) {});
 
 		m_listbox.GetEvents().MouseDown.Connect([&](const Berta::ArgMouse& args)
-		{
-			if (m_listbox.GetSelected().size() == 0)
-				return;
-			
-			//menu_popuper(m_fileSelectionPopup)(args);
-		});
+			{
+				if (m_listbox.GetSelected().size() == 0)
+					return;
+
+				//menu_popuper(m_fileSelectionPopup)(args);
+			});
 
 		rootNode.Select();
 	}
@@ -104,7 +106,7 @@ namespace Bruno
 		auto& nodeDirectoryEntry = node.GetUserData<std::filesystem::directory_entry>();
 		for (const auto& directoryEntry : std::filesystem::directory_iterator{ nodeDirectoryEntry.path()})
 		{
-			auto item = m_listbox.At(0);
+			auto item = m_listbox.Append(directoryEntry.path().filename().string());
 			item.SetText(0, directoryEntry.path().filename().string());
 			
 			ContentBrowserItem contentItem;

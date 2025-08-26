@@ -63,7 +63,7 @@ namespace Bruno
 
 		//Berta::nested_form* m_form;
 		std::unique_ptr<Berta::NestedForm> m_form;
-		Berta::Layout m_place;
+		Berta::Layout m_layout;
 		Berta::ComboBox m_gizmoTypeCombobox;
 		Berta::Button m_gizmoTransformSpaceButton;
 

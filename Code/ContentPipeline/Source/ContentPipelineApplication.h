@@ -28,7 +28,7 @@ namespace Bruno
 
 	private:
 		Berta::MenuBar		m_menubar;
-		Berta::Layout			m_place;
+		Berta::Layout			m_layout;
 
 		std::shared_ptr<GraphicsDevice>	m_device;
 		GameContentBuilder	m_contentBuilder;

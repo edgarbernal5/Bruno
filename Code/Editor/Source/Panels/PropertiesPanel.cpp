@@ -21,12 +21,12 @@ namespace Bruno
 
 		m_propertyGrid.Create(*this);
 
-		m_place.Create(this->Handle());
+		m_layout.Create(this->Handle());
 		////////// VIEW
-		m_place.Parse("vert <properties>");
+		m_layout.Parse("vert <properties>");
 
-		m_place.Attach("properties", m_propertyGrid);
-		m_place.Apply();
+		m_layout.Attach("properties", m_propertyGrid);
+		m_layout.Apply();
 
 		m_selectionChangedHandleId = m_sceneDocument->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{

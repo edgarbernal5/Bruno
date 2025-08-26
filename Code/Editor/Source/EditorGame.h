@@ -18,6 +18,8 @@ namespace Bruno
 	class ScenePanel;
 	class EditorAssetManager;
 	class AssetEditorService;
+	class SceneDocumentPanel;
+	class ContentBrowserPanel;
 
 	class EditorGame : public Game
 	{
@@ -46,8 +48,10 @@ namespace Bruno
 		std::atomic<bool>	m_exitRequested;
 
 		Berta::MenuBar		m_menubar;
-		Berta::Layout			m_place;
+		Berta::Layout			m_layout;
 
+		std::unique_ptr<SceneDocumentPanel> m_sceneDocumentPanel;
+		std::unique_ptr<ContentBrowserPanel> m_contentBrowserPanel;
 		std::vector<ScenePanel*> m_scenePanels;
 		std::mutex m_scenePanelsMutex{};
 

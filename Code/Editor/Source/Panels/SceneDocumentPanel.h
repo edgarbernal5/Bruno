@@ -19,6 +19,6 @@ namespace Bruno
 		EditorGame* m_editorGame;
 		std::shared_ptr<SceneDocument> m_sceneDocument;
 
-		Berta::Layout m_place;
+		Berta::Layout m_layout;
 	};
 }

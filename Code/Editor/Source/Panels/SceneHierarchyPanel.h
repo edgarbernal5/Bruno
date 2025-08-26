@@ -25,7 +25,7 @@ namespace Bruno
 	private:
 		void OnHierarchyAdded(Entity entity, const std::string& parentKey="");
 
-		Berta::Layout m_place;
+		Berta::Layout m_layout;
 		Berta::TreeBox m_treebox;
 		std::shared_ptr<SceneDocument> m_sceneDocument;
 		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;

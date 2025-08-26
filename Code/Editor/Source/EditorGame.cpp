@@ -47,7 +47,7 @@ namespace Bruno
 	{
 		auto scene = std::make_shared<Scene>();
 
-		//auto scenePanel = m_place.add_float_pane<ScenePanel>("pane19", { 500,500 }, this, scene);
+		//auto scenePanel = m_layout.add_float_pane<ScenePanel>("pane19", { 500,500 }, this, scene);
 
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(filename).Handle);
 
@@ -121,13 +121,13 @@ namespace Bruno
 	{
 		static int panelIdxx = 0;
 		auto nanaWindow = m_window->As<BertaWindow>();
-		
+
 		Berta::Form& form = nanaWindow->GetForm();
-		m_place.Create(form.Handle());
+		m_layout.Create(form.Handle());
 		m_menubar.Create(form.Handle());
 		////////// VIEW
-		m_place.Parse("{VerticalLayout {menubar Height=25} {Dock dockRoot}}");
-		m_place.Attach("menubar" , m_menubar);
+		m_layout.Parse("{VerticalLayout {menubar Height=25} {Dock dockRoot}}");
+		m_layout.Attach("menubar", m_menubar);
 
 		m_menubar.PushBack("&File");
 		m_menubar.At(0).Append("Exit", [](Berta::MenuItem& item)
@@ -150,34 +150,37 @@ namespace Bruno
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
 		sceneDocument->InstantiateModel(model);
 
-		//TODO
-		//auto sceneDocumentPanel = m_place.add_pane<SceneDocumentPanel>("documents-pane", "", Berta::dock_position::left, this, sceneDocument);
-		//auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("content-browser-pane", "documents-pane", Berta::dock_position::down, m_applicationParameters.WorkingDirectory,
-		//	[](const std::wstring& filename)
-		//	{
-		//		//AssetEditor?
-		//	});
+		m_sceneDocumentPanel = std::make_unique<SceneDocumentPanel>(form, this, sceneDocument);
 
-		m_place.Apply();
+		m_contentBrowserPanel = std::make_unique<ContentBrowserPanel>(form, m_applicationParameters.WorkingDirectory,
+			[](const std::wstring& filename)
+			{
+				//		//AssetEditor?
+			});
+
+		m_layout.AddPaneTab("scene-doc-pane", "tab-scene", *m_sceneDocumentPanel, "", Berta::DockPosition::Tab);
+		m_layout.AddPaneTab("content-browser-pane", "tab-content-browser", *m_contentBrowserPanel, "scene-doc-pane", Berta::DockPosition::Down);
+
+		m_layout.Apply();
 
 		form.GetEvents().KeyReleased.Connect([this](const Berta::ArgKeyboard& args)
-		{
-		});
+			{
+			});
 
 		form.GetEvents().EnterSizeMove.Connect([this](const Berta::ArgSizeMove& args)
-		{
-			//BR_CORE_TRACE << "enter_size_move / form." << std::endl;
-		});
+			{
+				//BR_CORE_TRACE << "enter_size_move / form." << std::endl;
+			});
 
 		form.GetEvents().ExitSizeMove.Connect([this](const Berta::ArgSizeMove& args)
-		{
-			//BR_CORE_TRACE << "exit_size_move / form." << std::endl;
-		});
+			{
+				//BR_CORE_TRACE << "exit_size_move / form." << std::endl;
+			});
 
 		form.GetEvents().Visibility.Connect([this](const Berta::ArgVisibility& args)
-		{
-			//BR_CORE_TRACE << "expose / form." << std::endl;
-		});
+			{
+				//BR_CORE_TRACE << "expose / form." << std::endl;
+			});
 	}
 
 	void EditorGame::OnInitialize()
