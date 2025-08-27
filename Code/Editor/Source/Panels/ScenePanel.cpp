@@ -47,7 +47,7 @@ namespace Bruno
 		m_gizmoTypeCombobox.Create(*this, false, { 0, 0, 150, 25 });
 		m_gizmoTransformSpaceButton.Create(*this);
 
-		m_layout.Parse("vert <weight=25 <gizmoTypeComboBox><gizmoSpaceButton>>");
+		m_layout.Parse("{VerticalLayout {HorizontalLayout {gizmoTypeComboBox}{gizmoSpaceButton} Height=25}}");
 
 		m_layout.Attach("gizmoTypeComboBox", m_gizmoTypeCombobox);
 		m_layout.Attach("gizmoSpaceButton", m_gizmoTransformSpaceButton);
@@ -75,7 +75,7 @@ namespace Bruno
 		});
 
 		//m_form = this;
-		m_form = std::make_unique<Berta::NestedForm>(this->Handle(), Berta::Rectangle{});
+		m_form = std::make_unique<Berta::NestedForm>(this->Handle(), Berta::Rectangle{}, Berta::FormStyle::Flat(), true);
 
 		//TO-DO: ver si se puede agregar un evento al form o nested_form cuando llega un mensaje de WM_ACTIVATEAPP 
 		//para luego disparar un evento y saber si el panel está activado o no. Es útil para el timer y el rendering/painting.

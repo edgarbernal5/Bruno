@@ -21,7 +21,7 @@ namespace Bruno
 		m_treebox.Create(*this);
 		
 		m_layout.Create(*this);
-		m_layout.Parse("vert <tree>");
+		m_layout.Parse("{VerticalLayout {tree}}");
 
 		m_layout.Attach("tree", m_treebox);
 		m_layout.Apply();

@@ -23,7 +23,7 @@ namespace Bruno
 
 		m_layout.Create(this->Handle());
 		////////// VIEW
-		m_layout.Parse("vert <properties>");
+		m_layout.Parse("{VerticalLayout {properties}}");
 
 		m_layout.Attach("properties", m_propertyGrid);
 		m_layout.Apply();
