@@ -100,6 +100,20 @@ namespace Bruno
 			::GetClientRect(hwnd, &r);
 			::InvalidateRect(hwnd, &r, FALSE);
 		});*/
+		auto hwnd = m_form->NativeHandle().Handle;
+		m_form->SetCustomPaintCallback([hwnd, this]()
+			{
+				m_timer.Tick();
+
+				OnUpdate(m_timer);
+				OnDraw();
+
+				/*RECT r;
+				::GetClientRect(hwnd, &r);
+				::InvalidateRect(hwnd, &r, FALSE);*/
+			}
+		);
+		m_form->Handle()->RenderFormData.AutoRefresh = true;
 #endif // SINGLE_THREAD_RENDERING
 
 		this->GetEvents().Destroy.Connect([this](const Berta::ArgDestroy& args)
