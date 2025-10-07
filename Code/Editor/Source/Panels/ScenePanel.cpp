@@ -113,7 +113,7 @@ namespace Bruno
 				::InvalidateRect(hwnd, &r, FALSE);*/
 			}
 		);
-		m_form->Handle()->RenderFormData.AutoRefresh = true;
+		m_form->Handle()->RenderForAttributes.AutoRefresh = true;
 #endif // SINGLE_THREAD_RENDERING
 
 		this->GetEvents().Destroy.Connect([this](const Berta::ArgDestroy& args)
