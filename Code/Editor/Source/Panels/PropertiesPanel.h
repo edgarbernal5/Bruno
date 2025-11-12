@@ -30,8 +30,8 @@ namespace Bruno
 
 		Berta::Layout m_layout;
 		Berta::PropertyGrid m_propertyGrid;
-		properties_collection m_currentProperties;
-		std::unordered_map<property_proxy, size_t> m_propOnChangedHandlers;
+		PropertyCollection m_currentProperties;
+		std::unordered_map<PropertyItem, size_t> m_propOnChangedHandlers;
 		Berta::Menu m_asset_file_menu_popup;
 	};
 }

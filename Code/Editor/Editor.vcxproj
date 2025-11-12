@@ -58,7 +58,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;BR_SINGLE_THREAD_RENDERING;BT_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;BR_SINGLE_THREAD_RENDERING;BT_PLATFORM_WINDOWS;BT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\SimpleMath;..\Engine\Dependencies\D3D12MA;..\Engine\Dependencies\assimp\include;..\Engine\Dependencies\Berta\Code\Berta\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>

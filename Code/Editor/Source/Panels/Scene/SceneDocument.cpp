@@ -21,7 +21,8 @@ namespace Bruno
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			auto entityUUID = selection.size() > 0 ? selection[0] : UUID(0);
-			if (entityUUID) {
+			if (entityUUID)
+			{
 				auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
 				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
 			}
@@ -81,7 +82,7 @@ namespace Bruno
 				auto prop = properties.get("Transform/Position");
 				auto currentPosition = prop.as_vector3();
 				currentPosition += delta;
-				prop.value(currentPosition);
+				prop.SetValue(currentPosition);
 			}
 		});
 
@@ -94,7 +95,7 @@ namespace Bruno
 				auto prop = properties.get("Transform/Rotation");
 				auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(prop.as_vector3());
 				currentRotation *= delta;
-				prop.value(currentRotation.ToEuler());
+				prop.SetValue(currentRotation.ToEuler());
 			}
 		});
 
@@ -114,7 +115,7 @@ namespace Bruno
 					auto newScale = currentScale * uniformDelta;
 					if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 					{
-						prop.value(newScale);
+						prop.SetValue(newScale);
 					}
 
 					continue;
@@ -122,7 +123,7 @@ namespace Bruno
 				auto newScale = currentScale + newDelta;
 				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 				{
-					prop.value(newScale);
+					prop.SetValue(newScale);
 				}
 			}
 		});

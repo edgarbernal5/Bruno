@@ -7,195 +7,199 @@
 
 namespace Bruno
 {
-    properties_collection::~properties_collection()
+    PropertyCollection::~PropertyCollection()
     {
         m_properties.clear();
     }
 
-    property_proxy properties_collection::append(const std::string& name)
+    PropertyItem PropertyCollection::append(const std::string& name)
     {
-        property_t prop;
+        PropertyType prop;
         prop.name = name;
         m_properties.push_back(prop);
-        return property_proxy{ &m_properties.back() };
+        return PropertyItem{ &m_properties.back() };
     }
 
-    property_proxy properties_collection::append(const property_t& prop)
+    PropertyItem PropertyCollection::append(const PropertyType& prop)
     {
         m_properties.push_back(prop);
-        return property_proxy{ &m_properties.back() };
+        return PropertyItem{ &m_properties.back() };
     }
 
-    void properties_collection::clear()
+    void PropertyCollection::clear()
     {
         m_properties.clear();
     }
     
-    property_proxy properties_collection::get(const std::string& name)
+    PropertyItem PropertyCollection::get(const std::string& name)
     {
         for (auto i = m_properties.begin(); i < m_properties.end(); ++i)
             if (i->name == name)
-                return property_proxy{ &*i };
+            {
+                return PropertyItem{ &*i };
+            }
 
-        return property_proxy{};
+        return PropertyItem{};
     }
     
-    property_proxy properties_collection::operator[](size_t index)
+    PropertyItem PropertyCollection::operator[](size_t index)
     {
-        return property_proxy{ &m_properties[index] };
+        return PropertyItem{ &m_properties[index] };
     }
 
-    size_t properties_collection::size() const
+    size_t PropertyCollection::size() const
     {
         return m_properties.size();
     }
 
-    property_proxy& property_proxy::name(const std::string& name)
+    PropertyItem& PropertyItem::SetName(const std::string& name)
     {
-        _prop->name = name;
+        m_prop->name = name;
         return *this;
     }
 
-    std::string property_proxy::name() const
+    std::string PropertyItem::GetName() const
     {
-        return _prop->name;
+        return m_prop->name;
     }
 
-    std::string property_proxy::category() const
+    std::string PropertyItem::GetCategory() const
     {
-        return _prop->category;
+        return m_prop->category;
     }
 
-    property_proxy& property_proxy::category(const std::string& category)
+    PropertyItem& PropertyItem::SetCategory(const std::string& category)
     {
-        _prop->category = category;
+        m_prop->category = category;
         return *this;
     }
 
-    property_proxy& property_proxy::label(const std::string& label)
+    PropertyItem& PropertyItem::SetLabel(const std::string& label)
     {
-        _prop->label = label;
+        m_prop->label = label;
         return *this;
     }
 
-    std::string property_proxy::label() const
+    std::string PropertyItem::GetLabel() const
     {
-        return _prop->label;
+        return m_prop->label;
     }
 
-    property_proxy& property_proxy::value(const std::string& value)
+    PropertyItem& PropertyItem::SetValue(const std::string& value)
     {
-        bool emit_event = _prop->value != value;
-        _prop->value = value;
+        bool emit_event = m_prop->value != value;
+        m_prop->value = value;
         if (emit_event)
-            _prop->on_change.emit(value);
+        {
+            m_prop->on_change.emit(value);
+        }
         return *this;
     }
 
-    std::string property_proxy::value() const
+    std::string PropertyItem::GetValue() const
     {
-        return _prop->value;
+        return m_prop->value;
     }
 
-    property_proxy& property_proxy::type(const pg_type type)
+    PropertyItem& PropertyItem::SetType(PropertyGridType type)
     {
-        _prop->type = type;
+        m_prop->type = type;
         return *this;
     }
 
-    pg_type property_proxy::type() const
+    PropertyGridType PropertyItem::GetType() const
     {
-        return _prop->type;
+        return m_prop->type;
     }
 
-    property_proxy& property_proxy::read_only(const bool read_only)
+    PropertyItem& PropertyItem::SetReadOnly(bool read_only)
     {
-        _prop->is_read_only = read_only;
+        m_prop->is_read_only = read_only;
         return *this;
     }
 
-    bool property_proxy::read_only() const
+    bool PropertyItem::IsReadOnly() const
     {
-        return _prop->is_read_only;
+        return m_prop->is_read_only;
     }
 
-    property_proxy& property_proxy::value(int value)
+    PropertyItem& PropertyItem::SetValue(int value)
     {
-        if (_prop)
+        if (m_prop)
         {
             auto new_value = std::to_string(value);
-            bool emit_event = _prop->value != new_value;
-            _prop->value = new_value;
+            bool emit_event = m_prop->value != new_value;
+            m_prop->value = new_value;
             if (emit_event)
-                _prop->on_change.emit(new_value);
+                m_prop->on_change.emit(new_value);
         }
 
         return *this;
     }
 
-    property_proxy& property_proxy::value(float value)
+    PropertyItem& PropertyItem::SetValue(float value)
     {
-        if (_prop)
+        if (m_prop)
         {
             auto new_value = std::to_string(value);
-            bool emit_event = _prop->value != new_value;
-            _prop->value = new_value;
+            bool emit_event = m_prop->value != new_value;
+            m_prop->value = new_value;
             if (emit_event)
-                _prop->on_change.emit(new_value);
+                m_prop->on_change.emit(new_value);
         }
 
         return *this;
     }
 
-    property_proxy& property_proxy::value(uint32_t value)
+    PropertyItem& PropertyItem::SetValue(uint32_t value)
     {
-        if (_prop)
+        if (m_prop)
         {
             auto new_value = std::to_string(value);
-            bool emit_event = _prop->value != new_value;
-            _prop->value = new_value;
+            bool emit_event = m_prop->value != new_value;
+            m_prop->value = new_value;
             if (emit_event)
-                _prop->on_change.emit(new_value);
+                m_prop->on_change.emit(new_value);
         }
 
         return *this;
     }
 
-    property_proxy& property_proxy::value(Math::Vector3 value)
+    PropertyItem& PropertyItem::SetValue(Math::Vector3 value)
     {
-        if (_prop)
+        if (m_prop)
         {
             std::ostringstream builder;
             builder << std::to_string(value.x) << "/" << std::to_string(value.y) << "/" << std::to_string(value.z);
 
             auto new_value = builder.str();
-            bool emit_event = _prop->value != new_value;
-            _prop->value = new_value;
+            bool emit_event = m_prop->value != new_value;
+            m_prop->value = new_value;
             if (emit_event)
-                _prop->on_change.emit(new_value);
+                m_prop->on_change.emit(new_value);
         }
         return *this;
     }
 
-    property_proxy& property_proxy::value(UUID value)
+    PropertyItem& PropertyItem::SetValue(UUID value)
     {
-        if (_prop)
+        if (m_prop)
         {
             auto new_value = std::to_string(value);
-            bool emit_event = _prop->value != new_value;
-            _prop->value = new_value;
+            bool emit_event = m_prop->value != new_value;
+            m_prop->value = new_value;
             if (emit_event)
-                _prop->on_change.emit(new_value);
+                m_prop->on_change.emit(new_value);
         }
         return *this;
     }
 
-    Math::Vector3 property_proxy::as_vector3(Math::Vector3 def) const
+    Math::Vector3 PropertyItem::as_vector3(Math::Vector3 def) const
     {
-        if (!_prop || _prop->value.empty())
+        if (!m_prop || m_prop->value.empty())
             return def;
 
-        std::istringstream builder(_prop->value);
+        std::istringstream builder(m_prop->value);
         Math::Vector3 result;
         char separator;
         builder >> result.x >> separator >> result.y >> separator >> result.z;

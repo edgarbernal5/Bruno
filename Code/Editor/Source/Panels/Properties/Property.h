@@ -9,104 +9,104 @@
 
 namespace Bruno
 {
-	enum class pg_type
+	enum class PropertyGridType
 	{
-		uint,
-		string,
-		vector3,
-		asset_file,
-		texture
+		Uint,
+		String,
+		Vector3,
+		AssetFile,
+		Texture
 	};
 
-	struct property_t
+	struct PropertyType
 	{
-		std::string			name;
-		std::string			value;
+		std::string name;
+		std::string value;
 
-		std::string			label;
-		std::string			category;
-		pg_type				type;
-		bool				is_read_only{ false };
-		Event<std::string>	on_change;
+		std::string label;
+		std::string category;
+		PropertyGridType type;
+		bool is_read_only{ false };
+		Event<std::string> on_change;
 	};
 	
-	class property_proxy
+	class PropertyItem
 	{
 	public:
-		property_proxy() = default;
-		explicit property_proxy(property_t* prop)
-			: _prop(prop)
+		PropertyItem() = default;
+		explicit PropertyItem(PropertyType* prop)
+			: m_prop(prop)
 		{}
 
-		property_proxy& category(const std::string& category);
-		std::string category() const;
+		PropertyItem& SetCategory(const std::string& category);
+		std::string GetCategory() const;
 
-		property_proxy& label(const std::string& label);
-		std::string label() const;
+		PropertyItem& SetLabel(const std::string& label);
+		std::string GetLabel() const;
 
-		property_proxy& name(const std::string& name);
-		std::string name() const;
+		PropertyItem& SetName(const std::string& name);
+		std::string GetName() const;
 
-		property_proxy& value(const std::string& value);
-		std::string value() const;
+		PropertyItem& SetValue(const std::string& value);
+		std::string GetValue() const;
 
-		property_proxy& type(const pg_type type);
-		pg_type type() const;
+		PropertyItem& SetType(PropertyGridType type);
+		PropertyGridType GetType() const;
 
-		property_proxy& read_only(const bool read_only);
-		bool read_only() const;
+		PropertyItem& SetReadOnly(bool read_only);
+		bool IsReadOnly() const;
 
-		property_proxy& value(int value);
-		property_proxy& value(float value);
-		property_proxy& value(uint32_t value);
-		property_proxy& value(Math::Vector3 value);
-		property_proxy& value(UUID value);
+		PropertyItem& SetValue(int value);
+		PropertyItem& SetValue(float value);
+		PropertyItem& SetValue(uint32_t value);
+		PropertyItem& SetValue(Math::Vector3 value);
+		PropertyItem& SetValue(UUID value);
 
-		Event<std::string>& on_change() { return _prop->on_change; }
-		const Event<std::string>& on_change() const { return _prop->on_change; }
+		Event<std::string>& on_change() { return m_prop->on_change; }
+		const Event<std::string>& on_change() const { return m_prop->on_change; }
 
 		Math::Vector3 as_vector3(Math::Vector3 def = Math::Vector3::Zero) const;
 
-		bool operator== (const property_proxy& other) const
+		bool operator== (const PropertyItem& other) const
 		{
-			return _prop == other._prop;
+			return m_prop == other.m_prop;
 		}
 	protected:
 		
 	private:
-		property_t* _prop{ nullptr };
+		PropertyType* m_prop{ nullptr };
 	};
 
-	class properties_collection
+	class PropertyCollection
 	{
 	public:
-		properties_collection() = default;
-		~properties_collection();
+		PropertyCollection() = default;
+		~PropertyCollection();
 
-		property_proxy append(const std::string& name);
-		property_proxy append(const property_t& prop);
+		PropertyItem append(const std::string& name);
+		PropertyItem append(const PropertyType& prop);
 
 		void clear();
 
-		property_proxy get(const std::string& name);
+		PropertyItem get(const std::string& name);
 
-		property_proxy operator[](size_t index);
+		PropertyItem operator[](size_t index);
 
 		size_t size() const;
 	protected:
-		std::vector<property_t>		m_properties;
+		std::vector<PropertyType>		m_properties;
 	};
 }
 
 namespace std
 {
 	template <>
-	struct hash<Bruno::property_proxy>
+	struct hash<Bruno::PropertyItem>
 	{
-		std::size_t operator()(const Bruno::property_proxy& key) const
+		std::size_t operator()(const Bruno::PropertyItem& key) const noexcept
 		{
-			return std::hash<std::string>{}(key.category()) ^
-				(std::hash<std::string>{}(key.name()));
+			return std::hash<std::string>{}(key.GetCategory()) ^
+				(std::hash<std::string>{}(key.GetName()));
 			
 		}
 	};

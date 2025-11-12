@@ -13,26 +13,26 @@ namespace Bruno
 
 	void SceneHierarchy::LoadProperties(Entity entity)
 	{
-		properties_collection properties;
+		PropertyCollection properties;
 
 		auto& hierarchy = entity.GetComponent<HierarchyComponent>();
 		
 		auto& name = entity.GetComponent<NameComponent>().Name;
-		properties.append("Name").label("Name").category("").type(pg_type::string).value(name);
+		properties.append("Name").SetLabel("Name").SetCategory("").SetType(PropertyGridType::String).SetValue(name);
 		
 		auto& transform = entity.GetComponent<TransformComponent>();
-		properties.append("Transform/Position").label("Position").category("Transform").type(pg_type::vector3).value(transform.Position);
+		properties.append("Transform/Position").SetLabel("Position").SetCategory("Transform").SetType(PropertyGridType::Vector3).SetValue(transform.Position);
 
-		properties.append("Transform/Rotation").label("Rotation").category("Transform").type(pg_type::vector3).value(transform.Rotation.ToEuler());
+		properties.append("Transform/Rotation").SetLabel("Rotation").SetCategory("Transform").SetType(PropertyGridType::Vector3).SetValue(transform.Rotation.ToEuler());
 
-		properties.append("Transform/Scale").label("Scale").category("Transform").type(pg_type::vector3).value(transform.Scale);
+		properties.append("Transform/Scale").SetLabel("Scale").SetCategory("Transform").SetType(PropertyGridType::Vector3).SetValue(transform.Scale);
 
 		if (entity.HasComponent<ModelComponent>())
 		{
 			auto& model = entity.GetComponent<ModelComponent>();
-			properties.append("Model/Handle").label("Handle").category("Model").type(pg_type::string).read_only(true).value(model.ModelHandle);
+			properties.append("Model/Handle").SetLabel("Handle").SetCategory("Model").SetType(PropertyGridType::String).SetReadOnly(true).SetValue(model.ModelHandle);
 
-			properties.append("Model/MeshIndex").label("Mesh index").category("Model").value(model.MeshIndex).type(pg_type::uint).read_only(true);
+			properties.append("Model/MeshIndex").SetLabel("Mesh index").SetCategory("Model").SetValue(model.MeshIndex).SetType(PropertyGridType::Uint).SetReadOnly(true);
 
 			for (auto& [index, materialAsset] : model.Materials->GetMaterials())
 			{
@@ -48,15 +48,14 @@ namespace Bruno
 					oss << "Material " << index;
 					propLabel = oss.str();
 				}
-				properties.append(propName).label(propLabel).category("Model").type(pg_type::asset_file).value(materialAsset);
+				properties.append(propName).SetLabel(propLabel).SetCategory("Model").SetType(PropertyGridType::AssetFile).SetValue(materialAsset);
 			}
 		}
 		m_uuidToProperties[entity.GetUUID()] = properties;
 
 		for (UUID child : hierarchy.Children)
 		{
-			auto childEntity = m_scene->TryGetEntityWithUUID(child);
-			if (childEntity)
+			if (auto childEntity = m_scene->TryGetEntityWithUUID(child))
 			{
 				LoadProperties(childEntity);
 			}

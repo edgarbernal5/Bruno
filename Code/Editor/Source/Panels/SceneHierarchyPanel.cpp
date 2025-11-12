@@ -95,7 +95,7 @@ namespace Bruno
 		auto& name = entity.GetComponent<NameComponent>().Name;
 
 		std::ostringstream builder;
-		builder << parentKey << (uint32_t)entity;
+		builder << parentKey << static_cast<uint32_t>(entity);
 		auto key = builder.str();
 
 		auto uuid = entity.GetUUID();

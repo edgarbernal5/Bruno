@@ -22,18 +22,18 @@ namespace Bruno
 	public:
 		SceneHierarchy(std::shared_ptr<Scene> scene);
 
-		using Iterator = std::unordered_map<UUID, properties_collection>::iterator;
-		using ConstIterator = std::unordered_map<UUID, properties_collection>::const_iterator;
+		using Iterator = std::unordered_map<UUID, PropertyCollection>::iterator;
+		using ConstIterator = std::unordered_map<UUID, PropertyCollection>::const_iterator;
 
 		void LoadProperties(Entity rootEntity);
 
 		Iterator begin() const { m_uuidToProperties.begin(); }
 		Iterator end() const { m_uuidToProperties.end(); }
-		properties_collection& operator[](const UUID& uuid) { return m_uuidToProperties[uuid]; }
-		properties_collection& get(const UUID& uuid) { return m_uuidToProperties[uuid]; }
+		PropertyCollection& operator[](const UUID& uuid) { return m_uuidToProperties[uuid]; }
+		PropertyCollection& get(const UUID& uuid) { return m_uuidToProperties[uuid]; }
 	private:
 
-		std::unordered_map<UUID, properties_collection> m_uuidToProperties;
+		std::unordered_map<UUID, PropertyCollection> m_uuidToProperties;
 		std::shared_ptr<Scene> m_scene;
 	};
 }
