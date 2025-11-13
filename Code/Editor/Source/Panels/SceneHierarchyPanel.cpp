@@ -33,12 +33,7 @@ namespace Bruno
 			if (m_ignoreEvents || args.Items.empty())
 				return;
 
-			/*if (!args.operated)
-			{
-				m_selectionService->Deselect(args.item.value<UUID>());
-				m_sceneDocument->UpdateSelection();
-				return;
-			}*/
+			m_selectionService->DeselectAll();
 			m_selectionService->Select(args.Items[0].GetUserData<UUID>());
 			m_sceneDocument->UpdateSelection();
 		});
