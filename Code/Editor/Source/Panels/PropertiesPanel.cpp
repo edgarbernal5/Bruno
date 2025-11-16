@@ -58,37 +58,43 @@ namespace Bruno
 				{
 					cat = m_propertyGrid.Append(prop.GetCategory());
 				}
-				Berta::PropertyGrid::PropertyItem ip;
+				Berta::PropertyGrid::PropertyItem pi;
 
 				if (prop.GetType() == PropertyGridType::String)
 				{
-					ip = cat.Append(Berta::PropertyGrid::PropertyGridFieldBasePtr(new Berta::PropertyGridFieldString(prop.GetLabel(), prop.GetValue())));
+					pi = cat.Append(Berta::PropertyGrid::PropertyGridFieldBasePtr(new Berta::PropertyGridFieldString(prop.GetLabel(), prop.GetValue())));
 				} 
 				else if (prop.GetType() == PropertyGridType::Uint)
 				{
-					ip = cat.Append(Berta::PropertyGrid::PropertyGridFieldBasePtr(new Berta::PropertyGridFieldStringUInt(prop.GetLabel(), prop.GetValue())));
+					pi = cat.Append(Berta::PropertyGrid::PropertyGridFieldBasePtr(new Berta::PropertyGridFieldStringUInt(prop.GetLabel(), prop.GetValue())));
 				}
 				else if (prop.GetType() == PropertyGridType::Vector3)
 				{
-					ip = cat.Append(Berta::PropertyGrid::PropertyGridFieldBasePtr(new Berta::PropertyGridFieldVector3(prop.GetLabel(), prop.GetValue())));
+					pi = cat.Append(Berta::PropertyGrid::PropertyGridFieldBasePtr(new Berta::PropertyGridFieldVector3(prop.GetLabel(), prop.GetValue())));
 				}
 				else if (prop.GetType() == PropertyGridType::AssetFile)
 				{
 					//auto pgaf = new pg_asset_file(prop.label(), prop.value());
-					//ip = cat.Append(Berta::PropertyGrid::pgitem_ptr(pgaf));
+					//pi = cat.Append(Berta::PropertyGrid::pgitem_ptr(pgaf));
 					//pgaf->set_button_click([&](const Berta::arg_click& click_args)
 					//{
 					//	//...
 					//	Berta::menu_popuper(m_asset_file_menu_popup, Berta::mouse::left_button)(*click_args.mouse_args);
 					//});
 				}
-				auto item_ptr = ip.GetPropertyFieldPtr();
-				auto handlerId = prop.on_change().connect([item_ptr](const std::string& newValue)
+
+				if (!pi)
+				{
+					continue;
+				}
+				
+				auto item_ptr = pi.GetPropertyFieldPtr();
+				const auto handlerId = prop.on_change().connect([item_ptr](const std::string& newValue)
 					{
 						item_ptr->SetValue(newValue);
 					});
 				
-				ip.SetEnabled(!prop.IsReadOnly());
+				pi.SetEnabled(!prop.IsReadOnly());
 				m_propOnChangedHandlers[prop] = handlerId;
 			}
 			m_propertyGrid.SetAutoDraw(true);

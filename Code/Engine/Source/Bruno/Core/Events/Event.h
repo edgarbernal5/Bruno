@@ -17,9 +17,9 @@ namespace Bruno
         using Handler = std::function<void(const Args &...)>;
         
         Event() : data(std::make_shared<Data>()) {}
-        Event(Event&& other) : Event() { *this = std::move(other); }
+        Event(Event&& other) noexcept : Event() { *this = std::move(other); }
         
-        Event& operator=(Event&& other)
+        Event& operator=(Event&& other) noexcept
         {
             std::swap(data, other.data);
             return *this;
