@@ -141,7 +141,8 @@ namespace Bruno
 
 	void PropertiesPanel::DisposePropertyBinders()
 	{
-		for (auto& [prop, handlerId] : m_propOnChangedHandlers) {
+		for (auto& [prop, handlerId] : m_propOnChangedHandlers)
+		{
 			prop.on_change().disconnect(handlerId);
 		}
 		m_propOnChangedHandlers.clear();
