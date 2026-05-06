@@ -23,7 +23,7 @@ namespace Bruno
 
 		friend class ScenePanel;
 	private:
-		void OnHierarchyAdded(Entity entity, const std::string& parentKey="");
+		void OnHierarchyAdded(Entity entity, const std::wstring& parentKey = L"");
 
 		Berta::Layout m_layout;
 		Berta::TreeBox m_treebox;

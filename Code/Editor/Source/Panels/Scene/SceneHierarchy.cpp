@@ -10,7 +10,7 @@ namespace Bruno
 		m_scene(scene)
 	{
 	}
-
+/*
 	void SceneHierarchy::LoadProperties(Entity entity)
 	{
 		PropertyCollection properties;
@@ -61,4 +61,5 @@ namespace Bruno
 			}
 		}
 	}
+	*/
 }

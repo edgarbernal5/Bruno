@@ -130,17 +130,17 @@ namespace Bruno
 		m_layout.Attach("menubar", m_menubar);
 
 		m_menubar.PushBack("&File");
-		m_menubar.At(0).Append("Exit", [](Berta::MenuItem& item)
+		m_menubar.At(0).Append("Exit", [](Berta::MenuItem item)
 			{
 				Berta::GUI::Exit();
 			});
 
 		m_menubar.PushBack("&Edit");
-		m_menubar.At(1).Append("Right panel", [this](Berta::MenuItem& item)
+		m_menubar.At(1).Append("Right panel", [this](Berta::MenuItem item)
 			{
 			});
 
-		m_menubar.At(1).Append("Tab Panel", [this](Berta::MenuItem& item)
+		m_menubar.At(1).Append("Tab Panel", [this](Berta::MenuItem item)
 			{
 			});
 

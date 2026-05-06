@@ -27,7 +27,7 @@ namespace Bruno
 		m_layout.Apply();
 
 		std::filesystem::directory_entry rootDirectoryEntry(m_workingDirectory);
-		auto rootNode = m_treebox.Insert("Content", "Content");
+		auto rootNode = m_treebox.Insert(L"Content", L"Content");
 		rootNode.SetUserData(rootDirectoryEntry);
 		PopulateDirectory(rootNode, workingDirectory);
 
@@ -38,7 +38,7 @@ namespace Bruno
 				m_listbox.SetAutoDraw(true);
 			});
 
-		m_listbox.GetEvents().Selected.Connect([&](const Berta::ArgListBox& args)
+		m_listbox.GetEvents().SelectionChanged.Connect([&](const Berta::ArgListBox& args)
 			{
 				//BR_CORE_TRACE << "listbox item selected: " << args.item.value<ContentBrowserItem>().DirectoryEntry.path() << std::endl;
 			});
@@ -55,7 +55,7 @@ namespace Bruno
 
 					if (contentItem.IsDirectory)
 					{
-						auto path = m_treebox.GetKeyPath(contentItem.TreeNode, '/') + ("/") + contentItem.DirectoryEntry.path().filename().generic_string();
+						auto path = m_treebox.GetKeyPath(contentItem.TreeNode, L'/') + L"/" + contentItem.DirectoryEntry.path().filename().generic_wstring();
 						m_treebox.Find(path).Select();
 					}
 					else
@@ -65,9 +65,9 @@ namespace Bruno
 				}
 			});
 
-		m_fileSelectionPopup.Append("Import new asset", [](Berta::MenuItem& ip) {});
+		m_fileSelectionPopup.Append("Import new asset", [](Berta::MenuItem ip) {});
 		m_fileSelectionPopup.AppendSeparator();
-		m_fileSelectionPopup.Append("Reimport asset", [](Berta::MenuItem& ip) {});
+		m_fileSelectionPopup.Append("Reimport asset", [](Berta::MenuItem ip) {});
 
 		m_listbox.GetEvents().MouseDown.Connect([&](const Berta::ArgMouse& args)
 			{
@@ -94,7 +94,7 @@ namespace Bruno
 			if (!std::filesystem::is_directory(directoryEntry))
 				continue;
 
-			auto child = m_treebox.Insert(node, directoryEntry.path().filename().generic_string(), directoryEntry.path().filename().generic_string());
+			auto child = m_treebox.Insert(node, directoryEntry.path().filename().generic_wstring(), directoryEntry.path().filename().generic_wstring());
 			child.SetUserData(directoryEntry);
 			PopulateDirectoryInner(child, directoryEntry.path());
 		}

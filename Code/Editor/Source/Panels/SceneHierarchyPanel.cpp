@@ -84,12 +84,12 @@ namespace Bruno
 		m_sceneDocument->HierarchyChanged.disconnect(m_hierarchyChangedHandleId);
 	}
 
-	void SceneHierarchyPanel::OnHierarchyAdded(Entity entity, const std::string& parentKey)
+	void SceneHierarchyPanel::OnHierarchyAdded(Entity entity, const std::wstring& parentKey)
 	{
 		auto& hierarchy = entity.GetComponent<HierarchyComponent>();
 		auto& name = entity.GetComponent<NameComponent>().Name;
 
-		std::ostringstream builder;
+		std::wostringstream builder;
 		builder << parentKey << static_cast<uint32_t>(entity);
 		auto key = builder.str();
 
@@ -98,19 +98,13 @@ namespace Bruno
 		node.SetUserData(uuid);
 
 		m_entityToNodeMap[uuid] = node;
-		auto properties = m_sceneHierarchy->get(uuid);
-		properties.get("Name").on_change().connect([this, uuid](const std::string& new_value)
-		{
-			auto& selected_node = m_entityToNodeMap[uuid];
-			selected_node.SetText(new_value);
-		});
 
 		for (UUID child : hierarchy.Children)
 		{
 			auto childEntity = m_sceneDocument->GetScene()->TryGetEntityWithUUID(child);
 			if (childEntity)
 			{
-				OnHierarchyAdded(childEntity, key + "/");
+				OnHierarchyAdded(childEntity, key + L"/");
 			}
 		}
 	}

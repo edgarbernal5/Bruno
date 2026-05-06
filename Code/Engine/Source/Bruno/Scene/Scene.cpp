@@ -22,12 +22,12 @@ namespace Bruno
 		}
 	}
 
-	Entity Scene::CreateEntity(const std::string& name)
+	Entity Scene::CreateEntity(const std::wstring& name)
 	{
 		return CreateEntity({}, name);
 	}
 
-	Entity Scene::CreateEntity(Entity parent, const std::string& name)
+	Entity Scene::CreateEntity(Entity parent, const std::wstring& name)
 	{
 		auto entity = Entity{ m_registry.create(), this };
 		auto& idComponent = entity.AddComponent<IdComponent>();
@@ -50,7 +50,7 @@ namespace Bruno
 
 	Entity Scene::InstantiateModel(std::shared_ptr<Model> model)
 	{
-		Entity rootEntity = CreateEntity("Mesh test");
+		Entity rootEntity = CreateEntity(L"Mesh test");
 		CreateModelEntityHierarchy(rootEntity, model, model->GetRootNode());
 
 		return rootEntity;
@@ -62,7 +62,8 @@ namespace Bruno
 		uint32_t frameIndex = device->GetFrameId();
 		auto entities = GetAllEntitiesWith<IdComponent, TransformComponent>();
 		uint32_t index = 0;
-		for (auto& ent : entities) {
+		for (auto& ent : entities)
+		{
 			auto [idComponent, transformComponent] = entities.get<IdComponent, TransformComponent>(ent);
 
 			auto world = GetWorldSpaceMatrix(GetEntityWithUUID(idComponent.Id));
@@ -87,7 +88,8 @@ namespace Bruno
 		Math::Matrix transform;
 
 		Entity parent = TryGetEntityWithUUID(entity.GetParentUUID());
-		if (parent) {
+		if (parent)
+		{
 			transform = GetWorldSpaceMatrix(parent);
 		}
 		return transform * entity.GetComponent<TransformComponent>().GetTransform();

@@ -108,7 +108,6 @@
     <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp" />
     <ClCompile Include="Source\Panels\Scene\SceneHierarchy.cpp" />
     <ClCompile Include="Source\Panels\Scene\SceneDocument.cpp" />
-    <ClCompile Include="Source\Panels\Properties\Property.cpp" />
     <ClCompile Include="Source\Panels\PropertiesPanel.cpp" />
     <ClCompile Include="Source\Panels\Properties\PropertyGridItems.cpp" />
     <ClCompile Include="Source\Panels\SceneDocumentPanel.cpp" />
@@ -138,7 +137,6 @@
     <ClInclude Include="Source\Panels\Scene\SceneHierarchy.h" />
     <ClInclude Include="Source\Panels\Scene\SceneDocument.h" />
     <ClInclude Include="Source\Panels\Properties\PropertyGridItems.h" />
-    <ClInclude Include="Source\Panels\Properties\Property.h" />
     <ClInclude Include="Source\Panels\PropertiesPanel.h" />
     <ClInclude Include="Source\Panels\SceneDocumentPanel.h" />
     <ClInclude Include="Source\AssetEditors\AssetEditorService.h" />

@@ -34,7 +34,7 @@ namespace Bruno
 		m_layout.Attach("menubar", m_menubar);
 
 		auto& menuFile = m_menubar.PushBack("&File");
-		menuFile.Append("Select folder", [&form, this](Berta::MenuItem& ip)
+		menuFile.Append("Select folder", [&form, this](Berta::MenuItem ip)
 		{
 			/*Berta::filebox fileBox(form, true);
 			fileBox.add_filter("Shader File", "*.hlsl;*.fx");
@@ -58,12 +58,12 @@ namespace Bruno
 			}*/
 		});
 
-		menuFile.Append("Build", [this](Berta::MenuItem& ip)
+		menuFile.Append("Build", [this](Berta::MenuItem ip)
 		{
 			m_contentBuilder.Run();
 		});
 
-		menuFile.Append("Read", [&form, this](Berta::MenuItem& ip)
+		menuFile.Append("Read", [&form, this](Berta::MenuItem ip)
 		{
 			/*Berta::filebox fileBox(form, true);
 			fileBox.add_filter("Shader File", "*.hlsl;*.fx");
@@ -86,7 +86,7 @@ namespace Bruno
 			}*/
 		});
 		menuFile.AppendSeparator();
-		menuFile.Append("Exit", [](Berta::MenuItem& ip)
+		menuFile.Append("Exit", [](Berta::MenuItem ip)
 		{
 			Berta::GUI::Exit();
 		});

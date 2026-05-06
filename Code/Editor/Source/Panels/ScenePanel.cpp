@@ -52,10 +52,10 @@ namespace Bruno
 		m_layout.Attach("gizmoTypeComboBox", m_gizmoTypeCombobox);
 		m_layout.Attach("gizmoSpaceButton", m_gizmoTransformSpaceButton);
 
-		m_gizmoTypeCombobox.PushItem("None");
-		m_gizmoTypeCombobox.PushItem("Translation");
-		m_gizmoTypeCombobox.PushItem("Rotation");
-		m_gizmoTypeCombobox.PushItem("Scale");
+		m_gizmoTypeCombobox.PushBack("None");
+		m_gizmoTypeCombobox.PushBack("Translation");
+		m_gizmoTypeCombobox.PushBack("Rotation");
+		m_gizmoTypeCombobox.PushBack("Scale");
 
 		m_gizmoTypeCombobox.SetSelectedIndex(1);
 		m_gizmoTransformSpaceButton.SetCaption("World");
@@ -105,8 +105,8 @@ namespace Bruno
 			{
 				m_timer.Tick();
 
-				OnUpdate(m_timer);
-				OnDraw();
+				/*OnUpdate(m_timer);
+				OnDraw();*/
 
 				/*RECT r;
 				::GetClientRect(hwnd, &r);
@@ -347,12 +347,15 @@ namespace Bruno
 		m_gizmoTypeCombobox.GetEvents().Selected.Connect([this](const Berta::ArgComboBox& acmb) mutable
 		{
 			//BR_CORE_TRACE << "Gizmo type selected: " << acmb.widget.option() << std::endl;
-
+			if (!acmb.SelectedIndex.has_value())
+				return;
+			
+			auto index = acmb.SelectedIndex.value();
 			if (m_gizmoService)
 			{
-				m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex()));
+				m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(index));
 			}
-			m_gizmoTransformSpaceButton.SetEnabled(m_gizmoTypeCombobox.GetSelectedIndex() < 3);
+			m_gizmoTransformSpaceButton.SetEnabled(index < 3);
 		});
 
 		InitializeGraphicsContext();
@@ -447,7 +450,7 @@ namespace Bruno
 
 	void ScenePanel::InitializeGizmoService()
 	{
-		m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex()));
+		m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
 		m_gizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? GizmoService::TransformSpace::World : GizmoService::TransformSpace::Local);
 	}
 

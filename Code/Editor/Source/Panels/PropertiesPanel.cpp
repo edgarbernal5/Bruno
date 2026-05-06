@@ -7,6 +7,8 @@
 #include <Bruno/Scene/Scene.h>
 
 #include <Berta/Controls/Properties/PropertyGridFields.h>
+#include <Berta/GUI/ControlDrawBatch.h>
+
 #include "Properties/PropertyGridItems.h"
 
 namespace Bruno
@@ -19,7 +21,8 @@ namespace Bruno
 
 		m_selectionService = sceneDocument->GetSelectionService();
 		m_sceneHierarchy = sceneDocument->GetSceneHierarchy();
-
+		m_scene = sceneDocument->GetScene();
+		
 		m_propertyGrid.Create(*this);
 
 		m_layout.Create(this->Handle());
@@ -34,22 +37,44 @@ namespace Bruno
 			BR_CORE_TRACE << "selection changed / selection.size = " << selection.size() << std::endl;
 
 			//TODO: si no hay cambios no refrescar.
-			m_propertyGrid.SetAutoDraw(false);
-			ClearPropertyGrid();
-			m_currentProperties.clear();
-			DisposePropertyBinders();
+			Berta::ControlDrawBatch batchGuard(m_propertyGrid);
+			
+			m_propertyGrid.Clear();
 
 			if (selection.size() != 1)
 			{
-				m_propertyGrid.SetAutoDraw(true);
 				return;
 			}
 
 			auto& uuid = selection[0];
-			auto& nodeProperties = m_sceneHierarchy->get(uuid);
+			auto entity = m_scene->GetEntityWithUUID(uuid);
+			
+			if (!entity) return;
+			
+			if (entity.HasComponent<NameComponent>())
+			{
+				auto categoryGeneral = m_propertyGrid.Append("General");
+				
+				categoryGeneral.EmplaceProperty<Berta::PropertyGridFieldString>(
+					"Name",
+					[entity]() -> std::wstring { return entity.GetComponent<NameComponent>().Name; },
+					[entity](const std::wstring& val) mutable { entity.GetComponent<NameComponent>().Name = val; }
+				);
+			}
+			
+			if (entity.HasComponent<TransformComponent>())
+			{
+				auto categoryTransform = m_propertyGrid.Append("Transform");
+				
+				/*categoryTransform.EmplaceProperty<Berta::PropertyGridFieldVector3>(
+					"Position",
+					[entity]() -> std::wstring { return entity.GetComponent<TransformComponent>().Name; },
+					[entity](const std::wstring& val) mutable { entity.GetComponent<TransformComponent>().Name = val; }
+				);*/
+			}
 			
 			//TODO
-			for (size_t i = 0; i < nodeProperties.size(); i++)
+			/*for (size_t i = 0; i < nodeProperties.size(); i++)
 			{
 				auto prop = nodeProperties[i];
 
@@ -96,55 +121,24 @@ namespace Bruno
 				
 				pi.SetEnabled(!prop.IsReadOnly());
 				m_propOnChangedHandlers[prop] = handlerId;
-			}
-			m_propertyGrid.SetAutoDraw(true);
+			}*/
 		});
 
-		m_asset_file_menu_popup.Append("Select asset...", [](Berta::MenuItem& ip) {
+		m_asset_file_menu_popup.Append("Select asset...", [](Berta::MenuItem ip)
+		{
 			//TODO: callback o un objeto. inyectarlo
 		});
 		m_asset_file_menu_popup.AppendSeparator();
-		m_asset_file_menu_popup.Append("Find asset in Content Browser", [](Berta::MenuItem& ip) {});
+		m_asset_file_menu_popup.Append("Find asset in Content Browser", [](Berta::MenuItem ip) {});
 
 		m_propertyGrid.GetEvents().PropertyChanged.Connect([this](const Berta::ArgPropertyGrid& args)
 		{
-			BR_CORE_TRACE << "property_changed / grid. label = " << args.Property.GetLabel() << ". value = " << args.Property.GetValue() << std::endl;
-			
-			//TODO
-			//auto cat = m_propertyGrid.at(arg.item.pos().cat);
-			
-			auto& uuid = m_selectionService->GetSelections()[0];
-			auto& nodeProperties = m_sceneHierarchy->get(uuid);
-
-			for (size_t i = 0; i < nodeProperties.size(); ++i)
-			{
-				auto property = nodeProperties[i];
-				if (args.Property.GetLabel() == property.GetLabel() /*&& cat.text() == property.category()*/)
-				{
-					property.SetValue(args.Property.GetValue());
-					break;
-				}
-			}
+			BR_CORE_TRACE << "property_changed / grid. label = " << args.Property.GetLabel() << ". value = " << args.Property.GetValueAsString() << std::endl;
 		});
 	}
 
 	PropertiesPanel::~PropertiesPanel()
 	{
 		m_sceneDocument->SelectionChanged.disconnect(m_selectionChangedHandleId);
-		DisposePropertyBinders();
-	}
-
-	void PropertiesPanel::ClearPropertyGrid()
-	{
-		m_propertyGrid.Clear();
-	}
-
-	void PropertiesPanel::DisposePropertyBinders()
-	{
-		for (auto& [prop, handlerId] : m_propOnChangedHandlers)
-		{
-			prop.on_change().disconnect(handlerId);
-		}
-		m_propOnChangedHandlers.clear();
 	}
 }

@@ -4,7 +4,9 @@
 #include <Berta/GUI/Layout.h>
 #include <Berta/Controls/Menu.h>
 #include <Berta/Controls/PropertyGrid.h>
-#include "Properties/Property.h"
+
+#include "Bruno/Core/Events/Event.h"
+#include "Bruno/Scene/Scene.h"
 
 namespace Bruno
 {
@@ -20,18 +22,15 @@ namespace Bruno
 		~PropertiesPanel();
 
 	private:
-		void ClearPropertyGrid();
-		void DisposePropertyBinders();
 
 		std::shared_ptr<SceneDocument> m_sceneDocument;
 		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;
+		std::shared_ptr<Scene> m_scene;
 		std::shared_ptr<SelectionService> m_selectionService;
 		EventHandlerId m_selectionChangedHandleId{ 0 };
 
 		Berta::Layout m_layout;
 		Berta::PropertyGrid m_propertyGrid;
-		PropertyCollection m_currentProperties;
-		std::unordered_map<PropertyItem, size_t> m_propOnChangedHandlers;
 		Berta::Menu m_asset_file_menu_popup;
 	};
 }

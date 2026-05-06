@@ -41,7 +41,6 @@ namespace Bruno
 	{
 		Entity rootEntity = m_scene->InstantiateModel(model);
 
-		m_sceneHierarchy->LoadProperties(rootEntity);
 
 		InitializeProperties(rootEntity);
 
@@ -75,89 +74,75 @@ namespace Bruno
 		m_gizmoService = std::make_shared<GizmoService>(device, m_camera, m_selectionService.get());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
 		{
-			auto& selections = m_selectionService->GetSelections();
-			for (auto& uuid : selections)
+			for (auto& uuid : m_selectionService->GetSelections())
 			{
-				auto& properties = m_sceneHierarchy->get(uuid);
-				auto prop = properties.get("Transform/Position");
-				auto currentPosition = prop.as_vector3();
-				currentPosition += delta;
-				prop.SetValue(currentPosition);
+				Entity entity = m_scene->GetEntityWithUUID(uuid);
+				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
+
+				// Usamos 'patch' para que EnTT dispare el evento 'on_update<TransformComponent>'
+				entity.GetRegistry().patch<TransformComponent>(entity.GetHandle(), [&delta](auto& transform) 
+				{
+					transform.Position += delta;
+				});
 			}
 		});
 
 		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
 		{
-			auto& selections = m_selectionService->GetSelections();
-			for (auto& uuid : selections)
+			for (auto& uuid : m_selectionService->GetSelections())
 			{
-				auto& properties = m_sceneHierarchy->get(uuid);
-				auto prop = properties.get("Transform/Rotation");
-				auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(prop.as_vector3());
-				currentRotation *= delta;
-				prop.SetValue(currentRotation.ToEuler());
+				Entity entity = m_scene->GetEntityByUUID(uuid);
+				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
+
+				entity.GetRegistry().patch<TransformComponent>(entity.GetHandle(), [&delta](auto& transform) 
+				{
+					// Asumiendo que transform.Rotation guarda los Euler Angles como Vector3
+					auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(transform.Rotation);
+					currentRotation *= delta;
+					transform.Rotation = currentRotation.ToEuler();
+				});
 			}
 		});
 
 		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
 		{
-			auto newDelta = delta * 0.1f;
-			auto& selections = m_selectionService->GetSelections();
-			for (auto& uuid : selections)
-			{
-				auto& properties = m_sceneHierarchy->get(uuid);
-				auto prop = properties.get("Transform/Scale");
-				auto currentScale = prop.as_vector3();
+			const Math::Vector3 newDelta = delta * 0.1f;
 
-				if (isUniform)
+			for (auto& uuid : m_selectionService->GetSelections())
+			{
+				Entity entity = m_scene->GetEntityByUUID(uuid);
+				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
+
+				entity.GetRegistry().patch<TransformComponent>(entity.GetHandle(), [newDelta, isUniform](auto& transform) 
 				{
-					float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
-					auto newScale = currentScale * uniformDelta;
-					if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+					Math::Vector3 newScale = transform.Scale;
+
+					if (isUniform)
 					{
-						prop.SetValue(newScale);
+						float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
+						newScale *= uniformDelta;
+					}
+					else
+					{
+						newScale += newDelta;
 					}
 
-					continue;
-				}
-				auto newScale = currentScale + newDelta;
-				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
-				{
-					prop.SetValue(newScale);
-				}
+					// Validación simple de límites (evita escalas invertidas o colapso a 0)
+					if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+					{
+						transform.Scale = newScale;
+					}
+				});
 			}
 		});
 	}
 
 	void SceneDocument::InitializeProperties(Entity entity)
 	{
-		auto& hierarchy = entity.GetComponent<HierarchyComponent>();
+		/*auto& hierarchy = entity.GetComponent<HierarchyComponent>();
 		auto& name = entity.GetComponent<NameComponent>().Name;
 
 		auto uuid = entity.GetUUID();
-
-		auto properties = m_sceneHierarchy->get(uuid);
-		properties.get("Transform/Position").on_change().connect([this, uuid](const std::string& new_value)
-		{
-			Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-			TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
-
-			entityTransform.Position = Property::AsVector3(new_value);
-		});
-		properties.get("Transform/Rotation").on_change().connect([this, uuid](const std::string& new_value)
-		{
-			Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-			TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
-
-			entityTransform.Rotation = Math::Quaternion::CreateFromYawPitchRoll(Property::AsVector3(new_value));
-		});
-		properties.get("Transform/Scale").on_change().connect([this, uuid](const std::string& new_value)
-		{
-			Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-			TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
-
-			entityTransform.Scale = Property::AsVector3(new_value);
-		});
 
 		for (UUID child : hierarchy.Children)
 		{
@@ -166,6 +151,6 @@ namespace Bruno
 			{
 				InitializeProperties(childEntity);
 			}
-		}
+		}*/
 	}
 }

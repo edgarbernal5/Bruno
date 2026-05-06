@@ -32,7 +32,7 @@ namespace Bruno
 		std::vector<uint32_t> Children;
 		std::vector<uint32_t> Meshes;
 
-		std::string Name;
+		std::wstring Name;
 		Math::Matrix LocalTransform;
 
 		inline bool IsRoot() const { return Parent == NullNode; }

@@ -24,8 +24,8 @@ namespace Bruno
 	public:
 		Scene();
 
-		Entity CreateEntity(const std::string& name = "Unnamed");
-		Entity CreateEntity(Entity parent, const std::string& name);
+		Entity CreateEntity(const std::wstring& name = L"Unnamed");
+		Entity CreateEntity(Entity parent, const std::wstring& name);
 		Entity InstantiateModel(std::shared_ptr<Model> model);
 
 		template<typename... Components>

@@ -143,7 +143,7 @@ namespace Bruno
 				modelNode.Meshes.push_back(meshIndex);
 			}
 
-			input.ReadString(modelNode.Name);
+			input.ReadWString(modelNode.Name);
 			input.ReadMatrix(modelNode.LocalTransform);
 		}
 

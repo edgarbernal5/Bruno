@@ -15,11 +15,11 @@ namespace Bruno
 
 	struct NameComponent
 	{
-		std::string Name;
+		std::wstring Name;
 
 		NameComponent() = default;
 		NameComponent(const NameComponent& other) = default;
-		NameComponent(std::string name) : Name(name) { }
+		NameComponent(std::wstring name) : Name(name) { }
 	};
 
 	struct HierarchyComponent
