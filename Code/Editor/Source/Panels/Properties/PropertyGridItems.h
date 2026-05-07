@@ -24,7 +24,7 @@ namespace Bruno
 		
 		virtual void SetFocus() override;
 		virtual void Refresh() override;
-		std::string GetValueAsString() const override;
+		std::wstring GetValueAsString() const override;
 		/*pg_vector3() = default;
 
 		pg_vector3(const std::string& label, const std::string& value)

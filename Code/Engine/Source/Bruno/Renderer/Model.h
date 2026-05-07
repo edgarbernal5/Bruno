@@ -102,7 +102,7 @@ namespace Bruno
 	public:
 		Mesh() = default;
 		Mesh(Mesh&&) = default;
-		Mesh(const std::string& name, uint32_t baseVertex, uint32_t baseIndex, uint32_t vertexCount, uint32_t indexCount, uint32_t materialIndex, 
+		Mesh(const std::wstring& name, uint32_t baseVertex, uint32_t baseIndex, uint32_t vertexCount, uint32_t indexCount, uint32_t materialIndex, 
 			const Math::Matrix& transform, const Math::Matrix& localTransform, const Math::BoundingBox& bbox);
 		
 		uint32_t GetBaseVertex() const { return m_baseVertex; }
@@ -113,15 +113,15 @@ namespace Bruno
 		const Math::BoundingBox& GetBoundingBox() const { return m_bBox; }
 		const Math::Matrix& GetTransform() const { return m_transform; }
 
-		void SetNodeName(const std::string& nodename) { m_nodeName = nodename; }
+		void SetNodeName(const std::wstring& nodename) { m_nodeName = nodename; }
 		void SetTransform(const Math::Matrix& transform) { m_transform = transform; }
 		void SetLocalTransform(const Math::Matrix& transform) { m_localTransform = transform; }
 		void SetBoundingBox(const Math::BoundingBox& box) { m_bBox = box; }
 		
 		Mesh& operator=(Mesh&&) = default;
 	private:
-		std::string m_meshName;
-		std::string m_nodeName;
+		std::wstring m_meshName;
+		std::wstring m_nodeName;
 		Math::Matrix m_transform;
 		Math::Matrix m_localTransform;
 		uint32_t m_baseVertex;

@@ -133,7 +133,7 @@ namespace Bruno
 
 		m_propertyGrid.GetEvents().PropertyChanged.Connect([this](const Berta::ArgPropertyGrid& args)
 		{
-			BR_CORE_TRACE << "property_changed / grid. label = " << args.Property.GetLabel() << ". value = " << args.Property.GetValueAsString() << std::endl;
+			BR_CORE_TRACE << "property_changed / grid. label = " << args.Property.GetLabel() << ". value = " << Berta::StringUtils::WideToUTF8(args.Property.GetValueAsString()) << std::endl;
 		});
 	}
 

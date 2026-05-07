@@ -34,4 +34,10 @@ namespace Bruno
 	{
 		return m_scene->m_registry.all_of<T...>(m_entityHandle);
 	}
+	
+	template<typename T, typename... Func>
+	void Entity::Patch(Func &&...func) const
+	{
+		m_scene->m_registry.patch<T>(m_entityHandle, std::forward<Func>(func)...);
+	}
 }

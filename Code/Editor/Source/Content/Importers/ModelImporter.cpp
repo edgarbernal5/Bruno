@@ -1,6 +1,7 @@
 #include "brepch.h"
 #include "ModelImporter.h"
 
+#include "Berta/Core/Base.h"
 #include "Bruno/Core/StringHelpers.h"
 #include "Bruno/Renderer/Material.h"
 
@@ -148,7 +149,7 @@ namespace Bruno
 		aabb.Center = (aabbMax + aabbMin) * 0.5f;
 		aabb.Extents = (aabbMax - aabbMin) * 0.5f;
 
-		auto mesh = std::make_shared<Mesh>(aiMesh->mName.C_Str(), baseVertex, baseIndex, aiMesh->mNumVertices, aiMesh->mNumFaces * 3, aiMesh->mMaterialIndex, Math::Matrix::Identity, Math::Matrix::Identity, aabb);
+		auto mesh = std::make_shared<Mesh>(Berta::StringUtils::UTF8ToWide(aiMesh->mName.C_Str()), baseVertex, baseIndex, aiMesh->mNumVertices, aiMesh->mNumFaces * 3, aiMesh->mMaterialIndex, Math::Matrix::Identity, Math::Matrix::Identity, aabb);
 
 		baseVertex += aiMesh->mNumVertices;
 		baseIndex += aiMesh->mNumFaces * 3;
@@ -167,7 +168,7 @@ namespace Bruno
 		{
 			uint32_t submeshIndex = aiNode->mMeshes[i];
 			auto& submesh = meshes[submeshIndex];
-			submesh->SetNodeName(aiNode->mName.C_Str());
+			submesh->SetNodeName(Berta::StringUtils::UTF8ToWide(aiNode->mName.C_Str()));
 			submesh->SetTransform(transform);
 			submesh->SetLocalTransform(node.LocalTransform);
 

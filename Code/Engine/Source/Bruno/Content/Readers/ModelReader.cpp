@@ -66,11 +66,11 @@ namespace Bruno
 
 		for (size_t i = 0; i < meshesCount; i++)
 		{
-			std::string meshName;
-			input.ReadString(meshName);
+			std::wstring meshName;
+			input.ReadWString(meshName);
 
-			std::string nodeName;
-			input.ReadString(nodeName);
+			std::wstring nodeName;
+			input.ReadWString(nodeName);
 
 			uint32_t baseVertex;
 			input.ReadUInt32(baseVertex);

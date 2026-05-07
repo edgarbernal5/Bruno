@@ -80,7 +80,7 @@ namespace Bruno
 				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
 
 				// Usamos 'patch' para que EnTT dispare el evento 'on_update<TransformComponent>'
-				entity.GetRegistry().patch<TransformComponent>(entity.GetHandle(), [&delta](auto& transform) 
+				entity.Patch<TransformComponent>([&delta](auto& transform) 
 				{
 					transform.Position += delta;
 				});
@@ -91,15 +91,15 @@ namespace Bruno
 		{
 			for (auto& uuid : m_selectionService->GetSelections())
 			{
-				Entity entity = m_scene->GetEntityByUUID(uuid);
+				Entity entity = m_scene->GetEntityWithUUID(uuid);
 				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
 
-				entity.GetRegistry().patch<TransformComponent>(entity.GetHandle(), [&delta](auto& transform) 
+				entity.Patch<TransformComponent>([&delta](auto& transform) 
 				{
 					// Asumiendo que transform.Rotation guarda los Euler Angles como Vector3
-					auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(transform.Rotation);
-					currentRotation *= delta;
-					transform.Rotation = currentRotation.ToEuler();
+					//auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(transform.Rotation);
+					//currentRotation *= delta;
+					//transform.Rotation = currentRotation.ToEuler();
 				});
 			}
 		});
@@ -110,10 +110,10 @@ namespace Bruno
 
 			for (auto& uuid : m_selectionService->GetSelections())
 			{
-				Entity entity = m_scene->GetEntityByUUID(uuid);
+				Entity entity = m_scene->GetEntityWithUUID(uuid);
 				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
 
-				entity.GetRegistry().patch<TransformComponent>(entity.GetHandle(), [newDelta, isUniform](auto& transform) 
+				entity.Patch<TransformComponent>([newDelta, isUniform](auto& transform) 
 				{
 					Math::Vector3 newScale = transform.Scale;
 
