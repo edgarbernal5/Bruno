@@ -32,7 +32,9 @@ namespace Bruno
 	std::shared_ptr<Asset> EditorAssetManager::GetAsset(AssetHandle assetHandle)
 	{
 		if (IsMemoryAsset(assetHandle))
+		{
 			return m_memoryAssets[assetHandle];
+		}
 
 		auto& metadata = GetMetadata(assetHandle);
 		if (!metadata)

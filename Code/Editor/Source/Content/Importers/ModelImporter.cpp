@@ -160,7 +160,7 @@ namespace Bruno
 	void ModelImporter::ProcessNode(aiNode* aiNode, uint32_t nodeIndex, std::vector<ModelNode>& modelNodes, std::vector<std::shared_ptr<Mesh>>& meshes, const Math::Matrix& parentTransform)
 	{
 		auto& node = modelNodes[nodeIndex];
-		//node.Name = aiNode->mName.C_Str();
+		node.Name = Berta::StringUtils::UTF8ToWide(aiNode->mName.C_Str());
 		node.LocalTransform = ToMatrix(aiNode->mTransformation);
 
 		Math::Matrix transform = parentTransform * node.LocalTransform;
@@ -175,7 +175,7 @@ namespace Bruno
 			node.Meshes.push_back(submeshIndex);
 		}
 
-		uint32_t parentNodeIndex = (uint32_t)modelNodes.size() - 1;
+		uint32_t parentNodeIndex = static_cast<uint32_t>(modelNodes.size()) - 1;
 		node.Children.resize(aiNode->mNumChildren);
 		for (uint32_t i = 0; i < aiNode->mNumChildren; i++)
 		{

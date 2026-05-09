@@ -66,11 +66,11 @@ namespace Bruno
 			{
 				auto categoryTransform = m_propertyGrid.Append("Transform");
 				
-				/*categoryTransform.EmplaceProperty<Berta::PropertyGridFieldVector3>(
+				categoryTransform.EmplaceProperty<Bruno::PropertyGridFieldVector3>(
 					"Position",
-					[entity]() -> std::wstring { return entity.GetComponent<TransformComponent>().Name; },
-					[entity](const std::wstring& val) mutable { entity.GetComponent<TransformComponent>().Name = val; }
-				);*/
+					[entity]() -> Math::Vector3 { return entity.GetComponent<TransformComponent>().Position; },
+					[entity](const Math::Vector3& val) mutable { entity.GetComponent<TransformComponent>().Position = val; }
+				);
 			}
 			
 			//TODO
