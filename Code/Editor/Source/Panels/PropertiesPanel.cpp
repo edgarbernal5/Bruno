@@ -49,7 +49,10 @@ namespace Bruno
 			auto& uuid = selection[0];
 			auto entity = m_scene->GetEntityWithUUID(uuid);
 			
-			if (!entity) return;
+			if (!entity)
+			{
+				return;
+			}
 			
 			if (entity.HasComponent<NameComponent>())
 			{
@@ -58,7 +61,13 @@ namespace Bruno
 				categoryGeneral.EmplaceProperty<Berta::PropertyGridFieldString>(
 					"Name",
 					[entity]() -> std::wstring { return entity.GetComponent<NameComponent>().Name; },
-					[entity](const std::wstring& val) mutable { entity.GetComponent<NameComponent>().Name = val; }
+					[entity](const std::wstring& val) mutable
+					{
+						entity.Patch<NameComponent>([&val](auto& component)
+						{
+						   component.Name = val;
+						});
+					}
 				);
 			}
 			
@@ -66,11 +75,101 @@ namespace Bruno
 			{
 				auto categoryTransform = m_propertyGrid.Append("Transform");
 				
-				categoryTransform.EmplaceProperty<Bruno::PropertyGridFieldVector3>(
-					"Position",
-					[entity]() -> Math::Vector3 { return entity.GetComponent<TransformComponent>().Position; },
-					[entity](const Math::Vector3& val) mutable { entity.GetComponent<TransformComponent>().Position = val; }
-				);
+				categoryTransform.EmplaceVector3("Position", 
+				[entity]()
+				{
+					Berta::OptionalVector3 opt;
+					auto& position = entity.GetComponent<TransformComponent>().Position;
+					opt.x = position.x;
+					opt.y = position.y;
+					opt.z = position.z;
+					
+					return opt;
+				},
+				[entity](const Berta::OptionalVector3& val) mutable
+				{
+					auto& position = entity.GetComponent<TransformComponent>().Position;
+					if (val.x.has_value())
+					{
+						position.x = val.x.value();
+					}
+					
+					if (val.y.has_value())
+					{
+						position.y = val.y.value();
+					}
+					
+					if (val.z.has_value())
+					{
+						position.z = val.z.value();
+					}
+				});
+				/*
+				*auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(prop.as_vector3());
+				currentRotation *= delta;
+				prop.value(currentRotation.ToEuler());
+				 */
+				categoryTransform.EmplaceVector3("Rotation", 
+				[entity]()
+				{
+					Berta::OptionalVector3 opt;
+					auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
+					auto currentRotation = rotation.ToEuler();
+					opt.x = currentRotation.x;
+					opt.y = currentRotation.y;
+					opt.z = currentRotation.z;
+					
+					return opt;
+				},
+				[entity](const Berta::OptionalVector3& val) mutable
+				{
+					auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
+					if (val.x.has_value())
+					{
+						//Math::Quaternion::CreateFromYawPitchRoll
+						rotation.x = val.x.value();
+					}
+					
+					if (val.y.has_value())
+					{
+						rotation.y = val.y.value();
+					}
+					
+					if (val.z.has_value())
+					{
+						rotation.z = val.z.value();
+					}
+				});
+				
+				categoryTransform.EmplaceVector3("Scale", 
+				[entity]()
+				{
+					Berta::OptionalVector3 opt;
+					auto& scale = entity.GetComponent<TransformComponent>().Scale;
+					opt.x = scale.x;
+					opt.y = scale.y;
+					opt.z = scale.z;
+					
+					return opt;
+				},
+				[entity](const Berta::OptionalVector3& val) mutable
+				{
+					auto& scale = entity.GetComponent<TransformComponent>().Scale;
+					if (val.x.has_value())
+					{
+						scale.x = val.x.value();
+					}
+					
+					if (val.y.has_value())
+					{
+						scale.y = val.y.value();
+					}
+					
+					if (val.z.has_value())
+					{
+						scale.z = val.z.value();
+					}
+				});
 			}
 			
 			//TODO
@@ -107,20 +206,6 @@ namespace Bruno
 					//	Berta::menu_popuper(m_asset_file_menu_popup, Berta::mouse::left_button)(*click_args.mouse_args);
 					//});
 				}
-
-				if (!pi)
-				{
-					continue;
-				}
-				
-				auto item_ptr = pi.GetPropertyFieldPtr();
-				const auto handlerId = prop.on_change().connect([item_ptr](const std::string& newValue)
-					{
-						item_ptr->SetValue(newValue);
-					});
-				
-				pi.SetEnabled(!prop.IsReadOnly());
-				m_propOnChangedHandlers[prop] = handlerId;
 			}*/
 		});
 

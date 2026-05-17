@@ -76,6 +76,8 @@ namespace Bruno
 				OnHierarchyAdded(sceneDocument->GetScene()->GetEntityWithUUID(idComponent.Id));
 			}
 		}
+		
+		m_sceneDocument->GetScene()->OnComponentUpdated<NameComponent>().connect<&SceneHierarchyPanel::OnEntityNameUpdated>(this);
 	}
 
 	SceneHierarchyPanel::~SceneHierarchyPanel()
@@ -107,5 +109,13 @@ namespace Bruno
 				OnHierarchyAdded(childEntity, key + L"/");
 			}
 		}
+	}
+
+	void SceneHierarchyPanel::OnEntityNameUpdated(entt::registry& registry, entt::entity entityHandle)
+	{
+		auto& nameComp = registry.get<NameComponent>(entityHandle);
+		auto& idComp = registry.get<IdComponent>(entityHandle);
+		
+		m_entityToNodeMap[idComp.Id].SetText(nameComp.Name);
 	}
 }

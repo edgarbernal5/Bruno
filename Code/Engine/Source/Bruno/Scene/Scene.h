@@ -37,7 +37,14 @@ namespace Bruno
 		Entity TryGetEntityWithUUID(UUID id) const;
 
 		void OnUpdate(const GameTimer& timer, Camera& camera);
-
+		
+		template<typename Component>
+		auto OnComponentUpdated() 
+		{
+			// EnTT permite crear un sink a partir de una señal (sigh)
+			return entt::sink{ m_registry.on_update<Component>() };
+		}
+		
 		friend class SceneRenderer;
 		friend class ObjectSelector;
 		friend class Entity;

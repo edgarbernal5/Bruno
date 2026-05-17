@@ -5,6 +5,7 @@
 #include <Berta/Controls/TreeBox.h>
 #include <Bruno/Core/UUID.h>
 #include <Bruno/Core/Events/Event.h>
+#include <entt/entt.hpp>
 
 namespace Bruno
 {
@@ -24,7 +25,8 @@ namespace Bruno
 		friend class ScenePanel;
 	private:
 		void OnHierarchyAdded(Entity entity, const std::wstring& parentKey = L"");
-
+		void OnEntityNameUpdated(entt::registry& registry, entt::entity entityHandle);
+		
 		Berta::Layout m_layout;
 		Berta::TreeBox m_treebox;
 		std::shared_ptr<SceneDocument> m_sceneDocument;
