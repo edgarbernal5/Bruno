@@ -113,6 +113,8 @@ namespace Bruno
 
 	void SceneHierarchyPanel::OnEntityNameUpdated(entt::registry& registry, entt::entity entityHandle)
 	{
+		Entity entity{ entityHandle, m_sceneDocument->GetScene().get() };
+		
 		auto& nameComp = registry.get<NameComponent>(entityHandle);
 		auto& idComp = registry.get<IdComponent>(entityHandle);
 		
