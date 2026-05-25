@@ -9,6 +9,7 @@
 #include <Berta/Controls/Properties/PropertyGridFields.h>
 #include <Berta/GUI/ControlDrawBatch.h>
 
+#include "Content/EditorAssetManager.h"
 #include "Properties/PropertyGridItems.h"
 
 namespace Bruno
@@ -75,101 +76,178 @@ namespace Bruno
 			{
 				auto categoryTransform = m_propertyGrid.Append("Transform");
 				
-				categoryTransform.EmplaceVector3("Position", 
-				[entity]()
-				{
-					Berta::OptionalVector3 opt;
-					auto& position = entity.GetComponent<TransformComponent>().Position;
-					opt.x = position.x;
-					opt.y = position.y;
-					opt.z = position.z;
-					
-					return opt;
-				},
+				categoryTransform.EmplaceVector3(
+					"Position", 
+					[entity]()
+					{
+						Berta::OptionalVector3 opt;
+						auto& position = entity.GetComponent<TransformComponent>().Position;
+						opt.x = position.x;
+						opt.y = position.y;
+						opt.z = position.z;
+						
+						return opt;
+					},
 				[entity](const Berta::OptionalVector3& val) mutable
-				{
-					auto& position = entity.GetComponent<TransformComponent>().Position;
-					if (val.x.has_value())
 					{
-						position.x = val.x.value();
+						auto& position = entity.GetComponent<TransformComponent>().Position;
+						if (val.x.has_value())
+						{
+							position.x = val.x.value();
+						}
+						
+						if (val.y.has_value())
+						{
+							position.y = val.y.value();
+						}
+						
+						if (val.z.has_value())
+						{
+							position.z = val.z.value();
+						}
 					}
-					
-					if (val.y.has_value())
-					{
-						position.y = val.y.value();
-					}
-					
-					if (val.z.has_value())
-					{
-						position.z = val.z.value();
-					}
-				});
+				);
 				/*
 				*auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(prop.as_vector3());
 				currentRotation *= delta;
 				prop.value(currentRotation.ToEuler());
 				 */
-				categoryTransform.EmplaceVector3("Rotation", 
+				categoryTransform.EmplaceVector3(
+					"Rotation", 
 				[entity]()
-				{
-					Berta::OptionalVector3 opt;
-					auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
-					auto currentRotation = rotation.ToEuler();
-					opt.x = currentRotation.x;
-					opt.y = currentRotation.y;
-					opt.z = currentRotation.z;
-					
-					return opt;
-				},
-				[entity](const Berta::OptionalVector3& val) mutable
-				{
-					auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
-					if (val.x.has_value())
 					{
-						//Math::Quaternion::CreateFromYawPitchRoll
-						rotation.x = val.x.value();
-					}
-					
-					if (val.y.has_value())
+						Berta::OptionalVector3 opt;
+						auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
+						auto currentRotation = rotation.ToEuler();
+						opt.x = currentRotation.x;
+						opt.y = currentRotation.y;
+						opt.z = currentRotation.z;
+						
+						return opt;
+					},
+					[entity](const Berta::OptionalVector3& val) mutable
 					{
-						rotation.y = val.y.value();
+						auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
+						if (val.x.has_value())
+						{
+							//Math::Quaternion::CreateFromYawPitchRoll
+							rotation.x = val.x.value();
+						}
+						
+						if (val.y.has_value())
+						{
+							rotation.y = val.y.value();
+						}
+						
+						if (val.z.has_value())
+						{
+							rotation.z = val.z.value();
+						}
 					}
-					
-					if (val.z.has_value())
-					{
-						rotation.z = val.z.value();
-					}
-				});
+				);
 				
-				categoryTransform.EmplaceVector3("Scale", 
-				[entity]()
+				categoryTransform.EmplaceVector3(
+					"Scale", 
+					[entity]()
+					{
+						Berta::OptionalVector3 opt;
+						auto& scale = entity.GetComponent<TransformComponent>().Scale;
+						opt.x = scale.x;
+						opt.y = scale.y;
+						opt.z = scale.z;
+						
+						return opt;
+					},
+					[entity](const Berta::OptionalVector3& val) mutable
+					{
+						auto& scale = entity.GetComponent<TransformComponent>().Scale;
+						if (val.x.has_value())
+						{
+							scale.x = val.x.value();
+						}
+						
+						if (val.y.has_value())
+						{
+							scale.y = val.y.value();
+						}
+						
+						if (val.z.has_value())
+						{
+							scale.z = val.z.value();
+						}
+					}
+				);
+			}
+			
+			if (entity.HasComponent<ModelComponent>())
+			{
+				auto modelCategory = m_propertyGrid.Append("Model");
+				modelCategory.EmplaceProperty<Berta::PropertyGridFieldString>(
+					"Handle", 
+					[entity]() -> std::wstring
+					{
+						auto handleToStr = std::to_wstring(entity.GetComponent<ModelComponent>().ModelHandle);
+						return handleToStr;
+					}, nullptr).SetReadOnly(true);
+
+				modelCategory.EmplaceProperty<Berta::PropertyGridFieldUInt>("Mesh index", 
+				[entity]() -> uint32_t
 				{
-					Berta::OptionalVector3 opt;
-					auto& scale = entity.GetComponent<TransformComponent>().Scale;
-					opt.x = scale.x;
-					opt.y = scale.y;
-					opt.z = scale.z;
-					
-					return opt;
-				},
-				[entity](const Berta::OptionalVector3& val) mutable
+					return entity.GetComponent<ModelComponent>().MeshIndex;
+				}, nullptr).SetReadOnly(true);
+				auto& assetManager = *m_sceneDocument->GetAssetManager();
+				auto modelMaterialsSubCategories = modelCategory.AppendSubCategory("Materials");
+				auto& modelComp = entity.GetComponent<ModelComponent>();
+				auto ownerWindow = this->Handle();
+				for (auto& [index, materialAssetHandle] : modelComp.Materials->GetMaterials())
 				{
-					auto& scale = entity.GetComponent<TransformComponent>().Scale;
-					if (val.x.has_value())
-					{
-						scale.x = val.x.value();
-					}
+					std::ostringstream oss;
+					oss << "Material " << index;
 					
-					if (val.y.has_value())
-					{
-						scale.y = val.y.value();
-					}
-					
-					if (val.z.has_value())
-					{
-						scale.z = val.z.value();
-					}
-				});
+					modelMaterialsSubCategories.EmplaceProperty<Berta::PropertyGridFieldStringButton>(oss.str(), 
+						[entity, materialAssetHandle, &assetManager]() -> std::wstring
+						{
+							if (materialAssetHandle == static_cast<UUID>(0))
+							{
+								return L"None";
+							}
+							if (auto metadata = assetManager.GetMetadata(materialAssetHandle))
+							{
+								return metadata.Filename;
+							}
+							
+							return L"";
+						},
+						[entity, index, &assetManager](const std::wstring& typedPath) mutable
+						{
+							UUID newHandle = 0; //assetManager.LoadOrCreateAsset(typedPath);
+							entity.Patch<ModelComponent>([newHandle, index](auto& comp)
+							{
+								comp.Materials->SetMaterial(index, newHandle);
+							});
+						},
+						[entity, index, ownerWindow, &assetManager](std::optional<std::wstring> currentValue) -> std::optional<std::wstring>
+						{
+							Berta::Menu menuContext;
+							
+							menuContext.Append("Clear Material", [entity, index](Berta::MenuItem ip)
+							{
+								std::cout << "Clear Material " << index << std::endl;
+								entity.Patch<ModelComponent>([index](auto& comp)
+								{
+									comp.Materials->SetMaterial(index, 0);
+								});
+							});
+							menuContext.Append("Find", [entity, index](Berta::MenuItem ip)
+							{
+								
+							});
+							
+							Berta::GUI::ShowContextMenu(std::move(menuContext), ownerWindow, Berta::GUI::GetMousePositionToWindow(ownerWindow));
+							
+							return std::nullopt;
+						});
+				}
 			}
 			
 			//TODO

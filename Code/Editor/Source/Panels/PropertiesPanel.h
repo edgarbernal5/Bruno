@@ -19,7 +19,7 @@ namespace Bruno
 	{
 	public:
 		PropertiesPanel(Berta::Window* window, std::shared_ptr<SceneDocument> sceneDocument);
-		~PropertiesPanel();
+		~PropertiesPanel() override;
 
 	private:
 

@@ -29,7 +29,7 @@ namespace Bruno
 		m_memoryAssets[metadata.Handle] = asset;
 	}
 
-	std::shared_ptr<Asset> EditorAssetManager::GetAsset(AssetHandle assetHandle)
+	std::shared_ptr<Asset> EditorAssetManager::GetAssetRaw(AssetHandle assetHandle)
 	{
 		if (IsMemoryAsset(assetHandle))
 		{
@@ -72,7 +72,7 @@ namespace Bruno
 	{
 		for (auto& [handle, metadata] : m_assetTable)
 		{
-			auto asset = GetAsset(handle);
+			auto asset = GetAssetRaw(handle);
 		}
 	}
 

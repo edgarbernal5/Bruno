@@ -10,7 +10,7 @@
 
 namespace Bruno
 {
-	SceneDocument::SceneDocument(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager) :
+	SceneDocument::SceneDocument(std::shared_ptr<Scene> scene, EditorAssetManager* assetManager) :
 		m_scene(scene),
 		m_assetManager(assetManager)
 	{

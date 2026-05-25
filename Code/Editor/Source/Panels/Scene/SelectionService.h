@@ -9,12 +9,12 @@
 namespace Bruno
 {
 	class Scene;
-	class AbstractAssetManager;
+	class EditorAssetManager;
 
 	class SelectionService
 	{
 	public:
-		SelectionService(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager);
+		SelectionService(std::shared_ptr<Scene> scene, EditorAssetManager* assetManager);
 
 		void SelectUnderMousePosition(const Camera& camera, const Math::Int2& mousePosition);
 		void DeselectAll();
@@ -32,7 +32,7 @@ namespace Bruno
 		UUID FindEntityUUIDWithRay(const Math::Ray& ray, float maxDistance);
 
 		std::shared_ptr<Scene> m_scene;
-		AbstractAssetManager* m_assetManager;
+		EditorAssetManager* m_assetManager;
 
 		std::vector<UUID> m_selections;
 	};

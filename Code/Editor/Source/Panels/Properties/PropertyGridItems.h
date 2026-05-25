@@ -33,20 +33,4 @@ namespace Bruno
 
 		Berta::TextBox m_xyz[3];
 	};
-
-	/*class pg_asset_file
-		: public Berta::pg_string_button
-	{
-	public:
-		pg_asset_file() = default;
-
-		pg_asset_file(const std::string& label, const std::string& value)
-			: pg_string_button(label, value)
-		{}
-
-		virtual void value(const std::string& value) override;
-
-	protected:
-		virtual void create(Berta::Window wd) override;
-	};*/
 }

@@ -35,7 +35,6 @@ namespace Bruno
 		friend class BertaWindow;
 	protected:
 		virtual void OnInitialize() override;
-		virtual void OnInitializeWindow(const WindowParameters& windowParameters) = 0;
 		virtual void OnRun() override;
 
 		virtual void OnGameLoop(const GameTimer& timer) = 0;

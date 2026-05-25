@@ -5,27 +5,6 @@
 
 namespace Bruno
 {
-	//void pg_asset_file::value(const std::string& value)
-	//{
-	//	pgitem::value(value);
-	//}
-
-	//void pg_asset_file::create(Berta::Window wd)
-	//{
-	//	pg_string_button::create(wd);
-
-	//	txt_.events().focus.connect_front([this](const Berta::arg_focus& arg)
-	//	{
-	//		arg.stop_propagation();
-	//	});
-
-	//	value(value_);
-
-	//	set_button_click([this](const Berta::arg_click& arg)
-	//	{
-	//	});
-	//}
-
 	void PropertyGridFieldVector3::Draw(Berta::Graphics& graphics, const Berta::Rectangle& area, const LayoutConfig& config)
 	{
 		auto labelWidth = graphics.GetTextExtent("X").Width;

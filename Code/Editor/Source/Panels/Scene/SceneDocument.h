@@ -15,7 +15,7 @@ namespace Bruno
 	class SceneHierarchy;
 	class SelectionService;
 	class GizmoService;
-	class AbstractAssetManager;
+	class EditorAssetManager;
 
 	enum class ActionMode
 	{
@@ -27,7 +27,7 @@ namespace Bruno
 	class SceneDocument
 	{
 	public:
-		SceneDocument(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager);
+		SceneDocument(std::shared_ptr<Scene> scene, EditorAssetManager* assetManager);
 		~SceneDocument();
 
 		void InstantiateModel(std::shared_ptr<Model> model);
@@ -37,7 +37,8 @@ namespace Bruno
 		Camera& GetCamera() { return m_camera; }
 		std::shared_ptr<GizmoService> GetGizmoService() { return m_gizmoService; }
 		std::shared_ptr<SelectionService> GetSelectionService() { return m_selectionService; }
-
+		EditorAssetManager* GetAssetManager() const { return m_assetManager; }
+		
 		void UpdateSelection();
 
 		Event<Entity, ActionMode> HierarchyChanged;
@@ -49,7 +50,7 @@ namespace Bruno
 
 		Camera m_camera;
 		std::shared_ptr<Scene> m_scene;
-		AbstractAssetManager* m_assetManager;
+		EditorAssetManager* m_assetManager;
 
 		std::shared_ptr<SelectionService>	m_selectionService;
 		std::shared_ptr<GizmoService>	m_gizmoService;

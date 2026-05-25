@@ -17,7 +17,7 @@ namespace Bruno
 		EditorAssetManager(const std::wstring& projectPath);
 
 		void AddMemoryOnlyAsset(std::shared_ptr<Asset> asset) override;
-		std::shared_ptr<Asset> GetAsset(AssetHandle assetHandle) override;
+		std::shared_ptr<Asset> GetAssetRaw(AssetHandle assetHandle) override;
 		std::wstring GetAbsolutePath(const std::wstring& path);
 
 		AssetMetadata& GetMetadata(AssetHandle handle);
