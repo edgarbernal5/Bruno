@@ -40,9 +40,9 @@ namespace Bruno
 		//auto propertiesPanel = m_layout.add_pane<PropertiesPanel>(paneInfo, "pane1", Berta::dock_position::down, m_sceneDocument);
 		m_propertiesPanel = std::make_unique<PropertiesPanel>(*this, m_sceneDocument);
 
-		m_layout.AddPaneTab("panel-hierarchy-pane", "tab-hierarchy", *m_sceneHierarchyPanel, "", Berta::DockPosition::Tab);
-		m_layout.AddPaneTab("panel-pane", "tab-scene", *m_scenePanel, "panel-hierarchy-pane", Berta::DockPosition::Right);
-		m_layout.AddPaneTab("panel-properties-pane", "tab-properties", *m_propertiesPanel, "panel-hierarchy-pane", Berta::DockPosition::Down);
+		m_layout.AddPaneTab("panel-hierarchy-pane", "tab-hierarchy", std::move(m_sceneHierarchyPanel), "", Berta::DockPosition::Tab);
+		m_layout.AddPaneTab("panel-pane", "tab-scene", std::move(m_scenePanel), "panel-hierarchy-pane", Berta::DockPosition::Right);
+		m_layout.AddPaneTab("panel-properties-pane", "tab-properties", std::move(m_propertiesPanel), "panel-hierarchy-pane", Berta::DockPosition::Down);
 		
 		//this->GetEvents().Visibility.Connect([scenePanel](const Berta::ArgVisibility& arg)
 		//{

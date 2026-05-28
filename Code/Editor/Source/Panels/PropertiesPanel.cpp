@@ -195,6 +195,7 @@ namespace Bruno
 				{
 					return entity.GetComponent<ModelComponent>().MeshIndex;
 				}, nullptr).SetReadOnly(true);
+				
 				auto& assetManager = *m_sceneDocument->GetAssetManager();
 				auto modelMaterialsSubCategories = modelCategory.AppendSubCategory("Materials");
 				auto& modelComp = entity.GetComponent<ModelComponent>();
@@ -253,8 +254,7 @@ namespace Bruno
 				}
 			}
 		});
-
-
+		
 		m_propertyGrid.GetEvents().PropertyChanged.Connect([this](const Berta::ArgPropertyGrid& args)
 		{
 			BR_CORE_TRACE << "property_changed / grid. label = " << args.Property.GetLabel() << ". value = " << Berta::StringUtils::WideToUTF8(args.Property.GetValueAsString()) << std::endl;
