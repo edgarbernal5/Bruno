@@ -226,7 +226,7 @@ namespace Bruno
 								comp.Materials->SetMaterial(index, newHandle);
 							});
 						},
-						[entity, index, ownerWindow, &assetManager](std::optional<std::wstring> currentValue) -> std::optional<std::wstring>
+						[entity, index, materialAssetHandle, ownerWindow, &assetManager](std::optional<std::wstring> currentValue)
 						{
 							Berta::Menu menuContext;
 							
@@ -238,61 +238,22 @@ namespace Bruno
 									comp.Materials->SetMaterial(index, 0);
 								});
 							});
-							menuContext.Append("Find", [entity, index](Berta::MenuItem ip)
+							menuContext.Append("Select asset...", [entity, materialAssetHandle](Berta::MenuItem ip)
 							{
 								
 							});
+							menuContext.AppendSeparator();
 							
+							menuContext.Append("Find asset in Content Browser", [entity, index](Berta::MenuItem ip)
+							{
+								
+							});
 							Berta::GUI::ShowContextMenu(std::move(menuContext), ownerWindow, Berta::GUI::GetMousePositionToWindow(ownerWindow));
-							
-							return std::nullopt;
 						});
 				}
 			}
-			
-			//TODO
-			/*for (size_t i = 0; i < nodeProperties.size(); i++)
-			{
-				auto prop = nodeProperties[i];
-
-				auto cat = m_propertyGrid.Find(prop.GetCategory());
-				if (!cat)
-				{
-					cat = m_propertyGrid.Append(prop.GetCategory());
-				}
-				Berta::PropertyGrid::PropertyItem pi;
-
-				if (prop.GetType() == PropertyGridType::String)
-				{
-					pi = cat.Append(Berta::PropertyGrid::PropertyGridFieldBasePtr(new Berta::PropertyGridFieldString(prop.GetLabel(), prop.GetValue())));
-				} 
-				else if (prop.GetType() == PropertyGridType::Uint)
-				{
-					pi = cat.Append(Berta::PropertyGrid::PropertyGridFieldBasePtr(new Berta::PropertyGridFieldStringUInt(prop.GetLabel(), prop.GetValue())));
-				}
-				else if (prop.GetType() == PropertyGridType::Vector3)
-				{
-					pi = cat.Append(Berta::PropertyGrid::PropertyGridFieldBasePtr(new Berta::PropertyGridFieldVector3(prop.GetLabel(), prop.GetValue())));
-				}
-				else if (prop.GetType() == PropertyGridType::AssetFile)
-				{
-					//auto pgaf = new pg_asset_file(prop.label(), prop.value());
-					//pi = cat.Append(Berta::PropertyGrid::pgitem_ptr(pgaf));
-					//pgaf->set_button_click([&](const Berta::arg_click& click_args)
-					//{
-					//	//...
-					//	Berta::menu_popuper(m_asset_file_menu_popup, Berta::mouse::left_button)(*click_args.mouse_args);
-					//});
-				}
-			}*/
 		});
 
-		m_asset_file_menu_popup.Append("Select asset...", [](Berta::MenuItem ip)
-		{
-			//TODO: callback o un objeto. inyectarlo
-		});
-		m_asset_file_menu_popup.AppendSeparator();
-		m_asset_file_menu_popup.Append("Find asset in Content Browser", [](Berta::MenuItem ip) {});
 
 		m_propertyGrid.GetEvents().PropertyChanged.Connect([this](const Berta::ArgPropertyGrid& args)
 		{

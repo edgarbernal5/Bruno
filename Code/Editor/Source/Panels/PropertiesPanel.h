@@ -31,6 +31,5 @@ namespace Bruno
 
 		Berta::Layout m_layout;
 		Berta::PropertyGrid m_propertyGrid;
-		Berta::Menu m_asset_file_menu_popup;
 	};
 }
