@@ -25,7 +25,7 @@ namespace Bruno
 	{
 	public:
 		EditorGame(const ApplicationParameters& parameters, const std::wstring& projectPath);
-		~EditorGame();
+		~EditorGame() override;
 
 		void AddScenePanel(ScenePanel* panel);
 		void RemoveScenePanel(ScenePanel* panel);
