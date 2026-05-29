@@ -118,19 +118,19 @@ namespace Bruno
 					{
 						Berta::OptionalVector3 opt;
 						auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
-						auto currentRotation = rotation.ToEuler();
-						opt.x = currentRotation.x;
-						opt.y = currentRotation.y;
-						opt.z = currentRotation.z;
+						//auto currentRotation = rotation.ToEuler();
+						opt.x = rotation.x;
+						opt.y = rotation.y;
+						opt.z = rotation.z;
 						
 						return opt;
 					},
 					[entity](const Berta::OptionalVector3& val) mutable
 					{
 						auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
+						
 						if (val.x.has_value())
 						{
-							//Math::Quaternion::CreateFromYawPitchRoll
 							rotation.x = val.x.value();
 						}
 						
