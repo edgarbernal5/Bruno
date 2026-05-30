@@ -3,6 +3,10 @@
 #include <exception>
 #include <stdio.h>
 
+#include <wrl.h>
+#include <d3d12.h>
+#include <dxgi1_6.h>
+
 #include "Bruno/Core/Assert.h"
 
 namespace Bruno

@@ -70,7 +70,7 @@ namespace Bruno
 	{
 		auto device = Graphics::GetDevice();
 		m_selectionService = std::make_shared<SelectionService>(m_scene, m_assetManager);
-
+return;
 		m_gizmoService = std::make_shared<GizmoService>(device, m_camera, m_selectionService.get());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
 		{

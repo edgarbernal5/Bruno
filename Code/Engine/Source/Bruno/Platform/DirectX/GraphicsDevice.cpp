@@ -25,153 +25,153 @@ namespace Bruno
 	GraphicsDevice::GraphicsDevice(std::shared_ptr<GraphicsAdapter> adapter) :
 		m_adapter(adapter)
 	{
-        if (!m_adapter)
-        {
-            m_adapter = GraphicsAdapter::Create();
-        }
-
-#if BR_DEBUG
-        Microsoft::WRL::ComPtr<IDXGIInfoQueue> dxgiInfoQueue;
-        if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(dxgiInfoQueue.GetAddressOf()))))
-        {
-            m_dxgiFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
-
-            dxgiInfoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_ERROR, true);
-            dxgiInfoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_CORRUPTION, true);
-
-            DXGI_INFO_QUEUE_MESSAGE_ID hide[] =
-            {
-                80 /* IDXGISwapChain::GetContainingOutput: The swapchain's adapter does not control the output on which the swapchain's window resides. */,
-            };
-            DXGI_INFO_QUEUE_FILTER filter = {};
-            filter.DenyList.NumIDs = static_cast<uint32_t>(std::size(hide));
-            filter.DenyList.pIDList = hide;
-            dxgiInfoQueue->AddStorageFilterEntries(DXGI_DEBUG_DXGI, &filter);
-        }
-        
-#endif
-        ThrowIfFailed(CreateDXGIFactory2(m_dxgiFactoryFlags, IID_PPV_ARGS(m_dxgiFactory.ReleaseAndGetAddressOf())));
-
-        // Determines whether tearing support is available for fullscreen borderless windows.
-        //if (m_options & c_AllowTearing)
-        //{
-        //}
-
-        // Create the DX12 API device object.
-        HRESULT hr = D3D12CreateDevice(
-            m_adapter->GetHandle(),
-            m_d3dMinFeatureLevel,
-            IID_PPV_ARGS(m_d3dDevice.ReleaseAndGetAddressOf())
-        );
-        ThrowIfFailed(hr);
-
-        m_d3dDevice->SetName(L"GraphicsDevice");
-
-#ifndef NDEBUG
-        // Configure debug device (if active).
-        Microsoft::WRL::ComPtr<ID3D12InfoQueue> d3dInfoQueue;
-        if (SUCCEEDED(m_d3dDevice.As(&d3dInfoQueue)))
-        {
-#ifdef _DEBUG
-            d3dInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
-            d3dInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
-#endif
-            D3D12_MESSAGE_ID hide[] =
-            {
-                D3D12_MESSAGE_ID_MAP_INVALID_NULLRANGE,
-                D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE,
-                // Workarounds for debug layer issues on hybrid-graphics systems
-                D3D12_MESSAGE_ID_EXECUTECOMMANDLISTS_WRONGSWAPCHAINBUFFERREFERENCE,
-                D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
-            };
-            D3D12_INFO_QUEUE_FILTER filter = {};
-            filter.DenyList.NumIDs = static_cast<uint32_t>(std::size(hide));
-            filter.DenyList.pIDList = hide;
-            d3dInfoQueue->AddStorageFilterEntries(&filter);
-        }
-#endif
-
-        // Determine maximum supported feature level for this device
-        static const D3D_FEATURE_LEVEL s_featureLevels[] =
-        {
-    #if defined(NTDDI_WIN10_FE) || defined(USING_D3D12_AGILITY_SDK)
-            D3D_FEATURE_LEVEL_12_2,
-    #endif
-            D3D_FEATURE_LEVEL_12_1,
-            D3D_FEATURE_LEVEL_12_0,
-            D3D_FEATURE_LEVEL_11_1,
-            D3D_FEATURE_LEVEL_11_0,
-        };
-
-        D3D12_FEATURE_DATA_FEATURE_LEVELS featLevels =
-        {
-            static_cast<uint32_t>(std::size(s_featureLevels)), s_featureLevels, D3D_FEATURE_LEVEL_11_0
-        };
-
-        hr = m_d3dDevice->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &featLevels, sizeof(featLevels));
-        if (SUCCEEDED(hr))
-        {
-            m_d3dFeatureLevel = featLevels.MaxSupportedFeatureLevel;
-        }
-        else
-        {
-            m_d3dFeatureLevel = m_d3dMinFeatureLevel;
-        }
-
-        m_graphicsQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
-        m_computeQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_COMPUTE);
-        m_copyQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_COPY);
-
-        m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::RTV_STAGING_DESCRIPTORS_COUNT);
-        m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::DSV_STAGING_DESCRIPTORS_COUNT);
-        m_srvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::SRV_STAGING_DESCRIPTORS_COUNT);
-        m_samplerRenderPassDescriptorHeap = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 0, Graphics::Core::SAMPLER_DESCRIPTORS_COUNT);
-
-        for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
-        {
-            m_srvRenderPassDescriptorHeaps[frameIndex] = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT, Graphics::Core::SRV_RENDER_PASS_USER_DESCRIPTORS_COUNT);
-        }
-
-        D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
-
-        // This is the highest version the sample supports. If
-        // CheckFeatureSupport succeeds, the HighestVersion returned will not be
-        // greater than this.
-        featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
-
-        if (FAILED(m_d3dDevice->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE,
-            &featureData,
-            sizeof(featureData))))
-        {
-            featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
-        }
-        m_highestRootSignatureVersion = featureData.HighestVersion;
-
-        D3D12MA::ALLOCATOR_DESC allocatorDesc = {};
-        allocatorDesc.Flags = D3D12MA::ALLOCATOR_FLAG_NONE;
-        allocatorDesc.pDevice = m_d3dDevice.Get();
-        allocatorDesc.pAdapter = m_adapter->GetHandle();
-
-        D3D12MA::CreateAllocator(&allocatorDesc, &m_allocator);
-
-        BufferCreationDesc uploadBufferDesc;
-        uploadBufferDesc.Size = AlignU32(10 * 1024 * 1024, 256);
-        uploadBufferDesc.AccessFlags = BufferAccessFlags::HostWritable;
-
-        BufferCreationDesc uploadTextureDesc;
-        uploadTextureDesc.Size = AlignU32(80 * 1024 * 1024, 256);
-        uploadTextureDesc.AccessFlags = BufferAccessFlags::HostWritable;
-
-        for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
-        {
-            m_uploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GpuBuffer>(*this, uploadBufferDesc), std::make_unique<GpuBuffer>(*this, uploadTextureDesc));
-        }
-
-        m_freeReservedDescriptorIndices.resize(Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT);
-        for (size_t i = 0; i < m_freeReservedDescriptorIndices.size(); i++)
-        {
-            m_freeReservedDescriptorIndices[i] = static_cast<uint32_t>(i);
-        }
+//         if (!m_adapter)
+//         {
+//             m_adapter = GraphicsAdapter::Create();
+//         }
+//
+// #if BR_DEBUG
+//         Microsoft::WRL::ComPtr<IDXGIInfoQueue> dxgiInfoQueue;
+//         if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(dxgiInfoQueue.GetAddressOf()))))
+//         {
+//             m_dxgiFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+//
+//             dxgiInfoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_ERROR, true);
+//             dxgiInfoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_CORRUPTION, true);
+//
+//             DXGI_INFO_QUEUE_MESSAGE_ID hide[] =
+//             {
+//                 80 /* IDXGISwapChain::GetContainingOutput: The swapchain's adapter does not control the output on which the swapchain's window resides. */,
+//             };
+//             DXGI_INFO_QUEUE_FILTER filter = {};
+//             filter.DenyList.NumIDs = static_cast<uint32_t>(std::size(hide));
+//             filter.DenyList.pIDList = hide;
+//             dxgiInfoQueue->AddStorageFilterEntries(DXGI_DEBUG_DXGI, &filter);
+//         }
+//         
+// #endif
+//         ThrowIfFailed(CreateDXGIFactory2(m_dxgiFactoryFlags, IID_PPV_ARGS(m_dxgiFactory.ReleaseAndGetAddressOf())));
+//
+//         // Determines whether tearing support is available for fullscreen borderless windows.
+//         //if (m_options & c_AllowTearing)
+//         //{
+//         //}
+//
+//         // Create the DX12 API device object.
+//         HRESULT hr = D3D12CreateDevice(
+//             m_adapter->GetHandle(),
+//             m_d3dMinFeatureLevel,
+//             IID_PPV_ARGS(m_d3dDevice.ReleaseAndGetAddressOf())
+//         );
+//         ThrowIfFailed(hr);
+//
+//         m_d3dDevice->SetName(L"GraphicsDevice");
+//
+// #ifndef NDEBUG
+//         // Configure debug device (if active).
+//         Microsoft::WRL::ComPtr<ID3D12InfoQueue> d3dInfoQueue;
+//         if (SUCCEEDED(m_d3dDevice.As(&d3dInfoQueue)))
+//         {
+// #ifdef _DEBUG
+//             d3dInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
+//             d3dInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
+// #endif
+//             D3D12_MESSAGE_ID hide[] =
+//             {
+//                 D3D12_MESSAGE_ID_MAP_INVALID_NULLRANGE,
+//                 D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE,
+//                 // Workarounds for debug layer issues on hybrid-graphics systems
+//                 D3D12_MESSAGE_ID_EXECUTECOMMANDLISTS_WRONGSWAPCHAINBUFFERREFERENCE,
+//                 D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
+//             };
+//             D3D12_INFO_QUEUE_FILTER filter = {};
+//             filter.DenyList.NumIDs = static_cast<uint32_t>(std::size(hide));
+//             filter.DenyList.pIDList = hide;
+//             d3dInfoQueue->AddStorageFilterEntries(&filter);
+//         }
+// #endif
+//
+//         // Determine maximum supported feature level for this device
+//         static const D3D_FEATURE_LEVEL s_featureLevels[] =
+//         {
+//     #if defined(NTDDI_WIN10_FE) || defined(USING_D3D12_AGILITY_SDK)
+//             D3D_FEATURE_LEVEL_12_2,
+//     #endif
+//             D3D_FEATURE_LEVEL_12_1,
+//             D3D_FEATURE_LEVEL_12_0,
+//             D3D_FEATURE_LEVEL_11_1,
+//             D3D_FEATURE_LEVEL_11_0,
+//         };
+//
+//         D3D12_FEATURE_DATA_FEATURE_LEVELS featLevels =
+//         {
+//             static_cast<uint32_t>(std::size(s_featureLevels)), s_featureLevels, D3D_FEATURE_LEVEL_11_0
+//         };
+//
+//         hr = m_d3dDevice->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &featLevels, sizeof(featLevels));
+//         if (SUCCEEDED(hr))
+//         {
+//             m_d3dFeatureLevel = featLevels.MaxSupportedFeatureLevel;
+//         }
+//         else
+//         {
+//             m_d3dFeatureLevel = m_d3dMinFeatureLevel;
+//         }
+//
+//         m_graphicsQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
+//         m_computeQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+//         m_copyQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_COPY);
+//
+//         m_rtvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Graphics::Core::RTV_STAGING_DESCRIPTORS_COUNT);
+//         m_dsvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, Graphics::Core::DSV_STAGING_DESCRIPTORS_COUNT);
+//         m_srvDescriptorHeap = std::make_unique<StagingDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::SRV_STAGING_DESCRIPTORS_COUNT);
+//         m_samplerRenderPassDescriptorHeap = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 0, Graphics::Core::SAMPLER_DESCRIPTORS_COUNT);
+//
+//         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
+//         {
+//             m_srvRenderPassDescriptorHeaps[frameIndex] = std::make_unique<RenderPassDescriptorHeap>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT, Graphics::Core::SRV_RENDER_PASS_USER_DESCRIPTORS_COUNT);
+//         }
+//
+//         D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
+//
+//         // This is the highest version the sample supports. If
+//         // CheckFeatureSupport succeeds, the HighestVersion returned will not be
+//         // greater than this.
+//         featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+//
+//         if (FAILED(m_d3dDevice->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE,
+//             &featureData,
+//             sizeof(featureData))))
+//         {
+//             featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
+//         }
+//         m_highestRootSignatureVersion = featureData.HighestVersion;
+//
+//         D3D12MA::ALLOCATOR_DESC allocatorDesc = {};
+//         allocatorDesc.Flags = D3D12MA::ALLOCATOR_FLAG_NONE;
+//         allocatorDesc.pDevice = m_d3dDevice.Get();
+//         allocatorDesc.pAdapter = m_adapter->GetHandle();
+//
+//         D3D12MA::CreateAllocator(&allocatorDesc, &m_allocator);
+//
+//         BufferCreationDesc uploadBufferDesc;
+//         uploadBufferDesc.Size = AlignU32(10 * 1024 * 1024, 256);
+//         uploadBufferDesc.AccessFlags = BufferAccessFlags::HostWritable;
+//
+//         BufferCreationDesc uploadTextureDesc;
+//         uploadTextureDesc.Size = AlignU32(80 * 1024 * 1024, 256);
+//         uploadTextureDesc.AccessFlags = BufferAccessFlags::HostWritable;
+//
+//         for (uint32_t frameIndex = 0; frameIndex < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; frameIndex++)
+//         {
+//             m_uploadContexts[frameIndex] = std::make_unique<UploadContext>(*this, std::make_unique<GpuBuffer>(*this, uploadBufferDesc), std::make_unique<GpuBuffer>(*this, uploadTextureDesc));
+//         }
+//
+//         m_freeReservedDescriptorIndices.resize(Graphics::Core::RESERVED_SRV_DESCRIPTORS_COUNT);
+//         for (size_t i = 0; i < m_freeReservedDescriptorIndices.size(); i++)
+//         {
+//             m_freeReservedDescriptorIndices[i] = static_cast<uint32_t>(i);
+//         }
 	}
 
     GraphicsDevice::~GraphicsDevice()
@@ -189,34 +189,34 @@ namespace Bruno
 
     void GraphicsDevice::BeginFrame()
     {
-        m_frameId = (m_frameId + 1) % Graphics::Core::FRAMES_IN_FLIGHT_COUNT;
-
-        //Wait on fences from 2 frames ago.
-        m_graphicsQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].GraphicsQueueFence);
-        m_computeQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].ComputeQueueFence);
-        m_copyQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].CopyQueueFence);
-
-        ProcessDestructions(m_frameId);
-
-        m_uploadContexts[m_frameId]->ResolveProcessedUploads();
-        m_uploadContexts[m_frameId]->Reset();
-
-        m_contextSubmissions[m_frameId].clear();
+        // m_frameId = (m_frameId + 1) % Graphics::Core::FRAMES_IN_FLIGHT_COUNT;
+        //
+        // //Wait on fences from 2 frames ago.
+        // m_graphicsQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].GraphicsQueueFence);
+        // m_computeQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].ComputeQueueFence);
+        // m_copyQueue->WaitForFenceCPUBlocking(m_endOfFrameFences[m_frameId].CopyQueueFence);
+        //
+        // ProcessDestructions(m_frameId);
+        //
+        // m_uploadContexts[m_frameId]->ResolveProcessedUploads();
+        // m_uploadContexts[m_frameId]->Reset();
+        //
+        // m_contextSubmissions[m_frameId].clear();
     }
 
     void GraphicsDevice::EndFrame()
     {
-        m_uploadContexts[m_frameId]->ProcessUploads();
-        SubmitContextWork(*m_uploadContexts[m_frameId]);
-
-        m_endOfFrameFences[m_frameId].ComputeQueueFence = m_computeQueue->SignalFence();
-        m_endOfFrameFences[m_frameId].CopyQueueFence = m_copyQueue->SignalFence();
+        // m_uploadContexts[m_frameId]->ProcessUploads();
+        // SubmitContextWork(*m_uploadContexts[m_frameId]);
+        //
+        // m_endOfFrameFences[m_frameId].ComputeQueueFence = m_computeQueue->SignalFence();
+        // m_endOfFrameFences[m_frameId].CopyQueueFence = m_copyQueue->SignalFence();
     }
 
     void GraphicsDevice::Present(Surface* surface)
     {
-        surface->Present();
-        m_endOfFrameFences[m_frameId].GraphicsQueueFence = m_graphicsQueue->SignalFence();
+        // surface->Present();
+        // m_endOfFrameFences[m_frameId].GraphicsQueueFence = m_graphicsQueue->SignalFence();
     }
 
     D3D12MA::Allocator* GraphicsDevice::GetAllocator() const

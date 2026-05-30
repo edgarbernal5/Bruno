@@ -18,6 +18,12 @@
 #include <mutex>
 #include <Bruno/Platform/DirectX/Texture.h>
 #include <Bruno/Renderer/Camera.h>
+
+#include "Bruno/Platform/DirectX/DescriptorAllocator.h"
+#include "Bruno/Platform/DirectX/GraphicsFence.h"
+#include "Bruno/Platform/DirectX/RenderContext.h"
+#include "Bruno/Platform/DirectX/SwapChain.h"
+#include "Bruno/Platform/DirectX/Device.h"
 #include "Gizmos/GizmoService.h"
 
 namespace Bruno
@@ -88,6 +94,15 @@ namespace Bruno
 		std::shared_ptr<SelectionService>	m_selectionService;
 		std::shared_ptr<GizmoService>		m_gizmoService;
 
+		
+		std::unique_ptr<DX::GraphicsDevice>	m_dxDevice;
+		std::unique_ptr<DX::GraphicsFence>	m_dxFence;
+		std::unique_ptr<DX::RenderContext>	m_dxRenderContext;
+		std::unique_ptr<DX::SwapChain>	m_dxSwapChain;
+		
+		D3D12_VIEWPORT m_dxViewport;
+		uint64_t m_frameFenceValues[3]{0,0,0};
+		uint64_t m_currentFrame=0;
 		Math::Int2 m_lastMousePosition;
 		Math::Int2 m_beginMouseDownPosition;
 		bool m_isResizing{ false };

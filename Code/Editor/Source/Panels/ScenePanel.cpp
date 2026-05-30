@@ -43,7 +43,7 @@ namespace Bruno
 		m_scene = m_sceneDocument->GetScene();
 		m_gizmoService = m_sceneDocument->GetGizmoService();
 		m_selectionService = m_sceneDocument->GetSelectionService();
-
+		
 		m_gizmoTypeCombobox.Create(*this, false, { 0, 0, 150, 25 });
 		m_gizmoTransformSpaceButton.Create(*this);
 
@@ -75,8 +75,19 @@ namespace Bruno
 		});
 
 		//m_form = this;
-		m_form = std::make_unique<Berta::NestedForm>(this->Handle(), Berta::Rectangle{}, Berta::FormStyle::Flat(), true);
-
+		m_form = std::make_unique<Berta::NestedForm>(this->Handle(), Berta::Rectangle{0,0,100,100}, Berta::FormStyle::Flat(), true);
+		m_dxViewport.Height=100;
+		m_dxViewport.Width=100;
+		m_dxViewport.TopLeftX	=0;
+		m_dxViewport.TopLeftY	=0;
+		m_dxViewport.MinDepth	=D3D12_MIN_DEPTH;
+		m_dxViewport.MaxDepth	=D3D12_MAX_DEPTH;
+		m_dxDevice=std::make_unique<DX::GraphicsDevice>();
+		m_dxRenderContext=std::make_unique<DX::RenderContext>(*m_dxDevice);
+		m_dxFence=std::make_unique<DX::GraphicsFence>(*m_dxDevice);
+		
+		m_dxSwapChain=std::make_unique<DX::SwapChain>(*m_dxDevice.get(), (void*)m_form->Handle()->RootHandle.Handle, 100, 100);
+		
 		//TO-DO: ver si se puede agregar un evento al form o nested_form cuando llega un mensaje de WM_ACTIVATEAPP 
 		//para luego disparar un evento y saber si el panel está activado o no. Es útil para el timer y el rendering/painting.
 		/*
@@ -111,6 +122,76 @@ namespace Bruno
 				/*RECT r;
 				::GetClientRect(hwnd, &r);
 				::InvalidateRect(hwnd, &r, FALSE);*/
+				BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime()<<std::endl;
+				
+				if (!m_isExposed || m_isResizing || m_isSizingMoving)
+					return;
+				m_dxFence->WaitForValue(m_frameFenceValues[m_currentFrame]);
+			m_currentFrame=m_dxSwapChain->GetCurrentBackBufferIndex();
+
+				// 2. Iniciamos el grabador de comandos
+				m_dxRenderContext->Begin();
+				auto cmdList = m_dxRenderContext->GetCommandList();
+
+				// 3. LA BARRERA DE RECURSOS (Vital en DX12)
+				// Le decimos a la GPU: "Deja de mostrar esta imagen en el monitor, voy a pintar en ella"
+				D3D12_RESOURCE_BARRIER barrier = {};
+				barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+				barrier.Transition.pResource = m_dxSwapChain->GetCurrentBackBuffer();
+				barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+				barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+				barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+				cmdList->ResourceBarrier(1, &barrier);
+
+				// 4. Limpiamos la pantalla (Ej: Color Azul Oscuro estilo motor)
+				auto rtvHandle = m_dxSwapChain->GetCurrentBackBufferView();
+				float clearColor[] = { 0.1f, 0.2f, 0.4f, 1.0f };
+				cmdList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+
+				// Le decimos a la GPU dónde está nuestro lienzo
+				cmdList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+
+				// 5. Configuramos el Viewport (Toda la ventana)
+				D3D12_VIEWPORT viewport = { 0.0f, 0.0f, (float)m_dxViewport.Width, (float)m_dxViewport.Height, 0.0f, 1.0f };
+				D3D12_RECT scissorRect = { 0, 0, (LONG)m_dxViewport.Width, (LONG)m_dxViewport.Height };
+				cmdList->RSSetViewports(1, &viewport);
+				cmdList->RSSetScissorRects(1, &scissorRect);
+
+				// --- AQUI DIBUJAMOS EL TRIÁNGULO ---
+
+				// Conectamos el cerebro (Root Signature) y el alma (PSO/Shaders)
+				//cmdList->SetGraphicsRootSignature(m_rootSignature->GetNative());
+				//cmdList->SetPipelineState(m_pso->GetNative());
+
+				// Le decimos cómo interpretar los puntos (Lista de Triángulos)
+				//cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+				// Conectamos el Vertex Buffer
+				//auto vbView = m_triangleVertexBuffer->GetView();
+				//cmdList->IASetVertexBuffers(0, 1, &vbView);
+
+				// ¡DIBUJA 3 VÉRTICES!
+				//cmdList->DrawInstanced(3, 1, 0, 0);
+
+				// -----------------------------------
+
+				// 6. OTRA BARRERA: "Terminé de pintar, prepara la imagen para el monitor"
+				barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+				barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+				cmdList->ResourceBarrier(1, &barrier);
+
+				// 7. Cerramos la grabación y enviamos a la tarjeta gráfica
+				m_dxRenderContext->Execute();
+
+				// 8. Presentamos en pantalla
+				m_dxSwapChain->Present();
+
+				// 9. Marcamos la valla de este frame
+				m_frameFenceValues[m_currentFrame] = m_dxFence->Signal(m_dxDevice->GetCommandQueue());
+			
+				//OnUpdate(m_timer);
+				//OnDraw();
 			}
 		);
 		m_form->Handle()->RenderForAttributes.AutoRefresh = true;
@@ -173,10 +254,10 @@ namespace Bruno
 			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
 
 			auto formSize = m_form->GetSize();
-			if (m_surface)
-			{
-				m_surface->Resize(formSize.Width, formSize.Height);
-			}
+			//if (m_surface)
+			//{
+			//	m_surface->Resize(formSize.Width, formSize.Height);
+			//}
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.Width, (float)formSize.Height));
 			m_isSizingMoving = false;
 		});
@@ -192,8 +273,11 @@ namespace Bruno
 				return;
 
 			m_isResizing = true;
-
-			if (m_surface)
+			m_dxViewport.Height = args.NewSize.Height;
+			m_dxViewport.Width = args.NewSize.Width;
+			m_dxSwapChain->Resize(args.NewSize.Width, args.NewSize.Height);
+			
+			/*if (m_surface)
 			{
 				m_surface->Resize(args.NewSize.Width, args.NewSize.Height);
 			}
@@ -212,7 +296,7 @@ namespace Bruno
 				//TODO: esta inicialización está acá porque depende del surface. Esto está mal, arreglarlo!
 				InitializeSceneRenderer();
 				InitializeGizmoService();
-			}
+			}*/
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.NewSize.Width, (float)args.NewSize.Height));
 			m_isResizing = false;
 		});
@@ -222,14 +306,14 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			//BR_CORE_TRACE << "Mouse down x=" << args.pos.x << "; y=" << args.pos.y << std::endl;
+			/*//BR_CORE_TRACE << "Mouse down x=" << args.pos.x << "; y=" << args.pos.y << std::endl;
 			m_lastMousePosition.x = args.Position.X;
 			m_lastMousePosition.y = args.Position.Y;
 			m_beginMouseDownPosition = m_lastMousePosition;
 
 			m_isGizmoing = args.ButtonState.LeftButton && m_gizmoService->BeginDrag(Math::Vector2(args.Position.X, args.Position.Y));
 			//TODO
-			//m_form->set_capture(true);
+			//m_form->set_capture(true);*/
 		});
 
 		m_form->GetEvents().MouseMove.Connect([this](const Berta::ArgMouse& args)
@@ -237,7 +321,7 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
+			/*Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
 
 			if (!m_isGizmoing && !args.ButtonState.LeftButton)
 			{
@@ -279,7 +363,7 @@ namespace Bruno
 			}
 			
 			m_lastMousePosition.x = args.Position.X;
-			m_lastMousePosition.y = args.Position.Y;
+			m_lastMousePosition.y = args.Position.Y;*/
 		});
 
 		m_form->GetEvents().MouseUp.Connect([this](const Berta::ArgMouse& args)
@@ -287,7 +371,7 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
+			/*Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
 			
 			if (args.ButtonState.LeftButton)
 			{
@@ -313,7 +397,7 @@ namespace Bruno
 			}
 
 			//TODO
-			//m_form->release_capture();
+			//m_form->release_capture();*/
 		});
 
 		m_form->GetEvents().MouseWheel.Connect([this](const Berta::ArgWheel& args)
@@ -390,8 +474,8 @@ namespace Bruno
 		auto device = Graphics::GetDevice();
 		device->BeginFrame();
 
-		UpdateCBs(timer);
-		m_gizmoService->Update();
+		//UpdateCBs(timer);
+		//m_gizmoService->Update();
 	}
 
 	void ScenePanel::OnDraw()
@@ -426,9 +510,9 @@ namespace Bruno
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
 
-		m_sceneRenderer->OnRender(m_graphicsContext.get());
+		//m_sceneRenderer->OnRender(m_graphicsContext.get());
 
-		m_gizmoService->Render(m_graphicsContext.get(), m_surface.get());
+		//m_gizmoService->Render(m_graphicsContext.get(), m_surface.get());
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();
@@ -457,7 +541,7 @@ namespace Bruno
 	void ScenePanel::InitializeGraphicsContext()
 	{
 		GraphicsDevice* device = Graphics::GetDevice();
-		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
+		//m_graphicsContext = std::make_unique<GraphicsContext>(*device);
 	}
 
 	void ScenePanel::InitializeSceneRenderer()

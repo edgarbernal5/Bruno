@@ -55,8 +55,8 @@ namespace Bruno
 		ContentTypeReaderManager::Initialize();
 		SurfaceWindowParameters surfaceParameters;
 
-		m_shaderCache.Initialize();
-		m_psoCache.Initialize(surfaceParameters.BackBufferFormat, surfaceParameters.DepthBufferFormat);
+		//m_shaderCache.Initialize();
+		//m_psoCache.Initialize(surfaceParameters.BackBufferFormat, surfaceParameters.DepthBufferFormat);
 	}
 
 	void Game::OnRun()

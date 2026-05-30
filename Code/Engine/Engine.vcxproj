@@ -105,6 +105,12 @@
     <ClInclude Include="Source\Bruno\Content\AssetTable.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTypes.h" />
     <ClInclude Include="Source\Bruno\Core\UUID.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorHandle.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Device.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsFence.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\RenderContext.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\SwapChain.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
@@ -189,6 +195,11 @@
     <ClCompile Include="Source\Bruno\Content\AssetManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\AssetTable.cpp" />
     <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Device.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsFence.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\RenderContext.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\SwapChain.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\PipelineStateObjectCache.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
