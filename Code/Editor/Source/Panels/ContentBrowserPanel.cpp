@@ -17,7 +17,7 @@ namespace Bruno
 		m_listbox.Create(*this);
 
 		m_layout.Create(*this);
-		m_layout.Parse("{HorizontalLayout {tree} |70% {VerticalLayout {list}}");
+		m_layout.Parse("{HorizontalLayout {tree} |70% {VerticalLayout {list}}}");
 
 		m_layout.Attach("tree", m_treebox);
 		m_layout.Attach("list", m_listbox);
