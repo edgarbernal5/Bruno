@@ -206,13 +206,14 @@ namespace Bruno
 					oss << "Material " << index;
 					
 					modelMaterialsSubCategories.EmplaceProperty<Berta::PropertyGridFieldStringButton>(oss.str(), 
-						[entity, materialAssetHandle, &assetManager]() -> std::wstring
+						[entity, index, &assetManager]() -> std::wstring
 						{
-							if (materialAssetHandle == static_cast<UUID>(0))
+							UUID currentHandle = entity.GetComponent<ModelComponent>().Materials->GetMaterial(index);
+							if (currentHandle == static_cast<UUID>(0))
 							{
 								return L"None";
 							}
-							if (auto metadata = assetManager.GetMetadata(materialAssetHandle))
+							if (auto metadata = assetManager.GetMetadata(currentHandle))
 							{
 								return metadata.Filename;
 							}
@@ -259,10 +260,31 @@ namespace Bruno
 		{
 			BR_CORE_TRACE << "property_changed / grid. label = " << args.Property.GetLabel() << ". value = " << Berta::StringUtils::WideToUTF8(args.Property.GetValueAsString()) << std::endl;
 		});
+		
+		m_nameUpdateConnection = m_sceneDocument->GetScene()->OnComponentUpdated<NameComponent>().connect<&PropertiesPanel::OnComponentUpdated>(this);
+		m_transformUpdateConnection = m_sceneDocument->GetScene()->OnComponentUpdated<TransformComponent>().connect<&PropertiesPanel::OnComponentUpdated>(this);
+		m_modelUpdateConnection = m_sceneDocument->GetScene()->OnComponentUpdated<ModelComponent>().connect<&PropertiesPanel::OnComponentUpdated>(this);
 	}
 
 	PropertiesPanel::~PropertiesPanel()
 	{
 		m_sceneDocument->SelectionChanged.disconnect(m_selectionChangedHandleId);
+	}
+
+	void PropertiesPanel::OnComponentUpdated(entt::registry& registry, entt::entity updatedEntity)
+	{
+		auto selection = m_selectionService->GetSelections();
+		if (selection.size() != 1)
+		{
+			return;
+		}
+
+		auto selectedEntity = m_scene->GetEntityWithUUID(selection[0]);
+		Entity entity{ updatedEntity, m_sceneDocument->GetScene().get() };
+		
+		if (selectedEntity && selectedEntity == entity)
+		{
+			m_propertyGrid.RefreshAll();
+		}
 	}
 }

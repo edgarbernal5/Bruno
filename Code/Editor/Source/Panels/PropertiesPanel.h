@@ -22,6 +22,7 @@ namespace Bruno
 		~PropertiesPanel() override;
 
 	private:
+		void OnComponentUpdated(entt::registry& registry, entt::entity updatedEntity);
 
 		std::shared_ptr<SceneDocument> m_sceneDocument;
 		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;
@@ -31,5 +32,8 @@ namespace Bruno
 
 		Berta::Layout m_layout;
 		Berta::PropertyGrid m_propertyGrid;
+		entt::scoped_connection m_nameUpdateConnection;
+		entt::scoped_connection m_transformUpdateConnection;
+		entt::scoped_connection m_modelUpdateConnection;
 	};
 }
