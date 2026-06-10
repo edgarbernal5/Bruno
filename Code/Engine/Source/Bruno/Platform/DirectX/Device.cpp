@@ -6,6 +6,7 @@
 #endif
 
 #include "D3DHelpers.h"
+#include "Queue.h"
 
 #include <numeric>
 
@@ -14,43 +15,60 @@
 
 namespace Bruno::DX
 {
-    GraphicsDevice::GraphicsDevice() 
-    {
-        EnableDebugLayer();
+    GraphicsDevice::GraphicsDevice() {
+        InitializeDXGI();
         CreateDevice();
-        CreateCommandQueue();
+        
+        // C++14/17: Creación segura de memoria dinámica (RAII)
+        m_directCommandQueue = std::make_unique<CommandQueue>(m_device, D3D12_COMMAND_LIST_TYPE_DIRECT);
     }
 
-    void GraphicsDevice::EnableDebugLayer() 
-    {
+    void GraphicsDevice::InitializeDXGI() {
+        UINT dxgiFactoryFlags = 0;
+
 #if defined(_DEBUG)
+        // Encender la capa de depuración de DX12. ¡Te salvará horas de dolores de cabeza!
         Microsoft::WRL::ComPtr<ID3D12Debug> debugController;
-        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) 
-        {
+        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
             debugController->EnableDebugLayer();
+            // dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG; // Opcional en DXGI 1.3+
         }
 #endif
+
+        ThrowIfFailed(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&m_dxgiFactory)));
     }
 
-    void GraphicsDevice::CreateDevice() 
-    {
-        ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&m_factory)));
+    void GraphicsDevice::CreateDevice() {
+        Microsoft::WRL::ComPtr<IDXGIAdapter1> hardwareAdapter;
+        Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
+        
+        // Iteramos por las tarjetas gráficas de la PC para encontrar una compatible con DX12
+        for (UINT adapterIndex = 0; 
+             DXGI_ERROR_NOT_FOUND != m_dxgiFactory->EnumAdapters1(adapterIndex, &adapter); 
+             ++adapterIndex) 
+        {
+            DXGI_ADAPTER_DESC1 desc;
+            adapter->GetDesc1(&desc);
 
-        // KISS: Aquí podrías iterar sobre los adaptadores (tarjetas gráficas)
-        // Por ahora, le pasamos nullptr para usar la GPU por defecto.
+            // Ignoramos el renderizador por software (Basic Render Driver)
+            if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
+
+            // Verificamos si soporta DX12 (Feature Level 11_0 es el mínimo para DX12 API)
+            if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr))) {
+                hardwareAdapter = adapter;
+                break;
+            }
+        }
+
+        if (!hardwareAdapter) {
+            throw std::runtime_error("No se encontró una tarjeta gráfica compatible con DirectX 12.");
+        }
+
+        // Creamos el Device real
         ThrowIfFailed(D3D12CreateDevice(
-            nullptr, 
-            D3D_FEATURE_LEVEL_12_0, 
+            hardwareAdapter.Get(), 
+            D3D_FEATURE_LEVEL_11_0, 
             IID_PPV_ARGS(&m_device)
         ));
-    }
-
-    void GraphicsDevice::CreateCommandQueue() 
-    {
-        D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-        queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-        queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-
-        ThrowIfFailed(m_device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue)));
     }
 }

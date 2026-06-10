@@ -109,6 +109,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorHandle.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Device.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsFence.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Queue.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\RenderContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\SwapChain.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Device.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsFence.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Queue.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\RenderContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\SwapChain.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp" />

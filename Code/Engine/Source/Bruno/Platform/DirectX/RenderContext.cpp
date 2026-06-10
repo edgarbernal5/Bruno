@@ -39,6 +39,6 @@ namespace Bruno::DX
         ThrowIfFailed(m_commandList->Close());
 
         ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
-        m_device.GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+        //m_device.GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
     }
 }

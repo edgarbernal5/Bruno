@@ -8,6 +8,8 @@
 
 namespace Bruno::DX
 {
+	class CommandQueue;
+	
 	class GraphicsDevice 
 	{
 	public:
@@ -18,17 +20,18 @@ namespace Bruno::DX
 		GraphicsDevice(const GraphicsDevice&) = delete;
 		GraphicsDevice& operator=(const GraphicsDevice&) = delete;
 
-		[[nodiscard]] ID3D12Device* GetNativeDevice() const { return m_device.Get(); }
-		[[nodiscard]] ID3D12CommandQueue* GetCommandQueue() const { return m_commandQueue.Get(); }
-		[[nodiscard]] IDXGIFactory4* GetFactory() const { return m_factory.Get(); }
-
+		[[nodiscard]] Microsoft::WRL::ComPtr<ID3D12Device2> GetNativeDevice() const { return m_device; }
+		[[nodiscard]] Microsoft::WRL::ComPtr<IDXGIFactory4> GetDXGIFactory() const { return m_dxgiFactory; }
+		
+		[[nodiscard]] CommandQueue& GetDirectCommandQueue() const { return *m_directCommandQueue; }
 	private:
-		void EnableDebugLayer();
+		void InitializeDXGI();
 		void CreateDevice();
-		void CreateCommandQueue();
 
-		Microsoft::WRL::ComPtr<IDXGIFactory4> m_factory;
-		Microsoft::WRL::ComPtr<ID3D12Device> m_device;
-		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_commandQueue;
+		Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
+		Microsoft::WRL::ComPtr<ID3D12Device2> m_device;
+        
+		// La cola principal de comandos de la GPU
+		std::unique_ptr<CommandQueue> m_directCommandQueue;
 	};
 }
