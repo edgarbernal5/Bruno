@@ -100,6 +100,21 @@ namespace Bruno
 		m_dxSwapChain = std::make_unique<DX::SwapChain>(*m_dxDevice.get(), (void*)m_form->Handle()->RootHandle.Handle, 100, 100);
 		m_commandQueue = &m_dxDevice->GetDirectCommandQueue();
 		
+		// 1. Describir el Heap
+		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+		srvHeapDesc.NumDescriptors = 1; // Cuántas texturas/buffers vas a enlazar. (Pon 1 por ahora para tu textura)
+		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; // Tipo para Texturas y Constant Buffers
+    
+		// ¡CRÍTICO! Este flag permite que el Shader pueda acceder a este Heap
+		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE; 
+
+		// 2. Crear el Heap nativo
+		m_dxDevice->GetNativeDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_srvHeap));
+		
+		auto cmdListComPtr = m_commandQueue->GetCommandList(0).Get();
+		D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = m_srvHeap->GetCPUDescriptorHandleForHeapStart();
+		m_texture = std::make_unique<Bruno::DX::Texture2D>(m_dxDevice->GetNativeDevice().Get(), cmdListComPtr,  srvHandle, L"textura.png");
+		
 		// Single-thread rendering.
 #ifdef BR_SINGLE_THREAD_RENDERING
 		
@@ -118,10 +133,6 @@ namespace Bruno
 			// 2. Pedirle a nuestra cola el "lápiz" (CommandList). 
 			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
 			auto commandList = m_commandQueue->GetCommandList(frameIndex);
-			
-			// Viewport y ScissorRect son "Stateless" en DX12, deben setearse cada frame
-			commandList->RSSetViewports(1, &m_dxViewport);
-			commandList->RSSetScissorRects(1, &m_scissorRect);
 			
 			// 3. Extraer la textura real y su descriptor
 			auto backBuffer = m_dxSwapChain->GetCurrentBackBuffer();
@@ -152,6 +163,32 @@ namespace Bruno
 			commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 			
 			// TODO: ¡Aquí irán los comandos DrawInstanced para tu triángulo / escena 3D!
+			// 2. Setear estado del Pipeline y RootSignature
+			//commandList->SetPipelineState(m_pso->GetNative());
+			commandList->SetGraphicsRootSignature(m_rootSignature->GetNative());
+
+			// 3. Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
+			ID3D12DescriptorHeap* descriptorHeaps[] = { m_srvHeap.Get() };
+			commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+			
+			// 4. Enlazar datos al Shader (Root Parameters)
+			// Asumimos Parameter 0: ConstantBuffer, Parameter 1: DescriptorTable (Textura)
+			commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetGPUAddress());
+			commandList->SetGraphicsRootDescriptorTable(1, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
+			
+			// 5. Configurar Viewport y Scissor Test explícitamente en este frame
+			commandList->RSSetViewports(1, &m_dxViewport);
+			commandList->RSSetScissorRects(1, &m_scissorRect);
+			
+			// 6. Setear la Geometría (Buffers)
+			D3D12_VERTEX_BUFFER_VIEW vbv = m_vertexBuffer->GetView();
+			D3D12_INDEX_BUFFER_VIEW ibv = m_indexBuffer->GetView();
+			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			commandList->IASetVertexBuffers(0, 1, &vbv);
+			commandList->IASetIndexBuffer(&ibv);
+			
+			// 7. ¡El gran llamado de dibujado!
+			commandList->DrawIndexedInstanced(m_indexBuffer->GetIndicesCount(), 1, 0, 0, 0);
 			
 			/*// A. Setear la firma (El contrato de los shaders)
 			commandList->SetGraphicsRootSignature(m_rootSignature->GetNative());

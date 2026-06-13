@@ -10,14 +10,14 @@ namespace Bruno::DX {
 
     class GraphicsDevice;
 
-    class DescriptorAllocator 
+    class DescriptorAllocator2
     {
     public:
-        DescriptorAllocator(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible = false);
-        ~DescriptorAllocator() = default;
+        DescriptorAllocator2(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible = false);
+        ~DescriptorAllocator2() = default;
 
-        DescriptorAllocator(const DescriptorAllocator&) = delete;
-        DescriptorAllocator& operator=(const DescriptorAllocator&) = delete;
+        DescriptorAllocator2(const DescriptorAllocator2&) = delete;
+        DescriptorAllocator2& operator=(const DescriptorAllocator2&) = delete;
 
         // Devuelve un handle y su índice en el heap. 
         // Usamos std::optional (C++17) por si nos quedamos sin memoria.

@@ -15,7 +15,8 @@
 
 namespace Bruno::DX
 {
-    GraphicsDevice::GraphicsDevice() {
+    GraphicsDevice::GraphicsDevice() 
+    {
         InitializeDXGI();
         CreateDevice();
         
@@ -23,13 +24,15 @@ namespace Bruno::DX
         m_directCommandQueue = std::make_unique<CommandQueue>(m_device, D3D12_COMMAND_LIST_TYPE_DIRECT);
     }
 
-    void GraphicsDevice::InitializeDXGI() {
+    void GraphicsDevice::InitializeDXGI()
+    {
         UINT dxgiFactoryFlags = 0;
 
 #if defined(_DEBUG)
         // Encender la capa de depuración de DX12. ¡Te salvará horas de dolores de cabeza!
         Microsoft::WRL::ComPtr<ID3D12Debug> debugController;
-        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+        {
             debugController->EnableDebugLayer();
             // dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG; // Opcional en DXGI 1.3+
         }
@@ -38,7 +41,8 @@ namespace Bruno::DX
         ThrowIfFailed(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&m_dxgiFactory)));
     }
 
-    void GraphicsDevice::CreateDevice() {
+    void GraphicsDevice::CreateDevice()
+    {
         Microsoft::WRL::ComPtr<IDXGIAdapter1> hardwareAdapter;
         Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
         

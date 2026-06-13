@@ -25,7 +25,9 @@
 #include "Bruno/Platform/DirectX/RenderContext.h"
 #include "Bruno/Platform/DirectX/SwapChain.h"
 #include "Bruno/Platform/DirectX/Device.h"
+#include "Bruno/Platform/DirectX/IndexBuffer_Gem.h"
 #include "Bruno/Platform/DirectX/RootSignature_Gem.h"
+#include "Bruno/Platform/DirectX/Texture2D.h"
 #include "Bruno/Platform/DirectX/VertexBuffer_Gem.h"
 #include "Gizmos/GizmoService.h"
 
@@ -107,7 +109,10 @@ namespace Bruno
 		D3D12_RECT m_scissorRect;
 		DX::RootSignature* m_rootSignature;
 		DX::VertexBuffer* m_vertexBuffer;
+		DX::IndexBuffer* m_indexBuffer;
 		DX::ConstantBuffer* m_constantBuffer;
+		std::unique_ptr<DX::Texture2D> m_texture;
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_srvHeap;
 		
 		uint64_t m_frameFenceValues[3]{0,0,0};
 		uint64_t m_currentFrame=0;

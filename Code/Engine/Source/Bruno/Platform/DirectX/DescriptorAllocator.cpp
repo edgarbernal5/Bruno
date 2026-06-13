@@ -5,7 +5,7 @@
 
 namespace Bruno::DX {
 
-    DescriptorAllocator::DescriptorAllocator(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible)
+    DescriptorAllocator2::DescriptorAllocator2(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible)
         : m_heapType(type), m_capacity(capacity)
     {
         auto nativeDevice = device.GetNativeDevice();
@@ -20,7 +20,7 @@ namespace Bruno::DX {
         ThrowIfFailed(nativeDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_heap)));
     }
 
-    std::optional<uint32_t> DescriptorAllocator::Allocate() 
+    std::optional<uint32_t> DescriptorAllocator2::Allocate() 
     {
         // C++17: Mutex locking seguro. Si falla algo, se libera solo.
         std::scoped_lock lock(m_allocationMutex);
@@ -46,7 +46,7 @@ namespace Bruno::DX {
         return std::nullopt; 
     }
 
-    void DescriptorAllocator::Free(uint32_t index) 
+    void DescriptorAllocator2::Free(uint32_t index) 
     {
         if (index >= m_capacity) return; // Prevención de crash
 
@@ -56,7 +56,7 @@ namespace Bruno::DX {
         m_freeIndices.push_back(index);
     }
 
-    DescriptorHandle DescriptorAllocator::GetHandle(uint32_t index) const 
+    DescriptorHandle DescriptorAllocator2::GetHandle(uint32_t index) const 
     {
         DescriptorHandle handle;
         if (index >= m_capacity) return handle; // Retorna un handle inválido

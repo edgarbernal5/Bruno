@@ -24,11 +24,13 @@ namespace Bruno::DX
         desc.NodeMask = 0;
 
         ThrowIfFailed(device->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_commandQueue)));
+        
         // 1. Crear la valla con valor inicial 0
         ThrowIfFailed(device->CreateFence(m_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
         
         m_fenceEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
-        if (!m_fenceEvent) {
+        if (!m_fenceEvent)
+        {
             throw std::runtime_error("Fallo al crear el evento de sincronización de Windows.");
         }
 
@@ -46,13 +48,14 @@ namespace Bruno::DX
         m_commandList->Close();
     }
 
-    CommandQueue::~CommandQueue() {
+    CommandQueue::~CommandQueue()
+    {
         Flush();
         ::CloseHandle(m_fenceEvent);
     }
 
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CommandQueue::GetCommandList(uint32_t frameIndex) {
-        
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CommandQueue::GetCommandList(uint32_t frameIndex)
+    {
         // 1. ANTES de usar el Allocator de este frame, verificamos que la GPU ya terminó de leerlo
         WaitForFenceValue(m_frameFenceValues[frameIndex]);
 
@@ -64,7 +67,8 @@ namespace Bruno::DX
         return m_commandList;
     }
 
-    uint64_t CommandQueue::ExecuteCommandList(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList, uint32_t frameIndex) {
+    uint64_t CommandQueue::ExecuteCommandList(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList, uint32_t frameIndex)
+    {
         ThrowIfFailed(commandList->Close());
 
         ID3D12CommandList* const ppCommandLists[] = { commandList.Get() };
@@ -80,7 +84,8 @@ namespace Bruno::DX
         return m_fenceValue;
     }
 
-    void CommandQueue::WaitForFenceValue(uint64_t fenceValue) {
+    void CommandQueue::WaitForFenceValue(uint64_t fenceValue)
+    {
         // Verificamos si la GPU ya cruzó la valla (Si es así, la CPU ni se frena)
         if (m_fence->GetCompletedValue() < fenceValue) 
         {
