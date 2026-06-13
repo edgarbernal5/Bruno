@@ -92,7 +92,7 @@ namespace Bruno
 
 	void CommandQueue::WaitForIdle()
 	{
-		WaitForFenceCPUBlocking(m_nextFenceValue - 1);
+		//WaitForFenceCPUBlocking(m_nextFenceValue - 1);
 	}
 
 	uint64_t CommandQueue::PollCurrentFenceValue()

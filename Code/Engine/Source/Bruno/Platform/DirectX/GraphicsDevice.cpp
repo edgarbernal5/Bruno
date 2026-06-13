@@ -255,7 +255,7 @@ namespace Bruno
         submissionResult.FrameId = m_frameId;
         submissionResult.SubmissionIndex = static_cast<uint32_t>(m_contextSubmissions[m_frameId].size());
 
-        m_contextSubmissions[m_frameId].push_back(std::make_pair(fenceResult, context.GetCommandType()));
+        m_contextSubmissions[m_frameId].emplace_back(fenceResult, context.GetCommandType());
 
         return submissionResult;
     }

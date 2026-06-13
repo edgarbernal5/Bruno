@@ -12,7 +12,7 @@ namespace Bruno::DX
         SwapChain(GraphicsDevice& device, void* nativeWindowHandle, uint32_t width, uint32_t height);
         ~SwapChain();
 
-        void Present();
+        void Present(bool vsync = true);
         void Resize(uint32_t width, uint32_t height);
 
         [[nodiscard]] uint32_t GetCurrentBackBufferIndex() const;

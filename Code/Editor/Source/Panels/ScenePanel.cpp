@@ -21,11 +21,11 @@
 #include <iostream>
 #include <Bruno/Core/Log.h>
 #include "SceneHierarchyPanel.h"
+#include "Bruno/Platform/DirectX/RootSignatureBuilder.h"
 
 namespace Bruno
 {
 	ScenePanel::ScenePanel(Berta::Window* window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters) :
-		//Berta::nested_form(window, Berta::appear::bald<>()),
 		Berta::Panel(window),
 		m_surfaceParameters(surfaceParameters),
 		m_sceneDocument(sceneDocument),
@@ -86,99 +86,105 @@ namespace Bruno
 		m_dxViewport.MinDepth	=D3D12_MIN_DEPTH;
 		m_dxViewport.MaxDepth	=D3D12_MAX_DEPTH;
 		m_dxDevice=std::make_unique<DX::GraphicsDevice>();
-		m_dxRenderContext=std::make_unique<DX::RenderContext>(*m_dxDevice);
+		m_dxRenderContext = std::make_unique<DX::RenderContext>(*m_dxDevice);
 		m_dxFence=std::make_unique<DX::GraphicsFence>(*m_dxDevice);
 		
-		m_dxSwapChain=std::make_unique<DX::SwapChain>(*m_dxDevice.get(), (void*)m_form->Handle()->RootHandle.Handle, 100, 100);
+		/*auto rootSig = DX::RootSignatureBuilder()
+			.AddRootConstantBufferView(0) // b0: Matrices (MVP)
+			.Build(m_dxDevice->GetNativeDevice().Get());*/
+		
+		m_rootSignature = new DX::RootSignature(*m_dxDevice.get());
+		
+		//m_vertexBuffer = new DX::VertexBuffer(m_dxDevice->GetNativeDevice().Get(), )
+		
+		m_dxSwapChain = std::make_unique<DX::SwapChain>(*m_dxDevice.get(), (void*)m_form->Handle()->RootHandle.Handle, 100, 100);
+		m_commandQueue = &m_dxDevice->GetDirectCommandQueue();
 		
 		// Single-thread rendering.
 #ifdef BR_SINGLE_THREAD_RENDERING
-		/*auto hwnd = reinterpret_cast<HWND>(m_form->NativeHandle());
-		m_form->draw_through([hwnd, this]
+		
+		m_form->SetCustomPaintCallback([this]()
 		{
 			m_timer.Tick();
-
-			OnUpdate(m_timer);
-			OnDraw();
-
-			RECT r;
-			::GetClientRect(hwnd, &r);
-			::InvalidateRect(hwnd, &r, FALSE);
-		});*/
-		auto hwnd = m_form->NativeHandle().Handle;
-		m_form->SetCustomPaintCallback([hwnd, this]()
-		{
-			m_timer.Tick();
-
-			/*OnUpdate(m_timer);
-			OnDraw();*/
 			
 			if (!m_isExposed || m_isResizing || m_isSizingMoving)
 				return;
-				
-			BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime()<<std::endl;
-				
-			// 1. Obtener una Command List limpia y lista para grabar comandos
-			auto commandList = m_dxDevice->GetDirectCommandQueue().GetCommandList();
-	            
-			// Obtener el recurso físico y el descriptor (puntero mágico) del frame actual
+			
+			uint32_t frameIndex = m_dxSwapChain->GetCurrentBackBufferIndex();
+
+			BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
+			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
+    
+			// 2. Pedirle a nuestra cola el "lápiz" (CommandList). 
+			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
+			auto commandList = m_commandQueue->GetCommandList(frameIndex);
+			
+			// Viewport y ScissorRect son "Stateless" en DX12, deben setearse cada frame
+			commandList->RSSetViewports(1, &m_dxViewport);
+			commandList->RSSetScissorRects(1, &m_scissorRect);
+			
+			// 3. Extraer la textura real y su descriptor
 			auto backBuffer = m_dxSwapChain->GetCurrentBackBuffer();
 			auto rtvHandle = m_dxSwapChain->GetCurrentRenderTargetView();
 
-			// ====================================================================
-			// FASE 1: PREPARACIÓN (Transición PRESENT -> RENDER_TARGET)
-			// ====================================================================
+			// ------------------------------------------------------------------
+			// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
+			// ------------------------------------------------------------------
 			D3D12_RESOURCE_BARRIER barrier = {};
 			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 			barrier.Transition.pResource = backBuffer.Get();
-			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
-			// Ordenamos a la GPU que espere a que termine la presentación antes de escribir
+			// Grabamos el comando de transición
 			commandList->ResourceBarrier(1, &barrier);
-
-			// ====================================================================
-			// FASE 2: DIBUJO
-			// ====================================================================
-	            
-			// Un azul oscuro elegante, clásico de los Game Engines modernos
-			const float clearColor[] = { 0.1f, 0.15f, 0.2f, 1.0f }; 
-	            
-			// Limpiamos la pantalla
+			
+			// ------------------------------------------------------------------
+			// FASE DE DIBUJO
+			// ------------------------------------------------------------------
+			// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
+			const float clearColor[] = { 0.1f, 0.1f, 0.15f, 1.0f }; 
+		    
+			// Limpiar la pantalla
 			commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+			commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+			
+			// TODO: ¡Aquí irán los comandos DrawInstanced para tu triángulo / escena 3D!
+			
+			/*// A. Setear la firma (El contrato de los shaders)
+			commandList->SetGraphicsRootSignature(m_rootSignature->GetNative());
+			// B. Actualizar matriz MVP en el Constant Buffer (CPU -> RAM) y Enlazarlo al registro b0
+			Math::Matrix MVP = Math::Matrix::Identity; //camera.GetViewProjectionMatrix() * model.GetTransform();
+			m_constantBuffer->Update(&MVP, sizeof(Math::Matrix));
+			commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetGPUAddress());
 
-			// ¡AQUÍ ES DONDE DIBUJAREMOS EL TRIÁNGULO EN EL SIGUIENTE PASO!
-			// ...
-
-			// ====================================================================
-			// FASE 3: CIERRE (Transición RENDER_TARGET -> PRESENT)
-			// ====================================================================
+			// C. Setear la topología (Triángulos) y el Vertex Buffer
+			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		    
+			D3D12_VERTEX_BUFFER_VIEW vbView = m_vertexBuffer->GetView();
+			commandList->IASetVertexBuffers(0, 1, &vbView);
+			commandList->DrawInstanced(3, 1, 0, 0); // 3 vértices para un triángulo
+			*/
+			// ------------------------------------------------------------------
+			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
+			// ------------------------------------------------------------------
 			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-
-			// Le decimos a la GPU que ya terminamos de pintar, que lo prepare para el monitor
+			
 			commandList->ResourceBarrier(1, &barrier);
 
-			// ====================================================================
-			// FASE 4: EJECUCIÓN Y PRESENTACIÓN
-			// ====================================================================
-	            
-			// 1. Ejecutar los comandos en la GPU
-			m_dxDevice->GetDirectCommandQueue().ExecuteCommandList(commandList);
-				
-			// 2. Intercambiar los buffers para mostrar en pantalla
-			m_dxSwapChain->Present();
-				
-			// 3. EL FRENO DE MANO: Esperar a que la GPU termine el frame actual 
-			// antes de permitir que el ciclo while comience el siguiente frame.
-			m_dxDevice->GetDirectCommandQueue().Flush();
+			// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
+			m_commandQueue->ExecuteCommandList(commandList, frameIndex);
+
+			// 5. Intercambiar los buffers y mostrar en pantalla (VSync activado por ahora)
+			m_dxSwapChain->Present(true);
 			
 			//OnUpdate(m_timer);
 			//OnDraw();
-		}
-		);
+		});
+		
 		m_form->Handle()->RenderForAttributes.AutoRefresh = true;
 #endif // SINGLE_THREAD_RENDERING
 
@@ -195,14 +201,6 @@ namespace Bruno
 			m_isExposed = false;
 			m_editorGame->RemoveScenePanel(this);
 		});
-
-		/*this->GetEvents().Resize.Connect([this](const Berta::ArgResize& args)
-		{
-			int margin = 4;
-			int height = m_gizmoTypeCombobox.GetSize().Height;
-			Berta::Rectangle newRect(margin, height + margin, args.NewSize.Width - margin * 2, args.NewSize.Height - height - margin * 2);
-			m_form->SetArea(newRect);
-		});*/
 
 		this->GetEvents().Visibility.Connect([this](const Berta::ArgVisibility& args)
 		{
@@ -260,6 +258,7 @@ namespace Bruno
 			m_isResizing = true;
 			m_dxViewport.Height = args.NewSize.Height;
 			m_dxViewport.Width = args.NewSize.Width;
+			m_scissorRect = { 0, 0, static_cast<LONG>(args.NewSize.Width), static_cast<LONG>(args.NewSize.Height) };
 			m_dxSwapChain->Resize(args.NewSize.Width, args.NewSize.Height);
 			
 			/*if (m_surface)

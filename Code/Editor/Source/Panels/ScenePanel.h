@@ -19,11 +19,14 @@
 #include <Bruno/Platform/DirectX/Texture.h>
 #include <Bruno/Renderer/Camera.h>
 
+#include "Bruno/Platform/DirectX/ConstantBuffer_Gem.h"
 #include "Bruno/Platform/DirectX/DescriptorAllocator.h"
 #include "Bruno/Platform/DirectX/GraphicsFence.h"
 #include "Bruno/Platform/DirectX/RenderContext.h"
 #include "Bruno/Platform/DirectX/SwapChain.h"
 #include "Bruno/Platform/DirectX/Device.h"
+#include "Bruno/Platform/DirectX/RootSignature_Gem.h"
+#include "Bruno/Platform/DirectX/VertexBuffer_Gem.h"
 #include "Gizmos/GizmoService.h"
 
 namespace Bruno
@@ -99,8 +102,13 @@ namespace Bruno
 		std::unique_ptr<DX::GraphicsFence>	m_dxFence;
 		std::unique_ptr<DX::RenderContext>	m_dxRenderContext;
 		std::unique_ptr<DX::SwapChain>	m_dxSwapChain;
-		
+		DX::CommandQueue* m_commandQueue { nullptr };
 		D3D12_VIEWPORT m_dxViewport;
+		D3D12_RECT m_scissorRect;
+		DX::RootSignature* m_rootSignature;
+		DX::VertexBuffer* m_vertexBuffer;
+		DX::ConstantBuffer* m_constantBuffer;
+		
 		uint64_t m_frameFenceValues[3]{0,0,0};
 		uint64_t m_currentFrame=0;
 		Math::Int2 m_lastMousePosition;

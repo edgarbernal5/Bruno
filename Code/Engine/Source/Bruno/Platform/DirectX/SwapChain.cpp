@@ -61,11 +61,15 @@ namespace Bruno::DX
 
         // 5. Vincular las texturas reales a los descriptores
         UpdateRenderTargetViews();
+        
+        // 6. Prohibir a DXGI que intercepte Alt+Enter (Nosotros lo manejaremos si queremos fullscreen)
+        ThrowIfFailed(dxgiFactory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER));
     }
 
     SwapChain::~SwapChain() {
         // En RAII, ComPtr se encarga de destruir las texturas y el SwapChain.
         // Solo asegúrate de que el GraphicsDevice haga un Flush() antes de llegar aquí.
+        m_device.GetDirectCommandQueue().Flush();
     }
 
     void SwapChain::UpdateRenderTargetViews() {
@@ -87,6 +91,10 @@ namespace Bruno::DX
     }
 
     void SwapChain::Resize(uint32_t width, uint32_t height) {
+        if (width == 0 || height == 0) {
+            return; 
+        }
+        
         // REGLA DE ORO: No puedes redimensionar algo que la GPU está usando.
         // Llamamos al método Flush que hicimos en el paso anterior.
         m_device.GetDirectCommandQueue().Flush();
@@ -109,9 +117,18 @@ namespace Bruno::DX
         UpdateRenderTargetViews();
     }
 
-    void SwapChain::Present() {
-        // Intercambiar los buffers (1 = activar VSync, 0 = FPS ilimitados)
-        ThrowIfFailed(m_swapChain->Present(1, 0));
+    void SwapChain::Present(bool vsync) {
+        UINT syncInterval = vsync ? 1 : 0;
+        UINT presentFlags = 0;
+        
+        // Si quitamos el VSync y el SwapChain lo soporta, le decimos a DX12 que 
+        // permita "Tearing" para no limitar los FPS al monitor.
+        // (Nota: Para que ALLOW_TEARING funcione del todo, deberías haberle pasado el flag
+        // DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING al swapChainDesc en el constructor).
+        if (!vsync) {
+            presentFlags = DXGI_PRESENT_ALLOW_TEARING;
+        }
+        ThrowIfFailed(m_swapChain->Present(syncInterval, presentFlags));
         
         // Actualizar cuál es el buffer en el que vamos a dibujar en el siguiente frame
         m_currentBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
