@@ -21,7 +21,11 @@ namespace Bruno::DX {
     }
 
     void DepthBuffer::Resize(uint32_t width, uint32_t height) {
-        if (m_width == width && m_height == height) return;
+        if (m_width == width && m_height == height)
+        {
+            return;
+        }
+        
         m_width = width;
         m_height = height;
         
@@ -30,7 +34,8 @@ namespace Bruno::DX {
         CreateResourceAndDescriptor();
     }
 
-    void DepthBuffer::CreateResourceAndDescriptor() {
+    void DepthBuffer::CreateResourceAndDescriptor()
+    {
         auto nativeDevice = m_device.GetNativeDevice();
 
         // 2. Describir la memoria de la textura

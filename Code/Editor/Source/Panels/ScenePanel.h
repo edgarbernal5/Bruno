@@ -20,6 +20,7 @@
 #include <Bruno/Renderer/Camera.h>
 
 #include "Bruno/Platform/DirectX/ConstantBuffer_Gem.h"
+#include "Bruno/Platform/DirectX/DepthBuffer_Gem.h"
 #include "Bruno/Platform/DirectX/DescriptorAllocator.h"
 #include "Bruno/Platform/DirectX/GraphicsFence.h"
 #include "Bruno/Platform/DirectX/RenderContext.h"
@@ -104,6 +105,7 @@ namespace Bruno
 		std::unique_ptr<DX::GraphicsFence>	m_dxFence;
 		std::unique_ptr<DX::RenderContext>	m_dxRenderContext;
 		std::unique_ptr<DX::SwapChain>	m_dxSwapChain;
+		std::unique_ptr<DX::DepthBuffer>	m_dxDepthBuffer;
 		DX::CommandQueue* m_commandQueue { nullptr };
 		D3D12_VIEWPORT m_dxViewport;
 		D3D12_RECT m_scissorRect;

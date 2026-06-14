@@ -5,7 +5,8 @@
 
 namespace Bruno::DX
 {
-    RootSignature::RootSignature(GraphicsDevice& device) {
+    RootSignature::RootSignature(GraphicsDevice& device)
+    {
         auto nativeDevice = device.GetNativeDevice();
 
         // ---------------------------------------------------------

@@ -100,6 +100,7 @@ namespace Bruno
 		m_dxSwapChain = std::make_unique<DX::SwapChain>(*m_dxDevice.get(), (void*)m_form->Handle()->RootHandle.Handle, 100, 100);
 		m_commandQueue = &m_dxDevice->GetDirectCommandQueue();
 		
+		m_dxDepthBuffer= std::make_unique<DX::DepthBuffer>(*m_dxDevice, 100,100);
 		// 1. Describir el Heap
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 		srvHeapDesc.NumDescriptors = 1; // Cuántas texturas/buffers vas a enlazar. (Pon 1 por ahora para tu textura)
@@ -160,6 +161,7 @@ namespace Bruno
 		    
 			// Limpiar la pantalla
 			commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+			commandList->ClearDepthStencilView(m_dxDepthBuffer->GetView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 			commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 			
 			// TODO: ¡Aquí irán los comandos DrawInstanced para tu triángulo / escena 3D!
@@ -276,8 +278,14 @@ namespace Bruno
 			auto formSize = m_form->GetSize();
 			//if (m_surface)
 			//{
-			//	m_surface->Resize(formSize.Width, formSize.Height);
-			//}
+			if (m_dxSwapChain)
+			{
+				m_dxSwapChain->Resize(formSize.Width, formSize.Height);
+			}
+			if (m_dxDepthBuffer)
+			{
+				m_dxDepthBuffer->Resize(formSize.Width, formSize.Height);
+			}
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.Width, (float)formSize.Height));
 			m_isSizingMoving = false;
 		});
@@ -297,7 +305,7 @@ namespace Bruno
 			m_dxViewport.Width = args.NewSize.Width;
 			m_scissorRect = { 0, 0, static_cast<LONG>(args.NewSize.Width), static_cast<LONG>(args.NewSize.Height) };
 			m_dxSwapChain->Resize(args.NewSize.Width, args.NewSize.Height);
-			
+			m_dxDepthBuffer->Resize(args.NewSize.Width, args.NewSize.Height);
 			/*if (m_surface)
 			{
 				m_surface->Resize(args.NewSize.Width, args.NewSize.Height);
