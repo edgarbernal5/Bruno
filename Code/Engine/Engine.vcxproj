@@ -119,6 +119,8 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature_Gem.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderCompiler.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Shader_Gem.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Surface_Gem.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\SwapChain.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Texture2D.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadHeap.h" />
@@ -220,6 +222,8 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignature_Gem.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderCompiler.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Shader_Gem.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Surface_Gem.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\SwapChain.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Texture2D.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadHeap.cpp" />

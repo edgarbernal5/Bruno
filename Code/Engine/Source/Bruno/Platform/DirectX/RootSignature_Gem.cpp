@@ -5,7 +5,8 @@
 
 namespace Bruno::DX
 {
-    RootSignature::RootSignature(GraphicsDevice& device)
+    RootSignature::RootSignature(GraphicsDevice& device) :
+        m_device(device)
     {
         auto nativeDevice = device.GetNativeDevice();
 
@@ -79,7 +80,7 @@ namespace Bruno::DX
         }
     }
 
-    void RootSignature::CreateOpaqueSignature(ID3D12Device* device)
+    void RootSignature::CreateOpaqueSignature()
     {
         // 1. Definir los parámetros (El contrato con el shader)
         CD3DX12_ROOT_PARAMETER rootParameters[2];
@@ -118,7 +119,7 @@ namespace Bruno::DX
     
         D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, &serializedRootSig, &errorBlob);
     
-        device->CreateRootSignature(
+        m_device.GetNativeDevice()->CreateRootSignature(
             0, 
             serializedRootSig->GetBufferPointer(), 
             serializedRootSig->GetBufferSize(), 

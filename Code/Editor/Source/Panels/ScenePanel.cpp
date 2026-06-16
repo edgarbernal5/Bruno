@@ -101,6 +101,8 @@ namespace Bruno
 		m_commandQueue = &m_dxDevice->GetDirectCommandQueue();
 		
 		m_dxDepthBuffer= std::make_unique<DX::DepthBuffer>(*m_dxDevice, 100,100);
+		
+		Bruno::Graphics::GetDXDevice() = m_dxDevice.get();
 		// 1. Describir el Heap
 		/*D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 		srvHeapDesc.NumDescriptors = 1; // Cuántas texturas/buffers vas a enlazar. (Pon 1 por ahora para tu textura)

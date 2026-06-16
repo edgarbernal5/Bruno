@@ -1,6 +1,7 @@
 #pragma once
 
-#include <Bruno/Platform/DirectX/PipelineStateObject.h>
+#include <Bruno/Platform/DirectX/RootSignature_Gem.h>
+#include <Bruno/Platform/DirectX/GraphicsPipelineState.h>
 #include <Bruno/Math/Math.h>
 
 namespace Bruno
@@ -21,11 +22,10 @@ namespace Bruno
 		std::shared_ptr<Scene> m_scene;
 		Surface* m_surface;
 		AbstractAssetManager* m_assetManager;
-		PipelineResourceSpace			m_meshPerObjectResourceSpace;
 
-		std::shared_ptr<RootSignature>			m_rootSignature;
-		std::unique_ptr<Shader>					m_opaqueShader;
-		std::unique_ptr<PipelineStateObject>	m_pipelineState;
+		std::shared_ptr<DX::RootSignature> m_opaqueRootSignature;
+		std::unique_ptr<Shader> m_opaqueShader;
+		std::unique_ptr<DX::GraphicsPipelineState> m_opaquePSO;
 
 	};
 }

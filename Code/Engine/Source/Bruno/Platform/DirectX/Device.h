@@ -41,3 +41,14 @@ namespace Bruno::DX
 		std::unique_ptr<DX::DescriptorAllocator> m_svrDescriptorAllocator;
 	};
 }
+
+
+namespace Bruno::Graphics
+{
+	inline DX::GraphicsDevice*& GetDXDevice()
+	{
+		static DX::GraphicsDevice* g_device = nullptr;
+		return g_device;
+	}
+	
+}

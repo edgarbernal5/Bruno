@@ -7,22 +7,20 @@
 namespace Bruno::DX {
 
     class RootSignature;
+    class GraphicsDevice;
 
     class GraphicsPipelineState {
     public:
         // C++17: Pasamos los blobs compilados y la firma
-        GraphicsPipelineState(ID3D12Device* device, 
-                              RootSignature* rootSignature,
-                              IDxcBlob* vertexShader,
-                              IDxcBlob* pixelShader,
-                              DXGI_FORMAT renderTargetFormat);
+        GraphicsPipelineState(GraphicsDevice& device);
         
         ~GraphicsPipelineState() = default;
 
         [[nodiscard]] ID3D12PipelineState* GetNative() const { return m_pso.Get(); }
-        void CreateOpaquePSO(ID3D12Device* device, ID3D12RootSignature* rootSig, ID3DBlob* vertexShaderByteCode, ID3DBlob* pixelShaderByteCode);
+        void CreateOpaquePSO(ID3D12RootSignature* rootSig, IDxcBlob* vertexShaderByteCode, IDxcBlob* pixelShaderByteCode);
         
     private:
+        GraphicsDevice& m_device;
         Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pso;
     };
 }

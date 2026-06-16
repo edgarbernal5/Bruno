@@ -13,6 +13,7 @@
 #include "Bruno/Platform/DirectX/Surface.h"
 
 #include "Bruno/Content/AssetManager.h"
+#include "Bruno/Platform/DirectX/ShaderCompiler.h"
 
 namespace Bruno
 {
@@ -21,9 +22,38 @@ namespace Bruno
 		m_surface(surface),
 		m_assetManager(assetManager)
 	{
-		m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
+		auto& device = Bruno::Graphics::GetDXDevice();
+		
+		//m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
 
-		PipelineResourceBinding textureBinding;
+		DX::ShaderCompiler compiler; 
+
+		// Compilas usando DXC (nota el _6_0)
+		auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"VS", L"vs_6_0");
+		auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"PS", L"ps_6_0");
+		
+		m_opaqueRootSignature = std::make_shared<DX::RootSignature>(*device);
+		m_opaqueRootSignature->CreateOpaqueSignature();
+
+		// Instanciamos el Pipeline State Object (PSO) pasándole el contrato y shaders
+		m_opaquePSO = std::make_unique<DX::GraphicsPipelineState>(*device);
+		m_opaquePSO->CreateOpaquePSO(
+			m_opaqueRootSignature->GetNative(), 
+			vertexShaderByteCode.Get(), 
+			pixelShaderByteCode.Get()
+		);
+		
+		/*
+		auto vsBlob = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"VS", L"vs_6_0");
+auto psBlob = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"PS", L"ps_6_0");
+
+D3D12_SHADER_BYTECODE vsBytecode = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
+D3D12_SHADER_BYTECODE psBytecode = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
+
+m_opaquePSO->CreateOpaquePSO(device, m_opaqueRootSignature->GetNative(), vsBytecode, psBytecode);
+		 */
+		
+		/*PipelineResourceBinding textureBinding;
 		textureBinding.BindingIndex = 0;
 
 		m_meshPerObjectResourceSpace.SetCBV(scene->m_objectBuffer[0].get());
@@ -45,7 +75,7 @@ namespace Bruno
 		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = surface->GetSurfaceFormat();
 		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 
-		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature, resourceMapping);
+		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature, resourceMapping);*/
 	}
 
 	void SceneRenderer::OnRender(GraphicsContext* graphicsContext)
@@ -56,7 +86,7 @@ namespace Bruno
 		Texture& backBuffer = m_surface->GetBackBuffer();
 		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
 
-		PipelineInfo pipeline;
+		/*PipelineInfo pipeline;
 		pipeline.Pipeline = m_pipelineState.get();
 		pipeline.RenderTargets.push_back(&backBuffer);
 		pipeline.DepthStencilTarget = &depthBuffer;
@@ -65,7 +95,7 @@ namespace Bruno
 		auto objectSize = AlignU32(sizeof(SceneObjectBuffer), 256);
 
 		VertexBuffer* currentVB = nullptr;
-		uint32_t objectIndex = 0;
+		uint32_t objectIndex = 0;*/
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
 		for (auto& ent : entities)
 		{
@@ -80,7 +110,7 @@ namespace Bruno
 			auto material = m_assetManager->GetAsset<Material>(materialHandle);
 			AssetHandle textureHandle{ 0 };
 			auto textIt = material->TexturesByName.find("Texture");
-			if (textIt != material->TexturesByName.end())
+			/*if (textIt != material->TexturesByName.end())
 			{
 				textureHandle = textIt->second;
 			}
@@ -115,7 +145,7 @@ namespace Bruno
 					mesh->GetBaseVertex(),
 					0);
 			}
-			objectIndex++;
+			objectIndex++;*/
 		}
 	}
 }

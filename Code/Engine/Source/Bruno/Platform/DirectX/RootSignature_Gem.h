@@ -7,7 +7,8 @@
 
 namespace Bruno::DX
 {
-    class RootSignature {
+    class RootSignature
+    {
     public:
         // Constructor que arma nuestra firma específica para 3D Texturizado
         explicit RootSignature(GraphicsDevice& device);
@@ -15,9 +16,10 @@ namespace Bruno::DX
 
         [[nodiscard]] ID3D12RootSignature* GetNative() const { return m_rootSignature.Get(); }
         
-        void CreateOpaqueSignature(ID3D12Device* device);
+        void CreateOpaqueSignature();
         
     private:
+        GraphicsDevice& m_device;
         Microsoft::WRL::ComPtr<ID3D12RootSignature> m_rootSignature;
     };
 
