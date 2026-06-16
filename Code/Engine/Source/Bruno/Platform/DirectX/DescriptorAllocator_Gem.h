@@ -8,18 +8,47 @@
 namespace Bruno::DX 
 {
     // Representa un bloque de memoria concedido dentro del Heap
-    struct DescriptorAllocation 
+    struct DescriptorAllocation
     {
         D3D12_CPU_DESCRIPTOR_HANDLE CPU;
         D3D12_GPU_DESCRIPTOR_HANDLE GPU;
         uint32_t Index;
+        uint32_t Count;          // Cuántos descriptores tiene este bloque
+        uint32_t DescriptorSize; // Tamaño en bytes de cada descriptor
+
+        // Obtener el handle base (offset 0)
+        D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return CPU; }
+        D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() const { return GPU; }
+
+        // Obtener un handle con desplazamiento (offset)
+        D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(uint32_t offset) const 
+        {
+            // Aseguramos no salirnos del bloque asignado
+            if (offset >= Count) 
+                throw std::out_of_range("Offset de descriptor fuera de rango.");
+        
+            D3D12_CPU_DESCRIPTOR_HANDLE handle = CPU;
+            handle.ptr += (static_cast<SIZE_T>(offset) * DescriptorSize);
+            return handle;
+        }
+
+        D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t offset) const 
+        {
+            if (offset >= Count) 
+                throw std::out_of_range("Offset de descriptor fuera de rango.");
+            
+            D3D12_GPU_DESCRIPTOR_HANDLE handle = GPU;
+            handle.ptr += (static_cast<SIZE_T>(offset) * DescriptorSize);
+            return handle;
+        }
     };
 
+    //DescriptorAllocator o DescriptorHeap o DescriptorHeapAllocator
     class DescriptorAllocator 
     {
     public:
-        // Por defecto, 256 descriptores es un excelente inicio para un CBV_SRV_UAV heap
-        DescriptorAllocator(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity = 256);
+        // NUEVO: Constructor que inicializa el Heap
+        DescriptorAllocator(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible);
         ~DescriptorAllocator() = default;
 
         // Prohibimos copias para proteger el recurso COM nativo

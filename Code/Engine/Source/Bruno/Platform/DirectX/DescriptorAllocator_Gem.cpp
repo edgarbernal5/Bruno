@@ -3,39 +3,35 @@
 
 namespace Bruno::DX 
 {
-    DescriptorAllocator::DescriptorAllocator(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity)
-        : m_heapType(type)
-        , m_capacity(capacity)
-        , m_allocatedCount(0)
+    DescriptorAllocator::DescriptorAllocator(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible)
+    : m_heapType(type), m_capacity(capacity), m_allocatedCount(0)
     {
+        // 1. Describir cómo queremos nuestro Heap
         D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-        heapDesc.NumDescriptors = m_capacity;
-        heapDesc.Type = m_heapType;
-        
-        // Regla de Oro DX12: Si son texturas/buffers para el Shader (CBV_SRV_UAV), 
-        // el heap TIENE que ser visible para la GPU.
-        if (type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV || type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER) {
-            heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-        } else {
-            heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-        }
-        heapDesc.NodeMask = 0;
+        heapDesc.NumDescriptors = capacity;
+        heapDesc.Type = type;
+    
+        // REGLA DE ORO: Si es para texturas/CBVs que se usan en el Draw(), DEBE ser Shader Visible
+        heapDesc.Flags = isShaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+        heapDesc.NodeMask = 0; // 0 significa que asume un solo adaptador (GPU)
 
+        // 2. Crear el Heap nativo en la GPU
         HRESULT hr = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_heap));
-        if (FAILED(hr)) {
-            throw std::runtime_error("Fallo crítico: No se pudo crear el Descriptor Heap.");
+        if (FAILED(hr))
+        {
+            throw std::runtime_error("Fallo al crear el Descriptor Heap.");
         }
 
-        // 1. Guardamos el tamaño del salto en memoria (Varía según el fabricante AMD/NVIDIA)
-        m_descriptorSize = device->GetDescriptorHandleIncrementSize(m_heapType);
-        
-        // 2. Guardamos las direcciones de inicio
+        // 3. Obtener el tamaño en bytes de cada descriptor para este tipo de Heap (varía según GPU)
+        m_descriptorSize = device->GetDescriptorHandleIncrementSize(type);
+
+        // 4. Guardar los cabezales de inicio (para la magia matemática de Allocate)
         m_cpuStart = m_heap->GetCPUDescriptorHandleForHeapStart();
-        
-        if (heapDesc.Flags & D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE) {
+    
+        if (isShaderVisible) {
             m_gpuStart = m_heap->GetGPUDescriptorHandleForHeapStart();
         } else {
-            m_gpuStart.ptr = 0; // Heaps como los Render Targets (RTV) no tienen acceso a la GPU
+            m_gpuStart.ptr = 0; // Si no es shader visible, el GPU handle no es válido
         }
     }
 
@@ -49,6 +45,8 @@ namespace Bruno::DX
 
         DescriptorAllocation allocation;
         allocation.Index = m_allocatedCount;
+        allocation.Count = count;
+        allocation.DescriptorSize = m_descriptorSize;
         
         // Magia aritmética: Avanzamos los punteros sumando bytes exactos.
         // Costo de CPU: Prácticamente 0 ciclos de reloj.
