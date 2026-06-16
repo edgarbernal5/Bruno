@@ -5,14 +5,6 @@ namespace Bruno::DX
 {
     ShaderCompiler::ShaderCompiler()
     {
-        /*
-        auto compiler = std::make_unique<ShaderCompiler>();
-auto vsBlob = compiler->CompileFromFile(L"Shaders/Mesh.hlsl", L"VSMain", L"vs_6_0");
-auto psBlob = compiler->CompileFromFile(L"Shaders/Mesh.hlsl", L"PSMain", L"ps_6_0");
-
-m_rootSignature = std::make_unique<RootSignature>(m_device->GetNativeDevice());
-m_rootSignature->BuildForMeshAndTexture();
-         */
         // Inicializamos las fábricas de DXC
         DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&m_utils));
         DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&m_compiler));

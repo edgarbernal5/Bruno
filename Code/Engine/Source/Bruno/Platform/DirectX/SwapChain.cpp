@@ -66,13 +66,15 @@ namespace Bruno::DX
         ThrowIfFailed(dxgiFactory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER));
     }
 
-    SwapChain::~SwapChain() {
+    SwapChain::~SwapChain()
+    {
         // En RAII, ComPtr se encarga de destruir las texturas y el SwapChain.
         // Solo asegúrate de que el GraphicsDevice haga un Flush() antes de llegar aquí.
         m_device.GetDirectCommandQueue().Flush();
     }
 
-    void SwapChain::UpdateRenderTargetViews() {
+    void SwapChain::UpdateRenderTargetViews()
+    {
         auto nativeDevice = m_device.GetNativeDevice();
         
         // Obtenemos el inicio de la lista de descriptores en la memoria de la GPU
@@ -90,8 +92,10 @@ namespace Bruno::DX
         }
     }
 
-    void SwapChain::Resize(uint32_t width, uint32_t height) {
-        if (width == 0 || height == 0) {
+    void SwapChain::Resize(uint32_t width, uint32_t height)
+    {
+        if (width == 0 || height == 0)
+        {
             return; 
         }
         
@@ -100,7 +104,8 @@ namespace Bruno::DX
         m_device.GetDirectCommandQueue().Flush();
 
         // 1. Liberar los punteros de las texturas viejas (si no, DX12 tirará un error al redimensionar)
-        for (uint32_t i = 0; i < BufferCount; i++) {
+        for (uint32_t i = 0; i < BufferCount; i++)
+        {
             m_renderTargets[i].Reset();
         }
 
@@ -117,7 +122,8 @@ namespace Bruno::DX
         UpdateRenderTargetViews();
     }
 
-    void SwapChain::Present(bool vsync) {
+    void SwapChain::Present(bool vsync)
+    {
         UINT syncInterval = vsync ? 1 : 0;
         UINT presentFlags = 0;
         
@@ -134,15 +140,18 @@ namespace Bruno::DX
         m_currentBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
     }
 
-    uint32_t SwapChain::GetCurrentBackBufferIndex() const {
+    uint32_t SwapChain::GetCurrentBackBufferIndex() const
+    {
         return m_currentBufferIndex;
     }
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> SwapChain::GetCurrentBackBuffer() const {
+    Microsoft::WRL::ComPtr<ID3D12Resource> SwapChain::GetCurrentBackBuffer() const
+    {
         return m_renderTargets[m_currentBufferIndex];
     }
 
-    D3D12_CPU_DESCRIPTOR_HANDLE SwapChain::GetCurrentRenderTargetView() const {
+    D3D12_CPU_DESCRIPTOR_HANDLE SwapChain::GetCurrentRenderTargetView() const
+    {
         // Magia de C++ y DX12: Aritmética de punteros extremadamente rápida
         return D3D12_CPU_DESCRIPTOR_HANDLE{ 
             m_rtvHeap->GetCPUDescriptorHandleForHeapStart().ptr + (m_currentBufferIndex * m_rtvDescriptorSize) 
