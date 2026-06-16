@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#include "D3DHelpers.h"
+#include <dxcapi.h>
+
 namespace Bruno::DX
 {
     enum class ShaderStage 
@@ -31,7 +34,7 @@ namespace Bruno::DX
     };
     
     class Shader : public Asset // Puede ser un Asset administrado por tu AssetManager
- {
+    {
     public:
         Shader(const std::string& name) : m_name(name) {}
 
@@ -50,7 +53,7 @@ namespace Bruno::DX
         std::string m_name;
         std::unique_ptr<ShaderProgram> m_vertexProgram;
         std::unique_ptr<ShaderProgram> m_pixelProgram;
- };
+    };
     
     /*
     // 1. Usar tu compilador para armar el Asset 'Shader'
