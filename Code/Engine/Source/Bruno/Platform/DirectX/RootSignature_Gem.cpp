@@ -78,4 +78,51 @@ namespace Bruno::DX
             throw std::runtime_error("Fallo al crear la Root Signature en el Device.");
         }
     }
+
+    void RootSignature::CreateOpaqueSignature(ID3D12Device* device)
+    {
+        // 1. Definir los parámetros (El contrato con el shader)
+        CD3DX12_ROOT_PARAMETER rootParameters[2];
+
+        // Parámetro 0: Constant Buffer View (CBV) en el registro b0
+        // Usamos SHADER_VISIBILITY_VERTEX porque solo el Vertex Shader usa la matriz
+        rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+
+        // Parámetro 1: Tabla de Descriptores para la Textura en el registro t0
+        CD3DX12_DESCRIPTOR_RANGE srvTable;
+        srvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // 1 textura, registro t0
+    
+        // Usamos SHADER_VISIBILITY_PIXEL porque solo el Pixel Shader lee la textura
+        rootParameters[1].InitAsDescriptorTable(1, &srvTable, D3D12_SHADER_VISIBILITY_PIXEL);
+
+        // 2. Definir el Sampler Estático (s0)
+        // Usar un sampler estático es mucho más eficiente que ponerlo en un Descriptor Heap
+        CD3DX12_STATIC_SAMPLER_DESC sampler(
+            0,                                 // s0
+            D3D12_FILTER_MIN_MAG_MIP_LINEAR,   // Filtro bilineal estándar
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP,   // WRAP en U
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP,   // WRAP en V
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP    // WRAP en W
+        );
+
+        // 3. Ensamblar la Root Signature
+        CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
+            2, rootParameters, 
+            1, &sampler, 
+            D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT // Requisito vital
+        );
+
+        // 4. Serializar y crear (Manejo de errores simplificado)
+        Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
+        Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+    
+        D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, &serializedRootSig, &errorBlob);
+    
+        device->CreateRootSignature(
+            0, 
+            serializedRootSig->GetBufferPointer(), 
+            serializedRootSig->GetBufferSize(), 
+            IID_PPV_ARGS(&m_rootSignature) // Tu puntero interno de la clase
+        );
+    }
 }

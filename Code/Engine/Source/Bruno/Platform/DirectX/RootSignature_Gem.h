@@ -14,7 +14,9 @@ namespace Bruno::DX
         ~RootSignature() = default;
 
         [[nodiscard]] ID3D12RootSignature* GetNative() const { return m_rootSignature.Get(); }
-
+        
+        void CreateOpaqueSignature(ID3D12Device* device);
+        
     private:
         Microsoft::WRL::ComPtr<ID3D12RootSignature> m_rootSignature;
     };

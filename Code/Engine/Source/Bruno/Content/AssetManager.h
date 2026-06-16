@@ -44,7 +44,7 @@ namespace Bruno
 		{
 			// Bonus C++17: Asegurarnos de que T herede de Asset
 			static_assert(std::is_base_of_v<Asset, T>, "GetAsset only works for types derived from Asset");
-            
+			
 			return std::static_pointer_cast<T>(GetAssetRaw(assetHandle));
 		}
 

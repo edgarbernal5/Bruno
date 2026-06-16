@@ -20,7 +20,8 @@ namespace Bruno::DX {
         ~GraphicsPipelineState() = default;
 
         [[nodiscard]] ID3D12PipelineState* GetNative() const { return m_pso.Get(); }
-
+        void CreateOpaquePSO(ID3D12Device* device, ID3D12RootSignature* rootSig, ID3DBlob* vertexShaderByteCode, ID3DBlob* pixelShaderByteCode);
+        
     private:
         Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pso;
     };
