@@ -1,11 +1,13 @@
 ﻿#include "brpch.h"
 #include "Texture2D.h"
+
 #include <DirectXTex.h> // Necesario para cargar texturas
 
 namespace Bruno::DX 
 {
-    Texture2D::Texture2D(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, 
-                         DescriptorAllocator& srvAllocator, const std::wstring& filePath)
+    BR_RTTI_DEFINITIONS(Texture2D);
+    
+    Texture2D::Texture2D(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, DescriptorAllocator& srvAllocator, const std::wstring& filePath)
     {
         // 1. Cargar la imagen desde disco
         DirectX::ScratchImage image;
