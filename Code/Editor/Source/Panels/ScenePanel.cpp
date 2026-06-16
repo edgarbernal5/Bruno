@@ -93,7 +93,7 @@ namespace Bruno
 			.AddRootConstantBufferView(0) // b0: Matrices (MVP)
 			.Build(m_dxDevice->GetNativeDevice().Get());*/
 		
-		m_rootSignature = new DX::RootSignature(*m_dxDevice.get());
+		//m_rootSignature = new DX::RootSignature(*m_dxDevice.get());
 		
 		//m_vertexBuffer = new DX::VertexBuffer(m_dxDevice->GetNativeDevice().Get(), )
 		
@@ -102,7 +102,7 @@ namespace Bruno
 		
 		m_dxDepthBuffer= std::make_unique<DX::DepthBuffer>(*m_dxDevice, 100,100);
 		// 1. Describir el Heap
-		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+		/*D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 		srvHeapDesc.NumDescriptors = 1; // Cuántas texturas/buffers vas a enlazar. (Pon 1 por ahora para tu textura)
 		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; // Tipo para Texturas y Constant Buffers
     
@@ -115,7 +115,7 @@ namespace Bruno
 		auto cmdListComPtr = m_commandQueue->GetCommandList(0).Get();
 		D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = m_srvHeap->GetCPUDescriptorHandleForHeapStart();
 		m_texture = std::make_unique<Bruno::DX::Texture2D>(m_dxDevice->GetNativeDevice().Get(), cmdListComPtr,  srvHandle, L"textura.png");
-		
+		*/
 		// Single-thread rendering.
 #ifdef BR_SINGLE_THREAD_RENDERING
 		
@@ -158,32 +158,32 @@ namespace Bruno
 			// ------------------------------------------------------------------
 			// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
 			const float clearColor[] = { 0.1f, 0.1f, 0.15f, 1.0f }; 
-		    
+			auto dsvHandle = m_dxDepthBuffer->GetView();
 			// Limpiar la pantalla
 			commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-			commandList->ClearDepthStencilView(m_dxDepthBuffer->GetView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-			commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+			commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 			
 			// TODO: ¡Aquí irán los comandos DrawInstanced para tu triángulo / escena 3D!
 			// 2. Setear estado del Pipeline y RootSignature
 			//commandList->SetPipelineState(m_pso->GetNative());
-			commandList->SetGraphicsRootSignature(m_rootSignature->GetNative());
+			//commandList->SetGraphicsRootSignature(m_rootSignature->GetNative());
 
 			// 3. Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
-			ID3D12DescriptorHeap* descriptorHeaps[] = { m_srvHeap.Get() };
-			commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+			//ID3D12DescriptorHeap* descriptorHeaps[] = { m_srvHeap.Get() };
+			//commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 			
 			// 4. Enlazar datos al Shader (Root Parameters)
 			// Asumimos Parameter 0: ConstantBuffer, Parameter 1: DescriptorTable (Textura)
-			commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetGPUAddress());
-			commandList->SetGraphicsRootDescriptorTable(1, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
+			//commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetGPUAddress());
+			//commandList->SetGraphicsRootDescriptorTable(1, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
 			
 			// 5. Configurar Viewport y Scissor Test explícitamente en este frame
 			commandList->RSSetViewports(1, &m_dxViewport);
 			commandList->RSSetScissorRects(1, &m_scissorRect);
 			
 			// 6. Setear la Geometría (Buffers)
-			D3D12_VERTEX_BUFFER_VIEW vbv = m_vertexBuffer->GetView();
+			/*D3D12_VERTEX_BUFFER_VIEW vbv = m_vertexBuffer->GetView();
 			D3D12_INDEX_BUFFER_VIEW ibv = m_indexBuffer->GetView();
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			commandList->IASetVertexBuffers(0, 1, &vbv);
@@ -191,20 +191,6 @@ namespace Bruno
 			
 			// 7. ¡El gran llamado de dibujado!
 			commandList->DrawIndexedInstanced(m_indexBuffer->GetIndicesCount(), 1, 0, 0, 0);
-			
-			/*// A. Setear la firma (El contrato de los shaders)
-			commandList->SetGraphicsRootSignature(m_rootSignature->GetNative());
-			// B. Actualizar matriz MVP en el Constant Buffer (CPU -> RAM) y Enlazarlo al registro b0
-			Math::Matrix MVP = Math::Matrix::Identity; //camera.GetViewProjectionMatrix() * model.GetTransform();
-			m_constantBuffer->Update(&MVP, sizeof(Math::Matrix));
-			commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetGPUAddress());
-
-			// C. Setear la topología (Triángulos) y el Vertex Buffer
-			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		    
-			D3D12_VERTEX_BUFFER_VIEW vbView = m_vertexBuffer->GetView();
-			commandList->IASetVertexBuffers(0, 1, &vbView);
-			commandList->DrawInstanced(3, 1, 0, 0); // 3 vértices para un triángulo
 			*/
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
@@ -219,9 +205,6 @@ namespace Bruno
 
 			// 5. Intercambiar los buffers y mostrar en pantalla (VSync activado por ahora)
 			m_dxSwapChain->Present(true);
-			
-			//OnUpdate(m_timer);
-			//OnDraw();
 		});
 		
 		m_form->Handle()->RenderForAttributes.AutoRefresh = true;
@@ -276,12 +259,11 @@ namespace Bruno
 			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
 
 			auto formSize = m_form->GetSize();
-			//if (m_surface)
-			//{
 			if (m_dxSwapChain)
 			{
 				m_dxSwapChain->Resize(formSize.Width, formSize.Height);
 			}
+			
 			if (m_dxDepthBuffer)
 			{
 				m_dxDepthBuffer->Resize(formSize.Width, formSize.Height);
