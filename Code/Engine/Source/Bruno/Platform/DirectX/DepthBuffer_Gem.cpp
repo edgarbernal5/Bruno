@@ -20,7 +20,8 @@ namespace Bruno::DX {
         CreateResourceAndDescriptor();
     }
 
-    void DepthBuffer::Resize(uint32_t width, uint32_t height) {
+    void DepthBuffer::Resize(uint32_t width, uint32_t height)
+    {
         if (m_width == width && m_height == height)
         {
             return;

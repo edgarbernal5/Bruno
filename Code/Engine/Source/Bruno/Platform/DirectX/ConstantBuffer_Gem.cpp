@@ -3,7 +3,8 @@
 
 namespace Bruno::DX
 {
-    ConstantBuffer::ConstantBuffer(ID3D12Device* device, size_t bufferSize) {
+    ConstantBuffer::ConstantBuffer(ID3D12Device* device, size_t bufferSize)
+    {
         // En DX12, los Constant Buffers DEBEN estar alineados a 256 bytes
         size_t alignedSize = (bufferSize + 255) & ~255;
 
@@ -28,7 +29,8 @@ namespace Bruno::DX
             nullptr,
             IID_PPV_ARGS(&m_buffer));
 
-        if (FAILED(hr)) {
+        if (FAILED(hr))
+        {
             throw std::runtime_error("Fallo al crear el Constant Buffer.");
         }
 
@@ -37,13 +39,16 @@ namespace Bruno::DX
         m_buffer->Map(0, &readRange, &m_mappedData);
     }
 
-    ConstantBuffer::~ConstantBuffer() {
-        if (m_buffer) {
+    ConstantBuffer::~ConstantBuffer()
+    {
+        if (m_buffer)
+        {
             m_buffer->Unmap(0, nullptr);
         }
     }
 
-    void ConstantBuffer::Update(const void* data, size_t dataSize) {
+    void ConstantBuffer::Update(const void* data, size_t dataSize)
+    {
         // Copia directa de RAM (tu matriz C++) a la memoria accesible por la GPU
         memcpy(m_mappedData, data, dataSize);
     }

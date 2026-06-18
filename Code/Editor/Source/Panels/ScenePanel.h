@@ -34,6 +34,10 @@
 
 namespace Bruno
 {
+	namespace DX
+	{
+		class Surface;
+	}
 	class Model;
 	class Surface;
 	class EditorGame;
@@ -85,7 +89,7 @@ namespace Bruno
 		EditorGame* m_editorGame;
 		std::shared_ptr<SceneDocument>		m_sceneDocument;
 		std::shared_ptr<Scene>				m_scene;
-		std::shared_ptr<SceneRenderer>		m_sceneRenderer;
+		SceneRenderer*		m_sceneRenderer { nullptr };
 
 		std::shared_ptr<Model> m_model;
 		
@@ -104,8 +108,7 @@ namespace Bruno
 		std::unique_ptr<DX::GraphicsDevice>	m_dxDevice;
 		std::unique_ptr<DX::GraphicsFence>	m_dxFence;
 		std::unique_ptr<DX::RenderContext>	m_dxRenderContext;
-		std::unique_ptr<DX::SwapChain>	m_dxSwapChain;
-		std::unique_ptr<DX::DepthBuffer>	m_dxDepthBuffer;
+		std::unique_ptr<DX::Surface> m_dxSurface;
 		DX::CommandQueue* m_commandQueue { nullptr };
 		D3D12_VIEWPORT m_dxViewport;
 		D3D12_RECT m_scissorRect;
@@ -114,7 +117,7 @@ namespace Bruno
 		DX::IndexBuffer* m_indexBuffer;
 		DX::ConstantBuffer* m_constantBuffer;
 		std::unique_ptr<DX::Texture2D> m_texture;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_srvHeap;
+		ID3D12DescriptorHeap* m_srvHeap;
 		
 		uint64_t m_frameFenceValues[3]{0,0,0};
 		uint64_t m_currentFrame=0;

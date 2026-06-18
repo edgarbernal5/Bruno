@@ -10,16 +10,15 @@
 #include "Bruno/Platform/DirectX/PipelineStateObject.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/Shader.h"
-#include "Bruno/Platform/DirectX/Surface.h"
+#include "Bruno/Platform/DirectX/Surface_Gem.h"
 
 #include "Bruno/Content/AssetManager.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
 
 namespace Bruno
 {
-	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, Surface* surface, AbstractAssetManager* assetManager) :
+	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager) :
 		m_scene(scene),
-		m_surface(surface),
 		m_assetManager(assetManager)
 	{
 		auto& device = Bruno::Graphics::GetDXDevice();
@@ -42,16 +41,6 @@ namespace Bruno
 			vertexShaderByteCode.Get(), 
 			pixelShaderByteCode.Get()
 		);
-		
-		/*
-		auto vsBlob = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"VS", L"vs_6_0");
-auto psBlob = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"PS", L"ps_6_0");
-
-D3D12_SHADER_BYTECODE vsBytecode = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
-D3D12_SHADER_BYTECODE psBytecode = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
-
-m_opaquePSO->CreateOpaquePSO(device, m_opaqueRootSignature->GetNative(), vsBytecode, psBytecode);
-		 */
 		
 		/*PipelineResourceBinding textureBinding;
 		textureBinding.BindingIndex = 0;
@@ -78,14 +67,41 @@ m_opaquePSO->CreateOpaquePSO(device, m_opaqueRootSignature->GetNative(), vsBytec
 		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature, resourceMapping);*/
 	}
 
+	void SceneRenderer::InitEntitiesForRender()
+	{
+		auto& device = Bruno::Graphics::GetDXDevice();
+		
+		size_t objectSize = AlignU32(sizeof(SceneObjectBuffer), 256);
+		// Buscamos todas las entidades que tienen un Mesh y un Transform
+		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
+		for (auto& ent : entities)
+		{
+			Entity entity = { ent, m_scene.get() };
+			// Si la entidad no tiene sus Constant Buffers, se los creamos
+			if (!entity.HasComponent<CBVComponent>()) 
+			{
+				CBVComponent cbv;
+				// Instanciar tus 2 constant buffers aquí (usando tu clase ConstantBuffer)
+				for (int i = 0; i < 2; ++i)
+				{
+					cbv.TransformCB[i] = std::make_shared<DX::ConstantBuffer>(device->GetNativeDevice().Get(), objectSize);
+				}
+                
+				// Le "pegamos" el componente de memoria de video a la entidad
+				entity.AddComponent<CBVComponent>(std::move(cbv));
+			}
+		}
+	}
+
 	void SceneRenderer::OnRender(GraphicsContext* graphicsContext)
 	{
-		auto device = Graphics::GetDevice();
-		uint32_t frameIndex = device->GetFrameId();
+		//auto device = Graphics::GetDevice();
+		//uint32_t frameIndex = device->GetFrameId();
 
-		Texture& backBuffer = m_surface->GetBackBuffer();
-		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
+		//Texture& backBuffer = m_surface->GetBackBuffer();
+		//DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
 
+		
 		/*PipelineInfo pipeline;
 		pipeline.Pipeline = m_pipelineState.get();
 		pipeline.RenderTargets.push_back(&backBuffer);

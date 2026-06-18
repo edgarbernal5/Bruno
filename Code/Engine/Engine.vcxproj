@@ -120,6 +120,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature_Gem.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderCompiler.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Shader_Gem.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\SurfaceTypes.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Surface_Gem.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\SwapChain.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Texture2D.h" />

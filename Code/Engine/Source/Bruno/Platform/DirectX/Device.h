@@ -27,7 +27,7 @@ namespace Bruno::DX
 		
 		[[nodiscard]] CommandQueue& GetDirectCommandQueue() const { return *m_directCommandQueue; }
 		
-		[[nodiscard]] DX::DescriptorAllocator& GetsvrDescriptorAllocator() const { return *m_svrDescriptorAllocator; }
+		[[nodiscard]] DX::DescriptorAllocator& GetSRVDescriptorAllocator() const { return *m_srvDescriptorAllocator; }
 	private:
 		void InitializeDXGI();
 		void CreateDevice();
@@ -38,7 +38,7 @@ namespace Bruno::DX
 		// La cola principal de comandos de la GPU
 		std::unique_ptr<CommandQueue> m_directCommandQueue;
 		
-		std::unique_ptr<DX::DescriptorAllocator> m_svrDescriptorAllocator;
+		std::unique_ptr<DX::DescriptorAllocator> m_srvDescriptorAllocator;
 	};
 }
 

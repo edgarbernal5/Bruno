@@ -10,6 +10,7 @@
 #include <Bruno/Platform/DirectX/VertexTypes.h>
 #include <Bruno/Platform/DirectX/GraphicsContext.h>
 #include <Bruno/Platform/DirectX/Queue.h>
+#include <Bruno/Platform/DirectX/Surface_Gem.h>
 #include <Bruno/Content/ContentManager.h>
 #include <Bruno/Renderer/Model.h>
 #include <Bruno/Scene/Scene.h>
@@ -97,12 +98,19 @@ namespace Bruno
 		
 		//m_vertexBuffer = new DX::VertexBuffer(m_dxDevice->GetNativeDevice().Get(), )
 		
-		m_dxSwapChain = std::make_unique<DX::SwapChain>(*m_dxDevice.get(), (void*)m_form->Handle()->RootHandle.Handle, 100, 100);
+		DX::SurfaceWindowParameters parameters;
+		parameters.Width = 100;
+		parameters.Height = 100;
+		parameters.BackBufferFormat = m_surfaceParameters.BackBufferFormat;
+		parameters.DepthBufferFormat = m_surfaceParameters.DepthBufferFormat;
+		parameters.WindowHandle = m_form->NativeHandle().Handle;
+		
+		m_dxSurface = std::make_unique<DX::Surface>(*m_dxDevice.get(), parameters);
 		m_commandQueue = &m_dxDevice->GetDirectCommandQueue();
 		
-		m_dxDepthBuffer= std::make_unique<DX::DepthBuffer>(*m_dxDevice, 100,100);
-		
 		Bruno::Graphics::GetDXDevice() = m_dxDevice.get();
+		
+		m_srvHeap = m_dxDevice->GetSRVDescriptorAllocator().GetHeap();
 		// 1. Describir el Heap
 		/*D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 		srvHeapDesc.NumDescriptors = 1; // Cuántas texturas/buffers vas a enlazar. (Pon 1 por ahora para tu textura)
@@ -128,7 +136,7 @@ namespace Bruno
 			if (!m_isExposed || m_isResizing || m_isSizingMoving)
 				return;
 			
-			uint32_t frameIndex = m_dxSwapChain->GetCurrentBackBufferIndex();
+			uint32_t frameIndex = m_dxSurface->GetCurrentBackBufferIndex();
 
 			BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
@@ -138,8 +146,8 @@ namespace Bruno
 			auto commandList = m_commandQueue->GetCommandList(frameIndex);
 			
 			// 3. Extraer la textura real y su descriptor
-			auto backBuffer = m_dxSwapChain->GetCurrentBackBuffer();
-			auto rtvHandle = m_dxSwapChain->GetCurrentRenderTargetView();
+			auto backBuffer = m_dxSurface->GetCurrentBackBuffer();
+			auto rtvHandle = m_dxSurface->GetCurrentRenderTargetView();
 
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
@@ -147,7 +155,7 @@ namespace Bruno
 			D3D12_RESOURCE_BARRIER barrier = {};
 			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-			barrier.Transition.pResource = backBuffer.Get();
+			barrier.Transition.pResource = backBuffer;
 			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -159,8 +167,10 @@ namespace Bruno
 			// FASE DE DIBUJO
 			// ------------------------------------------------------------------
 			// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
-			const float clearColor[] = { 0.1f, 0.1f, 0.15f, 1.0f }; 
-			auto dsvHandle = m_dxDepthBuffer->GetView();
+			//const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; 
+			const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+			auto dsvHandle = m_dxSurface->GetDepthBufferView();
+			
 			// Limpiar la pantalla
 			commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
@@ -172,8 +182,8 @@ namespace Bruno
 			//commandList->SetGraphicsRootSignature(m_rootSignature->GetNative());
 
 			// 3. Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
-			//ID3D12DescriptorHeap* descriptorHeaps[] = { m_srvHeap.Get() };
-			//commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+			ID3D12DescriptorHeap* descriptorHeaps[] = { m_srvHeap };
+			commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 			
 			// 4. Enlazar datos al Shader (Root Parameters)
 			// Asumimos Parameter 0: ConstantBuffer, Parameter 1: DescriptorTable (Textura)
@@ -206,7 +216,7 @@ namespace Bruno
 			m_commandQueue->ExecuteCommandList(commandList, frameIndex);
 
 			// 5. Intercambiar los buffers y mostrar en pantalla (VSync activado por ahora)
-			m_dxSwapChain->Present(true);
+			m_dxSurface->Present(true);
 		});
 		
 		m_form->Handle()->RenderForAttributes.AutoRefresh = true;
@@ -261,15 +271,11 @@ namespace Bruno
 			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
 
 			auto formSize = m_form->GetSize();
-			if (m_dxSwapChain)
+			if (m_dxSurface)
 			{
-				m_dxSwapChain->Resize(formSize.Width, formSize.Height);
+				m_dxSurface->Resize(formSize.Width, formSize.Height);
 			}
 			
-			if (m_dxDepthBuffer)
-			{
-				m_dxDepthBuffer->Resize(formSize.Width, formSize.Height);
-			}
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.Width, (float)formSize.Height));
 			m_isSizingMoving = false;
 		});
@@ -288,8 +294,8 @@ namespace Bruno
 			m_dxViewport.Height = args.NewSize.Height;
 			m_dxViewport.Width = args.NewSize.Width;
 			m_scissorRect = { 0, 0, static_cast<LONG>(args.NewSize.Width), static_cast<LONG>(args.NewSize.Height) };
-			m_dxSwapChain->Resize(args.NewSize.Width, args.NewSize.Height);
-			m_dxDepthBuffer->Resize(args.NewSize.Width, args.NewSize.Height);
+			m_dxSurface->Resize(args.NewSize.Width, args.NewSize.Height);
+
 			/*if (m_surface)
 			{
 				m_surface->Resize(args.NewSize.Width, args.NewSize.Height);
@@ -559,7 +565,7 @@ namespace Bruno
 
 	void ScenePanel::InitializeSceneRenderer()
 	{
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get(), m_editorGame->GetAssetManager());
+		m_sceneRenderer = m_sceneDocument->GetSceneRenderer();
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)

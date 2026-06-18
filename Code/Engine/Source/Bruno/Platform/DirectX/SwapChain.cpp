@@ -5,19 +5,19 @@
 
 namespace Bruno::DX
 {
-    SwapChain::SwapChain(GraphicsDevice& device, void* nativeWindowHandle, uint32_t width, uint32_t height)
-        : m_device(device), m_currentBufferIndex(0) 
+    SwapChain::SwapChain(GraphicsDevice& device, SurfaceWindowParameters const& parameters)
+        : m_device(device), m_currentBufferIndex(0), m_parameters(parameters)
     {
-        HWND hwnd = static_cast<HWND>(nativeWindowHandle);
+        HWND hwnd = parameters.WindowHandle;
         auto nativeDevice = m_device.GetNativeDevice();
         auto dxgiFactory = m_device.GetDXGIFactory();
         auto commandQueue = m_device.GetDirectCommandQueue().GetNativeQueue();
 
         // 1. Describir cómo queremos el Swap Chain
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-        swapChainDesc.Width = width;
-        swapChainDesc.Height = height;
-        swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // 32-bit color
+        swapChainDesc.Width = parameters.Width;
+        swapChainDesc.Height = parameters.Height;
+        swapChainDesc.Format = parameters.BackBufferFormat; //DXGI_FORMAT_R8G8B8A8_UNORM; // 32-bit color
         swapChainDesc.Stereo = FALSE;
         swapChainDesc.SampleDesc = { 1, 0 }; // DX12 requiere que el SwapChain no tenga MSAA (se hace en otro lado)
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -29,7 +29,7 @@ namespace Bruno::DX
         swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
         
         // DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING si quisieras FPS ilimitados (G-Sync/FreeSync)
-        swapChainDesc.Flags = 0; 
+        swapChainDesc.Flags = 0;
 
         // 2. Crear el SwapChain original
         Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain1;
@@ -80,7 +80,8 @@ namespace Bruno::DX
         // Obtenemos el inicio de la lista de descriptores en la memoria de la GPU
         D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_rtvHeap->GetCPUDescriptorHandleForHeapStart();
 
-        for (uint32_t i = 0; i < BufferCount; i++) {
+        for (uint32_t i = 0; i < BufferCount; i++)
+        {
             // Extraer la textura 2D del BackBuffer directamente del SwapChain
             ThrowIfFailed(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&m_renderTargets[i])));
             
@@ -112,7 +113,7 @@ namespace Bruno::DX
         // 2. Redimensionar el SwapChain
         ThrowIfFailed(m_swapChain->ResizeBuffers(
             BufferCount, width, height,
-            DXGI_FORMAT_R8G8B8A8_UNORM, 0
+            m_parameters.BackBufferFormat, 0
         ));
 
         // 3. Sincronizar nuestro índice
@@ -131,7 +132,8 @@ namespace Bruno::DX
         // permita "Tearing" para no limitar los FPS al monitor.
         // (Nota: Para que ALLOW_TEARING funcione del todo, deberías haberle pasado el flag
         // DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING al swapChainDesc en el constructor).
-        if (!vsync) {
+        if (!vsync)
+        {
             presentFlags = DXGI_PRESENT_ALLOW_TEARING;
         }
         ThrowIfFailed(m_swapChain->Present(syncInterval, presentFlags));
@@ -153,7 +155,8 @@ namespace Bruno::DX
     D3D12_CPU_DESCRIPTOR_HANDLE SwapChain::GetCurrentRenderTargetView() const
     {
         // Magia de C++ y DX12: Aritmética de punteros extremadamente rápida
-        return D3D12_CPU_DESCRIPTOR_HANDLE{ 
+        return D3D12_CPU_DESCRIPTOR_HANDLE
+        { 
             m_rtvHeap->GetCPUDescriptorHandleForHeapStart().ptr + (m_currentBufferIndex * m_rtvDescriptorSize) 
         };
     }

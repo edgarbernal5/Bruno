@@ -94,7 +94,7 @@ namespace Bruno
 	{
 		m_lastMousePosition = Math::Int2(x, y);
 
-		SetCapture(m_window->GetHandle());
+		::SetCapture(m_window->GetHandle());
 	}
 
 	void PlayerGame::OnMouseMove(MouseButtonState btnState, int x, int y)
@@ -119,7 +119,7 @@ namespace Bruno
 
 	void PlayerGame::OnMouseUp(MouseButtonState btnState, int x, int y)
 	{
-		ReleaseCapture();
+		::ReleaseCapture();
 	}
 
 	void PlayerGame::OnMouseWheel(MouseButtonState btnState, int x, int y, int wheelDelta) 
@@ -178,7 +178,7 @@ namespace Bruno
 
 		//m_scene->InstantiateModel(model);
 
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get(), m_assetManager.get());
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_assetManager.get());
 	}
 
 	void PlayerGame::InitializeSurface()

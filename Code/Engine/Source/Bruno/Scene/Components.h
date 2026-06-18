@@ -6,6 +6,8 @@
 #include <vector>
 #include <string>
 
+#include "Bruno/Platform/DirectX/ConstantBuffer_Gem.h"
+
 namespace Bruno
 {
 	struct IdComponent
@@ -59,7 +61,13 @@ namespace Bruno
 				Math::Matrix::CreateTranslation(Position);
 		}
 	};
-
+	
+	struct CBVComponent 
+	{
+		// El arreglo de 2 buffers que ya tenías, ahora vive como un componente
+		std::shared_ptr<DX::ConstantBuffer> TransformCB[2]; 
+	};
+	
 	struct ModelComponent
 	{
 		AssetHandle ModelHandle;

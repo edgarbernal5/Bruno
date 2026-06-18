@@ -38,13 +38,7 @@ namespace Bruno::DX
     public:
         Shader(const std::string& name) : m_name(name) {}
 
-        void AddProgram(ShaderProgram&& program) 
-        {
-            // En un motor real, podrías usar un map: m_programs[program.GetStage()] = program;
-            // o guardarlos en punteros directos para un acceso O(1):
-            if (program.GetStage() == ShaderStage::Vertex) m_vertexProgram = std::make_unique<ShaderProgram>(std::move(program));
-            if (program.GetStage() == ShaderStage::Pixel) m_pixelProgram = std::make_unique<ShaderProgram>(std::move(program));
-        }
+        void AddProgram(ShaderProgram&& program);
 
         const ShaderProgram* GetVertexProgram() const { return m_vertexProgram.get(); }
         const ShaderProgram* GetPixelProgram() const { return m_pixelProgram.get(); }

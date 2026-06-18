@@ -5,6 +5,8 @@
 
 #include "SelectionService.h"
 #include "SceneHierarchy.h"
+#include "Bruno/Renderer/SceneRenderer.h"
+#include "Content/EditorAssetManager.h"
 #include "Gizmos/GizmoService.h"
 #include "Panels/Properties/PropertyHelpers.h"
 
@@ -40,9 +42,6 @@ namespace Bruno
 	void SceneDocument::InstantiateModel(std::shared_ptr<Model> model)
 	{
 		Entity rootEntity = m_scene->InstantiateModel(model);
-
-
-		InitializeProperties(rootEntity);
 
 		HierarchyChanged.emit(rootEntity, ActionMode::Add);
 	}
@@ -137,20 +136,8 @@ return;
 		});
 	}
 
-	void SceneDocument::InitializeProperties(Entity entity)
+	void SceneDocument::InitializeSceneRenderer()
 	{
-		/*auto& hierarchy = entity.GetComponent<HierarchyComponent>();
-		auto& name = entity.GetComponent<NameComponent>().Name;
-
-		auto uuid = entity.GetUUID();
-
-		for (UUID child : hierarchy.Children)
-		{
-			auto childEntity = m_scene->TryGetEntityWithUUID(child);
-			if (childEntity)
-			{
-				InitializeProperties(childEntity);
-			}
-		}*/
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_assetManager);
 	}
 }

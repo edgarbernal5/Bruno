@@ -2,14 +2,17 @@
 
 #include "D3DHelpers.h"
 
+#include "SurfaceTypes.h"
+
 namespace Bruno::DX
 {
     class GraphicsDevice; // Forward declaration (KISS)
     
-    class SwapChain {
+    class SwapChain
+    {
     public:
         // C++17: HWND es un void*, usamos dependencias claras
-        SwapChain(GraphicsDevice& device, void* nativeWindowHandle, uint32_t width, uint32_t height);
+        SwapChain(GraphicsDevice& device, SurfaceWindowParameters const& parameters);
         ~SwapChain();
 
         void Present(bool vsync = true);
@@ -37,6 +40,8 @@ namespace Bruno::DX
         // Montículo de descriptores para los Render Targets
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
         uint32_t m_rtvDescriptorSize;
+        
+        SurfaceWindowParameters m_parameters;
     };
 
 }

@@ -1,9 +1,12 @@
 ﻿#pragma once
+
 #include <d3d12.h>
 #include <wrl/client.h>
+
 namespace Bruno::DX
 {
-    class ConstantBuffer {
+    class ConstantBuffer
+    {
     public:
         // C++17: Usamos size_t para la alineación
         ConstantBuffer(ID3D12Device* device, size_t bufferSize);

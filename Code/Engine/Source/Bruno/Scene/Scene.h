@@ -57,7 +57,7 @@ namespace Bruno
 		entt::entity m_sceneEntity{ entt::null };
 		std::unordered_map<UUID, Entity> m_entityIdMap;
 
-		std::unique_ptr<ConstantBuffer<SceneObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
+		//std::unique_ptr<ConstantBuffer<SceneObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
 	};
 }
 
