@@ -73,8 +73,7 @@
       <AdditionalDependencies>..\Engine\Dependencies\assimp\bin\assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /d "C:\Users\User\Documents\Projects\Bruno\Code\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\bin\x64\dxcompiler.dll" "$(OutDir)"
-xcopy /y /d "C:\Users\User\Documents\Projects\Bruno\Code\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\bin\x64\dxil.dll" "$(OutDir)"</Command>
+      <Command></Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
