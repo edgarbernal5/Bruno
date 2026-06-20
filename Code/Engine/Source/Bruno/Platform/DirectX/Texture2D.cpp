@@ -10,13 +10,27 @@ namespace Bruno::DX
 {
     BR_RTTI_DEFINITIONS(Texture2D);
     
-    Texture2D::Texture2D(DX::GraphicsDevice& device, DX::UploadContext& uploadContext, DescriptorAllocator& srvAllocator, const std::wstring& filePath)
+    Texture2D::Texture2D(DX::GraphicsDevice& device, DX::UploadContext& uploadContext, DescriptorAllocator& srvAllocator, const std::wstring& filename)
     {
         auto nativeDevice = device.GetNativeDevice();
-
+        std::filesystem::path filePath(filename);
+        if (!std::filesystem::exists(filePath))
+        {
+            return;
+        }
+        
         // 1. Cargar la imagen desde disco
         DirectX::ScratchImage image;
-        HRESULT hr = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, image);
+        HRESULT hr = 0;//DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, image);
+        
+        if (filePath.extension() == ".dds")
+        {
+            hr = DirectX::LoadFromDDSFile(filename.c_str(), DirectX::DDS_FLAGS_FORCE_RGB, nullptr, image);
+        }
+        else
+        {
+            hr = DirectX::LoadFromWICFile(filename.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, image);
+        }
         BR_ASSERT(SUCCEEDED(hr), "No se pudo cargar la textura!");
 
         const auto& metadata = image.GetMetadata();
