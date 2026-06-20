@@ -17,7 +17,7 @@ namespace Bruno
 		ImporterManager() = default;
 
 		void Initialize();
-		bool TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& asset);
+		bool TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset);
 
 	private:
 		bool m_initialized{ false };

@@ -14,7 +14,7 @@ namespace Bruno
 	{
 		m_importerManager.Initialize();
 		ProcessDirectory(projectPath);
-		//GetAssetsDirectory(projectPath);//TODO: HACK
+		GetAssetsDirectory(projectPath);//TODO: HACK
 	}
 
 	void EditorAssetManager::AddMemoryOnlyAsset(std::shared_ptr<Asset> asset)

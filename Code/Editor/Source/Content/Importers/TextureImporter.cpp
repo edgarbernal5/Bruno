@@ -12,7 +12,7 @@
 
 namespace Bruno
 {
-	bool TextureImporter::TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& asset)
+	bool TextureImporter::TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset)
 	{
 		auto assetFilename = context.GetAbsolutePath(metadata.Filename);
 		
@@ -23,8 +23,8 @@ namespace Bruno
 		
 		uploadContext.Reset();
 		
-		asset = std::make_shared<DX::Texture2D>(*device, uploadContext, device->GetSRVDescriptorAllocator(), assetFilename);
-		asset->SetHandle(metadata.Handle);
+		outputAsset = std::make_shared<DX::Texture2D>(*device, uploadContext, device->GetSRVDescriptorAllocator(), assetFilename);
+		outputAsset->SetHandle(metadata.Handle);
 
 		uint64_t uploadFence = commandManager->ExecuteAndReturnFence(uploadContext);
 

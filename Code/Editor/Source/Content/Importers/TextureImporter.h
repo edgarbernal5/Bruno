@@ -9,7 +9,7 @@ namespace Bruno
 	{
 	public:
 		TextureImporter() = default;
-		bool TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& asset) override;
+		bool TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset) override;
 
 	private:
 		
