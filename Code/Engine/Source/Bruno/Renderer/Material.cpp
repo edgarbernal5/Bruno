@@ -15,8 +15,7 @@ namespace Bruno
 		m_handle = {};
 	}
 
-	void Material::SetPipelineState(std::shared_ptr<DX::GraphicsPipelineState> pso,
-		std::shared_ptr<DX::RootSignature> rootSig)
+	void Material::SetPipelineState(std::shared_ptr<DX::GraphicsPipelineState> pso, std::shared_ptr<DX::RootSignature> rootSig)
 	{
 		m_pso = pso;
 		m_rootSignature = rootSig;
@@ -25,7 +24,9 @@ namespace Bruno
 	void Material::BuildDescriptors(DX::GraphicsDevice* device, DX::DescriptorAllocator* srvAllocator, AbstractAssetManager* assetManager)
 	{
 		if (m_descriptorsBuilt || TexturesByName.empty())
+		{
 			return;
+		}
 
 		// 1. Pedir espacio contiguo en el Heap para la cantidad de texturas que tenemos
 		uint32_t textureCount = static_cast<uint32_t>(TexturesByName.size());

@@ -24,7 +24,7 @@ namespace Bruno
     {
         m_gizmoGraphicsBinding.Shader = std::make_shared<Shader>(L"Shaders/UnlitColor.hlsl");
 
-        auto batch = std::make_shared<PrimitiveBatch<VertexPositionNormalColor>>(device, 4096 * 3 * 3, 4096 * 3);
+        /*auto batch = std::make_shared<PrimitiveBatch<VertexPositionNormalColor>>(device, 4096 * 3 * 3, 4096 * 3);
 
         m_gizmoTranslationRenderer = std::make_shared<GizmoTranslationRenderer>(device, camera, batch, GizmoTranslationRenderer::RenderConfig(gizmoConfig));
         m_gizmoRotationRenderer = std::make_shared<GizmoRotationRenderer>(device, camera, batch, GizmoRotationRenderer::RenderConfig(gizmoConfig));
@@ -54,7 +54,7 @@ namespace Bruno
 
         m_sceneGizmoCamera = m_camera;
         m_sceneGizmoCamera.SetLens(1.0f, 10.0f);
-        UpdateLocalState();
+        UpdateLocalState();*/
     }
 
     bool GizmoService::BeginDrag(const Math::Vector2& mousePosition)
