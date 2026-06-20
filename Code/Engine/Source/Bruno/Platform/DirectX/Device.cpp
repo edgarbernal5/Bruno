@@ -24,7 +24,7 @@ namespace Bruno::DX
         // C++14/17: Creación segura de memoria dinámica (RAII)
         m_directCommandQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
         
-        m_srvDescriptorAllocator = std::make_unique<DX::DescriptorAllocator>(m_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4096, true);
+        m_srvDescriptorAllocator = std::make_unique<DX::DescriptorAllocator>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4096, true);
         m_uploadContext = std::make_unique<DX::UploadContext>(*this);
     }
 

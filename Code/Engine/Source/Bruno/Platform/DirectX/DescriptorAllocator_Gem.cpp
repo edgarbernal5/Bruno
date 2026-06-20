@@ -1,11 +1,15 @@
 ﻿#include "brpch.h"
 #include "DescriptorAllocator_Gem.h"
 
+#include "Device.h"
+
 namespace Bruno::DX 
 {
-    DescriptorAllocator::DescriptorAllocator(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible)
+    DescriptorAllocator::DescriptorAllocator(DX::GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible)
     : m_heapType(type), m_capacity(capacity), m_allocatedCount(0)
     {
+        auto nativeDevice = device.GetNativeDevice();
+        
         // 1. Describir cómo queremos nuestro Heap
         D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
         heapDesc.NumDescriptors = capacity;
@@ -16,14 +20,14 @@ namespace Bruno::DX
         heapDesc.NodeMask = 0; // 0 significa que asume un solo adaptador (GPU)
 
         // 2. Crear el Heap nativo en la GPU
-        HRESULT hr = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_heap));
+        HRESULT hr = nativeDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_heap));
         if (FAILED(hr))
         {
             throw std::runtime_error("Fallo al crear el Descriptor Heap.");
         }
 
         // 3. Obtener el tamaño en bytes de cada descriptor para este tipo de Heap (varía según GPU)
-        m_descriptorSize = device->GetDescriptorHandleIncrementSize(type);
+        m_descriptorSize = nativeDevice->GetDescriptorHandleIncrementSize(type);
 
         // 4. Guardar los cabezales de inicio (para la magia matemática de Allocate)
         m_cpuStart = m_heap->GetCPUDescriptorHandleForHeapStart();
@@ -37,7 +41,8 @@ namespace Bruno::DX
 
     DescriptorAllocation DescriptorAllocator::Allocate(uint32_t count) 
     {
-        if (m_allocatedCount + count > m_capacity) {
+        if (m_allocatedCount + count > m_capacity)
+        {
             // En un motor AAA real, aquí instanciaríamos un nuevo Heap y lo encadenaríamos,
             // pero bajo el principio KISS, lanzar una excepción para redimensionar la capacidad es perfecto hoy.
             throw std::runtime_error("DescriptorAllocator se ha quedado sin capacidad.");

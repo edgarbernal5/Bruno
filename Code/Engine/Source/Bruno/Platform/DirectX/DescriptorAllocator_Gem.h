@@ -7,6 +7,8 @@
 
 namespace Bruno::DX 
 {
+    class GraphicsDevice;
+    
     // Representa un bloque de memoria concedido dentro del Heap
     struct DescriptorAllocation
     {
@@ -24,8 +26,10 @@ namespace Bruno::DX
         D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(uint32_t offset) const 
         {
             // Aseguramos no salirnos del bloque asignado
-            if (offset >= Count) 
+            if (offset >= Count)
+            {
                 throw std::out_of_range("Offset de descriptor fuera de rango.");
+            }
         
             D3D12_CPU_DESCRIPTOR_HANDLE handle = CPU;
             handle.ptr += (static_cast<SIZE_T>(offset) * DescriptorSize);
@@ -35,7 +39,9 @@ namespace Bruno::DX
         D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t offset) const 
         {
             if (offset >= Count) 
+            {
                 throw std::out_of_range("Offset de descriptor fuera de rango.");
+            }
             
             D3D12_GPU_DESCRIPTOR_HANDLE handle = GPU;
             handle.ptr += (static_cast<SIZE_T>(offset) * DescriptorSize);
@@ -44,11 +50,11 @@ namespace Bruno::DX
     };
 
     //DescriptorAllocator o DescriptorHeap o DescriptorHeapAllocator
-    class DescriptorAllocator 
+    class DescriptorAllocator
     {
     public:
         // NUEVO: Constructor que inicializa el Heap
-        DescriptorAllocator(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible);
+        DescriptorAllocator(DX::GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible);
         ~DescriptorAllocator() = default;
 
         // Prohibimos copias para proteger el recurso COM nativo
