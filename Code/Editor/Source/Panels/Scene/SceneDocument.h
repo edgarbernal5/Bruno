@@ -55,9 +55,9 @@ namespace Bruno
 		std::shared_ptr<SceneRenderer> m_sceneRenderer;
 		EditorAssetManager* m_assetManager;
 
-		std::shared_ptr<SelectionService>	m_selectionService;
-		std::shared_ptr<GizmoService>	m_gizmoService;
-		std::shared_ptr<SceneHierarchy>	m_sceneHierarchy;
+		std::shared_ptr<SelectionService> m_selectionService;
+		std::shared_ptr<GizmoService> m_gizmoService;
+		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;
 
 		EventHandlerId m_selectionChangedHandleId{ 0 };
 	};

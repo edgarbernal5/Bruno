@@ -1,6 +1,8 @@
 #include "brpch.h"
 #include "Queue.h"
 
+#include "Device.h"
+
 #ifdef BR_DEBUG
 #include <dxgidebug.h>
 #endif
@@ -9,24 +11,23 @@
 
 #include <numeric>
 
-//extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = D3D12_SDK_VERSION; }
-//extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
-
 namespace Bruno::DX
 {
-    CommandQueue::CommandQueue(Microsoft::WRL::ComPtr<ID3D12Device2> device, D3D12_COMMAND_LIST_TYPE type)
+    CommandQueue::CommandQueue(DX::GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE type)
         : m_fenceValue(0)
     {
+        auto nativeDevice = device.GetNativeDevice();
+        
         D3D12_COMMAND_QUEUE_DESC desc = {};
         desc.Type = type;
         desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
         desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
         desc.NodeMask = 0;
 
-        ThrowIfFailed(device->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_commandQueue)));
+        ThrowIfFailed(nativeDevice->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_commandQueue)));
         
         // 1. Crear la valla con valor inicial 0
-        ThrowIfFailed(device->CreateFence(m_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+        ThrowIfFailed(nativeDevice->CreateFence(m_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
         
         m_fenceEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
         if (!m_fenceEvent)
@@ -36,12 +37,12 @@ namespace Bruno::DX
 
         // CREACIÓN DE MÚLTIPLES ALLOCATORS
         for (uint32_t i = 0; i < BufferCount; ++i) {
-            ThrowIfFailed(device->CreateCommandAllocator(type, IID_PPV_ARGS(&m_commandAllocators[i])));
+            ThrowIfFailed(nativeDevice->CreateCommandAllocator(type, IID_PPV_ARGS(&m_commandAllocators[i])));
             m_frameFenceValues[i] = 0; // Inicializamos los tickets
         }
 
         // Creamos la CommandList usando el primer allocator
-        ThrowIfFailed(device->CreateCommandList(
+        ThrowIfFailed(nativeDevice->CreateCommandList(
             0, type, m_commandAllocators[0].Get(), nullptr, IID_PPV_ARGS(&m_commandList)
         ));
 

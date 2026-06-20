@@ -4,6 +4,9 @@
 #include "Material.h"
 #include <Bruno/Platform/DirectX/VertexTypes.h>
 
+#include "Bruno/Platform/DirectX/CommandQueueManager.h"
+#include "Bruno/Platform/DirectX/UploadContext_Gem.h"
+
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(ModelMaterial);
@@ -17,6 +20,7 @@ namespace Bruno
 		m_modelNodes(std::move(modelNodes))
 	{
 		//m_handle = {};
+		auto device = Bruno::Graphics::GetDXDevice();
 
 		std::vector< VertexPositionNormalTexture> verticesPNT;
 		verticesPNT.reserve(m_vertices.size());
@@ -27,17 +31,28 @@ namespace Bruno
 			vertex.Texture = Math::Vector2(m_vertices[i].Texcoord.x, m_vertices[i].Texcoord.y);
 			vertex.Normal = m_vertices[i].Normal;
 		}
+		
+		auto& uploadContext = device->GetUploadContext();
+		auto& commandManager = Graphics::GetCommandQueueManager();
+		
+		uploadContext.Reset();
+		
+		m_indexBuffer = std::make_shared<DX::IndexBuffer>(*device, uploadContext, m_indices);
+		m_vertexBuffer = std::make_shared<DX::VertexBuffer>(*device, uploadContext, verticesPNT.data(), verticesPNT.size(), sizeof(VertexPositionNormalTexture));
+		
+		uint64_t uploadFence = commandManager->ExecuteAndReturnFence(uploadContext);
 
-		m_indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(m_indices.size() * sizeof(uint32_t)), m_indices.data(), sizeof(uint32_t));
-		m_vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(m_vertices.size() * sizeof(VertexPositionNormalTexture)), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
+		commandManager->WaitForGpuFence(uploadFence);
+
+		uploadContext.ClearGarbage();
 	}
 
-	void Model::SetIndexBuffer(std::shared_ptr<IndexBuffer> buffer)
+	void Model::SetIndexBuffer(std::shared_ptr<DX::IndexBuffer> buffer)
 	{
 		m_indexBuffer = buffer;
 	}
 
-	void Model::SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer)
+	void Model::SetVertexBuffer(std::shared_ptr<DX::VertexBuffer> buffer)
 	{
 		m_vertexBuffer = buffer;
 	}

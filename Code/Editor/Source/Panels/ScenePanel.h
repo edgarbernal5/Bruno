@@ -104,8 +104,7 @@ namespace Bruno
 		std::shared_ptr<SelectionService>	m_selectionService;
 		std::shared_ptr<GizmoService>		m_gizmoService;
 
-		
-		std::unique_ptr<DX::GraphicsDevice>	m_dxDevice;
+		DX::GraphicsDevice* m_dxDevice;
 		std::unique_ptr<DX::GraphicsFence>	m_dxFence;
 		std::unique_ptr<DX::RenderContext>	m_dxRenderContext;
 		std::unique_ptr<DX::Surface> m_dxSurface;

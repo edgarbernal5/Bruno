@@ -11,6 +11,7 @@
 namespace Bruno::DX
 {
 	class CommandQueue;
+	class UploadContext;
 	
 	class GraphicsDevice
 	{
@@ -28,6 +29,11 @@ namespace Bruno::DX
 		[[nodiscard]] CommandQueue& GetDirectCommandQueue() const { return *m_directCommandQueue; }
 		
 		[[nodiscard]] DX::DescriptorAllocator& GetSRVDescriptorAllocator() const { return *m_srvDescriptorAllocator; }
+		
+		[[nodiscard]] DX::UploadContext& GetUploadContext() const { return *m_uploadContext; }
+		
+		static std::shared_ptr<DX::GraphicsDevice> Create();
+		
 	private:
 		void InitializeDXGI();
 		void CreateDevice();
@@ -37,6 +43,8 @@ namespace Bruno::DX
         
 		// La cola principal de comandos de la GPU
 		std::unique_ptr<CommandQueue> m_directCommandQueue;
+		
+		std::unique_ptr<UploadContext> m_uploadContext;
 		
 		std::unique_ptr<DX::DescriptorAllocator> m_srvDescriptorAllocator;
 	};
@@ -50,5 +58,4 @@ namespace Bruno::Graphics
 		static DX::GraphicsDevice* g_device = nullptr;
 		return g_device;
 	}
-	
 }

@@ -13,6 +13,9 @@
 #include <filesystem>
 #include <Bruno/Platform/DirectX/Surface.h>
 
+#include "Bruno/Platform/DirectX/CommandQueueManager.h"
+#include "Bruno/Platform/DirectX/Device.h"
+
 namespace Bruno
 {
 	Game::Game(const ApplicationParameters& parameters) :
@@ -52,6 +55,12 @@ namespace Bruno
 		m_device = GraphicsDevice::Create();
 		Bruno::Graphics::GetDevice() = m_device.get();
 
+		m_dxDevice = DX::GraphicsDevice::Create();
+		Bruno::Graphics::GetDXDevice() = m_dxDevice.get();
+		
+		m_commandQueueManager = DX::CommandQueueManager::Create(*m_dxDevice);
+		Bruno::Graphics::GetCommandQueueManager() = m_commandQueueManager.get();
+		
 		ContentTypeReaderManager::Initialize();
 		SurfaceWindowParameters surfaceParameters;
 

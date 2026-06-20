@@ -15,7 +15,8 @@ namespace Bruno::DX
         // Actualiza los datos desde C++ hacia la GPU (sin bloqueos)
         void Update(const void* data, size_t dataSize);
 
-        [[nodiscard]] D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddress() const { 
+        [[nodiscard]] D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddress() const
+        { 
             return m_buffer->GetGPUVirtualAddress(); 
         }
 

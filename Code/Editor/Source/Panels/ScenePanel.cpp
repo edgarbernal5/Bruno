@@ -86,7 +86,7 @@ namespace Bruno
 		m_dxViewport.TopLeftY	=0;
 		m_dxViewport.MinDepth	=D3D12_MIN_DEPTH;
 		m_dxViewport.MaxDepth	=D3D12_MAX_DEPTH;
-		m_dxDevice=std::make_unique<DX::GraphicsDevice>();
+		m_dxDevice= Graphics::GetDXDevice();
 		m_dxRenderContext = std::make_unique<DX::RenderContext>(*m_dxDevice);
 		m_dxFence=std::make_unique<DX::GraphicsFence>(*m_dxDevice);
 		
@@ -105,11 +105,10 @@ namespace Bruno
 		parameters.DepthBufferFormat = m_surfaceParameters.DepthBufferFormat;
 		parameters.WindowHandle = m_form->NativeHandle().Handle;
 		
-		m_dxSurface = std::make_unique<DX::Surface>(*m_dxDevice.get(), parameters);
+		m_dxSurface = std::make_unique<DX::Surface>(*m_dxDevice, parameters);
 		m_commandQueue = &m_dxDevice->GetDirectCommandQueue();
 		
-		Bruno::Graphics::GetDXDevice() = m_dxDevice.get();
-		
+		InitializeSceneRenderer();
 		m_srvHeap = m_dxDevice->GetSRVDescriptorAllocator().GetHeap();
 		// 1. Describir el Heap
 		/*D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
@@ -204,6 +203,9 @@ namespace Bruno
 			// 7. ¡El gran llamado de dibujado!
 			commandList->DrawIndexedInstanced(m_indexBuffer->GetIndicesCount(), 1, 0, 0, 0);
 			*/
+			
+			m_sceneRenderer->OnRender(nullptr);
+			
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 			// ------------------------------------------------------------------

@@ -24,7 +24,11 @@ namespace Bruno::DX
         // Helper para pasarlo al GraphicsPipelineState directamente
         D3D12_SHADER_BYTECODE GetNativeByteCode() const 
         {
-            if (!m_byteCode) return { nullptr, 0 };
+            if (!m_byteCode)
+            {
+                return { nullptr, 0 };
+            }
+            
             return { m_byteCode->GetBufferPointer(), m_byteCode->GetBufferSize() };
         }
 

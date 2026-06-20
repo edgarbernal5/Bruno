@@ -15,6 +15,12 @@
 
 namespace Bruno
 {
+	namespace DX
+	{
+		class GraphicsDevice;
+		class CommandQueueManager;
+	}
+
 	class GraphicsDevice;
 	class AbstractAssetManager;
 
@@ -47,6 +53,8 @@ namespace Bruno
 		GameTimer m_timer;
 		ContentManager m_contentManager;
 		std::shared_ptr<GraphicsDevice> m_device;
+		std::shared_ptr<DX::GraphicsDevice> m_dxDevice;
+		std::shared_ptr<DX::CommandQueueManager> m_commandQueueManager;
 		std::shared_ptr<AbstractAssetManager> m_assetManager;
 		ShaderCache m_shaderCache;
 		PipelineStateObjectCache m_psoCache;

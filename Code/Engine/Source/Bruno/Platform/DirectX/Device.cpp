@@ -7,11 +7,12 @@
 
 #include "D3DHelpers.h"
 #include "Queue.h"
+#include "UploadContext_Gem.h"
 
 #include <numeric>
 
-//extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = D3D12_SDK_VERSION; }
-//extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
+extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = D3D12_SDK_VERSION; }
+extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
 
 namespace Bruno::DX
 {
@@ -21,9 +22,15 @@ namespace Bruno::DX
         CreateDevice();
         
         // C++14/17: Creación segura de memoria dinámica (RAII)
-        m_directCommandQueue = std::make_unique<CommandQueue>(m_device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+        m_directCommandQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
         
         m_srvDescriptorAllocator = std::make_unique<DX::DescriptorAllocator>(m_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4096, true);
+        m_uploadContext = std::make_unique<DX::UploadContext>(*this);
+    }
+
+    std::shared_ptr<DX::GraphicsDevice> GraphicsDevice::Create()
+    {
+        return std::make_shared<DX::GraphicsDevice>();
     }
 
     void GraphicsDevice::InitializeDXGI()
@@ -36,7 +43,7 @@ namespace Bruno::DX
         if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
         {
             debugController->EnableDebugLayer();
-            // dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG; // Opcional en DXGI 1.3+
+            dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG; // Opcional en DXGI 1.3+
         }
 #endif
 

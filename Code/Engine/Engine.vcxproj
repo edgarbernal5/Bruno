@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.props" Condition="Exists('..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.props')" />
   <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -105,12 +106,15 @@
     <ClInclude Include="Source\Bruno\Content\AssetTable.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTypes.h" />
     <ClInclude Include="Source\Bruno\Core\UUID.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\CommandContext.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueueManager.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer_Gem.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer_Gem.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorAllocator_Gem.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorHandle.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Device.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext_Gem.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsFence.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer_Gem.h" />
@@ -124,6 +128,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\Surface_Gem.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\SwapChain.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Texture2D.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext_Gem.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadHeap.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer_Gem.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
@@ -210,11 +215,14 @@
     <ClCompile Include="Source\Bruno\Content\AssetManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\AssetTable.cpp" />
     <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\CommandContext.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueueManager.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBuffer_Gem.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer_Gem.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DescriptorAllocator_Gem.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Device.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsContext_Gem.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsFence.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer_Gem.cpp" />
@@ -227,6 +235,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\Surface_Gem.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\SwapChain.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Texture2D.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext_Gem.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadHeap.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer_Gem.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp" />
@@ -302,6 +311,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets')" />
+    <Import Project="..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.targets" Condition="Exists('..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -309,5 +319,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.targets'))" />
   </Target>
 </Project>

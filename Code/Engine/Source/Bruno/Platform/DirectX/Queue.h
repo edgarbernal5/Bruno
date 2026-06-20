@@ -15,7 +15,7 @@ namespace Bruno::DX
 		// C++17: Constante global de la clase para el doble buffering
 		static constexpr uint32_t BufferCount = 2;
 
-		CommandQueue(Microsoft::WRL::ComPtr<ID3D12Device2> device, D3D12_COMMAND_LIST_TYPE type);
+		CommandQueue(DX::GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE type);
 		~CommandQueue();
 
 		CommandQueue(const CommandQueue&) = delete;

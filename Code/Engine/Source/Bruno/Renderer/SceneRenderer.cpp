@@ -14,6 +14,7 @@
 
 #include "Bruno/Content/AssetManager.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
+#include "Bruno/Platform/DirectX/Texture2D.h"
 
 namespace Bruno
 {
@@ -23,8 +24,6 @@ namespace Bruno
 	{
 		auto& device = Bruno::Graphics::GetDXDevice();
 		
-		//m_opaqueShader = std::make_unique<Shader>(L"Shaders/Opaque.hlsl");
-
 		DX::ShaderCompiler compiler; 
 
 		// Compilas usando DXC (nota el _6_0)
@@ -77,11 +76,11 @@ namespace Bruno
 		for (auto& ent : entities)
 		{
 			Entity entity = { ent, m_scene.get() };
+			
 			// Si la entidad no tiene sus Constant Buffers, se los creamos
 			if (!entity.HasComponent<CBVComponent>()) 
 			{
 				CBVComponent cbv;
-				// Instanciar tus 2 constant buffers aquí (usando tu clase ConstantBuffer)
 				for (int i = 0; i < 2; ++i)
 				{
 					cbv.TransformCB[i] = std::make_shared<DX::ConstantBuffer>(device->GetNativeDevice().Get(), objectSize);
@@ -112,10 +111,10 @@ namespace Bruno
 
 		VertexBuffer* currentVB = nullptr;
 		uint32_t objectIndex = 0;*/
-		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
+		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent, CBVComponent>();
 		for (auto& ent : entities)
 		{
-			const auto& [transformComponent, modelComponent] = entities.get<TransformComponent, ModelComponent>(ent);
+			const auto& [transformComponent, modelComponent, cbv] = entities.get<TransformComponent, ModelComponent, CBVComponent>(ent);
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 
 			uint32_t meshIndex = modelComponent.MeshIndex;
@@ -126,12 +125,16 @@ namespace Bruno
 			auto material = m_assetManager->GetAsset<Material>(materialHandle);
 			AssetHandle textureHandle{ 0 };
 			auto textIt = material->TexturesByName.find("Texture");
-			/*if (textIt != material->TexturesByName.end())
+			if (textIt != material->TexturesByName.end())
 			{
 				textureHandle = textIt->second;
 			}
-			auto texture = m_assetManager->GetAsset<Texture>(textureHandle);
-			if (texture != nullptr && texture->IsReady())
+			auto texture = m_assetManager->GetAsset<DX::Texture2D>(textureHandle);
+			if (texture != nullptr)
+			{
+				
+			}
+			/*if (texture != nullptr && texture->IsReady())
 			{
 				auto& indexBuffer = model->GetIndexBuffer();
 				auto& vertexBuffer = model->GetVertexBuffer();

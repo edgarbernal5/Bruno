@@ -18,7 +18,8 @@ namespace Bruno
 	{
 		InitializeCamera();
 		InitializeGizmoService();
-
+		InitializeSceneRenderer();
+		
 		m_sceneHierarchy = std::make_shared<SceneHierarchy>(scene);
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
@@ -42,7 +43,8 @@ namespace Bruno
 	void SceneDocument::InstantiateModel(std::shared_ptr<Model> model)
 	{
 		Entity rootEntity = m_scene->InstantiateModel(model);
-
+		m_sceneRenderer->InitEntitiesForRender();
+		
 		HierarchyChanged.emit(rootEntity, ActionMode::Add);
 	}
 
