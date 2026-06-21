@@ -4,15 +4,11 @@
 #include "Bruno/Platform/DirectX/Surface.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 
-#include <Bruno/Platform/DirectX/IndexBuffer.h>
-#include <Bruno/Platform/DirectX/VertexBuffer.h>
 #include <Bruno/Platform/DirectX/Shader.h>
 #include <Bruno/Platform/DirectX/VertexTypes.h>
 #include <Bruno/Platform/DirectX/GraphicsContext.h>
 #include <Bruno/Platform/DirectX/Queue.h>
 #include <Bruno/Platform/DirectX/Surface_Gem.h>
-#include <Bruno/Content/ContentManager.h>
-#include <Bruno/Renderer/Model.h>
 #include <Bruno/Scene/Scene.h>
 #include <Bruno/Renderer/SceneRenderer.h>
 #include "Panels/Scene/SelectionService.h"
@@ -22,7 +18,7 @@
 #include <iostream>
 #include <Bruno/Core/Log.h>
 #include "SceneHierarchyPanel.h"
-#include "Bruno/Platform/DirectX/RootSignatureBuilder.h"
+#include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
 
 namespace Bruno
 {
@@ -86,17 +82,7 @@ namespace Bruno
 		m_dxViewport.TopLeftY	=0;
 		m_dxViewport.MinDepth	=D3D12_MIN_DEPTH;
 		m_dxViewport.MaxDepth	=D3D12_MAX_DEPTH;
-		m_dxDevice= Graphics::GetDXDevice();
-		m_dxRenderContext = std::make_unique<DX::RenderContext>(*m_dxDevice);
-		m_dxFence=std::make_unique<DX::GraphicsFence>(*m_dxDevice);
-		
-		/*auto rootSig = DX::RootSignatureBuilder()
-			.AddRootConstantBufferView(0) // b0: Matrices (MVP)
-			.Build(m_dxDevice->GetNativeDevice().Get());*/
-		
-		//m_rootSignature = new DX::RootSignature(*m_dxDevice.get());
-		
-		//m_vertexBuffer = new DX::VertexBuffer(m_dxDevice->GetNativeDevice().Get(), )
+		m_dxDevice = Graphics::GetDXDevice();
 		
 		DX::SurfaceWindowParameters parameters;
 		parameters.Width = 100;
@@ -109,22 +95,9 @@ namespace Bruno
 		m_commandQueue = &m_dxDevice->GetDirectCommandQueue();
 		
 		InitializeSceneRenderer();
+		InitializeGizmoService();
 		m_srvHeap = m_dxDevice->GetSRVDescriptorAllocator().GetHeap();
-		// 1. Describir el Heap
-		/*D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-		srvHeapDesc.NumDescriptors = 1; // Cuántas texturas/buffers vas a enlazar. (Pon 1 por ahora para tu textura)
-		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; // Tipo para Texturas y Constant Buffers
-    
-		// ¡CRÍTICO! Este flag permite que el Shader pueda acceder a este Heap
-		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE; 
-
-		// 2. Crear el Heap nativo
-		m_dxDevice->GetNativeDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_srvHeap));
 		
-		auto cmdListComPtr = m_commandQueue->GetCommandList(0).Get();
-		D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = m_srvHeap->GetCPUDescriptorHandleForHeapStart();
-		m_texture = std::make_unique<Bruno::DX::Texture2D>(m_dxDevice->GetNativeDevice().Get(), cmdListComPtr,  srvHandle, L"textura.png");
-		*/
 		// Single-thread rendering.
 #ifdef BR_SINGLE_THREAD_RENDERING
 		
@@ -133,16 +106,20 @@ namespace Bruno
 			m_timer.Tick();
 			
 			if (!m_isExposed || m_isResizing || m_isSizingMoving)
+			{
 				return;
+			}
 			
+			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
 			uint32_t frameIndex = m_dxSurface->GetCurrentBackBufferIndex();
 
 			BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
-			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
-    
+			
 			// 2. Pedirle a nuestra cola el "lápiz" (CommandList). 
 			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
 			auto commandList = m_commandQueue->GetCommandList(frameIndex);
+			auto allocator = m_commandQueue->GetAllocator(frameIndex);
+			DX::GraphicsContext context(*m_dxDevice, commandList.Get(), allocator.Get());
 			
 			// 3. Extraer la textura real y su descriptor
 			auto backBuffer = m_dxSurface->GetCurrentBackBuffer();
@@ -151,16 +128,7 @@ namespace Bruno
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
 			// ------------------------------------------------------------------
-			D3D12_RESOURCE_BARRIER barrier = {};
-			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-			barrier.Transition.pResource = backBuffer;
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-			// Grabamos el comando de transición
-			commandList->ResourceBarrier(1, &barrier);
+			context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 			
 			// ------------------------------------------------------------------
 			// FASE DE DIBUJO
@@ -171,48 +139,33 @@ namespace Bruno
 			auto dsvHandle = m_dxSurface->GetDepthBufferView();
 			
 			// Limpiar la pantalla
-			commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-			commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+			context.ClearRenderTarget(rtvHandle, clearColor);
+			context.ClearDepth(dsvHandle, 1.0f, 0);
+			context.SetRenderTargets(1, &rtvHandle, &dsvHandle);
+			//commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+			//commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+			//commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 			
-			// TODO: ¡Aquí irán los comandos DrawInstanced para tu triángulo / escena 3D!
-			// 2. Setear estado del Pipeline y RootSignature
-			//commandList->SetPipelineState(m_pso->GetNative());
-			//commandList->SetGraphicsRootSignature(m_rootSignature->GetNative());
-
-			// 3. Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
-			ID3D12DescriptorHeap* descriptorHeaps[] = { m_srvHeap };
-			commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+			// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
+			//ID3D12DescriptorHeap* descriptorHeaps[] = { m_srvHeap };
+			//commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+			context.SetDescriptorHeaps(&m_srvHeap, 1);
 			
-			// 4. Enlazar datos al Shader (Root Parameters)
-			// Asumimos Parameter 0: ConstantBuffer, Parameter 1: DescriptorTable (Textura)
-			//commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetGPUAddress());
-			//commandList->SetGraphicsRootDescriptorTable(1, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
+			// Configurar Viewport y Scissor Test explícitamente en este frame
+			//commandList->RSSetViewports(1, &m_dxViewport);
+			//commandList->RSSetScissorRects(1, &m_scissorRect);
+			context.SetViewport(m_dxViewport);
+			context.SetScissorRect(m_scissorRect);
 			
-			// 5. Configurar Viewport y Scissor Test explícitamente en este frame
-			commandList->RSSetViewports(1, &m_dxViewport);
-			commandList->RSSetScissorRects(1, &m_scissorRect);
-			
-			// 6. Setear la Geometría (Buffers)
-			/*D3D12_VERTEX_BUFFER_VIEW vbv = m_vertexBuffer->GetView();
-			D3D12_INDEX_BUFFER_VIEW ibv = m_indexBuffer->GetView();
-			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			commandList->IASetVertexBuffers(0, 1, &vbv);
-			commandList->IASetIndexBuffer(&ibv);
-			
-			// 7. ¡El gran llamado de dibujado!
-			commandList->DrawIndexedInstanced(m_indexBuffer->GetIndicesCount(), 1, 0, 0, 0);
-			*/
-			
-			m_sceneRenderer->OnRender(nullptr);
+			m_sceneRenderer->OnRender(&context);
 			
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 			// ------------------------------------------------------------------
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-			
-			commandList->ResourceBarrier(1, &barrier);
+			//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+			//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+			context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+			//commandList->ResourceBarrier(1, &barrier);
 
 			// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
 			m_commandQueue->ExecuteCommandList(commandList, frameIndex);
@@ -298,26 +251,6 @@ namespace Bruno
 			m_scissorRect = { 0, 0, static_cast<LONG>(args.NewSize.Width), static_cast<LONG>(args.NewSize.Height) };
 			m_dxSurface->Resize(args.NewSize.Width, args.NewSize.Height);
 
-			/*if (m_surface)
-			{
-				m_surface->Resize(args.NewSize.Width, args.NewSize.Height);
-			}
-			else
-			{
-				SurfaceWindowParameters parameters;
-				parameters.Width = args.NewSize.Width;
-				parameters.Height = args.NewSize.Height;
-				parameters.BackBufferFormat = m_surfaceParameters.BackBufferFormat;
-				parameters.DepthBufferFormat = m_surfaceParameters.DepthBufferFormat;
-				parameters.WindowHandle = m_form->NativeHandle().Handle;
-
-				m_surface = std::make_unique<Surface>(parameters);
-				m_surface->Initialize();
-
-				//TODO: esta inicialización está acá porque depende del surface. Esto está mal, arreglarlo!
-				InitializeSceneRenderer();
-				InitializeGizmoService();
-			}*/
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.NewSize.Width, (float)args.NewSize.Height));
 			m_isResizing = false;
 		});

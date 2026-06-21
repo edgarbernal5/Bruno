@@ -105,17 +105,11 @@ namespace Bruno
 		std::shared_ptr<GizmoService>		m_gizmoService;
 
 		DX::GraphicsDevice* m_dxDevice;
-		std::unique_ptr<DX::GraphicsFence>	m_dxFence;
-		std::unique_ptr<DX::RenderContext>	m_dxRenderContext;
 		std::unique_ptr<DX::Surface> m_dxSurface;
 		DX::CommandQueue* m_commandQueue { nullptr };
 		D3D12_VIEWPORT m_dxViewport;
 		D3D12_RECT m_scissorRect;
-		DX::RootSignature* m_rootSignature;
-		DX::VertexBuffer* m_vertexBuffer;
-		DX::IndexBuffer* m_indexBuffer;
-		DX::ConstantBuffer* m_constantBuffer;
-		std::unique_ptr<DX::Texture2D> m_texture;
+
 		ID3D12DescriptorHeap* m_srvHeap;
 		
 		uint64_t m_frameFenceValues[3]{0,0,0};

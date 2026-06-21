@@ -12,6 +12,8 @@
 #include "Bruno/Renderer/RenderItem.h"
 #include "Bruno/Content/ContentTypeReaderManager.h"
 #include <iostream>
+
+#include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
 #include "Bruno/Renderer/Model.h"
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Renderer/SceneRenderer.h"
@@ -78,8 +80,11 @@ namespace Bruno
 
 		m_graphicsContext->SetViewport(m_surface->GetViewport());
 		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
-		
-		m_sceneRenderer->OnRender(m_graphicsContext.get());
+		//auto commandList = m_commandQueue->GetCommandList(frameIndex);
+		//auto allocator = m_commandQueue->GetAllocator(frameIndex); // Asumiendo que agregas este getter
+		//DX::GraphicsContext context(*m_dxDevice, commandList.Get(), allocator.Get());
+			
+		//m_sceneRenderer->OnRender(&context);
 
 		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
 		m_graphicsContext->FlushBarriers();

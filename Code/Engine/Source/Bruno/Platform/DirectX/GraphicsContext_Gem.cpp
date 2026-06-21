@@ -3,13 +3,14 @@
 
 namespace Bruno::DX
 {
-    GraphicsContext::GraphicsContext(DX::GraphicsDevice& device) : 
-        CommandContext(device, D3D12_COMMAND_LIST_TYPE_DIRECT)
+    GraphicsContext::GraphicsContext(DX::GraphicsDevice& device, ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* allocator) : 
+    CommandContext(device, D3D12_COMMAND_LIST_TYPE_DIRECT, commandList, allocator)
     {
+        
     }
 
     void GraphicsContext::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES stateBefore,
-        D3D12_RESOURCE_STATES stateAfter)
+                                             D3D12_RESOURCE_STATES stateAfter)
     {
         if (stateBefore == stateAfter) return; // Optimización simple
 
@@ -31,55 +32,67 @@ namespace Bruno::DX
 
     void GraphicsContext::ClearDepth(D3D12_CPU_DESCRIPTOR_HANDLE dsv, float depth, uint8_t stencil)
     {
+        m_commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, depth, stencil, 0, nullptr);
     }
 
-    void GraphicsContext::SetRenderTargets(uint32_t count, const D3D12_CPU_DESCRIPTOR_HANDLE* rtvs,
-        D3D12_CPU_DESCRIPTOR_HANDLE* dsv)
+    void GraphicsContext::SetRenderTargets(uint32_t numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE* rtvs, D3D12_CPU_DESCRIPTOR_HANDLE* dsv)
     {
+        // FALSE indica que los RTVs no son necesariamente contiguos en memoria
+        m_commandList->OMSetRenderTargets(numRTVs, rtvs, FALSE, dsv);
     }
 
     void GraphicsContext::SetViewport(const D3D12_VIEWPORT& viewport)
     {
+        m_commandList->RSSetViewports(1, &viewport);
     }
 
     void GraphicsContext::SetScissorRect(const D3D12_RECT& rect)
     {
+        m_commandList->RSSetScissorRects(1, &rect);
     }
 
     void GraphicsContext::SetPipelineState(ID3D12PipelineState* pso)
     {
+        m_commandList->SetPipelineState(pso);
     }
 
     void GraphicsContext::SetRootSignature(ID3D12RootSignature* rootSig)
     {
+        m_commandList->SetGraphicsRootSignature(rootSig);
     }
 
-    void GraphicsContext::SetDescriptorHeaps(ID3D12DescriptorHeap** heaps, uint32_t count)
+    void GraphicsContext::SetDescriptorHeaps(ID3D12DescriptorHeap** ppHeaps, uint32_t count)
     {
+        m_commandList->SetDescriptorHeaps(count, ppHeaps);
     }
 
     void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS address)
     {
+        m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, address);
     }
 
     void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor)
     {
+        m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, baseDescriptor);
     }
 
     void GraphicsContext::SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology)
     {
+        m_commandList->IASetPrimitiveTopology(topology);
     }
 
     void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count, const D3D12_VERTEX_BUFFER_VIEW* views)
     {
+        m_commandList->IASetVertexBuffers(startSlot, count, views);
     }
 
     void GraphicsContext::SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW* view)
     {
+        m_commandList->IASetIndexBuffer(view);
     }
 
-    void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount,
-        uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation)
+    void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation)
     {
+        m_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
     }
 }

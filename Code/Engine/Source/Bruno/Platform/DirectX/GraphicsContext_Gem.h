@@ -11,7 +11,7 @@ namespace Bruno::DX
     {
     public:
         // Constructor inyectando la command list que viene de tu CommandQueue
-        GraphicsContext(DX::GraphicsDevice& device);
+        GraphicsContext(DX::GraphicsDevice& device, ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* allocator);
 
         // --- BARRERAS Y ESTADOS ---
         void TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter);
@@ -19,7 +19,7 @@ namespace Bruno::DX
         // --- CLEAR Y RENDER TARGETS ---
         void ClearRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtv, const float color[4]);
         void ClearDepth(D3D12_CPU_DESCRIPTOR_HANDLE dsv, float depth = 1.0f, uint8_t stencil = 0);
-        void SetRenderTargets(uint32_t count, const D3D12_CPU_DESCRIPTOR_HANDLE* rtvs, D3D12_CPU_DESCRIPTOR_HANDLE* dsv = nullptr);
+        void SetRenderTargets(uint32_t numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE* rtvs, D3D12_CPU_DESCRIPTOR_HANDLE* dsv = nullptr);
 
         // --- PIPELINE Y ESTADO GLOBAL ---
         void SetViewport(const D3D12_VIEWPORT& viewport);
@@ -28,7 +28,7 @@ namespace Bruno::DX
         void SetRootSignature(ID3D12RootSignature* rootSig);
 
         // --- ENLACE DE RECURSOS ---
-        void SetDescriptorHeaps(ID3D12DescriptorHeap** heaps, uint32_t count);
+        void SetDescriptorHeaps(ID3D12DescriptorHeap** ppHeaps, uint32_t count);
         void SetConstantBuffer(uint32_t rootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS address);
         void SetDescriptorTable(uint32_t rootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor);
 

@@ -29,4 +29,10 @@ namespace Bruno::DX
         // Así es obligatorio llamar a Reset() antes de usarlo por primera vez.
         m_commandList->Close();
     }
+
+    CommandContext::CommandContext(DX::GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE commandType,
+        ID3D12GraphicsCommandList* existingList, ID3D12CommandAllocator* existingAllocator) :
+        m_device(device), m_commandType(commandType), m_commandList(existingList), m_commandAllocator(existingAllocator)
+    {
+    }
 }

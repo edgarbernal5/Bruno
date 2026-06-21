@@ -25,6 +25,8 @@ namespace Bruno::DX
         
 		// FIRMAS CORREGIDAS: Reciben en qué frame estamos trabajando
 		[[nodiscard]] Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList(uint32_t frameIndex);
+		[[nodiscard]] Microsoft::WRL::ComPtr<ID3D12CommandAllocator> GetAllocator(uint32_t frameIndex);
+		
 		uint64_t ExecuteCommandList(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList, uint32_t frameIndex);
         
 		void Flush();

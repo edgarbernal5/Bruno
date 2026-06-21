@@ -11,10 +11,7 @@ namespace Bruno::DX
         m_utils->CreateDefaultIncludeHandler(&m_includeHandler);
     }
 
-    Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileFromFile(
-        std::wstring_view filePath, 
-        std::wstring_view entryPoint, 
-        std::wstring_view targetProfile) 
+    Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileFromFile(std::wstring_view filePath, std::wstring_view entryPoint, std::wstring_view targetProfile) 
     {
         // 1. Cargar el archivo fuente
         Microsoft::WRL::ComPtr<IDxcBlobEncoding> sourceBlob;
@@ -51,13 +48,15 @@ namespace Bruno::DX
         // 4. Revisar Errores
         Microsoft::WRL::ComPtr<IDxcBlobUtf8> errors = nullptr;
         results->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errors), nullptr);
-        if (errors != nullptr && errors->GetStringLength() != 0) {
+        if (errors != nullptr && errors->GetStringLength() != 0)
+        {
             std::cerr << "Shader Compilation Error:\n" << errors->GetStringPointer() << std::endl;
         }
 
         // 5. Verificar si falló internamente
         results->GetStatus(&hr);
-        if (FAILED(hr)) {
+        if (FAILED(hr))
+        {
             throw std::runtime_error("El shader falló al compilar.");
         }
 

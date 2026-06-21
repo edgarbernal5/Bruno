@@ -68,6 +68,11 @@ namespace Bruno::DX
         return m_commandList;
     }
 
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CommandQueue::GetAllocator(uint32_t frameIndex)
+    {
+        return m_commandAllocators[frameIndex];
+    }
+
     uint64_t CommandQueue::ExecuteCommandList(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList, uint32_t frameIndex)
     {
         ThrowIfFailed(commandList->Close());

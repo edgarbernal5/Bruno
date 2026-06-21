@@ -15,6 +15,7 @@
 #include "Bruno/Content/AssetManager.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
 #include "Bruno/Platform/DirectX/Texture2D.h"
+#include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
 
 namespace Bruno
 {
@@ -92,7 +93,7 @@ namespace Bruno
 		}
 	}
 
-	void SceneRenderer::OnRender(GraphicsContext* graphicsContext)
+	void SceneRenderer::OnRender(DX::GraphicsContext* graphicsContext)
 	{
 		//auto device = Graphics::GetDevice();
 		//uint32_t frameIndex = device->GetFrameId();
