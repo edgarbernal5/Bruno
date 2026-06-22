@@ -36,7 +36,7 @@ namespace Bruno
 		m_opaqueRootSignature->CreateOpaqueSignature();
 
 		// Instanciamos el Pipeline State Object (PSO) pasándole el contrato y shaders
-		m_opaquePSO = std::make_unique<DX::GraphicsPipelineState>(*device);
+		m_opaquePSO = std::make_shared<DX::GraphicsPipelineState>(*device);
 		m_opaquePSO->CreateOpaquePSO(
 			m_opaqueRootSignature->GetNative(), 
 			vertexShaderByteCode.Get(), 
@@ -68,7 +68,20 @@ namespace Bruno
 				// Le "pegamos" el componente de memoria de video a la entidad
 				entity.AddComponent<CBVComponent>(std::move(cbv));
 			}
+			const auto& modelComponent = entities.get<ModelComponent>(ent);
+			uint32_t meshIndex = modelComponent.MeshIndex;
+			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
+			auto& meshes = model->GetMeshes();
+			auto& mesh = meshes[meshIndex];
+			
+			auto materialHandle = modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
+			auto material = m_assetManager->GetAsset<Material>(materialHandle);
+			material->BuildDescriptors(device, &device->GetSRVDescriptorAllocator(), m_assetManager);
+			
+			material->SetPipelineState(m_opaquePSO, m_opaqueRootSignature);
 		}
+		
+		
 	}
 
 	void SceneRenderer::OnRender(DX::GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
@@ -109,11 +122,11 @@ namespace Bruno
 					currentVB = vertexBuffer.get();
 				}
 				
-				//graphicsContext->SetPipelineState(material->GetPSO()->GetNative());
-				//graphicsContext->SetRootSignature(material->GetRootSignature()->GetNative());
+				graphicsContext->SetPipelineState(material->GetPSO()->GetNative());
+				graphicsContext->SetRootSignature(material->GetRootSignature()->GetNative());
 				
-				graphicsContext->SetPipelineState(m_opaquePSO->GetNative());
-				graphicsContext->SetRootSignature(m_opaqueRootSignature->GetNative());
+				//graphicsContext->SetPipelineState(m_opaquePSO->GetNative());
+				//graphicsContext->SetRootSignature(m_opaqueRootSignature->GetNative());
 				
 				// Enlazar la tabla de texturas (Parámetro 1 en nuestra Root Signature)
 				graphicsContext->SetDescriptorTable(1, material->GetTextureDescriptorTable());
@@ -122,7 +135,7 @@ namespace Bruno
 				Math::Matrix wvp = (world * camera.GetViewProjection()).Transpose();
 				
 				SceneObjectBuffer objConstants;
-				objConstants.World = wvp;
+				objConstants.WorldViewProjection = wvp;
 				cbv.TransformCB[frameIndex]->Update(&objConstants, sizeof(SceneObjectBuffer));
 				
 				graphicsContext->SetConstantBuffer(0, cbv.TransformCB[frameIndex]->GetGPUAddress());

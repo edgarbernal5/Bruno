@@ -16,7 +16,7 @@ namespace Bruno
 
 	struct SceneObjectBuffer
 	{
-		Math::Matrix World;
+		Math::Matrix WorldViewProjection;
 	};
 
 	class Scene

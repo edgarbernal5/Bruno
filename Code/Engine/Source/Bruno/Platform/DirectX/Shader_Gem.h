@@ -39,6 +39,8 @@ namespace Bruno::DX
     
     class Shader : public Asset // Puede ser un Asset administrado por tu AssetManager
     {
+        BR_RTTI_DECLARATION(Shader, Asset);
+        
     public:
         Shader(const std::string& name) : m_name(name) {}
 
@@ -52,26 +54,4 @@ namespace Bruno::DX
         std::unique_ptr<ShaderProgram> m_vertexProgram;
         std::unique_ptr<ShaderProgram> m_pixelProgram;
     };
-    
-    /*
-    // 1. Usar tu compilador para armar el Asset 'Shader'
-auto opaqueShader = std::make_shared<Shader>("OpaqueUnlit");
-
-opaqueShader->AddProgram(ShaderProgram(
-    ShaderStage::Vertex, 
-    compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"VS", L"vs_6_0")
-));
-
-opaqueShader->AddProgram(ShaderProgram(
-    ShaderStage::Pixel, 
-    compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"PS", L"ps_6_0")
-));
-
-// 2. Le pasas el Objeto 'Shader' limpio a tu PSO
-m_opaquePSO->CreateOpaquePSO(
-    device, 
-    m_opaqueRootSignature->GetNative(), 
-    opaqueShader.get() // <--- Pasamos el objeto completo
-);
-     */
 }

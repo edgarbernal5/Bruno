@@ -12,7 +12,6 @@ namespace Bruno::DX
     
     Texture2D::Texture2D(DX::GraphicsDevice& device, DX::UploadContext& uploadContext, DescriptorAllocator& srvAllocator, const std::wstring& filename)
     {
-        auto nativeDevice = device.GetNativeDevice();
         std::filesystem::path filePath(filename);
         if (!std::filesystem::exists(filePath))
         {
@@ -46,6 +45,8 @@ namespace Bruno::DX
         texDesc.SampleDesc.Count = 1;
         texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
+        auto nativeDevice = device.GetNativeDevice();
+        
         // ¡La magia de DX12! Nace en estado COMMON
         auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
         ThrowIfFailed(nativeDevice->CreateCommittedResource(

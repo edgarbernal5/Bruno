@@ -3,6 +3,8 @@
 
 namespace Bruno::DX
 {
+	BR_RTTI_DEFINITIONS(Shader);
+    
     void Shader::AddProgram(ShaderProgram&& program)
     {
         // En un motor real, podrías usar un map: m_programs[program.GetStage()] = program;

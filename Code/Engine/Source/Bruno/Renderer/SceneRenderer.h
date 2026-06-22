@@ -31,6 +31,6 @@ namespace Bruno
 
 		std::shared_ptr<DX::RootSignature> m_opaqueRootSignature;
 		std::unique_ptr<Shader> m_opaqueShader;
-		std::unique_ptr<DX::GraphicsPipelineState> m_opaquePSO;
+		std::shared_ptr<DX::GraphicsPipelineState> m_opaquePSO;
 	};
 }

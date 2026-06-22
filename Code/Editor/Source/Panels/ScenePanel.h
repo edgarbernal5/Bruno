@@ -118,7 +118,7 @@ namespace Bruno
 		Math::Int2 m_beginMouseDownPosition;
 		bool m_isResizing{ false };
 		bool m_isSizingMoving{ false };
-		bool m_isExposed{ false };
+		bool m_isVisible{ false };
 
 		bool m_shiftPressed{ false };
 		bool m_isGizmoing{ false };

@@ -105,7 +105,7 @@ namespace Bruno
 		{
 			m_timer.Tick();
 			
-			if (!m_isExposed || m_isResizing || m_isSizingMoving)
+			if (!m_isVisible || m_isResizing || m_isSizingMoving)
 			{
 				return;
 			}
@@ -177,7 +177,7 @@ namespace Bruno
 			auto device = Graphics::GetDevice();
 			device->WaitForIdle();
 
-			m_isExposed = false;
+			m_isVisible = false;
 			m_editorGame->RemoveScenePanel(this);
 		});
 
@@ -188,14 +188,14 @@ namespace Bruno
 #endif
 			BR_CORE_TRACE << "Expose of panel: panel id = " << idxx << ". IsVisible = " << args.IsVisible << std::endl;
 
-			m_isExposed = args.IsVisible;
-			if (m_isExposed)
+			m_isVisible = args.IsVisible;
+			if (m_isVisible)
 				m_form->Show();
 			else
 				m_form->Hide();
-			//TODO
-			//if (args.IsVisible)
-			//	this->focus();
+			
+			if (args.IsVisible)
+				this->Focus();
 		});
 
 		m_form->GetEvents().EnterSizeMove.Connect([this](const Berta::ArgSizeMove& args)
@@ -253,14 +253,13 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			/*//BR_CORE_TRACE << "Mouse down x=" << args.pos.x << "; y=" << args.pos.y << std::endl;
+			//BR_CORE_TRACE << "Mouse down x=" << args.pos.x << "; y=" << args.pos.y << std::endl;
 			m_lastMousePosition.x = args.Position.X;
 			m_lastMousePosition.y = args.Position.Y;
 			m_beginMouseDownPosition = m_lastMousePosition;
 
 			m_isGizmoing = args.ButtonState.LeftButton && m_gizmoService->BeginDrag(Math::Vector2(args.Position.X, args.Position.Y));
-			//TODO
-			//m_form->set_capture(true);*/
+			m_form->Capture(false);
 		});
 
 		m_form->GetEvents().MouseMove.Connect([this](const Berta::ArgMouse& args)
@@ -268,7 +267,7 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			/*Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
+			Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
 
 			if (!m_isGizmoing && !args.ButtonState.LeftButton)
 			{
@@ -283,9 +282,7 @@ namespace Bruno
 			{
 				if (args.ButtonState.LeftButton)
 				{
-					//if (args.alt)
-					//TODO
-					if (false)
+					if (args.AltPressed)
 					{
 						m_sceneDocument->GetCamera().Rotate(currentPosition, m_lastMousePosition);
 					}
@@ -310,7 +307,7 @@ namespace Bruno
 			}
 			
 			m_lastMousePosition.x = args.Position.X;
-			m_lastMousePosition.y = args.Position.Y;*/
+			m_lastMousePosition.y = args.Position.Y;
 		});
 
 		m_form->GetEvents().MouseUp.Connect([this](const Berta::ArgMouse& args)
@@ -318,7 +315,7 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			/*Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
+			Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
 			
 			if (args.ButtonState.LeftButton)
 			{
@@ -334,17 +331,14 @@ namespace Bruno
 
 						m_dragRectangle = false;
 					}
-					//TODO
-					//else if (!args.alt)
-					if (false)
+					else if (!args.AltPressed)
 					{
 						m_selectionService->SelectUnderMousePosition(m_sceneDocument->GetCamera(), currentPosition);
 					}
 				}
 			}
 
-			//TODO
-			//m_form->release_capture();*/
+			m_form->ReleaseCapture();
 		});
 
 		m_form->GetEvents().MouseWheel.Connect([this](const Berta::ArgWheel& args)
@@ -394,7 +388,7 @@ namespace Bruno
 		editorGame->AddScenePanel(this);
 		m_form->Show();
 		m_timer.Reset();
-		m_isExposed = true;
+		m_isVisible = true;
 	}
 
 	ScenePanel::~ScenePanel()
@@ -407,7 +401,7 @@ namespace Bruno
 		auto device = Graphics::GetDevice();
 		device->WaitForIdle();
 
-		m_isExposed = false;
+		m_isVisible = false;
 		m_editorGame->RemoveScenePanel(this);
 	}
 
@@ -415,7 +409,7 @@ namespace Bruno
 	{
 		//BR_CORE_TRACE << "Paint panel. id = " << idxx << ". delta time = " << timer.GetDeltaTime() << std::endl;
 
-		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
+		if (!m_isVisible || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
 		auto device = Graphics::GetDevice();
@@ -427,7 +421,7 @@ namespace Bruno
 
 	void ScenePanel::OnDraw()
 	{
-		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
+		if (!m_isVisible || m_isResizing || m_isSizingMoving || !m_surface)
 			return;
 
 		auto device = Graphics::GetDevice();
@@ -476,7 +470,7 @@ namespace Bruno
 		std::lock_guard lock{ m_mutex };
 #endif
 
-		return (m_isExposed && !m_isResizing && !m_isSizingMoving);
+		return (m_isVisible && !m_isResizing && !m_isSizingMoving);
 	}
 
 	void ScenePanel::InitializeGizmoService()

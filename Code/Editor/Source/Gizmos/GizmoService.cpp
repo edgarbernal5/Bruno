@@ -182,6 +182,7 @@ namespace Bruno
 
     void GizmoService::OnMouseMove(const Math::Vector2& mousePosition)
     {
+        /*
 #ifdef BR_GIZMO_LINES_INTERSECTION
         Math::Vector3 boxIntersection;
         auto selectedAxis = GetAxis(mousePosition, boxIntersection);
@@ -243,7 +244,7 @@ namespace Bruno
             m_gizmoScaleRenderer->SetColors(m_activeAxisColors);
         }
         break;
-        }
+        }*/
     }
 
     void GizmoService::Render(GraphicsContext* context, Surface* surface)
