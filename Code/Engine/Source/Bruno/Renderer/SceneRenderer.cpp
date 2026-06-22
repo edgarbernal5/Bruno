@@ -42,30 +42,6 @@ namespace Bruno
 			vertexShaderByteCode.Get(), 
 			pixelShaderByteCode.Get()
 		);
-		
-		/*PipelineResourceBinding textureBinding;
-		textureBinding.BindingIndex = 0;
-
-		m_meshPerObjectResourceSpace.SetCBV(scene->m_objectBuffer[0].get());
-		m_meshPerObjectResourceSpace.SetSRV(textureBinding);
-		m_meshPerObjectResourceSpace.Lock();
-
-		PipelineResourceLayout meshResourceLayout;
-		meshResourceLayout.Spaces[Graphics::Core::PER_OBJECT_SPACE] = &m_meshPerObjectResourceSpace;
-
-		PipelineResourceMapping resourceMapping;
-		m_rootSignature = std::make_shared<RootSignature>(meshResourceLayout, resourceMapping);
-
-		GraphicsPipelineDesc meshPipelineDesc = GetDefaultGraphicsPipelineDesc();
-		meshPipelineDesc.VertexShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Vertex);
-		meshPipelineDesc.PixelShader = m_opaqueShader->GetShaderProgram(Shader::ShaderProgramType::Pixel);
-		meshPipelineDesc.RenderTargetDesc.DepthStencilFormat = surface->GetDepthBufferFormat();
-		meshPipelineDesc.RenderTargetDesc.RenderTargetsCount = 1;
-		meshPipelineDesc.DepthStencilDesc.DepthEnable = true;
-		meshPipelineDesc.RenderTargetDesc.RenderTargetFormats[0] = surface->GetSurfaceFormat();
-		meshPipelineDesc.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-
-		m_pipelineState = std::make_unique<PipelineStateObject>(meshPipelineDesc, m_rootSignature, resourceMapping);*/
 	}
 
 	void SceneRenderer::InitEntitiesForRender()
@@ -73,6 +49,7 @@ namespace Bruno
 		auto& device = Bruno::Graphics::GetDXDevice();
 		
 		size_t objectSize = AlignU32(sizeof(SceneObjectBuffer), 256);
+		
 		// Buscamos todas las entidades que tienen un Mesh y un Transform
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
 		for (auto& ent : entities)

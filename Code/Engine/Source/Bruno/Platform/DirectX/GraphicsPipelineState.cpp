@@ -32,8 +32,13 @@ namespace Bruno::DX
         // 3. Configurar Estados (Usamos los defaults de d3dx12 para código limpio)
         psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
         // Para ver geometría por dentro y por fuera si no tienes backface culling, usa:
-        // psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; 
-    
+        //psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+        
+        // ¡La línea mágica que invierte qué lado es el frente!
+        psoDesc.RasterizerState.FrontCounterClockwise = TRUE; 
+        psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+        // ... (asignas esto a tu D3D12_GRAPHICS_PIPELINE_STATE_DESC)
+        
         psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // Opaco, sin transparencias
         psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // Z-Buffer activado
         psoDesc.SampleMask = UINT_MAX;
