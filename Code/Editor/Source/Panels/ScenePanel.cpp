@@ -220,6 +220,9 @@ namespace Bruno
 			{
 				m_dxSurface->Resize(formSize.Width, formSize.Height);
 			}
+			m_dxViewport.Height = formSize.Height;
+			m_dxViewport.Width = formSize.Width;
+			m_scissorRect = { 0, 0, static_cast<LONG>(formSize.Width), static_cast<LONG>(formSize.Height) };
 			
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.Width, (float)formSize.Height));
 			m_isSizingMoving = false;
