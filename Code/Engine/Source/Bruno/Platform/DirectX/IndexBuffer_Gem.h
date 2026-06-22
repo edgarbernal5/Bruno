@@ -13,7 +13,7 @@ namespace Bruno::DX
     public:
         IndexBuffer(GraphicsDevice& device, UploadContext& uploadContext, const std::vector<uint32_t>& indices);
         
-        [[nodiscard]] D3D12_INDEX_BUFFER_VIEW GetView() const { return m_view; }
+        [[nodiscard]] const D3D12_INDEX_BUFFER_VIEW& GetView() const { return m_view; }
         [[nodiscard]] uint32_t GetIndicesCount() const { return m_indicesCount; }
 
     private:

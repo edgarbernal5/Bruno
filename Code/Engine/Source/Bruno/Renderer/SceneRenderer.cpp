@@ -16,6 +16,7 @@
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
 #include "Bruno/Platform/DirectX/Texture2D.h"
 #include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
+#include "Bruno/Renderer/Camera.h"
 
 namespace Bruno
 {
@@ -93,37 +94,26 @@ namespace Bruno
 		}
 	}
 
-	void SceneRenderer::OnRender(DX::GraphicsContext* graphicsContext)
+	void SceneRenderer::OnRender(DX::GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
 	{
-		//auto device = Graphics::GetDevice();
-		//uint32_t frameIndex = device->GetFrameId();
-
-		//Texture& backBuffer = m_surface->GetBackBuffer();
-		//DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
-
+		auto device = Graphics::GetDXDevice();
 		
-		/*PipelineInfo pipeline;
-		pipeline.Pipeline = m_pipelineState.get();
-		pipeline.RenderTargets.push_back(&backBuffer);
-		pipeline.DepthStencilTarget = &depthBuffer;
-		graphicsContext->SetPipeline(pipeline);
-
-		auto objectSize = AlignU32(sizeof(SceneObjectBuffer), 256);
-
-		VertexBuffer* currentVB = nullptr;
-		uint32_t objectIndex = 0;*/
+		DX::VertexBuffer* currentVB = nullptr;
+		
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent, CBVComponent>();
 		for (auto& ent : entities)
 		{
-			const auto& [transformComponent, modelComponent, cbv] = entities.get<TransformComponent, ModelComponent, CBVComponent>(ent);
+			const auto& [modelComponent, cbv] = entities.get<ModelComponent, CBVComponent>(ent);
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 
+			Entity entity{ ent, m_scene.get() };
 			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto& meshes = model->GetMeshes();
 			auto& mesh = meshes[meshIndex];
 			
 			auto materialHandle = modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
 			auto material = m_assetManager->GetAsset<Material>(materialHandle);
+			material->BuildDescriptors(device, &device->GetSRVDescriptorAllocator(), m_assetManager);
 			AssetHandle textureHandle{ 0 };
 			auto textIt = material->TexturesByName.find("Texture");
 			if (textIt != material->TexturesByName.end())
@@ -133,31 +123,32 @@ namespace Bruno
 			auto texture = m_assetManager->GetAsset<DX::Texture2D>(textureHandle);
 			if (texture != nullptr)
 			{
-				
-			}
-			/*if (texture != nullptr && texture->IsReady())
-			{
 				auto& indexBuffer = model->GetIndexBuffer();
 				auto& vertexBuffer = model->GetVertexBuffer();
-				if (!indexBuffer->IsReady() || !vertexBuffer->IsReady())
-					continue;
-
 				if (currentVB != vertexBuffer.get())
 				{
-					graphicsContext->SetVertexBuffer(*vertexBuffer);
-					graphicsContext->SetIndexBuffer(*indexBuffer);
+					graphicsContext->SetVertexBuffer(vertexBuffer->GetView());
+					graphicsContext->SetIndexBuffer(&indexBuffer->GetView());
 					currentVB = vertexBuffer.get();
 				}
-
-				PipelineResourceBinding textureBinding;
-				textureBinding.BindingIndex = 0;
-				textureBinding.Resource = texture.get();
-
-				m_meshPerObjectResourceSpace.SetCBV(m_scene->m_objectBuffer[frameIndex].get(), objectIndex * objectSize);
-				m_meshPerObjectResourceSpace.SetSRV(textureBinding);
-
-				graphicsContext->SetPipelineResources(Graphics::Core::PER_OBJECT_SPACE, m_meshPerObjectResourceSpace);
-
+				
+				//graphicsContext->SetPipelineState(material->GetPSO()->GetNative());
+				//graphicsContext->SetRootSignature(material->GetRootSignature()->GetNative());
+				
+				graphicsContext->SetPipelineState(m_opaquePSO->GetNative());
+				graphicsContext->SetRootSignature(m_opaqueRootSignature->GetNative());
+				
+				// Enlazar la tabla de texturas (Parámetro 1 en nuestra Root Signature)
+				graphicsContext->SetDescriptorTable(1, material->GetTextureDescriptorTable());
+				
+				Math::Matrix world = m_scene->GetWorldSpaceMatrix(entity);
+				Math::Matrix wvp = (world * camera.GetViewProjection()).Transpose();
+				
+				SceneObjectBuffer objConstants;
+				objConstants.World = wvp;
+				cbv.TransformCB[frameIndex]->Update(&objConstants, sizeof(SceneObjectBuffer));
+				
+				graphicsContext->SetConstantBuffer(0, cbv.TransformCB[frameIndex]->GetGPUAddress());
 				graphicsContext->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				graphicsContext->DrawIndexedInstanced(mesh->GetIndexCount(),
 					1,
@@ -165,7 +156,6 @@ namespace Bruno
 					mesh->GetBaseVertex(),
 					0);
 			}
-			objectIndex++;*/
 		}
 	}
 }

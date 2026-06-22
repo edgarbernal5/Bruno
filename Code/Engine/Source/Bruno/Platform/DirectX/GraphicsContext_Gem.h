@@ -34,6 +34,7 @@ namespace Bruno::DX
 
         // --- DIBUJO ---
         void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
+        void SetVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW&  view);
         void SetVertexBuffers(uint32_t startSlot, uint32_t count, const D3D12_VERTEX_BUFFER_VIEW* views);
         void SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW* view);
         void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation);

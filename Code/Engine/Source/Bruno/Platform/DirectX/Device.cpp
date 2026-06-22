@@ -73,7 +73,8 @@ namespace Bruno::DX
             }
         }
 
-        if (!hardwareAdapter) {
+        if (!hardwareAdapter)
+        {
             throw std::runtime_error("No se encontró una tarjeta gráfica compatible con DirectX 12.");
         }
 

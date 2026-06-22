@@ -14,6 +14,7 @@ namespace Bruno
 	class Scene;
 	class Shader;
 	class AbstractAssetManager;
+	class Camera;
 
 	class SceneRenderer
 	{
@@ -22,7 +23,7 @@ namespace Bruno
 
 		// Se llama cuando cargas una escena o agregas un objeto
 		void InitEntitiesForRender();
-		void OnRender(DX::GraphicsContext* graphicsContext);
+		void OnRender(DX::GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
 		
 	private:
 		std::shared_ptr<Scene> m_scene;

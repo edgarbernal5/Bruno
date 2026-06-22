@@ -142,30 +142,20 @@ namespace Bruno
 			context.ClearRenderTarget(rtvHandle, clearColor);
 			context.ClearDepth(dsvHandle, 1.0f, 0);
 			context.SetRenderTargets(1, &rtvHandle, &dsvHandle);
-			//commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-			//commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-			//commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 			
 			// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
-			//ID3D12DescriptorHeap* descriptorHeaps[] = { m_srvHeap };
-			//commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 			context.SetDescriptorHeaps(&m_srvHeap, 1);
 			
 			// Configurar Viewport y Scissor Test explícitamente en este frame
-			//commandList->RSSetViewports(1, &m_dxViewport);
-			//commandList->RSSetScissorRects(1, &m_scissorRect);
 			context.SetViewport(m_dxViewport);
 			context.SetScissorRect(m_scissorRect);
 			
-			m_sceneRenderer->OnRender(&context);
+			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
 			
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 			// ------------------------------------------------------------------
-			//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 			context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-			//commandList->ResourceBarrier(1, &barrier);
 
 			// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
 			m_commandQueue->ExecuteCommandList(commandList, frameIndex);

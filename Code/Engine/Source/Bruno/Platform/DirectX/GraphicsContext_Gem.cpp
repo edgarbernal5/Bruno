@@ -81,6 +81,11 @@ namespace Bruno::DX
         m_commandList->IASetPrimitiveTopology(topology);
     }
 
+    void GraphicsContext::SetVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW& view)
+    {
+        m_commandList->IASetVertexBuffers(0, 1, &view);
+    }
+
     void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count, const D3D12_VERTEX_BUFFER_VIEW* views)
     {
         m_commandList->IASetVertexBuffers(startSlot, count, views);
