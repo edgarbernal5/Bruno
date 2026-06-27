@@ -44,6 +44,7 @@ namespace Bruno
 			Rotation,
 			Scale
 		};
+		
 		enum class GizmoAxis
 		{
 			None,
@@ -56,12 +57,14 @@ namespace Bruno
 
 			XYZ
 		};
+		
 		enum class PivotType
 		{
 			ObjectCenter,
 			SelectionCenter,
 			WorldOrigin
 		};
+		
 		enum class TransformSpace
 		{
 			Local,
@@ -82,7 +85,7 @@ namespace Bruno
 		void Update();
 		void EndDrag();
 
-		TransformSpace GetTransformSpace() { return m_transformSpace; }
+		TransformSpace GetTransformSpace() const { return m_transformSpace; }
 
 		void SetTranslationCallback(DragTranslationCallback callback) { m_dragTranslationCallback = callback; }
 		void SetScaleCallback(DragScaleCallback callback) { m_dragScaleCallback = callback; }
@@ -134,6 +137,7 @@ namespace Bruno
 		void SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 		void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
 		void RenderCameraGizmo(GraphicsContext* context, Surface* surface);
+		
 #ifdef BR_GIZMO_LINES_INTERSECTION
 		std::tuple<Math::Vector3, Math::Vector3> LineLineClosetPoints(Math::Vector3 point1, Math::Vector3 direction1, Math::Vector3 point2, Math::Vector3 direction2);
 #endif

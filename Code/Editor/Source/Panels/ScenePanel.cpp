@@ -19,6 +19,8 @@
 #include <Bruno/Core/Log.h>
 #include "SceneHierarchyPanel.h"
 #include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
+#include "Bruno/Platform/DirectX/Shader_Gem.h"
+#include "Gizmos/GizmoService_Gem.h"
 
 namespace Bruno
 {
@@ -113,7 +115,7 @@ namespace Bruno
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
 			uint32_t frameIndex = m_dxSurface->GetCurrentBackBufferIndex();
 
-			BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
+			//BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
 			
 			// 2. Pedirle a nuestra cola el "lápiz" (CommandList). 
 			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
@@ -151,7 +153,9 @@ namespace Bruno
 			context.SetScissorRect(m_scissorRect);
 			
 			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
-			
+			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
+    
+			m_dxGizmoService->Render(&context, viewProj);
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 			// ------------------------------------------------------------------
@@ -258,7 +262,16 @@ namespace Bruno
 			m_lastMousePosition.y = args.Position.Y;
 			m_beginMouseDownPosition = m_lastMousePosition;
 
-			m_isGizmoing = args.ButtonState.LeftButton && m_gizmoService->BeginDrag(Math::Vector2(args.Position.X, args.Position.Y));
+			if (args.ButtonState.LeftButton)
+			{
+				m_isGizmoing = m_dxGizmoService->BeginDrag(Math::Vector2(args.Position.X, args.Position.Y));
+				std::cout << "is gizmoing: " << m_isGizmoing << std::endl;
+				if (!m_isGizmoing)
+				{
+					//Entity selectedEntity = m_scene->Raycast(mousePosition);
+					//m_selectionService->SetSelection(selectedEntity);
+				}
+			}
 			m_form->Capture(false);
 		});
 
@@ -271,12 +284,13 @@ namespace Bruno
 
 			if (!m_isGizmoing && !args.ButtonState.LeftButton)
 			{
-				m_gizmoService->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
+				//m_dxGizmoService->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
 			}
 
-			if (m_isGizmoing)
+			if (m_dxGizmoService->IsDragging())
+			//if (m_isGizmoing)
 			{
-				m_gizmoService->Drag(Math::Vector2(args.Position.X, args.Position.Y));
+				m_dxGizmoService->Drag(Math::Vector2(args.Position.X, args.Position.Y));
 			}
 			else
 			{
@@ -321,7 +335,7 @@ namespace Bruno
 			{
 				if (m_isGizmoing)
 				{
-					m_gizmoService->EndDrag();
+					m_dxGizmoService->EndDrag();
 					m_isGizmoing = false;
 				}
 				else
@@ -477,6 +491,8 @@ namespace Bruno
 	{
 		m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
 		m_gizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? GizmoService::TransformSpace::World : GizmoService::TransformSpace::Local);
+		
+		m_dxGizmoService = m_sceneDocument->GetDXGizmoService();
 	}
 
 	void ScenePanel::InitializeGraphicsContext()

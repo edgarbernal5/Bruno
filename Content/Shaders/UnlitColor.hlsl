@@ -6,7 +6,6 @@ cbuffer cbPerObject : register(b0)
 struct VertexPosColorTex
 {
     float3 Position : POSITION;
-    float3 Normal    : NORMAL;
     float4 Color     : COLOR0;
 };
 
@@ -16,7 +15,7 @@ struct VertexShaderOutput
     float4 Color     : COLOR0;
 };
 
-VertexShaderOutput main_VS(VertexPosColorTex IN)
+VertexShaderOutput VS(VertexPosColorTex IN)
 {
     VertexShaderOutput OUT;
 
@@ -26,7 +25,7 @@ VertexShaderOutput main_VS(VertexPosColorTex IN)
     return OUT;
 }
 
-float4 main_PS(VertexShaderOutput IN ) : SV_Target
+float4 PS(VertexShaderOutput IN ) : SV_Target
 {
     return IN.Color;
 }

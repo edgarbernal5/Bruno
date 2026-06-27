@@ -15,10 +15,11 @@ namespace Bruno::DX {
         GraphicsPipelineState(GraphicsDevice& device);
         
         ~GraphicsPipelineState() = default;
-
-        [[nodiscard]] ID3D12PipelineState* GetNative() const { return m_pso.Get(); }
-        void CreateOpaquePSO(ID3D12RootSignature* rootSig, IDxcBlob* vertexShaderByteCode, IDxcBlob* pixelShaderByteCode);
         
+        [[nodiscard]] ID3D12PipelineState* GetNative() const { return m_pso.Get(); }
+        
+        // Método 100% genérico. Quien lo llama es el responsable de llenar el descriptor.
+        void Initialize(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDesc);
     private:
         GraphicsDevice& m_device;
         Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pso;

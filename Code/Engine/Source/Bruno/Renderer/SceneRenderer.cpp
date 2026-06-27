@@ -26,22 +26,9 @@ namespace Bruno
 	{
 		auto& device = Bruno::Graphics::GetDXDevice();
 		
-		DX::ShaderCompiler compiler; 
+		InitializeOpaqueRootSignature(device);
 
-		// Compilas usando DXC (nota el _6_0)
-		auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"VS", L"vs_6_0");
-		auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"PS", L"ps_6_0");
-		
-		m_opaqueRootSignature = std::make_shared<DX::RootSignature>(*device);
-		m_opaqueRootSignature->CreateOpaqueSignature();
-
-		// Instanciamos el Pipeline State Object (PSO) pasándole el contrato y shaders
-		m_opaquePSO = std::make_shared<DX::GraphicsPipelineState>(*device);
-		m_opaquePSO->CreateOpaquePSO(
-			m_opaqueRootSignature->GetNative(), 
-			vertexShaderByteCode.Get(), 
-			pixelShaderByteCode.Get()
-		);
+		InitializeOpaquePSO(device);
 	}
 
 	void SceneRenderer::InitEntitiesForRender()
@@ -80,8 +67,78 @@ namespace Bruno
 			
 			material->SetPipelineState(m_opaquePSO, m_opaqueRootSignature);
 		}
+	}
+	
+	void SceneRenderer::InitializeOpaqueRootSignature(DX::GraphicsDevice* device)
+	{
+		// 1. Configuramos los rangos (Textura)
+		CD3DX12_DESCRIPTOR_RANGE srvTable;
+		srvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
+		// 2. Configuramos los parámetros (Matriz y Textura)
+		CD3DX12_ROOT_PARAMETER params[2];
+		params[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+		params[1].InitAsDescriptorTable(1, &srvTable, D3D12_SHADER_VISIBILITY_PIXEL);
+
+		// 3. Sampler
+		CD3DX12_STATIC_SAMPLER_DESC sampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
+
+		// 4. Inicializamos nuestra Root Signature
+		m_opaqueRootSignature = std::make_shared<DX::RootSignature>(*device);
+		m_opaqueRootSignature->Initialize(2, params, 1, &sampler);
+	}
+
+	void SceneRenderer::InitializeOpaquePSO(DX::GraphicsDevice* device)
+	{
+		// Instanciamos el Pipeline State Object (PSO) pasándole el contrato y shaders
+		
+		DX::ShaderCompiler compiler; 
+
+		// Compilas usando DXC (nota el _6_0)
+		auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"VS", L"vs_6_0");
+		auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"PS", L"ps_6_0");
 		
 		
+		// 1. Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
+        D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+        {
+            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+            { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+        };
+
+        D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+        psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
+        psoDesc.pRootSignature = m_opaqueRootSignature->GetNative();
+    
+        // 2. Adjuntar los Shaders
+        psoDesc.VS = { reinterpret_cast<BYTE*>(vertexShaderByteCode->GetBufferPointer()), vertexShaderByteCode->GetBufferSize() };
+        psoDesc.PS = { reinterpret_cast<BYTE*>(pixelShaderByteCode->GetBufferPointer()), pixelShaderByteCode->GetBufferSize() };
+    
+        // 3. Configurar Estados (Usamos los defaults de d3dx12 para código limpio)
+        psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+        // Para ver geometría por dentro y por fuera si no tienes backface culling, usa:
+        //psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+        
+        // ¡La línea mágica que invierte qué lado es el frente!
+        psoDesc.RasterizerState.FrontCounterClockwise = TRUE; 
+        psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+        // ... (asignas esto a tu D3D12_GRAPHICS_PIPELINE_STATE_DESC)
+        
+        psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // Opaco, sin transparencias
+        psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // Z-Buffer activado
+        psoDesc.SampleMask = UINT_MAX;
+        psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    
+        // 4. Formatos de Salida (DEBEN coincidir con tu SwapChain y DepthBuffer)
+        psoDesc.NumRenderTargets = 1;
+        psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // O el que uses en tu SwapChain
+        psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;  // O el que uses en tu DepthBuffer
+        psoDesc.SampleDesc.Count = 1;
+        psoDesc.SampleDesc.Quality = 0;
+		
+		m_opaquePSO = std::make_shared<DX::GraphicsPipelineState>(*device);
+		m_opaquePSO->Initialize(psoDesc);
 	}
 
 	void SceneRenderer::OnRender(DX::GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
@@ -124,9 +181,6 @@ namespace Bruno
 				
 				graphicsContext->SetPipelineState(material->GetPSO()->GetNative());
 				graphicsContext->SetRootSignature(material->GetRootSignature()->GetNative());
-				
-				//graphicsContext->SetPipelineState(m_opaquePSO->GetNative());
-				//graphicsContext->SetRootSignature(m_opaqueRootSignature->GetNative());
 				
 				// Enlazar la tabla de texturas (Parámetro 1 en nuestra Root Signature)
 				graphicsContext->SetDescriptorTable(1, material->GetTextureDescriptorTable());

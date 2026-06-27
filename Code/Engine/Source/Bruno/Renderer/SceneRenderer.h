@@ -23,6 +23,8 @@ namespace Bruno
 
 		// Se llama cuando cargas una escena o agregas un objeto
 		void InitEntitiesForRender();
+		void InitializeOpaqueRootSignature(DX::GraphicsDevice* device);
+		void InitializeOpaquePSO(DX::GraphicsDevice* device);
 		void OnRender(DX::GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
 		
 	private:

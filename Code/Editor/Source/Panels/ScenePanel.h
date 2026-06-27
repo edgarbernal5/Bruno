@@ -36,6 +36,7 @@ namespace Bruno
 {
 	namespace DX
 	{
+		class GizmoService;
 		class Surface;
 	}
 	class Model;
@@ -103,6 +104,7 @@ namespace Bruno
 
 		std::shared_ptr<SelectionService>	m_selectionService;
 		std::shared_ptr<GizmoService>		m_gizmoService;
+		std::shared_ptr<DX::GizmoService>		m_dxGizmoService;
 
 		DX::GraphicsDevice* m_dxDevice;
 		std::unique_ptr<DX::Surface> m_dxSurface;

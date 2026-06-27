@@ -35,7 +35,7 @@ namespace Bruno
 			uint32_t Tessellation = Gizmo::TESSELLATION;
 			uint32_t StackCount = 3;
 
-			RenderConfig(){}
+			RenderConfig() = default;
 			RenderConfig(const GizmoConfig& gizmoConfig);
 		};
 

@@ -132,6 +132,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadHeap.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer_Gem.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
+    <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch_Gem.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
     <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h" />
@@ -291,6 +292,7 @@
     <ClCompile Include="Source\Bruno\Renderer\Material.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Model.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\PrimitiveBatch.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\PrimitiveBatch_Gem.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\SceneRenderer.cpp" />

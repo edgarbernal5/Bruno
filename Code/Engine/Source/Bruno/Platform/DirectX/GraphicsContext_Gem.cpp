@@ -100,4 +100,14 @@ namespace Bruno::DX
     {
         m_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
     }
+
+    void GraphicsContext::SetGraphicsRoot32BitConstants(uint32_t rootParameterIndex, uint32_t num32BitValuesToSet, const void* pSrcData, uint32_t destOffsetIn32BitValues)
+    {
+        m_commandList->SetGraphicsRoot32BitConstants(
+            rootParameterIndex, 
+            num32BitValuesToSet, 
+            pSrcData, 
+            destOffsetIn32BitValues
+        );
+    }
 }

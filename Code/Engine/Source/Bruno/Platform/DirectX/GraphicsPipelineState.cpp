@@ -11,7 +11,22 @@ namespace Bruno::DX
     {
     }
 
-    void GraphicsPipelineState::CreateOpaquePSO(ID3D12RootSignature* rootSig, IDxcBlob* vertexShaderByteCode, IDxcBlob* pixelShaderByteCode)
+    void GraphicsPipelineState::Initialize(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDesc)
+    {
+        // Le pasamos el descriptor directamente a la API gráfica
+        HRESULT hr = m_device.GetNativeDevice()->CreateGraphicsPipelineState(
+            &psoDesc, 
+            IID_PPV_ARGS(&m_pso)
+        );
+
+        if (FAILED(hr))
+        {
+            // Aquí podrías agregar logs más detallados en el futuro
+            throw std::runtime_error("Fallo al crear el Graphics Pipeline State.");
+        }
+    }
+
+    /*void GraphicsPipelineState::CreateOpaquePSO(ID3D12RootSignature* rootSig, IDxcBlob* vertexShaderByteCode, IDxcBlob* pixelShaderByteCode)
     {
         // 1. Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
         D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -53,5 +68,5 @@ namespace Bruno::DX
 
         // 5. Crear el PSO
         m_device.GetNativeDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pso));
-    }
+    }*/
 }

@@ -18,7 +18,7 @@ namespace Bruno::DX
         // 2. Mapear y copiar de CPU (RAM) a Búfer Intermedio (RAM Visible a GPU)
         void* mappedData = nullptr;
         ThrowIfFailed(intermediateBuffer->Map(0, nullptr, &mappedData));
-        memcpy(mappedData, data, size);
+        ::memcpy(mappedData, data, size);
         intermediateBuffer->Unmap(0, nullptr);
 
         // 3. Grabar el comando para que la GPU mueva los datos al Destino Final (VRAM)

@@ -8,6 +8,8 @@
 #include "Bruno/Renderer/SceneRenderer.h"
 #include "Content/EditorAssetManager.h"
 #include "Gizmos/GizmoService.h"
+#include "Gizmos/GizmoService_Gem.h"
+#include "Bruno/Platform/DirectX/Shader_Gem.h"
 #include "Panels/Properties/PropertyHelpers.h"
 
 namespace Bruno
@@ -30,7 +32,7 @@ namespace Bruno
 				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
 			}
 			m_gizmoService->SetActive(entityUUID);
-
+			m_dxGizmoService->SetActive(entityUUID);
 			SelectionChanged.emit(selection);
 		});
 	}
@@ -70,8 +72,12 @@ namespace Bruno
 	void SceneDocument::InitializeGizmoService()
 	{
 		auto device = Graphics::GetDevice();
+		auto dxDevice = Graphics::GetDXDevice();
 		m_selectionService = std::make_shared<SelectionService>(m_scene, m_assetManager);
-
+		
+		m_dxGizmoService= std::make_shared<DX::GizmoService>(dxDevice, m_camera);
+		m_dxGizmoService->Initialize();
+		
 		m_gizmoService = std::make_shared<GizmoService>(device, m_camera, m_selectionService.get());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
 		{

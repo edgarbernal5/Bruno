@@ -60,7 +60,9 @@ namespace Bruno
     bool GizmoService::BeginDrag(const Math::Vector2& mousePosition)
     {
         if (m_currentGizmoType == GizmoType::None || !m_isActive)
+        {
             return false;
+        }
 
 #ifdef BR_GIZMO_LINES_INTERSECTION
         Math::Vector3 boxIntersection;
@@ -73,7 +75,9 @@ namespace Bruno
 
         //BR_CORE_TRACE << "selectedAxis = " << (int)selectedAxis << std::endl;
         if (m_currentAxis == GizmoAxis::None)
+        {
             return false;
+        }
 
 #ifdef BR_GIZMO_LINES_INTERSECTION
         m_currentIntersectionPoint = boxIntersection;
@@ -88,9 +92,13 @@ namespace Bruno
         }
 #else
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
+        {
             SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
+        }
         else if (m_currentGizmoType == GizmoType::Rotation)
+        {
             SetGizmoHandlePlaneForRotation(selectedAxis, mousePosition);
+        }
 
         Math::Vector3 intersectionPoint;
         if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
@@ -747,7 +755,6 @@ namespace Bruno
         if (Math::Abs(gizmoPositionViewSpace.z) > m_camera.GetNearPlane())
         {
             return Math::Abs(gizmoPositionViewSpace.z);
-            //return gizmoPositionViewSpace.Length();
         }
         return 0.0f;
     }

@@ -10,19 +10,27 @@ namespace Bruno::DX
     class VertexBuffer
     {
     public:
-        // C++17: Pasamos la lista de comandos para grabar la operación de copia al instante
+        // Constructor Original (Estático - DEFAULT HEAP)
         VertexBuffer(GraphicsDevice& device, DX::UploadContext& uploadContext, const void* data, size_t vertexCount, size_t vertexStride);
+        
+        // NUEVO: Constructor Dinámico (UPLOAD HEAP)
+        // No necesita UploadContext ni datos iniciales, solo el tamaño máximo en bytes.
+        explicit VertexBuffer(GraphicsDevice& device, size_t bufferSize, uint32_t stride, bool isDynamic = true);
+        
         ~VertexBuffer() = default;
 
-        // Limpia el "puente" de memoria una vez que la GPU haya terminado de copiar
-        void FreeUploadBuffer();
-
+        // NUEVO: Método para actualizar los datos desde la CPU
+        void Update(const void* data, size_t size);
+        
         [[nodiscard]] const D3D12_VERTEX_BUFFER_VIEW& GetView() const { return m_view; }
+        [[nodiscard]] ID3D12Resource* GetBuffer() const { return m_buffer.Get(); }
 
+        UINT GetSizeInBytes() const;
+        
     private:
-        Microsoft::WRL::ComPtr<ID3D12Resource> m_defaultBuffer; // Memoria ultra rápida en VRAM
-        Microsoft::WRL::ComPtr<ID3D12Resource> m_uploadBuffer;  // Puente temporal en RAM
+        Microsoft::WRL::ComPtr<ID3D12Resource> m_buffer; // Memoria ultra rápida en VRAM
         
         D3D12_VERTEX_BUFFER_VIEW m_view{};
+        bool m_isDynamic { false };
     };
 }

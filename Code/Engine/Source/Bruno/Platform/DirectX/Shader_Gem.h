@@ -2,7 +2,7 @@
 
 #include "D3DHelpers.h"
 #include <dxcapi.h>
-
+#include "Bruno/Content/Asset.h"
 namespace Bruno::DX
 {
     enum class ShaderStage 

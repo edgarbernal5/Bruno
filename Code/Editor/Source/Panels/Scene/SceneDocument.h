@@ -8,6 +8,10 @@
 
 namespace Bruno
 {
+	namespace DX
+	{
+		class GizmoService;
+	}
 	class SceneRenderer;
 	class Scene;
 	class Entity;
@@ -37,6 +41,7 @@ namespace Bruno
 
 		Camera& GetCamera() { return m_camera; }
 		std::shared_ptr<GizmoService> GetGizmoService() { return m_gizmoService; }
+		std::shared_ptr<DX::GizmoService> GetDXGizmoService() { return m_dxGizmoService; }
 		std::shared_ptr<SelectionService> GetSelectionService() { return m_selectionService; }
 		EditorAssetManager* GetAssetManager() const { return m_assetManager; }
 		SceneRenderer* GetSceneRenderer() const { return m_sceneRenderer.get(); }
@@ -57,6 +62,7 @@ namespace Bruno
 
 		std::shared_ptr<SelectionService> m_selectionService;
 		std::shared_ptr<GizmoService> m_gizmoService;
+		std::shared_ptr<DX::GizmoService> m_dxGizmoService;
 		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;
 
 		EventHandlerId m_selectionChangedHandleId{ 0 };

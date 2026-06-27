@@ -20,7 +20,7 @@ namespace Bruno::DX
         
         // ¡Se llama cuando la GPU ya avisó (Fence) que terminó de leer todo!
         void ClearGarbage();
-
+        
     private:
         // Helper interno para crear memoria Upload visible a la CPU
         Microsoft::WRL::ComPtr<ID3D12Resource> CreateIntermediateBuffer(UINT64 sizeInBytes);

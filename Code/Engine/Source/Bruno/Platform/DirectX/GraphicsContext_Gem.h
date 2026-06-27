@@ -39,6 +39,7 @@ namespace Bruno::DX
         void SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW* view);
         void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation);
 
-
+        // Sube valores de 32 bits (floats, ints) directamente a la Root Signature
+        void SetGraphicsRoot32BitConstants(uint32_t rootParameterIndex, uint32_t num32BitValuesToSet, const void* pSrcData, uint32_t destOffsetIn32BitValues = 0);
     };
 }

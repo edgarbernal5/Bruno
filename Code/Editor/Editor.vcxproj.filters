@@ -76,6 +76,7 @@
     <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp">
       <Filter>Source\Panels\Properties</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Gizmos\GizmoService_Gem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -194,6 +195,7 @@
     <ClInclude Include="Source\AssetEditors\AssetEditor.h">
       <Filter>Source\AssetEditors</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Gizmos\GizmoService_Gem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
