@@ -98,7 +98,6 @@ namespace Bruno
 		auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"VS", L"vs_6_0");
 		auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"PS", L"ps_6_0");
 		
-		
 		// 1. Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
         D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
         {
@@ -160,8 +159,9 @@ namespace Bruno
 			
 			auto materialHandle = modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
 			auto material = m_assetManager->GetAsset<Material>(materialHandle);
-			material->BuildDescriptors(device, &device->GetSRVDescriptorAllocator(), m_assetManager);
+			
 			AssetHandle textureHandle{ 0 };
+			
 			auto textIt = material->TexturesByName.find("Texture");
 			if (textIt != material->TexturesByName.end())
 			{

@@ -62,14 +62,14 @@ namespace Bruno
 
 		m_gizmoTransformSpaceButton.GetEvents().Click.Connect([&](const Berta::ArgClick& click)
 		{
-			if (m_gizmoService->GetTransformSpace() == GizmoService::TransformSpace::World)
+			if (m_dxGizmoService->GetTransformSpace() == DX::GizmoService::TransformSpace::World)
 			{
-				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::Local);
+				m_dxGizmoService->SetTransformSpace(DX::GizmoService::TransformSpace::Local);
 				m_gizmoTransformSpaceButton.SetCaption("World");
 			}
 			else
 			{
-				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::World);
+				m_dxGizmoService->SetTransformSpace(DX::GizmoService::TransformSpace::World);
 				m_gizmoTransformSpaceButton.SetCaption("Local");
 			}
 		});
@@ -155,6 +155,7 @@ namespace Bruno
 			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
 			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
     
+			m_dxGizmoService->BuildGeometry();
 			m_dxGizmoService->Render(&context, viewProj);
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
@@ -272,7 +273,7 @@ namespace Bruno
 					//m_selectionService->SetSelection(selectedEntity);
 				}
 			}
-			m_form->Capture(false);
+			//m_form->Capture(false);
 		});
 
 		m_form->GetEvents().MouseMove.Connect([this](const Berta::ArgMouse& args)
@@ -333,7 +334,8 @@ namespace Bruno
 			
 			if (args.ButtonState.LeftButton)
 			{
-				if (m_isGizmoing)
+				//if (m_isGizmoing)
+				if (m_dxGizmoService->IsDragging())
 				{
 					m_dxGizmoService->EndDrag();
 					m_isGizmoing = false;
@@ -352,7 +354,7 @@ namespace Bruno
 				}
 			}
 
-			m_form->ReleaseCapture();
+			//m_form->ReleaseCapture();
 		});
 
 		m_form->GetEvents().MouseWheel.Connect([this](const Berta::ArgWheel& args)
@@ -390,14 +392,12 @@ namespace Bruno
 				return;
 			
 			auto index = acmb.SelectedIndex.value();
-			if (m_gizmoService)
+			if (m_dxGizmoService)
 			{
-				m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(index));
+				m_dxGizmoService->SetGizmoType(static_cast<DX::GizmoService::GizmoType>(index));
 			}
 			m_gizmoTransformSpaceButton.SetEnabled(index < 3);
 		});
-
-		InitializeGraphicsContext();
 
 		editorGame->AddScenePanel(this);
 		m_form->Show();
@@ -493,12 +493,6 @@ namespace Bruno
 		m_gizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? GizmoService::TransformSpace::World : GizmoService::TransformSpace::Local);
 		
 		m_dxGizmoService = m_sceneDocument->GetDXGizmoService();
-	}
-
-	void ScenePanel::InitializeGraphicsContext()
-	{
-		GraphicsDevice* device = Graphics::GetDevice();
-		//m_graphicsContext = std::make_unique<GraphicsContext>(*device);
 	}
 
 	void ScenePanel::InitializeSceneRenderer()

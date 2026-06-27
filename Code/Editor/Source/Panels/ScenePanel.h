@@ -74,7 +74,6 @@ namespace Bruno
 		Berta::NestedForm& GetForm() { return *m_form; }
 	private:
 		void InitializeGizmoService();
-		void InitializeGraphicsContext();
 		void InitializeSceneRenderer();
 		void UpdateCBs(const GameTimer& timer);
 

@@ -27,34 +27,50 @@ namespace Bruno::DX
         m_indices.push_back(i1);
         m_indices.push_back(i2);
     }
-    
-    void PrimitiveBatch::DrawBox(const Math::Matrix& transform, float size, const Math::Color& color) {
-        float halfSize = size * 0.5f;
-
-        // 8 vértices del cubo local
-        Math::Vector3 corners[8] = {
-            Math::Vector3(-halfSize, -halfSize, -halfSize), Math::Vector3(halfSize, -halfSize, -halfSize),
-            Math::Vector3(halfSize,  halfSize, -halfSize), Math::Vector3(-halfSize,  halfSize, -halfSize),
-            Math::Vector3(-halfSize, -halfSize,  halfSize), Math::Vector3(halfSize, -halfSize,  halfSize),
-            Math::Vector3(halfSize,  halfSize,  halfSize), Math::Vector3(-halfSize,  halfSize,  halfSize)
-        };
-
+    // Si necesitas cajas rectangulares
+    void PrimitiveBatch::DrawBox(const Math::Matrix& transform, const Math::Vector3& size, const Math::Color& color)
+    {
         uint32_t baseIdx = static_cast<uint32_t>(m_vertices.size());
-        for (int i = 0; i < 8; ++i) {
-            AddVertex(corners[i], transform, color);
-        }
+        Math::Vector3 halfSize = size * 0.5f;
 
-        // 12 triángulos (Winding order CW)
-        uint32_t indices[] = {
-            0,2,1, 0,3,2, // Frente
-            1,6,5, 1,2,6, // Derecha
-            5,7,4, 5,6,7, // Atrás
-            4,3,0, 4,7,3, // Izquierda
-            3,6,2, 3,7,6, // Arriba
-            4,1,5, 4,0,1  // Abajo
-        };
+        // 1. Generar los 8 vértices únicos de un cubo
+        // Orden lógico: Bottom/Top, Left/Right, Front/Back
+        AddVertex(Math::Vector3(-halfSize.x, -halfSize.y, -halfSize.z), transform, color); // 0: Izquierda-Abajo-Frente
+        AddVertex(Math::Vector3( halfSize.x, -halfSize.y, -halfSize.z), transform, color); // 1: Derecha-Abajo-Frente
+        AddVertex(Math::Vector3( halfSize.x,  halfSize.y, -halfSize.z), transform, color); // 2: Derecha-Arriba-Frente
+        AddVertex(Math::Vector3(-halfSize.x,  halfSize.y, -halfSize.z), transform, color); // 3: Izquierda-Arriba-Frente
+    
+        AddVertex(Math::Vector3(-halfSize.x, -halfSize.y,  halfSize.z), transform, color); // 4: Izquierda-Abajo-Fondo
+        AddVertex(Math::Vector3( halfSize.x, -halfSize.y,  halfSize.z), transform, color); // 5: Derecha-Abajo-Fondo
+        AddVertex(Math::Vector3( halfSize.x,  halfSize.y,  halfSize.z), transform, color); // 6: Derecha-Arriba-Fondo
+        AddVertex(Math::Vector3(-halfSize.x,  halfSize.y,  halfSize.z), transform, color); // 7: Izquierda-Arriba-Fondo
 
-        for (int i = 0; i < 36; ++i) m_indices.push_back(baseIdx + indices[i]);
+        // 2. Generar los Índices (36 índices, 2 triángulos por cada una de las 6 caras)
+        // Winding Order: Clockwise (Sentido Horario) para DirectX
+
+        // Cara Frontal (-Z)
+        AddTriangle(baseIdx + 0, baseIdx + 3, baseIdx + 1);
+        AddTriangle(baseIdx + 1, baseIdx + 3, baseIdx + 2);
+
+        // Cara Trasera (+Z)
+        AddTriangle(baseIdx + 5, baseIdx + 6, baseIdx + 4);
+        AddTriangle(baseIdx + 4, baseIdx + 6, baseIdx + 7);
+
+        // Cara Superior (+Y)
+        AddTriangle(baseIdx + 3, baseIdx + 7, baseIdx + 2);
+        AddTriangle(baseIdx + 2, baseIdx + 7, baseIdx + 6);
+
+        // Cara Inferior (-Y)
+        AddTriangle(baseIdx + 4, baseIdx + 0, baseIdx + 5);
+        AddTriangle(baseIdx + 5, baseIdx + 0, baseIdx + 1);
+
+        // Cara Izquierda (-X)
+        AddTriangle(baseIdx + 4, baseIdx + 7, baseIdx + 0);
+        AddTriangle(baseIdx + 0, baseIdx + 7, baseIdx + 3);
+
+        // Cara Derecha (+X)
+        AddTriangle(baseIdx + 1, baseIdx + 2, baseIdx + 5);
+        AddTriangle(baseIdx + 5, baseIdx + 2, baseIdx + 6);
     }
 
     void PrimitiveBatch::DrawTorus(const Math::Matrix& transform, float outerRadius, float innerRadius, int slices, int segments, const Math::Color& color)
@@ -111,6 +127,51 @@ namespace Bruno::DX
         }
     }
 
+    void PrimitiveBatch::DrawHalfTorus(const Math::Matrix& transform, float outerRadius, float innerRadius, float angleStart, int slices, int segments, const Math::Color& color)
+    {
+        uint32_t baseIdx = static_cast<uint32_t>(m_vertices.size());
+    
+        // 1. Generar Vértices
+        // Nota el "<= segments" y "<= slices". Queremos cerrar el tubo en sí mismo (slices),
+        // pero dejar el arco abierto en los extremos (segments).
+        for (int i = 0; i <= segments; ++i) { 
+            // Medio círculo: de angleStart a angleStart + PI
+            float theta = angleStart + (static_cast<float>(i) / segments) * Math::PI; 
+            float cosTheta = cosf(theta);
+            float sinTheta = sinf(theta);
+
+            for (int j = 0; j <= slices; ++j) { 
+                // Anillo del tubo completo (el grosor): de 0 a 2*PI
+                float phi = (static_cast<float>(j) / slices) * (Math::PI * 2.0f); 
+                float cosPhi = cosf(phi);
+                float sinPhi = sinf(phi);
+
+                Math::Vector3 localPos(
+                    (outerRadius + innerRadius * cosPhi) * cosTheta,
+                    innerRadius * sinPhi,
+                    (outerRadius + innerRadius * cosPhi) * sinTheta
+                );
+
+                AddVertex(localPos, transform, color);
+            }
+        }
+
+        // 2. Generar Índices
+        int stride = slices + 1; // Cuántos vértices hay en un anillo transversal
+        for (int i = 0; i < segments; ++i) {
+            for (int j = 0; j < slices; ++j) {
+                uint32_t a = baseIdx + (i * stride + j);
+                uint32_t b = baseIdx + ((i + 1) * stride + j);
+                uint32_t c = baseIdx + (i * stride + j + 1);
+                uint32_t d = baseIdx + ((i + 1) * stride + j + 1);
+
+                // Winding order Clockwise
+                AddTriangle(a, c, b);
+                AddTriangle(b, c, d);
+            }
+        }
+    }
+
     void PrimitiveBatch::DrawCylinder(const Math::Matrix& transform, float height, float radius, int slices, const Math::Color& color)
     {
         float halfHeight = height * 0.5f;
@@ -146,6 +207,12 @@ namespace Bruno::DX
             AddTriangle(topCenterIdx, top1, top2);
             AddTriangle(bottomCenterIdx, bot2, bot1);
         }
+    }
+
+    // Sobrecarga cómoda para cubos perfectos (como los que usamos en las puntas del Scale Gizmo)
+    void PrimitiveBatch::DrawBox(const Math::Matrix& transform, float size, const Math::Color& color)
+    {
+        DrawBox(transform, Math::Vector3(size, size, size), color);
     }
 
     void PrimitiveBatch::DrawCone(const Math::Matrix& transform, float height, float radius, int slices, const Math::Color& color) {

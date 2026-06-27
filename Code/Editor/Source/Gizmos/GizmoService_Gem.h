@@ -71,6 +71,8 @@ namespace Bruno::DX
         GizmoService(GraphicsDevice* device, Camera& camera);
         void Initialize();
     
+        void BuildGeometry();
+        
         // Comienza el procesamiento de un nuevo frame de Gizmos
         void BeginFrame();
 
@@ -86,13 +88,19 @@ namespace Bruno::DX
         void EndFrame(DX::GraphicsDevice* device, DX::UploadContext* uploadCtx);
         void Render(DX::GraphicsContext* context, const Math::Matrix& viewProjection);
     
+        
         // Interacción
         bool BeginDrag(const Math::Vector2& mousePosition);
 		void Drag(const Math::Vector2& mousePosition);
         void EndDrag();
         
+        TransformSpace GetTransformSpace() const { return m_transformSpace; }
+        
         bool IsDragging() const { return m_selectionState.m_isDragging; }
+        void SetGizmoType(GizmoType type){ m_currentGizmoType = type; }
+        void SetTransformSpace(TransformSpace space){ m_transformSpace = space; }
 		void SetActive(bool isActive){ m_isActive = isActive; }
+        
     private:
         struct SelectionState
         {
@@ -116,7 +124,6 @@ namespace Bruno::DX
             bool m_isDragging;
         };
         
-        void BuildGeometry();
         
         // Calcula un factor de escala uniforme para mantener el gizmo legible según la distancia
         float CalculateAdaptiveScale(const Math::Vector3& position, const Math::Vector3& cameraPosition) const;
@@ -176,10 +183,6 @@ namespace Bruno::DX
         Math::Matrix RotMatrixX;
         Math::Matrix RotMatrixY;
         Math::Matrix RotMatrixZ;
-    
-        Math::Color m_colorX;
-        Math::Color m_colorY;
-        Math::Color m_colorZ;
         
         GraphicsDevice* m_device;
         Camera& m_camera;

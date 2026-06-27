@@ -57,9 +57,12 @@ namespace Bruno::DX
         // Costo de CPU: Prácticamente 0 ciclos de reloj.
         allocation.CPU.ptr = m_cpuStart.ptr + (static_cast<SIZE_T>(m_allocatedCount) * m_descriptorSize);
         
-        if (m_gpuStart.ptr != 0) {
+        if (m_gpuStart.ptr != 0)
+        {
             allocation.GPU.ptr = m_gpuStart.ptr + (static_cast<SIZE_T>(m_allocatedCount) * m_descriptorSize);
-        } else {
+        } 
+        else
+        {
             allocation.GPU.ptr = 0;
         }
 

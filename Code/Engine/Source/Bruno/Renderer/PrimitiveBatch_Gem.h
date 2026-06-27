@@ -28,8 +28,9 @@ namespace Bruno::DX
         void DrawCone(const Math::Matrix& transform, float height, float radius, int slices, const Math::Color& color);
         void DrawCylinder(const Math::Matrix& transform, float height, float radius, int slices, const Math::Color& color);
         void DrawBox(const Math::Matrix& transform, float size, const Math::Color& color);
+        void DrawBox(const Math::Matrix& transform, const Math::Vector3& size, const Math::Color& color);
         void DrawTorus(const Math::Matrix& transform, float outerRadius, float innerRadius, int slices, int segments, const Math::Color& color);
-
+        void DrawHalfTorus(const Math::Matrix& transform, float outerRadius, float innerRadius, float angleStart, int slices, int segments, const Math::Color& color);
         // Finaliza el batching y sube la geometría a los buffers dinámicos de la GPU
         void End(GraphicsDevice* device);
 
