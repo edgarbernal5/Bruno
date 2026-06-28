@@ -9,6 +9,7 @@
 #include <Berta/Controls/Properties/PropertyGridFields.h>
 #include <Berta/GUI/ControlDrawBatch.h>
 
+#include "FrameActionQueue.h"
 #include "Content/EditorAssetManager.h"
 #include "Properties/PropertyGridItems.h"
 
@@ -273,7 +274,7 @@ namespace Bruno
 
 	void PropertiesPanel::OnComponentUpdated(entt::registry& registry, entt::entity updatedEntity)
 	{
-		auto selection = m_selectionService->GetSelections();
+		const auto& selection = m_selectionService->GetSelections();
 		if (selection.size() != 1)
 		{
 			return;
@@ -284,7 +285,16 @@ namespace Bruno
 		
 		if (selectedEntity && selectedEntity == entity)
 		{
-			m_propertyGrid.RefreshAll();
+			if (!m_isDirty) // Solo encolamos la actualización UNA vez por frame
+			{
+				m_isDirty = true;
+				FrameActionQueue::Get().Enqueue([this]() 
+				{
+					// Este código se ejecutará de forma segura en la fase de "Idle"
+					m_propertyGrid.RefreshAll();
+					m_isDirty = false;
+				});
+			}
 		}
 	}
 }

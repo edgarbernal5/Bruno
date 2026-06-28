@@ -35,5 +35,6 @@ namespace Bruno
 		entt::scoped_connection m_nameUpdateConnection;
 		entt::scoped_connection m_transformUpdateConnection;
 		entt::scoped_connection m_modelUpdateConnection;
+		bool m_isDirty = false;
 	};
 }

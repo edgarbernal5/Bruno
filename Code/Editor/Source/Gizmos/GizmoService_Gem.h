@@ -72,9 +72,6 @@ namespace Bruno::DX
         void Initialize();
     
         void BuildGeometry();
-        
-        // Comienza el procesamiento de un nuevo frame de Gizmos
-        void BeginFrame();
 
         // Métodos principales para el dibujado de herramientas compuestas
         void DrawTranslationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition);
@@ -85,9 +82,7 @@ namespace Bruno::DX
         void DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color);
 
         // Prepara buffers y realiza el render final en la GPU
-        void EndFrame(DX::GraphicsDevice* device, DX::UploadContext* uploadCtx);
         void Render(DX::GraphicsContext* context, const Math::Matrix& viewProjection);
-    
         
         // Interacción
         bool BeginDrag(const Math::Vector2& mousePosition);
@@ -96,10 +91,16 @@ namespace Bruno::DX
         
         TransformSpace GetTransformSpace() const { return m_transformSpace; }
         
+        void SetTranslationCallback(DragTranslationCallback callback) { m_dragTranslationCallback = callback; }
+        void SetScaleCallback(DragScaleCallback callback) { m_dragScaleCallback = callback; }
+        void SetRotationCallback(DragRotationCallback callback) { m_dragRotationCallback = callback; }
+
         bool IsDragging() const { return m_selectionState.m_isDragging; }
         void SetGizmoType(GizmoType type){ m_currentGizmoType = type; }
         void SetTransformSpace(TransformSpace space){ m_transformSpace = space; }
 		void SetActive(bool isActive){ m_isActive = isActive; }
+        
+        void SetGizmoPosition(const Math::Vector3& position) { m_selectionState.m_gizmoPosition = position; }
         
     private:
         struct SelectionState

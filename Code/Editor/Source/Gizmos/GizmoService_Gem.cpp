@@ -88,11 +88,6 @@ namespace Bruno::DX
         m_psoDepthOff->Initialize(psoDesc);
     }
 
-    void GizmoService::BeginFrame()
-    {
-        m_primitiveBatch.Begin();
-    }
-
     void GizmoService::DrawTranslationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition)
     {
         Math::Vector3 origin = worldTransform.Translation();
@@ -185,12 +180,6 @@ namespace Bruno::DX
     void GizmoService::DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color)
     {
         m_primitiveBatch.DrawLine(start, end, color);
-    }
-
-    void GizmoService::EndFrame(DX::GraphicsDevice* device, DX::UploadContext* uploadCtx)
-    {
-        // Aquí disparamos la consolidación y el upload hacia la memoria de video
-        //m_primitiveBatch.End(device, uploadCtx);
     }
 
     void GizmoService::Render(DX::GraphicsContext* context, const Math::Matrix& viewProj)

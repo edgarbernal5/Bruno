@@ -29,7 +29,7 @@ namespace Bruno
 			if (entityUUID)
 			{
 				auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
-				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
+				m_dxGizmoService->SetGizmoPosition(worldMatrix.Translation());
 			}
 			m_gizmoService->SetActive(entityUUID);
 			m_dxGizmoService->SetActive(entityUUID);
@@ -77,6 +77,20 @@ namespace Bruno
 		
 		m_dxGizmoService= std::make_shared<DX::GizmoService>(dxDevice, m_camera);
 		m_dxGizmoService->Initialize();
+		m_dxGizmoService->SetTranslationCallback([&](const Math::Vector3& newPosition)
+		{
+			for (auto& uuid : m_selectionService->GetSelections())
+			{
+				Entity entity = m_scene->GetEntityWithUUID(uuid);
+				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
+
+				// Usamos 'patch' para que EnTT dispare el evento 'on_update<TransformComponent>'
+				entity.Patch<TransformComponent>([&newPosition](auto& transform) 
+				{
+					transform.Position = newPosition;
+				});
+			}
+		});
 		
 		m_gizmoService = std::make_shared<GizmoService>(device, m_camera, m_selectionService.get());
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)

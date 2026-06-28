@@ -115,6 +115,7 @@ xcopy /y /d "$(SolutionDir)packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\nat
     </ClCompile>
     <ClCompile Include="Source\Gizmos\GizmoService_Gem.cpp" />
     <ClCompile Include="Source\Layouts\PaneManager.cpp" />
+    <ClCompile Include="Source\Panels\FrameActionQueue.cpp" />
     <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp" />
     <ClCompile Include="Source\Panels\Scene\SceneHierarchy.cpp" />
     <ClCompile Include="Source\Panels\Scene\SceneDocument.cpp" />
@@ -144,6 +145,7 @@ xcopy /y /d "$(SolutionDir)packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\nat
     <ClInclude Include="Source\brepch.h" />
     <ClInclude Include="Source\Gizmos\GizmoService_Gem.h" />
     <ClInclude Include="Source\Layouts\PaneManager.h" />
+    <ClInclude Include="Source\Panels\FrameActionQueue.h" />
     <ClInclude Include="Source\Panels\Properties\PropertyHelpers.h" />
     <ClInclude Include="Source\Panels\Scene\SceneHierarchy.h" />
     <ClInclude Include="Source\Panels\Scene\SceneDocument.h" />

@@ -17,6 +17,9 @@
 
 #include <iostream>
 #include <Bruno/Core/Log.h>
+
+#include "FrameActionQueue.h"
+#include "PropertiesPanel.h"
 #include "SceneHierarchyPanel.h"
 #include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
 #include "Bruno/Platform/DirectX/Shader_Gem.h"
@@ -107,6 +110,7 @@ namespace Bruno
 		{
 			m_timer.Tick();
 			
+			FrameActionQueue::Get().ExecuteAll();
 			if (!m_isVisible || m_isResizing || m_isSizingMoving)
 			{
 				return;
@@ -115,7 +119,7 @@ namespace Bruno
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
 			uint32_t frameIndex = m_dxSurface->GetCurrentBackBufferIndex();
 
-			//BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
+			BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
 			
 			// 2. Pedirle a nuestra cola el "lápiz" (CommandList). 
 			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
@@ -273,7 +277,7 @@ namespace Bruno
 					//m_selectionService->SetSelection(selectedEntity);
 				}
 			}
-			//m_form->Capture(false);
+			m_form->Capture(false);
 		});
 
 		m_form->GetEvents().MouseMove.Connect([this](const Berta::ArgMouse& args)
@@ -354,7 +358,7 @@ namespace Bruno
 				}
 			}
 
-			//m_form->ReleaseCapture();
+			m_form->ReleaseCapture();
 		});
 
 		m_form->GetEvents().MouseWheel.Connect([this](const Berta::ArgWheel& args)

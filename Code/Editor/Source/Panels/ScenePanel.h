@@ -56,7 +56,6 @@ namespace Bruno
 	};
 
 	class ScenePanel : public Berta::Panel
-	//class ScenePanel : public Berta::nested_form
 	{
 	public:
 		ScenePanel(Berta::Window* window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters = SceneSurfaceParameters());
