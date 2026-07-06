@@ -62,8 +62,11 @@ namespace Bruno::DX
     // Implementación del método Update
     void IndexBuffer::Update(const void* data, size_t size)
     {
-        if (!m_isDynamic) return; // O lanzar un error: "¡No puedes actualizar un buffer estático!"
-
+        if (!m_isDynamic)
+        {
+            return; // O lanzar un error: "¡No puedes actualizar un buffer estático!"
+        }
+        
         void* mappedData = nullptr;
     
         // Map no necesita sincronización compleja si solo escribimos en él

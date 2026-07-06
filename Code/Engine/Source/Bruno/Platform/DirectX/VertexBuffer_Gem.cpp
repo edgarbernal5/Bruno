@@ -56,8 +56,11 @@ namespace Bruno::DX {
 
     void VertexBuffer::Update(const void* data, size_t size)
     {
-        if (!m_isDynamic) return; // O lanzar un error: "¡No puedes actualizar un buffer estático!"
-
+        if (!m_isDynamic)
+        {
+            return; // O lanzar un error: "¡No puedes actualizar un buffer estático!"
+        }
+        
         void* mappedData = nullptr;
     
         CD3DX12_RANGE readRange(0, 0); // No vamos a leer, solo escribir
