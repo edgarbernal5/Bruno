@@ -9,7 +9,7 @@
 #include <Berta/Controls/Properties/PropertyGridFields.h>
 #include <Berta/GUI/ControlDrawBatch.h>
 
-#include "FrameActionQueue.h"
+#include "Berta/GUI/Dispatcher.h"
 #include "Content/EditorAssetManager.h"
 #include "Properties/PropertyGridItems.h"
 
@@ -288,7 +288,7 @@ namespace Bruno
 			if (!m_isDirty) // Solo encolamos la actualización UNA vez por frame
 			{
 				m_isDirty = true;
-				FrameActionQueue::Get().Enqueue([this]() 
+				Berta::Dispatcher::Get().Enqueue([this]() 
 				{
 					// Este código se ejecutará de forma segura en la fase de "Idle"
 					m_propertyGrid.RefreshAll();

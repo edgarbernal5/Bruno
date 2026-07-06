@@ -18,7 +18,6 @@
 #include <iostream>
 #include <Bruno/Core/Log.h>
 
-#include "FrameActionQueue.h"
 #include "PropertiesPanel.h"
 #include "SceneHierarchyPanel.h"
 #include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
@@ -110,7 +109,6 @@ namespace Bruno
 		{
 			m_timer.Tick();
 			
-			FrameActionQueue::Get().ExecuteAll();
 			if (!m_isVisible || m_isResizing || m_isSizingMoving)
 			{
 				return;
