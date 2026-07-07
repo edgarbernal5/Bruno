@@ -1,7 +1,6 @@
 ﻿#include "brepch.h"
 #include "GizmoService_Gem.h"
 
-
 #include "Bruno/Platform/DirectX/Device.h"
 #include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
 #include "Bruno/Platform/DirectX/GraphicsPipelineState.h"
@@ -12,7 +11,10 @@
 
 namespace Bruno::DX
 {
-    GizmoService::GizmoService(GraphicsDevice* device, Camera& camera) : m_device(device), m_camera(camera)
+    GizmoService::GizmoService(GraphicsDevice* device, Camera& camera) : 
+        m_device(device),
+        m_camera(camera),
+        m_primitiveBatch(device)
     {
         for (size_t i = 0; i < 3; i++)
         {
@@ -34,7 +36,7 @@ namespace Bruno::DX
     void GizmoService::Initialize()
     {
         // 1. Inicializar buffers internos de la geometría procedimental
-        m_primitiveBatch.Begin();
+        //m_primitiveBatch.Begin();
         
         // 2. Compilar/Cargar Shaders Unlit sencillos para Gizmos
         DX::ShaderCompiler compiler; 
@@ -182,10 +184,12 @@ namespace Bruno::DX
         m_primitiveBatch.DrawLine(start, end, color);
     }
 
-    void GizmoService::Render(DX::GraphicsContext* context, const Math::Matrix& viewProj)
+    void GizmoService::Render(DX::GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProj)
     {
-        if (m_primitiveBatch.GetIndexCount() == 0) return;
-
+        if (m_primitiveBatch.GetIndexCount() == 0)
+        {
+            return;
+        }
         // Bind Root Signature y PSO
         context->SetRootSignature(m_rootSignature.get()->GetNative());
         context->SetPipelineState(m_psoDepthOff.get()->GetNative()); // Usar DepthOff si quieres que flote sobre todo
@@ -195,8 +199,8 @@ namespace Bruno::DX
         context->SetGraphicsRoot32BitConstants(0, sizeof(GizmoConstants) / 4, &constants, 0);
 
         // Bind Buffers
-        context->SetVertexBuffer(m_primitiveBatch.GetVertexBuffer()->GetView());
-        context->SetIndexBuffer(&m_primitiveBatch.GetIndexBuffer()->GetView());
+        context->SetVertexBuffer(m_primitiveBatch.GetVertexBuffer(frameIndex)->GetView());
+        context->SetIndexBuffer(&m_primitiveBatch.GetIndexBuffer(frameIndex)->GetView());
 
         // DIBUJAR TODO EL BATCH EN 1 SOLO DRAW CALL
         context->DrawIndexedInstanced(m_primitiveBatch.GetIndexCount(), 1, 0, 0, 0);
@@ -808,13 +812,14 @@ namespace Bruno::DX
         BR_CORE_TRACE << "selected plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
     }
 
-    void GizmoService::BuildGeometry()
+    void GizmoService::BuildGeometry(uint32_t frameIndex)
     {
+       
         m_primitiveBatch.Begin();
 
         if (m_currentGizmoType == GizmoType::None || !m_isActive)
         {
-            m_primitiveBatch.End(m_device);
+            m_primitiveBatch.End(frameIndex);
             return;
         }
 
@@ -1012,6 +1017,6 @@ namespace Bruno::DX
             }
         }
         
-        m_primitiveBatch.End(m_device);
+        m_primitiveBatch.End(frameIndex);
     }
 }

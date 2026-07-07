@@ -43,7 +43,6 @@ namespace Bruno
 		m_layout.Create(*this);
 
 		m_scene = m_sceneDocument->GetScene();
-		m_gizmoService = m_sceneDocument->GetGizmoService();
 		m_selectionService = m_sceneDocument->GetSelectionService();
 		
 		m_gizmoTypeCombobox.Create(*this, false, { 0, 0, 150, 25 });
@@ -80,12 +79,12 @@ namespace Bruno
 		m_form = std::make_unique<Berta::NestedForm>(this->Handle(), Berta::Rectangle{0,0,100,100}, Berta::FormStyle::Flat(), true);
 		m_layout.Attach("renderForm", *m_form);
 		
-		m_dxViewport.Height=100;
-		m_dxViewport.Width=100;
-		m_dxViewport.TopLeftX	=0;
-		m_dxViewport.TopLeftY	=0;
-		m_dxViewport.MinDepth	=D3D12_MIN_DEPTH;
-		m_dxViewport.MaxDepth	=D3D12_MAX_DEPTH;
+		m_dxViewport.Height = 100;
+		m_dxViewport.Width = 100;
+		m_dxViewport.TopLeftX = 0;
+		m_dxViewport.TopLeftY = 0;
+		m_dxViewport.MinDepth = D3D12_MIN_DEPTH;
+		m_dxViewport.MaxDepth = D3D12_MAX_DEPTH;
 		m_dxDevice = Graphics::GetDXDevice();
 		
 		DX::SurfaceWindowParameters parameters;
@@ -157,8 +156,8 @@ namespace Bruno
 			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
 			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
     
-			m_dxGizmoService->BuildGeometry();
-			m_dxGizmoService->Render(&context, viewProj);
+			m_dxGizmoService->BuildGeometry(frameIndex);
+			m_dxGizmoService->Render(&context, frameIndex, viewProj);
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 			// ------------------------------------------------------------------
@@ -491,10 +490,9 @@ namespace Bruno
 
 	void ScenePanel::InitializeGizmoService()
 	{
-		m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
-		m_gizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? GizmoService::TransformSpace::World : GizmoService::TransformSpace::Local);
-		
 		m_dxGizmoService = m_sceneDocument->GetDXGizmoService();
+		m_dxGizmoService->SetGizmoType(static_cast<DX::GizmoService::GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
+		m_dxGizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? DX::GizmoService::TransformSpace::World : DX::GizmoService::TransformSpace::Local);
 	}
 
 	void ScenePanel::InitializeSceneRenderer()

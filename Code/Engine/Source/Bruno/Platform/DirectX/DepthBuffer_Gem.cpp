@@ -46,13 +46,13 @@ namespace Bruno::DX {
         depthDesc.Height = m_height;
         depthDesc.DepthOrArraySize = 1;
         depthDesc.MipLevels = 1;
-        depthDesc.Format = DXGI_FORMAT_D32_FLOAT; // 32 bits para precisión de profundidad
+        depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // 32 bits para precisión de profundidad
         depthDesc.SampleDesc.Count = 1;           // Sin Anti-Aliasing (MSAA) por ahora
         depthDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL; // ¡Vital para que funcione como Depth Buffer!
 
         // Optimizamos la limpieza (Clear) indicando el valor por defecto (1.0f = lo más lejano)
         D3D12_CLEAR_VALUE optClear = {};
-        optClear.Format = DXGI_FORMAT_D32_FLOAT;
+        optClear.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
         optClear.DepthStencil.Depth = 1.0f;
         optClear.DepthStencil.Stencil = 0;
 
@@ -73,7 +73,7 @@ namespace Bruno::DX {
 
         // 4. Crear la vista (Descriptor) que conecta el Heap con la Textura
         D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-        dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+        dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
         dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
         dsvDesc.Texture2D.MipSlice = 0;
 

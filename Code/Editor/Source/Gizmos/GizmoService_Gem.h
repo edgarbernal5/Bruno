@@ -71,7 +71,7 @@ namespace Bruno::DX
         GizmoService(GraphicsDevice* device, Camera& camera);
         void Initialize();
     
-        void BuildGeometry();
+        void BuildGeometry(uint32_t frameIndex);
 
         // Métodos principales para el dibujado de herramientas compuestas
         void DrawTranslationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition);
@@ -82,7 +82,7 @@ namespace Bruno::DX
         void DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color);
 
         // Prepara buffers y realiza el render final en la GPU
-        void Render(DX::GraphicsContext* context, const Math::Matrix& viewProjection);
+        void Render(DX::GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProjection);
         
         // Interacción
         bool BeginDrag(const Math::Vector2& mousePosition);

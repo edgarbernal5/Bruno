@@ -3,6 +3,20 @@
 
 namespace Bruno::DX
 {
+    PrimitiveBatch::PrimitiveBatch(GraphicsDevice* device) : m_device(device)
+    {
+        // Alojar suficiente espacio para unos 65,000 vértices de gizmos (aprox 1.5 MB)
+        // Así nunca se disparará el if de redimensionamiento.
+        size_t initialVertexCapacity = 65536 * sizeof(GizmoVertex);
+        size_t initialIndexCapacity = 65536 * sizeof(uint32_t);
+        
+        for (int i = 0; i < 2; ++i)
+        {
+            m_vertexBuffer[i] = std::make_unique<DX::VertexBuffer>(*device, initialVertexCapacity, sizeof(GizmoVertex), true);
+            m_indexBuffer[i] = std::make_unique<DX::IndexBuffer>(*device, initialIndexCapacity, true);
+        }
+    }
+
     void PrimitiveBatch::Begin() {
         // No usamos m_vertices.shrink_to_fit() ni reasignamos para no perder la 
         // capacidad ya reservada en la RAM. Solo reiniciamos el contador.
@@ -11,7 +25,8 @@ namespace Bruno::DX
     }
 
     // Helper privado para insertar un vértice transformado y retornar su índice
-    uint32_t PrimitiveBatch::AddVertex(const Math::Vector3& localPos, const Math::Matrix& transform, const Math::Color& color) {
+    uint32_t PrimitiveBatch::AddVertex(const Math::Vector3& localPos, const Math::Matrix& transform, const Math::Color& color)
+    {
         GizmoVertex v;
         v.Position = Math::Vector3::Transform(localPos, transform);
         v.Color = color;
@@ -22,7 +37,8 @@ namespace Bruno::DX
     }
 
     // Helper para crear un triángulo (Winding Order Clockwise para DX12)
-    void PrimitiveBatch::AddTriangle(uint32_t i0, uint32_t i1, uint32_t i2) {
+    void PrimitiveBatch::AddTriangle(uint32_t i0, uint32_t i1, uint32_t i2)
+    {
         m_indices.push_back(i0);
         m_indices.push_back(i1);
         m_indices.push_back(i2);
@@ -183,7 +199,8 @@ namespace Bruno::DX
         uint32_t ringBaseIdx = static_cast<uint32_t>(m_vertices.size());
 
         // Generar vértices de los anillos superior e inferior
-        for (int i = 0; i <= slices; ++i) {
+        for (int i = 0; i <= slices; ++i)
+        {
             float theta = (static_cast<float>(i) / slices) * Math::TWO_PI;
             float x = cosf(theta) * radius;
             float z = sinf(theta) * radius;
@@ -215,7 +232,8 @@ namespace Bruno::DX
         DrawBox(transform, Math::Vector3(size, size, size), color);
     }
 
-    void PrimitiveBatch::DrawCone(const Math::Matrix& transform, float height, float radius, int slices, const Math::Color& color) {
+    void PrimitiveBatch::DrawCone(const Math::Matrix& transform, float height, float radius, int slices, const Math::Color& color)
+    {
         // El origen del cono para un gizmo suele ser su base, apuntando hacia arriba (+Y)
         uint32_t apexIdx = AddVertex(Math::Vector3(0, height, 0), transform, color);
         uint32_t baseCenterIdx = AddVertex(Math::Vector3(0, 0, 0), transform, color);
@@ -240,7 +258,8 @@ namespace Bruno::DX
         }
     }
     
-    void PrimitiveBatch::DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color) {
+    void PrimitiveBatch::DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color)
+    {
         // Calculamos la dirección y longitud
         Math::Vector3 dir = end - start;
         float length = dir.Length();
@@ -264,28 +283,30 @@ namespace Bruno::DX
     }
     
     // Fíjate que ya no pasamos el UploadContext como parámetro
-    void PrimitiveBatch::End(GraphicsDevice* device) {
-        if (m_vertices.empty() || m_indices.empty()) return;
-
+    void PrimitiveBatch::End(uint32_t frameIndex)
+    {
+        if (m_vertices.empty() || m_indices.empty())
+        {
+            return;
+        }
+        
         size_t vertexBufferSize = m_vertices.size() * sizeof(GizmoVertex);
         size_t indexBufferSize = m_indices.size() * sizeof(uint32_t);
 
         // 1. Validar y re-alojar Vertex Buffer si no existe o se quedó chico
-        if (!m_vertexBuffer || m_vertexBuffer->GetView().SizeInBytes < vertexBufferSize) {
-            size_t newSize = static_cast<size_t>(vertexBufferSize * 1.5f);
-            // Usamos el constructor dinámico
-            m_vertexBuffer = std::make_unique<DX::VertexBuffer>(*device, newSize, sizeof(GizmoVertex),true ); 
+        if (!m_vertexBuffer || m_vertexBuffer[frameIndex]->GetView().SizeInBytes < vertexBufferSize)
+        {
+             
         }
 
         // 2. Validar y re-alojar Index Buffer
-        if (!m_indexBuffer || m_indexBuffer->GetView().SizeInBytes < indexBufferSize) {
-            size_t newSize = static_cast<size_t>(indexBufferSize * 1.5f);
-            // Usamos el constructor dinámico
-            m_indexBuffer = std::make_unique<DX::IndexBuffer>(*device, newSize, true);
+        if (!m_indexBuffer || m_indexBuffer[frameIndex]->GetView().SizeInBytes < indexBufferSize)
+        {
+            
         }
 
         // 3. Subir a GPU instántaneamente (Map -> memcpy -> Unmap interno)
-        m_vertexBuffer->Update(m_vertices.data(), vertexBufferSize);
-        m_indexBuffer->Update(m_indices.data(), indexBufferSize);
+        m_vertexBuffer[frameIndex]->Update(m_vertices.data(), vertexBufferSize);
+        m_indexBuffer[frameIndex]->Update(m_indices.data(), indexBufferSize);
     }
 }

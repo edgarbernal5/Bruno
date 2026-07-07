@@ -75,7 +75,7 @@ namespace Bruno
 		auto dxDevice = Graphics::GetDXDevice();
 		m_selectionService = std::make_shared<SelectionService>(m_scene, m_assetManager);
 		
-		m_dxGizmoService= std::make_shared<DX::GizmoService>(dxDevice, m_camera);
+		m_dxGizmoService = std::make_shared<DX::GizmoService>(dxDevice, m_camera);
 		m_dxGizmoService->Initialize();
 		m_dxGizmoService->SetTranslationCallback([&](const Math::Vector3& newPosition)
 		{
@@ -88,6 +88,22 @@ namespace Bruno
 				entity.Patch<TransformComponent>([&newPosition](auto& transform) 
 				{
 					transform.Position = newPosition;
+				});
+			}
+		});
+		m_dxGizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
+		{
+			for (auto& uuid : m_selectionService->GetSelections())
+			{
+				Entity entity = m_scene->GetEntityWithUUID(uuid);
+				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
+
+				entity.Patch<TransformComponent>([&delta](auto& transform) 
+				{
+					// Asumiendo que transform.Rotation guarda los Euler Angles como Vector3
+					auto currentRotation = transform.Rotation; //Math::Quaternion::CreateFromYawPitchRoll(transform.Rotation);
+					currentRotation *= delta;
+					transform.Rotation = currentRotation;
 				});
 			}
 		});

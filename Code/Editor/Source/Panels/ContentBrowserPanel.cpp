@@ -46,7 +46,7 @@ namespace Bruno
 		m_listbox.GetEvents().DblClick.Connect([&](const Berta::ArgMouse& args)
 			{
 				auto selectedItems = m_listbox.GetSelected();
-				if (selectedItems.size() == 0)
+				if (selectedItems.empty())
 					return;
 
 				for (auto& item : selectedItems)
@@ -56,7 +56,9 @@ namespace Bruno
 					if (contentItem.IsDirectory)
 					{
 						auto path = m_treebox.GetKeyPath(contentItem.TreeNode, L'/') + L"/" + contentItem.DirectoryEntry.path().filename().generic_wstring();
-						m_treebox.Find(path).Select();
+						auto pathItem = m_treebox.Find(path);
+						pathItem.Select();
+						pathItem.ScrollToItem();
 					}
 					else
 					{
@@ -71,7 +73,7 @@ namespace Bruno
 
 		m_listbox.GetEvents().MouseDown.Connect([&](const Berta::ArgMouse& args)
 			{
-				if (m_listbox.GetSelected().size() == 0)
+				if (m_listbox.GetSelected().empty())
 					return;
 
 				//menu_popuper(m_fileSelectionPopup)(args);

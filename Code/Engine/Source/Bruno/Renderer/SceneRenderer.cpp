@@ -162,11 +162,15 @@ namespace Bruno
 			
 			AssetHandle textureHandle{ 0 };
 			
-			auto textIt = material->TexturesByName.find("Texture");
-			if (textIt != material->TexturesByName.end())
+			if (material)
 			{
-				textureHandle = textIt->second;
+				auto textIt = material->TexturesByName.find("Texture");
+				if (textIt != material->TexturesByName.end())
+				{
+					textureHandle = textIt->second;
+				}
 			}
+			
 			auto texture = m_assetManager->GetAsset<DX::Texture2D>(textureHandle);
 			if (texture != nullptr)
 			{

@@ -18,7 +18,7 @@ namespace Bruno::DX
     class PrimitiveBatch
     {
     public:
-        PrimitiveBatch() = default;
+        PrimitiveBatch(GraphicsDevice* device);
     
         // Prepara las listas para un nuevo frame
         void Begin();
@@ -32,11 +32,11 @@ namespace Bruno::DX
         void DrawTorus(const Math::Matrix& transform, float outerRadius, float innerRadius, int slices, int segments, const Math::Color& color);
         void DrawHalfTorus(const Math::Matrix& transform, float outerRadius, float innerRadius, float angleStart, int slices, int segments, const Math::Color& color);
         // Finaliza el batching y sube la geometría a los buffers dinámicos de la GPU
-        void End(GraphicsDevice* device);
+        void End(uint32_t frameIndex);
 
         // Devuelve los buffers para el renderizado
-        VertexBuffer* GetVertexBuffer() const { return m_vertexBuffer.get(); }
-        IndexBuffer* GetIndexBuffer() const { return m_indexBuffer.get(); }
+        VertexBuffer* GetVertexBuffer(uint32_t frameIndex) const { return m_vertexBuffer[frameIndex].get(); }
+        IndexBuffer* GetIndexBuffer(uint32_t frameIndex) const { return m_indexBuffer[frameIndex].get(); }
         uint32_t GetIndexCount() const { return static_cast<uint32_t>(m_indices.size()); }
 
     private:
@@ -45,9 +45,10 @@ namespace Bruno::DX
         
         std::vector<GizmoVertex> m_vertices;
         std::vector<uint32_t> m_indices;
+        GraphicsDevice* m_device;
 
         // Estos buffers deben ser "Dinámicos" o mapeables (creados en un Upload Heap en DX12)
-        std::unique_ptr<VertexBuffer> m_vertexBuffer;
-        std::unique_ptr<IndexBuffer> m_indexBuffer;
+        std::unique_ptr<VertexBuffer> m_vertexBuffer[2];
+        std::unique_ptr<IndexBuffer> m_indexBuffer[2];
     };
 }

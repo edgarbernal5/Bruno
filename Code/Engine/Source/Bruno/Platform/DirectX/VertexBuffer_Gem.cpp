@@ -4,8 +4,8 @@
 #include "UploadContext_Gem.h"
 #include "Device.h"
 
-namespace Bruno::DX {
-
+namespace Bruno::DX
+{
     VertexBuffer::VertexBuffer(GraphicsDevice& device, DX::UploadContext& uploadContext, const void* data, size_t vertexCount, size_t vertexStride) 
     {
         size_t byteSize = vertexCount * vertexStride;
@@ -73,7 +73,6 @@ namespace Bruno::DX {
         // Actualizamos el SizeInBytes por si en este frame dibujamos menos índices que la capacidad total
         m_view.SizeInBytes = static_cast<UINT>(size);
     }
-
 
     UINT VertexBuffer::GetSizeInBytes() const
     {

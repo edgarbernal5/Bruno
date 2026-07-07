@@ -3,33 +3,17 @@
 #include <Berta/Controls/Panel.h>
 #include <Berta/GUI/Layout.h>
 #include <Berta/Controls/Form.h>
-//#include <nana/gui/timer.hpp>
 #include <Berta/Controls/ComboBox.h>
 #include <Berta/Controls/Button.h>
 
-#include <Bruno/Platform/DirectX/IndexBuffer.h>
-#include <Bruno/Platform/DirectX/VertexBuffer.h>
-#include <Bruno/Platform/DirectX/Shader.h>
-#include <Bruno/Platform/DirectX/RootSignature.h>
-#include <Bruno/Platform/DirectX/PipelineStateObject.h>
 #include <Bruno/Core/GameTimer.h>
 #include <Bruno/Renderer/RenderItem.h>
-#include <Bruno/Platform/DirectX/ConstantBuffer.h>
 #include <mutex>
 #include <Bruno/Platform/DirectX/Texture.h>
 #include <Bruno/Renderer/Camera.h>
 
-#include "Bruno/Platform/DirectX/ConstantBuffer_Gem.h"
 #include "Bruno/Platform/DirectX/DepthBuffer_Gem.h"
-#include "Bruno/Platform/DirectX/DescriptorAllocator.h"
-#include "Bruno/Platform/DirectX/GraphicsFence.h"
-#include "Bruno/Platform/DirectX/RenderContext.h"
-#include "Bruno/Platform/DirectX/SwapChain.h"
 #include "Bruno/Platform/DirectX/Device.h"
-#include "Bruno/Platform/DirectX/IndexBuffer_Gem.h"
-#include "Bruno/Platform/DirectX/RootSignature_Gem.h"
-#include "Bruno/Platform/DirectX/Texture2D.h"
-#include "Bruno/Platform/DirectX/VertexBuffer_Gem.h"
 #include "Gizmos/GizmoService.h"
 
 namespace Bruno
@@ -76,7 +60,6 @@ namespace Bruno
 		void InitializeSceneRenderer();
 		void UpdateCBs(const GameTimer& timer);
 
-		//Berta::nested_form* m_form;
 		std::unique_ptr<Berta::NestedForm> m_form;
 		Berta::Layout m_layout;
 		Berta::ComboBox m_gizmoTypeCombobox;
@@ -101,7 +84,6 @@ namespace Bruno
 #endif
 
 		std::shared_ptr<SelectionService>	m_selectionService;
-		std::shared_ptr<GizmoService>		m_gizmoService;
 		std::shared_ptr<DX::GizmoService>		m_dxGizmoService;
 
 		DX::GraphicsDevice* m_dxDevice;
@@ -112,8 +94,6 @@ namespace Bruno
 
 		ID3D12DescriptorHeap* m_srvHeap;
 		
-		uint64_t m_frameFenceValues[3]{0,0,0};
-		uint64_t m_currentFrame=0;
 		Math::Int2 m_lastMousePosition;
 		Math::Int2 m_beginMouseDownPosition;
 		bool m_isResizing{ false };
