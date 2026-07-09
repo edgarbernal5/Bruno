@@ -704,8 +704,8 @@ namespace Bruno::DX
                 float sphereDist;
                 if (trackballSphere.Intersects(ray.position, ray.direction, sphereDist))
                 {
-                    //closestIntersection = 0.0f;
-                    //selectedAxis = GizmoAxis::XYZ;
+                    closestIntersection = 0.0f;
+                    selectedAxis = GizmoAxis::XYZ;
                 }
             }
         }
