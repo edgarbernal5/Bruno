@@ -69,7 +69,8 @@ namespace Bruno
 		});
 
 		auto entities = sceneDocument->GetScene()->GetAllEntitiesWith<IdComponent, HierarchyComponent>();
-		for (auto& ent : entities) {
+		for (auto& ent : entities)
+		{
 			auto [idComponent, hierarchy] = entities.get<IdComponent, HierarchyComponent>(ent);
 			if (!hierarchy.Parent)
 			{

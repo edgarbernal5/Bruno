@@ -20,7 +20,7 @@ namespace Bruno
 	{
 	public:
 		SceneHierarchyPanel(Berta::Window* window, std::shared_ptr<SceneDocument> sceneDocument);
-		~SceneHierarchyPanel();
+		~SceneHierarchyPanel() override;
 
 		friend class ScenePanel;
 	private:

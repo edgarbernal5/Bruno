@@ -159,7 +159,7 @@ namespace Bruno
 			});
 
 		m_layout.AddPaneTab("scene-doc-pane", "tab-scene", std::move(m_sceneDocumentPanel), "", Berta::DockPosition::Tab);
-		m_layout.AddPaneTab("content-browser-pane", "tab-content-browser", std::move(m_contentBrowserPanel), "scene-doc-pane", Berta::DockPosition::Down);
+		m_layout.AddPaneTab("content-browser-pane", "tab-content-browser", std::move(m_contentBrowserPanel), "scene-doc-pane", Berta::DockPosition::Right);
 
 		m_layout.Apply();
 

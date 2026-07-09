@@ -19,7 +19,6 @@ namespace Bruno
 
 	class SceneHierarchy;
 	class SelectionService;
-	class GizmoService;
 	class EditorAssetManager;
 
 	enum class ActionMode
@@ -40,7 +39,6 @@ namespace Bruno
 		std::shared_ptr<SceneHierarchy> GetSceneHierarchy() const { return m_sceneHierarchy; }
 
 		Camera& GetCamera() { return m_camera; }
-		std::shared_ptr<GizmoService> GetGizmoService() { return m_gizmoService; }
 		std::shared_ptr<DX::GizmoService> GetDXGizmoService() { return m_dxGizmoService; }
 		std::shared_ptr<SelectionService> GetSelectionService() { return m_selectionService; }
 		EditorAssetManager* GetAssetManager() const { return m_assetManager; }
@@ -61,7 +59,6 @@ namespace Bruno
 		EditorAssetManager* m_assetManager;
 
 		std::shared_ptr<SelectionService> m_selectionService;
-		std::shared_ptr<GizmoService> m_gizmoService;
 		std::shared_ptr<DX::GizmoService> m_dxGizmoService;
 		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;
 

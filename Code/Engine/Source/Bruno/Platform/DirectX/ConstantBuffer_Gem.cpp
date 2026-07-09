@@ -50,6 +50,6 @@ namespace Bruno::DX
     void ConstantBuffer::Update(const void* data, size_t dataSize)
     {
         // Copia directa de RAM (tu matriz C++) a la memoria accesible por la GPU
-        memcpy(m_mappedData, data, dataSize);
+        ::memcpy(m_mappedData, data, dataSize);
     }
 }

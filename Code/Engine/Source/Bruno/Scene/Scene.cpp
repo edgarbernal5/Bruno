@@ -85,14 +85,15 @@ namespace Bruno
 
 	Math::Matrix Scene::GetWorldSpaceMatrix(Entity entity)
 	{
-		Math::Matrix transform;
+		Math::Matrix parentTransform = Math::Matrix::Identity;
 
 		Entity parent = TryGetEntityWithUUID(entity.GetParentUUID());
 		if (parent)
 		{
-			transform = GetWorldSpaceMatrix(parent);
+			parentTransform = GetWorldSpaceMatrix(parent);
 		}
-		return transform * entity.GetComponent<TransformComponent>().GetTransform();
+		
+		return entity.GetComponent<TransformComponent>().GetTransform() * parentTransform;
 	}
 
 	Entity Scene::GetEntityWithUUID(UUID id) const

@@ -30,9 +30,10 @@ namespace Bruno
 			{
 				auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
 				m_dxGizmoService->SetGizmoPosition(worldMatrix.Translation());
+				m_dxGizmoService->SetGizmoWorldMatrix(worldMatrix);
 			}
-			m_gizmoService->SetActive(entityUUID);
 			m_dxGizmoService->SetActive(entityUUID);
+			
 			SelectionChanged.emit(selection);
 		});
 	}
@@ -57,9 +58,11 @@ namespace Bruno
 		{
 			auto entityUUID = selection[0];
 			auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
-			m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
+			m_dxGizmoService->SetGizmoPosition(worldMatrix.Translation());
+			m_dxGizmoService->SetGizmoWorldMatrix(worldMatrix);
 		}
-		m_gizmoService->SetActive(selection.size() > 0);
+		m_dxGizmoService->SetActive(selection.size() > 0);
+		
 		SelectionChanged.emit(selection);
 	}
 
@@ -85,9 +88,23 @@ namespace Bruno
 				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
 
 				// Usamos 'patch' para que EnTT dispare el evento 'on_update<TransformComponent>'
-				entity.Patch<TransformComponent>([&newPosition](auto& transform) 
+				entity.Patch<TransformComponent>([this, entity, &newPosition](auto& transform) 
 				{
-					transform.Position = newPosition;
+					Math::Matrix parentWorldMatrix = Math::Matrix::Identity;
+		            
+					// 1. VALIDAR SI REALMENTE TIENE PADRE
+					Entity parent = m_scene->TryGetEntityWithUUID(entity.GetParentUUID());
+					if (parent)
+					{
+						parentWorldMatrix = m_scene->GetWorldSpaceMatrix(parent);
+					}
+		            
+					Math::Matrix inverseTransform;
+					parentWorldMatrix.Invert(inverseTransform);
+		            
+					// 2. Transform (Punto) aplica rotación, escala y traslación inversa
+					// Esto convierte perfectamente la coordenada absoluta 'newPosition' al espacio local
+					transform.Position = Math::Vector3::Transform(newPosition, inverseTransform);
 				});
 			}
 		});
@@ -98,50 +115,35 @@ namespace Bruno
 				Entity entity = m_scene->GetEntityWithUUID(uuid);
 				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
 
-				entity.Patch<TransformComponent>([&delta](auto& transform) 
+				entity.Patch<TransformComponent>([this, entity, &delta](auto& transform) 
 				{
-					// Asumiendo que transform.Rotation guarda los Euler Angles como Vector3
-					auto currentRotation = transform.Rotation; //Math::Quaternion::CreateFromYawPitchRoll(transform.Rotation);
-					currentRotation *= delta;
-					transform.Rotation = currentRotation;
+					Math::Matrix parentWorldMatrix = Math::Matrix::Identity;
+					Entity parent = m_scene->TryGetEntityWithUUID(entity.GetParentUUID());
+					if (parent)
+					{
+						parentWorldMatrix = m_scene->GetWorldSpaceMatrix(parent);
+					}
+
+					// Extraemos solo la rotación del padre en espacio de mundo
+					Math::Vector3 dummyScale, dummyPos;
+					Math::Quaternion parentRot;
+					parentWorldMatrix.Decompose(dummyScale, parentRot, dummyPos);
+
+					Math::Quaternion invParentRot;
+					parentRot.Inverse(invParentRot);
+
+					// Matemáticas de Jerarquía DX12
+					// 1. Llevamos la rotación local al Mundo: (transform.Rotation * parentRot)
+					// 2. Le sumamos el delta del ratón: (* delta)
+					// 3. Lo devolvemos al espacio Local: (* invParentRot)
+					transform.Rotation = transform.Rotation * parentRot * delta * invParentRot;
+					transform.Rotation.Normalize(); // Previene degradación de precisión flotante
 				});
 			}
 		});
 		
-		m_gizmoService = std::make_shared<GizmoService>(device, m_camera, m_selectionService.get());
-		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
-		{
-			for (auto& uuid : m_selectionService->GetSelections())
-			{
-				Entity entity = m_scene->GetEntityWithUUID(uuid);
-				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
 
-				// Usamos 'patch' para que EnTT dispare el evento 'on_update<TransformComponent>'
-				entity.Patch<TransformComponent>([&delta](auto& transform) 
-				{
-					transform.Position += delta;
-				});
-			}
-		});
-
-		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
-		{
-			for (auto& uuid : m_selectionService->GetSelections())
-			{
-				Entity entity = m_scene->GetEntityWithUUID(uuid);
-				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
-
-				entity.Patch<TransformComponent>([&delta](auto& transform) 
-				{
-					// Asumiendo que transform.Rotation guarda los Euler Angles como Vector3
-					//auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(transform.Rotation);
-					//currentRotation *= delta;
-					//transform.Rotation = currentRotation.ToEuler();
-				});
-			}
-		});
-
-		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
+		/*m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
 		{
 			const Math::Vector3 newDelta = delta * 0.1f;
 
@@ -171,7 +173,7 @@ namespace Bruno
 					}
 				});
 			}
-		});
+		});*/
 	}
 
 	void SceneDocument::InitializeSceneRenderer()

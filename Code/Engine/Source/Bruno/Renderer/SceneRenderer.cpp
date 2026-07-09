@@ -142,8 +142,6 @@ namespace Bruno
 
 	void SceneRenderer::OnRender(DX::GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
 	{
-		auto device = Graphics::GetDXDevice();
-		
 		DX::VertexBuffer* currentVB = nullptr;
 		
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent, CBVComponent>();

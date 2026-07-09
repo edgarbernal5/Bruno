@@ -296,13 +296,11 @@ namespace Bruno::DX
         // 1. Validar y re-alojar Vertex Buffer si no existe o se quedó chico
         if (!m_vertexBuffer || m_vertexBuffer[frameIndex]->GetView().SizeInBytes < vertexBufferSize)
         {
-             
         }
 
         // 2. Validar y re-alojar Index Buffer
         if (!m_indexBuffer || m_indexBuffer[frameIndex]->GetView().SizeInBytes < indexBufferSize)
         {
-            
         }
 
         // 3. Subir a GPU instántaneamente (Map -> memcpy -> Unmap interno)

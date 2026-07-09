@@ -20,6 +20,7 @@ namespace Bruno::DX
         {
             //m_activeAxisColors[i] = m_axisColors[i];
         }
+        m_selectionState.m_gizmoWorldMatrix = Math::Matrix::Identity;
         m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
         m_selectionState.m_gizmoObjectOrientedWorld = Math::Matrix::Identity;
         m_selectionState.m_gizmoAxisAlignedWorld = Math::Matrix::Identity;
@@ -90,731 +91,8 @@ namespace Bruno::DX
         m_psoDepthOff->Initialize(psoDesc);
     }
 
-    void GizmoService::DrawTranslationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition)
-    {
-        Math::Vector3 origin = worldTransform.Translation();
-        float scale = CalculateAdaptiveScale(origin, cameraPosition);
-
-        // Dimensiones proporcionales basadas en la escala adaptativa
-        float cylinderLength = 1.8f * scale;
-        float cylinderRadius = 0.03f * scale;
-        float coneHeight     = 0.4f * scale;
-        float coneRadius     = 0.12f * scale;
-        int slices           = 16;
-
-        // --- EJE Y (Apantallado por defecto hacia arriba en sistemas Y-Up) ---
-        // El cilindro base crece desde el origen en +Y de forma natural.
-        Math::Matrix matY = Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matY, cylinderLength, cylinderRadius, slices, m_axisColors[1]);
-        // El cono de la punta se desfasa hasta el final del cilindro
-        Math::Matrix matConeY = Math::Matrix::CreateTranslation(0.0f, cylinderLength, 0.0f) * matY;
-        m_primitiveBatch.DrawCone(matConeY, coneHeight, coneRadius, slices, m_axisColors[1]);
-
-        // --- EJE X (Rotamos 90 grados en Z para acostar el eje Y local sobre el eje X global) ---
-        Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matX, cylinderLength, cylinderRadius, slices, m_axisColors[0]);
-        Math::Matrix matConeX = Math::Matrix::CreateTranslation(cylinderLength, 0.0f, 0.0f) * Math::Matrix::CreateTranslation(origin);
-        // Para el cono de X, rotamos el cono base para que apunte hacia +X
-        Math::Matrix matConeRotX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * matConeX;
-        m_primitiveBatch.DrawCone(matConeRotX, coneHeight, coneRadius, slices, m_axisColors[0]);
-
-        // --- EJE Z (Rotamos 90 grados en X para acostar el eje Y local sobre el eje Z global) ---
-        Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matZ, cylinderLength, cylinderRadius, slices, m_axisColors[2]);
-        Math::Matrix matConeZ = Math::Matrix::CreateTranslation(0.0f, 0.0f, cylinderLength) * Math::Matrix::CreateTranslation(origin);
-        // Rotamos el cono base para que apunte hacia +Z
-        Math::Matrix matConeRotZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * matConeZ;
-        m_primitiveBatch.DrawCone(matConeRotZ, coneHeight, coneRadius, slices, m_axisColors[2]);
-    }
-    
-    void GizmoService::DrawRotationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition)
-    {
-        Math::Vector3 origin = worldTransform.Translation();
-        float scale = CalculateAdaptiveScale(origin, cameraPosition);
-
-        float radius = 2.0f * scale;
-        float thickness = 0.04f * scale;
-        int slices = 48; // Más definición para que las curvas se vean suaves
-        int segments = 8;
-
-        // Eje X Anillo (Gira sobre el plano YZ, la matriz rota para orientar el Toroide)
-        Math::Matrix matRotX = Math::Matrix::CreateRotationZ(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawTorus(matRotX, radius, thickness, slices, segments, m_axisColors[0]);
-
-        // Eje Y Anillo (Gira sobre el plano XZ)
-        Math::Matrix matRotY = Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawTorus(matRotY, radius, thickness, slices, segments, m_axisColors[1]);
-
-        // Eje Z Anillo (Gira sobre el plano XY)
-        Math::Matrix matRotZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawTorus(matRotZ, radius, thickness, slices, segments, m_axisColors[2]);
-    }
-
-    void GizmoService::DrawScaleGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition)
-    {
-        Math::Vector3 origin = worldTransform.Translation();
-        float scale = CalculateAdaptiveScale(origin, cameraPosition);
-
-        float cylinderLength = 1.8f * scale;
-        float cylinderRadius = 0.03f * scale;
-        float boxSize        = 0.18f * scale; // En vez de cono, usamos cubos en los extremos
-        int slices           = 16;
-
-        // --- EJE Y ---
-        Math::Matrix matY = Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matY, cylinderLength, cylinderRadius, slices, m_axisColors[1]);
-        Math::Matrix matBoxY = Math::Matrix::CreateTranslation(0.0f, cylinderLength, 0.0f) * matY;
-        m_primitiveBatch.DrawBox(matBoxY, boxSize, m_axisColors[1]);
-
-        // --- EJE X ---
-        Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matX, cylinderLength, cylinderRadius, slices, m_axisColors[0]);
-        Math::Matrix matBoxX = Math::Matrix::CreateTranslation(cylinderLength, 0.0f, 0.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawBox(matBoxX, boxSize, m_axisColors[0]);
-
-        // --- EJE Z ---
-        Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matZ, cylinderLength, cylinderRadius, slices, m_axisColors[2]);
-        Math::Matrix matBoxZ = Math::Matrix::CreateTranslation(0.0f, 0.0f, cylinderLength) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawBox(matBoxZ, boxSize, m_axisColors[2]);
-    }
-
-    void GizmoService::DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color)
-    {
-        m_primitiveBatch.DrawLine(start, end, color);
-    }
-
-    void GizmoService::Render(DX::GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProj)
-    {
-        if (m_primitiveBatch.GetIndexCount() == 0)
-        {
-            return;
-        }
-        // Bind Root Signature y PSO
-        context->SetRootSignature(m_rootSignature.get()->GetNative());
-        context->SetPipelineState(m_psoDepthOff.get()->GetNative()); // Usar DepthOff si quieres que flote sobre todo
-    
-        // Bind Constantes (Root Constants o Constant Buffer temporal)
-        GizmoConstants constants = { viewProj };
-        context->SetGraphicsRoot32BitConstants(0, sizeof(GizmoConstants) / 4, &constants, 0);
-
-        // Bind Buffers
-        context->SetVertexBuffer(m_primitiveBatch.GetVertexBuffer(frameIndex)->GetView());
-        context->SetIndexBuffer(&m_primitiveBatch.GetIndexBuffer(frameIndex)->GetView());
-
-        // DIBUJAR TODO EL BATCH EN 1 SOLO DRAW CALL
-        context->DrawIndexedInstanced(m_primitiveBatch.GetIndexCount(), 1, 0, 0, 0);
-    
-        // Limpiamos los arrays de CPU para el siguiente frame
-        m_primitiveBatch.Begin(); 
-    }
-
-    float GizmoService::CalculateAdaptiveScale(const Math::Vector3& position, const Math::Vector3& cameraPosition) const
-    {
-        float distance = Math::Vector3::Distance(position, cameraPosition);
-        // Multiplicamos por un factor constante para ajustar el tamaño relativo en el viewport (ej: 0.1)
-        float scaleFactor = distance * 0.1f;
-    
-        // Evitamos escalas absurdas o negativas si la cámara se posiciona exactamente sobre el objeto
-        return std::max<float>(scaleFactor, 0.001f);
-    }
-
-    GizmoService::GizmoAxis GizmoService::GetAxis(const Math::Vector2& mousePosition)
-    {
-        float closestIntersection = (std::numeric_limits<float>::max)();
-        Math::Vector3 currentIntersection;
-        auto selectedAxis = GizmoAxis::None;
-
-        Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoObjectOrientedWorld.Invert();
-        
-        Math::Ray ray = ConvertMousePositionToRay(mousePosition);
-        ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
-        ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
-        ray.direction.Normalize();
-
-        if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
-        {
-            float intersection = -1.0f;
-
-            if (XAxisBox.Intersects(ray.position, ray.direction, intersection)) {
-                if (intersection < closestIntersection)
-                {
-                    selectedAxis = GizmoAxis::X;
-                    closestIntersection = intersection;
-                    currentIntersection = ray.position + (ray.direction * intersection);
-                }
-            }
-            if (YAxisBox.Intersects(ray.position, ray.direction, intersection)) {
-                if (intersection < closestIntersection)
-                {
-                    selectedAxis = GizmoAxis::Y;
-                    closestIntersection = intersection;
-                    currentIntersection = ray.position + (ray.direction * intersection);
-                }
-            }
-            if (ZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
-                if (intersection < closestIntersection)
-                {
-                    selectedAxis = GizmoAxis::Z;
-                    closestIntersection = intersection;
-                    currentIntersection = ray.position + (ray.direction * intersection);
-                }
-            }
-            if (m_currentGizmoType == GizmoType::Translation)
-            {
-                if (closestIntersection >= (std::numeric_limits<float>::max)())
-                    closestIntersection = (std::numeric_limits<float>::min)();
-
-                if (XYAxisBox.Intersects(ray.position, ray.direction, intersection)) {
-                    if (intersection > closestIntersection)
-                    {
-                        selectedAxis = GizmoAxis::XY;
-                        closestIntersection = intersection;
-                        currentIntersection = ray.position + (ray.direction * intersection);
-                    }
-                }
-                if (XZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
-                    if (intersection > closestIntersection)
-                    {
-                        selectedAxis = GizmoAxis::XZ;
-                        closestIntersection = intersection;
-                        currentIntersection = ray.position + (ray.direction * intersection);
-                    }
-                }
-                if (YZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
-                    if (intersection > closestIntersection)
-                    {
-                        selectedAxis = GizmoAxis::YZ;
-                        closestIntersection = intersection;
-                        currentIntersection = ray.position + (ray.direction * intersection);
-                    }
-                }
-            }
-            else if (m_currentGizmoType == GizmoType::Scale)
-            {
-                if (XYZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
-                    if (intersection < closestIntersection)
-                    {
-                        selectedAxis = GizmoAxis::XYZ;
-                        closestIntersection = intersection;
-                        currentIntersection = ray.position + (ray.direction * intersection);
-                    }
-                }
-            }
-        }
-        else if (m_currentGizmoType == GizmoType::Rotation)
-        {
-            Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
-
-            auto currentPointOnPlane = Math::Vector3::Zero;
-            for (int i = 0; i < 3; i++)
-            {
-                auto plane = Math::Plane(planeNormals[i], 0);
-                float intersection;
-
-                if (ray.Intersects(plane, intersection))
-                {
-                    auto positionOnPlane = ray.position + (ray.direction * intersection);
-                    if (positionOnPlane.Length() > (Gizmo::GIZMO_LENGTH + m_gizmoConfig.RingThickness * 1.5f))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        if (intersection < closestIntersection)
-                        {
-                            currentPointOnPlane = positionOnPlane;
-                            closestIntersection = intersection;
-
-                            selectedAxis = (GizmoAxis)(i + 1);
-                        }
-                    }
-                }
-            }
-            if (selectedAxis != GizmoAxis::None)
-            {
-                if (currentPointOnPlane.Length() < (Gizmo::GIZMO_LENGTH - m_gizmoConfig.RingThickness * 1.5f))
-                {
-                    selectedAxis = GizmoAxis::XYZ;
-                }
-            }
-        }
-
-        if (closestIntersection >= (std::numeric_limits<float>::max)() || closestIntersection <= (std::numeric_limits<float>::min)())
-        {
-            selectedAxis = GizmoAxis::None;
-        }
-
-        return selectedAxis;
-    }
-
-    Math::Vector3 GizmoService::ConstrainToAxis(const Math::Vector3& movement, GizmoAxis axis)
-    {
-        Math::Vector3 constrainedMovement = Math::Vector3::Zero;
-    
-        // Extraemos los ejes direccionales normalizados de la rotación actual del gizmo
-        // Asumiendo que m_gizmoObjectOrientedWorld es la matriz de transformación de la herramienta
-        Math::Vector3 right = m_selectionState.m_gizmoObjectOrientedWorld.Right();
-        Math::Vector3 up = m_selectionState.m_gizmoObjectOrientedWorld.Up();
-        Math::Vector3 forward = m_selectionState.m_gizmoObjectOrientedWorld.Forward();
-
-        right.Normalize(); 
-        up.Normalize(); 
-        forward.Normalize();
-
-        switch (axis)
-        {
-        case GizmoAxis::X:
-            // Proyección sobre el vector Right (X)
-            constrainedMovement = right * movement.Dot(right);
-            break;
-        case GizmoAxis::Y:
-            // Proyección sobre el vector Up (Y)
-            constrainedMovement = up * movement.Dot(up);
-            break;
-        case GizmoAxis::Z:
-            // Proyección sobre el vector Forward (Z)
-            constrainedMovement = forward * movement.Dot(forward);
-            break;
-        case GizmoAxis::XY:
-            // Si nos movemos en el plano XY, eliminamos cualquier movimiento en el eje Z (Forward)
-            constrainedMovement = movement - forward * movement.Dot(forward);
-            break;
-        case GizmoAxis::XZ:
-            // Eliminamos el movimiento en el eje Y (Up)
-            constrainedMovement = movement - up * movement.Dot(up);
-            break;
-        case GizmoAxis::YZ:
-            // Eliminamos el movimiento en el eje X (Right)
-            constrainedMovement = movement - right * movement.Dot(right);
-            break;
-        case GizmoAxis::XYZ:
-        default:
-            // Movimiento libre en todos los ejes simultáneamente
-            constrainedMovement = movement;
-            break;
-        }
-
-        return constrainedMovement;
-    }
-
-    Math::Vector3 GizmoService::ApplySnapAndPrecisionMode(Math::Vector3 delta)
-    {
-        /* 1. Modo Precisión (Asumiendo que tienes un InputSystem global o inyectado)
-        // Reduce el movimiento al 10% de su velocidad original
-        if (InputSystem::IsKeyDown(KeyCode::Shift)) 
-        {
-            delta *= 0.1f; 
-        }
-
-        // 2. Modo Snap (Se activa por teclado o por un toggle en la UI del Editor)
-        bool isSnapActive = InputSystem::IsKeyDown(KeyCode::Ctrl) || m_gizmoConfig.TranslationSnapEnabled;
-    
-        if (isSnapActive)
-        {
-            // Obtenemos el tamaño del "salto" de la grilla (ej: 0.5f, 1.0f)
-            float snapStep = m_gizmoConfig.TranslationSnapValue; 
-        
-            if (snapStep > 0.0f) 
-            {
-                // Usamos std::round para llevar el valor al múltiplo más cercano del paso
-                delta.x = std::round(delta.x / snapStep) * snapStep;
-                delta.y = std::round(delta.y / snapStep) * snapStep;
-                delta.z = std::round(delta.z / snapStep) * snapStep;
-            }
-        }*/
-
-        return delta;
-    }
-
-    Math::Ray GizmoService::ConvertMousePositionToRay(const Math::Vector2& mousePosition)
-    {
-        Math::Vector3 nearPoint(mousePosition.x, mousePosition.y, 0.0f);
-        Math::Vector3 farPoint(mousePosition.x, mousePosition.y, 1.0f);
-
-        nearPoint = m_camera.GetViewport().Unproject(nearPoint,
-            m_camera.GetProjection(),
-            m_camera.GetView(),
-            Math::Matrix::Identity);
-
-        farPoint = m_camera.GetViewport().Unproject(farPoint,
-            m_camera.GetProjection(),
-            m_camera.GetView(),
-            Math::Matrix::Identity);
-
-        Math::Vector3 direction = farPoint - nearPoint;
-        direction.Normalize();
-
-        return Math::Ray(nearPoint, direction);
-    }
-
-    bool GizmoService::GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint)
-    {
-        intersectionPoint = Math::Vector3::Zero;
-        if (m_currentGizmoType == GizmoType::None || !m_isActive)
-            return false;
-
-        if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
-        {
-            auto gizmoWorldInverse = m_selectionState.m_rotationMatrix.Transpose();
-
-            auto ray = ConvertMousePositionToRay(mousePosition);
-            ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
-            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
-            ray.direction.Normalize();
-
-            float intersection;
-            if (ray.Intersects(m_selectionState.m_currentGizmoPlane, intersection))
-            {
-                intersectionPoint = ray.position + (ray.direction * intersection);
-                return true;
-            }
-        }
-        else
-        {
-            if (m_currentAxis == GizmoAxis::XYZ)
-            {
-                return true;
-            }
-
-            auto gizmoWorldInverse = m_selectionState.m_gizmoAxisAlignedWorld.Invert();
-
-            auto ray = ConvertMousePositionToRay(mousePosition);
-            ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
-            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
-            ray.direction.Normalize();
-
-            Math::Plane plane = m_selectionState.m_currentGizmoPlane;
-
-            float intersection;
-            if (ray.Intersects(plane, intersection))
-            {
-                intersectionPoint = ray.position + (ray.direction * intersection);
-                intersectionPoint.Normalize();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    float GizmoService::GetCameraDistance() const
-    {
-        if (m_camera.IsOrthographic()) 
-        {
-            // En vista ortográfica, la escala en pantalla no depende de la distancia en Z, 
-            // sino del tamaño del viewport u orthographic size. Este valor fijo (25.0f) 
-            // asume una configuración estática, lo cual es correcto para proyecciones orto.
-            return 25.0f; 
-        }
-
-        // Transformamos la posición del gizmo al View Space de la cámara
-        Math::Vector3 gizmoPositionViewSpace = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, m_camera.GetView());
-    
-        // Extraer el Z absoluto (distancia en profundidad). 
-        // Esto evita que el gizmo se deforme si está en los bordes de la pantalla (fov distortion)
-        float depth = Math::Abs(gizmoPositionViewSpace.z);
-
-        // Retornamos la distancia solo si está frente a la cámara (más allá del Near Plane)
-        return (depth > m_camera.GetNearPlane()) ? depth : 0.0f;
-    }
-
-    void GizmoService::UpdateLocalState()
-    {
-        //if (m_selectionService->GetSelections().empty())
-        {
-            //return;
-        }
-
-        // 1. Calcular Escala de Pantalla (Screen Space Scale)
-        float cameraDistance = GetCameraDistance();
-        m_selectionState.m_screenScaleFactor = (cameraDistance > 0.0f) ? (cameraDistance * Gizmo::GIZMO_SCREEN_SCALE) : 1.0f;
-        m_selectionState.m_screenScaleMatrix = Math::Matrix::CreateScale(m_selectionState.m_screenScaleFactor);
-
-        // 2. Obtener la rotación base del objeto seleccionado (o Identidad si es TransformSpace::World)
-        Math::Matrix baseRotationMatrix = Math::Matrix::Identity;
-    
-        // Si estamos en Local Space, usamos la rotación del objeto.
-        // (A menos que estemos en Rotation y Dragging, donde a veces queremos mantener el marco inicial)
-        if (m_transformSpace == TransformSpace::Local) 
-        {
-            // Solo necesitamos la rotación, nos aseguramos de no traer traslaciones del objeto
-            //baseRotationMatrix = m_selectionService->GetSelectionTransform();
-            baseRotationMatrix.Translation(Math::Vector3::Zero); 
-        }
-
-        // Extraemos y normalizamos los ejes para asegurar una matriz ortonormal pura
-        Math::Vector3 right   = baseRotationMatrix.Right();   right.Normalize();
-        Math::Vector3 up      = baseRotationMatrix.Up();      up.Normalize();
-        Math::Vector3 forward = baseRotationMatrix.Forward(); forward.Normalize();
-
-        // Guardamos la matriz de rotación pura en el estado
-        m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
-        m_selectionState.m_rotationMatrix.Right(right);
-        m_selectionState.m_rotationMatrix.Up(up);
-        m_selectionState.m_rotationMatrix.Forward(forward);
-
-        // 3. Construir la Matriz Orientada al Objeto (OOBB)
-        // Orden de multiplicación DX12: Escala * Rotación * Traslación
-        Math::Matrix gizmoWorld = m_selectionState.m_rotationMatrix * Math::Matrix::CreateTranslation(m_selectionState.m_gizmoPosition);
-        m_selectionState.m_gizmoObjectOrientedWorld = m_selectionState.m_screenScaleMatrix * gizmoWorld;
-
-        // 4. Construir la Matriz Alineada a los Ejes Globales (AABB)
-        // Para World Space, la rotación es la identidad (excepto quizás remapear el Z, dependiendo de tu sistema de coordenadas)
-        Math::Matrix axisAlignedRotation = Math::Matrix::CreateWorld(Math::Vector3::Zero, Math::Vector3::Backward, Math::Vector3::Up);
-        Math::Matrix gizmoAxisAlignedWorld = axisAlignedRotation * Math::Matrix::CreateTranslation(m_selectionState.m_gizmoPosition);
-    
-        // En el modo de escala, las escalas SIEMPRE deben ser locales, los motores AAA no permiten 
-        // escalar en World Space porque se deforma (shear) la malla.
-        if (m_currentGizmoType == GizmoType::Scale)
-        {
-            m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_gizmoObjectOrientedWorld;
-        }
-        else
-        {
-            m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_screenScaleMatrix * gizmoAxisAlignedWorld;
-        }
-    }
-
-    bool GizmoService::BeginDrag(const Math::Vector2& mousePosition)
-    {
-        if (m_currentGizmoType == GizmoType::None || !m_isActive)
-        {
-            return false;
-        }
-        
-        auto selectedAxis = GetAxis(mousePosition);
-
-        m_currentAxis = selectedAxis;
-
-        BR_CORE_TRACE << "selectedAxis = " << (int)selectedAxis << std::endl;
-        if (m_currentAxis == GizmoAxis::None)
-        {
-            return false;
-        }
-        m_selectionState.m_initialGizmoPosition = m_selectionState.m_gizmoPosition;
-        if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
-        {
-            SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
-        }
-        else if (m_currentGizmoType == GizmoType::Rotation)
-        {
-            SetGizmoHandlePlaneForRotation(selectedAxis, mousePosition);
-        }
-
-        Math::Vector3 intersectionPoint;
-        if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
-        {
-            m_selectionState.m_prevMousePosition = mousePosition;
-            m_selectionState.m_prevIntersectionPosition = intersectionPoint;
-        }
-        else
-        {
-            BR_CORE_TRACE << "No intersection point found! plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
-
-            m_selectionState.m_isDragging = false;
-            m_currentAxis = GizmoAxis::None;
-            return false;
-        }
-
-        if (m_currentGizmoType == GizmoType::Rotation)
-        {
-            auto cameraViewInverse = m_camera.GetInverseView();
-            auto forward = cameraViewInverse.Forward();
-            forward.Normalize();
-
-            auto up = cameraViewInverse.Up();
-            up.Normalize();
-
-            auto right = cameraViewInverse.Right();
-            right.Normalize();
-
-            cameraViewInverse = Math::Matrix::Identity;
-            cameraViewInverse.Forward(forward);
-            cameraViewInverse.Up(up);
-            cameraViewInverse.Right(right);
-            m_selectionState.m_cameraViewInverseRotation = Math::Quaternion::CreateFromRotationMatrix(cameraViewInverse);
-            m_selectionState.m_cameraViewInverseRotationConjugate = m_selectionState.m_cameraViewInverseRotation;
-            m_selectionState.m_cameraViewInverseRotationConjugate.Conjugate();
-        }
-
-        m_selectionState.m_isDragging = true;
-        return true;
-    }
-
-    void GizmoService::Drag(const Math::Vector2& mousePosition)
-    {
-        switch (m_currentGizmoType)
-        {
-        case GizmoType::Translation:
-            {
-                Math::Vector3 currentIntersectionPoint;
-                if (GetAxisIntersectionPoint(mousePosition, currentIntersectionPoint))
-                {
-                    // Calculamos el movimiento TOTAL desde que se hizo clic
-                    Math::Vector3 totalMovement = currentIntersectionPoint - m_selectionState.m_prevIntersectionPosition;
-                    totalMovement = ApplySnapAndPrecisionMode(totalMovement);
-    
-                    // Proyectamos el movimiento sobre el eje seleccionado (si no es XYZ)
-                    totalMovement = ConstrainToAxis(totalMovement, m_currentAxis);
-
-                    // La nueva posición es el ancla inicial + movimiento total (Cero pérdida de precisión)
-                    m_selectionState.m_gizmoPosition = m_selectionState.m_initialGizmoPosition + totalMovement;
-
-                    if (m_dragTranslationCallback)
-                    {
-                        // Puedes pasar la posición absoluta, o el delta absoluto si el cliente lo requiere
-                        m_dragTranslationCallback(m_selectionState.m_gizmoPosition); 
-                    }
-                }
-            
-                break;
-            }
-        case GizmoType::Rotation:
-            {
-                /*auto rotationDelta = GetRotationDelta(mousePosition);
-                //TODO: Apply snap and precision mode
-            
-                if(m_dragRotationCallback)
-                    m_dragRotationCallback(rotationDelta);
-*/
-                break;
-            }
-        case GizmoType::Scale:
-            {
-                /*auto scaleDelta = GetDeltaMovement(mousePosition);
-                scaleDelta = ApplySnapAndPrecisionMode(scaleDelta);
-                BR_CORE_TRACE << "scaleDelta: " << scaleDelta << std::endl;
-
-                if (m_dragScaleCallback)
-                    m_dragScaleCallback(scaleDelta, m_currentAxis == GizmoAxis::XYZ);
-*/
-                break;
-            }
-        }
-
-        UpdateLocalState();
-        //BuildGeometry();
-    }
-
-    void GizmoService::EndDrag()
-    {
-        //OnMouseMove(m_selectionState.m_prevMousePosition);
-
-        m_selectionState.m_prevIntersectionPosition = Math::Vector3::Zero;
-        m_selectionState.m_intersectionPosition = Math::Vector3::Zero;
-        m_selectionState.m_prevMousePosition = Math::Vector2::Zero;
-
-        m_selectionState.m_isDragging = false;
-    }
-    
-    void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition)
-    {
-        auto ray = ConvertMousePositionToRay(mousePosition);
-        auto toLocal = m_selectionState.m_rotationMatrix.Transpose();
-
-        ray.position = Math::Vector3::Transform(ray.position, toLocal);
-        ray.direction = Math::Vector3::TransformNormal(ray.direction, toLocal);
-        ray.direction.Normalize();
-
-        SetGizmoHandlePlaneFor(selectedAxis, ray);
-    }
-
-    void GizmoService::SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition)
-    {
-        if (selectedAxis == GizmoAxis::XYZ)
-            return;
-
-        Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
-        if (m_transformSpace == TransformSpace::Local)
-        {
-            /*auto localObjectRotationMatrix = m_selectionService->GetSelectionTransform();
-            auto localForward = localObjectRotationMatrix.Forward();
-            localForward.Normalize();
-
-            auto localUp = localObjectRotationMatrix.Up();
-            localUp.Normalize();
-
-            auto localRight = localObjectRotationMatrix.Right();
-            localRight.Normalize();
-
-            planeNormals[0] = localRight;
-            planeNormals[1] = localUp;
-            planeNormals[2] = localForward;*/
-        }
-        int planeIndex = (int)selectedAxis - 1;
-
-        m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormals[planeIndex], 0);
-    }
-
-    void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray)
-    {
-        auto toLocal = m_selectionState.m_rotationMatrix.Transpose();
-
-        Math::Vector3 gizmoPositionInLocal = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, toLocal);
-        Math::Plane plane;
-        Math::Vector3 planeNormal;
-        float planeD = 0.0f;
-
-        switch (selectedAxis)
-        {
-        case GizmoAxis::XY:
-            planeNormal = Math::Vector3::Backward;
-            planeD = gizmoPositionInLocal.z;
-            break;
-        case GizmoAxis::YZ:
-            planeNormal = Math::Vector3::Left;
-            planeD = gizmoPositionInLocal.x;
-            break;
-        case GizmoAxis::XZ:
-            planeNormal = Math::Vector3::Down;
-            planeD = gizmoPositionInLocal.y;
-            break;
-
-        case GizmoAxis::X:
-        case GizmoAxis::Y:
-        case GizmoAxis::Z:
-        {
-            auto cameraToGizmo = m_selectionState.m_gizmoPosition - m_camera.GetPosition();
-            cameraToGizmo.Normalize();
-            cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, toLocal);
-
-            int axisIndex = (int)selectedAxis - 1;
-
-            Math::Vector3 perpendicularRayVector;
-            m_unaryDirections[axisIndex].Cross(cameraToGizmo, perpendicularRayVector);
-            
-            perpendicularRayVector = m_unaryDirections[axisIndex].Cross(perpendicularRayVector);
-            
-            float newD = -perpendicularRayVector.Dot(gizmoPositionInLocal);
-
-            perpendicularRayVector.Normalize();
-            planeNormal = perpendicularRayVector;
-            planeD = newD;
-        }
-        break;
-
-        case GizmoAxis::XYZ:
-        {
-            auto cameraToGizmo = m_camera.GetPosition() - m_selectionState.m_gizmoPosition;
-            cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, toLocal);
-
-            float zCamera = cameraToGizmo.Length();
-            cameraToGizmo.Normalize();
-
-            planeNormal = cameraToGizmo;
-            planeD = zCamera;
-        }
-        break;
-        }
-
-        m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormal, planeD);
-        BR_CORE_TRACE << "selected plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
-    }
-
     void GizmoService::BuildGeometry(uint32_t frameIndex)
     {
-       
         m_primitiveBatch.Begin();
 
         if (m_currentGizmoType == GizmoType::None || !m_isActive)
@@ -824,8 +102,8 @@ namespace Bruno::DX
         }
 
         Math::Matrix baseMatrix = (m_transformSpace == TransformSpace::Local || m_currentGizmoType == GizmoType::Scale) 
-                                ? m_selectionState.m_gizmoObjectOrientedWorld 
-                                : m_selectionState.m_gizmoAxisAlignedWorld;
+                                      ? m_selectionState.m_gizmoObjectOrientedWorld 
+                                      : m_selectionState.m_gizmoAxisAlignedWorld;
 
         // 1. Extraemos los valores de tu antigua estructura de configuración (RenderConfig/GizmoConfig)
         const float stickHeight   = m_gizmoConfig.StickHeight;
@@ -910,7 +188,7 @@ namespace Bruno::DX
 
                 break;
             }
-            case GizmoType::Scale:
+        case GizmoType::Scale:
             {
                 // 1. Extraemos los valores de configuración (igual que en Translation para mantener simetría)
                 const float stickHeight   = m_gizmoConfig.StickHeight;
@@ -1018,5 +296,855 @@ namespace Bruno::DX
         }
         
         m_primitiveBatch.End(frameIndex);
+    }
+    
+    void GizmoService::DrawTranslationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition)
+    {
+        Math::Vector3 origin = worldTransform.Translation();
+        float scale = CalculateAdaptiveScale(origin, cameraPosition);
+
+        // Dimensiones proporcionales basadas en la escala adaptativa
+        float cylinderLength = 1.8f * scale;
+        float cylinderRadius = 0.03f * scale;
+        float coneHeight     = 0.4f * scale;
+        float coneRadius     = 0.12f * scale;
+        int slices           = 16;
+
+        // --- EJE Y (Apantallado por defecto hacia arriba en sistemas Y-Up) ---
+        // El cilindro base crece desde el origen en +Y de forma natural.
+        Math::Matrix matY = Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawCylinder(matY, cylinderLength, cylinderRadius, slices, m_axisColors[1]);
+        // El cono de la punta se desfasa hasta el final del cilindro
+        Math::Matrix matConeY = Math::Matrix::CreateTranslation(0.0f, cylinderLength, 0.0f) * matY;
+        m_primitiveBatch.DrawCone(matConeY, coneHeight, coneRadius, slices, m_axisColors[1]);
+
+        // --- EJE X (Rotamos 90 grados en Z para acostar el eje Y local sobre el eje X global) ---
+        Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawCylinder(matX, cylinderLength, cylinderRadius, slices, m_axisColors[0]);
+        Math::Matrix matConeX = Math::Matrix::CreateTranslation(cylinderLength, 0.0f, 0.0f) * Math::Matrix::CreateTranslation(origin);
+        // Para el cono de X, rotamos el cono base para que apunte hacia +X
+        Math::Matrix matConeRotX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * matConeX;
+        m_primitiveBatch.DrawCone(matConeRotX, coneHeight, coneRadius, slices, m_axisColors[0]);
+
+        // --- EJE Z (Rotamos 90 grados en X para acostar el eje Y local sobre el eje Z global) ---
+        Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawCylinder(matZ, cylinderLength, cylinderRadius, slices, m_axisColors[2]);
+        Math::Matrix matConeZ = Math::Matrix::CreateTranslation(0.0f, 0.0f, cylinderLength) * Math::Matrix::CreateTranslation(origin);
+        // Rotamos el cono base para que apunte hacia +Z
+        Math::Matrix matConeRotZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * matConeZ;
+        m_primitiveBatch.DrawCone(matConeRotZ, coneHeight, coneRadius, slices, m_axisColors[2]);
+    }
+
+    void GizmoService::DrawRotationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition)
+    {
+        Math::Vector3 origin = worldTransform.Translation();
+        float scale = CalculateAdaptiveScale(origin, cameraPosition);
+
+        float radius = 2.0f * scale;
+        float thickness = 0.04f * scale;
+        int slices = 48; // Más definición para que las curvas se vean suaves
+        int segments = 8;
+
+        // Eje X Anillo (Gira sobre el plano YZ, la matriz rota para orientar el Toroide)
+        Math::Matrix matRotX = Math::Matrix::CreateRotationZ(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawTorus(matRotX, radius, thickness, slices, segments, m_axisColors[0]);
+
+        // Eje Y Anillo (Gira sobre el plano XZ)
+        Math::Matrix matRotY = Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawTorus(matRotY, radius, thickness, slices, segments, m_axisColors[1]);
+
+        // Eje Z Anillo (Gira sobre el plano XY)
+        Math::Matrix matRotZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawTorus(matRotZ, radius, thickness, slices, segments, m_axisColors[2]);
+    }
+
+    void GizmoService::DrawScaleGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition)
+    {
+        Math::Vector3 origin = worldTransform.Translation();
+        float scale = CalculateAdaptiveScale(origin, cameraPosition);
+
+        float cylinderLength = 1.8f * scale;
+        float cylinderRadius = 0.03f * scale;
+        float boxSize        = 0.18f * scale; // En vez de cono, usamos cubos en los extremos
+        int slices           = 16;
+
+        // --- EJE Y ---
+        Math::Matrix matY = Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawCylinder(matY, cylinderLength, cylinderRadius, slices, m_axisColors[1]);
+        Math::Matrix matBoxY = Math::Matrix::CreateTranslation(0.0f, cylinderLength, 0.0f) * matY;
+        m_primitiveBatch.DrawBox(matBoxY, boxSize, m_axisColors[1]);
+
+        // --- EJE X ---
+        Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawCylinder(matX, cylinderLength, cylinderRadius, slices, m_axisColors[0]);
+        Math::Matrix matBoxX = Math::Matrix::CreateTranslation(cylinderLength, 0.0f, 0.0f) * Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawBox(matBoxX, boxSize, m_axisColors[0]);
+
+        // --- EJE Z ---
+        Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawCylinder(matZ, cylinderLength, cylinderRadius, slices, m_axisColors[2]);
+        Math::Matrix matBoxZ = Math::Matrix::CreateTranslation(0.0f, 0.0f, cylinderLength) * Math::Matrix::CreateTranslation(origin);
+        m_primitiveBatch.DrawBox(matBoxZ, boxSize, m_axisColors[2]);
+    }
+
+    void GizmoService::DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color)
+    {
+        m_primitiveBatch.DrawLine(start, end, color);
+    }
+
+    void GizmoService::Render(DX::GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProj)
+    {
+        if (m_primitiveBatch.GetIndexCount() == 0)
+        {
+            return;
+        }
+        // Bind Root Signature y PSO
+        context->SetRootSignature(m_rootSignature.get()->GetNative());
+        context->SetPipelineState(m_psoDepthOff.get()->GetNative()); // Usar DepthOff si quieres que flote sobre todo
+    
+        // Bind Constantes (Root Constants o Constant Buffer temporal)
+        GizmoConstants constants = { viewProj };
+        context->SetGraphicsRoot32BitConstants(0, sizeof(GizmoConstants) / 4, &constants, 0);
+
+        // Bind Buffers
+        context->SetVertexBuffer(m_primitiveBatch.GetVertexBuffer(frameIndex)->GetView());
+        context->SetIndexBuffer(&m_primitiveBatch.GetIndexBuffer(frameIndex)->GetView());
+
+        // DIBUJAR TODO EL BATCH EN 1 SOLO DRAW CALL
+        context->DrawIndexedInstanced(m_primitiveBatch.GetIndexCount(), 1, 0, 0, 0);
+    }
+
+    bool GizmoService::BeginDrag(const Math::Vector2& mousePosition)
+    {
+        if (m_currentGizmoType == GizmoType::None || !m_isActive)
+        {
+            return false;
+        }
+        
+        auto selectedAxis = GetAxis(mousePosition);
+
+        m_currentAxis = selectedAxis;
+
+        BR_CORE_TRACE << "selectedAxis = " << static_cast<int>(selectedAxis) << std::endl;
+        if (m_currentAxis == GizmoAxis::None)
+        {
+            return false;
+        }
+        m_selectionState.m_initialGizmoPosition = m_selectionState.m_gizmoPosition;
+        
+        if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
+        {
+            SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
+        }
+        else if (m_currentGizmoType == GizmoType::Rotation)
+        {
+            SetGizmoHandlePlaneForRotation(selectedAxis, mousePosition);
+        }
+
+        Math::Vector3 intersectionPoint;
+        if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
+        {
+            m_selectionState.m_prevMousePosition = mousePosition;
+            m_selectionState.m_prevIntersectionPosition = intersectionPoint;
+        }
+        else
+        {
+            BR_CORE_TRACE << "No intersection point found! plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
+
+            m_selectionState.m_isDragging = false;
+            m_currentAxis = GizmoAxis::None;
+            return false;
+        }
+
+        if (m_currentGizmoType == GizmoType::Rotation)
+        {
+            auto cameraViewInverse = m_camera.GetInverseView();
+            auto forward = cameraViewInverse.Forward();
+            forward.Normalize();
+
+            auto up = cameraViewInverse.Up();
+            up.Normalize();
+
+            auto right = cameraViewInverse.Right();
+            right.Normalize();
+
+            cameraViewInverse = Math::Matrix::Identity;
+            cameraViewInverse.Forward(forward);
+            cameraViewInverse.Up(up);
+            cameraViewInverse.Right(right);
+            m_selectionState.m_cameraViewInverseRotation = Math::Quaternion::CreateFromRotationMatrix(cameraViewInverse);
+            m_selectionState.m_cameraViewInverseRotationConjugate = m_selectionState.m_cameraViewInverseRotation;
+            m_selectionState.m_cameraViewInverseRotationConjugate.Conjugate();
+        }
+
+        m_selectionState.m_isDragging = true;
+        return true;
+    }
+
+    void GizmoService::Drag(const Math::Vector2& mousePosition)
+    {
+        switch (m_currentGizmoType)
+        {
+        case GizmoType::Translation:
+            {
+                Math::Vector3 currentIntersectionPoint;
+                if (GetAxisIntersectionPoint(mousePosition, currentIntersectionPoint))
+                {
+                    // 1. Movimiento total en ESPACIO LOCAL
+                    Math::Vector3 totalMovement = currentIntersectionPoint - m_selectionState.m_prevIntersectionPosition;
+                    totalMovement = ApplySnapAndPrecisionMode(totalMovement);
+
+                    // 2. Restringimos al eje seleccionado (Sigue estando en Espacio Local, lo cual es perfecto 
+                    // porque ConstrainToAxis solo anula componentes, ej: Vector3(0, 0, Z))
+                    totalMovement = ConstrainToAxis(totalMovement, m_currentAxis);
+
+                    // 3. TRANSFORMACIÓN CRÍTICA: Convertir el vector direccional Local a Mundo.
+                    // TransformNormal aplica solo la rotación (m_rotationMatrix), ignorando la traslación.
+                    Math::Vector3 worldMovement = Math::Vector3::TransformNormal(totalMovement, m_selectionState.m_rotationMatrix);
+
+                    // 4. La nueva posición: Mundo + Mundo
+                    m_selectionState.m_gizmoPosition = m_selectionState.m_initialGizmoPosition + worldMovement;
+
+                    if (m_dragTranslationCallback)
+                    {
+                        m_dragTranslationCallback(m_selectionState.m_gizmoPosition); 
+                    }
+                }
+            
+                break;
+            }
+        case GizmoType::Rotation:
+            {
+                Math::Quaternion rotationDelta = GetRotationDelta(mousePosition);
+    
+                // Evitamos disparar callbacks y ensuciar (Dirty Flag) la UI 
+                // si el delta de rotación es identidad (no se movió el ratón)
+                if (rotationDelta != Math::Quaternion::Identity)
+                {
+                    // TODO: Apply snap (ej: redondear a 15 grados si se presiona CTRL)
+        
+                    if(m_dragRotationCallback)
+                    {
+                        m_dragRotationCallback(rotationDelta);
+                    }
+                }
+                break;
+            }
+        case GizmoType::Scale:
+            {
+                /*auto scaleDelta = GetDeltaMovement(mousePosition);
+                scaleDelta = ApplySnapAndPrecisionMode(scaleDelta);
+                BR_CORE_TRACE << "scaleDelta: " << scaleDelta << std::endl;
+
+                if (m_dragScaleCallback)
+                    m_dragScaleCallback(scaleDelta, m_currentAxis == GizmoAxis::XYZ);
+*/
+                break;
+            }
+        }
+
+        UpdateLocalState();
+    }
+
+    void GizmoService::EndDrag()
+    {
+        //OnMouseMove(m_selectionState.m_prevMousePosition);
+
+        m_selectionState.m_prevIntersectionPosition = Math::Vector3::Zero;
+        m_selectionState.m_intersectionPosition = Math::Vector3::Zero;
+        m_selectionState.m_prevMousePosition = Math::Vector2::Zero;
+
+        m_selectionState.m_isDragging = false;
+    }
+
+    void GizmoService::SetTransformSpace(TransformSpace space)
+    {
+        m_transformSpace = space;
+        UpdateLocalState();
+    }
+
+    void GizmoService::SetGizmoPosition(const Math::Vector3& position)
+    {
+        m_selectionState.m_gizmoPosition = position;
+        UpdateLocalState();
+    }
+
+    void GizmoService::SetGizmoWorldMatrix(const Math::Matrix& worldTransform)
+    {
+        m_selectionState.m_gizmoWorldMatrix = worldTransform;
+        UpdateLocalState();
+    }
+
+    float GizmoService::CalculateAdaptiveScale(const Math::Vector3& position, const Math::Vector3& cameraPosition) const
+    {
+        float distance = Math::Vector3::Distance(position, cameraPosition);
+        // Multiplicamos por un factor constante para ajustar el tamaño relativo en el viewport (ej: 0.1)
+        float scaleFactor = distance * 0.1f;
+    
+        // Evitamos escalas absurdas o negativas si la cámara se posiciona exactamente sobre el objeto
+        return std::max<float>(scaleFactor, 0.001f);
+    }
+
+    GizmoService::GizmoAxis GizmoService::GetAxis(const Math::Vector2& mousePosition)
+    {
+        float closestIntersection = (std::numeric_limits<float>::max)();
+        Math::Vector3 currentIntersection;
+        auto selectedAxis = GizmoAxis::None;
+
+        // USAMOS SIEMPRE LA MATRIZ ORIENTADA PARA ROTACIÓN
+        Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoObjectOrientedWorld.Invert();
+        Math::Ray ray = ConvertMousePositionToRay(mousePosition);
+        ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+        ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
+        ray.direction.Normalize();
+
+        if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
+        {
+            float intersection = -1.0f;
+
+            if (XAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                if (intersection < closestIntersection)
+                {
+                    selectedAxis = GizmoAxis::X;
+                    closestIntersection = intersection;
+                    currentIntersection = ray.position + (ray.direction * intersection);
+                }
+            }
+            if (YAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                if (intersection < closestIntersection)
+                {
+                    selectedAxis = GizmoAxis::Y;
+                    closestIntersection = intersection;
+                    currentIntersection = ray.position + (ray.direction * intersection);
+                }
+            }
+            if (ZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                if (intersection < closestIntersection)
+                {
+                    selectedAxis = GizmoAxis::Z;
+                    closestIntersection = intersection;
+                    currentIntersection = ray.position + (ray.direction * intersection);
+                }
+            }
+            if (m_currentGizmoType == GizmoType::Translation)
+            {
+                if (closestIntersection >= (std::numeric_limits<float>::max)())
+                    closestIntersection = (std::numeric_limits<float>::min)();
+
+                if (XYAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                    if (intersection > closestIntersection)
+                    {
+                        selectedAxis = GizmoAxis::XY;
+                        closestIntersection = intersection;
+                        currentIntersection = ray.position + (ray.direction * intersection);
+                    }
+                }
+                if (XZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                    if (intersection > closestIntersection)
+                    {
+                        selectedAxis = GizmoAxis::XZ;
+                        closestIntersection = intersection;
+                        currentIntersection = ray.position + (ray.direction * intersection);
+                    }
+                }
+                if (YZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                    if (intersection > closestIntersection)
+                    {
+                        selectedAxis = GizmoAxis::YZ;
+                        closestIntersection = intersection;
+                        currentIntersection = ray.position + (ray.direction * intersection);
+                    }
+                }
+            }
+            else if (m_currentGizmoType == GizmoType::Scale)
+            {
+                if (XYZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                    if (intersection < closestIntersection)
+                    {
+                        selectedAxis = GizmoAxis::XYZ;
+                        closestIntersection = intersection;
+                        currentIntersection = ray.position + (ray.direction * intersection);
+                    }
+                }
+            }
+        }
+        else if (m_currentGizmoType == GizmoType::Rotation)
+        {
+            float innerRadius = Gizmo::GIZMO_LENGTH - m_gizmoConfig.RingThickness * 1.5f;
+            float outerRadius = Gizmo::GIZMO_LENGTH + m_gizmoConfig.RingThickness * 1.5f;
+            
+            Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
+
+            auto currentPointOnPlane = Math::Vector3::Zero;
+            for (int i = 0; i < 3; i++)
+            {
+                auto plane = Math::Plane(planeNormals[i], 0.0f);
+                float intersection;
+
+                if (ray.Intersects(plane, intersection))
+                {
+                    auto positionOnPlane = ray.position + (ray.direction * intersection);
+                    float len = positionOnPlane.Length();
+                    // SOLO elegimos el eje si el clic cayó estrictamente SOBRE el grosor del anillo
+                    if (len >= innerRadius && len <= outerRadius)
+                    {
+                        if (intersection < closestIntersection)
+                        {
+                            currentPointOnPlane = positionOnPlane;
+                            closestIntersection = intersection;
+                            selectedAxis = static_cast<GizmoAxis>(i + 1); // 1=X, 2=Y, 3=Z
+                        }
+                    }
+                }
+            }
+            
+            if (selectedAxis == GizmoAxis::None)
+            {
+                Math::BoundingSphere trackballSphere(Math::Vector3::Zero, innerRadius);
+                float sphereDist;
+                if (trackballSphere.Intersects(ray.position, ray.direction, sphereDist))
+                {
+                    //closestIntersection = 0.0f;
+                    //selectedAxis = GizmoAxis::XYZ;
+                }
+            }
+        }
+
+        if (closestIntersection == (std::numeric_limits<float>::max)() || closestIntersection == (std::numeric_limits<float>::min)())
+        {
+            selectedAxis = GizmoAxis::None;
+        }
+
+        return selectedAxis;
+    }
+
+    Math::Vector3 GizmoService::ConstrainToAxis(const Math::Vector3& movement, GizmoAxis axis)
+    {
+        Math::Vector3 constrainedMovement = Math::Vector3::Zero;
+
+        // ¡La magia del Espacio Local! 
+        // Como 'movement' ya está en espacio local, los ejes siempre están alineados 
+        // perfectamente con X, Y y Z. Solo copiamos las componentes deseadas.
+
+        switch (axis)
+        {
+        case GizmoAxis::X:
+            constrainedMovement.x = movement.x;
+            break;
+        case GizmoAxis::Y:
+            constrainedMovement.y = movement.y;
+            break;
+        case GizmoAxis::Z:
+            constrainedMovement.z = movement.z;
+            break;
+        case GizmoAxis::XY:
+            constrainedMovement.x = movement.x;
+            constrainedMovement.y = movement.y;
+            break;
+        case GizmoAxis::XZ:
+            constrainedMovement.x = movement.x;
+            constrainedMovement.z = movement.z;
+            break;
+        case GizmoAxis::YZ:
+            constrainedMovement.y = movement.y;
+            constrainedMovement.z = movement.z;
+            break;
+        case GizmoAxis::XYZ:
+        default:
+            // Movimiento libre
+            constrainedMovement = movement;
+            break;
+        }
+
+        return constrainedMovement;
+    }
+
+    Math::Vector3 GizmoService::ApplySnapAndPrecisionMode(Math::Vector3 delta)
+    {
+        /* 1. Modo Precisión (Asumiendo que tienes un InputSystem global o inyectado)
+        // Reduce el movimiento al 10% de su velocidad original
+        if (InputSystem::IsKeyDown(KeyCode::Shift)) 
+        {
+            delta *= 0.1f; 
+        }
+
+        // 2. Modo Snap (Se activa por teclado o por un toggle en la UI del Editor)
+        bool isSnapActive = InputSystem::IsKeyDown(KeyCode::Ctrl) || m_gizmoConfig.TranslationSnapEnabled;
+    
+        if (isSnapActive)
+        {
+            // Obtenemos el tamaño del "salto" de la grilla (ej: 0.5f, 1.0f)
+            float snapStep = m_gizmoConfig.TranslationSnapValue; 
+        
+            if (snapStep > 0.0f) 
+            {
+                // Usamos std::round para llevar el valor al múltiplo más cercano del paso
+                delta.x = std::round(delta.x / snapStep) * snapStep;
+                delta.y = std::round(delta.y / snapStep) * snapStep;
+                delta.z = std::round(delta.z / snapStep) * snapStep;
+            }
+        }*/
+
+        return delta;
+    }
+
+    Math::Ray GizmoService::ConvertMousePositionToRay(const Math::Vector2& mousePosition)
+    {
+        Math::Vector3 nearPoint(mousePosition.x, mousePosition.y, 0.0f);
+        Math::Vector3 farPoint(mousePosition.x, mousePosition.y, 1.0f);
+
+        nearPoint = m_camera.GetViewport().Unproject(nearPoint,
+                                                     m_camera.GetProjection(),
+                                                     m_camera.GetView(),
+                                                     Math::Matrix::Identity);
+
+        farPoint = m_camera.GetViewport().Unproject(farPoint,
+                                                    m_camera.GetProjection(),
+                                                    m_camera.GetView(),
+                                                    Math::Matrix::Identity);
+
+        Math::Vector3 direction = farPoint - nearPoint;
+        direction.Normalize();
+
+        return Math::Ray(nearPoint, direction);
+    }
+
+    bool GizmoService::GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint)
+    {
+        intersectionPoint = Math::Vector3::Zero;
+        if (m_currentGizmoType == GizmoType::None || !m_isActive)
+        {
+            return false;
+        }
+
+        if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
+        {
+            auto gizmoWorldInverse = m_selectionState.m_rotationMatrix.Transpose();
+
+            auto ray = ConvertMousePositionToRay(mousePosition);
+            ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
+            ray.direction.Normalize();
+
+            float intersection;
+            if (ray.Intersects(m_selectionState.m_currentGizmoPlane, intersection))
+            {
+                intersectionPoint = ray.position + (ray.direction * intersection);
+                return true;
+            }
+        }
+        else
+        {
+            if (m_currentAxis == GizmoAxis::XYZ)
+            {
+                return true;
+            }
+
+            auto gizmoWorldInverse = m_selectionState.m_gizmoObjectOrientedWorld.Invert();
+
+            auto ray = ConvertMousePositionToRay(mousePosition);
+            ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
+            ray.direction.Normalize();
+
+            Math::Plane plane = m_selectionState.m_currentGizmoPlane;
+
+            float intersection;
+            if (ray.Intersects(plane, intersection))
+            {
+                intersectionPoint = ray.position + (ray.direction * intersection);
+                intersectionPoint.Normalize();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    Math::Quaternion GizmoService::GetRotationDelta(const Math::Vector2& mousePosition)
+    {
+        Math::Quaternion rotationDelta = Math::Quaternion::Identity;
+
+        if (m_currentAxis == GizmoAxis::XYZ)
+        {
+            // ==========================================
+            // ROTACIÓN LIBRE (Trackball)
+            // ==========================================
+            auto gizmoScreenPosition = GetScreenPosition(m_selectionState.m_gizmoPosition);
+            // Usamos una longitud de referencia (ej. StickHeight)
+            auto gizmoScreenPosition2 = GetScreenPosition(m_selectionState.m_gizmoPosition + m_camera.GetView().Right() * m_gizmoConfig.StickHeight);
+        
+            float length = 4.0f * (gizmoScreenPosition2 - gizmoScreenPosition).Length() / DirectX::XM_PI;
+        
+            // Prevención de división por cero si la cámara está demasiado lejos o el gizmo es muy pequeño
+            if (length < 0.0001f) return rotationDelta;
+
+            Math::Vector2 deltaAngles(1.0f / length);
+            Math::Vector2 mouseVelocity(mousePosition.x - m_selectionState.m_prevMousePosition.x, mousePosition.y - m_selectionState.m_prevMousePosition.y);
+
+            auto angles = mouseVelocity * deltaAngles;
+
+            auto localRotationDelta = Math::Quaternion::CreateFromYawPitchRoll(angles.x, 0.0f, 0.0f) * Math::Quaternion::CreateFromYawPitchRoll(0.0f, angles.y, 0.0f);
+                                  
+            rotationDelta = m_selectionState.m_cameraViewInverseRotationConjugate * localRotationDelta * m_selectionState.m_cameraViewInverseRotation;
+        }
+        else
+        {
+            // ==========================================
+            // ROTACIÓN RESTRINGIDA POR EJE (X, Y o Z)
+            // ==========================================
+            Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoObjectOrientedWorld.Invert();
+            
+            auto ray = ConvertMousePositionToRay(mousePosition);
+        
+            // Transformamos el rayo al espacio local del Gizmo
+            ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
+            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
+            ray.direction.Normalize();
+
+            Math::Plane plane = m_selectionState.m_currentGizmoPlane;
+            Math::Vector3 localPlaneNormal = plane.Normal(); // Este eje es LOCAL (ej. 1,0,0)
+
+            float intersectionDist;
+            if (ray.Intersects(plane, intersectionDist))
+            {
+                Math::Vector3 positionOnPlane = ray.position + (ray.direction * intersectionDist);
+
+                if (positionOnPlane.LengthSquared() > 0.000001f)
+                {
+                    Math::Vector3 newIntersectionPoint = positionOnPlane;
+                    newIntersectionPoint.Normalize();
+                
+                    m_selectionState.m_intersectionPosition = newIntersectionPoint;
+
+                    float dotP = newIntersectionPoint.Dot(m_selectionState.m_prevIntersectionPosition);
+                    float angle = std::acos(Math::Clamp(dotP, -1.0f, 1.0f));
+
+                    if (std::abs(angle) > 0.0001f)
+                    {
+                        Math::Vector3 perpendicularVector = m_selectionState.m_prevIntersectionPosition.Cross(newIntersectionPoint);
+                    
+                        if (perpendicularVector.LengthSquared() > 0.000001f)
+                        {
+                            perpendicularVector.Normalize();
+                        
+                            float sign = (perpendicularVector.Dot(localPlaneNormal) < 0.0f) ? -1.0f : 1.0f;
+                            float deltaAngle = sign * angle;
+
+                            // ¡LA TRANSFORMACIÓN CRÍTICA!
+                            // Rotamos el eje local de vuelta al Mundo para que el Cuaternión resultante
+                            // sea una rotación global (Igual que el Trackball).
+                            Math::Vector3 worldAxis = Math::Vector3::TransformNormal(localPlaneNormal, m_selectionState.m_gizmoObjectOrientedWorld);
+                            worldAxis.Normalize();
+
+                            rotationDelta = Math::Quaternion::CreateFromAxisAngle(worldAxis, deltaAngle);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Actualizamos el estado para el frame siguiente
+        m_selectionState.m_prevMousePosition = mousePosition;
+        m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
+    
+        return rotationDelta;
+    }
+
+    float GizmoService::GetCameraDistance() const
+    {
+        if (m_camera.IsOrthographic()) 
+        {
+            // En vista ortográfica, la escala en pantalla no depende de la distancia en Z, 
+            // sino del tamaño del viewport u orthographic size. Este valor fijo (25.0f) 
+            // asume una configuración estática, lo cual es correcto para proyecciones orto.
+            return 25.0f; 
+        }
+
+        // Transformamos la posición del gizmo al View Space de la cámara
+        Math::Vector3 gizmoPositionViewSpace = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, m_camera.GetView());
+    
+        // Extraer el Z absoluto (distancia en profundidad). 
+        // Esto evita que el gizmo se deforme si está en los bordes de la pantalla (fov distortion)
+        float depth = Math::Abs(gizmoPositionViewSpace.z);
+
+        // Retornamos la distancia solo si está frente a la cámara (más allá del Near Plane)
+        return (depth > m_camera.GetNearPlane()) ? depth : 0.0f;
+    }
+
+    void GizmoService::UpdateLocalState()
+    {
+        // 1. Calcular Escala de Pantalla (Screen Space Scale)
+        float cameraDistance = GetCameraDistance();
+        m_selectionState.m_screenScaleFactor = (cameraDistance > 0.0f) ? (cameraDistance * Gizmo::GIZMO_SCREEN_SCALE) : 1.0f;
+        m_selectionState.m_screenScaleMatrix = Math::Matrix::CreateScale(m_selectionState.m_screenScaleFactor);
+
+        // 2. Obtener la rotación base del objeto seleccionado (o Identidad si es TransformSpace::World)
+        Math::Matrix baseRotationMatrix = Math::Matrix::Identity;
+    
+        // Si estamos en Local Space, usamos la rotación del objeto.
+        // (A menos que estemos en Rotation y Dragging, donde a veces queremos mantener el marco inicial)
+        if (m_transformSpace == TransformSpace::Local) 
+        {
+            // Solo necesitamos la rotación, nos aseguramos de no traer traslaciones del objeto
+            baseRotationMatrix = m_selectionState.m_gizmoWorldMatrix;
+            baseRotationMatrix.Translation(Math::Vector3::Zero); 
+        }
+
+        // Extraemos y normalizamos los ejes para asegurar una matriz ortonormal pura
+        Math::Vector3 right   = baseRotationMatrix.Right();   right.Normalize();
+        Math::Vector3 up      = baseRotationMatrix.Up();      up.Normalize();
+        Math::Vector3 forward = baseRotationMatrix.Forward(); forward.Normalize();
+
+        // Guardamos la matriz de rotación pura en el estado
+        m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
+        m_selectionState.m_rotationMatrix.Right(right);
+        m_selectionState.m_rotationMatrix.Up(up);
+        m_selectionState.m_rotationMatrix.Forward(forward);
+
+        // 3. Construir la Matriz Orientada al Objeto (OOBB)
+        // Orden de multiplicación DX12: Escala * Rotación * Traslación
+        Math::Matrix gizmoWorld = m_selectionState.m_rotationMatrix * Math::Matrix::CreateTranslation(m_selectionState.m_gizmoPosition);
+        m_selectionState.m_gizmoObjectOrientedWorld = m_selectionState.m_screenScaleMatrix * gizmoWorld;
+
+        // 4. Construir la Matriz Alineada a los Ejes Globales (AABB)
+        // Para World Space, la rotación es la identidad (excepto quizás remapear el Z, dependiendo de tu sistema de coordenadas)
+        Math::Matrix axisAlignedRotation = Math::Matrix::CreateWorld(Math::Vector3::Zero, Math::Vector3::Backward, Math::Vector3::Up);
+        Math::Matrix gizmoAxisAlignedWorld = axisAlignedRotation * Math::Matrix::CreateTranslation(m_selectionState.m_gizmoPosition);
+    
+        // En el modo de escala, las escalas SIEMPRE deben ser locales, los motores AAA no permiten 
+        // escalar en World Space porque se deforma (shear) la malla.
+        if (m_currentGizmoType == GizmoType::Scale)
+        {
+            m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_gizmoObjectOrientedWorld;
+        }
+        else
+        {
+            m_selectionState.m_gizmoAxisAlignedWorld = m_selectionState.m_screenScaleMatrix * gizmoAxisAlignedWorld;
+        }
+    }
+
+    Math::Vector2 GizmoService::GetScreenPosition(const Math::Vector3& worldPosition)
+    {
+        auto point = m_camera.GetViewport().Project(worldPosition,
+                                                    m_camera.GetProjection(),
+                                                    m_camera.GetView(),
+                                                    Math::Matrix::Identity);
+
+        return Math::Vector2(point.x, point.y);
+    }
+
+    void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition)
+    {
+        auto ray = ConvertMousePositionToRay(mousePosition);
+        auto toLocal = m_selectionState.m_rotationMatrix.Transpose();
+
+        ray.position = Math::Vector3::Transform(ray.position, toLocal);
+        ray.direction = Math::Vector3::TransformNormal(ray.direction, toLocal);
+        ray.direction.Normalize();
+
+        SetGizmoHandlePlaneFor(selectedAxis, ray);
+    }
+
+    void GizmoService::SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition)
+    {
+        if (selectedAxis == GizmoAxis::XYZ)
+        {
+            return;
+        }
+
+        // Al transformar el rayo al espacio del Gizmo en GetRotationDelta, 
+        // las normales SIEMPRE son los ejes puros locales.
+        Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
+        int planeIndex = static_cast<int>(selectedAxis) - 1;
+    
+        // Distancia 0, porque el Gizmo está en el (0,0,0) del espacio local
+        m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormals[planeIndex], 0.0f);
+         
+        /*Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
+        if (m_transformSpace == TransformSpace::Local)
+        {
+            auto localObjectRotationMatrix = m_selectionState.m_gizmoWorldMatrix;
+            auto localForward = localObjectRotationMatrix.Forward();
+            localForward.Normalize();
+
+            auto localUp = localObjectRotationMatrix.Up();
+            localUp.Normalize();
+
+            auto localRight = localObjectRotationMatrix.Right();
+            localRight.Normalize();
+
+            planeNormals[0] = localRight;
+            planeNormals[1] = localUp;
+            planeNormals[2] = localForward;
+        }
+        int planeIndex = static_cast<int>(selectedAxis) - 1;
+
+        m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormals[planeIndex], 0);*/
+    }
+
+    void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray)
+    {
+        auto toLocal = m_selectionState.m_rotationMatrix.Transpose();
+
+        Math::Vector3 gizmoPositionInLocal = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, toLocal);
+        Math::Plane plane;
+        Math::Vector3 planeNormal;
+        float planeD = 0.0f;
+
+        switch (selectedAxis)
+        {
+        case GizmoAxis::XY:
+            planeNormal = Math::Vector3::Backward;
+            planeD = gizmoPositionInLocal.z;
+            break;
+        case GizmoAxis::YZ:
+            planeNormal = Math::Vector3::Left;
+            planeD = gizmoPositionInLocal.x;
+            break;
+        case GizmoAxis::XZ:
+            planeNormal = Math::Vector3::Down;
+            planeD = gizmoPositionInLocal.y;
+            break;
+
+        case GizmoAxis::X:
+        case GizmoAxis::Y:
+        case GizmoAxis::Z:
+            {
+                auto cameraToGizmo = m_selectionState.m_gizmoPosition - m_camera.GetPosition();
+                cameraToGizmo.Normalize();
+                cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, toLocal);
+
+                int axisIndex = static_cast<int>(selectedAxis) - 1;
+
+                Math::Vector3 perpendicularRayVector;
+                m_unaryDirections[axisIndex].Cross(cameraToGizmo, perpendicularRayVector);
+            
+                perpendicularRayVector = m_unaryDirections[axisIndex].Cross(perpendicularRayVector);
+            
+                float newD = -perpendicularRayVector.Dot(gizmoPositionInLocal);
+
+                perpendicularRayVector.Normalize();
+                planeNormal = perpendicularRayVector;
+                planeD = newD;
+            }
+            break;
+
+        case GizmoAxis::XYZ:
+            {
+                auto cameraToGizmo = m_camera.GetPosition() - m_selectionState.m_gizmoPosition;
+                cameraToGizmo = Math::Vector3::TransformNormal(cameraToGizmo, toLocal);
+
+                float zCamera = cameraToGizmo.Length();
+                cameraToGizmo.Normalize();
+
+                planeNormal = cameraToGizmo;
+                planeD = zCamera;
+            }
+            break;
+        }
+
+        m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormal, planeD);
+        BR_CORE_TRACE << "selected plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
     }
 }

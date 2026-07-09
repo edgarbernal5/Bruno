@@ -97,17 +97,19 @@ namespace Bruno::DX
 
         bool IsDragging() const { return m_selectionState.m_isDragging; }
         void SetGizmoType(GizmoType type){ m_currentGizmoType = type; }
-        void SetTransformSpace(TransformSpace space){ m_transformSpace = space; }
+        void SetTransformSpace(TransformSpace space);
 		void SetActive(bool isActive){ m_isActive = isActive; }
         
-        void SetGizmoPosition(const Math::Vector3& position) { m_selectionState.m_gizmoPosition = position; }
+        void SetGizmoPosition(const Math::Vector3& position);
+        void SetGizmoWorldMatrix(const Math::Matrix& worldTransform);
         
     private:
         struct SelectionState
         {
             Math::Vector3 m_gizmoPosition;
             Math::Vector3 m_initialGizmoPosition;
-
+            Math::Matrix m_gizmoWorldMatrix;
+            
             float m_screenScaleFactor;
             Math::Matrix m_screenScaleMatrix;
 
@@ -125,7 +127,6 @@ namespace Bruno::DX
             bool m_isDragging;
         };
         
-        
         // Calcula un factor de escala uniforme para mantener el gizmo legible según la distancia
         float CalculateAdaptiveScale(const Math::Vector3& position, const Math::Vector3& cameraPosition) const;
         GizmoAxis GetAxis(const Math::Vector2& mousePosition);
@@ -133,13 +134,14 @@ namespace Bruno::DX
         Math::Vector3 ApplySnapAndPrecisionMode(Math::Vector3 delta);
         Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
         bool GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
+        Math::Quaternion GetRotationDelta(const Math::Vector2& mousePosition);
         float GetCameraDistance() const;
         void UpdateLocalState();
-        
+        Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);
         void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
-    void SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
+        void SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 
-    void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
+        void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
         
         const Math::BoundingBox XAxisBox{
             DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f, 0.0f, 0.0f),
@@ -181,9 +183,6 @@ namespace Bruno::DX
         Math::Color m_activeAxisColors[3];
         Math::Color m_axisColors[3]{ Math::Color(1.0f,0.0f,0.0f,1.0f),Math::Color(0.0f,1.0f,0.0f,1.0f), Math::Color(0.0f,0.0f,1.0f,1.0f) };
         Math::Color m_axisSelectionColor = Math::Color(0.5f, 0.5f, 0.25f, 1);
-        Math::Matrix RotMatrixX;
-        Math::Matrix RotMatrixY;
-        Math::Matrix RotMatrixZ;
         
         GraphicsDevice* m_device;
         Camera& m_camera;

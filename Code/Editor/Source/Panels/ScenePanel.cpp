@@ -116,7 +116,7 @@ namespace Bruno
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
 			uint32_t frameIndex = m_dxSurface->GetCurrentBackBufferIndex();
 
-			BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
+			//BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
 			
 			// 2. Pedirle a nuestra cola el "lápiz" (CommandList). 
 			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.

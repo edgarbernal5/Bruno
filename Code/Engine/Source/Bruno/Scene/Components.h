@@ -64,7 +64,6 @@ namespace Bruno
 	
 	struct CBVComponent 
 	{
-		// El arreglo de 2 buffers que ya tenías, ahora vive como un componente
 		std::shared_ptr<DX::ConstantBuffer> TransformCB[2]; 
 	};
 	
