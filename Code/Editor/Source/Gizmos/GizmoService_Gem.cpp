@@ -435,26 +435,18 @@ namespace Bruno::DX
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
         {
             SetGizmoHandlePlaneFor(selectedAxis, mousePosition);
+            
+            // Solo para traslación necesitamos el punto de intersección inicial real en 3D
+            Math::Vector3 intersectionPoint;
+            if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
+                m_selectionState.m_prevIntersectionPosition = intersectionPoint;
         }
         else if (m_currentGizmoType == GizmoType::Rotation)
         {
             SetGizmoHandlePlaneForRotation(selectedAxis, mousePosition);
         }
 
-        Math::Vector3 intersectionPoint;
-        if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
-        {
-            m_selectionState.m_prevMousePosition = mousePosition;
-            m_selectionState.m_prevIntersectionPosition = intersectionPoint;
-        }
-        else
-        {
-            BR_CORE_TRACE << "No intersection point found! plane: " << m_selectionState.m_currentGizmoPlane << std::endl;
-
-            m_selectionState.m_isDragging = false;
-            m_currentAxis = GizmoAxis::None;
-            return false;
-        }
+        m_selectionState.m_prevMousePosition = mousePosition;
 
         if (m_currentGizmoType == GizmoType::Rotation)
         {
@@ -532,13 +524,14 @@ namespace Bruno::DX
             }
         case GizmoType::Scale:
             {
-                /*auto scaleDelta = GetDeltaMovement(mousePosition);
+                auto scaleDelta = GetDeltaMovement(mousePosition);
                 scaleDelta = ApplySnapAndPrecisionMode(scaleDelta);
                 BR_CORE_TRACE << "scaleDelta: " << scaleDelta << std::endl;
 
                 if (m_dragScaleCallback)
+                {
                     m_dragScaleCallback(scaleDelta, m_currentAxis == GizmoAxis::XYZ);
-*/
+                }
                 break;
             }
         }
@@ -670,41 +663,86 @@ namespace Bruno::DX
         }
         else if (m_currentGizmoType == GizmoType::Rotation)
         {
-            float innerRadius = Gizmo::GIZMO_LENGTH - m_gizmoConfig.RingThickness * 1.5f;
             float outerRadius = Gizmo::GIZMO_LENGTH + m_gizmoConfig.RingThickness * 1.5f;
-            
-            Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
+            float innerRadius = Gizmo::GIZMO_LENGTH - m_gizmoConfig.RingThickness * 1.5f;
+            float halfThickness = m_gizmoConfig.RingThickness * 1.5f;
 
-            auto currentPointOnPlane = Math::Vector3::Zero;
-            for (int i = 0; i < 3; i++)
+            // Precalcular la ecuación cuadrática de la esfera común (A=1 porque el rayo está normalizado)
+            float B = 2.0f * ray.position.Dot(ray.direction);
+            float C = ray.position.LengthSquared();
+
+            auto IntersectSphere = [](float R, float b, float c, float& t0, float& t1) {
+                float discriminant = b * b - 4.0f * (c - R * R);
+                if (discriminant < 0.0f) return false;
+                float sq = std::sqrt(discriminant);
+                t0 = (-b - sq) * 0.5f;
+                t1 = (-b + sq) * 0.5f;
+                return true;
+            };
+
+            float tOut0, tOut1, tIn0, tIn1;
+            bool hitOuter = IntersectSphere(outerRadius, B, C, tOut0, tOut1);
+            bool hitInner = IntersectSphere(innerRadius, B, C, tIn0, tIn1);
+
+            // Si el rayo ni siquiera toca la esfera exterior que envuelve al gizmo, ignoramos los anillos
+            if (hitOuter)
             {
-                auto plane = Math::Plane(planeNormals[i], 0.0f);
-                float intersection;
+                Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
 
-                if (ray.Intersects(plane, intersection))
+                for (int i = 0; i < 3; i++)
                 {
-                    auto positionOnPlane = ray.position + (ray.direction * intersection);
-                    float len = positionOnPlane.Length();
-                    // SOLO elegimos el eje si el clic cayó estrictamente SOBRE el grosor del anillo
-                    if (len >= innerRadius && len <= outerRadius)
+                    Math::Vector3 N = planeNormals[i];
+                    float dotDN = ray.direction.Dot(N);
+                    float dotON = ray.position.Dot(N);
+
+                    float tSlab0 = -1e30f;
+                    float tSlab1 = 1e30f;
+
+                    if (std::abs(dotDN) < 0.00001f) // Edge-on absoluto
                     {
-                        if (intersection < closestIntersection)
-                        {
-                            currentPointOnPlane = positionOnPlane;
-                            closestIntersection = intersection;
-                            selectedAxis = static_cast<GizmoAxis>(i + 1); // 1=X, 2=Y, 3=Z
+                        if (std::abs(dotON) > halfThickness) continue; // Pasa por fuera del grosor de este anillo
+                    }
+                    else 
+                    {
+                        float t1 = (-halfThickness - dotON) / dotDN;
+                        float t2 = ( halfThickness - dotON) / dotDN;
+                        tSlab0 = (std::min)(t1, t2);
+                        tSlab1 = (std::max)(t1, t2);
+                    }
+
+                    // Evaluar superposición de intervalos lógicos (OuterSphere INTERSECT Slab - InnerSphere)
+                    auto CheckOverlap = [&](float s0, float s1) {
+                        float start = (std::max)(s0, tSlab0);
+                        float end = (std::min)(s1, tSlab1);
+                        if (start <= end && end >= 0.0f) {
+                            float hit_t = (start < 0.0f) ? 0.0f : start; // Si la cámara está dentro del anillo
+                            if (hit_t < closestIntersection) {
+                                closestIntersection = hit_t;
+                                selectedAxis = (GizmoAxis)(i + 1);
+                            }
                         }
+                    };
+
+                    if (hitInner) {
+                        // Si golpea la esfera central, el rayo se divide en dos segmentos por evaluar
+                        CheckOverlap(tOut0, tIn0);
+                        CheckOverlap(tIn1, tOut1);
+                    } else {
+                        // Pasa por el borde del gizmo sin tocar el agujero central
+                        CheckOverlap(tOut0, tOut1);
                     }
                 }
             }
             
+            
+            // 2. Fallback: Si ningún anillo fue tocado, evaluamos la esfera central (Trackball)
             if (selectedAxis == GizmoAxis::None)
             {
                 Math::BoundingSphere trackballSphere(Math::Vector3::Zero, innerRadius);
                 float sphereDist;
                 if (trackballSphere.Intersects(ray.position, ray.direction, sphereDist))
                 {
-                    closestIntersection = 0.0f;
+                    closestIntersection=sphereDist;
                     selectedAxis = GizmoAxis::XYZ;
                 }
             }
@@ -811,10 +849,10 @@ namespace Bruno::DX
 
     bool GizmoService::GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint)
     {
-        intersectionPoint = Math::Vector3::Zero;
-        if (m_currentGizmoType == GizmoType::None || !m_isActive)
+        // Si no hay eje o es escalado uniforme, no hay intersección 3D
+        if (m_currentAxis == GizmoAxis::None || m_currentAxis == GizmoAxis::XYZ) 
         {
-            return false;
+            return false; 
         }
 
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
@@ -890,65 +928,141 @@ namespace Bruno::DX
         }
         else
         {
-            // ==========================================
-            // ROTACIÓN RESTRINGIDA POR EJE (X, Y o Z)
-            // ==========================================
+            // 1. Usamos SIEMPRE la inversa del mundo orientado actual
             Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoObjectOrientedWorld.Invert();
-            
-            auto ray = ConvertMousePositionToRay(mousePosition);
-        
-            // Transformamos el rayo al espacio local del Gizmo
-            ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
-            ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
-            ray.direction.Normalize();
+            Math::Vector3 N = m_selectionState.m_currentGizmoPlane.Normal();
 
-            Math::Plane plane = m_selectionState.m_currentGizmoPlane;
-            Math::Vector3 localPlaneNormal = plane.Normal(); // Este eje es LOCAL (ej. 1,0,0)
-
-            float intersectionDist;
-            if (ray.Intersects(plane, intersectionDist))
+            // 2. LAMBDA MÁGICA: Convierte un (X,Y) de pantalla a un punto local en el anillo
+            auto GetRingIntersection = [&](const Math::Vector2& screenPos, Math::Vector3& outLocalPoint) -> bool 
             {
-                Math::Vector3 positionOnPlane = ray.position + (ray.direction * intersectionDist);
+                Math::Ray worldRay = ConvertMousePositionToRay(screenPos);
+                Math::Ray localRay;
+                localRay.position = Math::Vector3::Transform(worldRay.position, gizmoWorldInverse);
+                localRay.direction = Math::Vector3::TransformNormal(worldRay.direction, gizmoWorldInverse);
+                localRay.direction.Normalize();
 
-                if (positionOnPlane.LengthSquared() > 0.000001f)
+                Math::Vector3 D = localRay.direction;
+                Math::Vector3 O = localRay.position;
+
+                float dotDN = D.Dot(N);
+                float dotON = O.Dot(N);
+                float radius = Gizmo::GIZMO_LENGTH;
+
+                float a = 1.0f - dotDN * dotDN; 
+                float b = 2.0f * (O.Dot(D) - dotON * dotDN);
+                float c = (O.LengthSquared() - dotON * dotON) - (radius * radius);
+
+                float t = -1.0f;
+                if (std::abs(a) < 0.0001f) 
                 {
-                    Math::Vector3 newIntersectionPoint = positionOnPlane;
-                    newIntersectionPoint.Normalize();
-                
-                    m_selectionState.m_intersectionPosition = newIntersectionPoint;
-
-                    float dotP = newIntersectionPoint.Dot(m_selectionState.m_prevIntersectionPosition);
-                    float angle = std::acos(Math::Clamp(dotP, -1.0f, 1.0f));
-
-                    if (std::abs(angle) > 0.0001f)
+                    t = -dotON / dotDN;
+                }
+                else
+                {
+                    float delta = b * b - 4.0f * a * c;
+                    if (delta >= 0.0f)
                     {
-                        Math::Vector3 perpendicularVector = m_selectionState.m_prevIntersectionPosition.Cross(newIntersectionPoint);
-                    
-                        if (perpendicularVector.LengthSquared() > 0.000001f)
-                        {
-                            perpendicularVector.Normalize();
-                        
-                            float sign = (perpendicularVector.Dot(localPlaneNormal) < 0.0f) ? -1.0f : 1.0f;
-                            float deltaAngle = sign * angle;
-
-                            // ¡LA TRANSFORMACIÓN CRÍTICA!
-                            // Rotamos el eje local de vuelta al Mundo para que el Cuaternión resultante
-                            // sea una rotación global (Igual que el Trackball).
-                            Math::Vector3 worldAxis = Math::Vector3::TransformNormal(localPlaneNormal, m_selectionState.m_gizmoObjectOrientedWorld);
-                            worldAxis.Normalize();
-
-                            rotationDelta = Math::Quaternion::CreateFromAxisAngle(worldAxis, deltaAngle);
-                        }
+                        float t1 = (-b - std::sqrt(delta)) / (2.0f * a);
+                        float t2 = (-b + std::sqrt(delta)) / (2.0f * a);
+                        t = (t1 >= 0.0f) ? t1 : t2; 
+                    }
+                    else
+                    {
+                        t = -b / (2.0f * a); 
                     }
                 }
+
+                if (t >= 0.0f)
+                {
+                    Math::Vector3 P = O + D * t;
+                    outLocalPoint = P - N * P.Dot(N); // Aplastar al plano
+                    if (outLocalPoint.LengthSquared() > 0.000001f)
+                    {
+                        outLocalPoint.Normalize();
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            // 3. Proyectamos AMBOS ratones (anterior y actual) en el espacio local DE ESTE FRAME
+            Math::Vector3 prevLocalPoint, currentLocalPoint;
+        
+            bool hitPrev = GetRingIntersection(m_selectionState.m_prevMousePosition, prevLocalPoint);
+            bool hitCurr = GetRingIntersection(mousePosition, currentLocalPoint);
+
+            // 4. Calcular el delta si ambos puntos son válidos
+            if (hitPrev && hitCurr)
+            {
+                // 1. Ángulo Absoluto
+                float dotProduct = Math::Clamp(prevLocalPoint.Dot(currentLocalPoint), -1.0f, 1.0f);
+                float deltaAngle = std::acos(dotProduct);
+
+                // 2. Signo de Rotación (+ o -) en espacio local
+                Math::Vector3 crossProduct = prevLocalPoint.Cross(currentLocalPoint);
+            
+                // Si el movimiento del ratón fue en contra de nuestra normal local, invertimos el ángulo
+                if (crossProduct.Dot(N) < 0.0f)
+                {
+                    deltaAngle = -deltaAngle;
+                }
+
+                // 3. ¡LA MAGIA! Convertimos el eje Local (N) en un eje Global (World Space)
+                // Usamos la misma matriz de rotación orientada del gizmo actual.
+                Math::Vector3 worldAxis = Math::Vector3::TransformNormal(N, m_selectionState.m_gizmoObjectOrientedWorld);
+                worldAxis.Normalize();
+
+                // 4. Creamos el cuaternión Delta de rotación usando el EJE GLOBAL
+                rotationDelta = Math::Quaternion::CreateFromAxisAngle(worldAxis, deltaAngle);
             }
         }
 
-        // Actualizamos el estado para el frame siguiente
         m_selectionState.m_prevMousePosition = mousePosition;
-        m_selectionState.m_prevIntersectionPosition = m_selectionState.m_intersectionPosition;
     
         return rotationDelta;
+    }
+
+    Math::Vector3 GizmoService::GetDeltaMovement(const Math::Vector2& mousePosition)
+    {
+        Math::Vector3 delta = Math::Vector3::Zero;
+
+        // 1. ESCALA / TRASLACIÓN UNIFORME (Movimiento puro en 2D de pantalla)
+        if (m_currentAxis == GizmoAxis::XYZ)
+        {
+            float sensitivity = 0.01f; 
+            float deltaScreen = (mousePosition.x - m_selectionState.m_prevMousePosition.x) - 
+                                (mousePosition.y - m_selectionState.m_prevMousePosition.y);
+
+            delta = Math::Vector3(deltaScreen * sensitivity);
+            m_selectionState.m_prevMousePosition = mousePosition;
+            return delta;
+        }
+
+        // 2. TRASLACIÓN / ESCALA EN EJES
+        Math::Vector3 currentLocalIntersection;
+        if (GetAxisIntersectionPoint(mousePosition, currentLocalIntersection))
+        {
+            Math::Vector3 localDelta = currentLocalIntersection - m_selectionState.m_prevIntersectionPosition;
+
+            if (m_currentAxis == GizmoAxis::X || m_currentAxis == GizmoAxis::XY || m_currentAxis == GizmoAxis::XZ)
+            {
+                delta.x = localDelta.x;
+            }
+            
+            if (m_currentAxis == GizmoAxis::Y || m_currentAxis == GizmoAxis::XY || m_currentAxis == GizmoAxis::YZ)
+            {
+                delta.y = localDelta.y;
+            }
+            
+            if (m_currentAxis == GizmoAxis::Z || m_currentAxis == GizmoAxis::XZ || m_currentAxis == GizmoAxis::YZ)
+            {
+                delta.z = localDelta.z;
+            }
+
+            m_selectionState.m_prevIntersectionPosition = currentLocalIntersection;
+        }
+
+        return delta;
     }
 
     float GizmoService::GetCameraDistance() const
@@ -1060,27 +1174,6 @@ namespace Bruno::DX
     
         // Distancia 0, porque el Gizmo está en el (0,0,0) del espacio local
         m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormals[planeIndex], 0.0f);
-         
-        /*Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
-        if (m_transformSpace == TransformSpace::Local)
-        {
-            auto localObjectRotationMatrix = m_selectionState.m_gizmoWorldMatrix;
-            auto localForward = localObjectRotationMatrix.Forward();
-            localForward.Normalize();
-
-            auto localUp = localObjectRotationMatrix.Up();
-            localUp.Normalize();
-
-            auto localRight = localObjectRotationMatrix.Right();
-            localRight.Normalize();
-
-            planeNormals[0] = localRight;
-            planeNormals[1] = localUp;
-            planeNormals[2] = localForward;
-        }
-        int planeIndex = static_cast<int>(selectedAxis) - 1;
-
-        m_selectionState.m_currentGizmoPlane = Math::Plane(planeNormals[planeIndex], 0);*/
     }
 
     void GizmoService::SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray)
@@ -1088,7 +1181,6 @@ namespace Bruno::DX
         auto toLocal = m_selectionState.m_rotationMatrix.Transpose();
 
         Math::Vector3 gizmoPositionInLocal = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, toLocal);
-        Math::Plane plane;
         Math::Vector3 planeNormal;
         float planeD = 0.0f;
 

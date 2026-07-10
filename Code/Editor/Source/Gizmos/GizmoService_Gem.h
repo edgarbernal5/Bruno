@@ -135,6 +135,7 @@ namespace Bruno::DX
         Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
         bool GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
         Math::Quaternion GetRotationDelta(const Math::Vector2& mousePosition);
+        Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
         float GetCameraDistance() const;
         void UpdateLocalState();
         Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);

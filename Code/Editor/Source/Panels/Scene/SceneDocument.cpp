@@ -142,8 +142,7 @@ namespace Bruno
 			}
 		});
 		
-
-		/*m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
+		m_dxGizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
 		{
 			const Math::Vector3 newDelta = delta * 0.1f;
 
@@ -173,7 +172,7 @@ namespace Bruno
 					}
 				});
 			}
-		});*/
+		});
 	}
 
 	void SceneDocument::InitializeSceneRenderer()
