@@ -20,7 +20,7 @@ namespace Bruno::DX
         {
             //m_activeAxisColors[i] = m_axisColors[i];
         }
-        m_selectionState.m_gizmoWorldMatrix = Math::Matrix::Identity;
+        m_selectionState.m_gizmoWorld = Math::Matrix::Identity;
         m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
         m_selectionState.m_gizmoObjectOrientedWorld = Math::Matrix::Identity;
         m_selectionState.m_gizmoAxisAlignedWorld = Math::Matrix::Identity;
@@ -73,12 +73,28 @@ namespace Bruno::DX
         psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; // CRÍTICO para primitivas sueltas
     
         // 4. Depth Stencil para "Rayos X" o Gizmos sobrepuestos
-        psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+        D3D12_DEPTH_STENCIL_DESC depthDesc = {};
         psoDesc.DepthStencilState.DepthEnable = TRUE;
         psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO; // No escriben en el Z-Buffer
-        psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;     // Siempre dibujan por encima
+        psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;    // O la que uses en tu motor
+        psoDesc.DepthStencilState = depthDesc;
+        
+        D3D12_RENDER_TARGET_BLEND_DESC blendDesc = {};
+        blendDesc.BlendEnable = TRUE;
+        blendDesc.LogicOpEnable = FALSE;
+        // El color del anillo se multiplica por su propio Alpha (0.15)
+        blendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA; 
+        // El color del fondo se multiplica por (1.0 - 0.15 = 0.85)
+        blendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA; 
+        blendDesc.BlendOp = D3D12_BLEND_OP_ADD;
+        // El canal alfa en sí (opcional dependiendo de si compones a otra textura)
+        blendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+        blendDesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+        blendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+        blendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
-        psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+        psoDesc.BlendState.RenderTarget[0] = blendDesc;
+        
         psoDesc.SampleMask = UINT_MAX;
         psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
         psoDesc.NumRenderTargets = 1;
@@ -256,41 +272,89 @@ namespace Bruno::DX
             }
         case GizmoType::Rotation:
             {
-                // Extraemos valores de tu vieja m_renderConfig
+                // Extraemos valores de tu vieja m_gizmoConfig
                 const float ringRadius = m_gizmoConfig.StickHeight + m_gizmoConfig.ArrowheadHeight; 
                 const float ringThickness = m_gizmoConfig.RingThickness; 
-                const int ringSegments = m_gizmoConfig.RingTessellation; // ej: 32 o 64
-                const int slices = 16; // Resolución del tubo
+                const int ringSegments = m_gizmoConfig.RingTessellation; 
+                const int slices = 16; 
 
-                // 1. Calcular dirección hacia la cámara en Espacio Local
+                bool isDragging = m_selectionState.m_isDragging;
+
+                // ==========================================
+                // 1. ESFERA TRACKBALL (Rotación Libre XYZ)
+                // ==========================================
+                // Usamos TRASLACIÓN PURA. Si le pasamos 'baseMatrix', la malla rotaría con el objeto
+                // y el usuario vería los polígonos girar. Con traslación pura, parece un cristal perfecto.
+                Math::Matrix sphereMat = Math::Matrix::CreateTranslation(m_selectionState.m_gizmoPosition);
+            
+                // Brilla un poco más si el ratón está encima o si lo estamos arrastrando
+                float sphereAlpha = (m_currentAxis == GizmoAxis::XYZ) ? 0.3f : 0.05f; 
+                Math::Color trackballColor(1.0f, 1.0f, 1.0f, sphereAlpha);
+            
+                // Radio ligeramente menor para que viva dentro de los anillos
+                m_primitiveBatch.DrawSphere(sphereMat, ringRadius * 0.95f, slices, ringSegments, trackballColor);
+
+                // ==========================================
+                // 2. LÓGICA DE CONGELAMIENTO (Estilo ImGuizmo)
+                // ==========================================
+                // Guardamos la matriz del momento del clic para el eje que se arrastra.
+                // Los ejes inactivos usan baseMatrix para rotar libremente con el objeto.
+                Math::Matrix dragBaseMatrix = isDragging ? m_selectionState.m_initialGizmoWorld : baseMatrix;
+
+                auto getAxisMatrix = [&](GizmoAxis axis)
+                {
+                    return (isDragging && m_currentAxis == axis) ? dragBaseMatrix : baseMatrix;
+                };
+
+                // Vectores a la cámara (El activo usa la matriz congelada para que el arco no tiemble)
                 Math::Vector3 cameraToModel = m_selectionState.m_gizmoPosition - m_camera.GetPosition();
                 cameraToModel.Normalize();
-    
-                // Invertimos la matriz base para convertir el vector de mundo a local
-                Math::Matrix worldInverse = baseMatrix.Invert();
-                Math::Vector3 localCamDir = Math::Vector3::TransformNormal(cameraToModel, worldInverse);
 
-                // 2. EJE Y (Anillo Verde - Plano XZ)
-                Math::Matrix matY = baseMatrix;
-                float angleY = std::atan2f(localCamDir.x, localCamDir.z);
-                m_primitiveBatch.DrawHalfTorus(matY, ringRadius, ringThickness, angleY, slices, ringSegments, m_axisColors[1]);
+                Math::Vector3 localCamDir = Math::Vector3::TransformNormal(cameraToModel, baseMatrix.Invert());
+                Math::Vector3 fixedLocalCamDir = Math::Vector3::TransformNormal(cameraToModel, dragBaseMatrix.Invert());
 
-                // 3. EJE X (Anillo Rojo - Plano YZ)
-                // Coincide perfecto con tu legacy: Rotamos Z -90 grados
-                Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * baseMatrix;
-                float angleX = std::atan2f(localCamDir.z, localCamDir.y) - (Math::PI * 0.5f);
-                m_primitiveBatch.DrawHalfTorus(matX, ringRadius, ringThickness, angleX, slices, ringSegments, m_axisColors[0]);
+                // Función lambda para atenuar los colores inactivos y resaltar el activo
+                auto getRingColor = [&](GizmoAxis axis, Math::Color baseColor)
+                {
+                    if (isDragging && m_currentAxis != axis)
+                    {
+                        // Desvanece los ejes que rotan para centrar la atención en el arrastre
+                        return Math::Color(baseColor.R(), baseColor.G(), baseColor.B(), 0.15f); 
+                    }
+                    return baseColor;
+                };
 
-                // 4. EJE Z (Anillo Azul - Plano XY)
-                // Coincide perfecto con tu legacy: Rotamos X 90 grados
-                Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * baseMatrix;
-                float angleZ = std::atan2f(localCamDir.y, localCamDir.x) + (Math::PI * 0.5f);
-                m_primitiveBatch.DrawHalfTorus(matZ, ringRadius, ringThickness, angleZ, slices, ringSegments, m_axisColors[2]);
+                // ==========================================
+                // 3. EJE Y (Verde - Plano XZ)
+                // ==========================================
+                GizmoAxis axisY = GizmoAxis::Y;
+                Math::Matrix matY = getAxisMatrix(axisY);
+                Math::Vector3 camDirY = (isDragging && m_currentAxis == axisY) ? fixedLocalCamDir : localCamDir;
+                float angleY = std::atan2f(camDirY.x, camDirY.z);
+                m_primitiveBatch.DrawHalfTorus(matY, ringRadius, ringThickness, angleY, slices, ringSegments, getRingColor(axisY, m_axisColors[1]));
 
-                // EXTRA (Opcional): Anillo Exterior Blanco (Rotación dependiente de la cámara)
-                // Muchos editores tienen un 4to anillo que siempre mira a la cámara para rotar libremente en pantalla.
-                // Si tenías esa funcionalidad o planeas agregarla, se haría con una matriz construida desde GetInverseView().
-    
+                // ==========================================
+                // 4. EJE X (Rojo - Plano YZ)
+                // ==========================================
+                GizmoAxis axisX = GizmoAxis::X;
+                Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * getAxisMatrix(axisX);
+                Math::Vector3 camDirX = (isDragging && m_currentAxis == axisX) ? fixedLocalCamDir : localCamDir;
+                float angleX = std::atan2f(camDirX.z, camDirX.y) - (Math::PI * 0.5f);
+                m_primitiveBatch.DrawHalfTorus(matX, ringRadius, ringThickness, angleX, slices, ringSegments, getRingColor(axisX, m_axisColors[0]));
+                
+                // ==========================================
+                // 5. EJE Z (Azul - Plano XY)
+                // ==========================================
+                GizmoAxis axisZ = GizmoAxis::Z;
+                Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * getAxisMatrix(axisZ);
+                Math::Vector3 camDirZ = (isDragging && m_currentAxis == axisZ) ? fixedLocalCamDir : localCamDir;
+                float angleZ = std::atan2f(camDirZ.y, camDirZ.x) + (Math::PI * 0.5f);
+                m_primitiveBatch.DrawHalfTorus(matZ, ringRadius, ringThickness, angleZ, slices, ringSegments, getRingColor(axisZ, m_axisColors[2]));
+                
+                // EXTRA: Anillo exterior de pantalla (Rotación 2D puramente alineada a cámara)
+                // Si quieres imitar el 4to anillo exterior blanco de ImGuizmo, se agregaría aquí
+                // usando un DrawTorus completo basado en la matriz invertida de la cámara.
+
                 break;
             }
         }
@@ -431,6 +495,9 @@ namespace Bruno::DX
             return false;
         }
         m_selectionState.m_initialGizmoPosition = m_selectionState.m_gizmoPosition;
+        m_selectionState.m_initialGizmoWorld = (m_transformSpace == TransformSpace::Local || m_currentGizmoType == GizmoType::Scale) 
+                                      ? m_selectionState.m_gizmoObjectOrientedWorld 
+                                      : m_selectionState.m_gizmoAxisAlignedWorld;
         
         if (m_currentGizmoType == GizmoType::Translation || m_currentGizmoType == GizmoType::Scale)
         {
@@ -439,7 +506,9 @@ namespace Bruno::DX
             // Solo para traslación necesitamos el punto de intersección inicial real en 3D
             Math::Vector3 intersectionPoint;
             if (GetAxisIntersectionPoint(mousePosition, intersectionPoint))
+            {
                 m_selectionState.m_prevIntersectionPosition = intersectionPoint;
+            }
         }
         else if (m_currentGizmoType == GizmoType::Rotation)
         {
@@ -548,6 +617,7 @@ namespace Bruno::DX
         m_selectionState.m_prevMousePosition = Math::Vector2::Zero;
 
         m_selectionState.m_isDragging = false;
+        m_currentAxis = GizmoAxis::None;
     }
 
     void GizmoService::SetTransformSpace(TransformSpace space)
@@ -564,7 +634,7 @@ namespace Bruno::DX
 
     void GizmoService::SetGizmoWorldMatrix(const Math::Matrix& worldTransform)
     {
-        m_selectionState.m_gizmoWorldMatrix = worldTransform;
+        m_selectionState.m_gizmoWorld = worldTransform;
         UpdateLocalState();
     }
 
@@ -595,7 +665,8 @@ namespace Bruno::DX
         {
             float intersection = -1.0f;
 
-            if (XAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+            if (XAxisBox.Intersects(ray.position, ray.direction, intersection))
+            {
                 if (intersection < closestIntersection)
                 {
                     selectedAxis = GizmoAxis::X;
@@ -603,7 +674,8 @@ namespace Bruno::DX
                     currentIntersection = ray.position + (ray.direction * intersection);
                 }
             }
-            if (YAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+            if (YAxisBox.Intersects(ray.position, ray.direction, intersection))
+            {
                 if (intersection < closestIntersection)
                 {
                     selectedAxis = GizmoAxis::Y;
@@ -611,7 +683,8 @@ namespace Bruno::DX
                     currentIntersection = ray.position + (ray.direction * intersection);
                 }
             }
-            if (ZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+            if (ZAxisBox.Intersects(ray.position, ray.direction, intersection))
+            {
                 if (intersection < closestIntersection)
                 {
                     selectedAxis = GizmoAxis::Z;
@@ -624,7 +697,8 @@ namespace Bruno::DX
                 if (closestIntersection >= (std::numeric_limits<float>::max)())
                     closestIntersection = (std::numeric_limits<float>::min)();
 
-                if (XYAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                if (XYAxisBox.Intersects(ray.position, ray.direction, intersection))
+                {
                     if (intersection > closestIntersection)
                     {
                         selectedAxis = GizmoAxis::XY;
@@ -632,7 +706,8 @@ namespace Bruno::DX
                         currentIntersection = ray.position + (ray.direction * intersection);
                     }
                 }
-                if (XZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                if (XZAxisBox.Intersects(ray.position, ray.direction, intersection))
+                {
                     if (intersection > closestIntersection)
                     {
                         selectedAxis = GizmoAxis::XZ;
@@ -640,7 +715,8 @@ namespace Bruno::DX
                         currentIntersection = ray.position + (ray.direction * intersection);
                     }
                 }
-                if (YZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                if (YZAxisBox.Intersects(ray.position, ray.direction, intersection))
+                {
                     if (intersection > closestIntersection)
                     {
                         selectedAxis = GizmoAxis::YZ;
@@ -651,7 +727,8 @@ namespace Bruno::DX
             }
             else if (m_currentGizmoType == GizmoType::Scale)
             {
-                if (XYZAxisBox.Intersects(ray.position, ray.direction, intersection)) {
+                if (XYZAxisBox.Intersects(ray.position, ray.direction, intersection))
+                {
                     if (intersection < closestIntersection)
                     {
                         selectedAxis = GizmoAxis::XYZ;
@@ -671,9 +748,13 @@ namespace Bruno::DX
             float B = 2.0f * ray.position.Dot(ray.direction);
             float C = ray.position.LengthSquared();
 
-            auto IntersectSphere = [](float R, float b, float c, float& t0, float& t1) {
+            auto IntersectSphere = [](float R, float b, float c, float& t0, float& t1)
+            {
                 float discriminant = b * b - 4.0f * (c - R * R);
-                if (discriminant < 0.0f) return false;
+                if (discriminant < 0.0f)
+                {
+                    return false;
+                }
                 float sq = std::sqrt(discriminant);
                 t0 = (-b - sq) * 0.5f;
                 t1 = (-b + sq) * 0.5f;
@@ -700,7 +781,8 @@ namespace Bruno::DX
 
                     if (std::abs(dotDN) < 0.00001f) // Edge-on absoluto
                     {
-                        if (std::abs(dotON) > halfThickness) continue; // Pasa por fuera del grosor de este anillo
+                        if (std::abs(dotON) > halfThickness)
+                            continue; // Pasa por fuera del grosor de este anillo
                     }
                     else 
                     {
@@ -711,40 +793,42 @@ namespace Bruno::DX
                     }
 
                     // Evaluar superposición de intervalos lógicos (OuterSphere INTERSECT Slab - InnerSphere)
-                    auto CheckOverlap = [&](float s0, float s1) {
+                    auto CheckOverlap = [&](float s0, float s1)
+                    {
                         float start = (std::max)(s0, tSlab0);
                         float end = (std::min)(s1, tSlab1);
-                        if (start <= end && end >= 0.0f) {
+                        if (start <= end && end >= 0.0f)
+                        {
                             float hit_t = (start < 0.0f) ? 0.0f : start; // Si la cámara está dentro del anillo
-                            if (hit_t < closestIntersection) {
+                            if (hit_t < closestIntersection)
+                            {
                                 closestIntersection = hit_t;
-                                selectedAxis = (GizmoAxis)(i + 1);
+                                selectedAxis = static_cast<GizmoAxis>(i + 1);
                             }
                         }
                     };
 
-                    if (hitInner) {
+                    if (hitInner)
+                    {
                         // Si golpea la esfera central, el rayo se divide en dos segmentos por evaluar
                         CheckOverlap(tOut0, tIn0);
                         CheckOverlap(tIn1, tOut1);
-                    } else {
+                    }
+                    else
+                    {
                         // Pasa por el borde del gizmo sin tocar el agujero central
                         CheckOverlap(tOut0, tOut1);
                     }
                 }
             }
             
-            
             // 2. Fallback: Si ningún anillo fue tocado, evaluamos la esfera central (Trackball)
-            if (selectedAxis == GizmoAxis::None)
+            Math::BoundingSphere trackballSphere(Math::Vector3::Zero, innerRadius);
+            float sphereDist;
+            if (trackballSphere.Intersects(ray.position, ray.direction, sphereDist) && sphereDist < closestIntersection)
             {
-                Math::BoundingSphere trackballSphere(Math::Vector3::Zero, innerRadius);
-                float sphereDist;
-                if (trackballSphere.Intersects(ray.position, ray.direction, sphereDist))
-                {
-                    closestIntersection=sphereDist;
-                    selectedAxis = GizmoAxis::XYZ;
-                }
+                closestIntersection = sphereDist;
+                selectedAxis = GizmoAxis::XYZ;
             }
         }
 
@@ -760,7 +844,6 @@ namespace Bruno::DX
     {
         Math::Vector3 constrainedMovement = Math::Vector3::Zero;
 
-        // ¡La magia del Espacio Local! 
         // Como 'movement' ya está en espacio local, los ejes siempre están alineados 
         // perfectamente con X, Y y Z. Solo copiamos las componentes deseadas.
 
@@ -1101,7 +1184,7 @@ namespace Bruno::DX
         if (m_transformSpace == TransformSpace::Local) 
         {
             // Solo necesitamos la rotación, nos aseguramos de no traer traslaciones del objeto
-            baseRotationMatrix = m_selectionState.m_gizmoWorldMatrix;
+            baseRotationMatrix = m_selectionState.m_gizmoWorld;
             baseRotationMatrix.Translation(Math::Vector3::Zero); 
         }
 

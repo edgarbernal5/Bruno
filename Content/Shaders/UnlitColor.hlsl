@@ -25,7 +25,11 @@ VertexShaderOutput VS(VertexPosColorTex IN)
     return OUT;
 }
 
-float4 PS(VertexShaderOutput IN ) : SV_Target
+float4 PS(VertexShaderOutput IN) : SV_Target
 {
+    if (IN.Color.a < 0.1f)
+    {
+        discard; // O clip(IN.Color.a - 0.1f);
+    }
     return IN.Color;
 }

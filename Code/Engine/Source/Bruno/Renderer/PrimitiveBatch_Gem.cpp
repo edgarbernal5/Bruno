@@ -188,6 +188,69 @@ namespace Bruno::DX
         }
     }
 
+    void PrimitiveBatch::DrawSphere(const Math::Matrix& transform, float radius, int slices, int stacks, const Math::Color& color)
+    {
+        // Protecciones básicas
+        if (slices < 3) slices = 3;
+        if (stacks < 2) stacks = 2;
+
+        // Vector temporal para guardar los índices reales (globales) que nos devuelve AddVertex
+        std::vector<uint32_t> vertexIndices;
+        vertexIndices.reserve((stacks + 1) * (slices + 1));
+
+        // ==========================================
+        // 1. GENERAR VÉRTICES
+        // ==========================================
+        for (int i = 0; i <= stacks; ++i)
+        {
+            // V va de 0.0 (polo norte) a 1.0 (polo sur)
+            float v = static_cast<float>(i) / stacks;
+            float phi = v * Math::PI; // Ángulo vertical (0 a PI)
+
+            for (int j = 0; j <= slices; ++j)
+            {
+                // U va de 0.0 a 1.0 alrededor del ecuador
+                float u = static_cast<float>(j) / slices;
+                float theta = u * Math::PI * 2.0f; // Ángulo horizontal (0 a 2PI)
+
+                // Coordenadas esféricas a cartesianas locales
+                float x = radius * std::sin(phi) * std::cos(theta);
+                float y = radius * std::cos(phi);
+                float z = radius * std::sin(phi) * std::sin(theta);
+
+                Math::Vector3 localPos(x, y, z);
+            
+                // Usamos tu helper maravilloso: él se encarga de transformarlo y añadirlo
+                uint32_t realIndex = AddVertex(localPos, transform, color);
+                vertexIndices.push_back(realIndex);
+            }
+        }
+
+        // ==========================================
+        // 2. GENERAR ÍNDICES (Winding Order Clockwise)
+        // ==========================================
+        for (int i = 0; i < stacks; ++i)
+        {
+            for (int j = 0; j < slices; ++j)
+            {
+                int nextI = i + 1;
+                int nextJ = j + 1;
+
+                // Mapeamos nuestra grilla 2D al índice real devuelto por AddVertex
+                uint32_t p0 = vertexIndices[i * (slices + 1) + j];         // Arriba-Izquierda
+                uint32_t p1 = vertexIndices[nextI * (slices + 1) + j];     // Abajo-Izquierda
+                uint32_t p2 = vertexIndices[nextI * (slices + 1) + nextJ]; // Abajo-Derecha
+                uint32_t p3 = vertexIndices[i * (slices + 1) + nextJ];     // Arriba-Derecha
+
+                // Triángulo 1: Arriba-Izquierda -> Arriba-Derecha -> Abajo-Derecha (CW)
+                AddTriangle(p0, p3, p2);
+
+                // Triángulo 2: Arriba-Izquierda -> Abajo-Derecha -> Abajo-Izquierda (CW)
+                AddTriangle(p0, p2, p1);
+            }
+        }
+    }
+
     void PrimitiveBatch::DrawCylinder(const Math::Matrix& transform, float height, float radius, int slices, const Math::Color& color)
     {
         float halfHeight = height * 0.5f;

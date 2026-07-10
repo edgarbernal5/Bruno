@@ -108,7 +108,8 @@ namespace Bruno::DX
         {
             Math::Vector3 m_gizmoPosition;
             Math::Vector3 m_initialGizmoPosition;
-            Math::Matrix m_gizmoWorldMatrix;
+            Math::Matrix m_gizmoWorld;
+            Math::Matrix m_initialGizmoWorld;
             
             float m_screenScaleFactor;
             Math::Matrix m_screenScaleMatrix;
