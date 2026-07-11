@@ -13,13 +13,13 @@ namespace Bruno::DX
         // Constructor Original (Estático - DEFAULT HEAP)
         VertexBuffer(GraphicsDevice& device, DX::UploadContext& uploadContext, const void* data, size_t vertexCount, size_t vertexStride);
         
-        // NUEVO: Constructor Dinámico (UPLOAD HEAP)
+        // Constructor Dinámico (UPLOAD HEAP)
         // No necesita UploadContext ni datos iniciales, solo el tamaño máximo en bytes.
         explicit VertexBuffer(GraphicsDevice& device, size_t bufferSize, uint32_t stride, bool isDynamic = true);
         
         ~VertexBuffer() = default;
 
-        // NUEVO: Método para actualizar los datos desde la CPU
+        // Método para actualizar los datos desde la CPU
         void Update(const void* data, size_t size);
         
         [[nodiscard]] const D3D12_VERTEX_BUFFER_VIEW& GetView() const { return m_view; }

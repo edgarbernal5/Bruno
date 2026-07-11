@@ -69,9 +69,6 @@ namespace Bruno::DX
         ::memcpy(mappedData, data, size);
     
         m_buffer->Unmap(0, nullptr);
-    
-        // Actualizamos el SizeInBytes por si en este frame dibujamos menos índices que la capacidad total
-        m_view.SizeInBytes = static_cast<UINT>(size);
     }
 
     UINT VertexBuffer::GetSizeInBytes() const

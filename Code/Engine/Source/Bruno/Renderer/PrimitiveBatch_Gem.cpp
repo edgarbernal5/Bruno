@@ -5,7 +5,7 @@ namespace Bruno::DX
 {
     PrimitiveBatch::PrimitiveBatch(GraphicsDevice* device) : m_device(device)
     {
-        // Alojar suficiente espacio para unos 65,000 vértices de gizmos (aprox 1.5 MB)
+        // Alojar suficiente espacio para unos 65,000 vértices (aprox 1.5 MB)
         // Así nunca se disparará el if de redimensionamiento.
         size_t initialVertexCapacity = 65536 * sizeof(GizmoVertex);
         size_t initialIndexCapacity = 65536 * sizeof(uint32_t);
@@ -99,12 +99,14 @@ namespace Bruno::DX
         // 1. Generar Vértices
         // segments: subdivisiones a lo largo del anillo principal (ej: 32 o 48)
         // slices: subdivisiones del tubo que forma el anillo (ej: 8 o 12)
-        for (int i = 0; i < segments; ++i) {
+        for (int i = 0; i < segments; ++i)
+        {
             float theta = (static_cast<float>(i) / segments) * Math::TWO_PI; // Ángulo del anillo principal
             float cosTheta = cosf(theta);
             float sinTheta = sinf(theta);
 
-            for (int j = 0; j < slices; ++j) {
+            for (int j = 0; j < slices; ++j)
+            {
                 float phi = (static_cast<float>(j) / slices) * Math::TWO_PI; // Ángulo del tubo
                 float cosPhi = cosf(phi);
                 float sinPhi = sinf(phi);
@@ -127,7 +129,8 @@ namespace Bruno::DX
             // Conectamos el último segmento con el primero usando módulo (%)
             int nextI = (i + 1) % segments; 
 
-            for (int j = 0; j < slices; ++j) {
+            for (int j = 0; j < slices; ++j)
+            {
                 // Conectamos la última cara del tubo con la primera
                 int nextJ = (j + 1) % slices;
 
@@ -279,7 +282,8 @@ namespace Bruno::DX
         }
 
         // Unir los vértices con triángulos
-        for (int i = 0; i < slices; ++i) {
+        for (int i = 0; i < slices; ++i)
+        {
             uint32_t top1 = ringBaseIdx + (i * 2);
             uint32_t bot1 = top1 + 1;
             uint32_t top2 = ringBaseIdx + ((i + 1) * 2);
@@ -309,14 +313,16 @@ namespace Bruno::DX
 
         uint32_t ringBaseIdx = static_cast<uint32_t>(m_vertices.size());
 
-        for (int i = 0; i <= slices; ++i) {
+        for (int i = 0; i <= slices; ++i)
+        {
             float theta = (static_cast<float>(i) / slices) * Math::TWO_PI;
             float x = cosf(theta) * radius;
             float z = sinf(theta) * radius;
             AddVertex(Math::Vector3(x, 0, z), transform, color);
         }
 
-        for (int i = 0; i < slices; ++i) {
+        for (int i = 0; i < slices; ++i)
+        {
             uint32_t v1 = ringBaseIdx + i;
             uint32_t v2 = ringBaseIdx + i + 1;
 
@@ -332,8 +338,11 @@ namespace Bruno::DX
         // Calculamos la dirección y longitud
         Math::Vector3 dir = end - start;
         float length = dir.Length();
-        if (length < 0.0001f) return;
-    
+        if (length < 0.0001f)
+        {
+            return;
+        }
+        
         dir.Normalize();
 
         // Creamos una matriz que apunte hacia esa dirección y la escalamos
@@ -365,11 +374,13 @@ namespace Bruno::DX
         // 1. Validar y re-alojar Vertex Buffer si no existe o se quedó chico
         if (!m_vertexBuffer || m_vertexBuffer[frameIndex]->GetView().SizeInBytes < vertexBufferSize)
         {
+            throw std::runtime_error("Fallo al subir datos del Vertex Buffer.");
         }
 
         // 2. Validar y re-alojar Index Buffer
         if (!m_indexBuffer || m_indexBuffer[frameIndex]->GetView().SizeInBytes < indexBufferSize)
         {
+            throw std::runtime_error("Fallo al subir datos del Index Buffer.");
         }
 
         // 3. Subir a GPU instántaneamente (Map -> memcpy -> Unmap interno)

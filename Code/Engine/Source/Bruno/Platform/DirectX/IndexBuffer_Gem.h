@@ -14,13 +14,13 @@ namespace Bruno::DX
         // Constructor Original (Estático - DEFAULT HEAP)
         IndexBuffer(GraphicsDevice& device, UploadContext& uploadContext, const std::vector<uint32_t>& indices);
 
-        // NUEVO: Constructor Dinámico (UPLOAD HEAP)
+        // Constructor Dinámico (UPLOAD HEAP)
         // No necesita UploadContext ni datos iniciales, solo el tamaño máximo en bytes.
         IndexBuffer(GraphicsDevice& device, size_t bufferSize, bool isDynamic = true);
         
         ~IndexBuffer() = default;
         
-        // NUEVO: Método para actualizar los datos desde la CPU
+        // Método para actualizar los datos desde la CPU
         void Update(const void* data, size_t size);
         
         [[nodiscard]] const D3D12_INDEX_BUFFER_VIEW& GetView() const { return m_view; }
