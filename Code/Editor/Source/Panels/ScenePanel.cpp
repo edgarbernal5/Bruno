@@ -137,8 +137,8 @@ namespace Bruno
 			// FASE DE DIBUJO
 			// ------------------------------------------------------------------
 			// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
-			//const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f }; 
-			const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+			const float clearColor[] = { 0.10f, 0.014f, 0.16f, 1.0f }; 
+			//const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 			auto dsvHandle = m_dxSurface->GetDepthBufferView();
 			
 			// Limpiar la pantalla
@@ -284,13 +284,9 @@ namespace Bruno
 #endif
 			Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
 
-			if (!m_isGizmoing && !args.ButtonState.LeftButton)
-			{
-				//m_dxGizmoService->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
-			}
+			m_dxGizmoService->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
 
 			if (m_dxGizmoService->IsDragging())
-			//if (m_isGizmoing)
 			{
 				m_dxGizmoService->Drag(Math::Vector2(args.Position.X, args.Position.Y));
 			}

@@ -72,15 +72,7 @@ namespace Bruno::DX
         void Initialize();
     
         void BuildGeometry(uint32_t frameIndex);
-
-        // Métodos principales para el dibujado de herramientas compuestas
-        void DrawTranslationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition);
-        void DrawRotationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition);
-        void DrawScaleGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition);
-
-        // Utilidades directas
-        void DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color);
-
+        
         // Prepara buffers y realiza el render final en la GPU
         void Render(DX::GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProjection);
         
@@ -88,6 +80,7 @@ namespace Bruno::DX
         bool BeginDrag(const Math::Vector2& mousePosition);
 		void Drag(const Math::Vector2& mousePosition);
         void EndDrag();
+        void OnMouseMove(const Math::Vector2& mousePosition);
         
         TransformSpace GetTransformSpace() const { return m_transformSpace; }
         
@@ -96,7 +89,7 @@ namespace Bruno::DX
         void SetRotationCallback(DragRotationCallback callback) { m_dragRotationCallback = callback; }
 
         bool IsDragging() const { return m_selectionState.m_isDragging; }
-        void SetGizmoType(GizmoType type){ m_currentGizmoType = type; }
+        void SetGizmoType(GizmoType type);
         void SetTransformSpace(TransformSpace space);
 		void SetActive(bool isActive){ m_isActive = isActive; }
         
@@ -128,8 +121,6 @@ namespace Bruno::DX
             bool m_isDragging;
         };
         
-        // Calcula un factor de escala uniforme para mantener el gizmo legible según la distancia
-        float CalculateAdaptiveScale(const Math::Vector3& position, const Math::Vector3& cameraPosition) const;
         GizmoAxis GetAxis(const Math::Vector2& mousePosition);
         Math::Vector3 ConstrainToAxis(const Math::Vector3& movement, GizmoAxis axis);
         Math::Vector3 ApplySnapAndPrecisionMode(Math::Vector3 delta);
@@ -145,44 +136,51 @@ namespace Bruno::DX
 
         void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Ray& ray);
         
-        const Math::BoundingBox XAxisBox{
+        const Math::BoundingBox XAxisBox
+        {
             DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f, 0.0f, 0.0f),
             DirectX::XMFLOAT3((Gizmo::GIZMO_LENGTH - Gizmo::LINE_OFFSET) * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f)
         };
 
-        const Math::BoundingBox YAxisBox{
+        const Math::BoundingBox YAxisBox
+        {
             DirectX::XMFLOAT3(0.0f, (Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f, 0.0f),
             DirectX::XMFLOAT3(Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, (Gizmo::GIZMO_LENGTH - Gizmo::LINE_OFFSET) * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f)
         };
 
-        const Math::BoundingBox ZAxisBox{
+        const Math::BoundingBox ZAxisBox
+        {
             DirectX::XMFLOAT3(0.0f, 0.0f, (Gizmo::GIZMO_LENGTH + Gizmo::LINE_OFFSET) * 0.5f),
             DirectX::XMFLOAT3(Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, Gizmo::SINGLE_AXIS_THICKNESS * 0.5f, (Gizmo::GIZMO_LENGTH - Gizmo::LINE_OFFSET) * 0.5f)
         };
 
-        const Math::BoundingBox XZAxisBox{
+        const Math::BoundingBox XZAxisBox
+        {
             DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f),
             DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f)
         };
 
-        const Math::BoundingBox XYAxisBox{
+        const Math::BoundingBox XYAxisBox
+        {
             DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f),
             DirectX::XMFLOAT3(Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::MULTI_AXIS_THICKNESS * 0.5f)
         };
 
-        const Math::BoundingBox YZAxisBox{
+        const Math::BoundingBox YZAxisBox
+        {
             DirectX::XMFLOAT3(Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f),
             DirectX::XMFLOAT3(Gizmo::MULTI_AXIS_THICKNESS * 0.5f, Gizmo::LINE_OFFSET * 0.5f, Gizmo::LINE_OFFSET * 0.5f)
         };
 
-        const Math::BoundingBox XYZAxisBox{
+        const Math::BoundingBox XYZAxisBox
+        {
             DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
             DirectX::XMFLOAT3(Gizmo::LINE_LENGTH * 0.25f, Gizmo::LINE_LENGTH * 0.25f, Gizmo::LINE_LENGTH * 0.25f)
         };
         
         PrimitiveBatch m_primitiveBatch;
         const Math::Vector3 m_unaryDirections[3]{ Math::Vector3::UnitX, Math::Vector3::UnitY, Math::Vector3::UnitZ };
-        Math::Color m_activeAxisColors[3];
+
         Math::Color m_axisColors[3]{ Math::Color(1.0f,0.0f,0.0f,1.0f),Math::Color(0.0f,1.0f,0.0f,1.0f), Math::Color(0.0f,0.0f,1.0f,1.0f) };
         Math::Color m_axisSelectionColor = Math::Color(0.5f, 0.5f, 0.25f, 1);
         

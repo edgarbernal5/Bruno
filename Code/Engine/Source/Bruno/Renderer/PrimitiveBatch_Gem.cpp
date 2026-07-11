@@ -17,7 +17,8 @@ namespace Bruno::DX
         }
     }
 
-    void PrimitiveBatch::Begin() {
+    void PrimitiveBatch::Begin()
+    {
         // No usamos m_vertices.shrink_to_fit() ni reasignamos para no perder la 
         // capacidad ya reservada en la RAM. Solo reiniciamos el contador.
         m_vertices.clear();
@@ -43,6 +44,7 @@ namespace Bruno::DX
         m_indices.push_back(i1);
         m_indices.push_back(i2);
     }
+    
     // Si necesitas cajas rectangulares
     void PrimitiveBatch::DrawBox(const Math::Matrix& transform, const Math::Vector3& size, const Math::Color& color)
     {
@@ -150,13 +152,15 @@ namespace Bruno::DX
         // 1. Generar Vértices
         // Nota el "<= segments" y "<= slices". Queremos cerrar el tubo en sí mismo (slices),
         // pero dejar el arco abierto en los extremos (segments).
-        for (int i = 0; i <= segments; ++i) { 
+        for (int i = 0; i <= segments; ++i)
+        { 
             // Medio círculo: de angleStart a angleStart + PI
             float theta = angleStart + (static_cast<float>(i) / segments) * Math::PI; 
             float cosTheta = cosf(theta);
             float sinTheta = sinf(theta);
 
-            for (int j = 0; j <= slices; ++j) { 
+            for (int j = 0; j <= slices; ++j)
+            { 
                 // Anillo del tubo completo (el grosor): de 0 a 2*PI
                 float phi = (static_cast<float>(j) / slices) * (Math::PI * 2.0f); 
                 float cosPhi = cosf(phi);
@@ -174,8 +178,10 @@ namespace Bruno::DX
 
         // 2. Generar Índices
         int stride = slices + 1; // Cuántos vértices hay en un anillo transversal
-        for (int i = 0; i < segments; ++i) {
-            for (int j = 0; j < slices; ++j) {
+        for (int i = 0; i < segments; ++i)
+        {
+            for (int j = 0; j < slices; ++j)
+            {
                 uint32_t a = baseIdx + (i * stride + j);
                 uint32_t b = baseIdx + ((i + 1) * stride + j);
                 uint32_t c = baseIdx + (i * stride + j + 1);

@@ -138,6 +138,9 @@ namespace Bruno
 					// 3. Lo devolvemos al espacio Local: (* invParentRot)
 					transform.Rotation = transform.Rotation * parentRot * delta * invParentRot;
 					transform.Rotation.Normalize(); // Previene degradación de precisión flotante
+					
+					auto newWorldMatrix = m_scene->GetWorldSpaceMatrix(entity);
+					m_dxGizmoService->SetGizmoWorldMatrix(newWorldMatrix);
 				});
 			}
 		});

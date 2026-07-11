@@ -16,10 +16,6 @@ namespace Bruno::DX
         m_camera(camera),
         m_primitiveBatch(device)
     {
-        for (size_t i = 0; i < 3; i++)
-        {
-            //m_activeAxisColors[i] = m_axisColors[i];
-        }
         m_selectionState.m_gizmoWorld = Math::Matrix::Identity;
         m_selectionState.m_rotationMatrix = Math::Matrix::Identity;
         m_selectionState.m_gizmoObjectOrientedWorld = Math::Matrix::Identity;
@@ -37,7 +33,7 @@ namespace Bruno::DX
     void GizmoService::Initialize()
     {
         // 1. Inicializar buffers internos de la geometría procedimental
-        //m_primitiveBatch.Begin();
+        m_primitiveBatch.Begin();
         
         // 2. Compilar/Cargar Shaders Unlit sencillos para Gizmos
         DX::ShaderCompiler compiler; 
@@ -129,88 +125,99 @@ namespace Bruno::DX
         const float arrowRadius   = m_gizmoConfig.ArrowheadRadius;
         const int   slices        = m_gizmoConfig.Tessellation;
 
-        // 2. Pre-calculamos las matemáticas para adaptar tu legacy a las nuevas primitivas
-        // El cilindro mide la diferencia entre la altura total y el hueco inicial
-        float cylinderLength = stickHeight - lineOffset;
-    
-        // Como DrawCylinder dibuja desde el centro, su centro Y local debe estar a la mitad de su recorrido
-        float cylinderCenterY = lineOffset + (cylinderLength * 0.5f);
-    
-        // El cono empieza exactamente donde termina el stick
-        float coneBaseY = stickHeight;
-
         switch (m_currentGizmoType)
         {
         case GizmoType::Translation:
+        {
+            const float gap           = m_gizmoConfig.LineOffset;   // El hueco desde el origen
+
+            // La longitud real del palito (restándole el gap inicial)
+            float cylinderLength  = stickHeight - gap;
+            // El centro del cilindro se desplaza para dejar el hueco libre
+            float cylinderCenterY = gap + (cylinderLength * 0.5f);
+            // El cono arranca exactamente al final del palo
+            float coneBaseY       = stickHeight;
+
+            // ==========================================
+            // LÓGICA DE HOVER (Color visual)
+            // ==========================================
+            // Si el eje es el actual, lo pintamos de Amarillo (1, 1, 0). Si no, su color base.
+            auto getAxisColor = [&](GizmoAxis axis, Math::Color baseColor)
             {
-                // ==========================================
-                // EJE Y (Verde - Up)
-                // ==========================================
-                Math::Matrix matY = baseMatrix;
-            
-                Math::Matrix cylMatY = Math::Matrix::CreateTranslation(0.0f, cylinderCenterY, 0.0f) * matY;
-                m_primitiveBatch.DrawCylinder(cylMatY, cylinderLength, stickRadius, slices, m_axisColors[1]);
-            
-                Math::Matrix coneMatY = Math::Matrix::CreateTranslation(0.0f, coneBaseY, 0.0f) * matY;
-                m_primitiveBatch.DrawCone(coneMatY, arrowHeight, arrowRadius, slices, m_axisColors[1]);
+                return (m_currentAxis == axis) ? Math::Color(1.0f, 1.0f, 0.0f, 1.0f) : baseColor;
+            };
 
-                // ==========================================
-                // EJE X (Rojo - Right) 
-                // Rotamos -90° en Z para que el Y local apunte al X global
-                // ==========================================
-                Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * baseMatrix;
-            
-                Math::Matrix cylMatX = Math::Matrix::CreateTranslation(0.0f, cylinderCenterY, 0.0f) * matX;
-                m_primitiveBatch.DrawCylinder(cylMatX, cylinderLength, stickRadius, slices, m_axisColors[0]);
-            
-                Math::Matrix coneMatX = Math::Matrix::CreateTranslation(0.0f, coneBaseY, 0.0f) * matX;
-                m_primitiveBatch.DrawCone(coneMatX, arrowHeight, arrowRadius, slices, m_axisColors[0]); // Corregí el m_axisColors[01] que tenías
+            // Para los planos, usamos el color base con baja opacidad, pero en hover brillan en amarillo.
+            auto getPlaneColor = [&](GizmoAxis axis, Math::Color baseColor) {
+                if (m_currentAxis == axis)
+                {
+                    return Math::Color(1.0f, 1.0f, 0.0f, 0.7f); // Amarillo semitransparente
+                }
+                    
+                return Math::Color(baseColor.R(), baseColor.G(), baseColor.B(), 0.25f); // Base muy transparente
+            };
 
-                // ==========================================
-                // EJE Z (Azul - Forward)
-                // Rotamos +90° en X para que el Y local apunte al Z global
-                // ==========================================
-                Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * baseMatrix;
+            // ==========================================
+            // EJE Y (Verde - Up)
+            // ==========================================
+            Math::Matrix matY = baseMatrix;
+            Math::Color colorY = getAxisColor(GizmoAxis::Y, m_axisColors[1]);
             
-                Math::Matrix cylMatZ = Math::Matrix::CreateTranslation(0.0f, cylinderCenterY, 0.0f) * matZ;
-                m_primitiveBatch.DrawCylinder(cylMatZ, cylinderLength, stickRadius, slices, m_axisColors[2]);
+            m_primitiveBatch.DrawCylinder(Math::Matrix::CreateTranslation(0.0f, cylinderCenterY, 0.0f) * matY, cylinderLength, stickRadius, slices, colorY);
+            m_primitiveBatch.DrawCone(Math::Matrix::CreateTranslation(0.0f, coneBaseY, 0.0f) * matY, arrowHeight, arrowRadius, slices, colorY);
+
+            // ==========================================
+            // EJE X (Rojo - Right)
+            // ==========================================
+            Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * baseMatrix;
+            Math::Color colorX = getAxisColor(GizmoAxis::X, m_axisColors[0]);
             
-                Math::Matrix coneMatZ = Math::Matrix::CreateTranslation(0.0f, coneBaseY, 0.0f) * matZ;
-                m_primitiveBatch.DrawCone(coneMatZ, arrowHeight, arrowRadius, slices, m_axisColors[2]);
+            m_primitiveBatch.DrawCylinder(Math::Matrix::CreateTranslation(0.0f, cylinderCenterY, 0.0f) * matX, cylinderLength, stickRadius, slices, colorX);
+            m_primitiveBatch.DrawCone(Math::Matrix::CreateTranslation(0.0f, coneBaseY, 0.0f) * matX, arrowHeight, arrowRadius, slices, colorX);
 
-                // ==========================================
-                // PLANOS DE TRASLACIÓN (XY, XZ, YZ)
-                // ==========================================
-                // Estos son los cuadritos que permiten mover en 2 ejes a la vez.
-                // Usaremos el grosor y offset de tu legacy: MULTI_AXIS_THICKNESS
-                const float planeSize = m_gizmoConfig.MultiAxisThickness; // O el nombre que le des
-                const float planeOffset = lineOffset + (planeSize * 0.5f);
+            // ==========================================
+            // EJE Z (Azul - Forward)
+            // ==========================================
+            Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * baseMatrix;
+            Math::Color colorZ = getAxisColor(GizmoAxis::Z, m_axisColors[2]);
             
-                // Plano XY (Azul, porque excluye Z)
-                Math::Matrix planeXY = Math::Matrix::CreateTranslation(planeOffset, planeOffset, 0.0f) * baseMatrix;
-                // DrawBox necesita una escala plana (ej: Z casi 0)
-                Math::Matrix scaleXY = Math::Matrix::CreateScale(planeSize, planeSize, 0.01f) * planeXY;
-                m_primitiveBatch.DrawBox(scaleXY, 1.0f, Math::Color(m_axisColors[2].R(), m_axisColors[2].G(), m_axisColors[2].B(), 0.5f)); // Semitransparente
+            m_primitiveBatch.DrawCylinder(Math::Matrix::CreateTranslation(0.0f, cylinderCenterY, 0.0f) * matZ, cylinderLength, stickRadius, slices, colorZ);
+            m_primitiveBatch.DrawCone(Math::Matrix::CreateTranslation(0.0f, coneBaseY, 0.0f) * matZ, arrowHeight, arrowRadius, slices, colorZ);
 
-                // Plano XZ (Verde, porque excluye Y)
-                Math::Matrix planeXZ = Math::Matrix::CreateTranslation(planeOffset, 0.0f, planeOffset) * baseMatrix;
-                Math::Matrix scaleXZ = Math::Matrix::CreateScale(planeSize, 0.01f, planeSize) * planeXZ;
-                m_primitiveBatch.DrawBox(scaleXZ, 1.0f, Math::Color(m_axisColors[1].R(), m_axisColors[1].G(), m_axisColors[1].B(), 0.5f));
+            // ==========================================
+            // PLANOS DE TRASLACIÓN 2D (Cajitas transparentes)
+            // ==========================================
+            // El tamaño del cuadrito será igual al "gap" para que encajen perfectos en la esquina
+            float planeSize = gap;
+            float planeOffset = planeSize * 0.5f; // Para centrar la cajita en el hueco
 
-                // Plano YZ (Rojo, porque excluye X)
-                Math::Matrix planeYZ = Math::Matrix::CreateTranslation(0.0f, planeOffset, planeOffset) * baseMatrix;
-                Math::Matrix scaleYZ = Math::Matrix::CreateScale(0.01f, planeSize, planeSize) * planeYZ;
-                m_primitiveBatch.DrawBox(scaleYZ, 1.0f, Math::Color(m_axisColors[0].R(), m_axisColors[0].G(), m_axisColors[0].B(), 0.5f));
+            // 1. Plano XY (Azul - Excluye Z)
+            Math::Matrix planeXY = Math::Matrix::CreateTranslation(planeOffset, planeOffset, 0.0f) * baseMatrix;
+            Math::Matrix scaleXY = Math::Matrix::CreateScale(planeSize, planeSize, 0.005f) * planeXY; // Z es casi cero para hacerlo plano
+            m_primitiveBatch.DrawBox(scaleXY, 1.0f, getPlaneColor(GizmoAxis::XY, m_axisColors[2]));
 
-                break;
-            }
+            // 2. Plano XZ (Verde - Excluye Y)
+            Math::Matrix planeXZ = Math::Matrix::CreateTranslation(planeOffset, 0.0f, planeOffset) * baseMatrix;
+            Math::Matrix scaleXZ = Math::Matrix::CreateScale(planeSize, 0.005f, planeSize) * planeXZ;
+            m_primitiveBatch.DrawBox(scaleXZ, 1.0f, getPlaneColor(GizmoAxis::XZ, m_axisColors[1]));
+
+            // 3. Plano YZ (Rojo - Excluye X)
+            Math::Matrix planeYZ = Math::Matrix::CreateTranslation(0.0f, planeOffset, planeOffset) * baseMatrix;
+            Math::Matrix scaleYZ = Math::Matrix::CreateScale(0.005f, planeSize, planeSize) * planeYZ;
+            m_primitiveBatch.DrawBox(scaleYZ, 1.0f, getPlaneColor(GizmoAxis::YZ, m_axisColors[0]));
+
+            // ==========================================
+            // CENTRO: CUBO BLANCO UNIFORME (Opcional para traslación en cámara)
+            // ==========================================
+            float centerBoxSize = gap * 0.3f; // Un cuadrito central muy pequeño
+            Math::Color centerColor = getAxisColor(GizmoAxis::XYZ, Math::Color(1.0f, 1.0f, 1.0f, 1.0f));
+            m_primitiveBatch.DrawBox(baseMatrix, centerBoxSize, centerColor);
+
+            break;
+        }
         case GizmoType::Scale:
             {
                 // 1. Extraemos los valores de configuración (igual que en Translation para mantener simetría)
-                const float stickHeight   = m_gizmoConfig.StickHeight;
-                const float lineOffset    = m_gizmoConfig.LineOffset;
-                const float stickRadius   = m_gizmoConfig.StickRadius;
-                const int   slices        = m_gizmoConfig.Tessellation;
 
                 // En tu legacy, el tamaño de la caja se basaba en la altura de la flecha * 0.85f
                 const float boxSize       = m_gizmoConfig.ArrowheadHeight * 0.85f;
@@ -321,6 +328,10 @@ namespace Bruno::DX
                         // Desvanece los ejes que rotan para centrar la atención en el arrastre
                         return Math::Color(baseColor.R(), baseColor.G(), baseColor.B(), 0.15f); 
                     }
+                    if (m_currentAxis == axis)
+                    {
+                        return Math::Color(1.0f, 1.0f, 0.0f, 0.7f); // Amarillo semitransparente
+                    }
                     return baseColor;
                 };
 
@@ -360,100 +371,6 @@ namespace Bruno::DX
         }
         
         m_primitiveBatch.End(frameIndex);
-    }
-    
-    void GizmoService::DrawTranslationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition)
-    {
-        Math::Vector3 origin = worldTransform.Translation();
-        float scale = CalculateAdaptiveScale(origin, cameraPosition);
-
-        // Dimensiones proporcionales basadas en la escala adaptativa
-        float cylinderLength = 1.8f * scale;
-        float cylinderRadius = 0.03f * scale;
-        float coneHeight     = 0.4f * scale;
-        float coneRadius     = 0.12f * scale;
-        int slices           = 16;
-
-        // --- EJE Y (Apantallado por defecto hacia arriba en sistemas Y-Up) ---
-        // El cilindro base crece desde el origen en +Y de forma natural.
-        Math::Matrix matY = Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matY, cylinderLength, cylinderRadius, slices, m_axisColors[1]);
-        // El cono de la punta se desfasa hasta el final del cilindro
-        Math::Matrix matConeY = Math::Matrix::CreateTranslation(0.0f, cylinderLength, 0.0f) * matY;
-        m_primitiveBatch.DrawCone(matConeY, coneHeight, coneRadius, slices, m_axisColors[1]);
-
-        // --- EJE X (Rotamos 90 grados en Z para acostar el eje Y local sobre el eje X global) ---
-        Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matX, cylinderLength, cylinderRadius, slices, m_axisColors[0]);
-        Math::Matrix matConeX = Math::Matrix::CreateTranslation(cylinderLength, 0.0f, 0.0f) * Math::Matrix::CreateTranslation(origin);
-        // Para el cono de X, rotamos el cono base para que apunte hacia +X
-        Math::Matrix matConeRotX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * matConeX;
-        m_primitiveBatch.DrawCone(matConeRotX, coneHeight, coneRadius, slices, m_axisColors[0]);
-
-        // --- EJE Z (Rotamos 90 grados en X para acostar el eje Y local sobre el eje Z global) ---
-        Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matZ, cylinderLength, cylinderRadius, slices, m_axisColors[2]);
-        Math::Matrix matConeZ = Math::Matrix::CreateTranslation(0.0f, 0.0f, cylinderLength) * Math::Matrix::CreateTranslation(origin);
-        // Rotamos el cono base para que apunte hacia +Z
-        Math::Matrix matConeRotZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * matConeZ;
-        m_primitiveBatch.DrawCone(matConeRotZ, coneHeight, coneRadius, slices, m_axisColors[2]);
-    }
-
-    void GizmoService::DrawRotationGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition)
-    {
-        Math::Vector3 origin = worldTransform.Translation();
-        float scale = CalculateAdaptiveScale(origin, cameraPosition);
-
-        float radius = 2.0f * scale;
-        float thickness = 0.04f * scale;
-        int slices = 48; // Más definición para que las curvas se vean suaves
-        int segments = 8;
-
-        // Eje X Anillo (Gira sobre el plano YZ, la matriz rota para orientar el Toroide)
-        Math::Matrix matRotX = Math::Matrix::CreateRotationZ(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawTorus(matRotX, radius, thickness, slices, segments, m_axisColors[0]);
-
-        // Eje Y Anillo (Gira sobre el plano XZ)
-        Math::Matrix matRotY = Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawTorus(matRotY, radius, thickness, slices, segments, m_axisColors[1]);
-
-        // Eje Z Anillo (Gira sobre el plano XY)
-        Math::Matrix matRotZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawTorus(matRotZ, radius, thickness, slices, segments, m_axisColors[2]);
-    }
-
-    void GizmoService::DrawScaleGizmo(const Math::Matrix& worldTransform, const Math::Vector3& cameraPosition)
-    {
-        Math::Vector3 origin = worldTransform.Translation();
-        float scale = CalculateAdaptiveScale(origin, cameraPosition);
-
-        float cylinderLength = 1.8f * scale;
-        float cylinderRadius = 0.03f * scale;
-        float boxSize        = 0.18f * scale; // En vez de cono, usamos cubos en los extremos
-        int slices           = 16;
-
-        // --- EJE Y ---
-        Math::Matrix matY = Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matY, cylinderLength, cylinderRadius, slices, m_axisColors[1]);
-        Math::Matrix matBoxY = Math::Matrix::CreateTranslation(0.0f, cylinderLength, 0.0f) * matY;
-        m_primitiveBatch.DrawBox(matBoxY, boxSize, m_axisColors[1]);
-
-        // --- EJE X ---
-        Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matX, cylinderLength, cylinderRadius, slices, m_axisColors[0]);
-        Math::Matrix matBoxX = Math::Matrix::CreateTranslation(cylinderLength, 0.0f, 0.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawBox(matBoxX, boxSize, m_axisColors[0]);
-
-        // --- EJE Z ---
-        Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawCylinder(matZ, cylinderLength, cylinderRadius, slices, m_axisColors[2]);
-        Math::Matrix matBoxZ = Math::Matrix::CreateTranslation(0.0f, 0.0f, cylinderLength) * Math::Matrix::CreateTranslation(origin);
-        m_primitiveBatch.DrawBox(matBoxZ, boxSize, m_axisColors[2]);
-    }
-
-    void GizmoService::DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color)
-    {
-        m_primitiveBatch.DrawLine(start, end, color);
     }
 
     void GizmoService::Render(DX::GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProj)
@@ -620,6 +537,21 @@ namespace Bruno::DX
         m_currentAxis = GizmoAxis::None;
     }
 
+    void GizmoService::OnMouseMove(const Math::Vector2& mousePosition)
+    {
+        if (!m_isActive || m_selectionState.m_isDragging)
+        {
+            return;
+        }
+        m_currentAxis = GetAxis(mousePosition);
+    }
+
+    void GizmoService::SetGizmoType(GizmoType type)
+    {
+        m_currentGizmoType = type;
+        UpdateLocalState();
+    }
+
     void GizmoService::SetTransformSpace(TransformSpace space)
     {
         m_transformSpace = space;
@@ -636,16 +568,6 @@ namespace Bruno::DX
     {
         m_selectionState.m_gizmoWorld = worldTransform;
         UpdateLocalState();
-    }
-
-    float GizmoService::CalculateAdaptiveScale(const Math::Vector3& position, const Math::Vector3& cameraPosition) const
-    {
-        float distance = Math::Vector3::Distance(position, cameraPosition);
-        // Multiplicamos por un factor constante para ajustar el tamaño relativo en el viewport (ej: 0.1)
-        float scaleFactor = distance * 0.1f;
-    
-        // Evitamos escalas absurdas o negativas si la cámara se posiciona exactamente sobre el objeto
-        return std::max<float>(scaleFactor, 0.001f);
     }
 
     GizmoService::GizmoAxis GizmoService::GetAxis(const Math::Vector2& mousePosition)
@@ -1181,7 +1103,7 @@ namespace Bruno::DX
     
         // Si estamos en Local Space, usamos la rotación del objeto.
         // (A menos que estemos en Rotation y Dragging, donde a veces queremos mantener el marco inicial)
-        if (m_transformSpace == TransformSpace::Local) 
+        if (m_transformSpace == TransformSpace::Local || m_currentGizmoType == GizmoType::Scale) 
         {
             // Solo necesitamos la rotación, nos aseguramos de no traer traslaciones del objeto
             baseRotationMatrix = m_selectionState.m_gizmoWorld;
