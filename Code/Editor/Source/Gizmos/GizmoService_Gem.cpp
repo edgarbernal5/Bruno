@@ -228,17 +228,33 @@ namespace Bruno::DX
     
                 // Centramos la caja justo en la punta del stick
                 float boxCenterY      = stickHeight;
-
+                
+                bool isDragging = m_selectionState.m_isDragging;
+                
+                // Función lambda para atenuar los colores inactivos y resaltar el activo
+                auto getRingColor = [&](GizmoAxis axis, Math::Color baseColor)
+                {
+                    if (isDragging && m_currentAxis != axis)
+                    {
+                        // Desvanece los ejes que rotan para centrar la atención en el arrastre
+                        return Math::Color(baseColor.R(), baseColor.G(), baseColor.B(), 0.15f); 
+                    }
+                    if (m_currentAxis == axis)
+                    {
+                        return Math::Color(1.0f, 1.0f, 0.0f, 0.7f); // Amarillo semitransparente
+                    }
+                    return baseColor;
+                };
                 // ==========================================
                 // EJE Y (Verde - Up)
                 // ==========================================
                 Math::Matrix matY = baseMatrix;
     
                 Math::Matrix cylMatY = Math::Matrix::CreateTranslation(0.0f, cylinderCenterY, 0.0f) * matY;
-                m_primitiveBatch.DrawCylinder(cylMatY, cylinderLength, stickRadius, slices, m_axisColors[1]);
+                m_primitiveBatch.DrawCylinder(cylMatY, cylinderLength, stickRadius, slices, getRingColor(GizmoAxis::Y, m_axisColors[1]));
     
                 Math::Matrix boxMatY = Math::Matrix::CreateTranslation(0.0f, boxCenterY, 0.0f) * matY;
-                m_primitiveBatch.DrawBox(boxMatY, boxSize, m_axisColors[1]);
+                m_primitiveBatch.DrawBox(boxMatY, boxSize, getRingColor(GizmoAxis::Y, m_axisColors[1]));
 
                 // ==========================================
                 // EJE X (Rojo - Right)
@@ -246,10 +262,10 @@ namespace Bruno::DX
                 Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * baseMatrix;
     
                 Math::Matrix cylMatX = Math::Matrix::CreateTranslation(0.0f, cylinderCenterY, 0.0f) * matX;
-                m_primitiveBatch.DrawCylinder(cylMatX, cylinderLength, stickRadius, slices, m_axisColors[0]);
+                m_primitiveBatch.DrawCylinder(cylMatX, cylinderLength, stickRadius, slices, getRingColor(GizmoAxis::X, m_axisColors[0]));
     
                 Math::Matrix boxMatX = Math::Matrix::CreateTranslation(0.0f, boxCenterY, 0.0f) * matX;
-                m_primitiveBatch.DrawBox(boxMatX, boxSize, m_axisColors[0]);
+                m_primitiveBatch.DrawBox(boxMatX, boxSize, getRingColor(GizmoAxis::X, m_axisColors[0]));
 
                 // ==========================================
                 // EJE Z (Azul - Forward)
@@ -257,10 +273,10 @@ namespace Bruno::DX
                 Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * baseMatrix;
     
                 Math::Matrix cylMatZ = Math::Matrix::CreateTranslation(0.0f, cylinderCenterY, 0.0f) * matZ;
-                m_primitiveBatch.DrawCylinder(cylMatZ, cylinderLength, stickRadius, slices, m_axisColors[2]);
+                m_primitiveBatch.DrawCylinder(cylMatZ, cylinderLength, stickRadius, slices, getRingColor(GizmoAxis::Z, m_axisColors[2]));
     
                 Math::Matrix boxMatZ = Math::Matrix::CreateTranslation(0.0f, boxCenterY, 0.0f) * matZ;
-                m_primitiveBatch.DrawBox(boxMatZ, boxSize, m_axisColors[2]);
+                m_primitiveBatch.DrawBox(boxMatZ, boxSize, getRingColor(GizmoAxis::Z, m_axisColors[2]));
 
                 // ==========================================
                 // CENTRO: ESCALA UNIFORME (EJE XYZ)
@@ -268,7 +284,7 @@ namespace Bruno::DX
                 // Dibujamos un cubo central (generalmente gris o blanco) para escalar proporcionalmente
                 // El tamaño suele ser ligeramente mayor al lineOffset para que sea fácil de clickear
                 float centerBoxSize = lineOffset * 1.5f;
-                Math::Color centerColor = Math::Color(0.8f, 0.8f, 0.8f, 1.0f); // Gris claro
+                Math::Color centerColor = Math::Color(0.8f, 0.8f, 0.8f, 0.7f); // Gris claro
                 m_primitiveBatch.DrawBox(baseMatrix, centerBoxSize, centerColor);
 
                 // Opcional: Planos 2D (XY, XZ, YZ)
@@ -312,14 +328,7 @@ namespace Bruno::DX
                 {
                     return (isDragging && m_currentAxis == axis) ? dragBaseMatrix : baseMatrix;
                 };
-
-                // Vectores a la cámara (El activo usa la matriz congelada para que el arco no tiemble)
-                Math::Vector3 cameraToModel = m_selectionState.m_gizmoPosition - m_camera.GetPosition();
-                cameraToModel.Normalize();
-
-                Math::Vector3 localCamDir = Math::Vector3::TransformNormal(cameraToModel, baseMatrix.Invert());
-                Math::Vector3 fixedLocalCamDir = Math::Vector3::TransformNormal(cameraToModel, dragBaseMatrix.Invert());
-
+                
                 // Función lambda para atenuar los colores inactivos y resaltar el activo
                 auto getRingColor = [&](GizmoAxis axis, Math::Color baseColor)
                 {
@@ -334,14 +343,20 @@ namespace Bruno::DX
                     }
                     return baseColor;
                 };
+                
+                // Obtenemos la cámara en el mundo una sola vez
+                Math::Vector3 camPosWorld = m_camera.GetPosition();
 
                 // ==========================================
                 // 3. EJE Y (Verde - Plano XZ)
                 // ==========================================
                 GizmoAxis axisY = GizmoAxis::Y;
                 Math::Matrix matY = getAxisMatrix(axisY);
-                Math::Vector3 camDirY = (isDragging && m_currentAxis == axisY) ? fixedLocalCamDir : localCamDir;
-                float angleY = std::atan2f(camDirY.x, camDirY.z);
+
+                // Llevamos la cámara al espacio de ESTE anillo en particular
+                Math::Vector3 camPosTorusY = Math::Vector3::Transform(camPosWorld, matY.Invert());
+                // atan2(Z, X) nos da el ángulo exacto hacia la cámara. Restamos PI/2 para centrar el arco.
+                float angleY = std::atan2(camPosTorusY.z, camPosTorusY.x) - (Math::PI * 0.5f);
                 m_primitiveBatch.DrawHalfTorus(matY, ringRadius, ringThickness, angleY, slices, ringSegments, getRingColor(axisY, m_axisColors[1]));
 
                 // ==========================================
@@ -349,17 +364,19 @@ namespace Bruno::DX
                 // ==========================================
                 GizmoAxis axisX = GizmoAxis::X;
                 Math::Matrix matX = Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) * getAxisMatrix(axisX);
-                Math::Vector3 camDirX = (isDragging && m_currentAxis == axisX) ? fixedLocalCamDir : localCamDir;
-                float angleX = std::atan2f(camDirX.z, camDirX.y) - (Math::PI * 0.5f);
+
+                Math::Vector3 camPosTorusX = Math::Vector3::Transform(camPosWorld, matX.Invert());
+                float angleX = std::atan2(camPosTorusX.z, camPosTorusX.x) - (Math::PI * 0.5f);
                 m_primitiveBatch.DrawHalfTorus(matX, ringRadius, ringThickness, angleX, slices, ringSegments, getRingColor(axisX, m_axisColors[0]));
-                
+
                 // ==========================================
                 // 5. EJE Z (Azul - Plano XY)
                 // ==========================================
                 GizmoAxis axisZ = GizmoAxis::Z;
                 Math::Matrix matZ = Math::Matrix::CreateRotationX(Math::PI / 2.0f) * getAxisMatrix(axisZ);
-                Math::Vector3 camDirZ = (isDragging && m_currentAxis == axisZ) ? fixedLocalCamDir : localCamDir;
-                float angleZ = std::atan2f(camDirZ.y, camDirZ.x) + (Math::PI * 0.5f);
+
+                Math::Vector3 camPosTorusZ = Math::Vector3::Transform(camPosWorld, matZ.Invert());
+                float angleZ = std::atan2(camPosTorusZ.z, camPosTorusZ.x) - (Math::PI * 0.5f);
                 m_primitiveBatch.DrawHalfTorus(matZ, ringRadius, ringThickness, angleZ, slices, ringSegments, getRingColor(axisZ, m_axisColors[2]));
                 
                 // EXTRA: Anillo exterior de pantalla (Rotación 2D puramente alineada a cámara)
@@ -715,17 +732,26 @@ namespace Bruno::DX
                     }
 
                     // Evaluar superposición de intervalos lógicos (OuterSphere INTERSECT Slab - InnerSphere)
+                    // Evaluar superposición de intervalos lógicos (OuterSphere INTERSECT Slab - InnerSphere)
                     auto CheckOverlap = [&](float s0, float s1)
                     {
                         float start = (std::max)(s0, tSlab0);
                         float end = (std::min)(s1, tSlab1);
                         if (start <= end && end >= 0.0f)
                         {
-                            float hit_t = (start < 0.0f) ? 0.0f : start; // Si la cámara está dentro del anillo
-                            if (hit_t < closestIntersection)
+                            float hit_t = (start < 0.0f) ? 0.0f : start; 
+        
+                            // ¡LA MAGIA! Calculamos el punto exacto de colisión en el espacio local
+                            Math::Vector3 hitPoint = ray.position + ray.direction * hit_t;
+        
+                            // Si el producto punto es mayor a 0, el punto está en el hemisferio que mira a la cámara
+                            if (hitPoint.Dot(ray.position) > 0.0f)
                             {
-                                closestIntersection = hit_t;
-                                selectedAxis = static_cast<GizmoAxis>(i + 1);
+                                if (hit_t < closestIntersection)
+                                {
+                                    closestIntersection = hit_t;
+                                    selectedAxis = static_cast<GizmoAxis>(i + 1);
+                                }
                             }
                         }
                     };
@@ -749,7 +775,7 @@ namespace Bruno::DX
             {
                 Math::BoundingSphere trackballSphere(Math::Vector3::Zero, innerRadius);
                 float sphereDist;
-                if (trackballSphere.Intersects(ray.position, ray.direction, sphereDist) /*&& sphereDist < closestIntersection*/)
+                if (trackballSphere.Intersects(ray.position, ray.direction, sphereDist) && sphereDist < closestIntersection)
                 {
                     closestIntersection = sphereDist;
                     selectedAxis = GizmoAxis::XYZ;
