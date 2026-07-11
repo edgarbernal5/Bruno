@@ -745,12 +745,15 @@ namespace Bruno::DX
             }
             
             // 2. Fallback: Si ningún anillo fue tocado, evaluamos la esfera central (Trackball)
-            Math::BoundingSphere trackballSphere(Math::Vector3::Zero, innerRadius);
-            float sphereDist;
-            if (trackballSphere.Intersects(ray.position, ray.direction, sphereDist) && sphereDist < closestIntersection)
+            if (selectedAxis == GizmoAxis::None)
             {
-                closestIntersection = sphereDist;
-                selectedAxis = GizmoAxis::XYZ;
+                Math::BoundingSphere trackballSphere(Math::Vector3::Zero, innerRadius);
+                float sphereDist;
+                if (trackballSphere.Intersects(ray.position, ray.direction, sphereDist) /*&& sphereDist < closestIntersection*/)
+                {
+                    closestIntersection = sphereDist;
+                    selectedAxis = GizmoAxis::XYZ;
+                }
             }
         }
 
