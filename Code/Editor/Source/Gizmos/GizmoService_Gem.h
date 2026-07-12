@@ -80,13 +80,14 @@ namespace Bruno::DX
         bool BeginDrag(const Math::Vector2& mousePosition);
 		void Drag(const Math::Vector2& mousePosition);
         void EndDrag();
+        void Update();
         void OnMouseMove(const Math::Vector2& mousePosition);
         
         TransformSpace GetTransformSpace() const { return m_transformSpace; }
         
-        void SetTranslationCallback(DragTranslationCallback callback) { m_dragTranslationCallback = callback; }
-        void SetScaleCallback(DragScaleCallback callback) { m_dragScaleCallback = callback; }
-        void SetRotationCallback(DragRotationCallback callback) { m_dragRotationCallback = callback; }
+        void SetTranslationCallback(DragTranslationCallback callback) { m_dragTranslationCallback = std::move(callback); }
+        void SetScaleCallback(DragScaleCallback callback) { m_dragScaleCallback = std::move(callback); }
+        void SetRotationCallback(DragRotationCallback callback) { m_dragRotationCallback = std::move(callback); }
 
         bool IsDragging() const { return m_selectionState.m_isDragging; }
         void SetGizmoType(GizmoType type);
@@ -121,16 +122,27 @@ namespace Bruno::DX
             bool m_isDragging;
         };
         
+        void BuildGizmoGeometry(uint32_t frameIndex);
+        void BuildCameraGizmoGeometry(uint32_t frameIndex);
+        
+        void RenderBatch(DX::GraphicsContext* context, DX::PrimitiveBatch& primitiveBatch, uint32_t frameIndex, const Math::Matrix& viewProjection);
+        
+        void RenderCameraGizmo(GraphicsContext* context, uint32_t frameIndex, Math::Viewport mainViewport);
+        
         GizmoAxis GetAxis(const Math::Vector2& mousePosition);
-        Math::Vector3 ConstrainToAxis(const Math::Vector3& movement, GizmoAxis axis);
-        Math::Vector3 ApplySnapAndPrecisionMode(Math::Vector3 delta);
+        
+        Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);
         Math::Ray ConvertMousePositionToRay(const Math::Vector2& mousePosition);
         bool GetAxisIntersectionPoint(const Math::Vector2& mousePosition, Math::Vector3& intersectionPoint);
+        
         Math::Quaternion GetRotationDelta(const Math::Vector2& mousePosition);
         Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
+        Math::Vector3 ConstrainToAxis(const Math::Vector3& movement, GizmoAxis axis);
+        Math::Vector3 ApplySnapAndPrecisionMode(Math::Vector3 delta);
         float GetCameraDistance() const;
+        
         void UpdateLocalState();
-        Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);
+        
         void SetGizmoHandlePlaneFor(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
         void SetGizmoHandlePlaneForRotation(GizmoAxis selectedAxis, const Math::Vector2& mousePosition);
 
@@ -178,7 +190,9 @@ namespace Bruno::DX
             DirectX::XMFLOAT3(Gizmo::LINE_LENGTH * 0.25f, Gizmo::LINE_LENGTH * 0.25f, Gizmo::LINE_LENGTH * 0.25f)
         };
         
-        PrimitiveBatch m_primitiveBatch;
+        PrimitiveBatch m_primitiveBatch; // Para el Gizmo 3D (Traslación, Rotación, Escalado)
+        PrimitiveBatch m_cameraGizmoBatch; // Para la brújula de la esquina
+        
         const Math::Vector3 m_unaryDirections[3]{ Math::Vector3::UnitX, Math::Vector3::UnitY, Math::Vector3::UnitZ };
 
         Math::Color m_axisColors[3]{ Math::Color(1.0f,0.0f,0.0f,1.0f),Math::Color(0.0f,1.0f,0.0f,1.0f), Math::Color(0.0f,0.0f,1.0f,1.0f) };
@@ -186,6 +200,8 @@ namespace Bruno::DX
         
         GraphicsDevice* m_device;
         Camera& m_camera;
+        Camera m_sceneGizmoCamera;
+        
         SelectionState m_selectionState{};
         
         DragTranslationCallback m_dragTranslationCallback;

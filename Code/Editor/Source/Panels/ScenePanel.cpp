@@ -357,9 +357,12 @@ namespace Bruno
 		m_form->GetEvents().MouseWheel.Connect([this](const Berta::ArgWheel& args)
 		{
 			float zoom = args.WheelDelta * 0.0025f;
-			if (!args.IsVertical) zoom = -zoom;
-
+			if (!args.IsVertical)
+			{
+				zoom = -zoom;
+			}
 			m_sceneDocument->GetCamera().Zoom(zoom);
+			m_dxGizmoService->Update();
 		});
 
 		m_form->GetEvents().KeyPressed.Connect([this](const Berta::ArgKeyboard& args)
