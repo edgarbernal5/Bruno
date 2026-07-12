@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstdint>
 #include "Constants.h"
 
@@ -20,5 +21,43 @@ namespace Bruno
 		float		MultiAxisThickness{ Gizmo::MULTI_AXIS_THICKNESS };
 		float		SingleAxisThickness{ Gizmo::SINGLE_AXIS_THICKNESS };
 	};
+	
+	// Constantes de transformación (Se pasan al Root Signature del Shader de Gizmos)
+	struct GizmoConstants
+	{
+		Math::Matrix ViewProjection;
+	};
+	enum class GizmoType
+	{
+		None,
+		Translation,
+		Rotation,
+		Scale
+	};
+		
+	enum class GizmoAxis
+	{
+		None,
+		X,
+		Y,
+		Z,
+		XY,
+		XZ,
+		YZ,
 
+		XYZ
+	};
+		
+	enum class PivotType
+	{
+		ObjectCenter,
+		SelectionCenter,
+		WorldOrigin
+	};
+		
+	enum class TransformSpace
+	{
+		Local,
+		World
+	};
 }

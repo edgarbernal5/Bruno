@@ -32,6 +32,8 @@ namespace Bruno::DX
 		
 		[[nodiscard]] DX::UploadContext& GetUploadContext() const { return *m_uploadContext; }
 		
+		void Flush();
+		
 		static std::shared_ptr<DX::GraphicsDevice> Create();
 		
 	private:

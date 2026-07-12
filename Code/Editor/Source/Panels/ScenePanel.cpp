@@ -23,6 +23,7 @@
 #include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
 #include "Bruno/Platform/DirectX/Shader_Gem.h"
 #include "Gizmos/GizmoService_Gem.h"
+#include "Gizmos/CameraGizmo.h"
 
 namespace Bruno
 {
@@ -63,14 +64,14 @@ namespace Bruno
 
 		m_gizmoTransformSpaceButton.GetEvents().Click.Connect([&](const Berta::ArgClick& click)
 		{
-			if (m_dxGizmoService->GetTransformSpace() == DX::GizmoService::TransformSpace::World)
+			if (m_dxGizmoService->GetTransformSpace() == TransformSpace::World)
 			{
-				m_dxGizmoService->SetTransformSpace(DX::GizmoService::TransformSpace::Local);
+				m_dxGizmoService->SetTransformSpace(TransformSpace::Local);
 				m_gizmoTransformSpaceButton.SetCaption("World");
 			}
 			else
 			{
-				m_dxGizmoService->SetTransformSpace(DX::GizmoService::TransformSpace::World);
+				m_dxGizmoService->SetTransformSpace(TransformSpace::World);
 				m_gizmoTransformSpaceButton.SetCaption("Local");
 			}
 		});
@@ -180,8 +181,9 @@ namespace Bruno
 #endif
 			BR_CORE_TRACE << "destroy. panel id = " << idxx << std::endl;
 
-			auto device = Graphics::GetDevice();
-			device->WaitForIdle();
+			
+			auto device = Graphics::GetDXDevice();
+			device->Flush();
 
 			m_isVisible = false;
 			m_editorGame->RemoveScenePanel(this);
@@ -394,7 +396,7 @@ namespace Bruno
 			auto index = acmb.SelectedIndex.value();
 			if (m_dxGizmoService)
 			{
-				m_dxGizmoService->SetGizmoType(static_cast<DX::GizmoService::GizmoType>(index));
+				m_dxGizmoService->SetGizmoType(static_cast<GizmoType>(index));
 			}
 			m_gizmoTransformSpaceButton.SetEnabled(index < 3);
 		});
@@ -412,8 +414,8 @@ namespace Bruno
 #endif
 		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
 
-		auto device = Graphics::GetDevice();
-		device->WaitForIdle();
+		auto device = Graphics::GetDXDevice();
+		device->Flush();
 
 		m_isVisible = false;
 		m_editorGame->RemoveScenePanel(this);
@@ -490,8 +492,10 @@ namespace Bruno
 	void ScenePanel::InitializeGizmoService()
 	{
 		m_dxGizmoService = m_sceneDocument->GetDXGizmoService();
-		m_dxGizmoService->SetGizmoType(static_cast<DX::GizmoService::GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
-		m_dxGizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? DX::GizmoService::TransformSpace::World : DX::GizmoService::TransformSpace::Local);
+		m_dxGizmoService->SetGizmoType(static_cast<GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
+		m_dxGizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? TransformSpace::World : TransformSpace::Local);
+		auto device = Graphics::GetDXDevice();
+		m_cameraGizmo = std::make_unique<CameraGizmo>(device, m_sceneDocument->GetCamera());
 	}
 
 	void ScenePanel::InitializeSceneRenderer()

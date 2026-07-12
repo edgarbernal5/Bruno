@@ -113,6 +113,7 @@ xcopy /y /d "$(SolutionDir)packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\nat
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Gizmos\CameraGizmo.cpp" />
     <ClCompile Include="Source\Gizmos\GizmoService_Gem.cpp" />
     <ClCompile Include="Source\Layouts\PaneManager.cpp" />
     <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp" />
@@ -142,6 +143,7 @@ xcopy /y /d "$(SolutionDir)packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\nat
   <ItemGroup>
     <ClInclude Include="Source\AssetEditors\AssetEditor.h" />
     <ClInclude Include="Source\brepch.h" />
+    <ClInclude Include="Source\Gizmos\CameraGizmo.h" />
     <ClInclude Include="Source\Gizmos\GizmoService_Gem.h" />
     <ClInclude Include="Source\Layouts\PaneManager.h" />
     <ClInclude Include="Source\Panels\Properties\PropertyHelpers.h" />
@@ -160,7 +162,7 @@ xcopy /y /d "$(SolutionDir)packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\nat
     <ClInclude Include="Source\Content\Importers\TextureImporter.h" />
     <ClInclude Include="Source\EditorGame.h" />
     <ClInclude Include="Source\Gizmos\Constants.h" />
-    <ClInclude Include="Source\Gizmos\GizmoConfig.h" />
+    <ClInclude Include="Source\Gizmos\GizmoBasicTypes.h" />
     <ClInclude Include="Source\Gizmos\GizmoRotationRenderer.h" />
     <ClInclude Include="Source\Gizmos\GizmoScaleRenderer.h" />
     <ClInclude Include="Source\Gizmos\GizmoService.h" />

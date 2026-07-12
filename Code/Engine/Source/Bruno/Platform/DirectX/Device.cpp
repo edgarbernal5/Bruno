@@ -28,6 +28,11 @@ namespace Bruno::DX
         m_uploadContext = std::make_unique<DX::UploadContext>(*this);
     }
 
+    void GraphicsDevice::Flush()
+    {
+        GetDirectCommandQueue().Flush();
+    }
+
     std::shared_ptr<DX::GraphicsDevice> GraphicsDevice::Create()
     {
         return std::make_shared<DX::GraphicsDevice>();

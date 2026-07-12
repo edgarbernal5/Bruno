@@ -3,7 +3,7 @@
 #include "Bruno/Math/Math.h"
 
 #include "Bruno/Renderer/PrimitiveBatch_Gem.h"
-#include "Gizmos/GizmoConfig.h"
+#include "Gizmos/GizmoBasicTypes.h"
 
 namespace Bruno::DX
 {
@@ -12,50 +12,10 @@ namespace Bruno::DX
     class GraphicsPipelineState;
     class RootSignature;
     class Shader;
-
-    // Constantes de transformación (Se pasan al Root Signature del Shader de Gizmos)
-    struct GizmoConstants
-    {
-        Math::Matrix ViewProjection;
-    };
     
     class GizmoService
     {
     public:
-        enum class GizmoType
-        {
-            None,
-            Translation,
-            Rotation,
-            Scale
-        };
-		
-        enum class GizmoAxis
-        {
-            None,
-            X,
-            Y,
-            Z,
-            XY,
-            XZ,
-            YZ,
-
-            XYZ
-        };
-		
-        enum class PivotType
-        {
-            ObjectCenter,
-            SelectionCenter,
-            WorldOrigin
-        };
-		
-        enum class TransformSpace
-        {
-            Local,
-            World
-        };
-
         struct SnapConfig
         {
             float Translation{ 1.0f };
@@ -80,8 +40,8 @@ namespace Bruno::DX
         bool BeginDrag(const Math::Vector2& mousePosition);
 		void Drag(const Math::Vector2& mousePosition);
         void EndDrag();
-        void Update();
         void OnMouseMove(const Math::Vector2& mousePosition);
+        void Update();
         
         TransformSpace GetTransformSpace() const { return m_transformSpace; }
         
@@ -123,11 +83,8 @@ namespace Bruno::DX
         };
         
         void BuildGizmoGeometry(uint32_t frameIndex);
-        void BuildCameraGizmoGeometry(uint32_t frameIndex);
         
         void RenderBatch(DX::GraphicsContext* context, DX::PrimitiveBatch& primitiveBatch, uint32_t frameIndex, const Math::Matrix& viewProjection);
-        
-        void RenderCameraGizmo(GraphicsContext* context, uint32_t frameIndex, Math::Viewport mainViewport);
         
         GizmoAxis GetAxis(const Math::Vector2& mousePosition);
         
@@ -191,7 +148,6 @@ namespace Bruno::DX
         };
         
         PrimitiveBatch m_primitiveBatch; // Para el Gizmo 3D (Traslación, Rotación, Escalado)
-        PrimitiveBatch m_cameraGizmoBatch; // Para la brújula de la esquina
         
         const Math::Vector3 m_unaryDirections[3]{ Math::Vector3::UnitX, Math::Vector3::UnitY, Math::Vector3::UnitZ };
 
@@ -200,7 +156,6 @@ namespace Bruno::DX
         
         GraphicsDevice* m_device;
         Camera& m_camera;
-        Camera m_sceneGizmoCamera;
         
         SelectionState m_selectionState{};
         

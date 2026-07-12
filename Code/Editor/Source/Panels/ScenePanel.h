@@ -32,6 +32,7 @@ namespace Bruno
 	class Scene;
 	class SceneDocument;
 	class SceneRenderer;
+	class CameraGizmo;
 
 	struct SceneSurfaceParameters
 	{
@@ -43,7 +44,7 @@ namespace Bruno
 	{
 	public:
 		ScenePanel(Berta::Window* window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters = SceneSurfaceParameters());
-		~ScenePanel();
+		~ScenePanel() override;
 
 		void OnUpdate(const GameTimer& timer);
 		void OnDraw();
@@ -75,7 +76,7 @@ namespace Bruno
 
 		std::shared_ptr<Model> m_model;
 		
-		std::unique_ptr<GraphicsContext>	m_graphicsContext;
+		std::unique_ptr<GraphicsContext> m_graphicsContext;
 
 #ifndef BR_SINGLE_THREAD_RENDERING
 		std::mutex m_mutex{};
@@ -83,8 +84,9 @@ namespace Bruno
 		GameTimer m_timer;
 #endif
 
-		std::shared_ptr<SelectionService>	m_selectionService;
-		std::shared_ptr<DX::GizmoService>		m_dxGizmoService;
+		std::shared_ptr<SelectionService> m_selectionService;
+		std::shared_ptr<DX::GizmoService> m_dxGizmoService;
+		std::unique_ptr<CameraGizmo> m_cameraGizmo;
 
 		DX::GraphicsDevice* m_dxDevice;
 		std::unique_ptr<DX::Surface> m_dxSurface;

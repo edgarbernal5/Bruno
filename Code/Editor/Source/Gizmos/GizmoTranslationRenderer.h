@@ -9,7 +9,7 @@
 #include "Bruno/Platform/DirectX/PipelineStateObject.h"
 #include "Gizmos/Constants.h"
 
-#include "Gizmos/GizmoConfig.h"
+#include "Gizmos/GizmoBasicTypes.h"
 
 namespace Bruno
 {

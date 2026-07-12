@@ -3,7 +3,6 @@
 
 namespace Bruno::DX
 {
-	
 	class SwapChain;
 	class DepthBuffer;
 	class GraphicsDevice;

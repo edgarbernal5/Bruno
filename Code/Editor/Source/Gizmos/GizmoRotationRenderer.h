@@ -8,7 +8,7 @@
 #include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/PipelineStateObject.h"
 
-#include "Gizmos/GizmoConfig.h"
+#include "Gizmos/GizmoBasicTypes.h"
 
 namespace Bruno
 {

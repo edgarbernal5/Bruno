@@ -2,7 +2,7 @@
 
 #include "Bruno/Renderer/Camera.h"
 #include "Constants.h"
-#include "GizmoConfig.h"
+#include "GizmoBasicTypes.h"
 #include "Bruno/Platform/DirectX/RenderObjectBinding.h"
 
 //#define BR_GIZMO_LINES_INTERSECTION
