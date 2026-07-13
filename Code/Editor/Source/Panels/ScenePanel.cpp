@@ -80,12 +80,12 @@ namespace Bruno
 		m_form = std::make_unique<Berta::NestedForm>(this->Handle(), Berta::Rectangle{0,0,100,100}, Berta::FormStyle::Flat(), true);
 		m_layout.Attach("renderForm", *m_form);
 		
-		m_dxViewport.Height = 100;
-		m_dxViewport.Width = 100;
-		m_dxViewport.TopLeftX = 0;
-		m_dxViewport.TopLeftY = 0;
-		m_dxViewport.MinDepth = D3D12_MIN_DEPTH;
-		m_dxViewport.MaxDepth = D3D12_MAX_DEPTH;
+		m_viewport.height = 100;
+		m_viewport.width = 100;
+		m_viewport.x = 0;
+		m_viewport.y = 0;
+		m_viewport.minDepth = D3D12_MIN_DEPTH;
+		m_viewport.maxDepth = D3D12_MAX_DEPTH;
 		m_dxDevice = Graphics::GetDXDevice();
 		
 		DX::SurfaceWindowParameters parameters;
@@ -151,7 +151,7 @@ namespace Bruno
 			context.SetDescriptorHeaps(&m_srvHeap, 1);
 			
 			// Configurar Viewport y Scissor Test explícitamente en este frame
-			context.SetViewport(m_dxViewport);
+			context.SetViewport(m_viewport);
 			context.SetScissorRect(m_scissorRect);
 			
 			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
@@ -159,6 +159,10 @@ namespace Bruno
     
 			m_dxGizmoService->BuildGeometry(frameIndex);
 			m_dxGizmoService->Render(&context, frameIndex, viewProj);
+			
+			m_cameraGizmo->BuildCameraGizmoGeometry(frameIndex);
+			m_cameraGizmo->RenderCameraGizmo(&context, frameIndex, m_viewport);
+			
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 			// ------------------------------------------------------------------
@@ -228,8 +232,8 @@ namespace Bruno
 			{
 				m_dxSurface->Resize(formSize.Width, formSize.Height);
 			}
-			m_dxViewport.Height = formSize.Height;
-			m_dxViewport.Width = formSize.Width;
+			m_viewport.height = formSize.Height;
+			m_viewport.width = formSize.Width;
 			m_scissorRect = { 0, 0, static_cast<LONG>(formSize.Width), static_cast<LONG>(formSize.Height) };
 			
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.Width, (float)formSize.Height));
@@ -247,8 +251,8 @@ namespace Bruno
 				return;
 
 			m_isResizing = true;
-			m_dxViewport.Height = args.NewSize.Height;
-			m_dxViewport.Width = args.NewSize.Width;
+			m_viewport.height = args.NewSize.Height;
+			m_viewport.width = args.NewSize.Width;
 			m_scissorRect = { 0, 0, static_cast<LONG>(args.NewSize.Width), static_cast<LONG>(args.NewSize.Height) };
 			m_dxSurface->Resize(args.NewSize.Width, args.NewSize.Height);
 
@@ -261,6 +265,8 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
+			m_form->Capture(false);
+			
 			//BR_CORE_TRACE << "Mouse down x=" << args.pos.x << "; y=" << args.pos.y << std::endl;
 			m_lastMousePosition.x = args.Position.X;
 			m_lastMousePosition.y = args.Position.Y;
@@ -268,15 +274,22 @@ namespace Bruno
 
 			if (args.ButtonState.LeftButton)
 			{
-				m_isGizmoing = m_dxGizmoService->BeginDrag(Math::Vector2(args.Position.X, args.Position.Y));
-				std::cout << "is gizmoing: " << m_isGizmoing << std::endl;
-				if (!m_isGizmoing)
+				if (m_cameraGizmo->OnClick(Math::Vector2(args.Position.X, args.Position.Y)))
 				{
-					//Entity selectedEntity = m_scene->Raycast(mousePosition);
-					//m_selectionService->SetSelection(selectedEntity);
+					return;
 				}
+				
+				m_isGizmoing = m_dxGizmoService->BeginDrag(Math::Vector2(args.Position.X, args.Position.Y));
+				
+				std::cout << "is gizmoing: " << m_isGizmoing << std::endl;
+				if (m_isGizmoing)
+				{
+					return;
+				}
+				
+				//Entity selectedEntity = m_scene->Raycast(mousePosition);
+				//m_selectionService->SetSelection(selectedEntity);
 			}
-			m_form->Capture(false);
 		});
 
 		m_form->GetEvents().MouseMove.Connect([this](const Berta::ArgMouse& args)
@@ -286,7 +299,7 @@ namespace Bruno
 #endif
 			Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
 
-			m_dxGizmoService->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
+			m_cameraGizmo->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
 
 			if (m_dxGizmoService->IsDragging())
 			{
@@ -294,6 +307,9 @@ namespace Bruno
 			}
 			else
 			{
+				
+				m_dxGizmoService->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
+				
 				if (args.ButtonState.LeftButton)
 				{
 					if (args.AltPressed)
@@ -494,8 +510,11 @@ namespace Bruno
 		m_dxGizmoService = m_sceneDocument->GetDXGizmoService();
 		m_dxGizmoService->SetGizmoType(static_cast<GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
 		m_dxGizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? TransformSpace::World : TransformSpace::Local);
+		
 		auto device = Graphics::GetDXDevice();
+		
 		m_cameraGizmo = std::make_unique<CameraGizmo>(device, m_sceneDocument->GetCamera());
+		m_cameraGizmo->Initialize();
 	}
 
 	void ScenePanel::InitializeSceneRenderer()

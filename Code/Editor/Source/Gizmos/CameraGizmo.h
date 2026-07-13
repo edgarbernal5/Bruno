@@ -6,6 +6,8 @@ namespace Bruno
 {
     namespace DX
     {
+        class GraphicsPipelineState;
+        class RootSignature;
         class GraphicsDevice;
         class GraphicsContext;
     }
@@ -15,19 +17,24 @@ namespace Bruno
     public:
         CameraGizmo(DX::GraphicsDevice* device, Camera& camera);
     
+        void Initialize();
         void BuildCameraGizmoGeometry(uint32_t frameIndex);
         void RenderCameraGizmo(DX::GraphicsContext* context, uint32_t frameIndex, Math::Viewport mainViewport);
         
+        bool OnClick(const Math::Vector2& mousePosition);
+        void OnMouseMove(const Math::Vector2& mousePosition);
+        
     private:
+        bool IsMouseOver(const Math::Vector2& mousePosition);
         void RenderBatch(DX::GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProjection);
         
         Camera& m_camera;
         Camera m_sceneGizmoCamera;
         DX::GraphicsDevice* m_device;
         DX::PrimitiveBatch m_cameraGizmoBatch; // Para la brújula de la esquina
-        
+        std::unique_ptr<DX::RootSignature> m_rootSignature;
+        std::unique_ptr<DX::GraphicsPipelineState> m_psoDepthOff; // Gizmos "X-Ray" dibujados sobre los objetos
+
         Math::Color m_axisColors[3]{ Math::Color(1.0f,0.0f,0.0f,1.0f),Math::Color(0.0f,1.0f,0.0f,1.0f), Math::Color(0.0f,0.0f,1.0f,1.0f) };
-        
-        
     };
 }

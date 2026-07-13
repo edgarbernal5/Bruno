@@ -91,7 +91,7 @@ namespace Bruno
 		DX::GraphicsDevice* m_dxDevice;
 		std::unique_ptr<DX::Surface> m_dxSurface;
 		DX::CommandQueue* m_commandQueue { nullptr };
-		D3D12_VIEWPORT m_dxViewport;
+		Math::Viewport m_viewport;
 		D3D12_RECT m_scissorRect;
 
 		ID3D12DescriptorHeap* m_srvHeap;

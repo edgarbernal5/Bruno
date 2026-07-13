@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include <d3d12.h>
 #include <dxcapi.h>
 #include <wrl/client.h>
@@ -52,6 +53,7 @@ namespace Bruno::DX
         
         // Método 100% genérico. Quien lo llama es el responsable de llenar el descriptor.
         void Initialize(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDesc);
+        
     private:
         GraphicsDevice& m_device;
         Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pso;
