@@ -76,7 +76,12 @@
     <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp">
       <Filter>Source\Panels\Properties</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Gizmos\GizmoService_Gem.cpp" />
+    <ClCompile Include="Source\Gizmos\CameraGizmo.cpp">
+      <Filter>Source\Gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Gizmos\GizmoService_Gem.cpp">
+      <Filter>Source\Gizmos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -141,9 +146,6 @@
     <ClInclude Include="Source\Gizmos\Constants.h">
       <Filter>Source\Gizmos</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Gizmos\GizmoConfig.h">
-      <Filter>Source\Gizmos</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Gizmos\GizmoRotationRenderer.h">
       <Filter>Source\Gizmos</Filter>
     </ClInclude>
@@ -195,7 +197,15 @@
     <ClInclude Include="Source\AssetEditors\AssetEditor.h">
       <Filter>Source\AssetEditors</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Gizmos\GizmoService_Gem.h" />
+    <ClInclude Include="Source\Gizmos\GizmoService_Gem.h">
+      <Filter>Source\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Gizmos\CameraGizmo.h">
+      <Filter>Source\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Gizmos\GizmoBasicTypes.h">
+      <Filter>Source\Gizmos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

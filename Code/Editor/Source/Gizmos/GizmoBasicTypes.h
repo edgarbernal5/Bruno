@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include "Constants.h"
+#include "Bruno/Math/Math.h"
 
 namespace Bruno
 {

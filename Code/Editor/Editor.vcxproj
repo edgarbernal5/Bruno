@@ -86,7 +86,7 @@ xcopy /y /d "$(SolutionDir)packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\nat
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_SINGLE_THREAD_RENDERING;BT_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\d3dx12;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\SimpleMath;..\Engine\Dependencies\D3D12MA;..\Engine\Dependencies\assimp\include;..\Engine\Dependencies\Berta\Code\Berta\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;..\Engine\Source;..\Engine\Dependencies\DirectXTex\include;..\Engine\Dependencies\SimpleMath;..\Engine\Dependencies\D3D12MA;..\Engine\Dependencies\assimp\include;..\Engine\Dependencies\Berta\Code\Berta\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brepch.h</PrecompiledHeaderFile>

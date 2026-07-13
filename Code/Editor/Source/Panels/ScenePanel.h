@@ -59,6 +59,7 @@ namespace Bruno
 	private:
 		void InitializeGizmoService();
 		void InitializeSceneRenderer();
+		void SetCameraGizmoViewport();
 		void UpdateCBs(const GameTimer& timer);
 
 		std::unique_ptr<Berta::NestedForm> m_form;

@@ -102,6 +102,9 @@ namespace Bruno
 		InitializeGizmoService();
 		m_srvHeap = m_dxDevice->GetSRVDescriptorAllocator().GetHeap();
 		
+		/*
+		
+		 */
 		// Single-thread rendering.
 #ifdef BR_SINGLE_THREAD_RENDERING
 		
@@ -113,7 +116,7 @@ namespace Bruno
 			{
 				return;
 			}
-			
+			SetCameraGizmoViewport();
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
 			uint32_t frameIndex = m_dxSurface->GetCurrentBackBufferIndex();
 
@@ -274,7 +277,7 @@ namespace Bruno
 
 			if (args.ButtonState.LeftButton)
 			{
-				if (m_cameraGizmo->OnClick(Math::Vector2(args.Position.X, args.Position.Y)))
+				if (m_cameraGizmo->OnMouseDown(Math::Vector2(args.Position.X, args.Position.Y)))
 				{
 					return;
 				}
@@ -345,11 +348,16 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
+			m_form->ReleaseCapture();
+			
 			Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
 			
 			if (args.ButtonState.LeftButton)
 			{
-				//if (m_isGizmoing)
+				if (m_cameraGizmo->OnMouseUp(Math::Vector2(args.Position.X, args.Position.Y)))
+				{
+					return;
+				}
 				if (m_dxGizmoService->IsDragging())
 				{
 					m_dxGizmoService->EndDrag();
@@ -369,7 +377,6 @@ namespace Bruno
 				}
 			}
 
-			m_form->ReleaseCapture();
 		});
 
 		m_form->GetEvents().MouseWheel.Connect([this](const Berta::ArgWheel& args)
@@ -416,7 +423,7 @@ namespace Bruno
 			}
 			m_gizmoTransformSpaceButton.SetEnabled(index < 3);
 		});
-
+		SetCameraGizmoViewport();
 		editorGame->AddScenePanel(this);
 		m_form->Show();
 		m_timer.Reset();
@@ -520,6 +527,20 @@ namespace Bruno
 	void ScenePanel::InitializeSceneRenderer()
 	{
 		m_sceneRenderer = m_sceneDocument->GetSceneRenderer();
+	}
+
+	void ScenePanel::SetCameraGizmoViewport()
+	{
+		auto mainViewport = m_sceneDocument->GetCamera().GetViewport();
+		float twenty = m_form->Handle()->ToScale(20.0f);
+		float gizmoCameraSize = m_form->Handle()->ToScale(Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS);
+		Math::Viewport gizmoCameraViewport={
+			mainViewport.width - gizmoCameraSize - twenty, 
+			twenty, 
+			gizmoCameraSize, 
+			gizmoCameraSize
+		};
+		m_cameraGizmo->SetCameraGizmoViewport(gizmoCameraViewport);
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
