@@ -206,7 +206,7 @@ namespace Bruno
         if (hoveredAxis != GizmoAxis::None)
         {
             SnapMainCameraToAxis(hoveredAxis);
-            m_mousePressed=true;
+            m_mousePressed = true;
             return true;
         }
         return false;

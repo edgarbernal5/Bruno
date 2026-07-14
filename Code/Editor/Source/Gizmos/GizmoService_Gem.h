@@ -57,6 +57,8 @@ namespace Bruno::DX
         void SetGizmoPosition(const Math::Vector3& position);
         void SetGizmoWorldMatrix(const Math::Matrix& worldTransform);
         
+        void SetSnapEnabled(bool enabled);
+        void SetPrecisionModeEnabled(bool enabled);
     private:
         struct SelectionState
         {
@@ -80,6 +82,12 @@ namespace Bruno::DX
 
             Math::Plane m_currentGizmoPlane;
             bool m_isDragging;
+        };
+
+        struct SnapInteraction
+        {
+            bool m_snapEnabled { false };
+            bool m_precisionModeEnabled { false };
         };
         
         void BuildGizmoGeometry(uint32_t frameIndex);
@@ -158,7 +166,9 @@ namespace Bruno::DX
         Camera& m_camera;
         
         SelectionState m_selectionState{};
-        
+        SnapInteraction m_snapInteraction{};
+        SnapConfig m_snapConfig{}
+        ;
         DragTranslationCallback m_dragTranslationCallback;
         DragScaleCallback m_dragScaleCallback;
         DragRotationCallback m_dragRotationCallback;

@@ -306,6 +306,8 @@ namespace Bruno
 			{
 				return;
 			}
+			m_dxGizmoService->SetSnapEnabled(args.ShiftPressed);
+			m_dxGizmoService->SetPrecisionModeEnabled(args.CtrlPressed);
 			
 			if (m_dxGizmoService->IsDragging())
 			{

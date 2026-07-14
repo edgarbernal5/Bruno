@@ -413,7 +413,6 @@ namespace Bruno::DX
             {
                 auto scaleDelta = GetDeltaMovement(mousePosition);
                 scaleDelta = ApplySnapAndPrecisionMode(scaleDelta);
-                BR_CORE_TRACE << "scaleDelta: " << scaleDelta << std::endl;
 
                 if (m_dragScaleCallback)
                 {
@@ -475,7 +474,17 @@ namespace Bruno::DX
         m_selectionState.m_gizmoWorld = worldTransform;
         UpdateLocalState();
     }
-    
+
+    void GizmoService::SetSnapEnabled(bool enabled)
+    {
+        m_snapInteraction.m_snapEnabled = enabled;
+    }
+
+    void GizmoService::SetPrecisionModeEnabled(bool enabled)
+    {
+        m_snapInteraction.m_precisionModeEnabled = enabled;
+    }
+
 
     GizmoAxis GizmoService::GetAxis(const Math::Vector2& mousePosition)
     {
@@ -723,29 +732,26 @@ namespace Bruno::DX
 
     Math::Vector3 GizmoService::ApplySnapAndPrecisionMode(Math::Vector3 delta)
     {
-        /* 1. Modo Precisión (Asumiendo que tienes un InputSystem global o inyectado)
-        // Reduce el movimiento al 10% de su velocidad original
-        if (InputSystem::IsKeyDown(KeyCode::Shift)) 
+        if (m_snapInteraction.m_snapEnabled)
         {
-            delta *= 0.1f; 
-        }
+            auto snapValue = m_currentGizmoType == GizmoType::Scale ?
+                m_snapConfig.Scale :
+                m_snapConfig.Translation;
 
-        // 2. Modo Snap (Se activa por teclado o por un toggle en la UI del Editor)
-        bool isSnapActive = InputSystem::IsKeyDown(KeyCode::Ctrl) || m_gizmoConfig.TranslationSnapEnabled;
-    
-        if (isSnapActive)
-        {
-            // Obtenemos el tamaño del "salto" de la grilla (ej: 0.5f, 1.0f)
-            float snapStep = m_gizmoConfig.TranslationSnapValue; 
-        
-            if (snapStep > 0.0f) 
+            if (m_snapInteraction.m_precisionModeEnabled)
             {
-                // Usamos std::round para llevar el valor al múltiplo más cercano del paso
-                delta.x = std::round(delta.x / snapStep) * snapStep;
-                delta.y = std::round(delta.y / snapStep) * snapStep;
-                delta.z = std::round(delta.z / snapStep) * snapStep;
+                delta *= m_snapConfig.PrecisionScale;
+                snapValue *= m_snapConfig.PrecisionScale;
             }
-        }*/
+
+            delta.x = std::round(delta.x / snapValue) * snapValue;
+            delta.y = std::round(delta.y / snapValue) * snapValue;
+            delta.z = std::round(delta.z / snapValue) * snapValue;
+        }
+        else if (m_snapInteraction.m_precisionModeEnabled)
+        {
+            delta *= m_snapConfig.PrecisionScale;
+        }
 
         return delta;
     }
