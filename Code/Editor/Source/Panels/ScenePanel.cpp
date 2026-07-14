@@ -302,15 +302,17 @@ namespace Bruno
 #endif
 			Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
 
-			m_cameraGizmo->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
-
+			if (m_cameraGizmo->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y)))
+			{
+				return;
+			}
+			
 			if (m_dxGizmoService->IsDragging())
 			{
 				m_dxGizmoService->Drag(Math::Vector2(args.Position.X, args.Position.Y));
 			}
 			else
 			{
-				
 				m_dxGizmoService->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
 				
 				if (args.ButtonState.LeftButton)

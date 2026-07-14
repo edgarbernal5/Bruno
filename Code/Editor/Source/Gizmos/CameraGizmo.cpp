@@ -103,26 +103,28 @@ namespace Bruno
         const int   slices = 16;
 
         // A. Ejes Principales (+X, +Y, +Z)
-        struct AxisDef { Math::Color color; Math::Matrix localRot; };
+        struct AxisDef { GizmoAxis axis; Math::Color color; Math::Matrix localRot; };
         const AxisDef axes[3] = {
-            { m_axisColors[0], Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) }, // X
-            { m_axisColors[1], Math::Matrix::Identity },                          // Y
-            { m_axisColors[2], Math::Matrix::CreateRotationX(Math::PI / 2.0f) }   // Z
+            {  GizmoAxis::X, m_axisColors[0], Math::Matrix::CreateRotationZ(-Math::PI / 2.0f) }, // X
+            { GizmoAxis::Y, m_axisColors[1], Math::Matrix::Identity },                          // Y
+            { GizmoAxis::Z,m_axisColors[2], Math::Matrix::CreateRotationX(Math::PI / 2.0f) }   // Z
         };
 
         Math::Color hoveredColor(1.0f, 1.0f, 0.0f, 1.0f);
         for (const auto& def : axes)
         {
+            auto color = def.axis == m_cameraGizmoHoveredAxis ? hoveredColor : def.color;
+            
             // Palo
             m_cameraGizmoBatch.DrawCylinder(Math::Matrix::CreateTranslation(0.0f, length * 0.5f, 0.0f) * def.localRot, 
-                                            length, radius, slices, def.color);
+                                            length, radius, slices, color);
             // Punta de Flecha
             m_cameraGizmoBatch.DrawCone(Math::Matrix::CreateTranslation(0.0f, length, 0.0f) * def.localRot, 
-                                        arrowH, arrowR, slices, def.color);
+                                        arrowH, arrowR, slices, color);
         
             // B. Ejes Negativos (-X, -Y, -Z) - Un toque AAA (esferitas opuestas)
             Math::Matrix negMat = Math::Matrix::CreateTranslation(0.0f, -length * 0.8f, 0.0f) * def.localRot;
-            m_cameraGizmoBatch.DrawSphere(negMat, radius * 1.5f, slices, slices, def.color);
+            m_cameraGizmoBatch.DrawSphere(negMat, radius * 1.5f, slices, slices, color);
         }
 
         // C. Centro (Cubo blanco)
@@ -142,7 +144,7 @@ namespace Bruno
         // 2. MAGIA MATEMÁTICA AAA
         // ==========================================
         auto cameraOrientation = Math::Matrix::CreateFromQuaternion(Math::Quaternion::CreateFromRotationMatrix(m_camera.GetView()));
-        m_sceneGizmoCamera.SetView(cameraOrientation * Math::Matrix::CreateLookAt(Math::Vector3(0, 0, Gizmo::GIZMO_LENGTH + 1.0f), Math::Vector3::Zero, Math::Vector3::Up));
+        m_sceneGizmoCamera.SetView(cameraOrientation * Math::Matrix::CreateLookAt(Math::Vector3(0, 0, Gizmo::GIZMO_LENGTH + 0.0f), Math::Vector3::Zero, Math::Vector3::Up));
         
         // 3. Bindear los Constant Buffers con la nueva matriz
         // 4. Dibujar la geometría previamente agrupada
@@ -154,6 +156,7 @@ namespace Bruno
 
     bool CameraGizmo::OnMouseDown(const Math::Vector2& mousePosition)
     {
+        m_mousePressed = false;
         if (!IsMouseOver(mousePosition))
         {
             return false;
@@ -203,17 +206,18 @@ namespace Bruno
         if (hoveredAxis != GizmoAxis::None)
         {
             SnapMainCameraToAxis(hoveredAxis);
+            m_mousePressed=true;
             return true;
         }
         return false;
     }
 
-    void CameraGizmo::OnMouseMove(const Math::Vector2& mousePosition)
+    bool CameraGizmo::OnMouseMove(const Math::Vector2& mousePosition)
     {
         if (!IsMouseOver(mousePosition))
         {
-            m_cameraGizmoHoveredAxis=GizmoAxis::None;
-            return;
+            m_cameraGizmoHoveredAxis = GizmoAxis::None;
+            return m_mousePressed;
         }
         
         Math::Ray ray = CalculateCameraGizmoPickingRay(mousePosition);
@@ -252,18 +256,21 @@ namespace Bruno
         }
 
         // Actualizamos el color para que brille en amarillo
-        m_cameraGizmoHoveredAxis = hoveredAxis; 
-
+        m_cameraGizmoHoveredAxis = hoveredAxis;
+        return m_mousePressed || m_cameraGizmoHoveredAxis != GizmoAxis::None;
+        
     }
 
     bool CameraGizmo::OnMouseUp(const Math::Vector2& mousePosition)
     {
-        return m_cameraGizmoHoveredAxis != GizmoAxis::None;
+        bool wasPressed = m_mousePressed;
+        m_mousePressed = false;
+        return wasPressed || m_cameraGizmoHoveredAxis != GizmoAxis::None;
     }
 
     void CameraGizmo::SetCameraGizmoViewport(const Math::Viewport& viewport)
     {
-        m_gizmoViewport=viewport;
+        m_gizmoViewport = viewport;
     }
 
     bool CameraGizmo::IsMouseOver(const Math::Vector2& mousePosition)
@@ -323,8 +330,8 @@ namespace Bruno
     void CameraGizmo::SnapMainCameraToAxis(GizmoAxis axis)
     {
         // Punto al que queremos mirar (puede ser el centro del mundo o el objeto seleccionado)
-        Math::Vector3 targetFocus = Math::Vector3::Zero; //m_selectionState.m_isActive ? m_selectionState.m_gizmoPosition : Math::Vector3::Zero;
-    
+        Math::Vector3 targetFocus = m_camera.GetTarget();
+        
         // Mantenemos la distancia actual al objetivo
         float currentDistance = (m_camera.GetPosition() - targetFocus).Length();
 
