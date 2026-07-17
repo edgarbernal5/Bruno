@@ -23,7 +23,6 @@ namespace Bruno::DX
         m_selectionState.m_screenScaleMatrix = Math::Matrix::Identity;
         m_selectionState.m_gizmoPosition = Math::Vector3::Zero;
         m_selectionState.m_isDragging = false;
-        //m_translationScaleSnapDelta = Math::Vector3::Zero;
 
         UpdateLocalState();
     }
@@ -332,7 +331,10 @@ namespace Bruno::DX
         {
             SetGizmoHandlePlaneForRotation(selectedAxis, mousePosition);
         }
-
+        m_selectionState.m_accumulatedRotationAngle = 0.0f;
+        m_selectionState.m_lastSnappedRotationAngle = 0.0f;
+        m_selectionState.m_accumulatedTrackballAngle = Math::Vector2::Zero;
+        m_selectionState.m_lastSnappedTrackballAngle = Math::Vector2::Zero;
         m_selectionState.m_prevMousePosition = mousePosition;
 
         if (m_currentGizmoType == GizmoType::Rotation)
@@ -396,12 +398,8 @@ namespace Bruno::DX
             {
                 Math::Quaternion rotationDelta = GetRotationDelta(mousePosition);
     
-                // Evitamos disparar callbacks y ensuciar (Dirty Flag) la UI 
-                // si el delta de rotación es identidad (no se movió el ratón)
                 if (rotationDelta != Math::Quaternion::Identity)
                 {
-                    // TODO: Apply snap (ej: redondear a 15 grados si se presiona CTRL)
-        
                     if(m_dragRotationCallback)
                     {
                         m_dragRotationCallback(rotationDelta);
@@ -432,7 +430,13 @@ namespace Bruno::DX
         m_selectionState.m_prevIntersectionPosition = Math::Vector3::Zero;
         m_selectionState.m_intersectionPosition = Math::Vector3::Zero;
         m_selectionState.m_prevMousePosition = Math::Vector2::Zero;
-
+        
+        // Limpiamos los acumuladores para no dejar basura matemática
+        m_selectionState.m_accumulatedRotationAngle = 0.0f;
+        m_selectionState.m_lastSnappedRotationAngle = 0.0f;
+        m_selectionState.m_accumulatedTrackballAngle = Math::Vector2::Zero;
+        m_selectionState.m_lastSnappedTrackballAngle = Math::Vector2::Zero;
+        
         m_selectionState.m_isDragging = false;
         m_currentAxis = GizmoAxis::None;
     }
@@ -484,7 +488,6 @@ namespace Bruno::DX
     {
         m_snapInteraction.m_precisionModeEnabled = enabled;
     }
-
 
     GizmoAxis GizmoService::GetAxis(const Math::Vector2& mousePosition)
     {
@@ -626,16 +629,16 @@ namespace Bruno::DX
                     {
                         float t1 = (-halfThickness - dotON) / dotDN;
                         float t2 = ( halfThickness - dotON) / dotDN;
-                        tSlab0 = (std::min)(t1, t2);
-                        tSlab1 = (std::max)(t1, t2);
+                        tSlab0 = std::min<float>(t1, t2);
+                        tSlab1 = std::max<float>(t1, t2);
                     }
 
                     // Evaluar superposición de intervalos lógicos (OuterSphere INTERSECT Slab - InnerSphere)
                     // Evaluar superposición de intervalos lógicos (OuterSphere INTERSECT Slab - InnerSphere)
                     auto CheckOverlap = [&](float s0, float s1)
                     {
-                        float start = (std::max)(s0, tSlab0);
-                        float end = (std::min)(s1, tSlab1);
+                        float start = std::max<float>(s0, tSlab0);
+                        float end = std::min<float>(s1, tSlab1);
                         if (start <= end && end >= 0.0f)
                         {
                             float hit_t = (start < 0.0f) ? 0.0f : start; 
@@ -756,6 +759,32 @@ namespace Bruno::DX
         return delta;
     }
 
+    float GizmoService::ApplyRotationSnap(float accumulatedAngle)
+    {
+        if (m_snapInteraction.m_snapEnabled)
+        {
+            // Convertimos el valor de la UI (ej. 15 grados) a Radianes
+            float snapValue = m_snapConfig.Rotation * (Math::PI / 180.0f);
+
+            if (m_snapInteraction.m_precisionModeEnabled)
+            {
+                accumulatedAngle *= m_snapConfig.PrecisionScale;
+                // Opcional: Hacer que la "cuadrícula" de snap también sea más fina en modo precisión
+                snapValue *= m_snapConfig.PrecisionScale; 
+            }
+
+            // Snapeamos el ángulo TOTAL
+            return std::round(accumulatedAngle / snapValue) * snapValue;
+        }
+        
+        if (m_snapInteraction.m_precisionModeEnabled)
+        {
+            accumulatedAngle *= m_snapConfig.PrecisionScale;
+        }
+
+        return accumulatedAngle;
+    }
+
     Math::Ray GizmoService::ConvertMousePositionToRay(const Math::Vector2& mousePosition)
     {
         Math::Vector3 nearPoint(mousePosition.x, mousePosition.y, 0.0f);
@@ -839,22 +868,52 @@ namespace Bruno::DX
             // ROTACIÓN LIBRE (Trackball)
             // ==========================================
             auto gizmoScreenPosition = GetScreenPosition(m_selectionState.m_gizmoPosition);
+            
             // Usamos una longitud de referencia (ej. StickHeight)
-            auto gizmoScreenPosition2 = GetScreenPosition(m_selectionState.m_gizmoPosition + m_camera.GetView().Right() * m_gizmoConfig.StickHeight);
-        
-            float length = 4.0f * (gizmoScreenPosition2 - gizmoScreenPosition).Length() / DirectX::XM_PI;
-        
+            auto gizmoScreenStickHeight = GetScreenPosition(m_selectionState.m_gizmoPosition + m_camera.GetView().Right() * m_gizmoConfig.StickHeight);
+            float length = 4.0f * (gizmoScreenStickHeight - gizmoScreenPosition).Length() / DirectX::XM_PI;
+            
             // Prevención de división por cero si la cámara está demasiado lejos o el gizmo es muy pequeño
-            if (length < 0.0001f) return rotationDelta;
-
+            if (length < 0.0001f)
+            {
+                return rotationDelta;
+            }
+            
             Math::Vector2 deltaAngles(1.0f / length);
             Math::Vector2 mouseVelocity(mousePosition.x - m_selectionState.m_prevMousePosition.x, mousePosition.y - m_selectionState.m_prevMousePosition.y);
 
             auto angles = mouseVelocity * deltaAngles;
 
-            auto localRotationDelta = Math::Quaternion::CreateFromYawPitchRoll(angles.x, 0.0f, 0.0f) * Math::Quaternion::CreateFromYawPitchRoll(0.0f, angles.y, 0.0f);
-                                  
-            rotationDelta = m_selectionState.m_cameraViewInverseRotationConjugate * localRotationDelta * m_selectionState.m_cameraViewInverseRotation;
+            // 1. Aplicar Precision Mode (disminuye drásticamente la sensibilidad del mouse)
+            if (m_snapInteraction.m_precisionModeEnabled)
+            {
+                angles.x *= m_snapConfig.PrecisionScale;
+                angles.y *= m_snapConfig.PrecisionScale;
+            }
+
+            // 2. Sumamos al ángulo total acumulado continuo
+            m_selectionState.m_accumulatedTrackballAngle.x += angles.x;
+            m_selectionState.m_accumulatedTrackballAngle.y += angles.y;
+
+            // 3. Obtenemos la posición absoluta snapeada actual
+            float snappedX = ApplyRotationSnap(m_selectionState.m_accumulatedTrackballAngle.x);
+            float snappedY = ApplyRotationSnap(m_selectionState.m_accumulatedTrackballAngle.y);
+
+            // 4. Extraemos EL DELTA necesario a aplicar ESTE FRAME
+            float effectiveX = snappedX - m_selectionState.m_lastSnappedTrackballAngle.x;
+            float effectiveY = snappedY - m_selectionState.m_lastSnappedTrackballAngle.y;
+
+            // 5. Actualizamos nuestro record
+            m_selectionState.m_lastSnappedTrackballAngle.x = snappedX;
+            m_selectionState.m_lastSnappedTrackballAngle.y = snappedY;
+
+            // 6. Solo si el ratón ha vencido el umbral del snap construimos el cuaternión
+            if (effectiveX != 0.0f || effectiveY != 0.0f)
+            {
+                auto localRotationDelta = Math::Quaternion::CreateFromYawPitchRoll(effectiveX, 0.0f, 0.0f) * Math::Quaternion::CreateFromYawPitchRoll(0.0f, effectiveY, 0.0f);
+                                      
+                rotationDelta = m_selectionState.m_cameraViewInverseRotationConjugate * localRotationDelta * m_selectionState.m_cameraViewInverseRotation;
+            }
         }
         else
         {
@@ -917,33 +976,53 @@ namespace Bruno::DX
 
             // 3. Proyectamos AMBOS ratones (anterior y actual) en el espacio local DE ESTE FRAME
             Math::Vector3 prevLocalPoint, currentLocalPoint;
-        
             bool hitPrev = GetRingIntersection(m_selectionState.m_prevMousePosition, prevLocalPoint);
             bool hitCurr = GetRingIntersection(mousePosition, currentLocalPoint);
-
+            
             // 4. Calcular el delta si ambos puntos son válidos
             if (hitPrev && hitCurr)
             {
-                // 1. Ángulo Absoluto
+                // 1. Ángulo Absoluto del delta de pantalla
                 float dotProduct = Math::Clamp(prevLocalPoint.Dot(currentLocalPoint), -1.0f, 1.0f);
                 float deltaAngle = std::acos(dotProduct);
 
                 // 2. Signo de Rotación (+ o -) en espacio local
                 Math::Vector3 crossProduct = prevLocalPoint.Cross(currentLocalPoint);
-            
+                
                 // Si el movimiento del ratón fue en contra de nuestra normal local, invertimos el ángulo
                 if (crossProduct.Dot(N) < 0.0f)
                 {
                     deltaAngle = -deltaAngle;
                 }
 
-                // 3. ¡LA MAGIA! Convertimos el eje Local (N) en un eje Global (World Space)
-                // Usamos la misma matriz de rotación orientada del gizmo actual.
-                Math::Vector3 worldAxis = Math::Vector3::TransformNormal(N, m_selectionState.m_gizmoObjectOrientedWorld);
-                worldAxis.Normalize();
+                // 3. APLICAR PRECISIÓN: Disminuye la velocidad a la que se acumula el giro
+                if (m_snapInteraction.m_precisionModeEnabled)
+                {
+                    deltaAngle *= m_snapConfig.PrecisionScale;
+                }
 
-                // 4. Creamos el cuaternión Delta de rotación usando el EJE GLOBAL
-                rotationDelta = Math::Quaternion::CreateFromAxisAngle(worldAxis, deltaAngle);
+                // 4. ACUMULAMOS EL ÁNGULO DE MANERA CONTINUA
+                m_selectionState.m_accumulatedRotationAngle += deltaAngle;
+
+                // 5. EVALUAR SNAP TOTAL
+                float snappedTotal = ApplyRotationSnap(m_selectionState.m_accumulatedRotationAngle);
+
+                // 6. DELTA EFECTIVO: Cuánto nos debemos mover AHORA relativo a la última vez que pasamos por el renderloop
+                float effectiveDeltaAngle = snappedTotal - m_selectionState.m_lastSnappedRotationAngle;
+
+                // 7. GUARDAR ESTADO para el siguiente ciclo
+                m_selectionState.m_lastSnappedRotationAngle = snappedTotal;
+
+                // 8. Si realmente hay movimiento (es decir, vencimos el "escalón" del Snap o estamos en modo continuo)
+                if (effectiveDeltaAngle != 0.0f)
+                {
+                    // Convertimos el eje Local (N) en un eje Global (World Space)
+                    Math::Vector3 worldAxis = Math::Vector3::TransformNormal(N, m_selectionState.m_gizmoObjectOrientedWorld);
+                    worldAxis.Normalize();
+
+                    // Creamos el cuaternión Delta usando el DELTA EFECTIVO
+                    rotationDelta = Math::Quaternion::CreateFromAxisAngle(worldAxis, effectiveDeltaAngle);
+                }
             }
         }
 

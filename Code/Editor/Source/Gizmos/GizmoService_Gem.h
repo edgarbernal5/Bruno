@@ -18,9 +18,10 @@ namespace Bruno::DX
     public:
         struct SnapConfig
         {
-            float Translation{ 1.0f };
-            float Scale{ 0.5f };
-            float PrecisionScale{ 0.1f };
+            float Translation { 1.0f };
+            float Scale { 0.5f };
+            float PrecisionScale { 0.1f };
+            float Rotation { 15.0f };
         };
         
         using DragTranslationCallback = std::function<void(const Math::Vector3&)>;
@@ -76,7 +77,15 @@ namespace Bruno::DX
             Math::Matrix m_rotationMatrix;
             Math::Quaternion m_cameraViewInverseRotation;
             Math::Quaternion m_cameraViewInverseRotationConjugate;
+            
+            // NUEVO: Tracking de ángulo continuo y su último estado snapeado (Para Ejes Simples)
+            float m_accumulatedRotationAngle{ 0.0f };
+            float m_lastSnappedRotationAngle{ 0.0f };
 
+            // NUEVO: Tracking de ángulo para el Trackball (Eje XYZ - Rotación Libre)
+            Math::Vector2 m_accumulatedTrackballAngle{ 0.0f, 0.0f };
+            Math::Vector2 m_lastSnappedTrackballAngle{ 0.0f, 0.0f };
+            
             Math::Vector3 m_intersectionPosition, m_prevIntersectionPosition;
             Math::Vector2 m_prevMousePosition;
 
@@ -104,6 +113,7 @@ namespace Bruno::DX
         Math::Vector3 GetDeltaMovement(const Math::Vector2& mousePosition);
         Math::Vector3 ConstrainToAxis(const Math::Vector3& movement, GizmoAxis axis);
         Math::Vector3 ApplySnapAndPrecisionMode(Math::Vector3 delta);
+        float ApplyRotationSnap(float accumulatedAngle);
         float GetCameraDistance() const;
         
         void UpdateLocalState();
