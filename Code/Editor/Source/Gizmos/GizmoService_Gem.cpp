@@ -289,9 +289,6 @@ namespace Bruno::DX
 
     void GizmoService::Render(DX::GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProjection)
     {
-        //Math::Viewport viewport=m_camera.GetViewport();
-        //RenderCameraGizmo(context, frameIndex, viewport);
-        
         RenderBatch(context, m_primitiveBatch, frameIndex, viewProjection);
     }
 
