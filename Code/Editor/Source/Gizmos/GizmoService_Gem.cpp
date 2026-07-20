@@ -416,8 +416,6 @@ namespace Bruno::DX
                 break;
             }
         }
-
-        UpdateLocalState();
     }
 
     void GizmoService::EndDrag()
@@ -455,25 +453,21 @@ namespace Bruno::DX
     void GizmoService::SetGizmoType(GizmoType type)
     {
         m_currentGizmoType = type;
-        UpdateLocalState();
     }
 
     void GizmoService::SetTransformSpace(TransformSpace space)
     {
         m_transformSpace = space;
-        UpdateLocalState();
     }
 
     void GizmoService::SetGizmoPosition(const Math::Vector3& position)
     {
         m_selectionState.m_gizmoPosition = position;
-        UpdateLocalState();
     }
 
     void GizmoService::SetGizmoWorldMatrix(const Math::Matrix& worldTransform)
     {
         m_selectionState.m_gizmoWorld = worldTransform;
-        UpdateLocalState();
     }
 
     void GizmoService::SetSnapEnabled(bool enabled)

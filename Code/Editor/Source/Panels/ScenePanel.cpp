@@ -116,7 +116,6 @@ namespace Bruno
 			{
 				return;
 			}
-			SetCameraGizmoViewport();
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
 			uint32_t frameIndex = m_dxSurface->GetCurrentBackBufferIndex();
 
@@ -153,6 +152,8 @@ namespace Bruno
 			// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
 			context.SetDescriptorHeaps(&m_srvHeap, 1);
 			
+			SetCameraGizmoViewport();
+			
 			// Configurar Viewport y Scissor Test explícitamente en este frame
 			context.SetViewport(m_viewport);
 			context.SetScissorRect(m_scissorRect);
@@ -160,6 +161,7 @@ namespace Bruno
 			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
 			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
     
+			m_dxGizmoService->Update();
 			m_dxGizmoService->BuildGeometry(frameIndex);
 			m_dxGizmoService->Render(&context, frameIndex, viewProj);
 			
@@ -391,7 +393,6 @@ namespace Bruno
 				zoom = -zoom;
 			}
 			m_sceneDocument->GetCamera().Zoom(zoom);
-			m_dxGizmoService->Update();
 		});
 
 		m_form->GetEvents().KeyPressed.Connect([this](const Berta::ArgKeyboard& args)

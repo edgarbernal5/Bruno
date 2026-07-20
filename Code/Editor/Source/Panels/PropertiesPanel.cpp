@@ -108,11 +108,7 @@ namespace Bruno
 						}
 					}
 				);
-				/*
-				*auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(prop.as_vector3());
-				currentRotation *= delta;
-				prop.value(currentRotation.ToEuler());
-				 */
+				
 				categoryTransform.EmplaceVector3(
 					"Rotation", 
 				[entity]()
