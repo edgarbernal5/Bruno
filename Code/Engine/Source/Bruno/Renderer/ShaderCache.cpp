@@ -3,7 +3,6 @@
 
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
-#include "Bruno/Platform/DirectX/PipelineStateObject.h"
 #include <filesystem>
 
 namespace Bruno
@@ -46,7 +45,8 @@ namespace Bruno
 
 	std::shared_ptr<Shader> ShaderCache::Load(const std::wstring& filename)
 	{
-		return std::make_shared<Shader>(filename);
+		//return std::make_shared<Shader>(filename);
+		return nullptr;
 	}
 
 }

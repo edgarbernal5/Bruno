@@ -5,17 +5,14 @@
 #include "Bruno/Renderer/RenderItem.h"
 #include "Bruno/Renderer/Material.h"
 
-#include "Bruno/Platform/DirectX/Texture.h"
+#include "Bruno/Platform/DirectX/Texture2D.h"
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
-#include "Bruno/Platform/DirectX/PipelineStateObject.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/Shader.h"
-#include "Bruno/Platform/DirectX/Surface_Gem.h"
 
 #include "Bruno/Content/AssetManager.h"
+#include "Bruno/Core/Memory.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
-#include "Bruno/Platform/DirectX/Texture2D.h"
-#include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
 #include "Bruno/Renderer/Camera.h"
 
 namespace Bruno
@@ -24,7 +21,7 @@ namespace Bruno
 		m_scene(scene),
 		m_assetManager(assetManager)
 	{
-		auto& device = Bruno::Graphics::GetDXDevice();
+		auto& device = Bruno::Graphics::GetDevice();
 		
 		InitializeOpaqueRootSignature(device);
 
@@ -33,7 +30,7 @@ namespace Bruno
 
 	void SceneRenderer::InitEntitiesForRender()
 	{
-		auto& device = Bruno::Graphics::GetDXDevice();
+		auto& device = Bruno::Graphics::GetDevice();
 		
 		size_t objectSize = AlignU32(sizeof(SceneObjectBuffer), 256);
 		
@@ -49,7 +46,7 @@ namespace Bruno
 				CBVComponent cbv;
 				for (int i = 0; i < 2; ++i)
 				{
-					cbv.TransformCB[i] = std::make_shared<DX::ConstantBuffer>(device->GetNativeDevice().Get(), objectSize);
+					cbv.TransformCB[i] = std::make_shared<ConstantBuffer>(device->GetNativeDevice().Get(), objectSize);
 				}
                 
 				// Le "pegamos" el componente de memoria de video a la entidad
@@ -69,7 +66,7 @@ namespace Bruno
 		}
 	}
 	
-	void SceneRenderer::InitializeOpaqueRootSignature(DX::GraphicsDevice* device)
+	void SceneRenderer::InitializeOpaqueRootSignature(GraphicsDevice* device)
 	{
 		// 1. Configuramos los rangos (Textura)
 		CD3DX12_DESCRIPTOR_RANGE srvTable;
@@ -84,15 +81,15 @@ namespace Bruno
 		CD3DX12_STATIC_SAMPLER_DESC sampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
 
 		// 4. Inicializamos nuestra Root Signature
-		m_opaqueRootSignature = std::make_shared<DX::RootSignature>(*device);
+		m_opaqueRootSignature = std::make_shared<RootSignature>(*device);
 		m_opaqueRootSignature->Initialize(2, params, 1, &sampler);
 	}
 
-	void SceneRenderer::InitializeOpaquePSO(DX::GraphicsDevice* device)
+	void SceneRenderer::InitializeOpaquePSO(GraphicsDevice* device)
 	{
 		// Instanciamos el Pipeline State Object (PSO) pasándole el contrato y shaders
 		
-		DX::ShaderCompiler compiler; 
+		ShaderCompiler compiler; 
 
 		// Compilas usando DXC (nota el _6_0)
 		auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"VS", L"vs_6_0");
@@ -136,13 +133,13 @@ namespace Bruno
         psoDesc.SampleDesc.Count = 1;
         psoDesc.SampleDesc.Quality = 0;
 		
-		m_opaquePSO = std::make_shared<DX::GraphicsPipelineState>(*device);
+		m_opaquePSO = std::make_shared<GraphicsPipelineState>(*device);
 		m_opaquePSO->Initialize(psoDesc);
 	}
 
-	void SceneRenderer::OnRender(DX::GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
+	void SceneRenderer::OnRender(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
 	{
-		DX::VertexBuffer* currentVB = nullptr;
+		VertexBuffer* currentVB = nullptr;
 		
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent, CBVComponent>();
 		for (auto& ent : entities)
@@ -169,7 +166,7 @@ namespace Bruno
 				}
 			}
 			
-			auto texture = m_assetManager->GetAsset<DX::Texture2D>(textureHandle);
+			auto texture = m_assetManager->GetAsset<Texture2D>(textureHandle);
 			if (texture != nullptr)
 			{
 				auto& indexBuffer = model->GetIndexBuffer();

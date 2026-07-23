@@ -2,23 +2,16 @@
 
 #include "Bruno.h"
 
-#include "Bruno/Platform/DirectX/Surface.h"
-#include "Bruno/Platform/DirectX/Shader.h"
-#include "Bruno/Platform/DirectX/RootSignature.h"
-#include "Bruno/Platform/DirectX/PipelineStateObject.h"
-#include "Bruno/Platform/DirectX/ConstantBuffer.h"
-#include "Bruno/Platform/DirectX/Texture.h"
 #include "Bruno/Platform/DirectX/VertexTypes.h"
-
 
 namespace Bruno
 {
-	struct RenderItem;
+	class Surface;
 	class GraphicsContext;
 	class Scene;
 	class SceneRenderer;
+	class CommandQueue;
 
-	template<typename TVertex>
 	class PrimitiveBatch;
 
 	class PlayerGame : public Game
@@ -52,7 +45,10 @@ namespace Bruno
 		std::unique_ptr<Surface>		m_surface;
 		std::shared_ptr<Scene>			m_scene;
 		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
-
+		CommandQueue* m_commandQueue { nullptr };
+		Math::Viewport m_viewport;
+		D3D12_RECT m_scissorRect;
+		ID3D12DescriptorHeap* m_srvHeap;
 		std::unique_ptr<GraphicsContext>	m_graphicsContext;
 
 		Math::Int2	m_lastMousePosition;

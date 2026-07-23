@@ -1,13 +1,13 @@
 ﻿#include "brpch.h"
 #include "CommandQueueManager.h"
 
-#include "Device.h" // Incluye para acceder al dispositivo nativo
-#include "Queue.h"
-#include "UploadContext_Gem.h"
+#include "GraphicsDevice.h" // Incluye para acceder al dispositivo nativo
+#include "CommandQueue.h"
+#include "UploadContext.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
-    CommandQueueManager::CommandQueueManager(DX::GraphicsDevice& device) 
+    CommandQueueManager::CommandQueueManager(GraphicsDevice& device) 
         : m_device(device)
     {
         // 1. INSTANCIAMOS TUS ABSTRACCIONES DE COLAS
@@ -71,8 +71,8 @@ namespace Bruno::DX
         }
     }
 
-    std::shared_ptr<DX::CommandQueueManager> CommandQueueManager::Create(DX::GraphicsDevice& device)
+    std::shared_ptr<CommandQueueManager> CommandQueueManager::Create(GraphicsDevice& device)
     {
-        return std::make_shared<DX::CommandQueueManager>(device);
+        return std::make_shared<CommandQueueManager>(device);
     }
 }

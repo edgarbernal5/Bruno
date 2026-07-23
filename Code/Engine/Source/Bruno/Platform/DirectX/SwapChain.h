@@ -4,7 +4,7 @@
 
 #include "SurfaceTypes.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
     class GraphicsDevice; // Forward declaration (KISS)
     

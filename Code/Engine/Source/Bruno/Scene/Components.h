@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-#include "Bruno/Platform/DirectX/ConstantBuffer_Gem.h"
+#include "Bruno/Platform/DirectX/ConstantBuffer.h"
 
 namespace Bruno
 {
@@ -64,7 +64,7 @@ namespace Bruno
 	
 	struct CBVComponent 
 	{
-		std::shared_ptr<DX::ConstantBuffer> TransformCB[2]; 
+		std::shared_ptr<ConstantBuffer> TransformCB[2]; 
 	};
 	
 	struct ModelComponent

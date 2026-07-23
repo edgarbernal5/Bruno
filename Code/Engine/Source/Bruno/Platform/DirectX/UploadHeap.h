@@ -4,7 +4,7 @@
 #include <wrl/client.h>
 #include <vector>
 
-namespace Bruno::DX 
+namespace Bruno 
 {
     class UploadHeap 
     {

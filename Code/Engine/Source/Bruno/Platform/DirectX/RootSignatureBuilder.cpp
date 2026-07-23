@@ -1,7 +1,7 @@
 ﻿#include "brpch.h"
 #include "RootSignatureBuilder.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
     RootSignatureBuilder& RootSignatureBuilder::AddDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE rangeType, UINT count,
         UINT shaderRegister)

@@ -1,27 +1,26 @@
 #include "brpch.h"
 #include "Material.h"
 
-#include "Bruno/Platform/DirectX/Texture.h"
 #include "Bruno/Content/AssetManager.h"
-#include "Bruno/Platform/DirectX/Device.h"
+#include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Bruno/Platform/DirectX/Texture2D.h"
 
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(Material);
 
-	Material::Material()
+	Material::Material() : m_textureDescriptorAllocation()
 	{
 		m_handle = {};
 	}
 
-	void Material::SetPipelineState(std::shared_ptr<DX::GraphicsPipelineState> pso, std::shared_ptr<DX::RootSignature> rootSig)
+	void Material::SetPipelineState(std::shared_ptr<GraphicsPipelineState> pso, std::shared_ptr<RootSignature> rootSig)
 	{
 		m_pso = pso;
 		m_rootSignature = rootSig;
 	}
 
-	void Material::BuildDescriptors(DX::GraphicsDevice* device, DX::DescriptorAllocator* srvAllocator, AbstractAssetManager* assetManager)
+	void Material::BuildDescriptors(GraphicsDevice* device, DescriptorAllocator* srvAllocator, AbstractAssetManager* assetManager)
 	{
 		if (m_descriptorsBuilt || TexturesByName.empty())
 		{
@@ -37,7 +36,7 @@ namespace Bruno
 		for (const auto& [textureName, assetHandle] : TexturesByName)
 		{
 			// Resolvemos el handle usando el AssetManager para obtener el Texture2D real
-			std::shared_ptr<DX::Texture2D> texture = assetManager->GetAsset<DX::Texture2D>(assetHandle);
+			std::shared_ptr<Texture2D> texture = assetManager->GetAsset<Texture2D>(assetHandle);
         
 			if (texture)
 			{

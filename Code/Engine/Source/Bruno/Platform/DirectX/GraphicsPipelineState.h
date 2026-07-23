@@ -36,7 +36,7 @@ void GraphicsPipelineState::Initialize(const PipelineStateDescriptor& desc)
         &d3d12Desc, IID_PPV_ARGS(&m_pso)));
 }
 */
-namespace Bruno::DX
+namespace Bruno
 {
     class RootSignature;
     class GraphicsDevice;

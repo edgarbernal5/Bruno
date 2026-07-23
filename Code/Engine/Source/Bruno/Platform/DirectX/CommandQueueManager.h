@@ -4,7 +4,7 @@
 #include <wrl.h>
 #include <cstdint>
 
-namespace Bruno::DX
+namespace Bruno
 {
     class GraphicsDevice;
     class UploadContext;
@@ -13,7 +13,7 @@ namespace Bruno::DX
     class CommandQueueManager
     {
     public:
-        CommandQueueManager(DX::GraphicsDevice& device);
+        CommandQueueManager(GraphicsDevice& device);
         ~CommandQueueManager(); // Importante para limpiar el evento
         
         // Getters que devuelven tu abstracción, no punteros crudos
@@ -26,10 +26,10 @@ namespace Bruno::DX
         // Bloquea el hilo de la CPU hasta que el Fence alcance el valor especificado
         void WaitForGpuFence(uint64_t fenceValue);
 
-        static std::shared_ptr<DX::CommandQueueManager> Create(DX::GraphicsDevice& device);
+        static std::shared_ptr<CommandQueueManager> Create(GraphicsDevice& device);
         
     private:
-        DX::GraphicsDevice& m_device;
+        GraphicsDevice& m_device;
 
         // --- MIEMBROS DE SINCRONIZACIÓN ---
         
@@ -49,9 +49,9 @@ namespace Bruno::DX
 }
 namespace Bruno::Graphics
 {
-    inline DX::CommandQueueManager*& GetCommandQueueManager()
+    inline CommandQueueManager*& GetCommandQueueManager()
     {
-        static DX::CommandQueueManager* g_commandManager = nullptr;
+        static CommandQueueManager* g_commandManager = nullptr;
         return g_commandManager;
     }
 }

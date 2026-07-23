@@ -1,7 +1,7 @@
 ﻿#include "brpch.h"
 #include "UploadHeap.h"
 
-namespace Bruno::DX 
+namespace Bruno 
 {
     UploadHeap::UploadHeap(ID3D12Device* device, UINT64 size) : m_size(size)
     {

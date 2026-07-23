@@ -1,10 +1,10 @@
 ﻿#include "brpch.h"
 #include "GraphicsPipelineState.h"
 
-#include "RootSignature_Gem.h"
-#include "Device.h"
+#include "RootSignature.h"
+#include "GraphicsDevice.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
     GraphicsPipelineState::GraphicsPipelineState(GraphicsDevice& device) :
         m_device(device)

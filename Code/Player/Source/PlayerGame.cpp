@@ -1,23 +1,16 @@
 #include "PlayerGame.h"
 
 #include "Bruno/Platform/Windows/WindowsGameWindow.h"
-#include "Bruno/Platform/DirectX/GraphicsAdapter.h"
-#include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Bruno/Platform/DirectX/Surface.h"
-#include "Bruno/Platform/DirectX/CommandQueue.h"
-#include "Bruno/Platform/DirectX/VertexTypes.h"
-#include "Bruno/Platform/DirectX/ShaderProgram.h"
-#include "Bruno/Platform/DirectX/GraphicsContext.h"
-#include "Bruno/Content/ContentManager.h"
-#include "Bruno/Renderer/RenderItem.h"
-#include "Bruno/Content/ContentTypeReaderManager.h"
+
 #include <iostream>
 
-#include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
-#include "Bruno/Renderer/Model.h"
+#include "Bruno/Platform/DirectX/CommandQueue.h"
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Renderer/SceneRenderer.h"
 #include "Bruno/Renderer/PrimitiveBatch.h"
+#include "Bruno/Platform/DirectX/GraphicsContext.h"
+#include "Bruno/Platform/DirectX/Shader.h"
 
 namespace Bruno
 {
@@ -40,6 +33,16 @@ namespace Bruno
 	{
 		m_window = std::make_unique<WindowsGameWindow>(windowParameters, this);
 		m_window->Initialize();
+		
+		m_viewport.height = windowParameters.Height;
+		m_viewport.width = windowParameters.Width;
+		m_viewport.x = 0;
+		m_viewport.y = 0;
+		m_viewport.minDepth = D3D12_MIN_DEPTH;
+		m_viewport.maxDepth = D3D12_MAX_DEPTH;
+		
+		m_scissorRect = { 0, 0, static_cast<LONG>(windowParameters.Width), static_cast<LONG>(windowParameters.Height) };
+		
 	}
 
 	void PlayerGame::OnResize()
@@ -47,7 +50,9 @@ namespace Bruno
 		// Resize screen dependent resources.
 		m_surface->Resize(m_window->GetWidth(), m_window->GetHeight());
 		
-		m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, (float)m_window->GetWidth(), (float)m_window->GetHeight()));
+		m_viewport.width = m_window->GetWidth();
+		m_viewport.height = m_window->GetHeight();
+		m_camera.SetViewport(Math::Viewport(0.0f, 0.0f, static_cast<float>(m_window->GetWidth()), static_cast<float>(m_window->GetHeight())));
 	}
 	
 	void PlayerGame::OnGameLoop(const GameTimer& timer)
@@ -58,41 +63,65 @@ namespace Bruno
 
 	void PlayerGame::OnUpdate(const GameTimer& timer)
 	{
-		//BR_CORE_TRACE << "delta time = " << timer.GetDeltaTime() << ". TotalTime " << TotalTime << std::endl;
-		m_device->BeginFrame();
-
-		UpdateCBs(timer);
+		
 	}
 
 	void PlayerGame::OnDraw()
 	{
-		Math::Color clearColor { 1.0f, 1.0f, 0.0f, 1.0f };
-
-		Texture& backBuffer = m_surface->GetBackBuffer();
-		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
-
-		m_graphicsContext->Reset();
-		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		m_graphicsContext->FlushBarriers();
-
-		m_graphicsContext->ClearRenderTarget(backBuffer, clearColor);
-		m_graphicsContext->ClearDepthStencilTarget(depthBuffer, 1.0f, 0);
-
-		m_graphicsContext->SetViewport(m_surface->GetViewport());
-		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
-		//auto commandList = m_commandQueue->GetCommandList(frameIndex);
-		//auto allocator = m_commandQueue->GetAllocator(frameIndex); // Asumiendo que agregas este getter
-		//DX::GraphicsContext context(*m_dxDevice, commandList.Get(), allocator.Get());
+		m_timer.Tick();
 			
-		//m_sceneRenderer->OnRender(&context);
+		// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
+		uint32_t frameIndex = m_surface->GetCurrentBackBufferIndex();
 
-		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
-		m_graphicsContext->FlushBarriers();
+		//BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
+			
+		// 2. Pedirle a nuestra cola el "lápiz" (CommandList). 
+		// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
+		auto commandList = m_commandQueue->GetCommandList(frameIndex);
+		auto allocator = m_commandQueue->GetAllocator(frameIndex);
+		GraphicsContext context(*m_device, commandList.Get(), allocator.Get());
+			
+		// 3. Extraer la textura real y su descriptor
+		auto backBuffer = m_surface->GetCurrentBackBuffer();
+		auto rtvHandle = m_surface->GetCurrentRenderTargetView();
 
-		m_device->SubmitContextWork(*m_graphicsContext);
+		// ------------------------------------------------------------------
+		// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
+		// ------------------------------------------------------------------
+		context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			
+		// ------------------------------------------------------------------
+		// FASE DE DIBUJO
+		// ------------------------------------------------------------------
+		// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
+		const float clearColor[] = { 0.10f, 0.014f, 0.16f, 1.0f }; 
+		//const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+		auto dsvHandle = m_surface->GetDepthBufferView();
+			
+		// Limpiar la pantalla
+		context.ClearRenderTarget(rtvHandle, clearColor);
+		context.ClearDepth(dsvHandle, 1.0f, 0);
+		context.SetRenderTargets(1, &rtvHandle, &dsvHandle);
+			
+		// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
+		context.SetDescriptorHeaps(&m_srvHeap, 1);
+			
+		// Configurar Viewport y Scissor Test explícitamente en este frame
+		context.SetViewport(m_viewport);
+		context.SetScissorRect(m_scissorRect);
+			
+		m_sceneRenderer->OnRender(&context, m_camera, frameIndex);
+			
+		// ------------------------------------------------------------------
+		// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
+		// ------------------------------------------------------------------
+		context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
-		m_device->EndFrame();
-		m_device->Present(m_surface.get());
+		// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
+		m_commandQueue->ExecuteCommandList(commandList, frameIndex);
+
+		// 5. Intercambiar los buffers y mostrar en pantalla (VSync activado por ahora)
+		m_surface->Present(true);
 	}
 
 	void PlayerGame::OnMouseDown(MouseButtonState btnState, int x, int y)
@@ -165,13 +194,13 @@ namespace Bruno
 
 	void PlayerGame::InitializeCamera()
 	{
-		m_camera.LookAt(Math::Vector3(0, 0, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
-		m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 1.0f, 1000.0f);
+		//m_camera.LookAt(Math::Vector3(0, 0, -25), Math::Vector3(0, 0, 0), Math::Vector3(0, 1, 0));
+		//m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 1.0f, 1000.0f);
 	}
 
 	void PlayerGame::InitializeGraphicsContext()
 	{
-		m_graphicsContext = std::make_unique<GraphicsContext>(*m_device);
+		
 	}
 
 	void PlayerGame::InitializeMeshAndTexture()
@@ -193,8 +222,10 @@ namespace Bruno
 		surfaceParameters.Height = m_applicationParameters.WindowHeight;
 		surfaceParameters.WindowHandle = reinterpret_cast<HWND>(m_window->GetHandle());
 
-		m_surface = std::make_unique<Surface>(surfaceParameters);
-		m_surface->Initialize();
+		m_surface = std::make_unique<Surface>(*m_device, surfaceParameters);
+		m_commandQueue = &m_device->GetDirectCommandQueue();
+		
+		m_srvHeap = m_device->GetSRVDescriptorAllocator().GetHeap();
 	}
 
 	void PlayerGame::UpdateCBs(const GameTimer& timer)

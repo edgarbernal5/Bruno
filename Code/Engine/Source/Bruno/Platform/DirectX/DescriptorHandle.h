@@ -2,7 +2,7 @@
 
 #include "D3DHelpers.h"
 
-namespace Bruno::DX {
+namespace Bruno {
 
     struct DescriptorHandle 
     {

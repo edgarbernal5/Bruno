@@ -4,10 +4,10 @@
 #include <string>
 #include <map>
 
-#include "Bruno/Platform/DirectX/DescriptorAllocator_Gem.h"
+#include "Bruno/Platform/DirectX/DescriptorAllocator.h"
 #include "Bruno/Platform/DirectX/GraphicsPipelineState.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
 	class GraphicsDevice;
 }
@@ -31,24 +31,24 @@ namespace Bruno
 		// --- NUEVA INTERFAZ PARA DIRECTX 12 ---
 
 		// 1. Asignar el Pipeline y Root Signature (Compartidos entre muchos materiales)
-		void SetPipelineState(std::shared_ptr<DX::GraphicsPipelineState> pso, std::shared_ptr<DX::RootSignature> rootSig);
+		void SetPipelineState(std::shared_ptr<GraphicsPipelineState> pso, std::shared_ptr<RootSignature> rootSig);
     
-		std::shared_ptr<DX::GraphicsPipelineState> GetPSO() const { return m_pso; }
-		std::shared_ptr<DX::RootSignature> GetRootSignature() const { return m_rootSignature; }
+		std::shared_ptr<GraphicsPipelineState> GetPSO() const { return m_pso; }
+		std::shared_ptr<RootSignature> GetRootSignature() const { return m_rootSignature; }
 
 		// 2. Construir la tabla de descriptores para este material específico
-		void BuildDescriptors(DX::GraphicsDevice* device, DX::DescriptorAllocator* srvAllocator, AbstractAssetManager* assetManager);
+		void BuildDescriptors(GraphicsDevice* device, DescriptorAllocator* srvAllocator, AbstractAssetManager* assetManager);
 
 		// 3. Obtener el handle para el RenderLoop
 		D3D12_GPU_DESCRIPTOR_HANDLE GetTextureDescriptorTable() const;
 		
 	private:
 		// Punteros a los objetos compartidos (No se crean aquí, se inyectan)
-		std::shared_ptr<DX::GraphicsPipelineState> m_pso;
-		std::shared_ptr<DX::RootSignature> m_rootSignature;
+		std::shared_ptr<GraphicsPipelineState> m_pso;
+		std::shared_ptr<RootSignature> m_rootSignature;
 
 		// La reserva de memoria en el Heap de Descriptores para las texturas de ESTE material
-		DX::DescriptorAllocation m_textureDescriptorAllocation;
+		DescriptorAllocation m_textureDescriptorAllocation;
 		bool m_descriptorsBuilt = false;
 	};
 }

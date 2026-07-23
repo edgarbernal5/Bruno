@@ -1,13 +1,13 @@
 ﻿#pragma once
 
 #include "D3DHelpers.h"
-#include "DescriptorAllocator_Gem.h"
+#include "DescriptorAllocator.h"
 #include <wrl/client.h>
 #include <string>
 
 #include "UploadHeap.h"
 
-namespace Bruno::DX 
+namespace Bruno 
 {
     class UploadContext;
     
@@ -17,7 +17,7 @@ namespace Bruno::DX
     
     public:
         // Carga una textura desde disco y reserva su lugar en el heap
-        Texture2D(DX::GraphicsDevice& device, DX::UploadContext& uploadContext, DescriptorAllocator& srvAllocator, const std::wstring& filename);
+        Texture2D(GraphicsDevice& device, UploadContext& uploadContext, DescriptorAllocator& srvAllocator, const std::wstring& filename);
         ~Texture2D() = default;
 
         // Necesario para el Render Loop (Lo lee la GPU al dibujar)

@@ -1,16 +1,16 @@
 ﻿#include "brpch.h"
 #include "Texture2D.h"
 
-#include "Device.h"
-#include "UploadContext_Gem.h"
+#include "GraphicsDevice.h"
+#include "UploadContext.h"
 
 #include <DirectXTex.h> // Necesario para cargar texturas
 
-namespace Bruno::DX 
+namespace Bruno 
 {
     BR_RTTI_DEFINITIONS(Texture2D);
     
-    Texture2D::Texture2D(DX::GraphicsDevice& device, DX::UploadContext& uploadContext, DescriptorAllocator& srvAllocator, const std::wstring& filename)
+    Texture2D::Texture2D(GraphicsDevice& device, UploadContext& uploadContext, DescriptorAllocator& srvAllocator, const std::wstring& filename)
     {
         std::filesystem::path filePath(filename);
         if (!std::filesystem::exists(filePath))

@@ -4,11 +4,9 @@
 #include "Bruno/Platform/DirectX/Surface.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 
-#include <Bruno/Platform/DirectX/Shader.h>
 #include <Bruno/Platform/DirectX/VertexTypes.h>
 #include <Bruno/Platform/DirectX/GraphicsContext.h>
-#include <Bruno/Platform/DirectX/Queue.h>
-#include <Bruno/Platform/DirectX/Surface_Gem.h>
+#include <Bruno/Platform/DirectX/CommandQueue.h>
 #include <Bruno/Scene/Scene.h>
 #include <Bruno/Renderer/SceneRenderer.h>
 #include "Panels/Scene/SelectionService.h"
@@ -18,11 +16,8 @@
 #include <iostream>
 #include <Bruno/Core/Log.h>
 
-#include "PropertiesPanel.h"
 #include "SceneHierarchyPanel.h"
-#include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
-#include "Bruno/Platform/DirectX/Shader_Gem.h"
-#include "Gizmos/GizmoService_Gem.h"
+#include "Gizmos/GizmoService.h"
 #include "Gizmos/CameraGizmo.h"
 
 namespace Bruno
@@ -86,21 +81,21 @@ namespace Bruno
 		m_viewport.y = 0;
 		m_viewport.minDepth = D3D12_MIN_DEPTH;
 		m_viewport.maxDepth = D3D12_MAX_DEPTH;
-		m_dxDevice = Graphics::GetDXDevice();
+		m_device = Graphics::GetDevice();
 		
-		DX::SurfaceWindowParameters parameters;
+		SurfaceWindowParameters parameters;
 		parameters.Width = 100;
 		parameters.Height = 100;
 		parameters.BackBufferFormat = m_surfaceParameters.BackBufferFormat;
 		parameters.DepthBufferFormat = m_surfaceParameters.DepthBufferFormat;
 		parameters.WindowHandle = m_form->NativeHandle().Handle;
 		
-		m_dxSurface = std::make_unique<DX::Surface>(*m_dxDevice, parameters);
-		m_commandQueue = &m_dxDevice->GetDirectCommandQueue();
+		m_surface = std::make_unique<Surface>(*m_device, parameters);
+		m_commandQueue = &m_device->GetDirectCommandQueue();
 		
 		InitializeSceneRenderer();
 		InitializeGizmoService();
-		m_srvHeap = m_dxDevice->GetSRVDescriptorAllocator().GetHeap();
+		m_srvHeap = m_device->GetSRVDescriptorAllocator().GetHeap();
 		
 		/*
 		
@@ -117,7 +112,7 @@ namespace Bruno
 				return;
 			}
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
-			uint32_t frameIndex = m_dxSurface->GetCurrentBackBufferIndex();
+			uint32_t frameIndex = m_surface->GetCurrentBackBufferIndex();
 
 			//BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
 			
@@ -125,11 +120,11 @@ namespace Bruno
 			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
 			auto commandList = m_commandQueue->GetCommandList(frameIndex);
 			auto allocator = m_commandQueue->GetAllocator(frameIndex);
-			DX::GraphicsContext context(*m_dxDevice, commandList.Get(), allocator.Get());
+			GraphicsContext context(*m_device, commandList.Get(), allocator.Get());
 			
 			// 3. Extraer la textura real y su descriptor
-			auto backBuffer = m_dxSurface->GetCurrentBackBuffer();
-			auto rtvHandle = m_dxSurface->GetCurrentRenderTargetView();
+			auto backBuffer = m_surface->GetCurrentBackBuffer();
+			auto rtvHandle = m_surface->GetCurrentRenderTargetView();
 
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
@@ -142,7 +137,7 @@ namespace Bruno
 			// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
 			const float clearColor[] = { 0.10f, 0.014f, 0.16f, 1.0f }; 
 			//const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
-			auto dsvHandle = m_dxSurface->GetDepthBufferView();
+			auto dsvHandle = m_surface->GetDepthBufferView();
 			
 			// Limpiar la pantalla
 			context.ClearRenderTarget(rtvHandle, clearColor);
@@ -177,7 +172,7 @@ namespace Bruno
 			m_commandQueue->ExecuteCommandList(commandList, frameIndex);
 
 			// 5. Intercambiar los buffers y mostrar en pantalla (VSync activado por ahora)
-			m_dxSurface->Present(true);
+			m_surface->Present(true);
 		});
 		
 		m_form->Handle()->RenderForAttributes.AutoRefresh = true;
@@ -191,7 +186,7 @@ namespace Bruno
 			BR_CORE_TRACE << "destroy. panel id = " << idxx << std::endl;
 
 			
-			auto device = Graphics::GetDXDevice();
+			auto device = Graphics::GetDevice();
 			device->Flush();
 
 			m_isVisible = false;
@@ -233,9 +228,9 @@ namespace Bruno
 			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
 
 			auto formSize = m_form->GetSize();
-			if (m_dxSurface)
+			if (m_surface)
 			{
-				m_dxSurface->Resize(formSize.Width, formSize.Height);
+				m_surface->Resize(formSize.Width, formSize.Height);
 			}
 			m_viewport.height = formSize.Height;
 			m_viewport.width = formSize.Width;
@@ -259,7 +254,7 @@ namespace Bruno
 			m_viewport.height = args.NewSize.Height;
 			m_viewport.width = args.NewSize.Width;
 			m_scissorRect = { 0, 0, static_cast<LONG>(args.NewSize.Width), static_cast<LONG>(args.NewSize.Height) };
-			m_dxSurface->Resize(args.NewSize.Width, args.NewSize.Height);
+			m_surface->Resize(args.NewSize.Width, args.NewSize.Height);
 
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.NewSize.Width, (float)args.NewSize.Height));
 			m_isResizing = false;
@@ -419,7 +414,9 @@ namespace Bruno
 		{
 			//BR_CORE_TRACE << "Gizmo type selected: " << acmb.widget.option() << std::endl;
 			if (!acmb.SelectedIndex.has_value())
+			{
 				return;
+			}
 			
 			auto index = acmb.SelectedIndex.value();
 			if (m_dxGizmoService)
@@ -442,7 +439,7 @@ namespace Bruno
 #endif
 		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
 
-		auto device = Graphics::GetDXDevice();
+		auto device = Graphics::GetDevice();
 		device->Flush();
 
 		m_isVisible = false;
@@ -451,61 +448,12 @@ namespace Bruno
 
 	void ScenePanel::OnUpdate(const GameTimer& timer)
 	{
-		//BR_CORE_TRACE << "Paint panel. id = " << idxx << ". delta time = " << timer.GetDeltaTime() << std::endl;
-
-		if (!m_isVisible || m_isResizing || m_isSizingMoving || !m_surface)
-			return;
-
-		auto device = Graphics::GetDevice();
-		device->BeginFrame();
-
-		//UpdateCBs(timer);
-		//m_gizmoService->Update();
+		
 	}
 
 	void ScenePanel::OnDraw()
 	{
-		if (!m_isVisible || m_isResizing || m_isSizingMoving || !m_surface)
-			return;
-
-		auto device = Graphics::GetDevice();
-		Math::Color clearColor{ 1.0f, 1.0f, 0.0f, 1.0f };
-		if (idxx == 2) {
-			clearColor.R(0.5f);
-		}
-		else if (idxx == 3) {
-			clearColor.R(0.25f);
-			clearColor.G(0.0f);
-		}
-		else if (idxx == 4) {
-			clearColor.R(0.0f);
-			clearColor.G(0.25f);
-			clearColor.B(0.5f);
-		}
-		Texture& backBuffer = m_surface->GetBackBuffer();
-		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
-
-		m_graphicsContext->Reset();
-		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		m_graphicsContext->FlushBarriers();
-
-		m_graphicsContext->ClearRenderTarget(backBuffer, clearColor);
-		m_graphicsContext->ClearDepthStencilTarget(depthBuffer, 1.0f, 0);
-
-		m_graphicsContext->SetViewport(m_surface->GetViewport());
-		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
-
-		//m_sceneRenderer->OnRender(m_graphicsContext.get());
-
-		//m_gizmoService->Render(m_graphicsContext.get(), m_surface.get());
-
-		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
-		m_graphicsContext->FlushBarriers();
-
-		device->SubmitContextWork(*m_graphicsContext);
-
-		device->EndFrame();
-		device->Present(m_surface.get());
+		
 	}
 
 	bool ScenePanel::IsEnabled()
@@ -523,7 +471,7 @@ namespace Bruno
 		m_dxGizmoService->SetGizmoType(static_cast<GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
 		m_dxGizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? TransformSpace::World : TransformSpace::Local);
 		
-		auto device = Graphics::GetDXDevice();
+		auto device = Graphics::GetDevice();
 		
 		m_cameraGizmo = std::make_unique<CameraGizmo>(device, m_sceneDocument->GetCamera());
 		m_cameraGizmo->Initialize();

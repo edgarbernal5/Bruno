@@ -4,7 +4,6 @@
 #include "Bruno/Core/Application.h"
 #include "Bruno/Core/GameTimer.h"
 #include "Bruno/Renderer/ShaderCache.h"
-#include "Bruno/Renderer/PipelineStateObjectCache.h"
 #include "Bruno/Content/ContentManager.h"
 
 #include "Bruno/Core/KeyCodes.h"
@@ -15,13 +14,8 @@
 
 namespace Bruno
 {
-	namespace DX
-	{
-		class GraphicsDevice;
-		class CommandQueueManager;
-	}
-
 	class GraphicsDevice;
+	class CommandQueueManager;
 	class AbstractAssetManager;
 
 	class Game : public Application
@@ -33,7 +27,6 @@ namespace Bruno
 		inline GraphicsDevice* GetDevice() { return m_device.get(); }
 		static Game* GetInstance() { return (Game*)g_instance; }
 		inline ShaderCache& GetShaderCache() { return m_shaderCache; }
-		inline PipelineStateObjectCache& GetPsoCache() { return m_psoCache; }
 		inline AbstractAssetManager* GetAssetManager() { return m_assetManager.get(); }
 		virtual void OnTick();
 
@@ -53,11 +46,9 @@ namespace Bruno
 		GameTimer m_timer;
 		ContentManager m_contentManager;
 		std::shared_ptr<GraphicsDevice> m_device;
-		std::shared_ptr<DX::GraphicsDevice> m_dxDevice;
-		std::shared_ptr<DX::CommandQueueManager> m_commandQueueManager;
+		std::shared_ptr<CommandQueueManager> m_commandQueueManager;
 		std::shared_ptr<AbstractAssetManager> m_assetManager;
 		ShaderCache m_shaderCache;
-		PipelineStateObjectCache m_psoCache;
 
 		int m_framesThisSecond = 0;
 		int m_framesPerSecond = 0;
@@ -74,10 +65,5 @@ namespace Bruno::Graphics
 	inline ShaderCache& GetShaderCache()
 	{
 		return Game::GetInstance()->GetShaderCache();
-	}
-
-	inline PipelineStateObjectCache& GetPsoCache()
-	{
-		return Game::GetInstance()->GetPsoCache();
 	}
 }

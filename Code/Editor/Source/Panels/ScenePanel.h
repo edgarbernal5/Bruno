@@ -9,20 +9,14 @@
 #include <Bruno/Core/GameTimer.h>
 #include <Bruno/Renderer/RenderItem.h>
 #include <mutex>
-#include <Bruno/Platform/DirectX/Texture.h>
 #include <Bruno/Renderer/Camera.h>
 
-#include "Bruno/Platform/DirectX/DepthBuffer_Gem.h"
-#include "Bruno/Platform/DirectX/Device.h"
+#include "Bruno/Platform/DirectX/DepthBuffer.h"
+#include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Gizmos/GizmoService.h"
 
 namespace Bruno
 {
-	namespace DX
-	{
-		class GizmoService;
-		class Surface;
-	}
 	class Model;
 	class Surface;
 	class EditorGame;
@@ -67,15 +61,12 @@ namespace Bruno
 		Berta::ComboBox m_gizmoTypeCombobox;
 		Berta::Button m_gizmoTransformSpaceButton;
 
-		std::unique_ptr<Surface> m_surface;
 		int idxx{ 0 };
 		SceneSurfaceParameters m_surfaceParameters;
 		EditorGame* m_editorGame;
 		std::shared_ptr<SceneDocument>		m_sceneDocument;
 		std::shared_ptr<Scene>				m_scene;
 		SceneRenderer*		m_sceneRenderer { nullptr };
-
-		std::shared_ptr<Model> m_model;
 		
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
 
@@ -86,12 +77,12 @@ namespace Bruno
 #endif
 
 		std::shared_ptr<SelectionService> m_selectionService;
-		std::shared_ptr<DX::GizmoService> m_dxGizmoService;
+		std::shared_ptr<GizmoService> m_dxGizmoService;
 		std::unique_ptr<CameraGizmo> m_cameraGizmo;
 
-		DX::GraphicsDevice* m_dxDevice;
-		std::unique_ptr<DX::Surface> m_dxSurface;
-		DX::CommandQueue* m_commandQueue { nullptr };
+		GraphicsDevice* m_device;
+		std::unique_ptr<Surface> m_surface;
+		CommandQueue* m_commandQueue { nullptr };
 		Math::Viewport m_viewport;
 		D3D12_RECT m_scissorRect;
 

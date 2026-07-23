@@ -2,7 +2,7 @@
 
 #include "D3DConstants.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
     struct SurfaceWindowParameters
     {

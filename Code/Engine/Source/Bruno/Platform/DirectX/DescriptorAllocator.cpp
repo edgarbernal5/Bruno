@@ -1,74 +1,74 @@
 ﻿#include "brpch.h"
 #include "DescriptorAllocator.h"
 
-#include "Device.h"
+#include "GraphicsDevice.h"
 
-namespace Bruno::DX {
-
-    DescriptorAllocator2::DescriptorAllocator2(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible)
-        : m_heapType(type), m_capacity(capacity)
+namespace Bruno 
+{
+    DescriptorAllocator::DescriptorAllocator(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible)
+    : m_heapType(type), m_capacity(capacity), m_allocatedCount(0)
     {
         auto nativeDevice = device.GetNativeDevice();
+        
+        // 1. Describir cómo queremos nuestro Heap
+        D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+        heapDesc.NumDescriptors = capacity;
+        heapDesc.Type = type;
+    
+        // REGLA DE ORO: Si es para texturas/CBVs que se usan en el Draw(), DEBE ser Shader Visible
+        heapDesc.Flags = isShaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+        heapDesc.NodeMask = 0; // 0 significa que asume un solo adaptador (GPU)
+
+        // 2. Crear el Heap nativo en la GPU
+        HRESULT hr = nativeDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_heap));
+        if (FAILED(hr))
+        {
+            throw std::runtime_error("Fallo al crear el Descriptor Heap.");
+        }
+
+        // 3. Obtener el tamaño en bytes de cada descriptor para este tipo de Heap (varía según GPU)
         m_descriptorSize = nativeDevice->GetDescriptorHandleIncrementSize(type);
 
-        D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-        desc.Type = type;
-        desc.NumDescriptors = capacity;
-        desc.Flags = isShaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-        desc.NodeMask = 0;
-
-        ThrowIfFailed(nativeDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_heap)));
+        // 4. Guardar los cabezales de inicio (para la magia matemática de Allocate)
+        m_cpuStart = m_heap->GetCPUDescriptorHandleForHeapStart();
+    
+        if (isShaderVisible) {
+            m_gpuStart = m_heap->GetGPUDescriptorHandleForHeapStart();
+        } else {
+            m_gpuStart.ptr = 0; // Si no es shader visible, el GPU handle no es válido
+        }
     }
 
-    std::optional<uint32_t> DescriptorAllocator2::Allocate() 
+    DescriptorAllocation DescriptorAllocator::Allocate(uint32_t count) 
     {
-        // C++17: Mutex locking seguro. Si falla algo, se libera solo.
-        std::scoped_lock lock(m_allocationMutex);
-
-        // Estrategia 1: Reutilizar espacios que han sido liberados (Free List)
-        if (!m_freeIndices.empty()) 
+        if (m_allocatedCount + count > m_capacity)
         {
-            uint32_t index = m_freeIndices.back();
-            m_freeIndices.pop_back();
-            return index;
+            // En un motor AAA real, aquí instanciaríamos un nuevo Heap y lo encadenaríamos,
+            // pero bajo el principio KISS, lanzar una excepción para redimensionar la capacidad es perfecto hoy.
+            throw std::runtime_error("DescriptorAllocator se ha quedado sin capacidad.");
         }
 
-        // Estrategia 2: Si no hay libres, consumimos espacio nuevo (Linear Allocation)
-        if (m_currentOffset < m_capacity) 
-        {
-            uint32_t index = m_currentOffset;
-            m_currentOffset++;
-            return index;
-        }
-
-        // Out of Memory (OOM) en este Heap
-        // En un motor AAA real, aquí se crearía una "Página" nueva automáticamente.
-        return std::nullopt; 
-    }
-
-    void DescriptorAllocator2::Free(uint32_t index) 
-    {
-        if (index >= m_capacity) return; // Prevención de crash
-
-        std::scoped_lock lock(m_allocationMutex);
+        DescriptorAllocation allocation;
+        allocation.Index = m_allocatedCount;
+        allocation.Count = count;
+        allocation.DescriptorSize = m_descriptorSize;
         
-        // Guardamos el índice para reciclarlo cuando se asigne una nueva textura
-        m_freeIndices.push_back(index);
-    }
-
-    DescriptorHandle DescriptorAllocator2::GetHandle(uint32_t index) const 
-    {
-        DescriptorHandle handle;
-        if (index >= m_capacity) return handle; // Retorna un handle inválido
-
-        // Aritmética de punteros para saber exactamente en qué byte vive este descriptor
-        handle.CPU.ptr = m_heap->GetCPUDescriptorHandleForHeapStart().ptr + (index * m_descriptorSize);
-
-        if (m_heap->GetDesc().Flags & D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE) 
+        // Magia aritmética: Avanzamos los punteros sumando bytes exactos.
+        // Costo de CPU: Prácticamente 0 ciclos de reloj.
+        allocation.CPU.ptr = m_cpuStart.ptr + (static_cast<SIZE_T>(m_allocatedCount) * m_descriptorSize);
+        
+        if (m_gpuStart.ptr != 0)
         {
-            handle.GPU.ptr = m_heap->GetGPUDescriptorHandleForHeapStart().ptr + (index * m_descriptorSize);
+            allocation.GPU.ptr = m_gpuStart.ptr + (static_cast<SIZE_T>(m_allocatedCount) * m_descriptorSize);
+        } 
+        else
+        {
+            allocation.GPU.ptr = 0;
         }
 
-        return handle;
+        // Avanzamos el cabezal de memoria
+        m_allocatedCount += count;
+        
+        return allocation;
     }
 }

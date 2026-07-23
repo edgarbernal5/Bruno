@@ -2,8 +2,8 @@
 
 #include "Bruno/Core/RTTI.h"
 #include "Bruno/Content/Asset.h"
-#include "Bruno/Platform/DirectX/IndexBuffer_Gem.h"
-#include "Bruno/Platform/DirectX/VertexBuffer_Gem.h"
+#include "Bruno/Platform/DirectX/IndexBuffer.h"
+#include "Bruno/Platform/DirectX/VertexBuffer.h"
 #include "Bruno/Math/Math.h"
 
 #include <string>
@@ -72,11 +72,11 @@ namespace Bruno
 
 		AssetType GetAssetType() const override { return AssetType::Model; }
 
-		const std::shared_ptr<DX::IndexBuffer>& GetIndexBuffer() const { return m_indexBuffer; }
-		const std::shared_ptr<DX::VertexBuffer>& GetVertexBuffer() const { return m_vertexBuffer; }
+		const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const { return m_indexBuffer; }
+		const std::shared_ptr<VertexBuffer>& GetVertexBuffer() const { return m_vertexBuffer; }
 
-		void SetIndexBuffer(std::shared_ptr<DX::IndexBuffer> buffer);
-		void SetVertexBuffer(std::shared_ptr<DX::VertexBuffer> buffer);
+		void SetIndexBuffer(std::shared_ptr<IndexBuffer> buffer);
+		void SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer);
 
 		const std::vector<std::shared_ptr<Mesh>>& GetMeshes() { return m_meshes; }
 		std::shared_ptr<Material>& GetMaterial(uint32_t materialIndex);
@@ -92,8 +92,8 @@ namespace Bruno
 		std::vector<uint32_t> m_indices;
 		std::vector<ModelNode> m_modelNodes;
 
-		std::shared_ptr<DX::VertexBuffer> m_vertexBuffer;
-		std::shared_ptr<DX::IndexBuffer> m_indexBuffer;
+		std::shared_ptr<VertexBuffer> m_vertexBuffer;
+		std::shared_ptr<IndexBuffer> m_indexBuffer;
 	};
 
 	class Mesh

@@ -2,12 +2,8 @@
 #include "ModelReader.h"
 
 #include "Bruno/Content/ContentReader.h"
-#include "Bruno/Platform/DirectX/IndexBuffer.h"
-#include "Bruno/Platform/DirectX/VertexBuffer.h"
-#include "Bruno/Platform/DirectX/VertexTypes.h"
 
 #include "Bruno/Renderer/Material.h"
-#include "Bruno/Platform/DirectX/Texture.h"
 
 namespace Bruno
 {

@@ -3,14 +3,14 @@
 
 #include "Constants.h"
 #include "GizmoBasicTypes.h"
-#include "Bruno/Platform/DirectX/GraphicsContext_Gem.h"
+#include "Bruno/Platform/DirectX/GraphicsContext.h"
 #include "Bruno/Platform/DirectX/GraphicsPipelineState.h"
-#include "Bruno/Platform/DirectX/RootSignature_Gem.h"
+#include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
 
 namespace Bruno
 {
-    CameraGizmo::CameraGizmo(DX::GraphicsDevice* device, Camera& camera) :
+    CameraGizmo::CameraGizmo(GraphicsDevice* device, Camera& camera) :
         m_camera(camera), 
         m_device(device),
         m_cameraGizmoBatch(device)
@@ -24,7 +24,7 @@ namespace Bruno
         m_cameraGizmoBatch.Begin();
         
         // 2. Compilar/Cargar Shaders Unlit sencillos para Gizmos
-        DX::ShaderCompiler compiler; 
+        ShaderCompiler compiler; 
 
         // Compilas usando DXC (nota el _6_0)
         auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"VS", L"vs_6_0");
@@ -35,7 +35,7 @@ namespace Bruno
         gizmoParams[0].InitAsConstants(16, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 
         // Inicializamos la firma sin samplers
-        m_rootSignature = std::make_unique<DX::RootSignature>(*m_device);
+        m_rootSignature = std::make_unique<RootSignature>(*m_device);
         m_rootSignature->Initialize(1, gizmoParams);
 
         // 1. Input Layout EXCLUSIVO para Gizmos (Position + Color)
@@ -87,7 +87,7 @@ namespace Bruno
         psoDesc.SampleDesc.Count = 1;
 
         // 5. Instanciar y configurar la clase genérica
-        m_psoDepthOff = std::make_unique<DX::GraphicsPipelineState>(*m_device);
+        m_psoDepthOff = std::make_unique<GraphicsPipelineState>(*m_device);
         m_psoDepthOff->Initialize(psoDesc);
     }
 
@@ -133,7 +133,7 @@ namespace Bruno
         m_cameraGizmoBatch.End(frameIndex);
     }
     
-    void CameraGizmo::RenderCameraGizmo(DX::GraphicsContext* context, uint32_t frameIndex, Math::Viewport mainViewport)
+    void CameraGizmo::RenderCameraGizmo(GraphicsContext* context, uint32_t frameIndex, Math::Viewport mainViewport)
     {
         // 1. Guardar el viewport original y configurar el de la esquina (Arriba a la Derecha)
         
@@ -281,7 +281,7 @@ namespace Bruno
                 mousePosition.y >= m_gizmoViewport.y && mousePosition.y <= (m_gizmoViewport.y + m_gizmoViewport.height));
     }
 
-    void CameraGizmo::RenderBatch(DX::GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProjection)
+    void CameraGizmo::RenderBatch(GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProjection)
     {
         if (m_cameraGizmoBatch.GetIndexCount() == 0)
         {

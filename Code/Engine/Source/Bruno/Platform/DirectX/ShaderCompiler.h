@@ -5,7 +5,7 @@
 #include <wrl/client.h>
 #include <dxcapi.h>
 
-namespace Bruno::DX
+namespace Bruno
 {
     class ShaderCompiler {
     public:

@@ -1,7 +1,7 @@
 ﻿#include "brpch.h"
 #include "ShaderCompiler.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
     ShaderCompiler::ShaderCompiler()
     {

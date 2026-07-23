@@ -1,9 +1,9 @@
 ﻿#include "brpch.h"
 #include "CommandContext.h"
 
-#include "Device.h"
+#include "GraphicsDevice.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
     void CommandContext::Close()
     {
@@ -16,7 +16,7 @@ namespace Bruno::DX
         ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), nullptr));
     }
 
-    CommandContext::CommandContext(DX::GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE commandType) :
+    CommandContext::CommandContext(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE commandType) :
         m_device(device), m_commandType(commandType)
     {
         ThrowIfFailed(device.GetNativeDevice()->CreateCommandAllocator(
@@ -30,7 +30,7 @@ namespace Bruno::DX
         m_commandList->Close();
     }
 
-    CommandContext::CommandContext(DX::GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE commandType,
+    CommandContext::CommandContext(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE commandType,
         ID3D12GraphicsCommandList* existingList, ID3D12CommandAllocator* existingAllocator) :
         m_device(device), m_commandType(commandType), m_commandList(existingList), m_commandAllocator(existingAllocator)
     {

@@ -6,7 +6,7 @@
 
 #include <Bruno/Platform/Windows/BertaWindow.h>
 #include <Bruno/Platform/DirectX/Shader.h>
-#include "Bruno/Platform/DirectX/Texture.h"
+#include "Bruno/Platform/DirectX/Texture2D.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Bruno/Renderer/Model.h"
 #include "Bruno/Content/ContentManager.h"

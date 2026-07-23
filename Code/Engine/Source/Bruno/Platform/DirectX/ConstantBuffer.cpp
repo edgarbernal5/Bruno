@@ -1,7 +1,7 @@
 ﻿#include "brpch.h"
-#include "ConstantBuffer_Gem.h"
+#include "ConstantBuffer.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
     ConstantBuffer::ConstantBuffer(ID3D12Device* device, size_t bufferSize)
     {

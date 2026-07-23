@@ -1,16 +1,12 @@
 #pragma once
 
-#include <Bruno/Platform/DirectX/RootSignature_Gem.h>
+#include <Bruno/Platform/DirectX/RootSignature.h>
 #include <Bruno/Platform/DirectX/GraphicsPipelineState.h>
 #include <Bruno/Math/Math.h>
 
 namespace Bruno
 {
-	namespace DX
-	{
-		class GraphicsContext;
-	}
-	
+	class GraphicsContext;
 	class Scene;
 	class Shader;
 	class AbstractAssetManager;
@@ -23,16 +19,16 @@ namespace Bruno
 
 		// Se llama cuando cargas una escena o agregas un objeto
 		void InitEntitiesForRender();
-		void InitializeOpaqueRootSignature(DX::GraphicsDevice* device);
-		void InitializeOpaquePSO(DX::GraphicsDevice* device);
-		void OnRender(DX::GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
+		void InitializeOpaqueRootSignature(GraphicsDevice* device);
+		void InitializeOpaquePSO(GraphicsDevice* device);
+		void OnRender(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
 		
 	private:
 		std::shared_ptr<Scene> m_scene;
 		AbstractAssetManager* m_assetManager;
 
-		std::shared_ptr<DX::RootSignature> m_opaqueRootSignature;
+		std::shared_ptr<RootSignature> m_opaqueRootSignature;
 		std::unique_ptr<Shader> m_opaqueShader;
-		std::shared_ptr<DX::GraphicsPipelineState> m_opaquePSO;
+		std::shared_ptr<GraphicsPipelineState> m_opaquePSO;
 	};
 }

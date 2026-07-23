@@ -5,7 +5,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 
-namespace Bruno::DX
+namespace Bruno
 {
     class RootSignatureBuilder {
     public:

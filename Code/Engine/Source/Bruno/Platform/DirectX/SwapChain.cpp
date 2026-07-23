@@ -1,9 +1,9 @@
 ﻿#include "brpch.h"
 #include "SwapChain.h"
-#include "Device.h"
-#include "Queue.h"
+#include "GraphicsDevice.h"
+#include "CommandQueue.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
     SwapChain::SwapChain(GraphicsDevice& device, SurfaceWindowParameters const& parameters)
         : m_device(device), m_currentBufferIndex(0), m_parameters(parameters)

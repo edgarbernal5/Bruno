@@ -1,9 +1,9 @@
 ﻿#include "brpch.h"
 #include "RenderContext.h"
 
-#include "Device.h"
+#include "GraphicsDevice.h"
 
-namespace Bruno::DX
+namespace Bruno
 {
     RenderContext::RenderContext(GraphicsDevice& device) : m_device(device) 
     {
