@@ -1,4 +1,4 @@
-#include "brpch.h"
+#include "brcppch.h"
 #include "ContentTypeWriterManager.h"
 
 #include "Writers/ShaderWriter.h"

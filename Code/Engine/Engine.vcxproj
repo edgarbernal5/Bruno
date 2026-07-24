@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props')" />
+  <Import Project="..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.props" Condition="Exists('..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.props')" />
+  <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -52,16 +53,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\Output\$(Configuration)_$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>..\..\Output\$(Configuration)_$(Platform)_tmp\$(ProjectName)\</IntDir>
+    <ExternalIncludePath>Dependencies\entt\include</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;BT_PLATFORM_WINDOWS;BT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\Berta\Code\Berta\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -70,7 +72,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\bin\Debug_x64\nana.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\DirectXTex\bin\DirectXTexd.lib;Dependencies\zlib\bin\zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -79,10 +81,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BT_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Source;Dependencies\nana\include;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\d3dx12;Dependencies\Berta\Code\Berta\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
@@ -94,7 +96,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\nana\bin\Release_x64\nana.lib;Dependencies\DirectXTex\bin\DirectXTex.lib;Dependencies\zlib\bin\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;Dependencies\DirectXTex\bin\DirectXTex.lib;Dependencies\zlib\bin\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -104,27 +106,38 @@
     <ClInclude Include="Source\Bruno\Content\AssetTable.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTypes.h" />
     <ClInclude Include="Source\Bruno\Core\UUID.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\CommandContext.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueueManager.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorHandle.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\RenderContext.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderCompiler.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Shader.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\SurfaceTypes.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\SwapChain.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Texture2D.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadHeap.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
+    <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_barriers.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_check_feature_support.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_core.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_default.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_pipeline_state_stream.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_property_format_table.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_render_pass.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_resource_helpers.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_root_signature.h" />
-    <ClInclude Include="Dependencies\d3dx12\d3dx12_state_object.h" />
     <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h" />
     <ClInclude Include="Dependencies\zlib\include\zconf.h" />
     <ClInclude Include="Dependencies\zlib\include\zlib.h" />
     <ClInclude Include="Source\Bruno\Content\Asset.h" />
     <ClInclude Include="Source\Bruno\Content\AssetMetadata.h" />
-    <ClInclude Include="Source\Bruno\Renderer\PipelineStateObjectCache.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\RenderObjectBinding.h" />
     <ClInclude Include="Source\Bruno\Content\ContentManager.h" />
     <ClInclude Include="Source\Bruno\Content\ContentReader.h" />
     <ClInclude Include="Source\Bruno\Content\ContentTypeReader.h" />
@@ -149,41 +162,22 @@
     <ClInclude Include="Source\Bruno\Core\Stream.h" />
     <ClInclude Include="Source\Bruno\Core\StringHelpers.h" />
     <ClInclude Include="Source\Bruno\Math\Math.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\Context.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DConstants.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DHelpers.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\GpuBuffer.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\PipelineStateObject.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Resource.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCore.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h" />
     <ClInclude Include="Source\Bruno\Core\Window.h" />
     <ClInclude Include="Source\brpch.h" />
     <ClInclude Include="Source\Bruno.h" />
     <ClInclude Include="Source\Bruno\Core\Game.h" />
     <ClInclude Include="Source\Bruno\EntryPoint.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\Resources.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\Shader.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderProgram.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\Texture.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\TextureHelpers.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexTypes.h" />
-    <ClInclude Include="Source\Bruno\Platform\Windows\NanaWindow.h" />
+    <ClInclude Include="Source\Bruno\Platform\Windows\BertaWindow.h" />
     <ClInclude Include="Source\Bruno\Platform\Windows\WindowsGameWindow.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
     <ClInclude Include="Source\Bruno\Renderer\Camera.h" />
     <ClInclude Include="Source\Bruno\Renderer\Material.h" />
     <ClInclude Include="Source\Bruno\Renderer\Model.h" />
-    <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch.h" />
     <ClInclude Include="Source\Bruno\Renderer\RenderItem.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
     <ClInclude Include="Source\Bruno\Renderer\SceneRenderer.h" />
@@ -199,8 +193,28 @@
     <ClCompile Include="Source\Bruno\Content\AssetManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\AssetTable.cpp" />
     <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\CommandContext.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueueManager.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsDevice.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsContext.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueue.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\RenderContext.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignature.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderCompiler.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Shader.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\SwapChain.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Texture2D.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadHeap.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp" />
-    <ClCompile Include="Source\Bruno\Renderer\PipelineStateObjectCache.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentTypeReader.cpp" />
@@ -220,34 +234,17 @@
     <ClCompile Include="Source\Bruno\Core\Stream.cpp" />
     <ClCompile Include="Source\Bruno\Core\StringHelpers.cpp" />
     <ClCompile Include="Source\Bruno\Math\Math.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\Context.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\GpuBuffer.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsContext.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\PipelineStateObject.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Resource.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueue.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\D3DCore.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsAdapter.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsDevice.cpp" />
     <ClCompile Include="Source\Bruno\Core\Window.cpp" />
     <ClCompile Include="Source\brpch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\Game.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\Resources.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignature.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\Shader.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderProgram.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\Texture.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexTypes.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\Windows\NanaWindow.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\Windows\BertaWindow.cpp" />
     <ClCompile Include="Source\Bruno\Platform\Windows\WindowsGameWindow.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Camera.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Material.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Model.cpp" />
@@ -264,15 +261,23 @@
     <None Include="packages.config" />
     <None Include="Source\Bruno\Math\Math.inl" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Dependencies\Berta\Code\Berta\Berta.vcxproj">
+      <Project>{43f596e7-94e6-4642-98c2-ac2be46955c0}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets')" />
+    <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets')" />
+    <Import Project="..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.targets" Condition="Exists('..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.611.2\build\native\Microsoft.Direct3D.D3D12.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\Microsoft.Direct3D.D3D12.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\Microsoft.Direct3D.DXC.targets'))" />
   </Target>
 </Project>

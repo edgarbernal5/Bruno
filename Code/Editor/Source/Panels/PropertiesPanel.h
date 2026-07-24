@@ -1,37 +1,38 @@
 #pragma once
 
-#include <nana/gui/widgets/panel.hpp>
-#include <nana/gui/place.hpp>
-#include <nana/gui/widgets/menu.hpp>
-#include <nana/gui/widgets/property_grid.hpp>
-#include "Properties/Property.h"
+#include <Berta/Controls/Panel.h>
+#include <Berta/GUI/Layout.h>
+#include <Berta/Controls/Menu.h>
+#include <Berta/Controls/PropertyGrid.h>
+
+#include "Bruno/Core/Events/Event.h"
+#include "Bruno/Scene/Scene.h"
 
 namespace Bruno
 {
 	class SelectionService;
-	class SceneHierarchy;
 	class SceneDocument;
 	class Entity;
 
-	class PropertiesPanel : public nana::panel<true>
+	class PropertiesPanel : public Berta::Panel
 	{
 	public:
-		PropertiesPanel(nana::window window, std::shared_ptr<SceneDocument> sceneDocument);
-		~PropertiesPanel();
+		PropertiesPanel(Berta::Window* window, std::shared_ptr<SceneDocument> sceneDocument);
+		~PropertiesPanel() override;
 
 	private:
-		void ClearPropertyGrid();
-		void DisposePropertyBinders();
+		void OnComponentUpdated(entt::registry& registry, entt::entity updatedEntity);
 
 		std::shared_ptr<SceneDocument> m_sceneDocument;
-		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;
+		std::shared_ptr<Scene> m_scene;
 		std::shared_ptr<SelectionService> m_selectionService;
 		EventHandlerId m_selectionChangedHandleId{ 0 };
 
-		nana::place m_place;
-		nana::propertygrid m_propertyGrid;
-		properties_collection m_currentProperties;
-		std::unordered_map<property_proxy, size_t> m_propOnChangedHandlers;
-		nana::menu m_asset_file_menu_popup;
+		Berta::Layout m_layout;
+		Berta::PropertyGrid m_propertyGrid;
+		entt::scoped_connection m_nameUpdateConnection;
+		entt::scoped_connection m_transformUpdateConnection;
+		entt::scoped_connection m_modelUpdateConnection;
+		bool m_isDirty = false;
 	};
 }

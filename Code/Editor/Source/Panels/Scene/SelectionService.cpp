@@ -8,7 +8,7 @@
 
 namespace Bruno
 {
-	SelectionService::SelectionService(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager) :
+	SelectionService::SelectionService(std::shared_ptr<Scene> scene, EditorAssetManager* assetManager) :
 		m_scene(scene),
 		m_assetManager(assetManager)
 	{
@@ -23,7 +23,9 @@ namespace Bruno
 	{
 		auto it = std::find(m_selections.begin(), m_selections.end(), selection);
 		if (it != m_selections.end())
+		{
 			m_selections.erase(it);
+		}
 	}
 
 	void SelectionService::SelectUnderMousePosition(const Camera& camera, const Math::Int2& mousePosition)

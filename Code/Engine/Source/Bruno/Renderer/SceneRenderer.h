@@ -1,31 +1,34 @@
 #pragma once
 
-#include <Bruno/Platform/DirectX/PipelineStateObject.h>
+#include <Bruno/Platform/DirectX/RootSignature.h>
+#include <Bruno/Platform/DirectX/GraphicsPipelineState.h>
 #include <Bruno/Math/Math.h>
 
 namespace Bruno
 {
-	class Scene;
 	class GraphicsContext;
+	class Scene;
 	class Shader;
-	class Surface;
 	class AbstractAssetManager;
+	class Camera;
 
 	class SceneRenderer
 	{
 	public:
-		SceneRenderer(std::shared_ptr<Scene> scene, Surface* surface, AbstractAssetManager* assetManager);
+		SceneRenderer(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager);
 
-		void OnRender(GraphicsContext* graphicsContext);
+		// Se llama cuando cargas una escena o agregas un objeto
+		void InitEntitiesForRender();
+		void InitializeOpaqueRootSignature(GraphicsDevice* device);
+		void InitializeOpaquePSO(GraphicsDevice* device);
+		void OnRender(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
+		
 	private:
 		std::shared_ptr<Scene> m_scene;
-		Surface* m_surface;
 		AbstractAssetManager* m_assetManager;
-		PipelineResourceSpace			m_meshPerObjectResourceSpace;
 
-		std::shared_ptr<RootSignature>			m_rootSignature;
-		std::unique_ptr<Shader>					m_opaqueShader;
-		std::unique_ptr<PipelineStateObject>	m_pipelineState;
-
+		std::shared_ptr<RootSignature> m_opaqueRootSignature;
+		std::unique_ptr<Shader> m_opaqueShader;
+		std::shared_ptr<GraphicsPipelineState> m_opaquePSO;
 	};
 }

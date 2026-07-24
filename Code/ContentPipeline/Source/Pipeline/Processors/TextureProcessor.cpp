@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "TextureProcessor.h"
 
 #include "Pipeline/Graphics/TextureContentItem.h"

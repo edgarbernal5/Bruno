@@ -1,24 +1,30 @@
 #pragma once
 
-#include <nana/gui/widgets/panel.hpp>
-#include <nana/gui/place.hpp>
+#include <Berta/Controls/Panel.h>
+#include <Berta/GUI/Layout.h>
 
 
 namespace Bruno
 {
 	class EditorGame;
 	class SceneDocument;
+	class SceneHierarchyPanel;
+	class ScenePanel;
+	class PropertiesPanel;
 
-	class SceneDocumentPanel : public nana::panel<true>
+	class SceneDocumentPanel : public Berta::Panel
 	{
 	public:
-		SceneDocumentPanel(nana::window window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument);
+		SceneDocumentPanel(Berta::Window* window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument);
 		~SceneDocumentPanel();
 
 	private:
 		EditorGame* m_editorGame;
 		std::shared_ptr<SceneDocument> m_sceneDocument;
+		std::unique_ptr<SceneHierarchyPanel> m_sceneHierarchyPanel;
+		std::unique_ptr<ScenePanel> m_scenePanel;
+		std::unique_ptr<PropertiesPanel> m_propertiesPanel;
 
-		nana::place m_place;
+		Berta::Layout m_layout;
 	};
 }

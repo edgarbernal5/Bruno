@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "AbstractProcessor.h"
 
 namespace Bruno

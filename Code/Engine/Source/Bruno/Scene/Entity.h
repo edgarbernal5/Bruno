@@ -14,7 +14,7 @@ namespace Bruno
 		Entity(entt::entity handle, Scene* scene) : m_entityHandle(handle), m_scene(scene) { }
 		~Entity() = default;
 
-		operator uint32_t () const { return (uint32_t)m_entityHandle; }
+		operator uint32_t () const { return static_cast<uint32_t>(m_entityHandle); }
 		operator bool() const;
 
 		bool operator==(const Entity& other) const
@@ -42,6 +42,9 @@ namespace Bruno
 		template<typename... T>
 		bool HasComponent() const;
 
+		template<typename T, typename... Func>
+		void Patch(Func &&...func) const;
+		
 		std::vector<UUID>& GetChildren();
 		UUID GetUUID() const;
 		Entity GetParent() const;

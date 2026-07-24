@@ -4,29 +4,26 @@
 #include "Bruno/Platform/DirectX/Surface.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 
-#include <Bruno/Platform/DirectX/IndexBuffer.h>
-#include <Bruno/Platform/DirectX/VertexBuffer.h>
-#include <Bruno/Platform/DirectX/Shader.h>
 #include <Bruno/Platform/DirectX/VertexTypes.h>
 #include <Bruno/Platform/DirectX/GraphicsContext.h>
-#include <Bruno/Content/ContentManager.h>
-#include <Bruno/Renderer/Model.h>
+#include <Bruno/Platform/DirectX/CommandQueue.h>
 #include <Bruno/Scene/Scene.h>
 #include <Bruno/Renderer/SceneRenderer.h>
 #include "Panels/Scene/SelectionService.h"
 #include "Scene/SceneDocument.h"
 #include "EditorGame.h"
 
-#include <nana/gui.hpp>
 #include <iostream>
 #include <Bruno/Core/Log.h>
+
 #include "SceneHierarchyPanel.h"
+#include "Gizmos/GizmoService.h"
+#include "Gizmos/CameraGizmo.h"
 
 namespace Bruno
 {
-	ScenePanel::ScenePanel(nana::window window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters) :
-		//nana::nested_form(window, nana::appear::bald<>()),
-		nana::panel<true>(window),
+	ScenePanel::ScenePanel(Berta::Window* window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters) :
+		Berta::Panel(window),
 		m_surfaceParameters(surfaceParameters),
 		m_sceneDocument(sceneDocument),
 
@@ -38,111 +35,182 @@ namespace Bruno
 
 		std::ostringstream idstr;
 		idstr << "Scene id " << idxx;
-		this->caption(idstr.str());
-		m_place.bind(*this);
+		this->SetCaption(idstr.str());
+		m_layout.Create(*this);
 
 		m_scene = m_sceneDocument->GetScene();
-		m_gizmoService = m_sceneDocument->GetGizmoService();
 		m_selectionService = m_sceneDocument->GetSelectionService();
+		
+		m_gizmoTypeCombobox.Create(*this, false, { 0, 0, 150, 25 });
+		m_gizmoTransformSpaceButton.Create(*this);
 
-		m_gizmoTypeCombobox.create(*this, { 0, 0, 150, 25 });
-		m_gizmoTransformSpaceButton.create(*this);
+		m_layout.Parse("{VerticalLayout {HorizontalLayout {gizmoTypeComboBox}{gizmoSpaceButton} Height=25} {renderForm}}");
 
-		m_place.div("vert <weight=25 <gizmoTypeComboBox><gizmoSpaceButton>>");
+		m_layout.Attach("gizmoTypeComboBox", m_gizmoTypeCombobox);
+		m_layout.Attach("gizmoSpaceButton", m_gizmoTransformSpaceButton);
 
-		m_place["gizmoTypeComboBox"] << m_gizmoTypeCombobox;
-		m_place["gizmoSpaceButton"] << m_gizmoTransformSpaceButton;
+		m_gizmoTypeCombobox.PushBack("None");
+		m_gizmoTypeCombobox.PushBack("Translation");
+		m_gizmoTypeCombobox.PushBack("Rotation");
+		m_gizmoTypeCombobox.PushBack("Scale");
 
-		m_gizmoTypeCombobox.push_back(("None"));
-		m_gizmoTypeCombobox.push_back(("Translation"));
-		m_gizmoTypeCombobox.push_back(("Rotation"));
-		m_gizmoTypeCombobox.push_back(("Scale"));
+		m_gizmoTypeCombobox.SetSelectedIndex(1);
+		m_gizmoTransformSpaceButton.SetCaption("World");
 
-		m_gizmoTypeCombobox.option(1);
-		m_gizmoTransformSpaceButton.caption("World");
-
-		m_gizmoTransformSpaceButton.events().click([&](const nana::arg_click& click)
+		m_gizmoTransformSpaceButton.GetEvents().Click.Connect([&](const Berta::ArgClick& click)
 		{
-			if (m_gizmoService->GetTransformSpace() == GizmoService::TransformSpace::World)
+			if (m_dxGizmoService->GetTransformSpace() == TransformSpace::World)
 			{
-				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::Local);
-				m_gizmoTransformSpaceButton.caption("World");
+				m_dxGizmoService->SetTransformSpace(TransformSpace::Local);
+				m_gizmoTransformSpaceButton.SetCaption("World");
 			}
 			else
 			{
-				m_gizmoService->SetTransformSpace(GizmoService::TransformSpace::World);
-				m_gizmoTransformSpaceButton.caption("Local");
+				m_dxGizmoService->SetTransformSpace(TransformSpace::World);
+				m_gizmoTransformSpaceButton.SetCaption("Local");
 			}
 		});
 
 		//m_form = this;
-		m_form = std::make_unique<nana::nested_form>(this->handle(), nana::appear::bald<>());
-
-		//TO-DO: ver si se puede agregar un evento al form o nested_form cuando llega un mensaje de WM_ACTIVATEAPP 
-		//para luego disparar un evento y saber si el panel está activado o no. Es útil para el timer y el rendering/painting.
+		m_form = std::make_unique<Berta::NestedForm>(this->Handle(), Berta::Rectangle{0,0,100,100}, Berta::FormStyle::Flat(), true);
+		m_layout.Attach("renderForm", *m_form);
+		
+		m_viewport.height = 100;
+		m_viewport.width = 100;
+		m_viewport.x = 0;
+		m_viewport.y = 0;
+		m_viewport.minDepth = D3D12_MIN_DEPTH;
+		m_viewport.maxDepth = D3D12_MAX_DEPTH;
+		m_device = Graphics::GetDevice();
+		
+		SurfaceWindowParameters parameters;
+		parameters.Width = 100;
+		parameters.Height = 100;
+		parameters.BackBufferFormat = m_surfaceParameters.BackBufferFormat;
+		parameters.DepthBufferFormat = m_surfaceParameters.DepthBufferFormat;
+		parameters.WindowHandle = m_form->NativeHandle().Handle;
+		
+		m_surface = std::make_unique<Surface>(*m_device, parameters);
+		m_commandQueue = &m_device->GetDirectCommandQueue();
+		
+		InitializeSceneRenderer();
+		InitializeGizmoService();
+		m_srvHeap = m_device->GetSRVDescriptorAllocator().GetHeap();
+		
 		/*
-		1. quitar el mensaje WM_ACTIVATEAPP como trivial (bedrock_windows.cpp)
-		2. crear el evento (en general_events.hpp)
-		3. crear el event code (event_code.hpp)
-		4. ver y analizar metodo bedrock::event_expose para emitir el evento
-		*/
-
+		
+		 */
 		// Single-thread rendering.
 #ifdef BR_SINGLE_THREAD_RENDERING
-		auto hwnd = reinterpret_cast<HWND>(m_form->native_handle());
-		m_form->draw_through([hwnd, this]
+		
+		m_form->SetCustomPaintCallback([this]()
 		{
 			m_timer.Tick();
+			
+			if (!m_isVisible || m_isResizing || m_isSizingMoving)
+			{
+				return;
+			}
+			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
+			uint32_t frameIndex = m_surface->GetCurrentBackBufferIndex();
 
-			OnUpdate(m_timer);
-			OnDraw();
+			//BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
+			
+			// 2. Pedirle a nuestra cola el "lápiz" (CommandList). 
+			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
+			auto commandList = m_commandQueue->GetCommandList(frameIndex);
+			auto allocator = m_commandQueue->GetAllocator(frameIndex);
+			GraphicsContext context(*m_device, commandList.Get(), allocator.Get());
+			
+			// 3. Extraer la textura real y su descriptor
+			auto backBuffer = m_surface->GetCurrentBackBuffer();
+			auto rtvHandle = m_surface->GetCurrentRenderTargetView();
 
-			RECT r;
-			::GetClientRect(hwnd, &r);
-			::InvalidateRect(hwnd, &r, FALSE);
+			// ------------------------------------------------------------------
+			// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
+			// ------------------------------------------------------------------
+			context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			
+			// ------------------------------------------------------------------
+			// FASE DE DIBUJO
+			// ------------------------------------------------------------------
+			// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
+			const float clearColor[] = { 0.10f, 0.014f, 0.16f, 1.0f }; 
+			//const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+			auto dsvHandle = m_surface->GetDepthBufferView();
+			
+			// Limpiar la pantalla
+			context.ClearRenderTarget(rtvHandle, clearColor);
+			context.ClearDepth(dsvHandle, 1.0f, 0);
+			context.SetRenderTargets(1, &rtvHandle, &dsvHandle);
+			
+			// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
+			context.SetDescriptorHeaps(&m_srvHeap, 1);
+			
+			SetCameraGizmoViewport();
+			
+			// Configurar Viewport y Scissor Test explícitamente en este frame
+			context.SetViewport(m_viewport);
+			context.SetScissorRect(m_scissorRect);
+			
+			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
+			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
+    
+			m_dxGizmoService->Update();
+			m_dxGizmoService->BuildGeometry(frameIndex);
+			m_dxGizmoService->Render(&context, frameIndex, viewProj);
+			
+			m_cameraGizmo->BuildCameraGizmoGeometry(frameIndex);
+			m_cameraGizmo->RenderCameraGizmo(&context, frameIndex, m_viewport);
+			
+			// ------------------------------------------------------------------
+			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
+			// ------------------------------------------------------------------
+			context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+
+			// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
+			m_commandQueue->ExecuteCommandList(commandList, frameIndex);
+
+			// 5. Intercambiar los buffers y mostrar en pantalla (VSync activado por ahora)
+			m_surface->Present(true);
 		});
+		
+		m_form->Handle()->RenderForAttributes.AutoRefresh = true;
 #endif // SINGLE_THREAD_RENDERING
 
-		this->events().destroy([this](const nana::arg_destroy& args)
+		this->GetEvents().Destroy.Connect([this](const Berta::ArgDestroy& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
 			BR_CORE_TRACE << "destroy. panel id = " << idxx << std::endl;
 
+			
 			auto device = Graphics::GetDevice();
-			device->WaitForIdle();
+			device->Flush();
 
-			m_isExposed = false;
+			m_isVisible = false;
 			m_editorGame->RemoveScenePanel(this);
 		});
 
-		this->events().resized([this](const nana::arg_resized& args)
-		{
-			int margin = 4;
-			int height = m_gizmoTypeCombobox.size().height;
-			nana::rectangle newRect(margin, height + margin, args.width - margin * 2, args.height - height - margin * 2);
-			m_form->move(newRect);
-		});
-
-		this->events().expose([this](const nana::arg_expose& args)
+		this->GetEvents().Visibility.Connect([this](const Berta::ArgVisibility& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			BR_CORE_TRACE << "Expose of panel: panel id = " << idxx << ". exposed = " << args.exposed << std::endl;
+			BR_CORE_TRACE << "Expose of panel: panel id = " << idxx << ". IsVisible = " << args.IsVisible << std::endl;
 
-			m_isExposed = args.exposed;
-			if (m_isExposed)
-				m_form->show();
+			m_isVisible = args.IsVisible;
+			if (m_isVisible)
+				m_form->Show();
 			else
-				m_form->hide();
-
-			if (args.exposed)
-				this->focus();
+				m_form->Hide();
+			
+			if (args.IsVisible)
+				this->Focus();
 		});
 
-		m_form->events().enter_size_move([this](const nana::arg_size_move& args)
+		m_form->GetEvents().EnterSizeMove.Connect([this](const Berta::ArgSizeMove& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
@@ -152,23 +220,27 @@ namespace Bruno
 			m_isSizingMoving = true;
 		});
 
-		m_form->events().exit_size_move([this](const nana::arg_size_move& args)
+		m_form->GetEvents().ExitSizeMove.Connect([this](const Berta::ArgSizeMove& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
 			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
 
-			auto formSize = m_form->size();
+			auto formSize = m_form->GetSize();
 			if (m_surface)
 			{
-				m_surface->Resize(formSize.width, formSize.height);
+				m_surface->Resize(formSize.Width, formSize.Height);
 			}
-			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.width, (float)formSize.height));
+			m_viewport.height = formSize.Height;
+			m_viewport.width = formSize.Width;
+			m_scissorRect = { 0, 0, static_cast<LONG>(formSize.Width), static_cast<LONG>(formSize.Height) };
+			
+			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.Width, (float)formSize.Height));
 			m_isSizingMoving = false;
 		});
 
-		m_form->events().resized([this](const nana::arg_resized& args)
+		m_form->GetEvents().Resize.Connect([this](const Berta::ArgResize& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
@@ -179,66 +251,72 @@ namespace Bruno
 				return;
 
 			m_isResizing = true;
+			m_viewport.height = args.NewSize.Height;
+			m_viewport.width = args.NewSize.Width;
+			m_scissorRect = { 0, 0, static_cast<LONG>(args.NewSize.Width), static_cast<LONG>(args.NewSize.Height) };
+			m_surface->Resize(args.NewSize.Width, args.NewSize.Height);
 
-			if (m_surface)
-			{
-				m_surface->Resize(args.width, args.height);
-			}
-			else
-			{
-				SurfaceWindowParameters parameters;
-				parameters.Width = args.width;
-				parameters.Height = args.height;
-				parameters.BackBufferFormat = m_surfaceParameters.BackBufferFormat;
-				parameters.DepthBufferFormat = m_surfaceParameters.DepthBufferFormat;
-				parameters.WindowHandle = reinterpret_cast<HWND>(m_form->native_handle());
-
-				m_surface = std::make_unique<Surface>(parameters);
-				m_surface->Initialize();
-
-				//TODO: esta inicialización está acá porque depende del surface. Esto está mal, arreglarlo!
-				InitializeSceneRenderer();
-				InitializeGizmoService();
-			}
-			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.width, (float)args.height));
+			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.NewSize.Width, (float)args.NewSize.Height));
 			m_isResizing = false;
 		});
 
-		m_form->events().mouse_down([this](const nana::arg_mouse& args)
+		m_form->GetEvents().MouseDown.Connect([this](const Berta::ArgMouse& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
+			m_form->Capture(false);
+			
 			//BR_CORE_TRACE << "Mouse down x=" << args.pos.x << "; y=" << args.pos.y << std::endl;
-			m_lastMousePosition.x = args.pos.x;
-			m_lastMousePosition.y = args.pos.y;
+			m_lastMousePosition.x = args.Position.X;
+			m_lastMousePosition.y = args.Position.Y;
 			m_beginMouseDownPosition = m_lastMousePosition;
 
-			m_isGizmoing = args.left_button && m_gizmoService->BeginDrag(Math::Vector2(args.pos.x, args.pos.y));
-			m_form->set_capture(true);
+			if (args.ButtonState.LeftButton)
+			{
+				if (m_cameraGizmo->OnMouseDown(Math::Vector2(args.Position.X, args.Position.Y)))
+				{
+					return;
+				}
+				
+				m_isGizmoing = m_dxGizmoService->BeginDrag(Math::Vector2(args.Position.X, args.Position.Y));
+				
+				std::cout << "is gizmoing: " << m_isGizmoing << std::endl;
+				if (m_isGizmoing)
+				{
+					return;
+				}
+				
+				//Entity selectedEntity = m_scene->Raycast(mousePosition);
+				//m_selectionService->SetSelection(selectedEntity);
+			}
 		});
 
-		m_form->events().mouse_move([this](const nana::arg_mouse& args)
+		m_form->GetEvents().MouseMove.Connect([this](const Berta::ArgMouse& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
+			Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
 
-			if (!m_isGizmoing && !args.left_button)
+			if (m_cameraGizmo->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y)))
 			{
-				m_gizmoService->OnMouseMove(Math::Vector2(args.pos.x, args.pos.y));
+				return;
 			}
-
-			if (m_isGizmoing)
+			m_dxGizmoService->SetSnapEnabled(args.ShiftPressed);
+			m_dxGizmoService->SetPrecisionModeEnabled(args.CtrlPressed);
+			
+			if (m_dxGizmoService->IsDragging())
 			{
-				m_gizmoService->Drag(Math::Vector2(args.pos.x, args.pos.y));
+				m_dxGizmoService->Drag(Math::Vector2(args.Position.X, args.Position.Y));
 			}
 			else
 			{
-				if (args.left_button)
+				m_dxGizmoService->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
+				
+				if (args.ButtonState.LeftButton)
 				{
-					if (args.alt)
+					if (args.AltPressed)
 					{
 						m_sceneDocument->GetCamera().Rotate(currentPosition, m_lastMousePosition);
 					}
@@ -252,32 +330,38 @@ namespace Bruno
 						}
 					}
 				}
-				else if (args.mid_button)
+				else if (args.ButtonState.MiddleButton)
 				{
 					m_sceneDocument->GetCamera().HandTool(currentPosition, m_lastMousePosition);
 				}
-				else if (args.right_button)
+				else if (args.ButtonState.RightButton)
 				{
 					m_sceneDocument->GetCamera().PitchYaw(currentPosition, m_lastMousePosition);
 				}
 			}
 			
-			m_lastMousePosition.x = args.pos.x;
-			m_lastMousePosition.y = args.pos.y;
+			m_lastMousePosition.x = args.Position.X;
+			m_lastMousePosition.y = args.Position.Y;
 		});
 
-		m_form->events().mouse_up([this](const nana::arg_mouse& args)
+		m_form->GetEvents().MouseUp.Connect([this](const Berta::ArgMouse& args)
 		{
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			Math::Int2 currentPosition{ args.pos.x, args.pos.y };
+			m_form->ReleaseCapture();
 			
-			if (args.button == nana::mouse::left_button)
+			Math::Int2 currentPosition{ args.Position.X, args.Position.Y };
+			
+			if (args.ButtonState.LeftButton)
 			{
-				if (m_isGizmoing)
+				if (m_cameraGizmo->OnMouseUp(Math::Vector2(args.Position.X, args.Position.Y)))
 				{
-					m_gizmoService->EndDrag();
+					return;
+				}
+				if (m_dxGizmoService->IsDragging())
+				{
+					m_dxGizmoService->EndDrag();
 					m_isGizmoing = false;
 				}
 				else
@@ -287,61 +371,65 @@ namespace Bruno
 
 						m_dragRectangle = false;
 					}
-					else if (!args.alt)
+					else if (!args.AltPressed)
 					{
 						m_selectionService->SelectUnderMousePosition(m_sceneDocument->GetCamera(), currentPosition);
 					}
 				}
 			}
-			
-			m_form->release_capture();
+
 		});
 
-		m_form->events().mouse_wheel([this](const nana::arg_wheel& args)
+		m_form->GetEvents().MouseWheel.Connect([this](const Berta::ArgWheel& args)
 		{
-			float zoom = args.distance * 0.0025f;
-			if (!args.upwards) zoom = -zoom;
-
+			float zoom = args.WheelDelta * 0.0025f;
+			if (!args.IsVertical)
+			{
+				zoom = -zoom;
+			}
 			m_sceneDocument->GetCamera().Zoom(zoom);
 		});
 
-		m_form->events().key_press([this](const nana::arg_keyboard& args)
+		m_form->GetEvents().KeyPressed.Connect([this](const Berta::ArgKeyboard& args)
 		{
-			if (args.key == 'A')
+			if (args.Key == 'A')
 			{
 				m_sceneDocument->GetCamera().Strafe(-0.25f);
 			}
-			else if (args.key == 'D')
+			else if (args.Key == 'D')
 			{
 				m_sceneDocument->GetCamera().Strafe(0.25f);
 			}
-			else if (args.key == 'W')
+			else if (args.Key == 'W')
 			{
 				m_sceneDocument->GetCamera().Walk(0.25f);
 			}
-			else if (args.key == 'S')
+			else if (args.Key == 'S')
 			{
 				m_sceneDocument->GetCamera().Walk(-0.25f);
 			}
 		});
 
-		m_gizmoTypeCombobox.events().selected([this](const nana::arg_combox& acmb) mutable
+		m_gizmoTypeCombobox.GetEvents().Selected.Connect([this](const Berta::ArgComboBox& acmb) mutable
 		{
-			BR_CORE_TRACE << "Gizmo type selected: " << acmb.widget.option() << std::endl;
-
-			if (m_gizmoService)
+			//BR_CORE_TRACE << "Gizmo type selected: " << acmb.widget.option() << std::endl;
+			if (!acmb.SelectedIndex.has_value())
 			{
-				m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(acmb.widget.option()));
+				return;
 			}
-			m_gizmoTransformSpaceButton.enabled(acmb.widget.option() < 3);
+			
+			auto index = acmb.SelectedIndex.value();
+			if (m_dxGizmoService)
+			{
+				m_dxGizmoService->SetGizmoType(static_cast<GizmoType>(index));
+			}
+			m_gizmoTransformSpaceButton.SetEnabled(index < 3);
 		});
-
-		InitializeGraphicsContext();
-
+		SetCameraGizmoViewport();
 		editorGame->AddScenePanel(this);
-		m_form->show();
+		m_form->Show();
 		m_timer.Reset();
-		m_isExposed = true;
+		m_isVisible = true;
 	}
 
 	ScenePanel::~ScenePanel()
@@ -352,69 +440,20 @@ namespace Bruno
 		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
 
 		auto device = Graphics::GetDevice();
-		device->WaitForIdle();
+		device->Flush();
 
-		m_isExposed = false;
+		m_isVisible = false;
 		m_editorGame->RemoveScenePanel(this);
 	}
 
 	void ScenePanel::OnUpdate(const GameTimer& timer)
 	{
-		//BR_CORE_TRACE << "Paint panel. id = " << idxx << ". delta time = " << timer.GetDeltaTime() << std::endl;
-
-		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
-			return;
-
-		auto device = Graphics::GetDevice();
-		device->BeginFrame();
-
-		UpdateCBs(timer);
-		m_gizmoService->Update();
+		
 	}
 
 	void ScenePanel::OnDraw()
 	{
-		if (!m_isExposed || m_isResizing || m_isSizingMoving || !m_surface)
-			return;
-
-		auto device = Graphics::GetDevice();
-		Math::Color clearColor{ 1.0f, 1.0f, 0.0f, 1.0f };
-		if (idxx == 2) {
-			clearColor.R(0.5f);
-		}
-		else if (idxx == 3) {
-			clearColor.R(0.25f);
-			clearColor.G(0.0f);
-		}
-		else if (idxx == 4) {
-			clearColor.R(0.0f);
-			clearColor.G(0.25f);
-			clearColor.B(0.5f);
-		}
-		Texture& backBuffer = m_surface->GetBackBuffer();
-		DepthBuffer& depthBuffer = m_surface->GetDepthBuffer();
-
-		m_graphicsContext->Reset();
-		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		m_graphicsContext->FlushBarriers();
-
-		m_graphicsContext->ClearRenderTarget(backBuffer, clearColor);
-		m_graphicsContext->ClearDepthStencilTarget(depthBuffer, 1.0f, 0);
-
-		m_graphicsContext->SetViewport(m_surface->GetViewport());
-		m_graphicsContext->SetScissorRect(m_surface->GetScissorRect());
-
-		m_sceneRenderer->OnRender(m_graphicsContext.get());
-
-		m_gizmoService->Render(m_graphicsContext.get(), m_surface.get());
-
-		m_graphicsContext->AddBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT);
-		m_graphicsContext->FlushBarriers();
-
-		device->SubmitContextWork(*m_graphicsContext);
-
-		device->EndFrame();
-		device->Present(m_surface.get());
+		
 	}
 
 	bool ScenePanel::IsEnabled()
@@ -423,24 +462,38 @@ namespace Bruno
 		std::lock_guard lock{ m_mutex };
 #endif
 
-		return (m_isExposed && !m_isResizing && !m_isSizingMoving);
+		return (m_isVisible && !m_isResizing && !m_isSizingMoving);
 	}
 
 	void ScenePanel::InitializeGizmoService()
 	{
-		m_gizmoService->SetGizmoType(static_cast<GizmoService::GizmoType>(m_gizmoTypeCombobox.option()));
-		m_gizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.caption() == "Local" ? GizmoService::TransformSpace::World : GizmoService::TransformSpace::Local);
-	}
-
-	void ScenePanel::InitializeGraphicsContext()
-	{
-		GraphicsDevice* device = Graphics::GetDevice();
-		m_graphicsContext = std::make_unique<GraphicsContext>(*device);
+		m_dxGizmoService = m_sceneDocument->GetDXGizmoService();
+		m_dxGizmoService->SetGizmoType(static_cast<GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
+		m_dxGizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? TransformSpace::World : TransformSpace::Local);
+		
+		auto device = Graphics::GetDevice();
+		
+		m_cameraGizmo = std::make_unique<CameraGizmo>(device, m_sceneDocument->GetCamera());
+		m_cameraGizmo->Initialize();
 	}
 
 	void ScenePanel::InitializeSceneRenderer()
 	{
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_surface.get(), m_editorGame->GetAssetManager());
+		m_sceneRenderer = m_sceneDocument->GetSceneRenderer();
+	}
+
+	void ScenePanel::SetCameraGizmoViewport()
+	{
+		auto mainViewport = m_sceneDocument->GetCamera().GetViewport();
+		float twenty = m_form->Handle()->ToScale(20.0f);
+		float gizmoCameraSize = m_form->Handle()->ToScale(Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS);
+		Math::Viewport gizmoCameraViewport={
+			mainViewport.width - gizmoCameraSize - twenty, 
+			twenty, 
+			gizmoCameraSize, 
+			gizmoCameraSize
+		};
+		m_cameraGizmo->SetCameraGizmoViewport(gizmoCameraViewport);
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)

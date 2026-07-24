@@ -1,14 +1,11 @@
 #include "brepch.h"
 #include "EditorGame.h"
 
-#include "Bruno/Platform/Windows/NanaWindow.h"
+#include "Bruno/Platform/Windows/BertaWindow.h"
 #include "Bruno/Renderer/Model.h"
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Content/ContentTypeReaderManager.h"
 #include "Content/EditorAssetManager.h"
-
-#include <nana/gui/widgets/button.hpp>
-#include <nana/debugger.hpp>
 
 #include "Panels/Scene/SceneDocument.h"
 #include "Panels/ScenePanel.h"
@@ -50,7 +47,7 @@ namespace Bruno
 	{
 		auto scene = std::make_shared<Scene>();
 
-		//auto scenePanel = m_place.add_float_pane<ScenePanel>("pane19", { 500,500 }, this, scene);
+		//auto scenePanel = m_layout.add_float_pane<ScenePanel>("pane19", { 500,500 }, this, scene);
 
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(filename).Handle);
 
@@ -79,7 +76,7 @@ namespace Bruno
 
 	void EditorGame::OnInitializeWindow(const WindowParameters& windowParameters)
 	{
-		m_window = std::make_unique<NanaWindow>(windowParameters, this);
+		m_window = std::make_unique<BertaWindow>(windowParameters, this);
 		m_window->Initialize();
 	}
 
@@ -97,14 +94,14 @@ namespace Bruno
 	{
 		std::lock_guard lock{ m_scenePanelsMutex };
 		
-		panel->GetForm().events().enter_size_move([this](const nana::arg_size_move& args)
-		{
-			OnResizeMoveStarted();
-		});
-		panel->GetForm().events().exit_size_move([this](const nana::arg_size_move& args)
-		{
-			OnResizeMoveFinished();
-		});
+		panel->GetForm().GetEvents().EnterSizeMove.Connect([this](const Berta::ArgSizeMove& args)
+			{
+				OnResizeMoveStarted();
+			});
+		panel->GetForm().GetEvents().ExitSizeMove.Connect([this](const Berta::ArgSizeMove& args)
+			{
+				OnResizeMoveFinished();
+			});
 
 		m_scenePanels.push_back(panel);
 	}
@@ -123,68 +120,67 @@ namespace Bruno
 	void EditorGame::InitializeUI()
 	{
 		static int panelIdxx = 0;
-		auto nanaWindow = m_window->As<NanaWindow>();
-		
-		nana::form& form = nanaWindow->GetForm();
-		m_place.bind(form.handle());
-		m_menubar.create(form.handle());
+		auto nanaWindow = m_window->As<BertaWindow>();
+
+		Berta::Form& form = nanaWindow->GetForm();
+		m_layout.Create(form.Handle());
+		m_menubar.Create(form.Handle());
 		////////// VIEW
-		m_place.div("vert <menubar weight=25> <dock>");
-		m_place["menubar"] << m_menubar;
+		m_layout.Parse("{VerticalLayout {menubar Height=25} {Dock dockRoot}}");
+		m_layout.Attach("menubar", m_menubar);
 
-		m_menubar.push_back("&File");
-		m_menubar.at(0).append("Exit", [](nana::menu::item_proxy& ip)
-		{
-			nana::API::exit_all();
-		});
-
-		m_menubar.push_back("&Edit");
-		m_menubar.at(1).append("Right panel", [this](nana::menu::item_proxy& ip)
-		{
-		});
-
-		m_menubar.at(1).append("Tab Panel", [this](nana::menu::item_proxy& ip)
-		{
-		});
-
-		m_menubar.push_back("Debug");
-		m_menubar.at(2).append("Enable Printing", [this](nana::menu::item_proxy& ip)
-		{
-			nana::debugger::enable_print_debug(!nana::debugger::is_enabled_print_debug());
-		});
-
-		auto scene = std::make_shared<Scene>();
-		auto sceneDocument = std::make_shared<SceneDocument>(scene, GetAssetManager());
-		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
-		sceneDocument->InstantiateModel(model);
-
-		auto sceneDocumentPanel = m_place.add_pane<SceneDocumentPanel>("documents-pane", "", nana::dock_position::left, this, sceneDocument);
-		auto contentBrowser = m_place.add_pane<ContentBrowserPanel>("content-browser-pane", "documents-pane", nana::dock_position::down, m_applicationParameters.WorkingDirectory,
-			[](const std::wstring& filename)
+		m_menubar.PushBack("&File");
+		m_menubar.At(0).Append("Exit", [](Berta::MenuItem item)
 			{
-				//AssetEditor?
+				Berta::GUI::Exit();
 			});
 
-		m_place.collocate();
+		m_menubar.PushBack("&Edit");
+		m_menubar.At(1).Append("Right panel", [this](Berta::MenuItem item)
+			{
+			});
 
-		form.events().key_release([this](const nana::arg_keyboard& args)
-		{
-		});
+		m_menubar.At(1).Append("Tab Panel", [this](Berta::MenuItem item)
+			{
+			});
 
-		form.events().enter_size_move([this](const nana::arg_size_move& args)
-		{
-			//BR_CORE_TRACE << "enter_size_move / form." << std::endl;
-		});
 
-		form.events().exit_size_move([this](const nana::arg_size_move& args)
-		{
-			//BR_CORE_TRACE << "exit_size_move / form." << std::endl;
-		});
+		auto scene = std::make_shared<Scene>();
+		auto sceneDocument = std::make_shared<SceneDocument>(scene, GetEditorAssetManager());
+		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
+		sceneDocument->InstantiateModel(model);
+		
+		m_sceneDocumentPanel = std::make_unique<SceneDocumentPanel>(form, this, sceneDocument);
 
-		form.events().expose([this](const nana::arg_expose& args)
-		{
-			//BR_CORE_TRACE << "expose / form." << std::endl;
-		});
+		m_contentBrowserPanel = std::make_unique<ContentBrowserPanel>(form, m_applicationParameters.WorkingDirectory,
+			[](const std::wstring& filename)
+			{
+				//		//AssetEditor?
+			});
+
+		m_layout.AddPaneTab("scene-doc-pane", "tab-scene", std::move(m_sceneDocumentPanel), "", Berta::DockPosition::Tab);
+		m_layout.AddPaneTab("content-browser-pane", "tab-content-browser", std::move(m_contentBrowserPanel), "scene-doc-pane", Berta::DockPosition::Right);
+
+		m_layout.Apply();
+
+		form.GetEvents().KeyReleased.Connect([this](const Berta::ArgKeyboard& args)
+			{
+			});
+
+		form.GetEvents().EnterSizeMove.Connect([this](const Berta::ArgSizeMove& args)
+			{
+				//BR_CORE_TRACE << "enter_size_move / form." << std::endl;
+			});
+
+		form.GetEvents().ExitSizeMove.Connect([this](const Berta::ArgSizeMove& args)
+			{
+				//BR_CORE_TRACE << "exit_size_move / form." << std::endl;
+			});
+
+		form.GetEvents().Visibility.Connect([this](const Berta::ArgVisibility& args)
+			{
+				//BR_CORE_TRACE << "expose / form." << std::endl;
+			});
 	}
 
 	void EditorGame::OnInitialize()

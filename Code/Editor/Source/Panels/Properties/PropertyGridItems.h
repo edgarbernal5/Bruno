@@ -1,55 +1,36 @@
 #pragma once
 
-#include <nana/gui/widgets/pgitems.hpp>
+#include <optional>
 
-#include <nana/gui/widgets/button.hpp>
-#include <nana/gui/widgets/textbox.hpp>
+#include "Berta/Controls/Properties/TypedPropertyField.h"
+#include <Berta/Controls/Button.h>
+#include <Berta/Controls/TextBox.h>
 #include <Bruno/Math/Math.h>
 
 namespace Bruno
 {
-	class pg_vector3
-		: public nana::pgitem
+	class PropertyGridFieldVector3 : public Berta::TypedPropertyField<Math::Vector3>
 	{
 	public:
-		pg_vector3() = default;
-
-		pg_vector3(const std::string& label, const std::string& value)
-			: pgitem(label, value)
-		{}
-
-		virtual void value(const std::string& value) override;
-
-		virtual void enabled(bool state) override;
-
-		virtual void value(Math::Vector3 value);
-		virtual Math::Vector3 to_vector3() const
+		PropertyGridFieldVector3(std::string_view label, GetterFn getter, SetterFn setter) :
+			TypedPropertyField(label, std::move(getter), std::move(setter))
 		{
-			return vector3_;
 		}
-
-	protected:
-		virtual void create(nana::window wd) override;
-
-		virtual void draw(nana::paint::graphics* graph, nana::rectangle area, unsigned labelw, unsigned  valuew, unsigned  iboxw, const int txtoff, nana::color bgcolor, nana::color fgcolor) const override;
+		virtual void Draw(Berta::Graphics& graphics, const Berta::Rectangle& area, const LayoutConfig& config) override;
 		
-		mutable nana::textbox	xyz_[3];
-		Math::Vector3	vector3_;
-	};
-
-	class pg_asset_file
-		: public nana::pg_string_button
-	{
-	public:
-		pg_asset_file() = default;
-
-		pg_asset_file(const std::string& label, const std::string& value)
-			: pg_string_button(label, value)
-		{}
-
-		virtual void value(const std::string& value) override;
+		virtual void SetFocus() override;
+		[[nodiscard]] bool HasFocus() const override;
+		
+		std::wstring GetValueAsString() const override;
 
 	protected:
-		virtual void create(nana::window wd) override;
+		virtual void OnCreate(Berta::Window* parent) override;
+		virtual void OnVisibilityChanged(bool visible) override;
+		virtual void OnEnableChanged(bool enabled) override;
+		
+		void SetValueInternal(const Math::Vector3& value) override;
+		void SetMixedValuesInternal() override;
+
+		Berta::TextBox m_xyz[3];
 	};
 }

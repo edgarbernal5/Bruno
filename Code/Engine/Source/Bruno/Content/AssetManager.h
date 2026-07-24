@@ -10,12 +10,13 @@ namespace Bruno
 		BR_RTTI_DECLARATION(AbstractAssetManager, RTTI);
 
 	public:
-		virtual ~AbstractAssetManager() = default;
+		~AbstractAssetManager() override = default;
 
 		virtual void AddMemoryOnlyAsset(std::shared_ptr<Asset> asset) = 0;
-		virtual std::shared_ptr<Asset> GetAsset(AssetHandle assetHandle) = 0;
 		//virtual bool IsMemoryAsset(AssetHandle handle) = 0;
-
+		
+		virtual std::shared_ptr<Asset> GetAssetRaw(AssetHandle assetHandle) = 0;
+		
 		template<typename TAsset>
 		AssetHandle AddMemoryOnlyAsset(std::shared_ptr<TAsset> asset)
 		{
@@ -39,15 +40,15 @@ namespace Bruno
 		}
 
 		template<typename T>
-		std::shared_ptr<T> GetAsset(AssetHandle assetHandle);
+		std::shared_ptr<T> GetAsset(AssetHandle assetHandle)
+		{
+			// Bonus C++17: Asegurarnos de que T herede de Asset
+			static_assert(std::is_base_of_v<Asset, T>, "GetAsset only works for types derived from Asset");
+			
+			return std::static_pointer_cast<T>(GetAssetRaw(assetHandle));
+		}
 
 	protected:
 		
 	};
-
-	template<typename T>
-	inline std::shared_ptr<T> AbstractAssetManager::GetAsset(AssetHandle assetHandle)
-	{
-		return std::static_pointer_cast<T>(GetAsset(assetHandle));
-	}
 }

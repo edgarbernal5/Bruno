@@ -17,7 +17,7 @@ namespace Bruno
 		m_initialized = true;
 	}
 
-	bool ImporterManager::TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& asset)
+	bool ImporterManager::TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset)
 	{
 		auto it = m_serializers.find(metadata.Type);
 		if (it == m_serializers.end())
@@ -26,6 +26,6 @@ namespace Bruno
 			return false;
 		}
 
-		return it->second->TryImport(metadata, context, asset);
+		return it->second->TryImport(metadata, context, outputAsset);
 	}
 }

@@ -2,12 +2,8 @@
 #include "ModelReader.h"
 
 #include "Bruno/Content/ContentReader.h"
-#include "Bruno/Platform/DirectX/IndexBuffer.h"
-#include "Bruno/Platform/DirectX/VertexBuffer.h"
-#include "Bruno/Platform/DirectX/VertexTypes.h"
 
 #include "Bruno/Renderer/Material.h"
-#include "Bruno/Platform/DirectX/Texture.h"
 
 namespace Bruno
 {
@@ -66,11 +62,11 @@ namespace Bruno
 
 		for (size_t i = 0; i < meshesCount; i++)
 		{
-			std::string meshName;
-			input.ReadString(meshName);
+			std::wstring meshName;
+			input.ReadWString(meshName);
 
-			std::string nodeName;
-			input.ReadString(nodeName);
+			std::wstring nodeName;
+			input.ReadWString(nodeName);
 
 			uint32_t baseVertex;
 			input.ReadUInt32(baseVertex);
@@ -143,7 +139,7 @@ namespace Bruno
 				modelNode.Meshes.push_back(meshIndex);
 			}
 
-			input.ReadString(modelNode.Name);
+			input.ReadWString(modelNode.Name);
 			input.ReadMatrix(modelNode.LocalTransform);
 		}
 

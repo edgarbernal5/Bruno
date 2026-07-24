@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "MaterialContentItem.h"
 
 namespace Bruno

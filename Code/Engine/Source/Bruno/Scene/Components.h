@@ -6,6 +6,8 @@
 #include <vector>
 #include <string>
 
+#include "Bruno/Platform/DirectX/ConstantBuffer.h"
+
 namespace Bruno
 {
 	struct IdComponent
@@ -15,11 +17,11 @@ namespace Bruno
 
 	struct NameComponent
 	{
-		std::string Name;
+		std::wstring Name;
 
 		NameComponent() = default;
 		NameComponent(const NameComponent& other) = default;
-		NameComponent(std::string name) : Name(name) { }
+		NameComponent(std::wstring name) : Name(name) { }
 	};
 
 	struct HierarchyComponent
@@ -59,7 +61,12 @@ namespace Bruno
 				Math::Matrix::CreateTranslation(Position);
 		}
 	};
-
+	
+	struct CBVComponent 
+	{
+		std::shared_ptr<ConstantBuffer> TransformCB[2]; 
+	};
+	
 	struct ModelComponent
 	{
 		AssetHandle ModelHandle;

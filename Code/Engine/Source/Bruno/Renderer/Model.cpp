@@ -4,6 +4,9 @@
 #include "Material.h"
 #include <Bruno/Platform/DirectX/VertexTypes.h>
 
+#include "Bruno/Platform/DirectX/CommandQueueManager.h"
+#include "Bruno/Platform/DirectX/UploadContext.h"
+
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(ModelMaterial);
@@ -17,6 +20,7 @@ namespace Bruno
 		m_modelNodes(std::move(modelNodes))
 	{
 		//m_handle = {};
+		auto device = Bruno::Graphics::GetDevice();
 
 		std::vector< VertexPositionNormalTexture> verticesPNT;
 		verticesPNT.reserve(m_vertices.size());
@@ -27,9 +31,20 @@ namespace Bruno
 			vertex.Texture = Math::Vector2(m_vertices[i].Texcoord.x, m_vertices[i].Texcoord.y);
 			vertex.Normal = m_vertices[i].Normal;
 		}
+		
+		auto& uploadContext = device->GetUploadContext();
+		auto& commandManager = Graphics::GetCommandQueueManager();
+		
+		uploadContext.Reset();
+		
+		m_indexBuffer = std::make_shared<IndexBuffer>(*device, uploadContext, m_indices);
+		m_vertexBuffer = std::make_shared<VertexBuffer>(*device, uploadContext, verticesPNT.data(), verticesPNT.size(), sizeof(VertexPositionNormalTexture));
+		
+		uint64_t uploadFence = commandManager->ExecuteAndReturnFence(uploadContext);
 
-		m_indexBuffer = std::make_shared<IndexBuffer>(static_cast<uint32_t>(m_indices.size() * sizeof(uint32_t)), m_indices.data(), sizeof(uint32_t));
-		m_vertexBuffer = std::make_shared<VertexBuffer>(static_cast<uint32_t>(m_vertices.size() * sizeof(VertexPositionNormalTexture)), verticesPNT.data(), sizeof(VertexPositionNormalTexture));
+		commandManager->WaitForGpuFence(uploadFence);
+
+		uploadContext.ClearGarbage();
 	}
 
 	void Model::SetIndexBuffer(std::shared_ptr<IndexBuffer> buffer)
@@ -47,7 +62,7 @@ namespace Bruno
 		return m_materials[materialIndex];
 	}
 
-	Mesh::Mesh(const std::string& meshName, uint32_t baseVertex, uint32_t baseIndex, uint32_t vertexCount, uint32_t indexCount, uint32_t materialIndex, 
+	Mesh::Mesh(const std::wstring& meshName, uint32_t baseVertex, uint32_t baseIndex, uint32_t vertexCount, uint32_t indexCount, uint32_t materialIndex, 
 		const Math::Matrix& transform, const Math::Matrix& localTransform, const Math::BoundingBox& bbox) :
 		m_meshName(meshName),
 		m_baseVertex(baseVertex),

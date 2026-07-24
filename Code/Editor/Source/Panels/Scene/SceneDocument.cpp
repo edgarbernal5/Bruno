@@ -4,29 +4,32 @@
 #include <Bruno/Scene/Scene.h>
 
 #include "SelectionService.h"
-#include "SceneHierarchy.h"
+#include "Bruno/Renderer/SceneRenderer.h"
+#include "Content/EditorAssetManager.h"
 #include "Gizmos/GizmoService.h"
-#include "Panels/Properties/PropertyHelpers.h"
+#include "Bruno/Platform/DirectX/Shader.h"
 
 namespace Bruno
 {
-	SceneDocument::SceneDocument(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager) :
+	SceneDocument::SceneDocument(std::shared_ptr<Scene> scene, EditorAssetManager* assetManager) :
 		m_scene(scene),
 		m_assetManager(assetManager)
 	{
 		InitializeCamera();
 		InitializeGizmoService();
-
-		m_sceneHierarchy = std::make_shared<SceneHierarchy>(scene);
+		InitializeSceneRenderer();
+		
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			auto entityUUID = selection.size() > 0 ? selection[0] : UUID(0);
-			if (entityUUID) {
+			if (entityUUID)
+			{
 				auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
 				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
+				m_gizmoService->SetGizmoWorldMatrix(worldMatrix);
 			}
 			m_gizmoService->SetActive(entityUUID);
-
+			
 			SelectionChanged.emit(selection);
 		});
 	}
@@ -39,11 +42,8 @@ namespace Bruno
 	void SceneDocument::InstantiateModel(std::shared_ptr<Model> model)
 	{
 		Entity rootEntity = m_scene->InstantiateModel(model);
-
-		m_sceneHierarchy->LoadProperties(rootEntity);
-
-		InitializeProperties(rootEntity);
-
+		m_sceneRenderer->InitEntitiesForRender();
+		
 		HierarchyChanged.emit(rootEntity, ActionMode::Add);
 	}
 
@@ -55,8 +55,10 @@ namespace Bruno
 			auto entityUUID = selection[0];
 			auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
 			m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
+			m_gizmoService->SetGizmoWorldMatrix(worldMatrix);
 		}
 		m_gizmoService->SetActive(selection.size() > 0);
+		
 		SelectionChanged.emit(selection);
 	}
 
@@ -69,102 +71,111 @@ namespace Bruno
 	void SceneDocument::InitializeGizmoService()
 	{
 		auto device = Graphics::GetDevice();
+		auto dxDevice = Graphics::GetDevice();
 		m_selectionService = std::make_shared<SelectionService>(m_scene, m_assetManager);
-
-		m_gizmoService = std::make_shared<GizmoService>(device, m_camera, m_selectionService.get());
-		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
+		
+		m_gizmoService = std::make_shared<GizmoService>(dxDevice, m_camera);
+		m_gizmoService->Initialize();
+		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& newPosition)
 		{
-			auto& selections = m_selectionService->GetSelections();
-			for (auto& uuid : selections)
+			for (auto& uuid : m_selectionService->GetSelections())
 			{
-				auto& properties = m_sceneHierarchy->get(uuid);
-				auto prop = properties.get("Transform/Position");
-				auto currentPosition = prop.as_vector3();
-				currentPosition += delta;
-				prop.value(currentPosition);
+				Entity entity = m_scene->GetEntityWithUUID(uuid);
+				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
+
+				// Usamos 'patch' para que EnTT dispare el evento 'on_update<TransformComponent>'
+				entity.Patch<TransformComponent>([this, entity, &newPosition](auto& transform) 
+				{
+					Math::Matrix parentWorldMatrix = Math::Matrix::Identity;
+		            
+					// 1. VALIDAR SI REALMENTE TIENE PADRE
+					Entity parent = m_scene->TryGetEntityWithUUID(entity.GetParentUUID());
+					if (parent)
+					{
+						parentWorldMatrix = m_scene->GetWorldSpaceMatrix(parent);
+					}
+		            
+					Math::Matrix inverseTransform;
+					parentWorldMatrix.Invert(inverseTransform);
+		            
+					// 2. Transform (Punto) aplica rotación, escala y traslación inversa
+					// Esto convierte perfectamente la coordenada absoluta 'newPosition' al espacio local
+					transform.Position = Math::Vector3::Transform(newPosition, inverseTransform);
+				});
 			}
 		});
-
 		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
 		{
-			auto& selections = m_selectionService->GetSelections();
-			for (auto& uuid : selections)
+			for (auto& uuid : m_selectionService->GetSelections())
 			{
-				auto& properties = m_sceneHierarchy->get(uuid);
-				auto prop = properties.get("Transform/Rotation");
-				auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(prop.as_vector3());
-				currentRotation *= delta;
-				prop.value(currentRotation.ToEuler());
-			}
-		});
+				Entity entity = m_scene->GetEntityWithUUID(uuid);
+				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
 
-		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
-		{
-			auto newDelta = delta * 0.1f;
-			auto& selections = m_selectionService->GetSelections();
-			for (auto& uuid : selections)
-			{
-				auto& properties = m_sceneHierarchy->get(uuid);
-				auto prop = properties.get("Transform/Scale");
-				auto currentScale = prop.as_vector3();
-
-				if (isUniform)
+				entity.Patch<TransformComponent>([this, entity, &delta](auto& transform) 
 				{
-					float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
-					auto newScale = currentScale * uniformDelta;
-					if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+					Math::Matrix parentWorldMatrix = Math::Matrix::Identity;
+					Entity parent = m_scene->TryGetEntityWithUUID(entity.GetParentUUID());
+					if (parent)
 					{
-						prop.value(newScale);
+						parentWorldMatrix = m_scene->GetWorldSpaceMatrix(parent);
 					}
 
-					continue;
-				}
-				auto newScale = currentScale + newDelta;
-				if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+					// Extraemos solo la rotación del padre en espacio de mundo
+					Math::Vector3 dummyScale, dummyPos;
+					Math::Quaternion parentRot;
+					parentWorldMatrix.Decompose(dummyScale, parentRot, dummyPos);
+
+					Math::Quaternion invParentRot;
+					parentRot.Inverse(invParentRot);
+
+					// Matemáticas de Jerarquía DX12
+					// 1. Llevamos la rotación local al Mundo: (transform.Rotation * parentRot)
+					// 2. Le sumamos el delta del ratón: (* delta)
+					// 3. Lo devolvemos al espacio Local: (* invParentRot)
+					transform.Rotation = transform.Rotation * parentRot * delta * invParentRot;
+					transform.Rotation.Normalize(); // Previene degradación de precisión flotante
+					
+					auto newWorldMatrix = m_scene->GetWorldSpaceMatrix(entity);
+					m_gizmoService->SetGizmoWorldMatrix(newWorldMatrix);
+				});
+			}
+		});
+		
+		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
+		{
+			const Math::Vector3 newDelta = delta * 0.1f;
+
+			for (auto& uuid : m_selectionService->GetSelections())
+			{
+				Entity entity = m_scene->GetEntityWithUUID(uuid);
+				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
+
+				entity.Patch<TransformComponent>([newDelta, isUniform](auto& transform) 
 				{
-					prop.value(newScale);
-				}
+					Math::Vector3 newScale = transform.Scale;
+
+					if (isUniform)
+					{
+						float uniformDelta = 1.0f + (newDelta.x + newDelta.y + newDelta.z) / 3.0f;
+						newScale *= uniformDelta;
+					}
+					else
+					{
+						newScale += newDelta;
+					}
+
+					// Validación simple de límites (evita escalas invertidas o colapso a 0)
+					if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
+					{
+						transform.Scale = newScale;
+					}
+				});
 			}
 		});
 	}
 
-	void SceneDocument::InitializeProperties(Entity entity)
+	void SceneDocument::InitializeSceneRenderer()
 	{
-		auto& hierarchy = entity.GetComponent<HierarchyComponent>();
-		auto& name = entity.GetComponent<NameComponent>().Name;
-
-		auto uuid = entity.GetUUID();
-
-		auto properties = m_sceneHierarchy->get(uuid);
-		properties.get("Transform/Position").on_change().connect([this, uuid](const std::string& new_value)
-		{
-			Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-			TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
-
-			entityTransform.Position = Property::AsVector3(new_value);
-		});
-		properties.get("Transform/Rotation").on_change().connect([this, uuid](const std::string& new_value)
-		{
-			Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-			TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
-
-			entityTransform.Rotation = Math::Quaternion::CreateFromYawPitchRoll(Property::AsVector3(new_value));
-		});
-		properties.get("Transform/Scale").on_change().connect([this, uuid](const std::string& new_value)
-		{
-			Entity entity = m_scene->TryGetEntityWithUUID(uuid);
-			TransformComponent& entityTransform = entity.GetComponent<TransformComponent>();
-
-			entityTransform.Scale = Property::AsVector3(new_value);
-		});
-
-		for (UUID child : hierarchy.Children)
-		{
-			auto childEntity = m_scene->TryGetEntityWithUUID(child);
-			if (childEntity)
-			{
-				InitializeProperties(childEntity);
-			}
-		}
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_assetManager);
 	}
 }

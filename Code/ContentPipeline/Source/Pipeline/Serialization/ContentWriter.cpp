@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "ContentWriter.h"
 
 #include "ContentTypeWriterManager.h"

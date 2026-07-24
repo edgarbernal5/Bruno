@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "ShaderProcessor.h"
 
 #include "Pipeline/Graphics/ShaderContentItem.h"

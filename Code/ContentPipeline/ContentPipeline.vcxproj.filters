@@ -99,6 +99,9 @@
     <ClCompile Include="Source\Pipeline\TimestampCache.cpp">
       <Filter>Source\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Source\brcppch.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ContentPipelineApplication.h">
@@ -175,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="Source\Pipeline\TimestampCache.h">
       <Filter>Source\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\brcppch.h">
+      <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

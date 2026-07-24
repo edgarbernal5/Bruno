@@ -1,6 +1,7 @@
 #include "brepch.h"
 #include "ModelImporter.h"
 
+#include "Berta/Core/Base.h"
 #include "Bruno/Core/StringHelpers.h"
 #include "Bruno/Renderer/Material.h"
 
@@ -24,7 +25,7 @@ namespace Bruno
 		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeLightMap] = std::make_pair(aiTextureType_LIGHTMAP, "LightMapTexture");
 	}
 
-	bool ModelImporter::TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& asset)
+	bool ModelImporter::TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset)
 	{
 		Assimp::Importer importer;
 
@@ -78,8 +79,8 @@ namespace Bruno
 		rootNode.Parent = ModelNode::NullNode;
 		ProcessNode(aiScene->mRootNode, 0, modelNodes, meshes, Math::Matrix::Identity);
 
-		asset = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
-		asset->SetHandle(metadata.Handle);
+		outputAsset = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
+		outputAsset->SetHandle(metadata.Handle);
 
 		return true;
 	}
@@ -148,7 +149,7 @@ namespace Bruno
 		aabb.Center = (aabbMax + aabbMin) * 0.5f;
 		aabb.Extents = (aabbMax - aabbMin) * 0.5f;
 
-		auto mesh = std::make_shared<Mesh>(aiMesh->mName.C_Str(), baseVertex, baseIndex, aiMesh->mNumVertices, aiMesh->mNumFaces * 3, aiMesh->mMaterialIndex, Math::Matrix::Identity, Math::Matrix::Identity, aabb);
+		auto mesh = std::make_shared<Mesh>(Berta::StringUtils::UTF8ToWide(aiMesh->mName.C_Str()), baseVertex, baseIndex, aiMesh->mNumVertices, aiMesh->mNumFaces * 3, aiMesh->mMaterialIndex, Math::Matrix::Identity, Math::Matrix::Identity, aabb);
 
 		baseVertex += aiMesh->mNumVertices;
 		baseIndex += aiMesh->mNumFaces * 3;
@@ -159,7 +160,7 @@ namespace Bruno
 	void ModelImporter::ProcessNode(aiNode* aiNode, uint32_t nodeIndex, std::vector<ModelNode>& modelNodes, std::vector<std::shared_ptr<Mesh>>& meshes, const Math::Matrix& parentTransform)
 	{
 		auto& node = modelNodes[nodeIndex];
-		node.Name = aiNode->mName.C_Str();
+		node.Name = Berta::StringUtils::UTF8ToWide(aiNode->mName.C_Str());
 		node.LocalTransform = ToMatrix(aiNode->mTransformation);
 
 		Math::Matrix transform = parentTransform * node.LocalTransform;
@@ -167,14 +168,14 @@ namespace Bruno
 		{
 			uint32_t submeshIndex = aiNode->mMeshes[i];
 			auto& submesh = meshes[submeshIndex];
-			submesh->SetNodeName(aiNode->mName.C_Str());
+			submesh->SetNodeName(Berta::StringUtils::UTF8ToWide(aiNode->mName.C_Str()));
 			submesh->SetTransform(transform);
 			submesh->SetLocalTransform(node.LocalTransform);
 
 			node.Meshes.push_back(submeshIndex);
 		}
 
-		uint32_t parentNodeIndex = (uint32_t)modelNodes.size() - 1;
+		uint32_t parentNodeIndex = static_cast<uint32_t>(modelNodes.size()) - 1;
 		node.Children.resize(aiNode->mNumChildren);
 		for (uint32_t i = 0; i < aiNode->mNumChildren; i++)
 		{

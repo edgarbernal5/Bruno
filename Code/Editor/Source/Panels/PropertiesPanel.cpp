@@ -3,139 +3,292 @@
 
 #include "Scene/SelectionService.h"
 #include "Scene/SceneDocument.h"
-#include "Scene/SceneHierarchy.h"
 #include <Bruno/Scene/Scene.h>
 
-#include <nana/gui/widgets/pgitems.hpp>
+#include <Berta/Controls/Properties/PropertyGridFields.h>
+#include <Berta/GUI/ControlDrawBatch.h>
+
+#include "Berta/GUI/Dispatcher.h"
+#include "Content/EditorAssetManager.h"
 #include "Properties/PropertyGridItems.h"
 
 namespace Bruno
 {
-	PropertiesPanel::PropertiesPanel(nana::window window, std::shared_ptr<SceneDocument> sceneDocument) :
-		nana::panel<true>(window),
+	PropertiesPanel::PropertiesPanel(Berta::Window* window, std::shared_ptr<SceneDocument> sceneDocument) :
+		Berta::Panel(window),
 		m_sceneDocument(sceneDocument)
 	{
-		this->caption("Properties");
+		this->SetCaption("Properties");
 
 		m_selectionService = sceneDocument->GetSelectionService();
-		m_sceneHierarchy = sceneDocument->GetSceneHierarchy();
+		m_scene = sceneDocument->GetScene();
+		
+		m_propertyGrid.Create(*this);
 
-		m_propertyGrid.create(*this);
-
-		m_place.bind(this->handle());
+		m_layout.Create(this->Handle());
 		////////// VIEW
-		m_place.div("vert <properties>");
+		m_layout.Parse("{VerticalLayout {properties}}");
 
-		m_place["properties"] << m_propertyGrid;
-		m_place.collocate();
+		m_layout.Attach("properties", m_propertyGrid);
+		m_layout.Apply();
 
 		m_selectionChangedHandleId = m_sceneDocument->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			BR_CORE_TRACE << "selection changed / selection.size = " << selection.size() << std::endl;
 
 			//TODO: si no hay cambios no refrescar.
-			m_propertyGrid.auto_draw(false);
-			ClearPropertyGrid();
-			m_currentProperties.clear();
-			DisposePropertyBinders();
+			Berta::ControlDrawBatch batchGuard(m_propertyGrid);
+			
+			m_propertyGrid.Clear();
 
 			if (selection.size() != 1)
 			{
-				m_propertyGrid.auto_draw(true);
 				return;
 			}
 
 			auto& uuid = selection[0];
-			auto& nodeProperties = m_sceneHierarchy->get(uuid);
+			auto entity = m_scene->GetEntityWithUUID(uuid);
 			
-			for (size_t i = 0; i < nodeProperties.size(); i++)
+			if (!entity)
 			{
-				auto prop = nodeProperties[i];
-
-				auto cat_idx = m_propertyGrid.find(prop.category());
-				auto cat = (cat_idx == nana::npos) ? m_propertyGrid.append(prop.category()) : m_propertyGrid.at(cat_idx);
-				nana::propertygrid::item_proxy ip(nullptr);
-
-				if (prop.type() == pg_type::string)
-				{
-					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string(prop.label(), prop.value())));
-				} 
-				else if (prop.type() == pg_type::uint)
-				{
-					ip = cat.append(nana::propertygrid::pgitem_ptr(new nana::pg_string_uint(prop.label(), prop.value())));
-				}
-				else if (prop.type() == pg_type::vector3)
-				{
-					ip = cat.append(nana::propertygrid::pgitem_ptr(new pg_vector3(prop.label(), prop.value())));
-				}
-				else if (prop.type() == pg_type::asset_file)
-				{
-					auto pgaf = new pg_asset_file(prop.label(), prop.value());
-					ip = cat.append(nana::propertygrid::pgitem_ptr(pgaf));
-					pgaf->set_button_click([&](const nana::arg_click& click_args)
+				return;
+			}
+			
+			if (entity.HasComponent<NameComponent>())
+			{
+				auto categoryGeneral = m_propertyGrid.Append("General");
+				
+				categoryGeneral.EmplaceProperty<Berta::PropertyGridFieldString>(
+					"Name",
+					[entity]() -> std::wstring { return entity.GetComponent<NameComponent>().Name; },
+					[entity](const std::wstring& val) mutable
 					{
-						//...
-						nana::menu_popuper(m_asset_file_menu_popup, nana::mouse::left_button)(*click_args.mouse_args);
-					});
-				}
-				auto item_ptr = ip._m_pgitem();
-				auto handlerId = prop.on_change().connect([item_ptr](const std::string& new_value)
-				{
-					item_ptr->value(new_value);
-				});
-				item_ptr->enabled(!prop.read_only());
-				m_propOnChangedHandlers[prop] = handlerId;
+						entity.Patch<NameComponent>([&val](auto& component)
+						{
+						   component.Name = val;
+						});
+					}
+				);
 			}
-			m_propertyGrid.auto_draw(true);
-		});
-
-		m_asset_file_menu_popup.append("Select asset...", [](nana::menu::item_proxy& ip) {
-			//TODO: callback o un objeto. inyectarlo
-		});
-		m_asset_file_menu_popup.append_splitter();
-		m_asset_file_menu_popup.append("Find asset in Content Browser", [](nana::menu::item_proxy& ip) {});
-
-		m_propertyGrid.events().property_changed([this](const nana::arg_propertygrid& arg)
-		{
-			BR_CORE_TRACE << "property_changed / grid. label = " << arg.item.label() << ". cat = " << arg.item.pos().cat << std::endl;
 			
-			auto cat = m_propertyGrid.at(arg.item.pos().cat);
-
-			auto& uuid = m_selectionService->GetSelections()[0];
-			auto& nodeProperties = m_sceneHierarchy->get(uuid);
-
-			for (size_t i = 0; i < nodeProperties.size(); ++i)
+			if (entity.HasComponent<TransformComponent>())
 			{
-				auto property = nodeProperties[i];
-				if (arg.item.label() == property.label() && cat.text() == property.category())
+				auto categoryTransform = m_propertyGrid.Append("Transform");
+				
+				categoryTransform.EmplaceVector3(
+					"Position", 
+					[entity]()
+					{
+						Berta::OptionalVector3 opt;
+						auto& position = entity.GetComponent<TransformComponent>().Position;
+						opt.x = position.x;
+						opt.y = position.y;
+						opt.z = position.z;
+						
+						return opt;
+					},
+				[entity](const Berta::OptionalVector3& val) mutable
+					{
+						auto& position = entity.GetComponent<TransformComponent>().Position;
+						if (val.x.has_value())
+						{
+							position.x = val.x.value();
+						}
+						
+						if (val.y.has_value())
+						{
+							position.y = val.y.value();
+						}
+						
+						if (val.z.has_value())
+						{
+							position.z = val.z.value();
+						}
+					}
+				);
+				
+				categoryTransform.EmplaceVector3(
+					"Rotation", 
+				[entity]()
+					{
+						Berta::OptionalVector3 opt;
+						auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
+						//auto currentRotation = rotation.ToEuler();
+						opt.x = rotation.x;
+						opt.y = rotation.y;
+						opt.z = rotation.z;
+						
+						return opt;
+					},
+					[entity](const Berta::OptionalVector3& val) mutable
+					{
+						auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
+						
+						if (val.x.has_value())
+						{
+							rotation.x = val.x.value();
+						}
+						
+						if (val.y.has_value())
+						{
+							rotation.y = val.y.value();
+						}
+						
+						if (val.z.has_value())
+						{
+							rotation.z = val.z.value();
+						}
+					}
+				);
+				
+				categoryTransform.EmplaceVector3(
+					"Scale", 
+					[entity]()
+					{
+						Berta::OptionalVector3 opt;
+						auto& scale = entity.GetComponent<TransformComponent>().Scale;
+						opt.x = scale.x;
+						opt.y = scale.y;
+						opt.z = scale.z;
+						
+						return opt;
+					},
+					[entity](const Berta::OptionalVector3& val) mutable
+					{
+						auto& scale = entity.GetComponent<TransformComponent>().Scale;
+						if (val.x.has_value())
+						{
+							scale.x = val.x.value();
+						}
+						
+						if (val.y.has_value())
+						{
+							scale.y = val.y.value();
+						}
+						
+						if (val.z.has_value())
+						{
+							scale.z = val.z.value();
+						}
+					}
+				);
+			}
+			
+			if (entity.HasComponent<ModelComponent>())
+			{
+				auto modelCategory = m_propertyGrid.Append("Model");
+				modelCategory.EmplaceProperty<Berta::PropertyGridFieldString>(
+					"Handle", 
+					[entity]() -> std::wstring
+					{
+						auto handleToStr = std::to_wstring(entity.GetComponent<ModelComponent>().ModelHandle);
+						return handleToStr;
+					}, nullptr).SetReadOnly(true);
+
+				modelCategory.EmplaceProperty<Berta::PropertyGridFieldUInt>("Mesh index", 
+				[entity]() -> uint32_t
 				{
-					property.value(arg.item.value());
-					break;
+					return entity.GetComponent<ModelComponent>().MeshIndex;
+				}, nullptr).SetReadOnly(true);
+				
+				auto& assetManager = *m_sceneDocument->GetAssetManager();
+				auto modelMaterialsSubCategories = modelCategory.AppendSubCategory("Materials");
+				auto& modelComp = entity.GetComponent<ModelComponent>();
+				auto ownerWindow = this->Handle();
+				for (auto& [index, materialAssetHandle] : modelComp.Materials->GetMaterials())
+				{
+					std::ostringstream oss;
+					oss << "Material " << index;
+					
+					modelMaterialsSubCategories.EmplaceProperty<Berta::PropertyGridFieldStringButton>(oss.str(), 
+						[entity, index, &assetManager]() -> std::wstring
+						{
+							UUID currentHandle = entity.GetComponent<ModelComponent>().Materials->GetMaterial(index);
+							if (currentHandle == static_cast<UUID>(0))
+							{
+								return L"None";
+							}
+							if (auto metadata = assetManager.GetMetadata(currentHandle))
+							{
+								return metadata.Filename;
+							}
+							
+							return L"";
+						},
+						[entity, index, &assetManager](const std::wstring& typedPath) mutable
+						{
+							UUID newHandle = 0; //assetManager.LoadOrCreateAsset(typedPath);
+							entity.Patch<ModelComponent>([newHandle, index](auto& comp)
+							{
+								comp.Materials->SetMaterial(index, newHandle);
+							});
+						},
+						[entity, index, materialAssetHandle, ownerWindow, &assetManager](std::optional<std::wstring> currentValue)
+						{
+							Berta::Menu menuContext;
+							
+							menuContext.Append("Clear Material", [entity, index](Berta::MenuItem ip)
+							{
+								std::cout << "Clear Material " << index << std::endl;
+								entity.Patch<ModelComponent>([index](auto& comp)
+								{
+									comp.Materials->SetMaterial(index, 0);
+								});
+							});
+							menuContext.Append("Select asset...", [entity, materialAssetHandle](Berta::MenuItem ip)
+							{
+								
+							});
+							menuContext.AppendSeparator();
+							
+							menuContext.Append("Find asset in Content Browser", [entity, index](Berta::MenuItem ip)
+							{
+								
+							});
+							Berta::GUI::ShowContextMenu(std::move(menuContext), ownerWindow, Berta::GUI::GetMousePositionToWindow(ownerWindow));
+						});
 				}
 			}
 		});
+		
+		m_propertyGrid.GetEvents().PropertyChanged.Connect([this](const Berta::ArgPropertyGrid& args)
+		{
+			BR_CORE_TRACE << "property_changed / grid. label = " << args.Property.GetLabel() << ". value = " << Berta::StringUtils::WideToUTF8(args.Property.GetValueAsString()) << std::endl;
+		});
+		
+		m_nameUpdateConnection = m_sceneDocument->GetScene()->OnComponentUpdated<NameComponent>().connect<&PropertiesPanel::OnComponentUpdated>(this);
+		m_transformUpdateConnection = m_sceneDocument->GetScene()->OnComponentUpdated<TransformComponent>().connect<&PropertiesPanel::OnComponentUpdated>(this);
+		m_modelUpdateConnection = m_sceneDocument->GetScene()->OnComponentUpdated<ModelComponent>().connect<&PropertiesPanel::OnComponentUpdated>(this);
 	}
 
 	PropertiesPanel::~PropertiesPanel()
 	{
 		m_sceneDocument->SelectionChanged.disconnect(m_selectionChangedHandleId);
-		DisposePropertyBinders();
 	}
 
-	void PropertiesPanel::ClearPropertyGrid()
+	void PropertiesPanel::OnComponentUpdated(entt::registry& registry, entt::entity updatedEntity)
 	{
-		m_propertyGrid.clear();
-		for (size_t i = 0; i < m_propertyGrid.size_categ(); i++)
+		const auto& selection = m_selectionService->GetSelections();
+		if (selection.size() != 1)
 		{
-			m_propertyGrid.erase();
+			return;
 		}
-	}
 
-	void PropertiesPanel::DisposePropertyBinders()
-	{
-		for (auto& [prop, handlerId] : m_propOnChangedHandlers) {
-			prop.on_change().disconnect(handlerId);
+		auto selectedEntity = m_scene->GetEntityWithUUID(selection[0]);
+		Entity entity{ updatedEntity, m_sceneDocument->GetScene().get() };
+		
+		if (selectedEntity && selectedEntity == entity)
+		{
+			if (!m_isDirty) // Solo encolamos la actualización UNA vez por frame
+			{
+				m_isDirty = true;
+				Berta::Dispatcher::Get().Enqueue([this]() 
+				{
+					// Este código se ejecutará de forma segura en la fase de "Idle"
+					m_propertyGrid.RefreshAll();
+					m_isDirty = false;
+				});
+			}
 		}
-		m_propOnChangedHandlers.clear();
 	}
 }

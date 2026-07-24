@@ -1,3 +1,4 @@
+#include "brcppch.h"
 #include "ContentProcessorContext.h"
 
 #include "GameContentBuilder.h"

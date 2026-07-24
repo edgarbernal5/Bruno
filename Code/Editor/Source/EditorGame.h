@@ -3,9 +3,9 @@
 #include "Bruno.h"
 #include "Bruno/Core/GameTimer.h"
 
-#include <nana/gui/widgets/menubar.hpp>
-#include <nana/gui/place.hpp>
-#include <nana/gui/widgets/panel.hpp>
+#include <Berta/Controls/MenuBar.h>
+#include <Berta/GUI/Layout.h>
+#include <Berta/Controls/Panel.h>
 #include <mutex>
 
 #include <thread>
@@ -13,17 +13,19 @@
 
 namespace Bruno
 {
-	class NanaWindow;
+	class BertaWindow;
 	class GraphicsDevice;
 	class ScenePanel;
 	class EditorAssetManager;
 	class AssetEditorService;
+	class SceneDocumentPanel;
+	class ContentBrowserPanel;
 
 	class EditorGame : public Game
 	{
 	public:
 		EditorGame(const ApplicationParameters& parameters, const std::wstring& projectPath);
-		~EditorGame();
+		~EditorGame() override;
 
 		void AddScenePanel(ScenePanel* panel);
 		void RemoveScenePanel(ScenePanel* panel);
@@ -45,9 +47,11 @@ namespace Bruno
 		std::thread			m_workerThread;
 		std::atomic<bool>	m_exitRequested;
 
-		nana::menubar		m_menubar;
-		nana::place			m_place;
+		Berta::MenuBar		m_menubar;
+		Berta::Layout			m_layout;
 
+		std::unique_ptr<SceneDocumentPanel> m_sceneDocumentPanel;
+		std::unique_ptr<ContentBrowserPanel> m_contentBrowserPanel;
 		std::vector<ScenePanel*> m_scenePanels;
 		std::mutex m_scenePanelsMutex{};
 

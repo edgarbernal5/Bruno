@@ -16,7 +16,7 @@ namespace Bruno
 
 	struct SceneObjectBuffer
 	{
-		Math::Matrix World;
+		Math::Matrix WorldViewProjection;
 	};
 
 	class Scene
@@ -24,8 +24,8 @@ namespace Bruno
 	public:
 		Scene();
 
-		Entity CreateEntity(const std::string& name = "Unnamed");
-		Entity CreateEntity(Entity parent, const std::string& name);
+		Entity CreateEntity(const std::wstring& name = L"Unnamed");
+		Entity CreateEntity(Entity parent, const std::wstring& name);
 		Entity InstantiateModel(std::shared_ptr<Model> model);
 
 		template<typename... Components>
@@ -37,7 +37,14 @@ namespace Bruno
 		Entity TryGetEntityWithUUID(UUID id) const;
 
 		void OnUpdate(const GameTimer& timer, Camera& camera);
-
+		
+		template<typename Component>
+		auto OnComponentUpdated() 
+		{
+			// EnTT permite crear un sink a partir de una señal (sigh)
+			return entt::sink{ m_registry.on_update<Component>() };
+		}
+		
 		friend class SceneRenderer;
 		friend class ObjectSelector;
 		friend class Entity;
@@ -50,7 +57,7 @@ namespace Bruno
 		entt::entity m_sceneEntity{ entt::null };
 		std::unordered_map<UUID, Entity> m_entityIdMap;
 
-		std::unique_ptr<ConstantBuffer<SceneObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
+		//std::unique_ptr<ConstantBuffer<SceneObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
 	};
 }
 

@@ -23,7 +23,7 @@ namespace Bruno
 
 		static Application* GetInstance() { return g_instance; }
 
-		friend class NanaWindow;
+		friend class BertaWindow;
 		friend class WindowsGameWindow;
 	protected:
 		Application(const ApplicationParameters& paramteres);

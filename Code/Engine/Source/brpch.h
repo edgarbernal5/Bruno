@@ -2,10 +2,16 @@
 
 #ifdef BR_PLATFORM_WINDOWS
 
-//#define NOMINMAX
-#include <Windows.h>
+#define D3D12_NO_HELPERS   // evita conflictos
+#include <d3d12.h>
+#include <dxgi1_6.h>
+#include <d3d12sdklayers.h>
+#include "d3dx12.h"
 
-//#include <wrl/client.h>
+#define NOMINMAX
+#include <windows.h>
+#include <wrl/client.h>
+
 #endif
 
 //STL Headers

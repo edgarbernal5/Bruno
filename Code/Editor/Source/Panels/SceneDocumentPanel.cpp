@@ -13,40 +13,46 @@
 
 namespace Bruno
 {
-	SceneDocumentPanel::SceneDocumentPanel(nana::window window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument) :
-		nana::panel<true>(window),
+	SceneDocumentPanel::SceneDocumentPanel(Berta::Window* window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument) :
+		Berta::Panel(window),
 		m_editorGame(editorGame),
 		m_sceneDocument(sceneDocument)
 	{
-		this->caption("Scene");
+		this->SetCaption("Scene");
 
-		m_place.bind(this->handle());
+		m_layout.Create(this->Handle());
 		////////// VIEW
-		m_place.div("<dock>");
+		m_layout.Parse("{VerticalLayout {Dock dockRoot}}");
 
-		nana::pane_info paneInfo;
-		paneInfo.show_close_button = false;
-		paneInfo.id = "pane1";
-		auto sceneHierarchyPanel = m_place.add_pane<SceneHierarchyPanel>(paneInfo, "", nana::dock_position::right, m_sceneDocument);
+		//Berta::pane_info paneInfo;
+		//paneInfo.show_close_button = false;
+		//paneInfo.id = "pane1";
+		m_sceneHierarchyPanel = std::make_unique<SceneHierarchyPanel>(*this, m_sceneDocument);
 
-		paneInfo.show_caption = false;
-		paneInfo.id = "pane3";
-		auto scenePanel = m_place.add_pane<ScenePanel>(paneInfo, "pane1", nana::dock_position::right, editorGame, m_sceneDocument);
+		//paneInfo.show_caption = false;
+		//paneInfo.id = "pane3";
+		//auto scenePanel = m_layout.add_pane<ScenePanel>(paneInfo, "pane1", Berta::dock_position::right, editorGame, m_sceneDocument);
+		m_scenePanel = std::make_unique<ScenePanel>(*this, editorGame, m_sceneDocument);
 
-		paneInfo.id = "pane2";
-		paneInfo.show_caption = true;
-		paneInfo.caption = "Properties";
-		auto propertiesPanel = m_place.add_pane<PropertiesPanel>(paneInfo, "pane1", nana::dock_position::down, m_sceneDocument);
+		//paneInfo.id = "pane2";
+		//paneInfo.show_caption = true;
+		//paneInfo.caption = "Properties";
+		//auto propertiesPanel = m_layout.add_pane<PropertiesPanel>(paneInfo, "pane1", Berta::dock_position::down, m_sceneDocument);
+		m_propertiesPanel = std::make_unique<PropertiesPanel>(*this, m_sceneDocument);
 
-		this->events().expose([scenePanel](const nana::arg_expose& arg)
-		{
-			if (arg.exposed)
-				scenePanel->show();
-			else
-				scenePanel->hide();
-		});
+		m_layout.AddPaneTab("panel-hierarchy-pane", "tab-hierarchy", std::move(m_sceneHierarchyPanel), "", Berta::DockPosition::Tab);
+		m_layout.AddPaneTab("panel-pane", "tab-scene", std::move(m_scenePanel), "panel-hierarchy-pane", Berta::DockPosition::Right);
+		m_layout.AddPaneTab("panel-properties-pane", "tab-properties", std::move(m_propertiesPanel), "panel-hierarchy-pane", Berta::DockPosition::Down);
+		
+		//this->GetEvents().Visibility.Connect([scenePanel](const Berta::ArgVisibility& arg)
+		//{
+		//	if (arg.IsVisible)
+		//		scenePanel->show();
+		//	else
+		//		scenePanel->hide();
+		//});
 
-		m_place.collocate();
+		m_layout.Apply();
 	}
 
 	SceneDocumentPanel::~SceneDocumentPanel()
