@@ -3,7 +3,6 @@
 
 #include "Scene/SelectionService.h"
 #include "Scene/SceneDocument.h"
-#include "Scene/SceneHierarchy.h"
 #include <Bruno/Scene/Scene.h>
 
 #include <Berta/Controls/Properties/PropertyGridFields.h>
@@ -22,7 +21,6 @@ namespace Bruno
 		this->SetCaption("Properties");
 
 		m_selectionService = sceneDocument->GetSelectionService();
-		m_sceneHierarchy = sceneDocument->GetSceneHierarchy();
 		m_scene = sceneDocument->GetScene();
 		
 		m_propertyGrid.Create(*this);

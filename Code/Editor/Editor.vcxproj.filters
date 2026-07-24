@@ -31,16 +31,7 @@
     <ClCompile Include="Source\Content\Importers\TextureImporter.cpp">
       <Filter>Source\Content\Importers</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Gizmos\GizmoRotationRenderer.cpp">
-      <Filter>Source\Gizmos</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Gizmos\GizmoScaleRenderer.cpp">
-      <Filter>Source\Gizmos</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Gizmos\GizmoService.cpp">
-      <Filter>Source\Gizmos</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Gizmos\GizmoTranslationRenderer.cpp">
       <Filter>Source\Gizmos</Filter>
     </ClCompile>
     <ClCompile Include="Source\Panels\Scene\SelectionService.cpp">
@@ -64,9 +55,6 @@
     <ClCompile Include="Source\Panels\Scene\SceneDocument.cpp">
       <Filter>Source\Panels\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Panels\Scene\SceneHierarchy.cpp">
-      <Filter>Source\Panels\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Layouts\PaneManager.cpp">
       <Filter>Source\Layouts</Filter>
     </ClCompile>
@@ -77,9 +65,6 @@
       <Filter>Source\Panels\Properties</Filter>
     </ClCompile>
     <ClCompile Include="Source\Gizmos\CameraGizmo.cpp">
-      <Filter>Source\Gizmos</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Gizmos\GizmoService_Gem.cpp">
       <Filter>Source\Gizmos</Filter>
     </ClCompile>
   </ItemGroup>
@@ -146,16 +131,7 @@
     <ClInclude Include="Source\Gizmos\Constants.h">
       <Filter>Source\Gizmos</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Gizmos\GizmoRotationRenderer.h">
-      <Filter>Source\Gizmos</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Gizmos\GizmoScaleRenderer.h">
-      <Filter>Source\Gizmos</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Gizmos\GizmoService.h">
-      <Filter>Source\Gizmos</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Gizmos\GizmoTranslationRenderer.h">
       <Filter>Source\Gizmos</Filter>
     </ClInclude>
     <ClInclude Include="Source\Panels\Scene\SelectionService.h">
@@ -182,9 +158,6 @@
     <ClInclude Include="Source\Panels\Scene\SceneDocument.h">
       <Filter>Source\Panels\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Panels\Scene\SceneHierarchy.h">
-      <Filter>Source\Panels\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Panels\Properties\PropertyHelpers.h">
       <Filter>Source\Panels\Properties</Filter>
     </ClInclude>
@@ -196,9 +169,6 @@
     </ClInclude>
     <ClInclude Include="Source\AssetEditors\AssetEditor.h">
       <Filter>Source\AssetEditors</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Gizmos\GizmoService_Gem.h">
-      <Filter>Source\Gizmos</Filter>
     </ClInclude>
     <ClInclude Include="Source\Gizmos\CameraGizmo.h">
       <Filter>Source\Gizmos</Filter>

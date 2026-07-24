@@ -4,13 +4,10 @@
 #include <Bruno/Scene/Scene.h>
 
 #include "SelectionService.h"
-#include "SceneHierarchy.h"
 #include "Bruno/Renderer/SceneRenderer.h"
 #include "Content/EditorAssetManager.h"
 #include "Gizmos/GizmoService.h"
-#include "Gizmos/GizmoService.h"
 #include "Bruno/Platform/DirectX/Shader.h"
-#include "Panels/Properties/PropertyHelpers.h"
 
 namespace Bruno
 {
@@ -22,17 +19,16 @@ namespace Bruno
 		InitializeGizmoService();
 		InitializeSceneRenderer();
 		
-		m_sceneHierarchy = std::make_shared<SceneHierarchy>(scene);
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			auto entityUUID = selection.size() > 0 ? selection[0] : UUID(0);
 			if (entityUUID)
 			{
 				auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
-				m_dxGizmoService->SetGizmoPosition(worldMatrix.Translation());
-				m_dxGizmoService->SetGizmoWorldMatrix(worldMatrix);
+				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
+				m_gizmoService->SetGizmoWorldMatrix(worldMatrix);
 			}
-			m_dxGizmoService->SetActive(entityUUID);
+			m_gizmoService->SetActive(entityUUID);
 			
 			SelectionChanged.emit(selection);
 		});
@@ -58,10 +54,10 @@ namespace Bruno
 		{
 			auto entityUUID = selection[0];
 			auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
-			m_dxGizmoService->SetGizmoPosition(worldMatrix.Translation());
-			m_dxGizmoService->SetGizmoWorldMatrix(worldMatrix);
+			m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
+			m_gizmoService->SetGizmoWorldMatrix(worldMatrix);
 		}
-		m_dxGizmoService->SetActive(selection.size() > 0);
+		m_gizmoService->SetActive(selection.size() > 0);
 		
 		SelectionChanged.emit(selection);
 	}
@@ -78,9 +74,9 @@ namespace Bruno
 		auto dxDevice = Graphics::GetDevice();
 		m_selectionService = std::make_shared<SelectionService>(m_scene, m_assetManager);
 		
-		m_dxGizmoService = std::make_shared<GizmoService>(dxDevice, m_camera);
-		m_dxGizmoService->Initialize();
-		m_dxGizmoService->SetTranslationCallback([&](const Math::Vector3& newPosition)
+		m_gizmoService = std::make_shared<GizmoService>(dxDevice, m_camera);
+		m_gizmoService->Initialize();
+		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& newPosition)
 		{
 			for (auto& uuid : m_selectionService->GetSelections())
 			{
@@ -108,7 +104,7 @@ namespace Bruno
 				});
 			}
 		});
-		m_dxGizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
+		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
 		{
 			for (auto& uuid : m_selectionService->GetSelections())
 			{
@@ -140,12 +136,12 @@ namespace Bruno
 					transform.Rotation.Normalize(); // Previene degradación de precisión flotante
 					
 					auto newWorldMatrix = m_scene->GetWorldSpaceMatrix(entity);
-					m_dxGizmoService->SetGizmoWorldMatrix(newWorldMatrix);
+					m_gizmoService->SetGizmoWorldMatrix(newWorldMatrix);
 				});
 			}
 		});
 		
-		m_dxGizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
+		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
 		{
 			const Math::Vector3 newDelta = delta * 0.1f;
 
