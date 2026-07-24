@@ -300,6 +300,84 @@
     <ClInclude Include="Source\Bruno\Core\Events\Event.h">
       <Filter>Source\Bruno\Core\Events</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\CommandContext.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueueManager.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorAllocator_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorHandle.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Device.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsFence.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Queue.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\RenderContext.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Shader_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderCompiler.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Surface_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\SurfaceTypes.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\SwapChain.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Texture2D.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext_Gem.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\UploadHeap.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -487,6 +565,78 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Content\AssetTable.cpp">
       <Filter>Source\Bruno\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\CommandContext.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueueManager.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBuffer_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\DescriptorAllocator_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Device.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsContext_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsFence.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\PrimitiveBatch_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Queue.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\RenderContext.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignature_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Shader_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderCompiler.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Surface_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\SwapChain.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Texture2D.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\UploadHeap.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer_Gem.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

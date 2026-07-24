@@ -4,7 +4,6 @@
 #include <Bruno/Scene/Scene.h>
 #include <Bruno/Scene/Entity.h>
 #include "Scene/SceneDocument.h"
-#include "Scene/SceneHierarchy.h"
 #include "Scene/SelectionService.h"
 
 namespace Bruno
@@ -16,7 +15,6 @@ namespace Bruno
 		this->SetCaption("Hierarchy");
 
 		m_selectionService = m_sceneDocument->GetSelectionService();
-		m_sceneHierarchy = m_sceneDocument->GetSceneHierarchy();
 
 		m_treebox.Create(*this);
 		
@@ -69,7 +67,8 @@ namespace Bruno
 		});
 
 		auto entities = sceneDocument->GetScene()->GetAllEntitiesWith<IdComponent, HierarchyComponent>();
-		for (auto& ent : entities) {
+		for (auto& ent : entities)
+		{
 			auto [idComponent, hierarchy] = entities.get<IdComponent, HierarchyComponent>(ent);
 			if (!hierarchy.Parent)
 			{

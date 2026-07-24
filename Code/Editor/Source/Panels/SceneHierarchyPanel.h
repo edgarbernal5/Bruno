@@ -10,7 +10,6 @@
 namespace Bruno
 {
 	class SceneDocument;
-	class SceneHierarchy;
 	class Entity;
 	class SelectionService;
 	class GizmoService;
@@ -20,7 +19,7 @@ namespace Bruno
 	{
 	public:
 		SceneHierarchyPanel(Berta::Window* window, std::shared_ptr<SceneDocument> sceneDocument);
-		~SceneHierarchyPanel();
+		~SceneHierarchyPanel() override;
 
 		friend class ScenePanel;
 	private:
@@ -30,7 +29,6 @@ namespace Bruno
 		Berta::Layout m_layout;
 		Berta::TreeBox m_treebox;
 		std::shared_ptr<SceneDocument> m_sceneDocument;
-		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;
 		std::shared_ptr<SelectionService> m_selectionService;
 
 		bool m_ignoreEvents{ false };

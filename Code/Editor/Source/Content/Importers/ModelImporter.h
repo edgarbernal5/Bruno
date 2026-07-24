@@ -20,7 +20,7 @@ namespace Bruno
 	{
 	public:
 		ModelImporter();
-		bool TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& asset) override;
+		bool TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset) override;
 
 	private:
 		enum TextureType : uint32_t

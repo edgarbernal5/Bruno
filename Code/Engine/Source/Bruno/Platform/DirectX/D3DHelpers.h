@@ -3,6 +3,12 @@
 #include <exception>
 #include <stdio.h>
 
+#include <wrl.h>
+#include <d3d12.h>
+#include <dxgi1_6.h>
+
+#include "Bruno/Core/Assert.h"
+
 namespace Bruno
 {
     class com_exception : public std::exception
@@ -27,6 +33,11 @@ namespace Bruno
         {
             throw com_exception(hr);
         }
+    }
+
+    inline void AssertIfFailed(HRESULT hr)
+    {
+        BR_ASSERT(SUCCEEDED(hr), "DX assertion failed");
     }
 
     template <class T>

@@ -149,7 +149,7 @@ namespace Bruno
 		auto sceneDocument = std::make_shared<SceneDocument>(scene, GetEditorAssetManager());
 		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
 		sceneDocument->InstantiateModel(model);
-
+		
 		m_sceneDocumentPanel = std::make_unique<SceneDocumentPanel>(form, this, sceneDocument);
 
 		m_contentBrowserPanel = std::make_unique<ContentBrowserPanel>(form, m_applicationParameters.WorkingDirectory,
@@ -159,7 +159,7 @@ namespace Bruno
 			});
 
 		m_layout.AddPaneTab("scene-doc-pane", "tab-scene", std::move(m_sceneDocumentPanel), "", Berta::DockPosition::Tab);
-		m_layout.AddPaneTab("content-browser-pane", "tab-content-browser", std::move(m_contentBrowserPanel), "scene-doc-pane", Berta::DockPosition::Down);
+		m_layout.AddPaneTab("content-browser-pane", "tab-content-browser", std::move(m_contentBrowserPanel), "scene-doc-pane", Berta::DockPosition::Right);
 
 		m_layout.Apply();
 

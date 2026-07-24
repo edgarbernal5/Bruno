@@ -10,7 +10,7 @@ namespace Bruno
 	public:
 		virtual ~AbstractAssetImporter() = default;
 
-		virtual bool TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& asset) = 0;
+		virtual bool TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset) = 0;
 	};
 }
 

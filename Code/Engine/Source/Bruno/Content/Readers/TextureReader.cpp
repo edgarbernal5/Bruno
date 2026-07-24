@@ -8,13 +8,13 @@ namespace Bruno
 	BR_RTTI_DEFINITIONS(TextureReader);
 
 	TextureReader::TextureReader() :
-		ContentTypeReader(Texture::GetTypeIdClass())
+		ContentTypeReader(Texture2D::GetTypeIdClass())
 	{
 	}
 
-	std::shared_ptr<Texture> TextureReader::ReadInternal(ContentReader& input)
+	std::shared_ptr<Texture2D> TextureReader::ReadInternal(ContentReader& input)
 	{
-		Texture::AssetPipelineInitData initData;
+		/*Texture2D::AssetPipelineInitData initData;
 		input.ReadUInt64(initData.Width);
 		input.ReadUInt64(initData.Height);
 		input.ReadUInt64(initData.Depth);
@@ -38,6 +38,7 @@ namespace Bruno
 			input.ReadUInt64(imageInitData.Offset);
 		}
 
-		return std::make_shared<Texture>(initData);
+		return std::make_shared<Texture>(initData);*/
+		return nullptr;
 	}
 }

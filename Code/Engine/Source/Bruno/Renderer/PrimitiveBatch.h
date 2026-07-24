@@ -1,119 +1,56 @@
-#pragma once
+﻿#pragma once
+#include "Bruno/Math/Math.h"
 
-#include <d3d12.h>
-#include "Bruno/Platform/DirectX/GpuBuffer.h"
+#include "Bruno/Renderer/Camera.h"
+#include "Bruno/Platform/DirectX/IndexBuffer.h"
+#include "Bruno/Platform/DirectX/UploadContext.h"
+#include "Bruno/Platform/DirectX/VertexBuffer.h"
 
 namespace Bruno
 {
-	class GraphicsDevice;
-	class GraphicsContext;
+    // Estructura ligera para el batching de Gizmos
+    struct GizmoVertex
+    {
+        Math::Vector3 Position;
+        Math::Vector4 Color;
+    };
 
-	class PrimitiveBatchBase
-	{
-	protected:
-		PrimitiveBatchBase(GraphicsDevice* device, uint64_t maxIndices, uint64_t maxVertices, uint64_t vertexSize);
-		virtual ~PrimitiveBatchBase();
+    class PrimitiveBatch
+    {
+    public:
+        PrimitiveBatch(GraphicsDevice* device);
+    
+        // Prepara las listas para un nuevo frame
+        void Begin();
+    
+        // Primitivas Base (Math puro, generan vértices e índices)
+        void DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color);
+        void DrawCone(const Math::Matrix& transform, float height, float radius, int slices, const Math::Color& color);
+        void DrawCylinder(const Math::Matrix& transform, float height, float radius, int slices, const Math::Color& color);
+        void DrawBox(const Math::Matrix& transform, float size, const Math::Color& color);
+        void DrawBox(const Math::Matrix& transform, const Math::Vector3& size, const Math::Color& color);
+        void DrawTorus(const Math::Matrix& transform, float outerRadius, float innerRadius, int slices, int segments, const Math::Color& color);
+        void DrawHalfTorus(const Math::Matrix& transform, float outerRadius, float innerRadius, float angleStart, int slices, int segments, const Math::Color& color);
+        void DrawSphere(const Math::Matrix& transform, float radius, int slices, int stacks, const Math::Color& color);
+        
+        // Finaliza el batching y sube la geometría a los buffers dinámicos de la GPU
+        void End(uint32_t frameIndex);
 
-	public:
-		void Begin(GraphicsContext* context);
-		void End();
+        // Devuelve los buffers para el renderizado
+        VertexBuffer* GetVertexBuffer(uint32_t frameIndex) const { return m_vertexBuffer[frameIndex].get(); }
+        IndexBuffer* GetIndexBuffer(uint32_t frameIndex) const { return m_indexBuffer[frameIndex].get(); }
+        uint32_t GetIndexCount() const { return static_cast<uint32_t>(m_indices.size()); }
 
-	protected:
-		void Draw(D3D_PRIMITIVE_TOPOLOGY topology, bool isIndexed, uint16_t const* indices, size_t indexCount, size_t vertexCount, void** pMappedVertices);
-		void Flush();
+    private:
+        uint32_t AddVertex(const Math::Vector3& localPos, const Math::Matrix& transform, const Math::Color& color);
+        void AddTriangle(uint32_t i0, uint32_t i1, uint32_t i2);
+        
+        std::vector<GizmoVertex> m_vertices;
+        std::vector<uint32_t> m_indices;
+        GraphicsDevice* m_device;
 
-		bool m_isIndexed;
-		bool m_isBatching;
-		bool m_inBeginEndPair;
-
-		uint64_t m_maxIndices;
-		uint64_t m_maxVertices;
-		uint64_t m_vertexSize;
-
-		uint64_t m_indexCount;
-		uint64_t m_vertexCount;
-
-		uint64_t m_baseIndex;
-		uint64_t m_baseVertex;
-
-		D3D_PRIMITIVE_TOPOLOGY m_topology;
-		GraphicsContext* m_graphicsContext;
-
-		std::unique_ptr<GpuBuffer> m_indexBuffer;
-		std::unique_ptr<GpuBuffer> m_vertexBuffer;
-	};
-
-	template<typename TVertex>
-	class PrimitiveBatch : public PrimitiveBatchBase
-	{
-	public:
-		PrimitiveBatch(GraphicsDevice* device, uint64_t maxIndices, uint64_t maxVertices) :
-			PrimitiveBatchBase(device, maxIndices, maxVertices, sizeof(TVertex))
-		{
-			BufferCreationDesc uploadIndexBufferDesc;
-			uploadIndexBufferDesc.Size = AlignU32(m_maxIndices * sizeof(uint16_t), 16);
-			uploadIndexBufferDesc.AccessFlags = BufferAccessFlags::HostWritable;
-
-			m_indexBuffer = std::make_unique<GpuBuffer>(*device, uploadIndexBufferDesc);
-
-			BufferCreationDesc uploadVertexBufferDesc;
-			uploadVertexBufferDesc.Size = AlignU32(m_maxVertices * m_vertexSize, 256);
-			uploadVertexBufferDesc.AccessFlags = BufferAccessFlags::HostWritable;
-
-			m_vertexBuffer = std::make_unique<GpuBuffer>(*device, uploadVertexBufferDesc);
-		}
-
-		void Draw(D3D_PRIMITIVE_TOPOLOGY topology, TVertex const* vertices, size_t vertexCount)
-		{
-			void* mappedVertices;
-
-			PrimitiveBatchBase::Draw(topology, false, nullptr, 0, vertexCount, &mappedVertices);
-
-			memcpy(mappedVertices, vertices, vertexCount * m_vertexSize);
-		}
-
-		void DrawIndexed(D3D_PRIMITIVE_TOPOLOGY topology, uint16_t const* indices, size_t indexCount, TVertex const* vertices, size_t vertexCount)
-		{
-			void* mappedVertices;
-
-			PrimitiveBatchBase::Draw(topology, true, indices, indexCount, vertexCount, &mappedVertices);
-
-			memcpy(mappedVertices, vertices, vertexCount * m_vertexSize);
-		}
-
-		void DrawLine(TVertex const& v1, TVertex const& v2)
-		{
-			TVertex* mappedVertices;
-
-			PrimitiveBatchBase::Draw(D3D_PRIMITIVE_TOPOLOGY_LINELIST, false, nullptr, 0, 2, reinterpret_cast<void**>(&mappedVertices));
-
-			mappedVertices[0] = v1;
-			mappedVertices[1] = v2;
-		}
-
-		void DrawTriangle(TVertex const& v1, TVertex const& v2, TVertex const& v3)
-		{
-			TVertex* mappedVertices;
-
-			PrimitiveBatchBase::Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, false, nullptr, 0, 3, reinterpret_cast<void**>(&mappedVertices));
-
-			mappedVertices[0] = v1;
-			mappedVertices[1] = v2;
-			mappedVertices[2] = v3;
-		}
-
-		void DrawQuad(TVertex const& v1, TVertex const& v2, TVertex const& v3, TVertex const& v4)
-		{
-			static const uint16_t quadIndices[] = { 0, 1, 2, 0, 2, 3 };
-
-			TVertex* mappedVertices;
-
-			PrimitiveBatchBase::Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, true, quadIndices, 6, 4, reinterpret_cast<void**>(&mappedVertices));
-
-			mappedVertices[0] = v1;
-			mappedVertices[1] = v2;
-			mappedVertices[2] = v3;
-			mappedVertices[3] = v4;
-		}
-	};
+        // Estos buffers deben ser "Dinámicos" o mapeables (creados en un Upload Heap en DX12)
+        std::unique_ptr<VertexBuffer> m_vertexBuffer[2];
+        std::unique_ptr<IndexBuffer> m_indexBuffer[2];
+    };
 }

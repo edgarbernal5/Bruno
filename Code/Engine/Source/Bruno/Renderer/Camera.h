@@ -14,12 +14,12 @@ namespace Bruno
 		const Math::Matrix& GetProjection();
 		const Math::Matrix& GetViewProjection();
 
-		bool IsOrthographic() { return m_isOrthographic; }
-		float GetNearPlane() { return m_nearPlane; }
-		float GetFieldOfView() { return m_fovY; }
-		Math::Vector3 GetPosition() { return m_position; }
-		Math::Vector3 GetTarget() { return m_target; }
-		Math::Vector3 GetUp() { return m_up; }
+		bool IsOrthographic() const { return m_isOrthographic; }
+		float GetNearPlane() const { return m_nearPlane; }
+		float GetFieldOfView() const { return m_fovY; }
+		Math::Vector3 GetPosition() const { return m_position; }
+		Math::Vector3 GetTarget() const { return m_target; }
+		Math::Vector3 GetUp() const { return m_up; }
 		Math::Viewport GetViewport() const { return m_viewport; }
 		void SetViewport(const Math::Viewport& viewport);
 

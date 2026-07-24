@@ -1,104 +1,77 @@
-#include "brpch.h"
+﻿#include "brpch.h"
 #include "UploadContext.h"
 
-#include "GpuBuffer.h"
-#include "Texture.h"
-#include "Bruno/Core/Memory.h"
+#include "GraphicsDevice.h"
 
 namespace Bruno
 {
-	UploadContext::UploadContext(GraphicsDevice& device, std::unique_ptr<GpuBuffer> bufferUploadHeap, std::unique_ptr<GpuBuffer> textureUploadHeap) :
-		Context(device, D3D12_COMMAND_LIST_TYPE_COPY),
-        m_bufferUploadHeap(std::move(bufferUploadHeap)),
-        m_textureUploadHeap(std::move(textureUploadHeap))
-	{
-	}
-	
-	UploadContext::~UploadContext()
-	{
-	}
-
-	void UploadContext::AddBufferUpload(std::unique_ptr<BufferUpload> bufferUpload)
-	{
-		BR_ASSERT(bufferUpload->BufferDataSize <= m_bufferUploadHeap->m_desc.Width);
-
-		m_bufferUploads.push_back(std::move(bufferUpload));
-	}
-
-	void UploadContext::AddTextureUpload(std::unique_ptr<TextureUpload> textureUpload)
-	{
-		BR_ASSERT(textureUpload->TextureDataSize <= m_textureUploadHeap->m_desc.Width);
-
-		m_textureUploads.push_back(std::move(textureUpload));
-	}
-	
-	void UploadContext::ProcessUploads()
-	{
-		const uint32_t numBufferUploads = static_cast<uint32_t>(m_bufferUploads.size());
-		const uint32_t numTextureUploads = static_cast<uint32_t>(m_textureUploads.size());
-		uint32_t numBuffersProcessed = 0;
-		uint32_t numTexturesProcessed = 0;
-		size_t bufferUploadHeapOffset = 0;
-		size_t textureUploadHeapOffset = 0;
-
-        for (numBuffersProcessed; numBuffersProcessed < numBufferUploads; ++numBuffersProcessed)
-        {
-            BufferUpload& currentUpload = *m_bufferUploads[numBuffersProcessed];
-
-            if ((bufferUploadHeapOffset + currentUpload.BufferDataSize) > m_bufferUploadHeap->m_desc.Width)
-            {
-                break;
-            }
-
-            memcpy(m_bufferUploadHeap->m_mappedResource + bufferUploadHeapOffset, currentUpload.BufferData.get(), currentUpload.BufferDataSize);
-            CopyBufferRegion(*currentUpload.Buffer, 0, *m_bufferUploadHeap, bufferUploadHeapOffset, currentUpload.BufferDataSize);
-
-            bufferUploadHeapOffset += currentUpload.BufferDataSize;
-            m_bufferUploadsInProgress.push_back(currentUpload.Buffer);
-        }
-
-        for (numTexturesProcessed; numTexturesProcessed < numTextureUploads; ++numTexturesProcessed)
-        {
-            TextureUpload& currentUpload = *m_textureUploads[numTexturesProcessed];
-
-            if ((textureUploadHeapOffset + currentUpload.TextureDataSize) > m_textureUploadHeap->m_desc.Width)
-            {
-                break;
-            }
-
-            memcpy(m_textureUploadHeap->m_mappedResource + textureUploadHeapOffset, currentUpload.TextureData.get(), currentUpload.TextureDataSize);
-            CopyTextureRegion(*currentUpload.Texture, *m_textureUploadHeap, textureUploadHeapOffset, currentUpload.SubResourceLayouts, currentUpload.SubResourcesCount);
-
-            textureUploadHeapOffset += currentUpload.TextureDataSize;
-            textureUploadHeapOffset = AlignU64(textureUploadHeapOffset, 512);
-
-            m_textureUploadsInProgress.push_back(currentUpload.Texture);
-        }
-
-        if (numBuffersProcessed > 0)
-        {
-            m_bufferUploads.erase(m_bufferUploads.begin(), m_bufferUploads.begin() + numBuffersProcessed);
-        }
-
-        if (numTexturesProcessed > 0)
-        {
-            m_textureUploads.erase(m_textureUploads.begin(), m_textureUploads.begin() + numTexturesProcessed);
-        }
-	}
-    
-    void UploadContext::ResolveProcessedUploads()
+    UploadContext::UploadContext(GraphicsDevice& device) :
+        CommandContext(device, D3D12_COMMAND_LIST_TYPE_COPY)
     {
-        for (auto& bufferUploadInProgress : m_bufferUploadsInProgress)
-        {
-            bufferUploadInProgress->m_isReady = true;
-        }
+    }
 
-        for (auto& textureUploadInProgress : m_textureUploadsInProgress)
-        {
-            textureUploadInProgress->m_isReady = true;
-        }
+    void UploadContext::UploadBuffer(ID3D12Resource* destBuffer, const void* data, size_t size)
+    {
+        // 1. Crear memoria intermedia (Upload Heap)
+        auto intermediateBuffer = CreateIntermediateBuffer(size);
+        
+        // 2. Mapear y copiar de CPU (RAM) a Búfer Intermedio (RAM Visible a GPU)
+        void* mappedData = nullptr;
+        ThrowIfFailed(intermediateBuffer->Map(0, nullptr, &mappedData));
+        ::memcpy(mappedData, data, size);
+        intermediateBuffer->Unmap(0, nullptr);
 
-        m_bufferUploadsInProgress.clear();
-        m_textureUploadsInProgress.clear();
+        // 3. Grabar el comando para que la GPU mueva los datos al Destino Final (VRAM)
+        m_commandList->CopyBufferRegion(destBuffer, 0, intermediateBuffer.Get(), 0, size);
+
+        // 4. Retener el búfer para que no se destruya al salir de esta función
+        m_intermediateBuffers.push_back(intermediateBuffer);
+    }
+
+    void UploadContext::UploadTexture(ID3D12Resource* destTexture, const D3D12_SUBRESOURCE_DATA& subResourceData)
+    {
+        UINT64 requiredSize = 0;
+        auto textureDesc = destTexture->GetDesc();
+        m_device.GetNativeDevice()->GetCopyableFootprints(
+            &textureDesc, 0, 1, 0, nullptr, nullptr, nullptr, &requiredSize);
+
+        auto intermediateBuffer = CreateIntermediateBuffer(requiredSize);
+
+        // Actualizamos subrecursos usando la metadata que DirectXTK ya calculó
+        UpdateSubresources(
+            m_commandList.Get(), 
+            destTexture, 
+            intermediateBuffer.Get(), 
+            0, 0, 1, 
+            &subResourceData
+        );
+
+        m_intermediateBuffers.push_back(intermediateBuffer);
+    }
+
+    void UploadContext::ClearGarbage()
+    {
+        // Vaciamos el vector. Los ComPtr llamarán automáticamente a ->Release()
+        // liberando la memoria de la GPU.
+        m_intermediateBuffers.clear(); 
+    }
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> UploadContext::CreateIntermediateBuffer(UINT64 sizeInBytes)
+    {
+        Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
+        
+        auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+        auto bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeInBytes);
+
+        ThrowIfFailed(m_device.GetNativeDevice()->CreateCommittedResource(
+            &heapProps,
+            D3D12_HEAP_FLAG_NONE,
+            &bufferDesc,
+            D3D12_RESOURCE_STATE_GENERIC_READ, // Los Upload Heaps DEBEN estar en este estado
+            nullptr,
+            IID_PPV_ARGS(&buffer)
+        ));
+
+        return buffer;
     }
 }

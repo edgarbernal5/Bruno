@@ -3,12 +3,12 @@
 
 #include "Scene/SelectionService.h"
 #include "Scene/SceneDocument.h"
-#include "Scene/SceneHierarchy.h"
 #include <Bruno/Scene/Scene.h>
 
 #include <Berta/Controls/Properties/PropertyGridFields.h>
 #include <Berta/GUI/ControlDrawBatch.h>
 
+#include "Berta/GUI/Dispatcher.h"
 #include "Content/EditorAssetManager.h"
 #include "Properties/PropertyGridItems.h"
 
@@ -21,7 +21,6 @@ namespace Bruno
 		this->SetCaption("Properties");
 
 		m_selectionService = sceneDocument->GetSelectionService();
-		m_sceneHierarchy = sceneDocument->GetSceneHierarchy();
 		m_scene = sceneDocument->GetScene();
 		
 		m_propertyGrid.Create(*this);
@@ -107,11 +106,7 @@ namespace Bruno
 						}
 					}
 				);
-				/*
-				*auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(prop.as_vector3());
-				currentRotation *= delta;
-				prop.value(currentRotation.ToEuler());
-				 */
+				
 				categoryTransform.EmplaceVector3(
 					"Rotation", 
 				[entity]()
@@ -273,7 +268,7 @@ namespace Bruno
 
 	void PropertiesPanel::OnComponentUpdated(entt::registry& registry, entt::entity updatedEntity)
 	{
-		auto selection = m_selectionService->GetSelections();
+		const auto& selection = m_selectionService->GetSelections();
 		if (selection.size() != 1)
 		{
 			return;
@@ -284,7 +279,16 @@ namespace Bruno
 		
 		if (selectedEntity && selectedEntity == entity)
 		{
-			m_propertyGrid.RefreshAll();
+			if (!m_isDirty) // Solo encolamos la actualización UNA vez por frame
+			{
+				m_isDirty = true;
+				Berta::Dispatcher::Get().Enqueue([this]() 
+				{
+					// Este código se ejecutará de forma segura en la fase de "Idle"
+					m_propertyGrid.RefreshAll();
+					m_isDirty = false;
+				});
+			}
 		}
 	}
 }

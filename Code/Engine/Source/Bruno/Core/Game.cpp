@@ -5,13 +5,15 @@
 #include "Bruno/Platform/Windows/WindowsGameWindow.h"
 #include "Bruno/Platform/Windows/BertaWindow.h"
 
-#include "Bruno/Platform/DirectX/GraphicsAdapter.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 
 #include "Bruno/Content/ContentTypeReaderManager.h"
 
 #include <filesystem>
 #include <Bruno/Platform/DirectX/Surface.h>
+
+#include "Bruno/Platform/DirectX/CommandQueueManager.h"
+#include "Bruno/Platform/DirectX/GraphicsDevice.h"
 
 namespace Bruno
 {
@@ -26,7 +28,7 @@ namespace Bruno
 
 	Game::~Game()
 	{
-		m_device->WaitForIdle();
+		m_device->Flush();
 
 		m_timer.Stop();
 		m_window.reset();
@@ -51,12 +53,15 @@ namespace Bruno
 
 		m_device = GraphicsDevice::Create();
 		Bruno::Graphics::GetDevice() = m_device.get();
-
+		
+		m_commandQueueManager = CommandQueueManager::Create(*m_device);
+		Bruno::Graphics::GetCommandQueueManager() = m_commandQueueManager.get();
+		
 		ContentTypeReaderManager::Initialize();
 		SurfaceWindowParameters surfaceParameters;
 
-		m_shaderCache.Initialize();
-		m_psoCache.Initialize(surfaceParameters.BackBufferFormat, surfaceParameters.DepthBufferFormat);
+		//m_shaderCache.Initialize();
+		//m_psoCache.Initialize(surfaceParameters.BackBufferFormat, surfaceParameters.DepthBufferFormat);
 	}
 
 	void Game::OnRun()

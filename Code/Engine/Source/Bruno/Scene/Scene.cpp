@@ -16,10 +16,10 @@ namespace Bruno
 	{
 		m_sceneEntity = m_registry.create();
 
-		for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-		{
-			m_objectBuffer[i] = std::make_unique<ConstantBuffer<SceneObjectBuffer>>(Graphics::Core::SCENE_OBJECT_COUNT);
-		}
+		//for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
+		//{
+		//	//m_objectBuffer[i] = std::make_unique<ConstantBuffer<SceneObjectBuffer>>(Graphics::Core::SCENE_OBJECT_COUNT);
+		//}
 	}
 
 	Entity Scene::CreateEntity(const std::wstring& name)
@@ -58,7 +58,7 @@ namespace Bruno
 
 	void Scene::OnUpdate(const GameTimer& timer, Camera& camera)
 	{
-		auto device = Graphics::GetDevice();
+		/*auto device = Graphics::GetDevice();
 		uint32_t frameIndex = device->GetFrameId();
 		auto entities = GetAllEntitiesWith<IdComponent, TransformComponent>();
 		uint32_t index = 0;
@@ -73,9 +73,9 @@ namespace Bruno
 			SceneObjectBuffer objectBuffer;
 			objectBuffer.World = mvpMatrix;
 
-			m_objectBuffer[frameIndex]->SetMappedData(index, objectBuffer);
+			//m_objectBuffer[frameIndex]->SetMappedData(index, objectBuffer);
 			index++;
-		}
+		}*/
 	}
 
 	Math::Matrix Scene::GetLocalSpaceMatrix(Entity entity)
@@ -85,14 +85,15 @@ namespace Bruno
 
 	Math::Matrix Scene::GetWorldSpaceMatrix(Entity entity)
 	{
-		Math::Matrix transform;
+		Math::Matrix parentTransform = Math::Matrix::Identity;
 
 		Entity parent = TryGetEntityWithUUID(entity.GetParentUUID());
 		if (parent)
 		{
-			transform = GetWorldSpaceMatrix(parent);
+			parentTransform = GetWorldSpaceMatrix(parent);
 		}
-		return transform * entity.GetComponent<TransformComponent>().GetTransform();
+		
+		return entity.GetComponent<TransformComponent>().GetTransform() * parentTransform;
 	}
 
 	Entity Scene::GetEntityWithUUID(UUID id) const
@@ -125,6 +126,7 @@ namespace Bruno
 
 			return;
 		}
+		
 		Entity nodeEntity = CreateEntity(parent, node.Name);
 		nodeEntity.GetComponent<TransformComponent>().ApplyTransform(node.LocalTransform);
 

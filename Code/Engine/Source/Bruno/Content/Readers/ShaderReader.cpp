@@ -2,6 +2,7 @@
 #include "ShaderReader.h"
 
 #include "Bruno/Content/ContentReader.h"
+#include "Bruno/Platform/DirectX/D3DConstants.h"
 
 namespace Bruno
 {
@@ -14,7 +15,7 @@ namespace Bruno
 
 	std::shared_ptr<Shader> ShaderReader::ReadInternal(ContentReader& input)
 	{
-		std::array<std::vector<uint8_t>, Graphics::Core::SHADER_PROGRAMS_COUNT> programsData;
+		/*std::array<std::vector<uint8_t>, Graphics::Core::SHADER_PROGRAMS_COUNT> programsData;
 		for (size_t i = 0; i < Graphics::Core::SHADER_PROGRAMS_COUNT; i++)
 		{
 			std::vector<uint8_t> data;
@@ -23,6 +24,7 @@ namespace Bruno
 			programsData[i] = std::move(data);
 		}
 	
-		return std::make_shared<Shader>(std::move(programsData));
+		return std::make_shared<Shader>(std::move(programsData));*/
+		return nullptr;
 	}
 }

@@ -1,120 +1,114 @@
 #include "brpch.h"
 #include "CommandQueue.h"
 
-#include "D3DHelpers.h"
 #include "GraphicsDevice.h"
-#include "Surface.h"
+
+#ifdef BR_DEBUG
+#include <dxgidebug.h>
+#endif
+
+#include "D3DHelpers.h"
+
+#include <numeric>
 
 namespace Bruno
 {
-	CommandQueue::CommandQueue(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE queueType) :
-		m_device(device),
-		m_queueType(queueType)
-	{
-		D3D12_COMMAND_QUEUE_DESC desc = {};
-		desc.Flags		= D3D12_COMMAND_QUEUE_FLAG_NONE;
-		desc.NodeMask	= 0;
-		desc.Priority	= D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-		desc.Type		= queueType;
+    CommandQueue::CommandQueue(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE type)
+        : m_fenceValue(0)
+    {
+        auto nativeDevice = device.GetNativeDevice();
+        
+        D3D12_COMMAND_QUEUE_DESC desc = {};
+        desc.Type = type;
+        desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+        desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+        desc.NodeMask = 0;
 
-		ThrowIfFailed(device.GetD3DDevice()->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_commandQueue)));
-		
-		switch (queueType)
-		{
-		case D3D12_COMMAND_LIST_TYPE_COPY:
-			m_commandQueue->SetName(L"Copy Command Queue");
-			break;
-		case D3D12_COMMAND_LIST_TYPE_COMPUTE:
-			m_commandQueue->SetName(L"Compute Command Queue");
-			break;
-		case D3D12_COMMAND_LIST_TYPE_DIRECT:
-			m_commandQueue->SetName(L"Direct Command Queue");
-			break;
-		}
+        ThrowIfFailed(nativeDevice->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_commandQueue)));
+        
+        // 1. Crear la valla con valor inicial 0
+        ThrowIfFailed(nativeDevice->CreateFence(m_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+        
+        m_fenceEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
+        if (!m_fenceEvent)
+        {
+            throw std::runtime_error("Fallo al crear el evento de sincronización de Windows.");
+        }
 
-		ThrowIfFailed(m_device.GetD3DDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
-		m_fence->SetName(L"CommandQueue");
+        // CREACIÓN DE MÚLTIPLES ALLOCATORS
+        for (uint32_t i = 0; i < BufferCount; ++i) {
+            ThrowIfFailed(nativeDevice->CreateCommandAllocator(type, IID_PPV_ARGS(&m_commandAllocators[i])));
+            m_frameFenceValues[i] = 0; // Inicializamos los tickets
+        }
 
-		m_fence->Signal(m_lastCompletedFenceValue);
+        // Creamos la CommandList usando el primer allocator
+        ThrowIfFailed(nativeDevice->CreateCommandList(
+            0, type, m_commandAllocators[0].Get(), nullptr, IID_PPV_ARGS(&m_commandList)
+        ));
 
-		m_fenceEventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
-		BR_ASSERT(m_fenceEventHandle != INVALID_HANDLE_VALUE);
-	}
+        m_commandList->Close();
+    }
 
-	CommandQueue::~CommandQueue()
-	{
-		CloseHandle(m_fenceEventHandle);
-		m_fenceEventHandle = nullptr;
+    CommandQueue::~CommandQueue()
+    {
+        Flush();
+        ::CloseHandle(m_fenceEvent);
+    }
 
-		
-	}
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CommandQueue::GetCommandList(uint32_t frameIndex)
+    {
+        // 1. ANTES de usar el Allocator de este frame, verificamos que la GPU ya terminó de leerlo
+        WaitForFenceValue(m_frameFenceValues[frameIndex]);
 
-	bool CommandQueue::IsFenceComplete(uint64_t fenceValue)
-	{
-		if (fenceValue > m_lastCompletedFenceValue)
-		{
-			PollCurrentFenceValue();
-		}
+        // 2. Ahora es 100% seguro resetearlo
+        auto& currentAllocator = m_commandAllocators[frameIndex];
+        ThrowIfFailed(currentAllocator->Reset());
+        ThrowIfFailed(m_commandList->Reset(currentAllocator.Get(), nullptr));
+        
+        return m_commandList;
+    }
 
-		return fenceValue <= m_lastCompletedFenceValue;
-	}
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CommandQueue::GetAllocator(uint32_t frameIndex)
+    {
+        return m_commandAllocators[frameIndex];
+    }
 
-	void CommandQueue::InsertWait(uint64_t fenceValue)
-	{
-		m_commandQueue->Wait(m_fence.Get(), fenceValue);
-	}
+    uint64_t CommandQueue::ExecuteCommandList(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList, uint32_t frameIndex)
+    {
+        ThrowIfFailed(commandList->Close());
 
-	void CommandQueue::InsertWaitForQueueFence(CommandQueue* otherQueue, uint64_t fenceValue)
-	{
-		m_commandQueue->Wait(otherQueue->GetFence(), fenceValue);
-	}
+        ID3D12CommandList* const ppCommandLists[] = { commandList.Get() };
+        m_commandQueue->ExecuteCommandLists(1, ppCommandLists);
 
-	void CommandQueue::InsertWaitForQueue(CommandQueue* otherQueue)
-	{
-		m_commandQueue->Wait(otherQueue->GetFence(), otherQueue->GetNextFenceValue() - 1);
-	}
+        // Aumentamos el ticket global
+        m_fenceValue++;
+        ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), m_fenceValue));
 
-	void CommandQueue::WaitForFenceCPUBlocking(uint64_t fenceValue)
-	{
-		if (IsFenceComplete(fenceValue))
-		{
-			return;
-		}
+        // GUARDAMOS EL TICKET ESPECÍFICO DE ESTE FRAME
+        m_frameFenceValues[frameIndex] = m_fenceValue;
 
-		{
-			std::lock_guard<std::mutex> lockGuard(m_eventMutex);
+        return m_fenceValue;
+    }
 
-			m_fence->SetEventOnCompletion(fenceValue, m_fenceEventHandle);
-			WaitForSingleObjectEx(m_fenceEventHandle, INFINITE, false);
-			m_lastCompletedFenceValue = fenceValue;
-		}
-	}
+    void CommandQueue::WaitForFenceValue(uint64_t fenceValue)
+    {
+        // Verificamos si la GPU ya cruzó la valla (Si es así, la CPU ni se frena)
+        if (m_fence->GetCompletedValue() < fenceValue) 
+        {
+            // Le decimos a la GPU: "Despierta a este evento de Windows cuando llegues a este valor"
+            ThrowIfFailed(m_fence->SetEventOnCompletion(fenceValue, m_fenceEvent));
+            
+            // Dormimos el hilo de la CPU (Cero uso de CPU) hasta que la GPU grite "¡Terminé!"
+            ::WaitForSingleObject(m_fenceEvent, INFINITE);
+        }
+    }
 
-	void CommandQueue::WaitForIdle()
-	{
-		WaitForFenceCPUBlocking(m_nextFenceValue - 1);
-	}
-
-	uint64_t CommandQueue::PollCurrentFenceValue()
-	{
-		m_lastCompletedFenceValue = (std::max)(m_lastCompletedFenceValue, m_fence->GetCompletedValue());
-		return m_lastCompletedFenceValue;
-	}
-
-	uint64_t CommandQueue::ExecuteCommandList(ID3D12CommandList* commandList)
-	{
-		ThrowIfFailed(static_cast<ID3D12GraphicsCommandList*>(commandList)->Close());
-		m_commandQueue->ExecuteCommandLists(1, &commandList);
-
-		return SignalFence();
-	}
-
-	uint64_t CommandQueue::SignalFence()
-	{
-		std::lock_guard<std::mutex> lockGuard(m_fenceMutex);
-
-		m_commandQueue->Signal(m_fence.Get(), m_nextFenceValue);
-
-		return m_nextFenceValue++;
-	}
+    void CommandQueue::Flush()
+    {
+        // Truco maestro: Metemos una señal vacía y obligamos a la CPU a esperarla.
+        // Garantiza que TODAS las operaciones previas de la GPU hayan concluido.
+        m_fenceValue++;
+        ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), m_fenceValue));
+        WaitForFenceValue(m_fenceValue);
+    }
 }

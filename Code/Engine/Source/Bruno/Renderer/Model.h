@@ -68,8 +68,7 @@ namespace Bruno
 		BR_RTTI_DECLARATION(Model, Asset);
 
 	public:
-		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, 
-			std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes);
+		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes);
 
 		AssetType GetAssetType() const override { return AssetType::Model; }
 

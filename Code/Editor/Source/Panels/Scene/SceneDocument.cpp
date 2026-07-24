@@ -4,9 +4,10 @@
 #include <Bruno/Scene/Scene.h>
 
 #include "SelectionService.h"
-#include "SceneHierarchy.h"
+#include "Bruno/Renderer/SceneRenderer.h"
+#include "Content/EditorAssetManager.h"
 #include "Gizmos/GizmoService.h"
-#include "Panels/Properties/PropertyHelpers.h"
+#include "Bruno/Platform/DirectX/Shader.h"
 
 namespace Bruno
 {
@@ -16,8 +17,8 @@ namespace Bruno
 	{
 		InitializeCamera();
 		InitializeGizmoService();
-
-		m_sceneHierarchy = std::make_shared<SceneHierarchy>(scene);
+		InitializeSceneRenderer();
+		
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			auto entityUUID = selection.size() > 0 ? selection[0] : UUID(0);
@@ -25,9 +26,10 @@ namespace Bruno
 			{
 				auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
 				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
+				m_gizmoService->SetGizmoWorldMatrix(worldMatrix);
 			}
 			m_gizmoService->SetActive(entityUUID);
-
+			
 			SelectionChanged.emit(selection);
 		});
 	}
@@ -40,10 +42,8 @@ namespace Bruno
 	void SceneDocument::InstantiateModel(std::shared_ptr<Model> model)
 	{
 		Entity rootEntity = m_scene->InstantiateModel(model);
-
-
-		InitializeProperties(rootEntity);
-
+		m_sceneRenderer->InitEntitiesForRender();
+		
 		HierarchyChanged.emit(rootEntity, ActionMode::Add);
 	}
 
@@ -55,8 +55,10 @@ namespace Bruno
 			auto entityUUID = selection[0];
 			auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
 			m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
+			m_gizmoService->SetGizmoWorldMatrix(worldMatrix);
 		}
 		m_gizmoService->SetActive(selection.size() > 0);
+		
 		SelectionChanged.emit(selection);
 	}
 
@@ -69,10 +71,12 @@ namespace Bruno
 	void SceneDocument::InitializeGizmoService()
 	{
 		auto device = Graphics::GetDevice();
+		auto dxDevice = Graphics::GetDevice();
 		m_selectionService = std::make_shared<SelectionService>(m_scene, m_assetManager);
-
-		m_gizmoService = std::make_shared<GizmoService>(device, m_camera, m_selectionService.get());
-		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& delta)
+		
+		m_gizmoService = std::make_shared<GizmoService>(dxDevice, m_camera);
+		m_gizmoService->Initialize();
+		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& newPosition)
 		{
 			for (auto& uuid : m_selectionService->GetSelections())
 			{
@@ -80,13 +84,26 @@ namespace Bruno
 				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
 
 				// Usamos 'patch' para que EnTT dispare el evento 'on_update<TransformComponent>'
-				entity.Patch<TransformComponent>([&delta](auto& transform) 
+				entity.Patch<TransformComponent>([this, entity, &newPosition](auto& transform) 
 				{
-					transform.Position += delta;
+					Math::Matrix parentWorldMatrix = Math::Matrix::Identity;
+		            
+					// 1. VALIDAR SI REALMENTE TIENE PADRE
+					Entity parent = m_scene->TryGetEntityWithUUID(entity.GetParentUUID());
+					if (parent)
+					{
+						parentWorldMatrix = m_scene->GetWorldSpaceMatrix(parent);
+					}
+		            
+					Math::Matrix inverseTransform;
+					parentWorldMatrix.Invert(inverseTransform);
+		            
+					// 2. Transform (Punto) aplica rotación, escala y traslación inversa
+					// Esto convierte perfectamente la coordenada absoluta 'newPosition' al espacio local
+					transform.Position = Math::Vector3::Transform(newPosition, inverseTransform);
 				});
 			}
 		});
-
 		m_gizmoService->SetRotationCallback([&](const Math::Quaternion& delta)
 		{
 			for (auto& uuid : m_selectionService->GetSelections())
@@ -94,16 +111,36 @@ namespace Bruno
 				Entity entity = m_scene->GetEntityWithUUID(uuid);
 				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
 
-				entity.Patch<TransformComponent>([&delta](auto& transform) 
+				entity.Patch<TransformComponent>([this, entity, &delta](auto& transform) 
 				{
-					// Asumiendo que transform.Rotation guarda los Euler Angles como Vector3
-					//auto currentRotation = Math::Quaternion::CreateFromYawPitchRoll(transform.Rotation);
-					//currentRotation *= delta;
-					//transform.Rotation = currentRotation.ToEuler();
+					Math::Matrix parentWorldMatrix = Math::Matrix::Identity;
+					Entity parent = m_scene->TryGetEntityWithUUID(entity.GetParentUUID());
+					if (parent)
+					{
+						parentWorldMatrix = m_scene->GetWorldSpaceMatrix(parent);
+					}
+
+					// Extraemos solo la rotación del padre en espacio de mundo
+					Math::Vector3 dummyScale, dummyPos;
+					Math::Quaternion parentRot;
+					parentWorldMatrix.Decompose(dummyScale, parentRot, dummyPos);
+
+					Math::Quaternion invParentRot;
+					parentRot.Inverse(invParentRot);
+
+					// Matemáticas de Jerarquía DX12
+					// 1. Llevamos la rotación local al Mundo: (transform.Rotation * parentRot)
+					// 2. Le sumamos el delta del ratón: (* delta)
+					// 3. Lo devolvemos al espacio Local: (* invParentRot)
+					transform.Rotation = transform.Rotation * parentRot * delta * invParentRot;
+					transform.Rotation.Normalize(); // Previene degradación de precisión flotante
+					
+					auto newWorldMatrix = m_scene->GetWorldSpaceMatrix(entity);
+					m_gizmoService->SetGizmoWorldMatrix(newWorldMatrix);
 				});
 			}
 		});
-
+		
 		m_gizmoService->SetScaleCallback([&](const Math::Vector3& delta, bool isUniform)
 		{
 			const Math::Vector3 newDelta = delta * 0.1f;
@@ -137,20 +174,8 @@ namespace Bruno
 		});
 	}
 
-	void SceneDocument::InitializeProperties(Entity entity)
+	void SceneDocument::InitializeSceneRenderer()
 	{
-		/*auto& hierarchy = entity.GetComponent<HierarchyComponent>();
-		auto& name = entity.GetComponent<NameComponent>().Name;
-
-		auto uuid = entity.GetUUID();
-
-		for (UUID child : hierarchy.Children)
-		{
-			auto childEntity = m_scene->TryGetEntityWithUUID(child);
-			if (childEntity)
-			{
-				InitializeProperties(childEntity);
-			}
-		}*/
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_assetManager);
 	}
 }

@@ -25,7 +25,7 @@ namespace Bruno
 		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeLightMap] = std::make_pair(aiTextureType_LIGHTMAP, "LightMapTexture");
 	}
 
-	bool ModelImporter::TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& asset)
+	bool ModelImporter::TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset)
 	{
 		Assimp::Importer importer;
 
@@ -79,8 +79,8 @@ namespace Bruno
 		rootNode.Parent = ModelNode::NullNode;
 		ProcessNode(aiScene->mRootNode, 0, modelNodes, meshes, Math::Matrix::Identity);
 
-		asset = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
-		asset->SetHandle(metadata.Handle);
+		outputAsset = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
+		outputAsset->SetHandle(metadata.Handle);
 
 		return true;
 	}

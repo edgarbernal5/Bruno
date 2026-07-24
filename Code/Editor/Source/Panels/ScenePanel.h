@@ -3,21 +3,16 @@
 #include <Berta/Controls/Panel.h>
 #include <Berta/GUI/Layout.h>
 #include <Berta/Controls/Form.h>
-//#include <nana/gui/timer.hpp>
 #include <Berta/Controls/ComboBox.h>
 #include <Berta/Controls/Button.h>
 
-#include <Bruno/Platform/DirectX/IndexBuffer.h>
-#include <Bruno/Platform/DirectX/VertexBuffer.h>
-#include <Bruno/Platform/DirectX/Shader.h>
-#include <Bruno/Platform/DirectX/RootSignature.h>
-#include <Bruno/Platform/DirectX/PipelineStateObject.h>
 #include <Bruno/Core/GameTimer.h>
 #include <Bruno/Renderer/RenderItem.h>
-#include <Bruno/Platform/DirectX/ConstantBuffer.h>
 #include <mutex>
-#include <Bruno/Platform/DirectX/Texture.h>
 #include <Bruno/Renderer/Camera.h>
+
+#include "Bruno/Platform/DirectX/DepthBuffer.h"
+#include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Gizmos/GizmoService.h"
 
 namespace Bruno
@@ -31,6 +26,7 @@ namespace Bruno
 	class Scene;
 	class SceneDocument;
 	class SceneRenderer;
+	class CameraGizmo;
 
 	struct SceneSurfaceParameters
 	{
@@ -39,11 +35,10 @@ namespace Bruno
 	};
 
 	class ScenePanel : public Berta::Panel
-	//class ScenePanel : public Berta::nested_form
 	{
 	public:
 		ScenePanel(Berta::Window* window, EditorGame* editorGame, std::shared_ptr<SceneDocument> sceneDocument, const SceneSurfaceParameters& surfaceParameters = SceneSurfaceParameters());
-		~ScenePanel();
+		~ScenePanel() override;
 
 		void OnUpdate(const GameTimer& timer);
 		void OnDraw();
@@ -57,27 +52,23 @@ namespace Bruno
 		Berta::NestedForm& GetForm() { return *m_form; }
 	private:
 		void InitializeGizmoService();
-		void InitializeGraphicsContext();
 		void InitializeSceneRenderer();
+		void SetCameraGizmoViewport();
 		void UpdateCBs(const GameTimer& timer);
 
-		//Berta::nested_form* m_form;
 		std::unique_ptr<Berta::NestedForm> m_form;
 		Berta::Layout m_layout;
 		Berta::ComboBox m_gizmoTypeCombobox;
 		Berta::Button m_gizmoTransformSpaceButton;
 
-		std::unique_ptr<Surface> m_surface;
 		int idxx{ 0 };
 		SceneSurfaceParameters m_surfaceParameters;
 		EditorGame* m_editorGame;
 		std::shared_ptr<SceneDocument>		m_sceneDocument;
 		std::shared_ptr<Scene>				m_scene;
-		std::shared_ptr<SceneRenderer>		m_sceneRenderer;
-
-		std::shared_ptr<Model> m_model;
+		SceneRenderer*		m_sceneRenderer { nullptr };
 		
-		std::unique_ptr<GraphicsContext>	m_graphicsContext;
+		std::unique_ptr<GraphicsContext> m_graphicsContext;
 
 #ifndef BR_SINGLE_THREAD_RENDERING
 		std::mutex m_mutex{};
@@ -85,14 +76,23 @@ namespace Bruno
 		GameTimer m_timer;
 #endif
 
-		std::shared_ptr<SelectionService>	m_selectionService;
-		std::shared_ptr<GizmoService>		m_gizmoService;
+		std::shared_ptr<SelectionService> m_selectionService;
+		std::shared_ptr<GizmoService> m_dxGizmoService;
+		std::unique_ptr<CameraGizmo> m_cameraGizmo;
 
+		GraphicsDevice* m_device;
+		std::unique_ptr<Surface> m_surface;
+		CommandQueue* m_commandQueue { nullptr };
+		Math::Viewport m_viewport;
+		D3D12_RECT m_scissorRect;
+
+		ID3D12DescriptorHeap* m_srvHeap;
+		
 		Math::Int2 m_lastMousePosition;
 		Math::Int2 m_beginMouseDownPosition;
 		bool m_isResizing{ false };
 		bool m_isSizingMoving{ false };
-		bool m_isExposed{ false };
+		bool m_isVisible{ false };
 
 		bool m_shiftPressed{ false };
 		bool m_isGizmoing{ false };

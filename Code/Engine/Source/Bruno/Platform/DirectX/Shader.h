@@ -1,72 +1,57 @@
-#pragma once
+﻿#pragma once
 
-#include <d3d12.h>
-#include "d3dx12.h"
-#include "D3DConstants.h"
-
-#include "PipelineStateObject.h"
-#include "Bruno/Core/RTTI.h"
+#include "D3DHelpers.h"
+#include <dxcapi.h>
 #include "Bruno/Content/Asset.h"
-#include <vector>
-#include <string>
-#include <map>
-
 namespace Bruno
 {
-	class ShaderProgram;
-	class RootSignature;
+    enum class ShaderStage 
+    {
+        Vertex,
+        Pixel,
+        Compute
+    };
 
-	class Shader : public Asset
-	{
-		BR_RTTI_DECLARATION(Shader, Asset);
+    class ShaderProgram 
+    {
+    public:
+        ShaderProgram(ShaderStage stage, Microsoft::WRL::ComPtr<IDxcBlob> byteCode)
+            : m_stage(stage), m_byteCode(std::move(byteCode)) {}
 
-	public:
-		enum class ShaderProgramType : uint8_t
-		{
-			Vertex = 0,
-			Pixel
-		};
+        ShaderStage GetStage() const { return m_stage; }
+        IDxcBlob* GetByteCode() const { return m_byteCode.Get(); }
+    
+        // Helper para pasarlo al GraphicsPipelineState directamente
+        D3D12_SHADER_BYTECODE GetNativeByteCode() const 
+        {
+            if (!m_byteCode)
+            {
+                return { nullptr, 0 };
+            }
+            
+            return { m_byteCode->GetBufferPointer(), m_byteCode->GetBufferSize() };
+        }
 
-		struct Sampler
-		{
-			std::string Name;
-			uint32_t BindPoint, BindSlot;
-			D3D12_SHADER_VISIBILITY Visibility;
-			D3D12_STATIC_SAMPLER_DESC Desc;
+    private:
+        ShaderStage m_stage;
+        Microsoft::WRL::ComPtr<IDxcBlob> m_byteCode;
+    };
+    
+    class Shader : public Asset // Puede ser un Asset administrado por tu AssetManager
+    {
+        BR_RTTI_DECLARATION(Shader, Asset);
+        
+    public:
+        Shader(const std::string& name) : m_name(name) {}
 
-			void Setup();
-		};
+        void AddProgram(ShaderProgram&& program);
 
-		Shader(std::array<std::vector<uint8_t>, Graphics::Core::SHADER_PROGRAMS_COUNT>&& programsData);
-		Shader(const std::wstring& sourceFilename);
-		
-		D3D12_INPUT_LAYOUT_DESC GetInputLayout();
-		std::shared_ptr<RootSignature> CreateRootSignature(PipelineResourceMapping& resourceMapping);
+        const ShaderProgram* GetVertexProgram() const { return m_vertexProgram.get(); }
+        const ShaderProgram* GetPixelProgram() const { return m_pixelProgram.get(); }
 
-		ShaderProgram* GetShaderProgram(ShaderProgramType type);
-		uint32_t GetIndexMap(const std::wstring& name);
-	private:
-		struct ShaderTypeDesc
-		{
-			ShaderProgramType Type;
-			const char* EntryPoint;
-			const char* Target;
-			D3D12_SHADER_VISIBILITY Visibility;
-		};
-
-		void InitializeParameters();
-		void InitializeParameters(ShaderProgram* program);
-
-		std::array<std::shared_ptr<ShaderProgram>, Graphics::Core::SHADER_PROGRAMS_COUNT> m_programs;
-		std::shared_ptr<RootSignature> m_rootSignature;
-		std::map<std::wstring, uint32_t> m_rootParameterIndexMap;
-
-		std::vector<CD3DX12_ROOT_PARAMETER1> m_rootParameters;
-		std::vector<CD3DX12_DESCRIPTOR_RANGE1> m_descriptorRanges;
-		std::vector<Sampler> m_samplers;
-
-		static const ShaderTypeDesc& VS, & PS;
-		static const ShaderTypeDesc ShaderTypes[];
-	};
+    private:
+        std::string m_name;
+        std::unique_ptr<ShaderProgram> m_vertexProgram;
+        std::unique_ptr<ShaderProgram> m_pixelProgram;
+    };
 }
-

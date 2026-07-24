@@ -11,7 +11,6 @@
 namespace Bruno
 {
 	class SelectionService;
-	class SceneHierarchy;
 	class SceneDocument;
 	class Entity;
 
@@ -25,7 +24,6 @@ namespace Bruno
 		void OnComponentUpdated(entt::registry& registry, entt::entity updatedEntity);
 
 		std::shared_ptr<SceneDocument> m_sceneDocument;
-		std::shared_ptr<SceneHierarchy> m_sceneHierarchy;
 		std::shared_ptr<Scene> m_scene;
 		std::shared_ptr<SelectionService> m_selectionService;
 		EventHandlerId m_selectionChangedHandleId{ 0 };
@@ -35,5 +33,6 @@ namespace Bruno
 		entt::scoped_connection m_nameUpdateConnection;
 		entt::scoped_connection m_transformUpdateConnection;
 		entt::scoped_connection m_modelUpdateConnection;
+		bool m_isDirty = false;
 	};
 }
