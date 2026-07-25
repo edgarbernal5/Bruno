@@ -28,7 +28,7 @@ namespace Bruno
 		}
 		
 		template<typename T, typename... Args>
-		T& AddComponent(Args&&... args);
+		decltype(auto) AddComponent(Args&&... args);
 
 		template<typename T>
 		T& GetComponent();

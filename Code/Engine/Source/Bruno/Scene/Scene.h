@@ -29,6 +29,9 @@ namespace Bruno
 		Entity InstantiateModel(std::shared_ptr<Model> model);
 
 		template<typename... Components>
+		auto Clear() { return m_registry.clear<Components...>(); }
+		
+		template<typename... Components>
 		auto GetAllEntitiesWith() { return m_registry.view<Components...>(); }
 
 		Entity GetEntityWithUUID(UUID id) const;

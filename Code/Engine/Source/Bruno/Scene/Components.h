@@ -67,6 +67,12 @@ namespace Bruno
 		std::shared_ptr<ConstantBuffer> TransformCB[2]; 
 	};
 	
+	struct BoundingBoxComponent
+	{
+		Math::Vector3 Center;  // En espacio local
+		Math::Vector3 Extents; // Mitad del tamaño (Half-size)
+	};
+	
 	struct ModelComponent
 	{
 		AssetHandle ModelHandle;

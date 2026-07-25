@@ -176,6 +176,9 @@
     <ClInclude Include="Source\Gizmos\GizmoBasicTypes.h">
       <Filter>Source\Gizmos</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Panels\Scene\Components.h">
+      <Filter>Source\Panels\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

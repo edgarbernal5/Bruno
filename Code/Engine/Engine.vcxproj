@@ -111,13 +111,11 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorHandle.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\RenderContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderCompiler.h" />
@@ -203,7 +201,6 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueue.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\RenderContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignature.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderCompiler.cpp" />
