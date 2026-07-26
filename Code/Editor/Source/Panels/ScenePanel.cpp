@@ -368,7 +368,31 @@ namespace Bruno
 				{
 					if (m_dragRectangle)
 					{
+						// Dimensiones de tu viewport (resolución del ScenePanel)
+						float screenWidth = static_cast<float>(m_viewport.width);
+						float screenHeight = static_cast<float>(m_viewport.height);
 
+						// Convertir de Píxeles a NDC [-1, 1]
+						// Recordatorio DirectX: NDC Y=+1 es arriba, Y=-1 es abajo.
+						Math::Vector2 ndcMin;
+						Math::Vector2 ndcMax;
+
+						// Calculamos los min/max por si el usuario arrastró el mouse de derecha a izquierda
+						float minX = std::min<int>(m_beginMouseDownPosition.x, args.Position.X);
+						float maxX = std::max<int>(m_beginMouseDownPosition.x, args.Position.X);
+						float minY = std::min<int>(m_beginMouseDownPosition.y, args.Position.Y);
+						float maxY = std::max<int>(m_beginMouseDownPosition.y, args.Position.Y);
+
+						ndcMin.x =  (minX / screenWidth) * 2.0f - 1.0f;
+						ndcMax.x =  (maxX / screenWidth) * 2.0f - 1.0f;
+
+						// Invertimos Y para DirectX (Mouse coord Y=0 es arriba, NDC Y=1 es arriba)
+						ndcMin.y = -((maxY / screenHeight) * 2.0f - 1.0f); 
+						ndcMax.y = -((minY / screenHeight) * 2.0f - 1.0f);
+
+						Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
+						m_selectionService->SelectEntitiesInRect(viewProj, ndcMin, ndcMax);
+						
 						m_dragRectangle = false;
 					}
 					else if (!args.AltPressed)

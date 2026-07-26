@@ -119,44 +119,35 @@ namespace Bruno
 
 	UUID SelectionService::FindEntityUUIDWithRay(const Math::Ray& ray, float maxDistance)
 	{
-		auto entities = m_scene->GetAllEntitiesWith<IdComponent, ModelComponent>();
+		auto entities = m_scene->GetAllEntitiesWith<IdComponent, TransformComponent, BoundingBoxComponent>();
+    
 		float closestDistance = (std::numeric_limits<float>::max)();
 		UUID closestId = 0;
-		for (auto& ent : entities)
+
+		// Nota: en EnTT es mejor iterar 'ent' por valor, no por referencia (auto&), ya que es solo un entero.
+		for (auto ent : entities)
 		{
 			Entity entity = { ent, m_scene.get() };
-			auto [idComponent, modelComponent] = entities.get<IdComponent, ModelComponent>(ent);
-			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
-
-			uint32_t meshIndex = modelComponent.MeshIndex;
-			auto& meshes = model->GetMeshes();
-			auto& mesh = meshes[meshIndex];
-			auto bbox = mesh->GetBoundingBox();
+        
+			// Extraemos la data contigua directamente
+			auto [idComponent, transformComponent, bboxComponent] = entities.get<IdComponent, TransformComponent, BoundingBoxComponent>(ent);
 
 			Math::Matrix transform = m_scene->GetWorldSpaceMatrix(entity);
 
-			Math::Vector3 bboxCenter = bbox.Center;
-			Math::Vector3 bboxExtents = bbox.Extents;
+			// 2. Recreamos la caja delimitadora en espacio local
+			// Asumo que tienes un constructor o inicializador para tu wrapper de BoundingBox
+			Math::BoundingBox localAABB(bboxComponent.Center, bboxComponent.Extents);
 
-			auto bboxMin = bboxCenter - bboxExtents;
-			auto bboxMax = bboxCenter + bboxExtents;
-			bboxMin = Math::Vector3::Transform(bboxMin, transform);
-			bboxMax = Math::Vector3::Transform(bboxMax, transform);
+			// 3. MEJORA AAA: Transformamos a un OBB (Oriented Bounding Box)
+			Math::BoundingOrientedBox obb;
+			Math::BoundingOrientedBox::CreateFromBoundingBox(obb, localAABB);
+			obb.Transform(obb, transform);
 
-			bboxCenter.x = std::min<float>(bboxMin.x, bboxMax.x);
-			bboxCenter.y = std::min<float>(bboxMin.y, bboxMax.y);
-			bboxCenter.z = std::min<float>(bboxMin.z, bboxMax.z);
-			bboxExtents.x = std::max<float>(bboxMin.x, bboxMax.x);
-			bboxExtents.y = std::max<float>(bboxMin.y, bboxMax.y);
-			bboxExtents.z = std::max<float>(bboxMin.z, bboxMax.z);
-
-			bbox.Center = (bboxExtents + bboxCenter) * 0.5f;
-			bbox.Extents = (bboxExtents - bboxCenter) * 0.5f;
-			
+			// 4. Test de intersección
 			float distance;
-			if (ray.Intersects(bbox, distance) && distance <= maxDistance)
+			if (ray.Intersects(obb, distance) && distance <= maxDistance)
 			{
-				if (closestDistance > distance)
+				if (distance < closestDistance)
 				{
 					closestDistance = distance;
 					closestId = idComponent.Id;
