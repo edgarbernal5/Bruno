@@ -3762,6 +3762,20 @@ inline bool Ray::Intersects(const Plane& plane, _Out_ float& Dist) const noexcep
     }
 }
 
+inline bool Ray::Intersects(const BoundingOrientedBox& obb, _Out_  float& outDistance) const noexcept
+{
+    // 1. Cargamos nuestros Vector3 (floats escalares) a XMVECTOR (Registros SIMD de CPU)
+    DirectX::XMVECTOR rayOrigin = DirectX::XMLoadFloat3(&this->position);
+        
+    // ¡IMPORTANTE! El rayo DEBE estar normalizado para que la distancia sea correcta en unidades de mundo
+    DirectX::XMVECTOR rayDir = DirectX::XMLoadFloat3(&this->direction);
+    rayDir = DirectX::XMVector3Normalize(rayDir);
+
+    // 2. Usamos la función nativa de DirectXMath
+    // Firma: bool Intersects(FXMVECTOR Origin, FXMVECTOR Direction, float& Dist) const;
+    return obb.Intersects(rayOrigin, rayDir, outDistance);
+}
+
 
 /****************************************************************************
  *

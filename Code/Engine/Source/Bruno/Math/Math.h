@@ -9,6 +9,7 @@ namespace Bruno::Math
     constexpr float TWO_PI = 6.283185307f;
     
     using BoundingBox = DirectX::BoundingBox;
+    using BoundingOrientedBox = DirectX::BoundingOrientedBox;
     using BoundingSphere = DirectX::BoundingSphere;
 
     using Vector2 = DirectX::SimpleMath::Vector2;
