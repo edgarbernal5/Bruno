@@ -130,11 +130,18 @@ namespace Bruno
 		Entity nodeEntity = CreateEntity(parent, node.Name);
 		nodeEntity.GetComponent<TransformComponent>().ApplyTransform(node.LocalTransform);
 
+		auto& meshes = model->GetMeshes();
 		if (node.Meshes.size() == 1)
 		{
 			uint32_t submeshIndex = node.Meshes[0];
 			auto& modelComponent = nodeEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
+			auto& boundingBoxComponent = nodeEntity.AddComponent<BoundingBoxComponent>();
 
+			auto& mesh = meshes[submeshIndex];
+			auto bbox = mesh->GetBoundingBox();
+			boundingBoxComponent.Center = bbox.Center;
+			boundingBoxComponent.Extents = bbox.Extents;
+			
 			for (size_t j = 0; j < model->GetMaterials().size(); ++j)
 			{
 				auto& material = model->GetMaterials()[j];
@@ -149,7 +156,13 @@ namespace Bruno
 
 				Entity childEntity = CreateEntity(nodeEntity, node.Name);
 				auto& modelComponent = childEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
+				auto& boundingBoxComponent = childEntity.AddComponent<BoundingBoxComponent>();
 
+				auto& mesh = meshes[submeshIndex];
+				auto bbox = mesh->GetBoundingBox();
+				boundingBoxComponent.Center = bbox.Center;
+				boundingBoxComponent.Extents = bbox.Extents;
+				
 				for (size_t j = 0; j < model->GetMaterials().size(); ++j)
 				{
 					auto& material = model->GetMaterials()[j];
