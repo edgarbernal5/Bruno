@@ -58,18 +58,21 @@ namespace Bruno
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
 			m_ignoreEvents = true;
-			m_treebox.DeselectAll();
-			for (auto& uuid : selection)
+			std::vector<Berta::TreeBoxItem> items;
+			items.reserve(selection.size());
+			for (auto& item : selection)
 			{
-				m_entityToNodeMap[uuid].Select();
+				items.push_back(m_entityToNodeMap[item]);
 			}
+			m_treebox.SelectItems(items);
+			
 			m_ignoreEvents = false;
 		});
 
 		auto entities = sceneDocument->GetScene()->GetAllEntitiesWith<IdComponent, HierarchyComponent>();
 		for (auto& ent : entities)
 		{
-			auto [idComponent, hierarchy] = entities.get<IdComponent, HierarchyComponent>(ent);
+			const auto& [idComponent, hierarchy] = entities.get<IdComponent, HierarchyComponent>(ent);
 			if (!hierarchy.Parent)
 			{
 				OnHierarchyAdded(sceneDocument->GetScene()->GetEntityWithUUID(idComponent.Id));

@@ -63,16 +63,18 @@ namespace Bruno
 	{
 		// 1. Limpiamos selecciones anteriores (opcional, dependiendo de si usas Shift para sumar)
 		m_scene->Clear<SelectedComponent>();
-
+		m_selections.clear();
+		
 		// 2. Obtenemos todas las entidades con Transform y BoundingBox
-		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, BoundingBoxComponent>();
+		auto entities = m_scene->GetAllEntitiesWith<IdComponent, TransformComponent, BoundingBoxComponent>();
 
 		for (auto entt : entities)
 		{
-			const auto& [transform, bbox] = entities.get<TransformComponent, BoundingBoxComponent>(entt);
-
+			const auto& [idComponent, transform, bbox] = entities.get<IdComponent, TransformComponent, BoundingBoxComponent>(entt);
+			Entity entity = { entt, m_scene.get() };
 			// Calcular matriz final: Local a Proyección
-			Math::Matrix worldViewProj = transform.GetTransform() * viewProjection;
+			Math::Matrix worldViewProj = m_scene->GetWorldSpaceMatrix(entity) * viewProjection;
+			//Math::Matrix worldViewProj = transform.GetTransform() * viewProjection;
 
 			// Obtener los 8 vértices del AABB en NDC
 			Math::Vector2 entityMin(FLT_MAX, FLT_MAX);
@@ -82,8 +84,11 @@ namespace Bruno
 			if (ProjectAABBToNDC(bbox, worldViewProj, entityMin, entityMax, isBehindCamera))
 			{
 				// Si la entidad está completamente detrás de la cámara, la ignoramos
-				if (isBehindCamera) continue;
-
+				if (isBehindCamera)
+				{
+					continue;
+				}
+				
 				// 3. Intersección de Rectángulos 2D (AABB vs Marquee Rect)
 				if (CheckRectIntersection(ndcRectMin, ndcRectMax, entityMin, entityMax))
 				{
@@ -91,15 +96,18 @@ namespace Bruno
 					
 					// ¡Seleccionado! Le añadimos el tag a EnTT
 					entity.AddComponent<SelectedComponent>();
+					m_selections.push_back(idComponent.Id);
 				}
 			}
 		}
+		
+		SelectionChanged.emit(m_selections);
 	}
 
 	Math::Ray SelectionService::ConvertMousePositionToRay(Camera camera, const Math::Int2& mousePosition)
 	{
-		Math::Vector3 nearPoint((float)mousePosition.x, (float)mousePosition.y, 0.0f);
-		Math::Vector3 farPoint((float)mousePosition.x, (float)mousePosition.y, 1.0f);
+		Math::Vector3 nearPoint(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y), 0.0f);
+		Math::Vector3 farPoint(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y), 1.0f);
 
 		nearPoint = camera.GetViewport().Unproject(nearPoint,
 		                                           camera.GetProjection(),

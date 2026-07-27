@@ -31,7 +31,7 @@ namespace Bruno
 
 		HierarchyComponent() = default;
 		HierarchyComponent(const HierarchyComponent& other) = default;
-		HierarchyComponent(UUID parent) : Parent(parent) {}
+		HierarchyComponent(const UUID& parent) : Parent(parent) {}
 	};
 
 	struct TransformComponent
