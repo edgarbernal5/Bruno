@@ -17,6 +17,7 @@
 #include <Bruno/Core/Log.h>
 
 #include "SceneHierarchyPanel.h"
+#include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
 #include "Gizmos/CameraGizmo.h"
 
@@ -59,14 +60,14 @@ namespace Bruno
 
 		m_gizmoTransformSpaceButton.GetEvents().Click.Connect([&](const Berta::ArgClick& click)
 		{
-			if (m_dxGizmoService->GetTransformSpace() == TransformSpace::World)
+			if (m_gizmoService->GetTransformSpace() == TransformSpace::World)
 			{
-				m_dxGizmoService->SetTransformSpace(TransformSpace::Local);
+				m_gizmoService->SetTransformSpace(TransformSpace::Local);
 				m_gizmoTransformSpaceButton.SetCaption("World");
 			}
 			else
 			{
-				m_dxGizmoService->SetTransformSpace(TransformSpace::World);
+				m_gizmoService->SetTransformSpace(TransformSpace::World);
 				m_gizmoTransformSpaceButton.SetCaption("Local");
 			}
 		});
@@ -153,12 +154,20 @@ namespace Bruno
 			context.SetViewport(m_viewport);
 			context.SetScissorRect(m_scissorRect);
 			
+			TransformSystem::Update(m_scene.get());
 			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
 			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
-    
-			m_dxGizmoService->Update();
-			m_dxGizmoService->BuildGeometry(frameIndex);
-			m_dxGizmoService->Render(&context, frameIndex, viewProj);
+			
+			Math::Matrix gizmoWorld;
+			Math::Vector3 gizmoPivot;
+			
+			if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
+			{
+				m_gizmoService->SetGizmoPosition(gizmoPivot);
+			}
+			m_gizmoService->Update();
+			m_gizmoService->BuildGeometry(frameIndex);
+			m_gizmoService->Render(&context, frameIndex, viewProj);
 			
 			m_cameraGizmo->BuildCameraGizmoGeometry(frameIndex);
 			m_cameraGizmo->RenderCameraGizmo(&context, frameIndex, m_viewport);
@@ -279,7 +288,7 @@ namespace Bruno
 					return;
 				}
 				
-				m_isGizmoing = m_dxGizmoService->BeginDrag(Math::Vector2(args.Position.X, args.Position.Y));
+				m_isGizmoing = m_gizmoService->BeginDrag(Math::Vector2(args.Position.X, args.Position.Y));
 				
 				std::cout << "is gizmoing: " << m_isGizmoing << std::endl;
 				if (m_isGizmoing)
@@ -303,16 +312,16 @@ namespace Bruno
 			{
 				return;
 			}
-			m_dxGizmoService->SetSnapEnabled(args.ShiftPressed);
-			m_dxGizmoService->SetPrecisionModeEnabled(args.CtrlPressed);
+			m_gizmoService->SetSnapEnabled(args.ShiftPressed);
+			m_gizmoService->SetPrecisionModeEnabled(args.CtrlPressed);
 			
-			if (m_dxGizmoService->IsDragging())
+			if (m_gizmoService->IsDragging())
 			{
-				m_dxGizmoService->Drag(Math::Vector2(args.Position.X, args.Position.Y));
+				m_gizmoService->Drag(Math::Vector2(args.Position.X, args.Position.Y));
 			}
 			else
 			{
-				m_dxGizmoService->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
+				m_gizmoService->OnMouseMove(Math::Vector2(args.Position.X, args.Position.Y));
 				
 				if (args.ButtonState.LeftButton)
 				{
@@ -359,9 +368,9 @@ namespace Bruno
 				{
 					return;
 				}
-				if (m_dxGizmoService->IsDragging())
+				if (m_gizmoService->IsDragging())
 				{
-					m_dxGizmoService->EndDrag();
+					m_gizmoService->EndDrag();
 					m_isGizmoing = false;
 				}
 				else
@@ -390,8 +399,7 @@ namespace Bruno
 						ndcMin.y = -((maxY / screenHeight) * 2.0f - 1.0f); 
 						ndcMax.y = -((minY / screenHeight) * 2.0f - 1.0f);
 
-						Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
-						m_selectionService->SelectEntitiesInRect(viewProj, ndcMin, ndcMax);
+						m_selectionService->SelectEntitiesInRect(m_sceneDocument->GetCamera(), ndcMin, ndcMax);
 						
 						m_dragRectangle = false;
 					}
@@ -443,9 +451,9 @@ namespace Bruno
 			}
 			
 			auto index = acmb.SelectedIndex.value();
-			if (m_dxGizmoService)
+			if (m_gizmoService)
 			{
-				m_dxGizmoService->SetGizmoType(static_cast<GizmoType>(index));
+				m_gizmoService->SetGizmoType(static_cast<GizmoType>(index));
 			}
 			m_gizmoTransformSpaceButton.SetEnabled(index < 3);
 		});
@@ -491,9 +499,9 @@ namespace Bruno
 
 	void ScenePanel::InitializeGizmoService()
 	{
-		m_dxGizmoService = m_sceneDocument->GetDXGizmoService();
-		m_dxGizmoService->SetGizmoType(static_cast<GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
-		m_dxGizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? TransformSpace::World : TransformSpace::Local);
+		m_gizmoService = m_sceneDocument->GetDXGizmoService();
+		m_gizmoService->SetGizmoType(static_cast<GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
+		m_gizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? TransformSpace::World : TransformSpace::Local);
 		
 		auto device = Graphics::GetDevice();
 		

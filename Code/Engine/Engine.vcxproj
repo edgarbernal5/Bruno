@@ -183,6 +183,8 @@
     <ClInclude Include="Source\Bruno\Scene\Entity.h" />
     <ClInclude Include="Source\Bruno\Scene\Entity.inl" />
     <ClInclude Include="Source\Bruno\Scene\Scene.h" />
+    <ClInclude Include="Source\Bruno\Scene\Systems\HierarchySystem.h" />
+    <ClInclude Include="Source\Bruno\Scene\Systems\TransformSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dependencies\D3D12MA\D3D12MemAlloc.cpp" />
@@ -252,6 +254,8 @@
     <ClCompile Include="Source\Bruno\Renderer\ShaderCache.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Entity.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Scene.cpp" />
+    <ClCompile Include="Source\Bruno\Scene\Systems\HierarchySystem.cpp" />
+    <ClCompile Include="Source\Bruno\Scene\Systems\TransformSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dependencies\SimpleMath\SimpleMath.inl" />

@@ -52,6 +52,9 @@
     <Filter Include="Source\Bruno\Core\Events">
       <UniqueIdentifier>{3f4a1b95-e11e-4fd1-93f8-d960b1d0a309}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Bruno\Scene\Systems">
+      <UniqueIdentifier>{925c742d-3dd0-4af3-92f0-8cea9bfdb914}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -303,6 +306,12 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadHeap.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Scene\Systems\TransformSystem.h">
+      <Filter>Source\Bruno\Scene\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Scene\Systems\HierarchySystem.h">
+      <Filter>Source\Bruno\Scene\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -496,6 +505,12 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBuffer.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Scene\Systems\TransformSystem.cpp">
+      <Filter>Source\Bruno\Scene\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Scene\Systems\HierarchySystem.cpp">
+      <Filter>Source\Bruno\Scene\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

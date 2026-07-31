@@ -69,13 +69,19 @@ namespace Bruno
 			m_ignoreEvents = false;
 		});
 
-		auto entities = sceneDocument->GetScene()->GetAllEntitiesWith<IdComponent, HierarchyComponent>();
-		for (auto& ent : entities)
+		auto scene = sceneDocument->GetScene().get();
+		auto entities = scene->GetAllEntitiesWith<IdComponent>();
+		for (auto& entt : entities)
 		{
-			const auto& [idComponent, hierarchy] = entities.get<IdComponent, HierarchyComponent>(ent);
-			if (!hierarchy.Parent)
+			Entity entity { entt, scene };
+			const auto* hierarchy = scene->TryGetWith<HierarchyComponent>(entity);
+			// Una entidad es raíz si NO tiene componente de jerarquía, 
+			// o si lo tiene pero su Parent es nulo.
+			bool isRoot = (hierarchy == nullptr) || (hierarchy->Parent == entt::null);
+
+			if (isRoot)
 			{
-				OnHierarchyAdded(sceneDocument->GetScene()->GetEntityWithUUID(idComponent.Id));
+				OnHierarchyAdded(entity, L"");
 			}
 		}
 		
@@ -90,33 +96,46 @@ namespace Bruno
 
 	void SceneHierarchyPanel::OnHierarchyAdded(Entity entity, const std::wstring& parentKey)
 	{
-		auto& hierarchy = entity.GetComponent<HierarchyComponent>();
-		auto& name = entity.GetComponent<NameComponent>().Name;
+		// 1. Buenas prácticas: validar siempre los componentes que asumimos que existen
+		std::wstring name = L"Unnamed Entity";
+		if (entity.HasComponent<NameComponent>())
+		{
+			name = entity.GetComponent<NameComponent>().Name;
+		}
 
 		std::wostringstream builder;
-		builder << parentKey << static_cast<uint32_t>(entity);
+		builder << parentKey << static_cast<uint32_t>(entity); // Casting explícito del entt::entity crudo
 		auto key = builder.str();
 
 		auto uuid = entity.GetUUID();
+    
+		// 2. Insertar en la UI
 		auto node = m_treebox.Insert(key, name);
 		node.SetUserData(uuid);
 
 		m_entityToNodeMap[uuid] = node;
 
-		for (UUID child : hierarchy.Children)
+		// 3. Reconstruir los hijos solo si esta entidad tiene jerarquía
+		if (entity.HasComponent<HierarchyComponent>())
 		{
-			auto childEntity = m_sceneDocument->GetScene()->TryGetEntityWithUUID(child);
-			if (childEntity)
+			auto& hierarchy = entity.GetComponent<HierarchyComponent>();
+        
+			// Iteramos directamente sobre la lista enlazada intrusiva
+			entt::entity currentChild = hierarchy.FirstChild;
+               
+			while (currentChild != entt::null)
 			{
+				Entity childEntity { currentChild, m_sceneDocument->GetScene().get() };
+          
 				OnHierarchyAdded(childEntity, key + L"/");
+				
+				currentChild = childEntity.GetComponent<HierarchyComponent>().NextSibling;
 			}
 		}
 	}
 
 	void SceneHierarchyPanel::OnEntityNameUpdated(entt::registry& registry, entt::entity entityHandle)
 	{
-		Entity entity{ entityHandle, m_sceneDocument->GetScene().get() };
-		
 		auto& nameComp = registry.get<NameComponent>(entityHandle);
 		auto& idComp = registry.get<IdComponent>(entityHandle);
 		

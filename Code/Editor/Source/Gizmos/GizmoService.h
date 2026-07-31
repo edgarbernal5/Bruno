@@ -177,8 +177,7 @@ namespace Bruno
         
         SelectionState m_selectionState{};
         SnapInteraction m_snapInteraction{};
-        SnapConfig m_snapConfig{}
-        ;
+        SnapConfig m_snapConfig{};
         DragTranslationCallback m_dragTranslationCallback;
         DragScaleCallback m_dragScaleCallback;
         DragRotationCallback m_dragRotationCallback;

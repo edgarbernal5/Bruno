@@ -36,9 +36,9 @@ namespace Bruno
 		
 		// Buscamos todas las entidades que tienen un Mesh y un Transform
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
-		for (auto& ent : entities)
+		for (auto& entt : entities)
 		{
-			Entity entity = { ent, m_scene.get() };
+			Entity entity = { entt, m_scene.get() };
 			
 			// Si la entidad no tiene sus Constant Buffers, se los creamos
 			if (!entity.HasComponent<CBVComponent>()) 
@@ -52,7 +52,7 @@ namespace Bruno
 				// Le "pegamos" el componente de memoria de video a la entidad
 				entity.AddComponent<CBVComponent>(std::move(cbv));
 			}
-			const auto& modelComponent = entities.get<ModelComponent>(ent);
+			const auto& modelComponent = entities.get<ModelComponent>(entt);
 			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 			auto& meshes = model->GetMeshes();

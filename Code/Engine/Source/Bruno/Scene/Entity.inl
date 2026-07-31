@@ -8,6 +8,12 @@ namespace Bruno
 		BR_ASSERT(!HasComponent<T>(), "Entity already has component!");
 		return m_scene->m_registry.emplace<T>(m_entityHandle, std::forward<Args>(args)...);
 	}
+	
+	template<typename T, typename... Args>
+	decltype(auto) Entity::AddOrReplaceComponent(Args&&... args)
+	{
+		return m_scene->m_registry.emplace_or_replace<T>(m_entityHandle, std::forward<Args>(args)...);
+	}
 
 	template<typename T>
 	T& Entity::GetComponent()

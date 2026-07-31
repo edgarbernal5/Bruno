@@ -89,7 +89,7 @@ namespace Bruno
 					Math::Matrix parentWorldMatrix = Math::Matrix::Identity;
 		            
 					// 1. VALIDAR SI REALMENTE TIENE PADRE
-					Entity parent = m_scene->TryGetEntityWithUUID(entity.GetParentUUID());
+					Entity parent = entity.GetParent();
 					if (parent)
 					{
 						parentWorldMatrix = m_scene->GetWorldSpaceMatrix(parent);
@@ -101,6 +101,11 @@ namespace Bruno
 					// 2. Transform (Punto) aplica rotación, escala y traslación inversa
 					// Esto convierte perfectamente la coordenada absoluta 'newPosition' al espacio local
 					transform.Position = Math::Vector3::Transform(newPosition, inverseTransform);
+					
+					// 3. ¡VITAL PARA LA NUEVA ARQUITECTURA!
+					// Marcamos el transform como sucio para que el TransformSystem 
+					// recalcule las matrices World/Local de esta entidad y de TODOS sus hijos en el próximo frame.
+					transform.IsDirty = true;
 				});
 			}
 		});
@@ -114,7 +119,7 @@ namespace Bruno
 				entity.Patch<TransformComponent>([this, entity, &delta](auto& transform) 
 				{
 					Math::Matrix parentWorldMatrix = Math::Matrix::Identity;
-					Entity parent = m_scene->TryGetEntityWithUUID(entity.GetParentUUID());
+					Entity parent = entity.GetParent();
 					if (parent)
 					{
 						parentWorldMatrix = m_scene->GetWorldSpaceMatrix(parent);
@@ -134,6 +139,8 @@ namespace Bruno
 					// 3. Lo devolvemos al espacio Local: (* invParentRot)
 					transform.Rotation = transform.Rotation * parentRot * delta * invParentRot;
 					transform.Rotation.Normalize(); // Previene degradación de precisión flotante
+					
+					transform.IsDirty = true;
 					
 					auto newWorldMatrix = m_scene->GetWorldSpaceMatrix(entity);
 					m_gizmoService->SetGizmoWorldMatrix(newWorldMatrix);
@@ -168,6 +175,7 @@ namespace Bruno
 					if (newScale.x > 0.001f && newScale.y > 0.001f && newScale.z > 0.001f)
 					{
 						transform.Scale = newScale;
+						transform.IsDirty = true;
 					}
 				});
 			}

@@ -1,11 +1,11 @@
 #include "brepch.h"
 #include "SelectionService.h"
 
+#include <algorithm>
+
 #include "Components.h"
 #include "Bruno/Scene/Scene.h"
-#include "Content/EditorAssetManager.h"
 #include "Bruno/Renderer/Model.h"
-#include "Bruno/Content/AssetManager.h"
 
 namespace Bruno
 {
@@ -13,17 +13,31 @@ namespace Bruno
 		m_scene(scene),
 		m_assetManager(assetManager)
 	{
+		// Conectamos las señales de EnTT a nuestros métodos internos
+		m_scene->OnConstruct<SelectedComponent>().connect<&SelectionService::OnEntitySelected>(this);
+		m_scene->OnDestroy<SelectedComponent>().connect<&SelectionService::OnEntityDeselected>(this);
+	}
+
+	SelectionService::~SelectionService()
+	{
+		// Siempre es buena práctica desconectar al destruir el servicio
+		m_scene->OnConstruct<SelectedComponent>().disconnect<&SelectionService::OnEntitySelected>(this);
+		m_scene->OnDestroy<SelectedComponent>().disconnect<&SelectionService::OnEntityDeselected>(this);
 	}
 
 	void SelectionService::SelectUnderMousePosition(const Camera& camera, const Math::Int2& mousePosition)
 	{
 		auto ray = ConvertMousePositionToRay(camera, mousePosition);
 
+		m_scene->Clear<SelectedComponent>();
 		m_selections.clear();
-		UUID entityUUID = FindEntityUUIDWithRay(ray, 1000.0f);
+		
+		Entity entity;
+		UUID entityUUID = FindEntityUUIDWithRay(ray, 1000.0f, entity);
 		if (entityUUID)
 		{
 			Select(entityUUID);
+			entity.AddComponent<SelectedComponent>();
 		}
 
 		SelectionChanged.emit(m_selections);
@@ -31,17 +45,48 @@ namespace Bruno
 
 	void SelectionService::DeselectAll()
 	{
+		ScopedSelectionBatch batch(*this);
+		m_scene->Clear<SelectedComponent>();
 		m_selections.clear();
 	}
 
-	Math::Matrix SelectionService::GetSelectionLocalTransform()
+	bool SelectionService::GetGizmoTransform(Math::Matrix& outMatrix, Math::Vector3& outPosition)
 	{
-		return m_scene->GetLocalSpaceMatrix(m_scene->GetEntityWithUUID(m_selections[0]));
-	}
+		auto view = m_scene->GetAllEntitiesWith<SelectedComponent, TransformComponent>();
+    
+		if (view.begin() == view.end())
+		{
+			return false;
+		}
 
-	Math::Matrix SelectionService::GetSelectionTransform()
-	{
-		return m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(m_selections[0]));
+		Math::Vector3 averagePosition(0.0f, 0.0f, 0.0f);
+		size_t count = 0;
+		Math::Matrix lastTransform;
+
+		for (auto entity : view)
+		{
+			auto& transform = view.get<TransformComponent>(entity);
+			averagePosition += transform.GetWorldPosition();
+			lastTransform = transform.WorldTransform;
+			count++;
+		}
+
+		averagePosition /= static_cast<float>(count);
+		outPosition = averagePosition;
+
+		if (count == 1)
+		{
+			// Un solo objeto: El gizmo toma la matriz real del objeto (útil para Local Space rotation)
+			outMatrix = lastTransform; 
+		}
+		else
+		{
+			// Múltiples objetos: Forzamos el gizmo a alinearse al Mundo (World Space)
+			// pero centrado en el promedio de todas las posiciones.
+			outMatrix = Math::Matrix::CreateTranslation(averagePosition);
+		}
+
+		return true;
 	}
 
 	void SelectionService::Select(UUID selection)
@@ -58,50 +103,113 @@ namespace Bruno
 		}
 	}
 
-	void SelectionService::SelectEntitiesInRect(const Math::Matrix& viewProjection, const Math::Vector2& ndcRectMin,
-	                                            const Math::Vector2& ndcRectMax)
+	void SelectionService::SelectEntitiesInRect(const Camera& camera, const Math::Vector2& ndcRectMin, const Math::Vector2& ndcRectMax)
 	{
-		// 1. Limpiamos selecciones anteriores (opcional, dependiendo de si usas Shift para sumar)
+		ScopedSelectionBatch batch(*this);
 		m_scene->Clear<SelectedComponent>();
 		m_selections.clear();
+
+		float sizeX = ndcRectMax.x - ndcRectMin.x;
+		float sizeY = ndcRectMax.y - ndcRectMin.y;
+		if (sizeX <= 0.0001f || sizeY <= 0.0001f)
+		{
+			return;
+		}
 		
-		// 2. Obtenemos todas las entidades con Transform y BoundingBox
+		// 1. Precalculamos la matriz combinada View * Projection
+		Math::Matrix viewProj = camera.GetViewProjection();
+
+		// 2. Obtenemos todas las entidades candidatas
 		auto entities = m_scene->GetAllEntitiesWith<IdComponent, TransformComponent, BoundingBoxComponent>();
 
-		for (auto entt : entities)
+		for (auto ent : entities)
 		{
-			const auto& [idComponent, transform, bbox] = entities.get<IdComponent, TransformComponent, BoundingBoxComponent>(entt);
-			Entity entity = { entt, m_scene.get() };
-			// Calcular matriz final: Local a Proyección
-			Math::Matrix worldViewProj = m_scene->GetWorldSpaceMatrix(entity) * viewProjection;
-			//Math::Matrix worldViewProj = transform.GetTransform() * viewProjection;
+			Entity entity = { ent, m_scene.get() };
+			auto [idComponent, transformComponent, bboxComponent] = entities.get<IdComponent, TransformComponent, BoundingBoxComponent>(ent);
 
-			// Obtener los 8 vértices del AABB en NDC
-			Math::Vector2 entityMin(FLT_MAX, FLT_MAX);
-			Math::Vector2 entityMax(-FLT_MAX, -FLT_MAX);
-			bool isBehindCamera = false;
+			// 3. Generamos el OBB de la entidad en Espacio de Mundo
+			Math::BoundingBox localAABB(bboxComponent.Center, bboxComponent.Extents);
+			Math::BoundingOrientedBox obb;
+			Math::BoundingOrientedBox::CreateFromBoundingBox(obb, localAABB);
+			obb.Transform(obb, transformComponent.WorldTransform);
 
-			if (ProjectAABBToNDC(bbox, worldViewProj, entityMin, entityMax, isBehindCamera))
+			// 4. Obtenemos el centro de la entidad en el Espacio de Mundo
+			Math::Vector3 worldCenter = obb.Center;
+			
+			// 5. Proyectamos el centro de la entidad al Espacio Clip / NDC (-1 a 1)
+			Math::Vector3 clipFloat3 = Math::Vector3::Transform(worldCenter, viewProj);
+
+			// Validamos que el objeto esté frente a la cámara (Z en NDC para DirectX típicamente está entre 0 y 1 o -1 y 1 según el reverse-z)
+			// Verificamos si las coordenadas X e Y del centro del objeto caen dentro del rectángulo del marquee en pantalla
+			if (clipFloat3.x >= ndcRectMin.x && clipFloat3.x <= ndcRectMax.x &&
+				clipFloat3.y >= ndcRectMin.y && clipFloat3.y <= ndcRectMax.y)
 			{
-				// Si la entidad está completamente detrás de la cámara, la ignoramos
-				if (isBehindCamera)
+				// Opcional avanzado: Si quieres asegurar que cubra toda la caja y no solo el centro, 
+				// puedes proyectar los 8 vértices del OBB y verificar si al menos uno cae dentro del rectángulo.
+				entity.AddComponent<SelectedComponent>();
+				m_selections.push_back(idComponent.Id);
+			}
+		}
+	}
+	
+	void SelectionService::BeginBatch()
+	{
+		m_isBatching = true;
+	}
+
+	void SelectionService::EndBatch()
+	{
+		m_isBatching = false;
+        
+		// Solo emitimos si algo realmente cambió durante el batch
+		if (m_isDirty)
+		{
+			SelectionChanged.emit(m_selections);
+			m_isDirty = false;
+		}
+	}
+
+	void SelectionService::OnEntitySelected(entt::registry& registry, entt::entity entityHandle)
+	{
+		Entity entity = { entityHandle, m_scene.get() };
+		UUID uuid = entity.GetUUID();
+
+		if (std::find(m_selections.begin(), m_selections.end(), uuid) == m_selections.end())
+		{
+			m_selections.push_back(uuid);
+
+			if (m_isBatching)
+			{
+				m_isDirty = true; // Silenciamos el evento y marcamos como sucio
+			}
+			else
+			{
+				SelectionChanged.emit(m_selections); // Comportamiento normal (clic individual)
+			}
+		}
+	}
+
+	void SelectionService::OnEntityDeselected(entt::registry& registry, entt::entity entityHandle)
+	{
+		if (registry.any_of<IdComponent>(entityHandle))
+		{
+			UUID uuid = registry.get<IdComponent>(entityHandle).Id;
+			auto it = std::find(m_selections.begin(), m_selections.end(), uuid);
+            
+			if (it != m_selections.end())
+			{
+				m_selections.erase(it);
+
+				if (m_isBatching)
 				{
-					continue;
+					m_isDirty = true;
 				}
-				
-				// 3. Intersección de Rectángulos 2D (AABB vs Marquee Rect)
-				if (CheckRectIntersection(ndcRectMin, ndcRectMax, entityMin, entityMax))
+				else
 				{
-					Entity entity = { entt, m_scene.get() };
-					
-					// ¡Seleccionado! Le añadimos el tag a EnTT
-					entity.AddComponent<SelectedComponent>();
-					m_selections.push_back(idComponent.Id);
+					SelectionChanged.emit(m_selections);
 				}
 			}
 		}
-		
-		SelectionChanged.emit(m_selections);
 	}
 
 	Math::Ray SelectionService::ConvertMousePositionToRay(Camera camera, const Math::Int2& mousePosition)
@@ -125,13 +233,14 @@ namespace Bruno
 		return Math::Ray(nearPoint, direction);
 	}
 
-	UUID SelectionService::FindEntityUUIDWithRay(const Math::Ray& ray, float maxDistance)
+	UUID SelectionService::FindEntityUUIDWithRay(const Math::Ray& ray, float maxDistance, Entity& outEntity)
 	{
 		auto entities = m_scene->GetAllEntitiesWith<IdComponent, TransformComponent, BoundingBoxComponent>();
     
 		float closestDistance = (std::numeric_limits<float>::max)();
 		UUID closestId = 0;
-
+		Entity closestEntity{};
+		
 		// Nota: en EnTT es mejor iterar 'ent' por valor, no por referencia (auto&), ya que es solo un entero.
 		for (auto ent : entities)
 		{
@@ -140,7 +249,7 @@ namespace Bruno
 			// Extraemos la data contigua directamente
 			auto [idComponent, transformComponent, bboxComponent] = entities.get<IdComponent, TransformComponent, BoundingBoxComponent>(ent);
 
-			Math::Matrix transform = m_scene->GetWorldSpaceMatrix(entity);
+			const Math::Matrix& transform = transformComponent.WorldTransform;
 
 			// 2. Recreamos la caja delimitadora en espacio local
 			// Asumo que tienes un constructor o inicializador para tu wrapper de BoundingBox
@@ -159,63 +268,76 @@ namespace Bruno
 				{
 					closestDistance = distance;
 					closestId = idComponent.Id;
+					closestEntity = entity;
 				}
 			}
 		}
+		
+		outEntity = closestEntity;
 		return closestId;
 	}
 
-	bool SelectionService::ProjectAABBToNDC(const BoundingBoxComponent& bbox, const Math::Matrix& wvp,
-	                                        Math::Vector2& outMin, Math::Vector2& outMax, bool& outIsBehindCamera)
+	bool SelectionService::ProjectAABBToNDC(const BoundingBoxComponent& bbox, const Math::Matrix& wvp, Math::Vector2& outMin, Math::Vector2& outMax, bool& outIsBehindCamera)
 	{
-		// Los 8 vértices del AABB local
-        Math::Vector3 corners[8] = {
-            Math::Vector3(bbox.Center.x - bbox.Extents.x, bbox.Center.y - bbox.Extents.y, bbox.Center.z - bbox.Extents.z),
-            Math::Vector3(bbox.Center.x + bbox.Extents.x, bbox.Center.y - bbox.Extents.y, bbox.Center.z - bbox.Extents.z),
-            Math::Vector3(bbox.Center.x - bbox.Extents.x, bbox.Center.y + bbox.Extents.y, bbox.Center.z - bbox.Extents.z),
-            Math::Vector3(bbox.Center.x + bbox.Extents.x, bbox.Center.y + bbox.Extents.y, bbox.Center.z - bbox.Extents.z),
-            Math::Vector3(bbox.Center.x - bbox.Extents.x, bbox.Center.y - bbox.Extents.y, bbox.Center.z + bbox.Extents.z),
-            Math::Vector3(bbox.Center.x + bbox.Extents.x, bbox.Center.y - bbox.Extents.y, bbox.Center.z + bbox.Extents.z),
-            Math::Vector3(bbox.Center.x - bbox.Extents.x, bbox.Center.y + bbox.Extents.y, bbox.Center.z + bbox.Extents.z),
-            Math::Vector3(bbox.Center.x + bbox.Extents.x, bbox.Center.y + bbox.Extents.y, bbox.Center.z + bbox.Extents.z),
-        };
+		// 1. Recrear el AABB local y obtener sus 8 esquinas físicas
+		Math::BoundingBox localAABB(bbox.Center, bbox.Extents);
+		Math::Vector3 corners[8];
+		localAABB.GetCorners(corners);
 
-        int verticesBehindCamera = 0;
+		// Inicializamos con los extremos opuestos de la pantalla
+		outMin = Math::Vector2(FLT_MAX, FLT_MAX);
+		outMax = Math::Vector2(-FLT_MAX, -FLT_MAX);
+    
+		int verticesBehindCamera = 0;
 
-        for (int i = 0; i < 8; ++i) {
-            // Multiplicamos por WorldViewProjection
-            // Nota: Dependiendo de tu wrapper, podrías necesitar Math::Vector4 o TransformCoord
-            Math::Vector4 projected = Math::Vector4::Transform(Math::Vector4(corners[i].x, corners[i].y, corners[i].z, 1.0f), wvp);
+		// 2. Proyectar CADA esquina independientemente al espacio de pantalla
+		for (int i = 0; i < 8; ++i)
+		{
+			// Creamos un vector de 4 componentes (X, Y, Z, W=1) para la matriz de proyección
+			Math::Vector4 corner4(corners[i].x, corners[i].y, corners[i].z, 1.0f);
+        
+			// Multiplicamos por WorldViewProjection para pasarlo a Clip Space
+			Math::Vector4 p = Math::Vector4::Transform(corner4, wvp);
 
-            // Z (o W) nos dice si está detrás de la cámara (Plano Near)
-            if (projected.w <= 0.0f) {
-                verticesBehindCamera++;
-            }
+			// 3. Revisar si el vértice atraviesa la cámara (Z-Clipping / W-Clipping)
+			if (p.w <= 0.0f)
+			{
+				verticesBehindCamera++;
+				// IMPORTANTE: Si 'w' es negativo, la división invierte los ejes y manda
+				// la geometría al otro lado de la pantalla. Le damos un valor mínimo
+				// para que el Bounding Box crezca de forma segura fuera del monitor.
+				p.w = 0.0001f; 
+			}
 
-            // Normalizamos dividiendo por W (Perspectiva)
-            // Cuidado con la división por cero si w es muy cercano a 0
-            float invW = (projected.w > 0.0001f) ? (1.0f / projected.w) : 1.0f;
-            
-            float nx = projected.x * invW;
-            float ny = projected.y * invW;
+			// 4. División de Perspectiva (Pasar de Clip Space a NDC puro [-1, 1])
+			float invW = 1.0f / p.w;
+			float ndcX = p.x * invW;
+			float ndcY = p.y * invW;
 
-            // Encontramos los límites 2D del AABB proyectado en la pantalla
-            if (nx < outMin.x) outMin.x = nx;
-            if (nx > outMax.x) outMax.x = nx;
-            if (ny < outMin.y) outMin.y = ny;
-            if (ny > outMax.y) outMax.y = ny;
-        }
+			// 5. Expandir el Bounding Box 2D en base a donde cayó esta esquina
+			outMin.x = std::min<int>(outMin.x, ndcX);
+			outMin.y = std::min<int>(outMin.y, ndcY);
+			outMax.x = std::max<int>(outMax.x, ndcX);
+			outMax.y = std::max<int>(outMax.y, ndcY);
+		}
 
-        outIsBehindCamera = (verticesBehindCamera == 8);
-        return true;
+		// Si TODAS las 8 esquinas están detrás de la espalda de la cámara, ignoramos el objeto
+		if (verticesBehindCamera == 8)
+		{
+			outIsBehindCamera = true;
+			return false;
+		}
+
+		outIsBehindCamera = false;
+		return true;
 	}
 
-	bool SelectionService::CheckRectIntersection(const Math::Vector2& rectA_Min, const Math::Vector2& rectA_Max,
-		const Math::Vector2& rectB_Min, const Math::Vector2& rectB_Max)
+	bool SelectionService::CheckRectIntersection(const Math::Vector2& rectA_Min, const Math::Vector2& rectA_Max, const Math::Vector2& rectB_Min, const Math::Vector2& rectB_Max)
 	{
 		// Prueba clásica de intersección AABB 2D
 		if (rectA_Max.x < rectB_Min.x || rectA_Min.x > rectB_Max.x) return false;
 		if (rectA_Max.y < rectB_Min.y || rectA_Min.y > rectB_Max.y) return false;
+		
 		return true;
 	}
 }

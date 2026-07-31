@@ -14,7 +14,7 @@ namespace Bruno
 	{
 	}
 
-	const Math::Matrix& Camera::GetView()
+	const Math::Matrix& Camera::GetView() const
 	{
 		if (m_states.ViewDirty)
 		{
@@ -26,7 +26,7 @@ namespace Bruno
 		return m_view;
 	}
 
-	const Math::Matrix& Camera::GetInverseView()
+	const Math::Matrix& Camera::GetInverseView() const
 	{
 		if (m_states.ViewDirty)
 		{
@@ -38,7 +38,7 @@ namespace Bruno
 		return m_inverseView;
 	}
 
-	const Math::Matrix& Camera::GetProjection()
+	const Math::Matrix& Camera::GetProjection() const
 	{
 		if (m_states.ProjectionDirty)
 		{
@@ -59,7 +59,7 @@ namespace Bruno
 		return m_projection;
 	}
 
-	const Math::Matrix& Camera::GetViewProjection()
+	const Math::Matrix& Camera::GetViewProjection() const
 	{
 		if (m_states.ViewProjectionDirty)
 		{

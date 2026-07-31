@@ -77,7 +77,7 @@ namespace Bruno
 #endif
 
 		std::shared_ptr<SelectionService> m_selectionService;
-		std::shared_ptr<GizmoService> m_dxGizmoService;
+		std::shared_ptr<GizmoService> m_gizmoService;
 		std::unique_ptr<CameraGizmo> m_cameraGizmo;
 
 		GraphicsDevice* m_device;

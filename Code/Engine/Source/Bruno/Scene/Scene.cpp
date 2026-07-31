@@ -9,17 +9,13 @@
 #include <Bruno/Core/GameTimer.h>
 
 #include "Bruno/Scene/Entity.h"
+#include "Systems/HierarchySystem.h"
 
 namespace Bruno
 {
 	Scene::Scene()
 	{
 		m_sceneEntity = m_registry.create();
-
-		//for (size_t i = 0; i < Graphics::Core::FRAMES_IN_FLIGHT_COUNT; i++)
-		//{
-		//	//m_objectBuffer[i] = std::make_unique<ConstantBuffer<SceneObjectBuffer>>(Graphics::Core::SCENE_OBJECT_COUNT);
-		//}
 	}
 
 	Entity Scene::CreateEntity(const std::wstring& name)
@@ -29,20 +25,21 @@ namespace Bruno
 
 	Entity Scene::CreateEntity(Entity parent, const std::wstring& name)
 	{
-		auto entity = Entity{ m_registry.create(), this };
+		entt::entity rawHandle = m_registry.create();
+		auto entity = Entity{ rawHandle, this };
+		
 		auto& idComponent = entity.AddComponent<IdComponent>();
 		idComponent.Id = {};
 
 		entity.AddComponent<TransformComponent>();
-		entity.AddComponent<HierarchyComponent>();
 		entity.AddComponent<NameComponent>().Name = name;
 
 		if (parent)
 		{
-			entity.SetParent(parent);
+			HierarchySystem::SetParent(m_registry, rawHandle, parent.GetEntityHandle());
 		}
 
-		m_entityIdMap[idComponent.Id] = entity;
+		m_entityIdMap[idComponent.Id] = rawHandle;
 
 		//SortEntities();
 		return entity;
@@ -80,34 +77,29 @@ namespace Bruno
 
 	Math::Matrix Scene::GetLocalSpaceMatrix(Entity entity)
 	{
-		return entity.GetComponent<TransformComponent>().GetTransform();
+		return entity.GetComponent<TransformComponent>().LocalTransform;
 	}
 
 	Math::Matrix Scene::GetWorldSpaceMatrix(Entity entity)
 	{
-		Math::Matrix parentTransform = Math::Matrix::Identity;
-
-		Entity parent = TryGetEntityWithUUID(entity.GetParentUUID());
-		if (parent)
-		{
-			parentTransform = GetWorldSpaceMatrix(parent);
-		}
-		
-		return entity.GetComponent<TransformComponent>().GetTransform() * parentTransform;
+		return entity.GetComponent<TransformComponent>().WorldTransform;
 	}
 
-	Entity Scene::GetEntityWithUUID(UUID id) const
+	Entity Scene::GetEntityWithUUID(UUID id)
 	{
-		BR_ASSERT(m_entityIdMap.find(id) != m_entityIdMap.end(), "Invalid entity Id");
-		return m_entityIdMap.at(id);
+		auto it = m_entityIdMap.find(id);
+		
+		BR_ASSERT(it != m_entityIdMap.end(), "Invalid entity Id");
+    
+		return Entity{ it->second, this };
 	}
 
-	Entity Scene::TryGetEntityWithUUID(UUID id) const
+	Entity Scene::TryGetEntityWithUUID(UUID id)
 	{
 		auto it = m_entityIdMap.find(id);
 		if (it != m_entityIdMap.end())
 		{
-			return it->second;
+			return Entity{ it->second, this };
 		}
 
 		return Entity{};

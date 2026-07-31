@@ -89,20 +89,25 @@ namespace Bruno
 					},
 				[entity](const Berta::OptionalVector3& val) mutable
 					{
-						auto& position = entity.GetComponent<TransformComponent>().Position;
+						auto &transform = entity.GetComponent<TransformComponent>();
+						auto& position = transform.Position;
+						auto& isDirty = transform.IsDirty;
 						if (val.x.has_value())
 						{
 							position.x = val.x.value();
+							isDirty = true;
 						}
 						
 						if (val.y.has_value())
 						{
 							position.y = val.y.value();
+							isDirty = true;
 						}
 						
 						if (val.z.has_value())
 						{
 							position.z = val.z.value();
+							isDirty = true;
 						}
 					}
 				);
@@ -122,21 +127,26 @@ namespace Bruno
 					},
 					[entity](const Berta::OptionalVector3& val) mutable
 					{
-						auto& rotation = entity.GetComponent<TransformComponent>().Rotation;
+						auto &transform = entity.GetComponent<TransformComponent>();
+						auto& rotation = transform.Rotation;
+						auto& isDirty = transform.IsDirty;
 						
 						if (val.x.has_value())
 						{
 							rotation.x = val.x.value();
+							isDirty = true;
 						}
 						
 						if (val.y.has_value())
 						{
 							rotation.y = val.y.value();
+							isDirty = true;
 						}
 						
 						if (val.z.has_value())
 						{
 							rotation.z = val.z.value();
+							isDirty = true;
 						}
 					}
 				);
@@ -155,20 +165,25 @@ namespace Bruno
 					},
 					[entity](const Berta::OptionalVector3& val) mutable
 					{
-						auto& scale = entity.GetComponent<TransformComponent>().Scale;
+						auto &transform = entity.GetComponent<TransformComponent>();
+						auto& scale = transform.Scale;
+						auto& isDirty = transform.IsDirty;
 						if (val.x.has_value())
 						{
 							scale.x = val.x.value();
+							isDirty = true;
 						}
 						
 						if (val.y.has_value())
 						{
 							scale.y = val.y.value();
+							isDirty = true;
 						}
 						
 						if (val.z.has_value())
 						{
 							scale.z = val.z.value();
+							isDirty = true;
 						}
 					}
 				);

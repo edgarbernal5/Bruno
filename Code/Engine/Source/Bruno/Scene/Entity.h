@@ -30,6 +30,9 @@ namespace Bruno
 		template<typename T, typename... Args>
 		decltype(auto) AddComponent(Args&&... args);
 
+		template<typename T, typename... Args>
+		decltype(auto) AddOrReplaceComponent(Args&&... args);
+
 		template<typename T>
 		T& GetComponent();
 
@@ -45,17 +48,14 @@ namespace Bruno
 		template<typename T, typename... Func>
 		void Patch(Func &&...func) const;
 		
-		std::vector<UUID>& GetChildren();
+		
 		UUID GetUUID() const;
 		Entity GetParent() const;
-		UUID GetParentUUID() const;
-		void SetParentUUID(UUID parent);
-		bool RemoveChild(Entity child);
 		void SetParent(Entity parent);
 
+		entt::entity GetEntityHandle() const { return m_entityHandle; }
 	private:
 		entt::entity m_entityHandle{ entt::null };
 		Scene* m_scene{ nullptr };
 	};
-
 }

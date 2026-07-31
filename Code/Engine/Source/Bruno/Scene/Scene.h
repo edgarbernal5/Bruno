@@ -33,11 +33,14 @@ namespace Bruno
 		
 		template<typename... Components>
 		auto GetAllEntitiesWith() { return m_registry.view<Components...>(); }
-
-		Entity GetEntityWithUUID(UUID id) const;
+		
+		template<typename... Components>
+		auto TryGetWith(Entity entity) { return m_registry.try_get<Components...>(entity.GetEntityHandle()); }
+		
+		Entity GetEntityWithUUID(UUID id);
 		Math::Matrix GetLocalSpaceMatrix(Entity entity);
 		Math::Matrix GetWorldSpaceMatrix(Entity entity);
-		Entity TryGetEntityWithUUID(UUID id) const;
+		Entity TryGetEntityWithUUID(UUID id);
 
 		void OnUpdate(const GameTimer& timer, Camera& camera);
 		
@@ -46,6 +49,18 @@ namespace Bruno
 		{
 			// EnTT permite crear un sink a partir de una señal (sigh)
 			return entt::sink{ m_registry.on_update<Component>() };
+		}
+		
+		template<typename Component>
+		auto OnConstruct()
+		{
+			return entt::sink{ m_registry.on_construct<Component>() };
+		}
+		
+		template<typename Component>
+		auto OnDestroy()
+		{
+			return entt::sink{ m_registry.on_destroy<Component>() };
 		}
 		
 		friend class SceneRenderer;
@@ -58,9 +73,7 @@ namespace Bruno
 
 		entt::registry m_registry;
 		entt::entity m_sceneEntity{ entt::null };
-		std::unordered_map<UUID, Entity> m_entityIdMap;
-
-		//std::unique_ptr<ConstantBuffer<SceneObjectBuffer>> m_objectBuffer[Graphics::Core::FRAMES_IN_FLIGHT_COUNT];
+		std::unordered_map<UUID, entt::entity> m_entityIdMap;
 	};
 }
 
