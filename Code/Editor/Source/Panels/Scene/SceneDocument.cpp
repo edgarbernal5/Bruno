@@ -141,9 +141,6 @@ namespace Bruno
 					transform.Rotation.Normalize(); // Previene degradación de precisión flotante
 					
 					transform.IsDirty = true;
-					
-					auto newWorldMatrix = m_scene->GetWorldSpaceMatrix(entity);
-					m_gizmoService->SetGizmoWorldMatrix(newWorldMatrix);
 				});
 			}
 		});

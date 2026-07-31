@@ -164,6 +164,7 @@ namespace Bruno
 			if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
 			{
 				m_gizmoService->SetGizmoPosition(gizmoPivot);
+				m_gizmoService->SetGizmoWorldMatrix(gizmoWorld);
 			}
 			m_gizmoService->Update();
 			m_gizmoService->BuildGeometry(frameIndex);
