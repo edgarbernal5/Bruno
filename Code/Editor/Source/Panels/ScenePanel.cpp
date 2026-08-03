@@ -17,6 +17,7 @@
 #include <Bruno/Core/Log.h>
 
 #include "SceneHierarchyPanel.h"
+#include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
 #include "Gizmos/CameraGizmo.h"
@@ -30,12 +31,8 @@ namespace Bruno
 
 		m_editorGame(editorGame)
 	{
-		static int idx = 0;
-		idx++;
-		idxx = idx;
-
 		std::ostringstream idstr;
-		idstr << "Scene id " << idxx;
+		idstr << "Scene id " << 0;
 		this->SetCaption(idstr.str());
 		m_layout.Create(*this);
 
@@ -97,7 +94,11 @@ namespace Bruno
 		InitializeSceneRenderer();
 		InitializeGizmoService();
 		m_srvHeap = m_device->GetSRVDescriptorAllocator().GetHeap();
-		
+
+		for (int i = 0; i < 2; ++i)
+		{
+			m_dynamicAllocators[i] = std::make_unique<LinearAllocator>(*m_device);
+		}
 		/*
 		
 		 */
@@ -121,7 +122,7 @@ namespace Bruno
 			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
 			auto commandList = m_commandQueue->GetCommandList(frameIndex);
 			auto allocator = m_commandQueue->GetAllocator(frameIndex);
-			GraphicsContext context(*m_device, commandList.Get(), allocator.Get());
+			GraphicsContext context(*m_device, commandList.Get(), allocator.Get(), m_dynamicAllocators[frameIndex].get());
 			
 			// 3. Extraer la textura real y su descriptor
 			auto backBuffer = m_surface->GetCurrentBackBuffer();
@@ -193,8 +194,6 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			BR_CORE_TRACE << "destroy. panel id = " << idxx << std::endl;
-
 			
 			auto device = Graphics::GetDevice();
 			device->Flush();
@@ -208,16 +207,14 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			BR_CORE_TRACE << "Expose of panel: panel id = " << idxx << ". IsVisible = " << args.IsVisible << std::endl;
 
 			m_isVisible = args.IsVisible;
-			if (m_isVisible)
-				m_form->Show();
-			else
-				m_form->Hide();
+			m_isVisible ? m_form->Show() : m_form->Hide();
 			
 			if (args.IsVisible)
+			{
 				this->Focus();
+			}
 		});
 
 		m_form->GetEvents().EnterSizeMove.Connect([this](const Berta::ArgSizeMove& args)
@@ -225,7 +222,6 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			BR_CORE_TRACE << "enter_size_move /panel id = " << idxx << std::endl;
 
 			m_isSizingMoving = true;
 		});
@@ -235,7 +231,6 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			BR_CORE_TRACE << "exit_size_move /panel id = " << idxx << std::endl;
 
 			auto formSize = m_form->GetSize();
 			if (m_surface)
@@ -246,7 +241,7 @@ namespace Bruno
 			m_viewport.width = formSize.Width;
 			m_scissorRect = { 0, 0, static_cast<LONG>(formSize.Width), static_cast<LONG>(formSize.Height) };
 			
-			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)formSize.Width, (float)formSize.Height));
+			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, static_cast<float>(formSize.Width), static_cast<float>(formSize.Height)));
 			m_isSizingMoving = false;
 		});
 
@@ -258,7 +253,9 @@ namespace Bruno
 			//BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << m_form->native_handle() << ". w=" << args.width << "; h=" << args.height << std::endl;
 
 			if (m_isSizingMoving)
+			{
 				return;
+			}
 
 			m_isResizing = true;
 			m_viewport.height = args.NewSize.Height;
@@ -266,7 +263,7 @@ namespace Bruno
 			m_scissorRect = { 0, 0, static_cast<LONG>(args.NewSize.Width), static_cast<LONG>(args.NewSize.Height) };
 			m_surface->Resize(args.NewSize.Width, args.NewSize.Height);
 
-			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, (float)args.NewSize.Width, (float)args.NewSize.Height));
+			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, static_cast<float>(args.NewSize.Width), static_cast<float>(args.NewSize.Height)));
 			m_isResizing = false;
 		});
 
@@ -458,8 +455,11 @@ namespace Bruno
 			}
 			m_gizmoTransformSpaceButton.SetEnabled(index < 3);
 		});
+		
 		SetCameraGizmoViewport();
+		
 		editorGame->AddScenePanel(this);
+		
 		m_form->Show();
 		m_timer.Reset();
 		m_isVisible = true;
@@ -470,7 +470,6 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 		std::lock_guard lock{ m_mutex };
 #endif
-		BR_CORE_TRACE << "destructor panel id = " << idxx << std::endl;
 
 		auto device = Graphics::GetDevice();
 		device->Flush();
@@ -500,7 +499,7 @@ namespace Bruno
 
 	void ScenePanel::InitializeGizmoService()
 	{
-		m_gizmoService = m_sceneDocument->GetDXGizmoService();
+		m_gizmoService = m_sceneDocument->GetGizmoService();
 		m_gizmoService->SetGizmoType(static_cast<GizmoType>(m_gizmoTypeCombobox.GetSelectedIndex().value()));
 		m_gizmoService->SetTransformSpace(m_gizmoTransformSpaceButton.GetCaption() == "Local" ? TransformSpace::World : TransformSpace::Local);
 		
@@ -532,5 +531,33 @@ namespace Bruno
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
 	{
 		m_scene->OnUpdate(timer, m_sceneDocument->GetCamera());
+	}
+
+	void ScenePanel::RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax)
+	{
+		/*auto cmdList = context.GetNative();
+
+		// 1. Setear Pipeline
+		cmdList->SetPipelineState(m_marqueePSO.Get());
+		cmdList->SetGraphicsRootSignature(m_marqueeRootSig.Get());
+		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+		// 2. Preparar datos
+		MarqueeData data;
+		data.RectMin = ndcMin;
+		data.RectMax = ndcMax;
+		data.FillColor = Math::Color(0.2f, 0.5f, 1.0f, 0.3f);
+		data.BorderColor = Math::Color(0.2f, 0.5f, 1.0f, 1.0f);
+		data.BorderThickness = 0.015f;
+
+		// 3. Asignar memoria dinámica mágicamente alineada y lista
+		DynamicAllocation alloc = context.AllocateDynamicSpace(sizeof(MarqueeData));
+    
+		// Copiar a la memoria persistente (CPU -> Upload Heap)
+		memcpy(alloc.CPUAddress, &data, sizeof(MarqueeData));
+
+		// 4. Bindear y Dibujar
+		cmdList->SetGraphicsRootConstantBufferView(0, alloc.GPUAddress);
+		cmdList->DrawInstanced(4, 1, 0, 0);*/
 	}
 }

@@ -34,7 +34,7 @@ namespace Bruno
 		std::shared_ptr<Scene> GetScene() const { return m_scene; }
 		
 		Camera& GetCamera() { return m_camera; }
-		std::shared_ptr<GizmoService> GetDXGizmoService() { return m_gizmoService; }
+		std::shared_ptr<GizmoService> GetGizmoService() { return m_gizmoService; }
 		std::shared_ptr<SelectionService> GetSelectionService() { return m_selectionService; }
 		EditorAssetManager* GetAssetManager() const { return m_assetManager; }
 		SceneRenderer* GetSceneRenderer() const { return m_sceneRenderer.get(); }

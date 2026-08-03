@@ -104,7 +104,7 @@ namespace Bruno
 		}
 
 		__int64 currTime;
-		QueryPerformanceCounter((LARGE_INTEGER*)&currTime);
+		QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&currTime));
 		m_currTime = currTime;
 
 		// Time difference between this frame and the previous.

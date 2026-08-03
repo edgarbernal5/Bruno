@@ -7,12 +7,17 @@
 
 namespace Bruno
 {
+    class LinearAllocator;
+    struct DynamicAllocation;
+    
     class GraphicsContext : public CommandContext
     {
     public:
         // Constructor inyectando la command list que viene de tu CommandQueue
-        GraphicsContext(GraphicsDevice& device, ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* allocator);
+        GraphicsContext(GraphicsDevice& device, ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* allocator, LinearAllocator* dynamicAllocator);
 
+        DynamicAllocation AllocateDynamicSpace(size_t sizeInBytes);
+        
         // --- BARRERAS Y ESTADOS ---
         void TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter);
     
@@ -31,7 +36,8 @@ namespace Bruno
         void SetDescriptorHeaps(ID3D12DescriptorHeap** ppHeaps, uint32_t count);
         void SetConstantBuffer(uint32_t rootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS address);
         void SetDescriptorTable(uint32_t rootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor);
-
+        void SetDynamicDescriptorTable(uint32_t rootParameterIndex, D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor);
+        
         // --- DIBUJO ---
         void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
         void SetVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW&  view);
@@ -41,5 +47,8 @@ namespace Bruno
 
         // Sube valores de 32 bits (floats, ints) directamente a la Root Signature
         void SetGraphicsRoot32BitConstants(uint32_t rootParameterIndex, uint32_t num32BitValuesToSet, const void* pSrcData, uint32_t destOffsetIn32BitValues = 0);
+        
+    private:
+        LinearAllocator* m_dynamicAllocator = nullptr;
     };
 }

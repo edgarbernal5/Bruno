@@ -17,6 +17,7 @@
 
 namespace Bruno
 {
+	class LinearAllocator;
 	class Model;
 	class Surface;
 	class EditorGame;
@@ -51,25 +52,36 @@ namespace Bruno
 
 		Berta::NestedForm& GetForm() { return *m_form; }
 	private:
+		// Estructura para subir al Constant Buffer
+		struct MarqueeData
+		{
+			Math::Vector2 RectMin;
+			Math::Vector2 RectMax;
+			Math::Color FillColor;
+			Math::Color BorderColor;
+			float BorderThickness;
+			float padding[3];
+		};
+		
 		void InitializeGizmoService();
 		void InitializeSceneRenderer();
 		void SetCameraGizmoViewport();
 		void UpdateCBs(const GameTimer& timer);
-
+		void RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax);
+		
 		std::unique_ptr<Berta::NestedForm> m_form;
 		Berta::Layout m_layout;
 		Berta::ComboBox m_gizmoTypeCombobox;
 		Berta::Button m_gizmoTransformSpaceButton;
 
-		int idxx{ 0 };
 		SceneSurfaceParameters m_surfaceParameters;
 		EditorGame* m_editorGame;
-		std::shared_ptr<SceneDocument>		m_sceneDocument;
-		std::shared_ptr<Scene>				m_scene;
-		SceneRenderer*		m_sceneRenderer { nullptr };
+		std::shared_ptr<SceneDocument> m_sceneDocument;
+		std::shared_ptr<Scene> m_scene;
+		SceneRenderer* m_sceneRenderer { nullptr };
 		
-		std::unique_ptr<GraphicsContext> m_graphicsContext;
-
+		std::array<std::unique_ptr<LinearAllocator>, 2> m_dynamicAllocators;
+		
 #ifndef BR_SINGLE_THREAD_RENDERING
 		std::mutex m_mutex{};
 #else

@@ -79,7 +79,7 @@ namespace Bruno
 		// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
 		auto commandList = m_commandQueue->GetCommandList(frameIndex);
 		auto allocator = m_commandQueue->GetAllocator(frameIndex);
-		GraphicsContext context(*m_device, commandList.Get(), allocator.Get());
+		GraphicsContext context(*m_device, commandList.Get(), allocator.Get(), nullptr);
 			
 		// 3. Extraer la textura real y su descriptor
 		auto backBuffer = m_surface->GetCurrentBackBuffer();

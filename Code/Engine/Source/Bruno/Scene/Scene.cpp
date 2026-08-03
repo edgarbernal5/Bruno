@@ -55,24 +55,7 @@ namespace Bruno
 
 	void Scene::OnUpdate(const GameTimer& timer, Camera& camera)
 	{
-		/*auto device = Graphics::GetDevice();
-		uint32_t frameIndex = device->GetFrameId();
-		auto entities = GetAllEntitiesWith<IdComponent, TransformComponent>();
-		uint32_t index = 0;
-		for (auto& ent : entities)
-		{
-			auto [idComponent, transformComponent] = entities.get<IdComponent, TransformComponent>(ent);
-
-			auto world = GetWorldSpaceMatrix(GetEntityWithUUID(idComponent.Id));
-
-			Math::Matrix mvpMatrix = world * camera.GetViewProjection();
-
-			SceneObjectBuffer objectBuffer;
-			objectBuffer.World = mvpMatrix;
-
-			//m_objectBuffer[frameIndex]->SetMappedData(index, objectBuffer);
-			index++;
-		}*/
+		
 	}
 
 	Math::Matrix Scene::GetLocalSpaceMatrix(Entity entity)

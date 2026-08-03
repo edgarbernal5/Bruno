@@ -11,7 +11,7 @@ namespace Bruno
         auto nativeDevice = device.GetNativeDevice();
         
         // 1. Describir cómo queremos nuestro Heap
-        D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+        D3D12_DESCRIPTOR_HEAP_DESC heapDesc;
         heapDesc.NumDescriptors = capacity;
         heapDesc.Type = type;
     
@@ -32,9 +32,12 @@ namespace Bruno
         // 4. Guardar los cabezales de inicio (para la magia matemática de Allocate)
         m_cpuStart = m_heap->GetCPUDescriptorHandleForHeapStart();
     
-        if (isShaderVisible) {
+        if (isShaderVisible)
+        {
             m_gpuStart = m_heap->GetGPUDescriptorHandleForHeapStart();
-        } else {
+        }
+        else
+        {
             m_gpuStart.ptr = 0; // Si no es shader visible, el GPU handle no es válido
         }
     }

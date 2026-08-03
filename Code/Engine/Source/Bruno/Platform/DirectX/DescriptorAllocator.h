@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "D3DHelpers.h" // Asumo que aquí tienes tus includes de DX12
+#include "D3DHelpers.h"
 #include <wrl/client.h>
 #include <cstdint>
 #include <stdexcept>
@@ -67,7 +67,7 @@ namespace Bruno
         ID3D12DescriptorHeap* GetHeap() const { return m_heap.Get(); }
         uint32_t GetCapacity() const { return m_capacity; }
 
-    private:
+    protected:
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_heap;
         D3D12_DESCRIPTOR_HEAP_TYPE m_heapType;
         

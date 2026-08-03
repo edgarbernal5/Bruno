@@ -1,19 +1,29 @@
 ﻿#include "brpch.h"
 #include "GraphicsContext.h"
 
+#include "DynamicAllocation.h"
+
 namespace Bruno
 {
-    GraphicsContext::GraphicsContext(GraphicsDevice& device, ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* allocator) : 
-    CommandContext(device, D3D12_COMMAND_LIST_TYPE_DIRECT, commandList, allocator)
+    GraphicsContext::GraphicsContext(GraphicsDevice& device, ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* allocator, LinearAllocator* dynamicAllocator) : 
+        CommandContext(device, D3D12_COMMAND_LIST_TYPE_DIRECT, commandList, allocator), m_dynamicAllocator(dynamicAllocator)
     {
-        
     }
-
-    void GraphicsContext::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES stateBefore,
-                                             D3D12_RESOURCE_STATES stateAfter)
+    
+    DynamicAllocation GraphicsContext::AllocateDynamicSpace(size_t sizeInBytes)
     {
-        if (stateBefore == stateAfter) return; // Optimización simple
-
+        // Delegamos la petición al allocator del frame actual
+        // Esto es O(1), solo avanza un puntero interno.
+        return m_dynamicAllocator->Allocate(sizeInBytes); 
+    }
+    
+    void GraphicsContext::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter)
+    {
+        if (stateBefore == stateAfter)
+        {
+            return; // Optimización simple
+        }
+        
         D3D12_RESOURCE_BARRIER barrier = {};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
