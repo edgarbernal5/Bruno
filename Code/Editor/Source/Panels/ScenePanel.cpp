@@ -141,8 +141,8 @@ namespace Bruno
 			// FASE DE DIBUJO
 			// ------------------------------------------------------------------
 			// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
-			//const float clearColor[] = { 0.10f, 0.014f, 0.16f, 1.0f }; 
-			const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+			const float clearColor[] = { 0.10f, 0.014f, 0.16f, 1.0f }; 
+			//const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 			auto dsvHandle = m_surface->GetDepthBufferView();
 			
 			// Limpiar la pantalla
@@ -353,7 +353,6 @@ namespace Bruno
 							float screenHeight = static_cast<float>(m_viewport.height);
 
 							// Convertir de Píxeles a NDC [-1, 1]
-							// Recordatorio DirectX: NDC Y=+1 es arriba, Y=-1 es abajo.
 							Math::Vector2 ndcMin;
 							Math::Vector2 ndcMax;
 
