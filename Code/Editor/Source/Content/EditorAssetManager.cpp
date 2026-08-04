@@ -124,7 +124,10 @@ namespace Bruno
 			return metadata.Handle;
 		}
 
-		AssetType assetType = GetAssetTypeByExtension(relativePath.extension().string());
+		std::string extension = relativePath.extension().string();
+		std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char ch){ return std::tolower(ch); });
+		
+		AssetType assetType = GetAssetTypeByExtension(extension);
 		if (assetType == AssetType::None)
 		{
 			return 0;

@@ -19,7 +19,7 @@ namespace Bruno
 
 	ModelProcessor::ModelProcessor()
 	{
-		m_supportedExtensions = { L".fbx", L".x" };
+		m_supportedExtensions = { L".fbx", L".x", L".obj" };
 
 		g_textureTypeMappings[ModelProcessor::TextureType::TextureTypeDiffuse] = std::make_pair(aiTextureType_DIFFUSE, "Texture");
 		g_textureTypeMappings[ModelProcessor::TextureType::TextureTypeSpecularMap] = std::make_pair(aiTextureType_SPECULAR, "SpecularTexture");
