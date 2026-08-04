@@ -31,9 +31,14 @@ namespace Bruno
 			if (m_ignoreEvents || args.Items.empty())
 				return;
 
+			std::vector<UUID> uuids;
+			uuids.reserve(args.Items.size());
+			for (auto& item : args.Items)
+			{
+				uuids.push_back(item.GetUserData<UUID>());
+			}
 			m_selectionService->DeselectAll();
-			m_selectionService->Select(args.Items[0].GetUserData<UUID>());
-			m_sceneDocument->UpdateSelection();
+			m_selectionService->Select(uuids);
 		});
 
 		m_hierarchyChangedHandleId = sceneDocument->HierarchyChanged.connect([&](Entity entity, ActionMode actionMode)
@@ -53,7 +58,6 @@ namespace Bruno
 		});
 
 		m_treebox.EnableMultiselection(true);
-		//m_treebox.use_select_contracted_parent_node(false);
 
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
@@ -78,7 +82,6 @@ namespace Bruno
 			// Una entidad es raíz si NO tiene componente de jerarquía, 
 			// o si lo tiene pero su Parent es nulo.
 			bool isRoot = (hierarchy == nullptr) || (hierarchy->Parent == entt::null);
-
 			if (isRoot)
 			{
 				OnHierarchyAdded(entity, L"");
@@ -122,7 +125,6 @@ namespace Bruno
         
 			// Iteramos directamente sobre la lista enlazada intrusiva
 			entt::entity currentChild = hierarchy.FirstChild;
-               
 			while (currentChild != entt::null)
 			{
 				Entity childEntity { currentChild, m_sceneDocument->GetScene().get() };

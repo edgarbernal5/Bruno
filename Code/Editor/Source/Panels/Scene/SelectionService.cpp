@@ -37,7 +37,6 @@ namespace Bruno
 		UUID entityUUID = FindEntityUUIDWithRay(ray, 1000.0f, entity);
 		if (entityUUID)
 		{
-			Select(entityUUID);
 			entity.AddComponent<SelectedComponent>();
 		}
 	}
@@ -89,8 +88,19 @@ namespace Bruno
 	}
 
 	void SelectionService::Select(UUID selection)
+	{		
+		auto entity = m_scene->GetEntityWithUUID(selection);
+		entity.AddComponent<SelectedComponent>();
+	}
+
+	void SelectionService::Select(const std::vector<UUID>& selection)
 	{
-		//m_selections.push_back(selection);
+		ScopedSelectionBatch batch(*this);
+		for (auto uuid : selection)
+		{
+			auto entity = m_scene->GetEntityWithUUID(uuid);
+			entity.AddComponent<SelectedComponent>();
+		}
 	}
 
 	void SelectionService::Deselect(UUID selection)

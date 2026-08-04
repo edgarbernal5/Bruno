@@ -27,6 +27,7 @@ namespace Bruno
 		
 		const std::vector<UUID>& GetSelections() const { return m_selections; }
 		void Select(UUID selection);
+		void Select(const std::vector<UUID>& selection);
 		void Deselect(UUID selection);
 		
 		void SelectEntitiesInRect(const Camera& camera, const Math::Vector2& ndcRectMin, const Math::Vector2& ndcRectMax);

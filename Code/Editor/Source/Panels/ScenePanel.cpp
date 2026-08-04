@@ -100,9 +100,9 @@ namespace Bruno
 		{
 			m_dynamicAllocators[i] = std::make_unique<LinearAllocator>(*m_device);
 		}
-		/*
 		
-		 */
+		InitializeMarquee();
+		
 		// Single-thread rendering.
 #ifdef BR_SINGLE_THREAD_RENDERING
 		
@@ -141,8 +141,8 @@ namespace Bruno
 			// FASE DE DIBUJO
 			// ------------------------------------------------------------------
 			// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
-			const float clearColor[] = { 0.10f, 0.014f, 0.16f, 1.0f }; 
-			//const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+			//const float clearColor[] = { 0.10f, 0.014f, 0.16f, 1.0f }; 
+			const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 			auto dsvHandle = m_surface->GetDepthBufferView();
 			
 			// Limpiar la pantalla
@@ -159,12 +159,12 @@ namespace Bruno
 			context.SetViewport(m_viewport);
 			context.SetScissorRect(m_scissorRect);
 			
-			TransformSystem::Update(m_scene.get());
-			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
 			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
-			
 			Math::Matrix gizmoWorld;
 			Math::Vector3 gizmoPivot;
+			
+			TransformSystem::Update(m_scene.get());
+			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
 			
 			if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
 			{
@@ -303,6 +303,8 @@ namespace Bruno
 					return;
 				}
 				
+				m_gizmoService->SetActive(false);
+				
 				//Entity selectedEntity = m_scene->Raycast(mousePosition);
 				//m_selectionService->SetSelection(selectedEntity);
 			}
@@ -421,7 +423,6 @@ namespace Bruno
 					}
 				}
 			}
-
 		});
 
 		m_form->GetEvents().MouseWheel.Connect([this](const Berta::ArgWheel& args)
@@ -471,7 +472,6 @@ namespace Bruno
 		});
 		
 		SetCameraGizmoViewport();
-		InitializeMarquee();
 		editorGame->AddScenePanel(this);
 		
 		m_form->Show();

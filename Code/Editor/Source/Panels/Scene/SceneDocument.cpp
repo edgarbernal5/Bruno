@@ -21,14 +21,15 @@ namespace Bruno
 		
 		m_selectionChangedHandleId = m_selectionService->SelectionChanged.connect([&](const std::vector<UUID>& selection)
 		{
-			auto entityUUID = selection.size() > 0 ? selection[0] : UUID(0);
-			if (entityUUID)
+			Math::Matrix gizmoWorld;
+			Math::Vector3 gizmoPivot;
+			bool gizmoActive = m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot);
+			if (gizmoActive)
 			{
-				auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
-				m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
-				m_gizmoService->SetGizmoWorldMatrix(worldMatrix);
+				m_gizmoService->SetGizmoPosition(gizmoPivot);
+				m_gizmoService->SetGizmoWorldMatrix(gizmoWorld);
 			}
-			m_gizmoService->SetActive(entityUUID);
+			m_gizmoService->SetActive(gizmoActive);
 			
 			SelectionChanged.emit(selection);
 		});
@@ -50,14 +51,15 @@ namespace Bruno
 	void SceneDocument::UpdateSelection()
 	{
 		auto& selection = m_selectionService->GetSelections();
-		if (selection.size() > 0)
+		Math::Matrix gizmoWorld;
+		Math::Vector3 gizmoPivot;
+		bool gizmoActive = m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot);
+		if (gizmoActive)
 		{
-			auto entityUUID = selection[0];
-			auto worldMatrix = m_scene->GetWorldSpaceMatrix(m_scene->GetEntityWithUUID(entityUUID));
-			m_gizmoService->SetGizmoPosition(worldMatrix.Translation());
-			m_gizmoService->SetGizmoWorldMatrix(worldMatrix);
+			m_gizmoService->SetGizmoPosition(gizmoPivot);
+			m_gizmoService->SetGizmoWorldMatrix(gizmoWorld);
 		}
-		m_gizmoService->SetActive(selection.size() > 0);
+		m_gizmoService->SetActive(gizmoActive);
 		
 		SelectionChanged.emit(selection);
 	}
@@ -71,10 +73,9 @@ namespace Bruno
 	void SceneDocument::InitializeGizmoService()
 	{
 		auto device = Graphics::GetDevice();
-		auto dxDevice = Graphics::GetDevice();
 		m_selectionService = std::make_shared<SelectionService>(m_scene, m_assetManager);
 		
-		m_gizmoService = std::make_shared<GizmoService>(dxDevice, m_camera);
+		m_gizmoService = std::make_shared<GizmoService>(device, m_camera);
 		m_gizmoService->Initialize();
 		m_gizmoService->SetTranslationCallback([&](const Math::Vector3& newPosition)
 		{
