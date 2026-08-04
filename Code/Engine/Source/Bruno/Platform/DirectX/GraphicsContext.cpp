@@ -2,6 +2,7 @@
 #include "GraphicsContext.h"
 
 #include "DynamicAllocation.h"
+#include "DynamicDescriptorAllocator.h"
 
 namespace Bruno
 {
@@ -84,6 +85,19 @@ namespace Bruno
     void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor)
     {
         m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, baseDescriptor);
+    }
+
+    void GraphicsContext::SetDynamicDescriptorTable(uint32_t rootParameterIndex, D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor)
+    {
+        // 1. Asegurarnos de que el Heap Dinámico está seteado en el Command List
+        ID3D12DescriptorHeap* heaps[] = { m_dynamicDescriptorAllocator->GetHeap() };
+        m_commandList->SetDescriptorHeaps(1, heaps);
+
+        // 2. Copiar del Almacén al Mostrador
+        D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = m_dynamicDescriptorAllocator->CopyDescriptor(m_device, cpuStagingDescriptor);
+
+        // 3. Bindear en la Root Signature
+        m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, gpuHandle);
     }
 
     void GraphicsContext::SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology)

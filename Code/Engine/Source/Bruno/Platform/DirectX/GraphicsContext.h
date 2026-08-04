@@ -7,6 +7,7 @@
 
 namespace Bruno
 {
+    class DynamicDescriptorAllocator;
     class LinearAllocator;
     struct DynamicAllocation;
     
@@ -51,5 +52,6 @@ namespace Bruno
         
     private:
         LinearAllocator* m_dynamicAllocator = nullptr;
+        DynamicDescriptorAllocator* m_dynamicDescriptorAllocator = nullptr;
     };
 }
