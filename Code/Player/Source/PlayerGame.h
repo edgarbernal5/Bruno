@@ -6,6 +6,7 @@
 
 namespace Bruno
 {
+	class LinearAllocator;
 	class Surface;
 	class GraphicsContext;
 	class Scene;
@@ -37,7 +38,7 @@ namespace Bruno
 
 	private:
 		void InitializeCamera();
-		void InitializeGraphicsContext();
+		void InitializeAllocators();
 		void InitializeMeshAndTexture();
 		void InitializeSurface();
 		void UpdateCBs(const GameTimer& timer);
@@ -51,6 +52,7 @@ namespace Bruno
 		ID3D12DescriptorHeap* m_srvHeap;
 		std::unique_ptr<GraphicsContext>	m_graphicsContext;
 
+		std::array<std::unique_ptr<LinearAllocator>, 2> m_dynamicAllocators;
 		Math::Int2	m_lastMousePosition;
 		Camera		m_camera;
 		bool m_shiftPressed=false;

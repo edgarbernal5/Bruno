@@ -27,6 +27,7 @@ namespace Bruno
 
 	void SelectionService::SelectUnderMousePosition(const Camera& camera, const Math::Int2& mousePosition)
 	{
+		ScopedSelectionBatch batch(*this);
 		auto ray = ConvertMousePositionToRay(camera, mousePosition);
 
 		m_scene->Clear<SelectedComponent>();
@@ -39,8 +40,6 @@ namespace Bruno
 			Select(entityUUID);
 			entity.AddComponent<SelectedComponent>();
 		}
-
-		SelectionChanged.emit(m_selections);
 	}
 
 	void SelectionService::DeselectAll()
@@ -91,7 +90,7 @@ namespace Bruno
 
 	void SelectionService::Select(UUID selection)
 	{
-		m_selections.push_back(selection);
+		//m_selections.push_back(selection);
 	}
 
 	void SelectionService::Deselect(UUID selection)
@@ -147,7 +146,6 @@ namespace Bruno
 				// Opcional avanzado: Si quieres asegurar que cubra toda la caja y no solo el centro, 
 				// puedes proyectar los 8 vértices del OBB y verificar si al menos uno cae dentro del rectángulo.
 				entity.AddComponent<SelectedComponent>();
-				m_selections.push_back(idComponent.Id);
 			}
 		}
 	}

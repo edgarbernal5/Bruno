@@ -43,6 +43,7 @@ namespace Bruno
         void SetVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW&  view);
         void SetVertexBuffers(uint32_t startSlot, uint32_t count, const D3D12_VERTEX_BUFFER_VIEW* views);
         void SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW* view);
+        void DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation);
         void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation);
 
         // Sube valores de 32 bits (floats, ints) directamente a la Root Signature

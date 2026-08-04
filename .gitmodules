@@ -1,4 +1,4 @@
 [submodule "Code/Engine/Dependencies/Berta"]
 	path = Code/Engine/Dependencies/Berta
-	url = git@github.com:edgarbernal5/Berta.git
+	url = git@github.com-personal:edgarbernal5/Berta.git
 	branch = develop

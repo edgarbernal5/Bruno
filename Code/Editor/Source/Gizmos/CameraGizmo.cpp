@@ -288,6 +288,8 @@ namespace Bruno
             return;
         }
         
+        context->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        
         // Bind Root Signature y PSO
         context->SetRootSignature(m_rootSignature.get()->GetNative());
         context->SetPipelineState(m_psoDepthOff.get()->GetNative()); // Usar DepthOff si quieres que flote sobre todo

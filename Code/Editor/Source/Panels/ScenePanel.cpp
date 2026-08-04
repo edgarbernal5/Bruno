@@ -18,6 +18,7 @@
 
 #include "SceneHierarchyPanel.h"
 #include "Bruno/Platform/DirectX/DynamicAllocation.h"
+#include "Bruno/Platform/DirectX/ShaderCompiler.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
 #include "Gizmos/CameraGizmo.h"
@@ -95,7 +96,7 @@ namespace Bruno
 		InitializeGizmoService();
 		m_srvHeap = m_device->GetSRVDescriptorAllocator().GetHeap();
 
-		for (int i = 0; i < 2; ++i)
+		for (int i = 0; i < m_dynamicAllocators.size(); ++i)
 		{
 			m_dynamicAllocators[i] = std::make_unique<LinearAllocator>(*m_device);
 		}
@@ -122,7 +123,10 @@ namespace Bruno
 			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
 			auto commandList = m_commandQueue->GetCommandList(frameIndex);
 			auto allocator = m_commandQueue->GetAllocator(frameIndex);
-			GraphicsContext context(*m_device, commandList.Get(), allocator.Get(), m_dynamicAllocators[frameIndex].get());
+			auto dynamicAllocator = m_dynamicAllocators[frameIndex].get();
+			GraphicsContext context(*m_device, commandList.Get(), allocator.Get(), dynamicAllocator);
+			
+			dynamicAllocator->Reset();
 			
 			// 3. Extraer la textura real y su descriptor
 			auto backBuffer = m_surface->GetCurrentBackBuffer();
@@ -166,6 +170,11 @@ namespace Bruno
 			{
 				m_gizmoService->SetGizmoPosition(gizmoPivot);
 				m_gizmoService->SetGizmoWorldMatrix(gizmoWorld);
+			}
+			
+			if (m_marqueeInteraction.m_dragRectangle)
+			{
+				RenderMarquee(context, m_marqueeInteraction.m_ndcMin, m_marqueeInteraction.m_ndcMax);
 			}
 			m_gizmoService->Update();
 			m_gizmoService->BuildGeometry(frameIndex);
@@ -331,9 +340,36 @@ namespace Bruno
 					{
 						int dragLength = Math::Abs(m_beginMouseDownPosition.x - currentPosition.x) + Math::Abs(m_beginMouseDownPosition.y - currentPosition.y);
 
-						if (!m_dragRectangle)
+						if (!m_marqueeInteraction.m_dragRectangle)
 						{
-							m_dragRectangle = dragLength > 2;
+							m_marqueeInteraction.m_dragRectangle = dragLength > 2;
+						}
+						if (m_marqueeInteraction.m_dragRectangle)
+						{
+							// Dimensiones de tu viewport (resolución del ScenePanel)
+							float screenWidth = static_cast<float>(m_viewport.width);
+							float screenHeight = static_cast<float>(m_viewport.height);
+
+							// Convertir de Píxeles a NDC [-1, 1]
+							// Recordatorio DirectX: NDC Y=+1 es arriba, Y=-1 es abajo.
+							Math::Vector2 ndcMin;
+							Math::Vector2 ndcMax;
+
+							// Calculamos los min/max por si el usuario arrastró el mouse de derecha a izquierda
+							float minX = std::min<int>(m_beginMouseDownPosition.x, args.Position.X);
+							float maxX = std::max<int>(m_beginMouseDownPosition.x, args.Position.X);
+							float minY = std::min<int>(m_beginMouseDownPosition.y, args.Position.Y);
+							float maxY = std::max<int>(m_beginMouseDownPosition.y, args.Position.Y);
+
+							ndcMin.x =  (minX / screenWidth) * 2.0f - 1.0f;
+							ndcMax.x =  (maxX / screenWidth) * 2.0f - 1.0f;
+
+							// Invertimos Y para DirectX (Mouse coord Y=0 es arriba, NDC Y=1 es arriba)
+							ndcMin.y = -((maxY / screenHeight) * 2.0f - 1.0f); 
+							ndcMax.y = -((minY / screenHeight) * 2.0f - 1.0f);
+
+							m_marqueeInteraction.m_ndcMin = ndcMin;
+							m_marqueeInteraction.m_ndcMax = ndcMax;
 						}
 					}
 				}
@@ -373,33 +409,11 @@ namespace Bruno
 				}
 				else
 				{
-					if (m_dragRectangle)
+					if (m_marqueeInteraction.m_dragRectangle)
 					{
-						// Dimensiones de tu viewport (resolución del ScenePanel)
-						float screenWidth = static_cast<float>(m_viewport.width);
-						float screenHeight = static_cast<float>(m_viewport.height);
-
-						// Convertir de Píxeles a NDC [-1, 1]
-						// Recordatorio DirectX: NDC Y=+1 es arriba, Y=-1 es abajo.
-						Math::Vector2 ndcMin;
-						Math::Vector2 ndcMax;
-
-						// Calculamos los min/max por si el usuario arrastró el mouse de derecha a izquierda
-						float minX = std::min<int>(m_beginMouseDownPosition.x, args.Position.X);
-						float maxX = std::max<int>(m_beginMouseDownPosition.x, args.Position.X);
-						float minY = std::min<int>(m_beginMouseDownPosition.y, args.Position.Y);
-						float maxY = std::max<int>(m_beginMouseDownPosition.y, args.Position.Y);
-
-						ndcMin.x =  (minX / screenWidth) * 2.0f - 1.0f;
-						ndcMax.x =  (maxX / screenWidth) * 2.0f - 1.0f;
-
-						// Invertimos Y para DirectX (Mouse coord Y=0 es arriba, NDC Y=1 es arriba)
-						ndcMin.y = -((maxY / screenHeight) * 2.0f - 1.0f); 
-						ndcMax.y = -((minY / screenHeight) * 2.0f - 1.0f);
-
-						m_selectionService->SelectEntitiesInRect(m_sceneDocument->GetCamera(), ndcMin, ndcMax);
+						m_selectionService->SelectEntitiesInRect(m_sceneDocument->GetCamera(), m_marqueeInteraction.m_ndcMin, m_marqueeInteraction.m_ndcMax);
 						
-						m_dragRectangle = false;
+						m_marqueeInteraction.m_dragRectangle = false;
 					}
 					else if (!args.AltPressed)
 					{
@@ -457,7 +471,7 @@ namespace Bruno
 		});
 		
 		SetCameraGizmoViewport();
-		
+		InitializeMarquee();
 		editorGame->AddScenePanel(this);
 		
 		m_form->Show();
@@ -514,6 +528,73 @@ namespace Bruno
 		m_sceneRenderer = m_sceneDocument->GetSceneRenderer();
 	}
 
+	void ScenePanel::InitializeMarquee()
+	{
+		ShaderCompiler compiler; 
+
+		// 1. Compilar Shaders
+		auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/Marquee.hlsl", L"VS", L"vs_6_0");
+		auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/Marquee.hlsl", L"PS", L"ps_6_0");
+    
+		// --- 2. ROOT SIGNATURE ---
+		// En lugar de InitAsConstants, usamos InitAsConstantBufferView.
+		// Esto encaja con context.SetConstantBuffer(0, alloc.GPUAddress) que usamos en el render.
+		CD3DX12_ROOT_PARAMETER rootParams[1];
+		// Visible en ALL porque el VS necesita la posición (RectMin/Max) y el PS necesita los colores
+		rootParams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+
+		m_marqueeRootSig = std::make_unique<RootSignature>(*m_device);
+		m_marqueeRootSig->Initialize(1, rootParams);
+
+		// --- 3. PIPELINE STATE OBJECT (PSO) ---
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+    
+		// CRÍTICO: El input layout queda vacío. No hay Vertex Buffer.
+		psoDesc.InputLayout = { nullptr, 0 };
+    
+		psoDesc.pRootSignature = m_marqueeRootSig->GetNative();
+		psoDesc.VS = { reinterpret_cast<BYTE*>(vertexShaderByteCode->GetBufferPointer()), vertexShaderByteCode->GetBufferSize() };
+		psoDesc.PS = { reinterpret_cast<BYTE*>(pixelShaderByteCode->GetBufferPointer()), pixelShaderByteCode->GetBufferSize() };
+
+		// Rasterizer: Sin Culling (Dibujamos un quad bidimensional)
+		psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; 
+
+		// Profundidad: Totalmente apagada para elementos de UI/Marquee
+		psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		psoDesc.DepthStencilState.DepthEnable = FALSE;
+		psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+
+		// Blending: Alpha Blending tradicional
+		D3D12_RENDER_TARGET_BLEND_DESC blendDesc = {};
+		blendDesc.BlendEnable = TRUE;
+		blendDesc.LogicOpEnable = FALSE;
+		blendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA; 
+		blendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA; 
+		blendDesc.BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+		blendDesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+		blendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		psoDesc.BlendState.RenderTarget[0] = blendDesc;
+    
+		psoDesc.SampleMask = UINT_MAX;
+		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoDesc.NumRenderTargets = 1;
+		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    
+		// OJO: Aunque la profundidad esté apagada, debes indicarle al PSO cuál es 
+		// el formato de tu DSV actual, porque estará atado a la salida del pase de render.
+		psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT; 
+		psoDesc.SampleDesc.Count = 1;
+
+		// 4. Instanciar PSO
+		m_marqueePSO = std::make_unique<GraphicsPipelineState>(*m_device);
+		m_marqueePSO->Initialize(psoDesc);
+	}
+
 	void ScenePanel::SetCameraGizmoViewport()
 	{
 		auto mainViewport = m_sceneDocument->GetCamera().GetViewport();
@@ -535,12 +616,10 @@ namespace Bruno
 
 	void ScenePanel::RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax)
 	{
-		/*auto cmdList = context.GetNative();
-
 		// 1. Setear Pipeline
-		cmdList->SetPipelineState(m_marqueePSO.Get());
-		cmdList->SetGraphicsRootSignature(m_marqueeRootSig.Get());
-		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		context.SetPipelineState(m_marqueePSO->GetNative());
+		context.SetRootSignature(m_marqueeRootSig->GetNative());
+		context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 		// 2. Preparar datos
 		MarqueeData data;
@@ -548,7 +627,8 @@ namespace Bruno
 		data.RectMax = ndcMax;
 		data.FillColor = Math::Color(0.2f, 0.5f, 1.0f, 0.3f);
 		data.BorderColor = Math::Color(0.2f, 0.5f, 1.0f, 1.0f);
-		data.BorderThickness = 0.015f;
+		data.BorderThicknessX = 2.0f / m_viewport.width;
+		data.BorderThicknessY = 2.0f / m_viewport.height;
 
 		// 3. Asignar memoria dinámica mágicamente alineada y lista
 		DynamicAllocation alloc = context.AllocateDynamicSpace(sizeof(MarqueeData));
@@ -557,7 +637,7 @@ namespace Bruno
 		memcpy(alloc.CPUAddress, &data, sizeof(MarqueeData));
 
 		// 4. Bindear y Dibujar
-		cmdList->SetGraphicsRootConstantBufferView(0, alloc.GPUAddress);
-		cmdList->DrawInstanced(4, 1, 0, 0);*/
+		context.SetConstantBuffer(0, alloc.GPUAddress);
+		context.DrawInstanced(4, 1, 0, 0);
 	}
 }

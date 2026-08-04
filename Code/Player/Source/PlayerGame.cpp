@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "Bruno/Platform/DirectX/CommandQueue.h"
+#include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Renderer/SceneRenderer.h"
 #include "Bruno/Renderer/PrimitiveBatch.h"
@@ -26,7 +27,7 @@ namespace Bruno
 		InitializeSurface();
 		InitializeMeshAndTexture();
 		InitializeCamera();
-		InitializeGraphicsContext();
+		InitializeAllocators();
 	}
 
 	void PlayerGame::OnInitializeWindow(const WindowParameters& windowParameters)
@@ -79,7 +80,8 @@ namespace Bruno
 		// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
 		auto commandList = m_commandQueue->GetCommandList(frameIndex);
 		auto allocator = m_commandQueue->GetAllocator(frameIndex);
-		GraphicsContext context(*m_device, commandList.Get(), allocator.Get(), nullptr);
+		auto dynamicAllocator = m_dynamicAllocators[frameIndex].get();
+		GraphicsContext context(*m_device, commandList.Get(), allocator.Get(), dynamicAllocator);
 			
 		// 3. Extraer la textura real y su descriptor
 		auto backBuffer = m_surface->GetCurrentBackBuffer();
@@ -198,9 +200,12 @@ namespace Bruno
 		//m_camera.SetLens(Math::ConvertToRadians(45.0f), Math::Viewport(0.0f, 0.0f, m_surface->GetViewport().Width, m_surface->GetViewport().Height), 1.0f, 1000.0f);
 	}
 
-	void PlayerGame::InitializeGraphicsContext()
+	void PlayerGame::InitializeAllocators()
 	{
-		
+		for (int i = 0; i < m_dynamicAllocators.size(); ++i)
+		{
+			m_dynamicAllocators[i] = std::make_unique<LinearAllocator>(*m_device);
+		}
 	}
 
 	void PlayerGame::InitializeMeshAndTexture()

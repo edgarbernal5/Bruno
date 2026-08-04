@@ -59,12 +59,22 @@ namespace Bruno
 			Math::Vector2 RectMax;
 			Math::Color FillColor;
 			Math::Color BorderColor;
-			float BorderThickness;
-			float padding[3];
+			float BorderThicknessX;
+			float BorderThicknessY;
+			float padding[2];
+		};
+		
+		struct MarqueeInteraction
+		{
+			bool m_dragRectangle{ false };
+			
+			Math::Vector2 m_ndcMin;
+			Math::Vector2 m_ndcMax;
 		};
 		
 		void InitializeGizmoService();
 		void InitializeSceneRenderer();
+		void InitializeMarquee();
 		void SetCameraGizmoViewport();
 		void UpdateCBs(const GameTimer& timer);
 		void RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax);
@@ -91,6 +101,8 @@ namespace Bruno
 		std::shared_ptr<SelectionService> m_selectionService;
 		std::shared_ptr<GizmoService> m_gizmoService;
 		std::unique_ptr<CameraGizmo> m_cameraGizmo;
+		std::unique_ptr<RootSignature> m_marqueeRootSig;
+		std::unique_ptr<GraphicsPipelineState> m_marqueePSO;
 
 		GraphicsDevice* m_device;
 		std::unique_ptr<Surface> m_surface;
@@ -108,8 +120,7 @@ namespace Bruno
 
 		bool m_shiftPressed{ false };
 		bool m_isGizmoing{ false };
-		bool m_dragRectangle{ false };
-
+		MarqueeInteraction m_marqueeInteraction;
 		float m_totalTime{ 0.0f };
 	};
 }

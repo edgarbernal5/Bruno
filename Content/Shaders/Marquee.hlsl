@@ -1,47 +1,52 @@
-// Constant Buffer para el rectángulo
-cbuffer MarqueeCB : register(b0)
+cbuffer MarqueeData : register(b0)
 {
-    float2 RectMin; // Coordenadas en NDC [-1, 1]
-    float2 RectMax; // Coordenadas en NDC [-1, 1]
+    float2 RectMin;
+    float2 RectMax;
     float4 FillColor;
     float4 BorderColor;
-    float BorderThickness; // Porcentaje (ej. 0.02)
-    float padding[3];
+    float BorderThicknessX;
+    float BorderThicknessY;
 };
 
 struct VSOutput
 {
-    float4 Pos : SV_POSITION;
-    float2 UV  : TEXCOORD0;
+    float4 Position : SV_Position;
+    float2 PosNDC : TEXCOORD0; // <--- NUEVO: Guardamos la posición absoluta NDC
 };
 
-// Generamos el quad sin Vertex Buffer (Dibujamos usando un Triangle Strip de 4 vértices)
-VSOutput VSMain(uint vertexID : SV_VertexID)
+VSOutput VS(uint vertexID : SV_VertexID)
 {
     VSOutput output;
     
-    // UVs de las 4 esquinas
-    float2 texCoords[4] = { float2(0,0), float2(1,0), float2(0,1), float2(1,1) };
-    
-    // Posiciones a partir de RectMin y RectMax
-    float2 pos[4] = {
-        RectMin,
-        float2(RectMax.x, RectMin.y),
-        float2(RectMin.x, RectMax.y),
-        RectMax
-    };
+    float2 pos = float2(
+        (vertexID & 1) ? RectMax.x : RectMin.x,
+        (vertexID & 2) ? RectMax.y : RectMin.y
+    );
 
-    output.Pos = float4(pos[vertexID], 0.0f, 1.0f); // Z = 0, W = 1
-    output.UV = texCoords[vertexID];
+    output.Position = float4(pos, 0.0f, 1.0f);
+    output.PosNDC = pos; // <--- Pasamos la coordenada NDC tal cual al Pixel Shader
     
     return output;
 }
 
-float4 PSMain(VSOutput input) : SV_TARGET
+float4 PS(VSOutput input) : SV_TARGET
 {
-    // Lógica para dibujar el borde usando UVs
-    if (input.UV.x < BorderThickness || input.UV.x > 1.0f - BorderThickness ||
-        input.UV.y < BorderThickness || input.UV.y > 1.0f - BorderThickness)
+    // 1. Identificar los límites reales del rectángulo
+    // (min/max protegen el cálculo si el usuario arrastra de derecha a izquierda)
+    float leftEdge   = min(RectMin.x, RectMax.x);
+    float rightEdge  = max(RectMin.x, RectMax.x);
+    float topEdge    = min(RectMin.y, RectMax.y);
+    float bottomEdge = max(RectMin.y, RectMax.y);
+
+    // 2. Calcular la distancia absoluta del píxel actual a los 4 bordes
+    float distLeft   = abs(input.PosNDC.x - leftEdge);
+    float distRight  = abs(input.PosNDC.x - rightEdge);
+    float distTop    = abs(input.PosNDC.y - topEdge);
+    float distBottom = abs(input.PosNDC.y - bottomEdge);
+
+    // 3. Si el píxel está más cerca de CUALQUIER borde que nuestro grosor, es borde.
+    if (distLeft < BorderThicknessX || distRight < BorderThicknessX ||
+        distTop < BorderThicknessY || distBottom < BorderThicknessY)
     {
         return BorderColor;
     }
