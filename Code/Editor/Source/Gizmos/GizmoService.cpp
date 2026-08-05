@@ -337,7 +337,7 @@ namespace Bruno
 
         if (m_currentGizmoType == GizmoType::Rotation)
         {
-            auto cameraViewInverse = m_camera.GetInverseView();
+            auto cameraViewInverse = m_camera.GetViewInverse();
             auto forward = cameraViewInverse.Forward();
             forward.Normalize();
 

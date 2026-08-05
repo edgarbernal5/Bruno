@@ -67,6 +67,9 @@
     <ClCompile Include="Source\Gizmos\CameraGizmo.cpp">
       <Filter>Source\Gizmos</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Panels\Scene\EditorCameraController.cpp">
+      <Filter>Source\Panels\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -177,6 +180,9 @@
       <Filter>Source\Gizmos</Filter>
     </ClInclude>
     <ClInclude Include="Source\Panels\Scene\Components.h">
+      <Filter>Source\Panels\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\Scene\EditorCameraController.h">
       <Filter>Source\Panels\Scene</Filter>
     </ClInclude>
   </ItemGroup>

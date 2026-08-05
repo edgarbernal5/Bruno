@@ -3,6 +3,8 @@
 
 #include <Bruno/Scene/Scene.h>
 #include <Bruno/Scene/Entity.h>
+
+#include "Scene/EditorCameraController.h"
 #include "Scene/SceneDocument.h"
 #include "Scene/SelectionService.h"
 
@@ -40,7 +42,13 @@ namespace Bruno
 			m_selectionService->DeselectAll();
 			m_selectionService->Select(uuids);
 		});
-
+		
+		m_treebox.GetEvents().ItemDblClick.Connect([&](const Berta::ArgTreeBox& args)
+		{
+			auto uuid = args.Item.GetUserData<UUID>();
+			m_sceneDocument->GetCameraController()->FocusOnSelection();
+		});
+		
 		m_hierarchyChangedHandleId = sceneDocument->HierarchyChanged.connect([&](Entity entity, ActionMode actionMode)
 		{
 			switch (actionMode)
@@ -79,6 +87,7 @@ namespace Bruno
 		{
 			Entity entity { entt, scene };
 			const auto* hierarchy = scene->TryGetWith<HierarchyComponent>(entity);
+			
 			// Una entidad es raíz si NO tiene componente de jerarquía, 
 			// o si lo tiene pero su Parent es nulo.
 			bool isRoot = (hierarchy == nullptr) || (hierarchy->Parent == entt::null);

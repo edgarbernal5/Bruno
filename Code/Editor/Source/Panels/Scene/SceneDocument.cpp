@@ -3,6 +3,7 @@
 
 #include <Bruno/Scene/Scene.h>
 
+#include "EditorCameraController.h"
 #include "SelectionService.h"
 #include "Bruno/Renderer/SceneRenderer.h"
 #include "Content/EditorAssetManager.h"
@@ -178,6 +179,8 @@ namespace Bruno
 				});
 			}
 		});
+		
+		m_cameraController = std::make_shared<EditorCameraController>(m_camera, m_scene.get(), m_selectionService.get());
 	}
 
 	void SceneDocument::InitializeSceneRenderer()

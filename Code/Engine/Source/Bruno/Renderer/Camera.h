@@ -10,7 +10,7 @@ namespace Bruno
 		Camera();
 
 		const Math::Matrix& GetView() const;
-		const Math::Matrix& GetInverseView() const;
+		const Math::Matrix& GetViewInverse() const;
 		const Math::Matrix& GetProjection() const;
 		const Math::Matrix& GetViewProjection() const;
 
@@ -21,6 +21,11 @@ namespace Bruno
 		Math::Vector3 GetTarget() const { return m_target; }
 		Math::Vector3 GetUp() const { return m_up; }
 		Math::Viewport GetViewport() const { return m_viewport; }
+		
+		void SetTarget(const Math::Vector3& target);
+
+		void SetPosition(const Math::Vector3& position);
+		
 		void SetViewport(const Math::Viewport& viewport);
 
 		void LookAt(const Math::Vector3& position, const Math::Vector3& target, const Math::Vector3& up);
@@ -30,12 +35,13 @@ namespace Bruno
 
 		void SetView(const Math::Matrix& viewMatrix);
 
-		void SetIsOrthographic(bool isOrthographic, float size) {
+		void SetIsOrthographic(bool isOrthographic, float size)
+		{
 			m_isOrthographic = isOrthographic;
 			m_size = size;
 			m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
-			
 		}
+		
 		//TODO: these methods should be in camera controller (!?).
 		void HandTool(const Math::Int2& mousePosition, const Math::Int2& previousPosition);
 		void Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition);

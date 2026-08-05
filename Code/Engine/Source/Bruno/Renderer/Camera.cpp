@@ -26,7 +26,7 @@ namespace Bruno
 		return m_view;
 	}
 
-	const Math::Matrix& Camera::GetInverseView() const
+	const Math::Matrix& Camera::GetViewInverse() const
 	{
 		if (m_states.ViewDirty)
 		{
@@ -69,58 +69,15 @@ namespace Bruno
 		return m_viewProjection;
 	}
 
-	void Camera::Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
+	void Camera::SetTarget(const Math::Vector3& target)
 	{
-		// 1. Calculamos el delta del mouse
-		Math::Vector2 deltaAngles(2.0f * DirectX::XM_PI / m_viewport.width, DirectX::XM_PI / m_viewport.height);
-		Math::Vector2 mouseVelocity(static_cast<float>(mousePosition.x - previousPosition.x), static_cast<float>(mousePosition.y - previousPosition.y));
-		auto angles = mouseVelocity * deltaAngles;
+		m_target = target;
+		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}
 
-		// EL SECRETO #1: Eje Y Global (World Up) constante.
-		// Esto evita que la cámara se incline hacia los lados (Roll)
-		Math::Vector3 worldUp = Math::Vector3::Up;
-
-		// Vector de dirección que va del Target hacia la Cámara (el radio de la órbita)
-		Math::Vector3 dir = m_position - m_target;
-
-		// 2. YAW (Rotación Horizontal)
-		// Rotamos SIEMPRE alrededor del Eje Y GLOBAL. 
-		auto rotationMatrixYaw = Math::Matrix::CreateFromAxisAngle(worldUp, -angles.x);
-		dir = Math::Vector3::Transform(dir, rotationMatrixYaw);
-
-		// 3. PITCH (Rotación Vertical)
-		// Calculamos el Eje Right (X local) cruzando el World Up con nuestra dirección actual
-		Math::Vector3 right = worldUp.Cross(dir); 
-		right.Normalize();
-
-		// Rotamos la dirección alrededor del eje Right local
-		auto rotationMatrixPitch = Math::Matrix::CreateFromAxisAngle(right, angles.y);
-		Math::Vector3 newDir = Math::Vector3::Transform(dir, rotationMatrixPitch);
-
-		// EL SECRETO #2: Prevenir el "Gimbal Lock" (Pasar por encima del polo)
-		// Normalizamos la nueva dirección temporalmente solo para medir su ángulo
-		Math::Vector3 dirNormalized = newDir;
-		dirNormalized.Normalize();
-    
-		// El Producto Punto nos dirá qué tan paralelos estamos al WorldUp
-		// 1.0f es mirando totalmente arriba, -1.0f es mirando totalmente abajo
-		float dot = dirNormalized.Dot(worldUp);
-    
-		// Si NO estamos demasiado cerca del cenit o el nadir (los polos), aceptamos el Pitch.
-		// 0.99f equivale a unos 8 grados de límite. Evita que la cámara tiemble o se voltee.
-		if (std::abs(dot) < 0.99f)
-		{
-			dir = newDir;
-		}
-
-		// 4. Aplicamos los resultados
-		m_position = m_target + dir;
-    
-		// EL SECRETO #3: Fijar el Up al World Up.
-		// Al pasarle el World Up puro a Math::Matrix::CreateLookAt en GetView(), 
-		// la matriz se encargará matemáticamente de calcular el Up Local perfecto y ortogonal.
-		m_up = worldUp; 
-
+	void Camera::SetPosition(const Math::Vector3& position)
+	{
+		m_position = position;
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}
 
@@ -130,9 +87,71 @@ namespace Bruno
 		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
 	}
 
+	void Camera::LookAt(const Math::Vector3& position, const Math::Vector3& target, const Math::Vector3& up)
+	{
+		Math::Vector3 zAxis = target - position;
+		if (zAxis.LengthSquared() < 0.00001f) return;
+		zAxis.Normalize();
+
+		Math::Vector3 safeUp = up;
+		if (safeUp.LengthSquared() < 0.00001f) safeUp = Math::Vector3(0.0f, 1.0f, 0.0f);
+
+		// Si zAxis (mirada) y safeUp son paralelos (ej. el caso de tu crash de 0,25,0)
+		if (std::abs(zAxis.Dot(safeUp)) > 0.999f)
+		{
+			// Elegimos un up perpendicular de rescate
+			safeUp = (std::abs(zAxis.y) > 0.99f) ? Math::Vector3(0.0f, 0.0f, 1.0f) : Math::Vector3(0.0f, 1.0f, 0.0f);
+		}
+
+		// Reconstruimos la base (Left-Handed)
+		Math::Vector3 xAxis = safeUp.Cross(zAxis);
+		xAxis.Normalize();
+
+		Math::Vector3 yAxis = zAxis.Cross(xAxis);
+		yAxis.Normalize();
+
+		m_position = position;
+		m_target = target;
+		m_up = yAxis; // Guardamos un Up perfecto, garantizado 100% de no ser paralelo a zAxis
+
+		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}
+
+	void Camera::SetLens(float nearPlane, float farPlane)
+	{
+		m_nearPlane = nearPlane;
+		m_farPlane = farPlane;
+		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
+	}
+
+	void Camera::SetLens(float fovY, const Math::Viewport& viewport)
+	{
+		m_fovY = fovY;
+		m_viewport = viewport;
+		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
+	}
+
+	void Camera::SetLens(float fovY, const Math::Viewport& viewport, float nearPlane, float farPlane)
+	{
+		m_fovY = fovY;
+		m_viewport = viewport;
+		m_nearPlane = nearPlane;
+		m_farPlane = farPlane;
+		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
+	}
+
+	void Camera::SetView(const Math::Matrix& viewMatrix)
+	{
+		m_view = viewMatrix;
+
+		m_inverseView = m_view.Invert();
+		m_states.ViewDirty = false;
+		m_states.ViewProjectionDirty = true;
+	}
+
 	void Camera::HandTool(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
 	{
-		Math::Vector2 mouseVelocity((float)(mousePosition.x - previousPosition.x), (float)(mousePosition.y - previousPosition.y));
+		Math::Vector2 mouseVelocity(static_cast<float>(mousePosition.x - previousPosition.x), static_cast<float>(mousePosition.y - previousPosition.y));
 		
 		auto zAxis = m_target - m_position;
 		zAxis.Normalize();
@@ -147,6 +166,60 @@ namespace Bruno
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}
 
+	void Camera::Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
+	{
+		Math::Vector2 deltaAngles(2.0f * DirectX::XM_PI / m_viewport.width, DirectX::XM_PI / m_viewport.height);
+		Math::Vector2 mouseVelocity((float)(mousePosition.x - previousPosition.x), (float)(mousePosition.y - previousPosition.y));
+		auto angles = mouseVelocity * deltaAngles;
+
+		Math::Vector3 worldUp = Math::Vector3(0.0f, 1.0f, 0.0f);
+		Math::Vector3 forward = m_target - m_position;
+		float distance = forward.Length();
+
+		if (distance < 0.0001f) return;
+		forward /= distance;
+
+		// 1. Calcular Right
+		Math::Vector3 right = worldUp.Cross(forward);
+    
+		// Si la cámara mira recto abajo/arriba
+		if (right.LengthSquared() < 0.00001f)
+		{
+			right = m_up.Cross(forward);
+			if (right.LengthSquared() < 0.00001f) 
+				right = Math::Vector3(1.0f, 0.0f, 0.0f);
+		}
+		right.Normalize();
+
+		// 2. YAW 
+		auto rotationMatrixYaw = Math::Matrix::CreateFromAxisAngle(worldUp, -angles.x);
+		forward = Math::Vector3::Transform(forward, rotationMatrixYaw);
+		right = Math::Vector3::Transform(right, rotationMatrixYaw);
+
+		// 3. PITCH
+		auto rotationMatrixPitch = Math::Matrix::CreateFromAxisAngle(right, angles.y);
+		Math::Vector3 newForward = Math::Vector3::Transform(forward, rotationMatrixPitch);
+
+		// 4. PREVENCIÓN DE GIMBAL LOCK ¡CON ESCAPE AUTOMÁTICO!
+		float currentDot = forward.Dot(worldUp);
+		float newDot = newForward.Dot(worldUp);
+
+		// Permitimos la rotación si:
+		// a) Estamos en una zona segura (ej. < 0.99f, a unos 8 grados de los polos)
+		// b) O si la rotación nos está ALEJANDO del polo (|newDot| < |currentDot|)
+		if (std::abs(newDot) < 0.99f || std::abs(newDot) < std::abs(currentDot))
+		{
+			forward = newForward;
+		}
+
+		// 5. Aplicar Estado
+		m_up = forward.Cross(right);
+		m_up.Normalize();
+
+		m_position = m_target - (forward * distance);
+		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}
+	
 	void Camera::PitchYaw(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
 	{
 		Math::Vector2 deltaAngles(2.0f * DirectX::XM_PI / m_viewport.width, DirectX::XM_PI / m_viewport.height);
@@ -181,6 +254,21 @@ namespace Bruno
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}
 
+	void Camera::Zoom(float delta)
+	{
+		auto zAxis = m_target - m_position;
+		zAxis.Normalize();
+		auto newPosition = m_position + zAxis * delta;
+
+		if (Math::Vector3::DistanceSquared(newPosition, m_target) < 0.25f)
+		{
+			return;
+		}
+
+		m_position = newPosition;
+		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}
+
 	void Camera::Strafe(float delta)
 	{
 		auto zAxis = m_target - m_position;
@@ -204,72 +292,5 @@ namespace Bruno
 		m_target += zAxis * delta;
 
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
-	}
-
-	void Camera::Zoom(float delta)
-	{
-		auto zAxis = m_target - m_position;
-		zAxis.Normalize();
-		auto newPosition = m_position + zAxis * delta;
-
-		if (Math::Vector3::DistanceSquared(newPosition, m_target) < 0.25f)
-			return;
-
-		m_position = newPosition;
-		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
-	}
-
-	void Camera::LookAt(const Math::Vector3& position, const Math::Vector3& target, const Math::Vector3& up)
-	{
-		auto direction = target - position;
-		auto zAxis = direction;
-		zAxis.Normalize();
-		
-		auto xAxis = up.Cross(zAxis);
-		xAxis.Normalize();
-
-		auto yAxis = zAxis.Cross(xAxis);
-		yAxis.Normalize();
-
-		xAxis = yAxis.Cross(zAxis);
-		xAxis.Normalize();
-
-		m_position = position;
-		m_target = target;
-		m_up = yAxis;
-
-		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
-	}
-	
-	void Camera::SetLens(float fovY, const Math::Viewport& viewport, float nearPlane, float farPlane)
-	{
-		m_fovY = fovY;
-		m_viewport = viewport;
-		m_nearPlane = nearPlane;
-		m_farPlane = farPlane;
-		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
-	}
-
-	void Camera::SetView(const Math::Matrix& viewMatrix)
-	{
-		m_view = viewMatrix;
-
-		m_inverseView = m_view.Invert();
-		m_states.ViewDirty = false;
-		m_states.ViewProjectionDirty = true;
-	}
-
-	void Camera::SetLens(float nearPlane, float farPlane)
-	{
-		m_nearPlane = nearPlane;
-		m_farPlane = farPlane;
-		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
-	}
-
-	void Camera::SetLens(float fovY, const Math::Viewport& viewport)
-	{
-		m_fovY = fovY;
-		m_viewport = viewport;
-		m_states.ProjectionDirty = m_states.ViewProjectionDirty = true;
 	}
 }

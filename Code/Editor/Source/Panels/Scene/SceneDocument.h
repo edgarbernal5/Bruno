@@ -16,6 +16,7 @@ namespace Bruno
 	class SelectionService;
 	class EditorAssetManager;
 	class GizmoService;
+	class EditorCameraController;
 
 	enum class ActionMode
 	{
@@ -38,6 +39,7 @@ namespace Bruno
 		std::shared_ptr<SelectionService> GetSelectionService() { return m_selectionService; }
 		EditorAssetManager* GetAssetManager() const { return m_assetManager; }
 		SceneRenderer* GetSceneRenderer() const { return m_sceneRenderer.get(); }
+		EditorCameraController* GetCameraController() const { return m_cameraController.get(); }
 		
 		void UpdateSelection();
 
@@ -55,6 +57,7 @@ namespace Bruno
 
 		std::shared_ptr<SelectionService> m_selectionService;
 		std::shared_ptr<GizmoService> m_gizmoService;
+		std::shared_ptr<EditorCameraController> m_cameraController;
 
 		EventHandlerId m_selectionChangedHandleId{ 0 };
 	};

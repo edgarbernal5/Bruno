@@ -22,6 +22,7 @@
 #include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
 #include "Gizmos/CameraGizmo.h"
+#include "Scene/EditorCameraController.h"
 
 namespace Bruno
 {
@@ -452,6 +453,10 @@ namespace Bruno
 			{
 				m_sceneDocument->GetCamera().Walk(-0.25f);
 			}
+			else if (args.Key == 'F')
+			{
+				m_sceneDocument->GetCameraController()->FocusOnSelection();
+			}
 		});
 
 		m_gizmoTypeCombobox.GetEvents().Selected.Connect([this](const Berta::ArgComboBox& acmb) mutable
@@ -476,6 +481,8 @@ namespace Bruno
 		m_form->Show();
 		m_timer.Reset();
 		m_isVisible = true;
+		
+		m_form->Focus();
 	}
 
 	ScenePanel::~ScenePanel()
@@ -639,4 +646,5 @@ namespace Bruno
 		context.SetConstantBuffer(0, alloc.GPUAddress);
 		context.DrawInstanced(4, 1, 0, 0);
 	}
+
 }
