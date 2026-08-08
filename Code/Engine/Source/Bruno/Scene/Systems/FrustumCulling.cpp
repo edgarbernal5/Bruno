@@ -1,7 +1,7 @@
 ﻿#include "brpch.h"
 #include "FrustumCulling.h"
 
-#include "Bruno/Platform/DirectX/VertexTypes.h"
+#include "Bruno/Core/JobSystem.h"
 #include "Bruno/Renderer/Camera.h"
 #include "Bruno/Scene/Components.h"
 #include "Bruno/Scene/Scene.h"
@@ -19,34 +19,75 @@ namespace Bruno
         // Calcular ViewProjection y extraer los 6 planos universales
         DirectX::XMVECTOR frustumPlanes[6];
         ExtractFrustumPlanes(frustumPlanes);
-		
-        m_visibleEntities.clear();
         
-        auto entitiesCull = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent, BoundingBoxComponent>();
-        for (auto& entt : entitiesCull)
+        // Obtener todas las entidades con los componentes necesarios
+        auto entitiesGroup = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent, BoundingBoxComponent>();
+        std::vector<entt::entity> entitiesToCull(entitiesGroup.begin(), entitiesGroup.end());
+        const size_t totalEntities = entitiesToCull.size();
+        
+        // Definir el tamaño del chunk (ej. 1024 entidades por Hilo)
+        const size_t chunkSize = 1024;
+        const size_t numChunks = (totalEntities + chunkSize - 1) / chunkSize;
+        
+        // Vector de vectores para guardar resultados SIN mutexes
+        std::vector<std::vector<entt::entity>> threadLocalVisible(numChunks);
+        
+        for (size_t chunkIdx = 0; chunkIdx < numChunks; ++chunkIdx)
         {
-            const auto& [transform, modelComponent, bbox] = entitiesCull.get<TransformComponent, ModelComponent, BoundingBoxComponent>(entt);
-			
-            DirectX::BoundingOrientedBox localObb;
-            localObb.Center = DirectX::XMFLOAT3(bbox.Center.x, bbox.Center.y, bbox.Center.z);
-            localObb.Extents = DirectX::XMFLOAT3(bbox.Extents.x, bbox.Extents.y, bbox.Extents.z);
-            localObb.Orientation = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+            JobSystem::Get().Execute([&, chunkIdx]()
+            {
+                size_t startIdx = chunkIdx * chunkSize;
+                size_t endIdx = std::min<size_t>(startIdx + chunkSize, totalEntities);
+                
+                // Reservamos memoria aproximada para evitar allocations
+                threadLocalVisible[chunkIdx].reserve(chunkSize / 2);
+                
+                for (size_t i = startIdx; i < endIdx; ++i)
+                {
+                    entt::entity entt = entitiesToCull[i];
+                    const auto& [transform, modelComponent, bbox] = entitiesGroup.get<TransformComponent, ModelComponent, BoundingBoxComponent>(entt);
+                    
+                    DirectX::BoundingOrientedBox localObb;
+                    localObb.Center = DirectX::XMFLOAT3(bbox.Center.x, bbox.Center.y, bbox.Center.z);
+                    localObb.Extents = DirectX::XMFLOAT3(bbox.Extents.x, bbox.Extents.y, bbox.Extents.z);
+                    localObb.Orientation = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
-            Math::Matrix worldMat = transform.WorldTransform;
-            const DirectX::XMFLOAT4X4* worldMatFloat = reinterpret_cast<const DirectX::XMFLOAT4X4*>(&worldMat);
-            DirectX::XMMATRIX xmWorld = DirectX::XMLoadFloat4x4(worldMatFloat);
+                    Math::Matrix worldMat = transform.WorldTransform;
+                    const DirectX::XMFLOAT4X4* worldMatFloat = reinterpret_cast<const DirectX::XMFLOAT4X4*>(&worldMat);
+                    DirectX::XMMATRIX xmWorld = DirectX::XMLoadFloat4x4(worldMatFloat);
             
-            DirectX::BoundingOrientedBox worldObb;
-            localObb.Transform(worldObb, xmWorld);
+                    DirectX::BoundingOrientedBox worldObb;
+                    localObb.Transform(worldObb, xmWorld);
+                    
+                    // Usamos la función nativa ContainedBy contra nuestros planos perfectos
+                    // Orden: Near, Far, Right, Left, Top, Bottom
+                    DirectX::ContainmentType result = worldObb.ContainedBy(
+                        frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], 
+                        frustumPlanes[3], frustumPlanes[4], frustumPlanes[5]
+                    );
 
-            // Usamos la función nativa ContainedBy contra nuestros planos perfectos
-            // Orden: Near, Far, Right, Left, Top, Bottom
-            DirectX::ContainmentType result = worldObb.ContainedBy(
-                frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], 
-                frustumPlanes[3], frustumPlanes[4], frustumPlanes[5]
-            );
-
-            if (result != DirectX::DISJOINT)
+                    if (result != DirectX::DISJOINT)
+                    {
+                        threadLocalVisible[chunkIdx].emplace_back(entt);
+                    }
+                }
+            });
+        }
+        
+        JobSystem::Get().Wait();
+        
+        m_visibleEntities.clear();
+        // Reduce: Unificamos los resultados de manera contigua
+        size_t totalVisibleCount = 0;
+        for (const auto& localList : threadLocalVisible)
+        {
+            totalVisibleCount += localList.size();
+        }
+    
+        m_visibleEntities.reserve(totalVisibleCount);
+        for (const auto& localList : threadLocalVisible)
+        {
+            for (const auto& entt : localList)
             {
                 m_visibleEntities.emplace_back(entt, m_scene.get());
             }

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <Bruno/Platform/DirectX/Surface.h>
 
+#include "Bruno/Core/JobSystem.h"
 #include "Bruno/Platform/DirectX/CommandQueueManager.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 
@@ -38,6 +39,7 @@ namespace Bruno
 #endif
 
 		ContentTypeReaderManager::Shutdown();
+		JobSystem::Get().Shutdown();
 	}
 
 	void Game::OnInitialize()
@@ -60,6 +62,7 @@ namespace Bruno
 		ContentTypeReaderManager::Initialize();
 		SurfaceWindowParameters surfaceParameters;
 
+		JobSystem::Get().Initialize();
 		//m_shaderCache.Initialize();
 		//m_psoCache.Initialize(surfaceParameters.BackBufferFormat, surfaceParameters.DepthBufferFormat);
 	}

@@ -23,6 +23,11 @@ namespace Bruno
         // Esperar a que todo termine (Sincronización en el Main Thread)
         void Wait();
         
+        static JobSystem& Get()
+        {
+            static JobSystem instance;
+            return instance;
+        }
     private:
         std::vector<std::thread> m_workers;
         std::queue<std::function<void()>> m_jobQueue;
@@ -33,7 +38,4 @@ namespace Bruno
         std::atomic<bool> m_stop{ false };
         std::atomic<uint32_t> m_activeJobs{ 0 };
     };
-
-    // Singleton o instancia global para fácil acceso
-    extern JobSystem g_JobSystem;
 }

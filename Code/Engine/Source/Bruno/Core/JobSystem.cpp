@@ -7,8 +7,11 @@ namespace Bruno
     {
         // Obtenemos los cores reales del procesador (dejamos 1 para el Main Thread / OS)
         uint32_t numThreads = std::thread::hardware_concurrency() - 1;
-        if (numThreads == 0) numThreads = 1;
-
+        if (numThreads == 0)
+        {
+            numThreads = 1;
+        }
+        
         for (uint32_t i = 0; i < numThreads; ++i)
         {
             m_workers.emplace_back([this]()
