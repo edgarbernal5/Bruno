@@ -147,8 +147,8 @@ namespace Bruno
 
 		auto scene = std::make_shared<Scene>();
 		auto sceneDocument = std::make_shared<SceneDocument>(scene, GetEditorAssetManager());
-		//auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
-		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\sponza\\sponza.obj").Handle);
+		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
+		//auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\sponza\\sponza.obj").Handle);
 		sceneDocument->InstantiateModel(model);
 		
 		m_sceneDocumentPanel = std::make_unique<SceneDocumentPanel>(form, this, sceneDocument);

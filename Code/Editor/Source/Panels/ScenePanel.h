@@ -17,6 +17,7 @@
 
 namespace Bruno
 {
+	class DebugRenderer;
 	class LinearAllocator;
 	class Model;
 	class Surface;
@@ -103,6 +104,7 @@ namespace Bruno
 		std::unique_ptr<CameraGizmo> m_cameraGizmo;
 		std::unique_ptr<RootSignature> m_marqueeRootSig;
 		std::unique_ptr<GraphicsPipelineState> m_marqueePSO;
+		std::unique_ptr<DebugRenderer> m_debugRenderer;
 
 		GraphicsDevice* m_device;
 		std::unique_ptr<Surface> m_surface;

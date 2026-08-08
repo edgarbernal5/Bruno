@@ -185,6 +185,7 @@
     <ClInclude Include="Source\Bruno\Scene\Entity.h" />
     <ClInclude Include="Source\Bruno\Scene\Entity.inl" />
     <ClInclude Include="Source\Bruno\Scene\Scene.h" />
+    <ClInclude Include="Source\Bruno\Scene\Systems\FrustumCulling.h" />
     <ClInclude Include="Source\Bruno\Scene\Systems\HierarchySystem.h" />
     <ClInclude Include="Source\Bruno\Scene\Systems\TransformSystem.h" />
   </ItemGroup>
@@ -258,6 +259,7 @@
     <ClCompile Include="Source\Bruno\Renderer\ShaderCache.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Entity.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Scene.cpp" />
+    <ClCompile Include="Source\Bruno\Scene\Systems\FrustumCulling.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Systems\HierarchySystem.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Systems\TransformSystem.cpp" />
   </ItemGroup>

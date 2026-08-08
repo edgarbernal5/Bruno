@@ -50,6 +50,7 @@ namespace Bruno
 		void Strafe(float delta);
 		void Walk(float delta);
 
+		DirectX::BoundingFrustum GetWorldSpaceFrustum() const;
 	private:
 		Math::Vector3 m_position;
 		Math::Vector3 m_target;

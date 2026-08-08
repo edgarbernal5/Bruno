@@ -1,6 +1,7 @@
 #include "brpch.h"
 #include "SceneRenderer.h"
 
+#include "PrimitiveBatch.h"
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Renderer/RenderItem.h"
 #include "Bruno/Renderer/Material.h"
@@ -14,11 +15,13 @@
 #include "Bruno/Core/Memory.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
 #include "Bruno/Renderer/Camera.h"
+#include "Bruno/Scene/Systems/FrustumCulling.h"
 
 namespace Bruno
 {
-	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager) :
+	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<FrustumCulling> frustumCulling, AbstractAssetManager* assetManager) :
 		m_scene(scene),
+		m_frustumCulling(frustumCulling),
 		m_assetManager(assetManager)
 	{
 		auto& device = Bruno::Graphics::GetDevice();
@@ -140,14 +143,16 @@ namespace Bruno
 	void SceneRenderer::OnRender(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
 	{
 		VertexBuffer* currentVB = nullptr;
+		m_frustumCulling->Update();
 		
-		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent, CBVComponent>();
-		for (auto& ent : entities)
+		auto& visibleEntities = m_frustumCulling->GetVisibleEntities();
+		for (Entity entity : visibleEntities)
 		{
-			const auto& [modelComponent, cbv] = entities.get<ModelComponent, CBVComponent>(ent);
+			const auto& modelComponent = entity.GetComponent<ModelComponent>();
+			const auto& cbv = entity.GetComponent<CBVComponent>();
+			
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 
-			Entity entity{ ent, m_scene.get() };
 			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto& meshes = model->GetMeshes();
 			auto& mesh = meshes[meshIndex];
@@ -201,4 +206,5 @@ namespace Bruno
 			}
 		}
 	}
+
 }

@@ -12,6 +12,7 @@
 #include "Bruno/Renderer/PrimitiveBatch.h"
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
 #include "Bruno/Platform/DirectX/Shader.h"
+#include "Bruno/Scene/Systems/FrustumCulling.h"
 
 namespace Bruno
 {
@@ -217,7 +218,8 @@ namespace Bruno
 
 		//m_scene->InstantiateModel(model);
 
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_assetManager.get());
+		m_frustumCulling = std::make_shared<FrustumCulling>(m_camera, m_scene);
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_frustumCulling, m_assetManager.get());
 	}
 
 	void PlayerGame::InitializeSurface()

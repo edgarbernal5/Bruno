@@ -7,12 +7,12 @@ namespace Bruno
     {
         // Alojar suficiente espacio para unos 65,000 vértices (aprox 1.5 MB)
         // Así nunca se disparará el if de redimensionamiento.
-        size_t initialVertexCapacity = 65536 * sizeof(GizmoVertex);
+        size_t initialVertexCapacity = 65536 * sizeof(PrimitiveVertex);
         size_t initialIndexCapacity = 65536 * sizeof(uint32_t);
         
         for (int i = 0; i < 2; ++i)
         {
-            m_vertexBuffer[i] = std::make_unique<VertexBuffer>(*device, initialVertexCapacity, sizeof(GizmoVertex), true);
+            m_vertexBuffer[i] = std::make_unique<VertexBuffer>(*device, initialVertexCapacity, sizeof(PrimitiveVertex), true);
             m_indexBuffer[i] = std::make_unique<IndexBuffer>(*device, initialIndexCapacity, true);
         }
     }
@@ -28,7 +28,7 @@ namespace Bruno
     // Helper privado para insertar un vértice transformado y retornar su índice
     uint32_t PrimitiveBatch::AddVertex(const Math::Vector3& localPos, const Math::Matrix& transform, const Math::Color& color)
     {
-        GizmoVertex v;
+        PrimitiveVertex v;
         v.Position = Math::Vector3::Transform(localPos, transform);
         v.Color = color;
     
@@ -260,6 +260,34 @@ namespace Bruno
         }
     }
 
+    void PrimitiveBatch::DrawFrustum(const DirectX::BoundingFrustum& frustum, const Math::Color& color)
+    {
+        // DirectXMath llenará este arreglo con las 8 esquinas del frustum
+        Math::Vector3 corners[8];
+        frustum.GetCorners(corners);
+
+        // --- Plano Near (Cercano a la cámara) ---
+        // (Vértices 0, 1, 2, 3)
+        DrawLine(corners[0], corners[1], color); // Arriba
+        DrawLine(corners[1], corners[2], color); // Derecha
+        DrawLine(corners[2], corners[3], color); // Abajo
+        DrawLine(corners[3], corners[0], color); // Izquierda
+
+        // --- Plano Far (Lejano a la cámara) ---
+        // (Vértices 4, 5, 6, 7)
+        DrawLine(corners[4], corners[5], color); // Arriba
+        DrawLine(corners[5], corners[6], color); // Derecha
+        DrawLine(corners[6], corners[7], color); // Abajo
+        DrawLine(corners[7], corners[4], color); // Izquierda
+
+        // --- Líneas conectores (Los lados de la pirámide truncada) ---
+        // Conectan el plano Near con el plano Far
+        DrawLine(corners[0], corners[4], color); // Top Left
+        DrawLine(corners[1], corners[5], color); // Top Right
+        DrawLine(corners[2], corners[6], color); // Bottom Right
+        DrawLine(corners[3], corners[7], color); // Bottom Left
+    }
+
     void PrimitiveBatch::DrawCylinder(const Math::Matrix& transform, float height, float radius, int slices, const Math::Color& color)
     {
         float halfHeight = height * 0.5f;
@@ -335,55 +363,63 @@ namespace Bruno
     
     void PrimitiveBatch::DrawLine(const Math::Vector3& start, const Math::Vector3& end, const Math::Color& color)
     {
-        // Calculamos la dirección y longitud
-        Math::Vector3 dir = end - start;
-        float length = dir.Length();
-        if (length < 0.0001f)
-        {
-            return;
-        }
-        
-        dir.Normalize();
-
-        // Creamos una matriz que apunte hacia esa dirección y la escalamos
-        // Utilizamos CreateLookAt o utilidades similares de math.
-        // En DXMath: XMMatrixLookToLH o crear un quaternion desde un vector UP hacia 'dir'.
-        Math::Matrix lineTransform = Math::Matrix::CreateWorld(start, dir, Math::Vector3::Up);
-    
-        // Convertimos la línea en un rectángulo muy fino (Grosor: 0.02f)
-        // Desplazamos el centro porque DrawBox lo centra, pero queremos que inicie en 'start'
-        Math::Matrix offset = Math::Matrix::CreateTranslation(0, 0, length * 0.5f); 
-    
-        // Escala no uniforme: Ancho(X), Alto(Y), Largo(Z)
-        Math::Matrix scale = Math::Matrix::CreateScale(0.02f, 0.02f, length);
-    
-        DrawBox(scale * offset * lineTransform, 1.0f, color);
+        // Asumiendo que tu batch guarda los vértices en un std::vector interno
+        // y tu Vertex struct tiene Posición y Color
+        m_vertices.push_back({ start, color });
+        m_vertices.push_back({ end, color });
     }
-    
+
+    void PrimitiveBatch::DrawWireBox(const DirectX::BoundingOrientedBox& obb, const Math::Vector4& color)
+    {
+        Math::Vector3 corners[8];
+        obb.GetCorners(corners);
+
+        // Base de la caja (Bottom)
+        DrawLine(corners[0], corners[1], color);
+        DrawLine(corners[1], corners[2], color);
+        DrawLine(corners[2], corners[3], color);
+        DrawLine(corners[3], corners[0], color);
+
+        // Tapa de la caja (Top)
+        DrawLine(corners[4], corners[5], color);
+        DrawLine(corners[5], corners[6], color);
+        DrawLine(corners[6], corners[7], color);
+        DrawLine(corners[7], corners[4], color);
+
+        // Pilares (Conectando base con tapa)
+        DrawLine(corners[0], corners[4], color);
+        DrawLine(corners[1], corners[5], color);
+        DrawLine(corners[2], corners[6], color);
+        DrawLine(corners[3], corners[7], color);
+    }
+
     void PrimitiveBatch::End(uint32_t frameIndex)
     {
-        if (m_vertices.empty() || m_indices.empty())
+        // Solo abortamos si NO hay vértices. ¡Los índices ahora son opcionales!
+        if (m_vertices.empty())
         {
             return;
         }
-        
-        size_t vertexBufferSize = m_vertices.size() * sizeof(GizmoVertex);
-        size_t indexBufferSize = m_indices.size() * sizeof(uint32_t);
+    
+        size_t vertexBufferSize = m_vertices.size() * sizeof(PrimitiveVertex);
 
-        // 1. Validar y re-alojar Vertex Buffer si no existe o se quedó chico
+        // 1. Validar, re-alojar y subir Vertex Buffer
         if (!m_vertexBuffer || m_vertexBuffer[frameIndex]->GetView().SizeInBytes < vertexBufferSize)
         {
             throw std::runtime_error("Fallo al subir datos del Vertex Buffer.");
         }
-
-        // 2. Validar y re-alojar Index Buffer
-        if (!m_indexBuffer || m_indexBuffer[frameIndex]->GetView().SizeInBytes < indexBufferSize)
-        {
-            throw std::runtime_error("Fallo al subir datos del Index Buffer.");
-        }
-
-        // 3. Subir a GPU instántaneamente (Map -> memcpy -> Unmap interno)
         m_vertexBuffer[frameIndex]->Update(m_vertices.data(), vertexBufferSize);
-        m_indexBuffer[frameIndex]->Update(m_indices.data(), indexBufferSize);
+
+        // 2. Procesar el Index Buffer SOLO si realmente usamos índices en este batch
+        if (!m_indices.empty())
+        {
+            size_t indexBufferSize = m_indices.size() * sizeof(uint32_t);
+        
+            if (!m_indexBuffer || m_indexBuffer[frameIndex]->GetView().SizeInBytes < indexBufferSize)
+            {
+                throw std::runtime_error("Fallo al subir datos del Index Buffer.");
+            }
+            m_indexBuffer[frameIndex]->Update(m_indices.data(), indexBufferSize);
+        }
     }
 }

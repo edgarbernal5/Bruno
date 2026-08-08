@@ -6,6 +6,7 @@
 
 namespace Bruno
 {
+	class FrustumCulling;
 	class GraphicsContext;
 	class Scene;
 	class Shader;
@@ -15,7 +16,7 @@ namespace Bruno
 	class SceneRenderer
 	{
 	public:
-		SceneRenderer(std::shared_ptr<Scene> scene, AbstractAssetManager* assetManager);
+		SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<FrustumCulling> frustumCulling, AbstractAssetManager* assetManager);
 
 		// Se llama cuando cargas una escena o agregas un objeto
 		void InitEntitiesForRender();
@@ -24,7 +25,9 @@ namespace Bruno
 		void OnRender(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
 		
 	private:
+		
 		std::shared_ptr<Scene> m_scene;
+		std::shared_ptr<FrustumCulling> m_frustumCulling;
 		AbstractAssetManager* m_assetManager;
 
 		std::shared_ptr<RootSignature> m_opaqueRootSignature;

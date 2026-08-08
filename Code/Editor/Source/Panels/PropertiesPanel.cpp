@@ -294,12 +294,11 @@ namespace Bruno
 		
 		if (selectedEntity && selectedEntity == entity)
 		{
-			if (!m_isDirty) // Solo encolamos la actualización UNA vez por frame
+			if (!m_isDirty)
 			{
 				m_isDirty = true;
 				Berta::Dispatcher::Get().Enqueue([this]() 
 				{
-					// Este código se ejecutará de forma segura en la fase de "Idle"
 					m_propertyGrid.RefreshAll();
 					m_isDirty = false;
 				});

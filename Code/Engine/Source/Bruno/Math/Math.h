@@ -11,6 +11,7 @@ namespace Bruno::Math
     using BoundingBox = DirectX::BoundingBox;
     using BoundingOrientedBox = DirectX::BoundingOrientedBox;
     using BoundingSphere = DirectX::BoundingSphere;
+    using BoundingFrustum = DirectX::BoundingFrustum;
 
     using Vector2 = DirectX::SimpleMath::Vector2;
     using Vector3 = DirectX::SimpleMath::Vector3;

@@ -125,10 +125,8 @@ namespace Bruno
 			return;
 		}
 		
-		// 1. Precalculamos la matriz combinada View * Projection
 		Math::Matrix viewProj = camera.GetViewProjection();
 
-		// 2. Obtenemos todas las entidades candidatas
 		auto entities = m_scene->GetAllEntitiesWith<IdComponent, TransformComponent, BoundingBoxComponent>();
 
 		for (auto ent : entities)
@@ -136,16 +134,14 @@ namespace Bruno
 			Entity entity = { ent, m_scene.get() };
 			auto [idComponent, transformComponent, bboxComponent] = entities.get<IdComponent, TransformComponent, BoundingBoxComponent>(ent);
 
-			// 3. Generamos el OBB de la entidad en Espacio de Mundo
 			Math::BoundingBox localAABB(bboxComponent.Center, bboxComponent.Extents);
 			Math::BoundingOrientedBox obb;
 			Math::BoundingOrientedBox::CreateFromBoundingBox(obb, localAABB);
 			obb.Transform(obb, transformComponent.WorldTransform);
 
-			// 4. Obtenemos el centro de la entidad en el Espacio de Mundo
 			Math::Vector3 worldCenter = obb.Center;
 			
-			// 5. Proyectamos el centro de la entidad al Espacio Clip / NDC (-1 a 1)
+			// Proyectamos el centro de la entidad al Espacio Clip / NDC (-1 a 1)
 			Math::Vector3 clipFloat3 = Math::Vector3::Transform(worldCenter, viewProj);
 
 			// Validamos que el objeto esté frente a la cámara (Z en NDC para DirectX típicamente está entre 0 y 1 o -1 y 1 según el reverse-z)
@@ -252,23 +248,16 @@ namespace Bruno
 		// Nota: en EnTT es mejor iterar 'ent' por valor, no por referencia (auto&), ya que es solo un entero.
 		for (auto ent : entities)
 		{
-			Entity entity = { ent, m_scene.get() };
-        
-			// Extraemos la data contigua directamente
-			auto [idComponent, transformComponent, bboxComponent] = entities.get<IdComponent, TransformComponent, BoundingBoxComponent>(ent);
+			const auto& [idComponent, transformComponent, bboxComponent] = entities.get<IdComponent, TransformComponent, BoundingBoxComponent>(ent);
 
 			const Math::Matrix& transform = transformComponent.WorldTransform;
 
-			// 2. Recreamos la caja delimitadora en espacio local
-			// Asumo que tienes un constructor o inicializador para tu wrapper de BoundingBox
 			Math::BoundingBox localAABB(bboxComponent.Center, bboxComponent.Extents);
 
-			// 3. MEJORA AAA: Transformamos a un OBB (Oriented Bounding Box)
 			Math::BoundingOrientedBox obb;
 			Math::BoundingOrientedBox::CreateFromBoundingBox(obb, localAABB);
 			obb.Transform(obb, transform);
 
-			// 4. Test de intersección
 			float distance;
 			if (ray.Intersects(obb, distance) && distance <= maxDistance)
 			{
@@ -276,7 +265,7 @@ namespace Bruno
 				{
 					closestDistance = distance;
 					closestId = idComponent.Id;
-					closestEntity = entity;
+					closestEntity = { ent, m_scene.get() };
 				}
 			}
 		}

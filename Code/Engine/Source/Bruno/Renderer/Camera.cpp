@@ -90,13 +90,16 @@ namespace Bruno
 	void Camera::LookAt(const Math::Vector3& position, const Math::Vector3& target, const Math::Vector3& up)
 	{
 		Math::Vector3 zAxis = target - position;
-		if (zAxis.LengthSquared() < 0.00001f) return;
+		if (zAxis.LengthSquared() < 0.00001f)
+		{
+			return;
+		}
 		zAxis.Normalize();
 
 		Math::Vector3 safeUp = up;
 		if (safeUp.LengthSquared() < 0.00001f) safeUp = Math::Vector3(0.0f, 1.0f, 0.0f);
 
-		// Si zAxis (mirada) y safeUp son paralelos (ej. el caso de tu crash de 0,25,0)
+		// Si zAxis (mirada) y safeUp son paralelos
 		if (std::abs(zAxis.Dot(safeUp)) > 0.999f)
 		{
 			// Elegimos un up perpendicular de rescate
@@ -169,14 +172,17 @@ namespace Bruno
 	void Camera::Rotate(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
 	{
 		Math::Vector2 deltaAngles(2.0f * DirectX::XM_PI / m_viewport.width, DirectX::XM_PI / m_viewport.height);
-		Math::Vector2 mouseVelocity((float)(mousePosition.x - previousPosition.x), (float)(mousePosition.y - previousPosition.y));
+		Math::Vector2 mouseVelocity(static_cast<float>(mousePosition.x - previousPosition.x), static_cast<float>(mousePosition.y - previousPosition.y));
 		auto angles = mouseVelocity * deltaAngles;
 
 		Math::Vector3 worldUp = Math::Vector3(0.0f, 1.0f, 0.0f);
 		Math::Vector3 forward = m_target - m_position;
 		float distance = forward.Length();
 
-		if (distance < 0.0001f) return;
+		if (distance < 0.0001f)
+		{
+			return;
+		}
 		forward /= distance;
 
 		// 1. Calcular Right
@@ -223,7 +229,7 @@ namespace Bruno
 	void Camera::PitchYaw(const Math::Int2& mousePosition, const Math::Int2& previousPosition)
 	{
 		Math::Vector2 deltaAngles(2.0f * DirectX::XM_PI / m_viewport.width, DirectX::XM_PI / m_viewport.height);
-		Math::Vector2 mouseVelocity((float)(mousePosition.x - previousPosition.x), (float)(mousePosition.y - previousPosition.y));
+		Math::Vector2 mouseVelocity(static_cast<float>(mousePosition.x - previousPosition.x), static_cast<float>(mousePosition.y - previousPosition.y));
 		auto angles = mouseVelocity * deltaAngles;
 		
 		auto zAxis = m_target - m_position;
@@ -292,5 +298,40 @@ namespace Bruno
 		m_target += zAxis * delta;
 
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
+	}
+
+	DirectX::BoundingFrustum Camera::GetWorldSpaceFrustum() const
+	{
+		DirectX::BoundingFrustum frustum;
+    
+		// 1. Carga segura de la Proyección (Evita corrupción de memoria/SIMD)
+		// Casteamos tu matriz a XMFLOAT4X4 para que DirectXMath la asimile correctamente
+		const DirectX::XMFLOAT4X4* projFloat = reinterpret_cast<const DirectX::XMFLOAT4X4*>(&GetProjection());
+		DirectX::XMMATRIX xmProjection = DirectX::XMLoadFloat4x4(projFloat);
+    
+		// Crear el frustum en espacio local
+		DirectX::BoundingFrustum::CreateFromMatrix(frustum, xmProjection);
+
+		// 2. Carga segura de la Matriz de Vista Inversa
+		// ¡TRUCO!: Es más seguro invertir la matriz usando tu propia librería de Math
+		// antes de pasarla a DirectXMath. Si tu clase Matrix tiene un método .Invert(), úsalo:
+		Math::Matrix viewInverse = GetView().Invert(); 
+    
+		// Si tu Math::Matrix NO tiene Invert(), usa este bloque en su lugar:
+		/*
+		const DirectX::XMFLOAT4X4* viewFloat = reinterpret_cast<const DirectX::XMFLOAT4X4*>(&view);
+		DirectX::XMMATRIX xmView = DirectX::XMLoadFloat4x4(viewFloat);
+		DirectX::XMVECTOR det;
+		DirectX::XMMATRIX xmViewInverse = DirectX::XMMatrixInverse(&det, xmView);
+		*/
+
+		// Cargar la matriz inversa segura a XMMATRIX
+		const DirectX::XMFLOAT4X4* viewInvFloat = reinterpret_cast<const DirectX::XMFLOAT4X4*>(&viewInverse);
+		DirectX::XMMATRIX xmViewInverse = DirectX::XMLoadFloat4x4(viewInvFloat);
+
+		// 3. Transformar al Mundo
+		frustum.Transform(frustum, xmViewInverse);
+
+		return frustum;
 	}
 }

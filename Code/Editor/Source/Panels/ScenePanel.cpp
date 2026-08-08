@@ -22,6 +22,7 @@
 #include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
 #include "Gizmos/CameraGizmo.h"
+#include "Scene/DebugRenderer.h"
 #include "Scene/EditorCameraController.h"
 
 namespace Bruno
@@ -103,7 +104,7 @@ namespace Bruno
 		}
 		
 		InitializeMarquee();
-		
+		m_debugRenderer =std::make_unique<DebugRenderer>(m_device, m_scene);
 		// Single-thread rendering.
 #ifdef BR_SINGLE_THREAD_RENDERING
 		
@@ -161,6 +162,7 @@ namespace Bruno
 			context.SetScissorRect(m_scissorRect);
 			
 			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
+			
 			Math::Matrix gizmoWorld;
 			Math::Vector3 gizmoPivot;
 			
@@ -172,7 +174,7 @@ namespace Bruno
 				m_gizmoService->SetGizmoPosition(gizmoPivot);
 				m_gizmoService->SetGizmoWorldMatrix(gizmoWorld);
 			}
-			
+			m_debugRenderer->RenderBoundingBoxes(&context, m_sceneDocument->GetCamera(), frameIndex);
 			if (m_marqueeInteraction.m_dragRectangle)
 			{
 				RenderMarquee(context, m_marqueeInteraction.m_ndcMin, m_marqueeInteraction.m_ndcMax);
