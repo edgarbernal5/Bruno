@@ -52,13 +52,22 @@ namespace Bruno
 				const auto& transform = entity.GetComponent<TransformComponent>();
 				DirectX::BoundingBox pointBox(transform.Position, Math::Vector3(0.5f, 0.5f, 0.5f)); 
             
-				if (!hasBounds) { mergedBox = pointBox; hasBounds = true; }
-				else { DirectX::BoundingBox::CreateMerged(mergedBox, mergedBox, pointBox); }
+				if (!hasBounds)
+				{
+					mergedBox = pointBox; hasBounds = true;
+				}
+				else
+				{
+					DirectX::BoundingBox::CreateMerged(mergedBox, mergedBox, pointBox);
+				}
 			}
 		}
 
-		if (!hasBounds) return; // No hay nada enfocable
-
+		if (!hasBounds)
+		{
+			return; // No hay nada enfocable
+		}
+    	
 		// 3. Obtener el centro y el radio de la caja fusionada
 		Math::Vector3 center = mergedBox.Center;
 		Math::Vector3 extents = mergedBox.Extents;
@@ -68,8 +77,11 @@ namespace Bruno
 		float radius = DirectX::XMVectorGetX(DirectX::XMVector3Length(extentsVec));
 
 		// Si el radio es muy pequeño (ej. un empty object), le damos un tamaño mínimo
-		if (radius < 0.1f) radius = 2.0f;
-
+		if (radius < 0.1f)
+		{
+			radius = 2.0f;
+		}
+    	
 		// 4. Calcular la distancia de la cámara usando trigonometría
 		// Distancia = Radio / Seno(FOV / 2). 
 		// Nota: Reemplaza GetFov() por tu variable de FOV (usualmente XM_PIDIV4 o 45 grados en radianes)

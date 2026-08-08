@@ -312,6 +312,18 @@
     <ClInclude Include="Source\Bruno\Scene\Systems\HierarchySystem.h">
       <Filter>Source\Bruno\Scene\Systems</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\JobSystem.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Scene\Systems\FrustumCulling.h">
+      <Filter>Source\Bruno\Scene\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DynamicAllocation.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\DynamicDescriptorAllocator.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -511,6 +523,18 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Scene\Systems\HierarchySystem.cpp">
       <Filter>Source\Bruno\Scene\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\JobSystem.cpp">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Scene\Systems\FrustumCulling.cpp">
+      <Filter>Source\Bruno\Scene\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\DynamicAllocation.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\DynamicDescriptorAllocator.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

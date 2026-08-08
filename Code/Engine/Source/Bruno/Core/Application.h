@@ -26,7 +26,7 @@ namespace Bruno
 		friend class BertaWindow;
 		friend class WindowsGameWindow;
 	protected:
-		Application(const ApplicationParameters& paramteres);
+		Application(const ApplicationParameters& parameters);
 
 		virtual void OnInitialize() = 0;
 		virtual void OnInitializeWindow(const WindowParameters& windowParameters) = 0;

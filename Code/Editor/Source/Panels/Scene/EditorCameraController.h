@@ -13,6 +13,7 @@ namespace Bruno
         EditorCameraController(Camera& camera, Scene* scene, SelectionService* selectionService);
         
         void FocusOnSelection();
+        
     private:
         Camera& m_camera;
         SelectionService* m_selectionService;

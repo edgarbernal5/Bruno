@@ -105,6 +105,7 @@
     <ClInclude Include="Source\Bruno\Content\AssetManager.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTable.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTypes.h" />
+    <ClInclude Include="Source\Bruno\Core\JobSystem.h" />
     <ClInclude Include="Source\Bruno\Core\UUID.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueueManager.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="Source\Bruno\Content\Asset.cpp" />
     <ClCompile Include="Source\Bruno\Content\AssetManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\AssetTable.cpp" />
+    <ClCompile Include="Source\Bruno\Core\JobSystem.cpp" />
     <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueueManager.cpp" />
