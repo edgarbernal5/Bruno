@@ -119,7 +119,6 @@ namespace Bruno
 
 	void EditorGame::InitializeUI()
 	{
-		static int panelIdxx = 0;
 		auto nanaWindow = m_window->As<BertaWindow>();
 
 		Berta::Form& form = nanaWindow->GetForm();

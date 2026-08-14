@@ -11,13 +11,14 @@ namespace Bruno
         DepthBuffer(GraphicsDevice& device, uint32_t width, uint32_t height);
         ~DepthBuffer() = default;
 
-        // Si la ventana cambia de tamaño, el Depth Buffer también debe hacerlo
         void Resize(uint32_t width, uint32_t height);
 
         [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetView() const
         {
             return m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
         }
+        
+        [[nodiscard]] ID3D12Resource* GetResource() const { return m_depthTexture.Get(); }
 
     private:
         void CreateResourceAndDescriptor();

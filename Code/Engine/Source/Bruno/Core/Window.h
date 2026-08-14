@@ -26,7 +26,7 @@ namespace Bruno
 	{
 		BR_RTTI_DECLARATION(Window, RTTI);
 	public:
-		virtual ~Window() {}
+		~Window() override {}
 
 		virtual WindowHandle GetHandle() = 0;
 		virtual void Initialize() = 0;

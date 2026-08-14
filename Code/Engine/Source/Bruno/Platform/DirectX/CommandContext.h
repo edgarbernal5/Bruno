@@ -10,8 +10,6 @@ namespace Bruno
     class CommandContext
     {
     public:
-    
-        // Getter para métodos que aún no hayas envuelto
         ID3D12GraphicsCommandList* GetNative() const { return m_commandList.Get(); }
         
         // Métodos de ciclo de vida esenciales

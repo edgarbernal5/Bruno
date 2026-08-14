@@ -132,6 +132,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
     <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch.h" />
+    <ClInclude Include="Source\Bruno\Renderer\RHITypes.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
     <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h" />

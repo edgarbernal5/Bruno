@@ -5,7 +5,7 @@
 
 namespace Bruno
 {
-    const size_t VertexPosition::HashId = std::hash<std::string>{}("P");
+    /*const size_t VertexPosition::HashId = std::hash<std::string>{}("P");
 
     const D3D12_INPUT_ELEMENT_DESC VertexPosition::InputElements[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
@@ -73,5 +73,25 @@ namespace Bruno
 
         outputLayout = it->second;
         return true;
+    }*/
+
+    std::vector<InputElementDesc> VertexPositionNormalTexture::GetLayout()
+    {
+        return
+        {
+            { "POSITION", 0, VertexFormat::Float3 },
+            { "NORMAL",   0, VertexFormat::Float3 },
+            { "TEXCOORD", 0, VertexFormat::Float2 }
+        };
+    }
+    
+
+    std::vector<InputElementDesc> VertexPositionColor::GetLayout()
+    {
+        return
+        {
+                { "POSITION", 0, VertexFormat::Float3 },
+                { "COLOR",   0, VertexFormat::Float4 }
+        };
     }
 }

@@ -5,11 +5,12 @@
 
 namespace Bruno
 {
+    class GraphicsDevice;
+    
     class ConstantBuffer
     {
     public:
-        // C++17: Usamos size_t para la alineación
-        ConstantBuffer(ID3D12Device* device, size_t bufferSize);
+        ConstantBuffer(GraphicsDevice* device, size_t bufferSize);
         ~ConstantBuffer();
 
         // Actualiza los datos desde C++ hacia la GPU (sin bloqueos)

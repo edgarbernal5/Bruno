@@ -18,6 +18,7 @@
 
 #include "SceneHierarchyPanel.h"
 #include "Bruno/Platform/DirectX/DynamicAllocation.h"
+#include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
@@ -72,7 +73,6 @@ namespace Bruno
 			}
 		});
 
-		//m_form = this;
 		m_form = std::make_unique<Berta::NestedForm>(this->Handle(), Berta::Rectangle{0,0,100,100}, Berta::FormStyle::Flat(), true);
 		m_layout.Attach("renderForm", *m_form);
 		
@@ -82,6 +82,8 @@ namespace Bruno
 		m_viewport.y = 0;
 		m_viewport.minDepth = D3D12_MIN_DEPTH;
 		m_viewport.maxDepth = D3D12_MAX_DEPTH;
+		
+		m_scissorRect = { 0, 0, 100, 100 };
 		m_device = Graphics::GetDevice();
 		
 		SurfaceWindowParameters parameters;
@@ -104,7 +106,9 @@ namespace Bruno
 		}
 		
 		InitializeMarquee();
-		m_debugRenderer =std::make_unique<DebugRenderer>(m_device, m_scene);
+		
+		m_debugRenderer = std::make_unique<DebugRenderer>(m_device, m_scene);
+		
 		// Single-thread rendering.
 #ifdef BR_SINGLE_THREAD_RENDERING
 		
@@ -116,6 +120,7 @@ namespace Bruno
 			{
 				return;
 			}
+			
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
 			uint32_t frameIndex = m_surface->GetCurrentBackBufferIndex();
 
@@ -131,42 +136,42 @@ namespace Bruno
 			dynamicAllocator->Reset();
 			
 			// 3. Extraer la textura real y su descriptor
-			auto backBuffer = m_surface->GetCurrentBackBuffer();
-			auto rtvHandle = m_surface->GetCurrentRenderTargetView();
+			auto backBuffer = m_surface->GetCurrentRenderTarget();
 
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
 			// ------------------------------------------------------------------
-			context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			context.TransitionResource(backBuffer, ResourceState::Present, ResourceState::RenderTarget);
 			
 			// ------------------------------------------------------------------
 			// FASE DE DIBUJO
 			// ------------------------------------------------------------------
 			// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
-			const float clearColor[] = { 0.10f, 0.014f, 0.16f, 1.0f }; 
-			//const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
-			auto dsvHandle = m_surface->GetDepthBufferView();
+			Math::Color clearColor = { 0.10f, 0.014f, 0.16f, 1.0f }; 
+			//Math::Color clearColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+			auto depthBuffer = m_surface->GetDepthBuffer();
 			
 			// Limpiar la pantalla
-			context.ClearRenderTarget(rtvHandle, clearColor);
-			context.ClearDepth(dsvHandle, 1.0f, 0);
-			context.SetRenderTargets(1, &rtvHandle, &dsvHandle);
+			context.ClearRenderTarget(backBuffer, clearColor);
+			context.ClearDepth(depthBuffer, 1.0f, 0);
+			context.SetRenderTargets(1, &backBuffer, depthBuffer);
 			
 			// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
 			context.SetDescriptorHeaps(&m_srvHeap, 1);
 			
-			SetCameraGizmoViewport();
+			SetupCameraGizmoViewport();
 			
 			// Configurar Viewport y Scissor Test explícitamente en este frame
 			context.SetViewport(m_viewport);
 			context.SetScissorRect(m_scissorRect);
+			
+			TransformSystem::Update(m_scene.get());
 			
 			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
 			
 			Math::Matrix gizmoWorld;
 			Math::Vector3 gizmoPivot;
 			
-			TransformSystem::Update(m_scene.get());
 			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
 			
 			if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
@@ -189,7 +194,7 @@ namespace Bruno
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 			// ------------------------------------------------------------------
-			context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+			context.TransitionResource(backBuffer, ResourceState::RenderTarget, ResourceState::Present);
 
 			// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
 			m_commandQueue->ExecuteCommandList(commandList, frameIndex);
@@ -299,9 +304,7 @@ namespace Bruno
 				}
 				
 				m_isGizmoing = m_gizmoService->BeginDrag(Math::Vector2(args.Position.X, args.Position.Y));
-				
-				std::cout << "is gizmoing: " << m_isGizmoing << std::endl;
-				if (m_isGizmoing)
+				if (m_isGizmoing || args.AltPressed)
 				{
 					return;
 				}
@@ -477,7 +480,7 @@ namespace Bruno
 			m_gizmoTransformSpaceButton.SetEnabled(index < 3);
 		});
 		
-		SetCameraGizmoViewport();
+		SetupCameraGizmoViewport();
 		editorGame->AddScenePanel(this);
 		
 		m_form->Show();
@@ -540,10 +543,12 @@ namespace Bruno
 	{
 		ShaderCompiler compiler; 
 
-		// 1. Compilar Shaders
 		auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/Marquee.hlsl", L"VS", L"vs_6_0");
 		auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/Marquee.hlsl", L"PS", L"ps_6_0");
-    
+		
+		std::unique_ptr<ShaderProgram> vertexShader = std::make_unique<ShaderProgram>(ShaderStage::Vertex, vertexShaderByteCode);
+		std::unique_ptr<ShaderProgram> pixelShader = std::make_unique<ShaderProgram>(ShaderStage::Pixel, pixelShaderByteCode);
+		
 		// --- 2. ROOT SIGNATURE ---
 		// En lugar de InitAsConstants, usamos InitAsConstantBufferView.
 		// Esto encaja con context.SetConstantBuffer(0, alloc.GPUAddress) que usamos en el render.
@@ -554,61 +559,39 @@ namespace Bruno
 		m_marqueeRootSig = std::make_unique<RootSignature>(*m_device);
 		m_marqueeRootSig->Initialize(1, rootParams);
 
-		// --- 3. PIPELINE STATE OBJECT (PSO) ---
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-    
+		GraphicsPipelineStateDesc psoDesc = {};
 		// CRÍTICO: El input layout queda vacío. No hay Vertex Buffer.
-		psoDesc.InputLayout = { nullptr, 0 };
+		//psoDesc.InputLayout = { nullptr, 0 };
     
-		psoDesc.pRootSignature = m_marqueeRootSig->GetNative();
-		psoDesc.VS = { reinterpret_cast<BYTE*>(vertexShaderByteCode->GetBufferPointer()), vertexShaderByteCode->GetBufferSize() };
-		psoDesc.PS = { reinterpret_cast<BYTE*>(pixelShaderByteCode->GetBufferPointer()), pixelShaderByteCode->GetBufferSize() };
+		psoDesc.RootSignature = m_marqueeRootSig.get();
+		
+		psoDesc.VertexShader = vertexShader.get();
+		psoDesc.PixelShader = pixelShader.get();
+		
+		psoDesc.RasterizerState.CullMode = CullMode::None;
+		
+		psoDesc.DepthState.Mode = DepthMode::None;
 
-		// Rasterizer: Sin Culling (Dibujamos un quad bidimensional)
-		psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-		psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; 
-
-		// Profundidad: Totalmente apagada para elementos de UI/Marquee
-		psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-		psoDesc.DepthStencilState.DepthEnable = FALSE;
-		psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-
-		// Blending: Alpha Blending tradicional
-		D3D12_RENDER_TARGET_BLEND_DESC blendDesc = {};
-		blendDesc.BlendEnable = TRUE;
-		blendDesc.LogicOpEnable = FALSE;
-		blendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA; 
-		blendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA; 
-		blendDesc.BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
-		blendDesc.DestBlendAlpha = D3D12_BLEND_ZERO;
-		blendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-		psoDesc.BlendState.RenderTarget[0] = blendDesc;
+		
+		psoDesc.BlendState.Mode = BlendMode::AlphaBlend;
     
-		psoDesc.SampleMask = UINT_MAX;
-		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoDesc.Topology = PrimitiveTopology::TriangleList;
 		psoDesc.NumRenderTargets = 1;
-		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-    
-		// OJO: Aunque la profundidad esté apagada, debes indicarle al PSO cuál es 
-		// el formato de tu DSV actual, porque estará atado a la salida del pase de render.
-		psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT; 
-		psoDesc.SampleDesc.Count = 1;
+		psoDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;
+		psoDesc.DSVFormat = TextureFormat::D24_Unorm_S8_Uint;
 
 		// 4. Instanciar PSO
 		m_marqueePSO = std::make_unique<GraphicsPipelineState>(*m_device);
 		m_marqueePSO->Initialize(psoDesc);
 	}
 
-	void ScenePanel::SetCameraGizmoViewport()
+	void ScenePanel::SetupCameraGizmoViewport()
 	{
 		auto mainViewport = m_sceneDocument->GetCamera().GetViewport();
 		float twenty = m_form->Handle()->ToScale(20.0f);
 		float gizmoCameraSize = m_form->Handle()->ToScale(Gizmo::CAMERA_GIZMO_SCREEN_SIZE_IN_PIXELS);
-		Math::Viewport gizmoCameraViewport={
+		Math::Viewport gizmoCameraViewport =
+		{
 			mainViewport.width - gizmoCameraSize - twenty, 
 			twenty, 
 			gizmoCameraSize, 
@@ -625,9 +608,9 @@ namespace Bruno
 	void ScenePanel::RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax)
 	{
 		// 1. Setear Pipeline
-		context.SetPipelineState(m_marqueePSO->GetNative());
-		context.SetRootSignature(m_marqueeRootSig->GetNative());
-		context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		context.SetPipelineState(m_marqueePSO.get());
+		context.SetRootSignature(m_marqueeRootSig.get());
+		context.SetPrimitiveTopology(PrimitiveTopology::TriangleStrip);
 
 		// 2. Preparar datos
 		MarqueeData data;
@@ -645,8 +628,7 @@ namespace Bruno
 		memcpy(alloc.CPUAddress, &data, sizeof(MarqueeData));
 
 		// 4. Bindear y Dibujar
-		context.SetConstantBuffer(0, alloc.GPUAddress);
+		context.SetConstantBuffer(0, alloc);
 		context.DrawInstanced(4, 1, 0, 0);
 	}
-
 }

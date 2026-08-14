@@ -16,8 +16,7 @@ namespace Bruno
         m_allocatedCount = 0;
     }
 
-    D3D12_GPU_DESCRIPTOR_HANDLE DynamicDescriptorAllocator::CopyDescriptor(GraphicsDevice& device,
-        D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor)
+    D3D12_GPU_DESCRIPTOR_HANDLE DynamicDescriptorAllocator::CopyDescriptor(GraphicsDevice& device, D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor)
     {
         // 1. Reservamos 1 hueco en nuestro heap dinámico actual
         DescriptorAllocation alloc = Allocate(1);

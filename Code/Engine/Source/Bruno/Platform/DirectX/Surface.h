@@ -3,6 +3,7 @@
 
 namespace Bruno
 {
+	class Texture2D;
 	class SwapChain;
 	class DepthBuffer;
 	class GraphicsDevice;
@@ -15,7 +16,9 @@ namespace Bruno
     	
     	[[nodiscard]] uint32_t GetCurrentBackBufferIndex() const;
     	[[nodiscard]] ID3D12Resource* GetCurrentBackBuffer() const;
+    	[[nodiscard]] Texture2D* GetCurrentRenderTarget() const;
     	[[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentRenderTargetView() const;
+    	[[nodiscard]] DepthBuffer* GetDepthBuffer() const;
     	[[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetDepthBufferView() const;
 
     	void Present(bool vsync = true);

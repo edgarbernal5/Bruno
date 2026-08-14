@@ -1,11 +1,13 @@
 ﻿#pragma once
 
 #include "D3DHelpers.h"
+#include "DescriptorAllocator.h"
 
 #include "SurfaceTypes.h"
 
 namespace Bruno
 {
+    class Texture2D;
     class GraphicsDevice; // Forward declaration (KISS)
     
     class SwapChain
@@ -23,19 +25,25 @@ namespace Bruno
         
         // Descriptor Handle para usar en el pipeline
         [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentRenderTargetView() const;
+        
+        Texture2D* GetCurrentRenderTarget() const;
 
     private:
+        struct RenderTargetData
+        {
+            std::shared_ptr<Texture2D> Resource{ nullptr };
+            DescriptorAllocation RtvHandle{};
+        };
+        
         void UpdateRenderTargetViews();
-
-    private:
+        
         GraphicsDevice& m_device;
         Microsoft::WRL::ComPtr<IDXGISwapChain4> m_swapChain;
         
-        static const uint8_t BufferCount = 2; // Doble buffering
         uint32_t m_currentBufferIndex;
 
         // Recursos reales (Texturas 2D en VRAM)
-        Microsoft::WRL::ComPtr<ID3D12Resource> m_renderTargets[BufferCount];
+        RenderTargetData m_renderTargets[Graphics::Core::BACK_BUFFER_COUNT];
         
         // Montículo de descriptores para los Render Targets
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_rtvHeap;

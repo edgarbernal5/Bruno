@@ -37,14 +37,13 @@ namespace Bruno
 		{
 			// Resolvemos el handle usando el AssetManager para obtener el Texture2D real
 			std::shared_ptr<Texture2D> texture = assetManager->GetAsset<Texture2D>(assetHandle);
-        
 			if (texture)
 			{
 				// 1. Obtener el destino (Dónde vamos a escribir en nuestro nuevo heap contiguo)
 				D3D12_CPU_DESCRIPTOR_HANDLE destHandle = m_textureDescriptorAllocation.GetCPUHandle(offset);
             
 				// 2. Obtener el origen (El SRV original que tu textura ya creó en su constructor)
-				D3D12_CPU_DESCRIPTOR_HANDLE srcHandle = texture->GetCPUHandle();
+				D3D12_CPU_DESCRIPTOR_HANDLE srcHandle = texture->GetSRV();
             
 				// 3. Copiar (1 descriptor, de origen a destino, tipo CBV_SRV_UAV)
 				device->GetNativeDevice()->CopyDescriptorsSimple(

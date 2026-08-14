@@ -6,7 +6,9 @@
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
 #include "Bruno/Platform/DirectX/GraphicsPipelineState.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
+#include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
+#include "Bruno/Platform/DirectX/VertexTypes.h"
 
 namespace Bruno
 {
@@ -20,16 +22,6 @@ namespace Bruno
 
     void CameraGizmo::Initialize()
     {
-        // 1. Inicializar buffers internos de la geometría procedimental
-        m_cameraGizmoBatch.Begin();
-        
-        // 2. Compilar/Cargar Shaders Unlit sencillos para Gizmos
-        ShaderCompiler compiler; 
-
-        // Compilas usando DXC (nota el _6_0)
-        auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"VS", L"vs_6_0");
-        auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"PS", L"ps_6_0");
-		
         // 16 floats equivalen a una Matriz de 4x4
         CD3DX12_ROOT_PARAMETER gizmoParams[1];
         gizmoParams[0].InitAsConstants(16, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
@@ -37,54 +29,35 @@ namespace Bruno
         // Inicializamos la firma sin samplers
         m_rootSignature = std::make_unique<RootSignature>(*m_device);
         m_rootSignature->Initialize(1, gizmoParams);
+        
+        ShaderCompiler compiler; 
 
-        // 1. Input Layout EXCLUSIVO para Gizmos (Position + Color)
-        D3D12_INPUT_ELEMENT_DESC inputLayout[] =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-            { "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-        };
-
-        // 2. Llenar el descriptor
-        D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-        psoDesc.InputLayout = { inputLayout, _countof(inputLayout) };
-        psoDesc.pRootSignature = m_rootSignature->GetNative();
-        psoDesc.VS = { reinterpret_cast<BYTE*>(vertexShaderByteCode->GetBufferPointer()), vertexShaderByteCode->GetBufferSize() };
-        psoDesc.PS = { reinterpret_cast<BYTE*>(pixelShaderByteCode->GetBufferPointer()), pixelShaderByteCode->GetBufferSize() };
-
+        auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"VS", L"vs_6_0");
+        auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"PS", L"ps_6_0");
+		
+        std::unique_ptr<ShaderProgram> vertexShader = std::make_unique<ShaderProgram>(ShaderStage::Vertex, vertexShaderByteCode);
+        std::unique_ptr<ShaderProgram> pixelShader = std::make_unique<ShaderProgram>(ShaderStage::Pixel, pixelShaderByteCode);
+        
+        GraphicsPipelineStateDesc psoDesc = {};
+        // Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
+        psoDesc.RootSignature = m_rootSignature.get();
+        psoDesc.InputLayout = VertexPositionColor::GetLayout();
+        
+        psoDesc.VertexShader = vertexShader.get();
+        psoDesc.PixelShader = pixelShader.get();
+        
         // 3. Rasterizer para Gizmos (Sin Culling para que siempre se vean)
-        psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-        psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; // CRÍTICO para primitivas sueltas
+        psoDesc.RasterizerState.CullMode = CullMode::None;
     
-        // 4. Depth Stencil para "Rayos X" o Gizmos sobrepuestos
-        D3D12_DEPTH_STENCIL_DESC depthDesc = {};
-        psoDesc.DepthStencilState.DepthEnable = TRUE;
-        psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO; // No escriben en el Z-Buffer
-        psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;    // O la que uses en tu motor
-        psoDesc.DepthStencilState = depthDesc;
+        psoDesc.DepthState.Mode = DepthMode::None;
         
-        D3D12_RENDER_TARGET_BLEND_DESC blendDesc = {};
-        blendDesc.BlendEnable = TRUE;
-        blendDesc.LogicOpEnable = FALSE;
-        // El color del anillo se multiplica por su propio Alpha (0.15)
-        blendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA; 
-        // El color del fondo se multiplica por (1.0 - 0.15 = 0.85)
-        blendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA; 
-        blendDesc.BlendOp = D3D12_BLEND_OP_ADD;
-        // El canal alfa en sí (opcional dependiendo de si compones a otra textura)
-        blendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
-        blendDesc.DestBlendAlpha = D3D12_BLEND_ZERO;
-        blendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
-        blendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-        psoDesc.BlendState.RenderTarget[0] = blendDesc;
+        psoDesc.BlendState.Mode = BlendMode::AlphaBlend;
         
-        psoDesc.SampleMask = UINT_MAX;
-        psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+        psoDesc.Topology = PrimitiveTopology::TriangleList;
+        
         psoDesc.NumRenderTargets = 1;
-        psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-        psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        psoDesc.SampleDesc.Count = 1;
+        psoDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;
+        psoDesc.DSVFormat = TextureFormat::D24_Unorm_S8_Uint;
 
         // 5. Instanciar y configurar la clase genérica
         m_psoDepthOff = std::make_unique<GraphicsPipelineState>(*m_device);
@@ -288,19 +261,19 @@ namespace Bruno
             return;
         }
         
-        context->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        context->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
         
         // Bind Root Signature y PSO
-        context->SetRootSignature(m_rootSignature.get()->GetNative());
-        context->SetPipelineState(m_psoDepthOff.get()->GetNative()); // Usar DepthOff si quieres que flote sobre todo
+        context->SetRootSignature(m_rootSignature.get());
+        context->SetPipelineState(m_psoDepthOff.get()); // Usar DepthOff si quieres que flote sobre todo
     
         // Bind Constantes (Root Constants o Constant Buffer temporal)
         GizmoConstants constants = { viewProjection };
-        context->SetGraphicsRoot32BitConstants(0, sizeof(GizmoConstants) / 4, &constants, 0);
+        context->SetPushConstants(0, sizeof(GizmoConstants) / 4, &constants, 0);
 
         // Bind Buffers
-        context->SetVertexBuffer(m_cameraGizmoBatch.GetVertexBuffer(frameIndex)->GetView());
-        context->SetIndexBuffer(&m_cameraGizmoBatch.GetIndexBuffer(frameIndex)->GetView());
+        context->SetVertexBuffer(0, m_cameraGizmoBatch.GetVertexBuffer(frameIndex));
+        context->SetIndexBuffer(m_cameraGizmoBatch.GetIndexBuffer(frameIndex));
 
         // DIBUJAR TODO EL BATCH EN 1 SOLO DRAW CALL
         context->DrawIndexedInstanced(m_cameraGizmoBatch.GetIndexCount(), 1, 0, 0, 0);

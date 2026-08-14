@@ -4,9 +4,11 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Bruno/Renderer/RHITypes.h"
+
 namespace Bruno
 {
-    struct VertexPosition
+    /*struct VertexPosition
     {
         VertexPosition() = default;
 
@@ -119,5 +121,24 @@ namespace Bruno
 
     private:
         static std::unordered_map<size_t, const D3D12_INPUT_LAYOUT_DESC> g_vertexTypesByElementCount;
+    };*/
+    
+    // Vértice estándar para modelos 3D opacos
+    struct VertexPositionNormalTexture
+    {
+        Math::Vector3 Position;
+        Math::Vector3 Normal;
+        Math::Vector2 TexCoord;
+
+        static std::vector<InputElementDesc> GetLayout();
+    };
+    
+    // Vértice simple para los Gizmos (como los que programamos antes)
+    struct VertexPositionColor
+    {
+        Math::Vector3 Position;
+        Math::Vector4 Color;
+        
+        static std::vector<InputElementDesc> GetLayout();
     };
 }

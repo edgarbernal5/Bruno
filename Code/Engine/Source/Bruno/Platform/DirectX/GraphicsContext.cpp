@@ -1,8 +1,17 @@
 ﻿#include "brpch.h"
 #include "GraphicsContext.h"
 
+#include <entt/entt.hpp>
+
+#include "ConstantBuffer.h"
+#include "DepthBuffer.h"
 #include "DynamicAllocation.h"
 #include "DynamicDescriptorAllocator.h"
+#include "GraphicsPipelineState.h"
+#include "IndexBuffer.h"
+#include "RootSignature.h"
+#include "Texture2D.h"
+#include "VertexBuffer.h"
 
 namespace Bruno
 {
@@ -17,59 +26,115 @@ namespace Bruno
         // Esto es O(1), solo avanza un puntero interno.
         return m_dynamicAllocator->Allocate(sizeInBytes); 
     }
-    
-    void GraphicsContext::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter)
+
+    void GraphicsContext::TransitionResource(Texture2D* texture, ResourceState stateBefore, ResourceState stateAfter)
     {
         if (stateBefore == stateAfter)
         {
-            return; // Optimización simple
+            return;
         }
         
-        D3D12_RESOURCE_BARRIER barrier = {};
-        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        barrier.Transition.pResource = resource;
-        barrier.Transition.StateBefore = stateBefore;
-        barrier.Transition.StateAfter = stateAfter;
-        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        D3D12_RESOURCE_STATES dxBefore = GetDX12ResourceState(stateBefore);
+        D3D12_RESOURCE_STATES dxAfter = GetDX12ResourceState(stateAfter);
+
+        // Extraemos el ID3D12Resource nativo de nuestra clase Texture2D
+        ID3D12Resource* nativeResource = texture->GetResource();
+
+        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+            nativeResource,
+            dxBefore,
+            dxAfter
+        );
 
         m_commandList->ResourceBarrier(1, &barrier);
     }
 
-    void GraphicsContext::ClearRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtv, const float color[4])
+    void GraphicsContext::TransitionResource(DepthBuffer* depthBuffer, ResourceState stateBefore, ResourceState stateAfter)
     {
-        m_commandList->ClearRenderTargetView(rtv, color, 0, nullptr);
+        D3D12_RESOURCE_STATES dxBefore = GetDX12ResourceState(stateBefore);
+        D3D12_RESOURCE_STATES dxAfter = GetDX12ResourceState(stateAfter);
+
+        ID3D12Resource* nativeResource = depthBuffer->GetResource();
+
+        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+            nativeResource,
+            dxBefore,
+            dxAfter
+        );
+
+        m_commandList->ResourceBarrier(1, &barrier);
     }
 
-    void GraphicsContext::ClearDepth(D3D12_CPU_DESCRIPTOR_HANDLE dsv, float depth, uint8_t stencil)
+    void GraphicsContext::ClearRenderTarget(Texture2D* renderTarget, const Math::Color& color)
     {
-        m_commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, depth, stencil, 0, nullptr);
+        // Extraemos el Descriptor Handle (D3D12_CPU_DESCRIPTOR_HANDLE)
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget->GetRTV();
+
+        m_commandList->ClearRenderTargetView(rtvHandle, color, 0, nullptr);
     }
 
-    void GraphicsContext::SetRenderTargets(uint32_t numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE* rtvs, D3D12_CPU_DESCRIPTOR_HANDLE* dsv)
+    void GraphicsContext::ClearDepth(DepthBuffer* depthBuffer, float depth, uint8_t stencil)
     {
-        // FALSE indica que los RTVs no son necesariamente contiguos en memoria
-        m_commandList->OMSetRenderTargets(numRTVs, rtvs, FALSE, dsv);
+        // Extraemos el Descriptor Handle (D3D12_CPU_DESCRIPTOR_HANDLE)
+        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = depthBuffer->GetView();
+
+        m_commandList->ClearDepthStencilView(
+            dsvHandle,
+            D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+            depth,
+            stencil,
+            0,
+            nullptr
+        );
     }
 
-    void GraphicsContext::SetViewport(const D3D12_VIEWPORT& viewport)
+    void GraphicsContext::SetRenderTargets(uint32_t numRTVs, Texture2D** renderTargets, DepthBuffer* depthBuffer)
     {
-        m_commandList->RSSetViewports(1, &viewport);
+        // DirectX 12 permite un máximo de 8 Render Targets simultáneos por lo general.
+        BR_ASSERT(numRTVs <= 8, "Se superó el límite máximo de Render Targets.");
+
+        // Creamos un arreglo temporal en el Stack (¡súper rápido, 0 asignaciones en el Heap!)
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[8];
+    
+        for (uint32_t i = 0; i < numRTVs; ++i)
+        {
+            // Extraemos el Handle nativo de cada textura agnóstica
+            rtvHandles[i] = renderTargets[i]->GetRTV();
+        }
+
+        // Preparamos el Depth Stencil (si existe)
+        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
+        D3D12_CPU_DESCRIPTOR_HANDLE* pDsvHandle = nullptr;
+
+        if (depthBuffer)
+        {
+            dsvHandle = depthBuffer->GetView();
+            pDsvHandle = &dsvHandle;
+        }
+
+        // Llamada nativa
+        // Parámetros: Num RTVs, Puntero al array, RTs Contiguos (FALSE porque los sacamos manualmente), Puntero al DSV
+        m_commandList->OMSetRenderTargets(numRTVs, rtvHandles, FALSE, pDsvHandle);
     }
 
-    void GraphicsContext::SetScissorRect(const D3D12_RECT& rect)
+    void GraphicsContext::SetViewport(const Math::Viewport& viewport)
     {
-        m_commandList->RSSetScissorRects(1, &rect);
+        m_commandList->RSSetViewports(1, viewport.Get12());
     }
 
-    void GraphicsContext::SetPipelineState(ID3D12PipelineState* pso)
+    void GraphicsContext::SetScissorRect(const Rect& rect)
     {
-        m_commandList->SetPipelineState(pso);
+        m_commandList->RSSetScissorRects(1, rect.Get12());
     }
 
-    void GraphicsContext::SetRootSignature(ID3D12RootSignature* rootSig)
+    void GraphicsContext::SetPipelineState(GraphicsPipelineState* pso)
     {
-        m_commandList->SetGraphicsRootSignature(rootSig);
+        m_commandList->SetPipelineState(pso->GetNative());
+    }
+
+    void GraphicsContext::SetRootSignature(RootSignature* rootSig)
+    {
+        m_commandList->SetGraphicsRootSignature(rootSig->GetNative());
     }
 
     void GraphicsContext::SetDescriptorHeaps(ID3D12DescriptorHeap** ppHeaps, uint32_t count)
@@ -77,9 +142,14 @@ namespace Bruno
         m_commandList->SetDescriptorHeaps(count, ppHeaps);
     }
 
-    void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS address)
+    void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, ConstantBuffer* buffer)
     {
-        m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, address);
+        m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, buffer->GetGPUAddress());
+    }
+
+    void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, const DynamicAllocation& allocation)
+    {
+        m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, allocation.GPUAddress);
     }
 
     void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor)
@@ -100,24 +170,52 @@ namespace Bruno
         m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, gpuHandle);
     }
 
-    void GraphicsContext::SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology)
+    void GraphicsContext::SetTexture(uint32_t rootParameterIndex, Texture2D* texture)
     {
-        m_commandList->IASetPrimitiveTopology(topology);
+        // 1. Extraemos el Descriptor Handle nativo (CPU) de la textura agnóstica.
+        D3D12_CPU_DESCRIPTOR_HANDLE srv = texture->GetSRV();
+
+        // 2. Usamos tu método existente que copia este descriptor a un Heap dinámico 
+        //    visible por la GPU y enlaza el Descriptor Table.
+        SetDynamicDescriptorTable(rootParameterIndex, srv);
     }
 
-    void GraphicsContext::SetVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW& view)
+    void GraphicsContext::SetPrimitiveTopology(PrimitiveTopology topology)
     {
-        m_commandList->IASetVertexBuffers(0, 1, &view);
+        D3D_PRIMITIVE_TOPOLOGY dxTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    
+        // Traducción estática ultra rápida
+        switch (topology) {
+        case PrimitiveTopology::PointList:     dxTopology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST; break;
+        case PrimitiveTopology::LineList:      dxTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
+        case PrimitiveTopology::LineStrip:     dxTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP; break;
+        case PrimitiveTopology::TriangleList:  dxTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
+        case PrimitiveTopology::TriangleStrip: dxTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP; break;
+        }
+    
+        m_commandList->IASetPrimitiveTopology(dxTopology);
     }
 
-    void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count, const D3D12_VERTEX_BUFFER_VIEW* views)
+    void GraphicsContext::SetVertexBuffer(uint32_t startSlot, VertexBuffer* vertexBuffer)
     {
-        m_commandList->IASetVertexBuffers(startSlot, count, views);
+        D3D12_VERTEX_BUFFER_VIEW view = vertexBuffer->GetView();
+        m_commandList->IASetVertexBuffers(startSlot, 1, &view);
     }
 
-    void GraphicsContext::SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW* view)
+    void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer* views)
     {
-        m_commandList->IASetIndexBuffer(view);
+        /*D3D12_VERTEX_BUFFER_VIEW d3dViews[count];
+        for (uint32_t i = 0; i < count; i++)
+        {
+            d3dViews[i] = views->GetView();
+        }
+        m_commandList->IASetVertexBuffers(startSlot, count, d3dViews);*/
+    }
+
+    void GraphicsContext::SetIndexBuffer(IndexBuffer* indexBuffer)
+    {
+        D3D12_INDEX_BUFFER_VIEW view = indexBuffer->GetView();
+        m_commandList->IASetIndexBuffer(&view);
     }
 
     void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation)
@@ -130,13 +228,29 @@ namespace Bruno
         m_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
     }
 
-    void GraphicsContext::SetGraphicsRoot32BitConstants(uint32_t rootParameterIndex, uint32_t num32BitValuesToSet, const void* pSrcData, uint32_t destOffsetIn32BitValues)
+    void GraphicsContext::SetPushConstants(uint32_t rootParameterIndex, uint32_t num32BitValues, const void* data, uint32_t destOffsetIn32BitValues)
     {
-        m_commandList->SetGraphicsRoot32BitConstants(
-            rootParameterIndex, 
-            num32BitValuesToSet, 
-            pSrcData, 
-            destOffsetIn32BitValues
-        );
+        // Inyecta valores crudos (ej. un índice, un color) directo en la firma sin crear buffers
+        m_commandList->SetGraphicsRoot32BitConstants(rootParameterIndex, num32BitValues, data, destOffsetIn32BitValues);
+    }
+
+    D3D12_RESOURCE_STATES GraphicsContext::GetDX12ResourceState(ResourceState state)
+    {
+        switch (state)
+        {
+        case ResourceState::Common:                   return D3D12_RESOURCE_STATE_COMMON;
+        case ResourceState::VertexAndConstantBuffer:  return D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+        case ResourceState::IndexBuffer:              return D3D12_RESOURCE_STATE_INDEX_BUFFER;
+        case ResourceState::RenderTarget:             return D3D12_RESOURCE_STATE_RENDER_TARGET;
+        case ResourceState::UnorderedAccess:          return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        case ResourceState::DepthWrite:               return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+        case ResourceState::DepthRead:                return D3D12_RESOURCE_STATE_DEPTH_READ;
+        case ResourceState::NonPixelShaderResource:   return D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+        case ResourceState::PixelShaderResource:      return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+        case ResourceState::CopyDest:                 return D3D12_RESOURCE_STATE_COPY_DEST;
+        case ResourceState::CopySource:               return D3D12_RESOURCE_STATE_COPY_SOURCE;
+        case ResourceState::Present:                  return D3D12_RESOURCE_STATE_PRESENT;
+        default:                                      return D3D12_RESOURCE_STATE_COMMON;
+        }
     }
 }

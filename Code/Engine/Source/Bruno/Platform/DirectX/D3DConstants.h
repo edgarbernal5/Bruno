@@ -5,7 +5,7 @@
 namespace Bruno::Graphics::Core
 {
     constexpr uint32_t FRAMES_IN_FLIGHT_COUNT{ 2 };
-    constexpr uint32_t BACK_BUFFER_COUNT{ 3 };
+    constexpr uint32_t BACK_BUFFER_COUNT{ 2 }; // C++17: Constante global de la clase para el doble buffering
     constexpr uint32_t MAX_BACK_BUFFER_COUNT{ 3 };
     constexpr uint32_t SHADER_PROGRAMS_COUNT{ 2 };
     constexpr uint32_t INVALID_RESOURCE_TABLE_INDEX{ UINT_MAX };

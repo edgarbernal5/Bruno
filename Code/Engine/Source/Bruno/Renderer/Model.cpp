@@ -28,7 +28,7 @@ namespace Bruno
 		{
 			auto& vertex = verticesPNT.emplace_back();
 			vertex.Position = m_vertices[i].Position;
-			vertex.Texture = Math::Vector2(m_vertices[i].Texcoord.x, m_vertices[i].Texcoord.y);
+			vertex.TexCoord = Math::Vector2(m_vertices[i].Texcoord.x, m_vertices[i].Texcoord.y);
 			vertex.Normal = m_vertices[i].Normal;
 		}
 		

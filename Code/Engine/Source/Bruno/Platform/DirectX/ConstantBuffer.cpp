@@ -1,10 +1,14 @@
 ﻿#include "brpch.h"
 #include "ConstantBuffer.h"
 
+#include "GraphicsDevice.h"
+
 namespace Bruno
 {
-    ConstantBuffer::ConstantBuffer(ID3D12Device* device, size_t bufferSize)
+    ConstantBuffer::ConstantBuffer(GraphicsDevice* device, size_t bufferSize)
     {
+        auto nativeDevice = device->GetNativeDevice();
+        
         // En DX12, los Constant Buffers DEBEN estar alineados a 256 bytes
         size_t alignedSize = (bufferSize + 255) & ~255;
 
@@ -21,7 +25,7 @@ namespace Bruno
         bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
         bufferDesc.SampleDesc.Count = 1;
 
-        HRESULT hr = device->CreateCommittedResource(
+        HRESULT hr = nativeDevice->CreateCommittedResource(
             &heapProps,
             D3D12_HEAP_FLAG_NONE,
             &bufferDesc,

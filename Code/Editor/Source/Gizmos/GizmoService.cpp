@@ -7,6 +7,7 @@
 #include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
 #include "Bruno/Platform/DirectX/Shader.h"
+#include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/PrimitiveBatch.h"
 
 namespace Bruno
@@ -29,16 +30,6 @@ namespace Bruno
 
     void GizmoService::Initialize()
     {
-        // 1. Inicializar buffers internos de la geometría procedimental
-        m_primitiveBatch.Begin();
-        
-        // 2. Compilar/Cargar Shaders Unlit sencillos para Gizmos
-        ShaderCompiler compiler; 
-
-        // Compilas usando DXC (nota el _6_0)
-        auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"VS", L"vs_6_0");
-        auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"PS", L"ps_6_0");
-		
         // 16 floats equivalen a una Matriz de 4x4
         CD3DX12_ROOT_PARAMETER gizmoParams[1];
         gizmoParams[0].InitAsConstants(16, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
@@ -47,55 +38,34 @@ namespace Bruno
         m_rootSignature = std::make_unique<RootSignature>(*m_device);
         m_rootSignature->Initialize(1, gizmoParams);
 
-        // 1. Input Layout EXCLUSIVO para Gizmos (Position + Color)
-        D3D12_INPUT_ELEMENT_DESC inputLayout[] =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-            { "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-        };
+        ShaderCompiler compiler; 
 
-        // 2. Llenar el descriptor
-        D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-        psoDesc.InputLayout = { inputLayout, _countof(inputLayout) };
-        psoDesc.pRootSignature = m_rootSignature->GetNative();
-        psoDesc.VS = { reinterpret_cast<BYTE*>(vertexShaderByteCode->GetBufferPointer()), vertexShaderByteCode->GetBufferSize() };
-        psoDesc.PS = { reinterpret_cast<BYTE*>(pixelShaderByteCode->GetBufferPointer()), pixelShaderByteCode->GetBufferSize() };
-
-        // 3. Rasterizer para Gizmos (Sin Culling para que siempre se vean)
-        psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-        psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; // CRÍTICO para primitivas sueltas
+        auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"VS", L"vs_6_0");
+        auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"PS", L"ps_6_0");
+		
+        std::unique_ptr<ShaderProgram> vertexShader = std::make_unique<ShaderProgram>(ShaderStage::Vertex, vertexShaderByteCode);
+        std::unique_ptr<ShaderProgram> pixelShader = std::make_unique<ShaderProgram>(ShaderStage::Pixel, pixelShaderByteCode);
+        
+        GraphicsPipelineStateDesc psoDesc = {};
+        // Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
+        psoDesc.RootSignature = m_rootSignature.get();
+        psoDesc.InputLayout = VertexPositionColor::GetLayout();
+        
+        psoDesc.VertexShader = vertexShader.get();
+        psoDesc.PixelShader = pixelShader.get();
+        
+        psoDesc.RasterizerState.CullMode = CullMode::None;
     
-        // 4. Depth Stencil para "Rayos X" o Gizmos sobrepuestos
-        D3D12_DEPTH_STENCIL_DESC depthDesc = {};
-        psoDesc.DepthStencilState.DepthEnable = TRUE;
-        psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO; // No escriben en el Z-Buffer
-        psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;    // O la que uses en tu motor
-        psoDesc.DepthStencilState = depthDesc;
+        psoDesc.DepthState.Mode = DepthMode::None;
         
-        D3D12_RENDER_TARGET_BLEND_DESC blendDesc = {};
-        blendDesc.BlendEnable = TRUE;
-        blendDesc.LogicOpEnable = FALSE;
-        // El color del anillo se multiplica por su propio Alpha (0.15)
-        blendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA; 
-        // El color del fondo se multiplica por (1.0 - 0.15 = 0.85)
-        blendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA; 
-        blendDesc.BlendOp = D3D12_BLEND_OP_ADD;
-        // El canal alfa en sí (opcional dependiendo de si compones a otra textura)
-        blendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
-        blendDesc.DestBlendAlpha = D3D12_BLEND_ZERO;
-        blendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
-        blendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-        psoDesc.BlendState.RenderTarget[0] = blendDesc;
+        psoDesc.BlendState.Mode = BlendMode::AlphaBlend;
         
-        psoDesc.SampleMask = UINT_MAX;
-        psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+        psoDesc.Topology = PrimitiveTopology::TriangleList;
+        
         psoDesc.NumRenderTargets = 1;
-        psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-        psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        psoDesc.SampleDesc.Count = 1;
+        psoDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;
+        psoDesc.DSVFormat = TextureFormat::D24_Unorm_S8_Uint;
 
-        // 5. Instanciar y configurar la clase genérica
         m_psoDepthOff = std::make_unique<GraphicsPipelineState>(*m_device);
         m_psoDepthOff->Initialize(psoDesc);
     }
@@ -232,13 +202,16 @@ namespace Bruno
 
         case GizmoType::Rotation:
             {
-                const float ringRadius    = stickHeight + m_gizmoConfig.ArrowheadHeight; 
+                // Ajustar el radio para que sea armónico con la traslación.
+                // Usar 'stickHeight' directo hace que el anillo abarque el área interactiva principal.
+                const float ringRadius    = stickHeight; 
                 const float ringThickness = m_gizmoConfig.RingThickness; 
                 const int   ringSegments  = m_gizmoConfig.RingTessellation; 
                 const int   torusSlices   = 16; 
-            
-                // A. Esfera Trackball Central
-                Math::Matrix sphereMat = Math::Matrix::CreateTranslation(m_selectionState.m_gizmoPosition);
+    
+                // La esfera ahora SI toma la escala de la pantalla (cámara).
+                // Multiplicamos la escala de pantalla por la posición para que no se deforme al hacer zoom.
+                Math::Matrix sphereMat = m_selectionState.m_screenScaleMatrix * Math::Matrix::CreateTranslation(m_selectionState.m_gizmoPosition);
                 float sphereAlpha = (m_currentAxis == GizmoAxis::XYZ) ? 0.3f : 0.05f; 
                 m_primitiveBatch.DrawSphere(sphereMat, ringRadius * 0.95f, torusSlices, ringSegments, Math::Color(1.0f, 1.0f, 1.0f, sphereAlpha));
 
@@ -250,11 +223,11 @@ namespace Bruno
                 {
                     Math::Matrix axisBaseMat = (isDragging && m_currentAxis == def.axis) ? dragBaseMat : baseMatrix;
                     Math::Matrix mat = def.localRot * axisBaseMat;
-                    Math::Color col = resolveColor(def.axis, def.color, 1.0f, 0.7f, true); // Aplica desvanecimiento al arrastrar
-                
+                    Math::Color col = resolveColor(def.axis, def.color, 1.0f, 0.7f, true); 
+        
                     Math::Vector3 camPosLocal = Math::Vector3::Transform(camPosWorld, mat.Invert());
                     float angle = std::atan2(camPosLocal.z, camPosLocal.x) - (Math::PI * 0.5f);
-                
+        
                     m_primitiveBatch.DrawHalfTorus(mat, ringRadius, ringThickness, angle, torusSlices, ringSegments, col);
                 }
                 break;
@@ -264,33 +237,28 @@ namespace Bruno
         m_primitiveBatch.End(frameIndex);
     }
 
-    void GizmoService::RenderBatch(GraphicsContext* context, PrimitiveBatch& primitiveBatch, uint32_t frameIndex, const Math::Matrix& viewProjection)
+    void GizmoService::Render(GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProjection)
     {
-        if (primitiveBatch.GetIndexCount() == 0)
+        if (m_primitiveBatch.GetIndexCount() == 0)
         {
             return;
         }
-        context->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        context->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
         
         // Bind Root Signature y PSO
-        context->SetRootSignature(m_rootSignature.get()->GetNative());
-        context->SetPipelineState(m_psoDepthOff.get()->GetNative()); // Usar DepthOff si quieres que flote sobre todo
+        context->SetRootSignature(m_rootSignature.get());
+        context->SetPipelineState(m_psoDepthOff.get()); // Usar DepthOff si quieres que flote sobre todo
     
         // Bind Constantes (Root Constants o Constant Buffer temporal)
         GizmoConstants constants = { viewProjection };
-        context->SetGraphicsRoot32BitConstants(0, sizeof(GizmoConstants) / 4, &constants, 0);
+        context->SetPushConstants(0, sizeof(GizmoConstants) / 4, &constants, 0);
 
         // Bind Buffers
-        context->SetVertexBuffer(primitiveBatch.GetVertexBuffer(frameIndex)->GetView());
-        context->SetIndexBuffer(&primitiveBatch.GetIndexBuffer(frameIndex)->GetView());
+        context->SetVertexBuffer(0, m_primitiveBatch.GetVertexBuffer(frameIndex));
+        context->SetIndexBuffer(m_primitiveBatch.GetIndexBuffer(frameIndex));
 
         // DIBUJAR TODO EL BATCH EN 1 SOLO DRAW CALL
-        context->DrawIndexedInstanced(primitiveBatch.GetIndexCount(), 1, 0, 0, 0);
-    }
-
-    void GizmoService::Render(GraphicsContext* context, uint32_t frameIndex, const Math::Matrix& viewProjection)
-    {
-        RenderBatch(context, m_primitiveBatch, frameIndex, viewProjection);
+        context->DrawIndexedInstanced(m_primitiveBatch.GetIndexCount(), 1, 0, 0, 0);
     }
 
     bool GizmoService::BeginDrag(const Math::Vector2& mousePosition)
@@ -487,8 +455,13 @@ namespace Bruno
         Math::Vector3 currentIntersection;
         auto selectedAxis = GizmoAxis::None;
 
+        Math::Matrix baseMatrix = (m_transformSpace == TransformSpace::Local || m_currentGizmoType == GizmoType::Scale) 
+                                  ? m_selectionState.m_gizmoObjectOrientedWorld 
+                                  : m_selectionState.m_gizmoAxisAlignedWorld;
+        
         // USAMOS SIEMPRE LA MATRIZ ORIENTADA PARA ROTACIÓN
-        Math::Matrix gizmoWorldInverse = m_selectionState.m_gizmoObjectOrientedWorld.Invert();
+        Math::Matrix gizmoWorldInverse = baseMatrix.Invert();
+        
         Math::Ray ray = ConvertMousePositionToRay(mousePosition);
         ray.position = Math::Vector3::Transform(ray.position, gizmoWorldInverse);
         ray.direction = Math::Vector3::TransformNormal(ray.direction, gizmoWorldInverse);
@@ -573,11 +546,14 @@ namespace Bruno
         }
         else if (m_currentGizmoType == GizmoType::Rotation)
         {
-            float outerRadius = Gizmo::GIZMO_LENGTH + m_gizmoConfig.RingThickness * 1.5f;
-            float innerRadius = Gizmo::GIZMO_LENGTH - m_gizmoConfig.RingThickness * 1.5f;
-            float halfThickness = m_gizmoConfig.RingThickness * 1.5f;
+            float ringRadius = m_gizmoConfig.StickHeight; 
+            float tubeRadius = m_gizmoConfig.RingThickness;
 
-            // Precalcular la ecuación cuadrática de la esfera común (A=1 porque el rayo está normalizado)
+            float outerRadius = ringRadius + tubeRadius;
+            float innerRadius = ringRadius - tubeRadius;
+            float slabThickness = tubeRadius; 
+
+            // Precalcular la ecuación cuadrática de la esfera común
             float B = 2.0f * ray.position.Dot(ray.direction);
             float C = ray.position.LengthSquared();
 
@@ -591,6 +567,7 @@ namespace Bruno
                 float sq = std::sqrt(discriminant);
                 t0 = (-b - sq) * 0.5f;
                 t1 = (-b + sq) * 0.5f;
+                
                 return true;
             };
 
@@ -598,7 +575,6 @@ namespace Bruno
             bool hitOuter = IntersectSphere(outerRadius, B, C, tOut0, tOut1);
             bool hitInner = IntersectSphere(innerRadius, B, C, tIn0, tIn1);
 
-            // Si el rayo ni siquiera toca la esfera exterior que envuelve al gizmo, ignoramos los anillos
             if (hitOuter)
             {
                 Math::Vector3 planeNormals[3]{ Math::Vector3::Right, Math::Vector3::Up, Math::Vector3::Forward };
@@ -614,19 +590,20 @@ namespace Bruno
 
                     if (std::abs(dotDN) < 0.00001f) // Edge-on absoluto
                     {
-                        if (std::abs(dotON) > halfThickness)
-                            continue; // Pasa por fuera del grosor de este anillo
+                        // Usamos slabThickness en lugar del antiguo halfThickness
+                        if (std::abs(dotON) > slabThickness)
+                        {
+                            continue;
+                        }
                     }
                     else 
                     {
-                        float t1 = (-halfThickness - dotON) / dotDN;
-                        float t2 = ( halfThickness - dotON) / dotDN;
+                        float t1 = (-slabThickness - dotON) / dotDN;
+                        float t2 = ( slabThickness - dotON) / dotDN;
                         tSlab0 = std::min<float>(t1, t2);
                         tSlab1 = std::max<float>(t1, t2);
                     }
 
-                    // Evaluar superposición de intervalos lógicos (OuterSphere INTERSECT Slab - InnerSphere)
-                    // Evaluar superposición de intervalos lógicos (OuterSphere INTERSECT Slab - InnerSphere)
                     auto CheckOverlap = [&](float s0, float s1)
                     {
                         float start = std::max<float>(s0, tSlab0);
@@ -634,11 +611,8 @@ namespace Bruno
                         if (start <= end && end >= 0.0f)
                         {
                             float hit_t = (start < 0.0f) ? 0.0f : start; 
-        
-                            // ¡LA MAGIA! Calculamos el punto exacto de colisión en el espacio local
                             Math::Vector3 hitPoint = ray.position + ray.direction * hit_t;
         
-                            // Si el producto punto es mayor a 0, el punto está en el hemisferio que mira a la cámara
                             if (hitPoint.Dot(ray.position) > 0.0f)
                             {
                                 if (hit_t < closestIntersection)
@@ -652,13 +626,11 @@ namespace Bruno
 
                     if (hitInner)
                     {
-                        // Si golpea la esfera central, el rayo se divide en dos segmentos por evaluar
                         CheckOverlap(tOut0, tIn0);
                         CheckOverlap(tIn1, tOut1);
                     }
                     else
                     {
-                        // Pasa por el borde del gizmo sin tocar el agujero central
                         CheckOverlap(tOut0, tOut1);
                     }
                 }
@@ -667,7 +639,8 @@ namespace Bruno
             // 2. Fallback: Si ningún anillo fue tocado, evaluamos la esfera central (Trackball)
             if (selectedAxis == GizmoAxis::None)
             {
-                Math::BoundingSphere trackballSphere(Math::Vector3::Zero, innerRadius);
+                // Usamos el mismo 0.95f que le pasaste al primitiveBatch.DrawSphere
+                Math::BoundingSphere trackballSphere(Math::Vector3::Zero, ringRadius * 0.95f);
                 float sphereDist;
                 if (trackballSphere.Intersects(ray.position, ray.direction, sphereDist) && sphereDist < closestIntersection)
                 {
@@ -1078,22 +1051,27 @@ namespace Bruno
 
         // Transformamos la posición del gizmo al View Space de la cámara
         Math::Vector3 gizmoPositionViewSpace = Math::Vector3::Transform(m_selectionState.m_gizmoPosition, m_camera.GetView());
-    
-        // Extraer el Z absoluto (distancia en profundidad). 
-        // Esto evita que el gizmo se deforme si está en los bordes de la pantalla (fov distortion)
-        float depth = Math::Abs(gizmoPositionViewSpace.z);
 
-        // Retornamos la distancia solo si está frente a la cámara (más allá del Near Plane)
-        return (depth > m_camera.GetNearPlane()) ? depth : 0.0f;
+        // 1. ELIMINAMOS el Math::Abs(). Queremos la Z real para saber si está detrás de la cámara.
+        // (Nota: Si tu motor usa Z negativo hacia adelante en ViewSpace, invierte el signo: -gizmoPositionViewSpace.z)
+        float depth = -gizmoPositionViewSpace.z;
+
+        // 2. Clampeamos al Near Plane. 
+        // Si la cámara lo atraviesa (depth < nearPlane), la distancia se queda fijada en el nearPlane.
+        // Esto asegura que la matemática nunca devuelva 0 ni números negativos.
+        return std::max<float>(depth, m_camera.GetNearPlane());
     }
 
     void GizmoService::UpdateLocalState()
     {
         // 1. Calcular Escala de Pantalla (Screen Space Scale)
         float cameraDistance = GetCameraDistance();
-        m_selectionState.m_screenScaleFactor = (cameraDistance > 0.0f) ? (cameraDistance * Gizmo::GIZMO_SCREEN_SCALE) : 1.0f;
+        
+        // Al garantizar matemáticamente que cameraDistance >= NearPlane, 
+        // podemos multiplicar directamente de forma segura. ¡Se acabó el salto a 1.0f!
+        m_selectionState.m_screenScaleFactor = cameraDistance * Gizmo::GIZMO_SCREEN_SCALE;
         m_selectionState.m_screenScaleMatrix = Math::Matrix::CreateScale(m_selectionState.m_screenScaleFactor);
-
+        
         // 2. Obtener la rotación base del objeto seleccionado (o Identidad si es TransformSpace::World)
         Math::Matrix baseRotationMatrix = Math::Matrix::Identity;
     

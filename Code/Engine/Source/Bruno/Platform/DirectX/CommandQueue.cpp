@@ -11,6 +11,7 @@
 
 #include <numeric>
 
+
 namespace Bruno
 {
     CommandQueue::CommandQueue(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE type)
@@ -36,7 +37,8 @@ namespace Bruno
         }
 
         // CREACIÓN DE MÚLTIPLES ALLOCATORS
-        for (uint32_t i = 0; i < BufferCount; ++i) {
+        for (uint32_t i = 0; i < Graphics::Core::BACK_BUFFER_COUNT; ++i)
+        {
             ThrowIfFailed(nativeDevice->CreateCommandAllocator(type, IID_PPV_ARGS(&m_commandAllocators[i])));
             m_frameFenceValues[i] = 0; // Inicializamos los tickets
         }

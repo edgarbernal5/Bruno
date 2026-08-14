@@ -4,10 +4,30 @@
 #include "GraphicsDevice.h"
 #include <stdexcept>
 
+#include "Bruno/Renderer/RHITypes.h"
+
 namespace Bruno
 {
     RootSignature::RootSignature(GraphicsDevice& device) :
         m_device(device)
+    {
+    }
+
+    void RootSignature::AddConstantBufferView(uint32_t shaderRegister, uint32_t registerSpace,
+        ShaderVisibility visibility)
+    {
+    }
+
+    void RootSignature::AddDescriptorTableSRV(uint32_t numDescriptors, uint32_t shaderRegister,
+        ShaderVisibility visibility)
+    {
+    }
+
+    void RootSignature::AddStaticSampler(uint32_t shaderRegister, ShaderVisibility visibility)
+    {
+    }
+
+    void RootSignature::Build()
     {
     }
 
@@ -60,7 +80,17 @@ namespace Bruno
             throw std::runtime_error("Fallo al crear la Root Signature en el Device");
         }
     }
-    
+
+    D3D12_CULL_MODE RootSignature::GetDX12CullMode(CullMode mode)
+    {
+        switch(mode) {
+        case CullMode::None: return D3D12_CULL_MODE_NONE;
+        case CullMode::Front: return D3D12_CULL_MODE_FRONT;
+        case CullMode::Back: return D3D12_CULL_MODE_BACK;
+        }
+        return D3D12_CULL_MODE_BACK;
+    }
+
     /*void RootSignature::CreateOpaqueSignature()
     {
         // 1. Definir los parámetros (El contrato con el shader)

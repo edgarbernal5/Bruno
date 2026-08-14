@@ -13,6 +13,7 @@
 
 #include "Bruno/Platform/DirectX/DepthBuffer.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
+#include "Bruno/Renderer/RHITypes.h"
 #include "Gizmos/GizmoService.h"
 
 namespace Bruno
@@ -76,7 +77,7 @@ namespace Bruno
 		void InitializeGizmoService();
 		void InitializeSceneRenderer();
 		void InitializeMarquee();
-		void SetCameraGizmoViewport();
+		void SetupCameraGizmoViewport();
 		void UpdateCBs(const GameTimer& timer);
 		void RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax);
 		
@@ -110,7 +111,7 @@ namespace Bruno
 		std::unique_ptr<Surface> m_surface;
 		CommandQueue* m_commandQueue { nullptr };
 		Math::Viewport m_viewport;
-		D3D12_RECT m_scissorRect;
+		Rect m_scissorRect;
 
 		ID3D12DescriptorHeap* m_srvHeap;
 		

@@ -55,7 +55,7 @@ namespace Bruno
             &texDesc, 
             D3D12_RESOURCE_STATE_COMMON, 
             nullptr, 
-            IID_PPV_ARGS(&m_textureResource)
+            IID_PPV_ARGS(&m_resource)
         ));
 
         // 3. Subir los datos asíncronamente usando nuestro motor DMA
@@ -65,10 +65,10 @@ namespace Bruno
         subresourceData.SlicePitch = image.GetImages()->slicePitch;
 
         // ¡Una sola línea para toda la complejidad de subida!
-        uploadContext.UploadTexture(m_textureResource.Get(), subresourceData);
+        uploadContext.UploadTexture(m_resource.Get(), subresourceData);
 
         // 4. Crear el SRV (Shader Resource View)
-        m_allocation = srvAllocator.Allocate(1); // O simplemente Allocate() según tu definición
+        m_srvAllocation = srvAllocator.Allocate(1); // O simplemente Allocate() según tu definición
     
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -76,6 +76,17 @@ namespace Bruno
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Texture2D.MipLevels = 1;
 
-        nativeDevice->CreateShaderResourceView(m_textureResource.Get(), &srvDesc, m_allocation.CPU);
+        nativeDevice->CreateShaderResourceView(m_resource.Get(), &srvDesc, m_srvAllocation.CPU);
+    }
+
+    void Texture2D::AttachNativeResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource, D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle)
+    {
+        m_resource = resource;
+        m_rtvHandle = rtvHandle;
+        
+        // Opcional pero recomendado: Extraer el ancho y alto directamente del recurso nativo
+        // auto desc = m_resource->GetDesc();
+        // m_width = static_cast<uint32_t>(desc.Width);
+        // m_height = desc.Height;
     }
 }

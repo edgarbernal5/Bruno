@@ -14,6 +14,7 @@
 #include "Bruno/Content/AssetManager.h"
 #include "Bruno/Core/Memory.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
+#include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/Camera.h"
 #include "Bruno/Scene/Systems/FrustumCulling.h"
 
@@ -49,7 +50,7 @@ namespace Bruno
 				CBVComponent cbv;
 				for (int i = 0; i < 2; ++i)
 				{
-					cbv.TransformCB[i] = std::make_shared<ConstantBuffer>(device->GetNativeDevice().Get(), objectSize);
+					cbv.TransformCB[i] = std::make_shared<ConstantBuffer>(device, objectSize);
 				}
                 
 				// Le "pegamos" el componente de memoria de video a la entidad
@@ -91,50 +92,32 @@ namespace Bruno
 	void SceneRenderer::InitializeOpaquePSO(GraphicsDevice* device)
 	{
 		// Instanciamos el Pipeline State Object (PSO) pasándole el contrato y shaders
-		
 		ShaderCompiler compiler; 
 
-		// Compilas usando DXC (nota el _6_0)
 		auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"VS", L"vs_6_0");
 		auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"PS", L"ps_6_0");
 		
-		// 1. Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
-        D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-            { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-        };
-
-        D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-        psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
-        psoDesc.pRootSignature = m_opaqueRootSignature->GetNative();
-    
-        // 2. Adjuntar los Shaders
-        psoDesc.VS = { reinterpret_cast<BYTE*>(vertexShaderByteCode->GetBufferPointer()), vertexShaderByteCode->GetBufferSize() };
-        psoDesc.PS = { reinterpret_cast<BYTE*>(pixelShaderByteCode->GetBufferPointer()), pixelShaderByteCode->GetBufferSize() };
-    
-        // 3. Configurar Estados (Usamos los defaults de d3dx12 para código limpio)
-        psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-        // Para ver geometría por dentro y por fuera si no tienes backface culling, usa:
-        //psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+		std::unique_ptr<ShaderProgram> vertexShader = std::make_unique<ShaderProgram>(ShaderStage::Vertex, vertexShaderByteCode);
+		std::unique_ptr<ShaderProgram> pixelShader = std::make_unique<ShaderProgram>(ShaderStage::Pixel, pixelShaderByteCode);
+		
+		GraphicsPipelineStateDesc psoDesc = {};
+		// Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
+		psoDesc.RootSignature = m_opaqueRootSignature.get();
+		psoDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
+		
+        psoDesc.VertexShader = vertexShader.get();
+        psoDesc.PixelShader = pixelShader.get();
+		
+		psoDesc.RasterizerState.CullMode = CullMode::Back;
+		psoDesc.RasterizerState.FillMode = FillMode::Solid;
+		psoDesc.RasterizerState.FrontCounterClockwise = true;
         
-        // ¡La línea mágica que invierte qué lado es el frente!
-        psoDesc.RasterizerState.FrontCounterClockwise = TRUE; 
-        psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
-        // ... (asignas esto a tu D3D12_GRAPHICS_PIPELINE_STATE_DESC)
-        
-        psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // Opaco, sin transparencias
-        psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // Z-Buffer activado
-        psoDesc.SampleMask = UINT_MAX;
-        psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+        psoDesc.Topology = PrimitiveTopology::TriangleList;
     
-        // 4. Formatos de Salida (DEBEN coincidir con tu SwapChain y DepthBuffer)
+        // Formatos de Salida (DEBEN coincidir con tu SwapChain y DepthBuffer)
         psoDesc.NumRenderTargets = 1;
-        psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // O el que uses en tu SwapChain
-        psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;  // O el que uses en tu DepthBuffer
-        psoDesc.SampleDesc.Count = 1;
-        psoDesc.SampleDesc.Quality = 0;
+        psoDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;
+        psoDesc.DSVFormat = TextureFormat::D24_Unorm_S8_Uint;
 		
 		m_opaquePSO = std::make_shared<GraphicsPipelineState>(*device);
 		m_opaquePSO->Initialize(psoDesc);
@@ -142,10 +125,10 @@ namespace Bruno
 
 	void SceneRenderer::OnRender(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
 	{
-		VertexBuffer* currentVB = nullptr;
 		m_frustumCulling->Update();
-		
 		auto& visibleEntities = m_frustumCulling->GetVisibleEntities();
+		
+		VertexBuffer* currentVB = nullptr;
 		for (Entity entity : visibleEntities)
 		{
 			const auto& modelComponent = entity.GetComponent<ModelComponent>();
@@ -178,13 +161,13 @@ namespace Bruno
 				auto& vertexBuffer = model->GetVertexBuffer();
 				if (currentVB != vertexBuffer.get())
 				{
-					graphicsContext->SetVertexBuffer(vertexBuffer->GetView());
-					graphicsContext->SetIndexBuffer(&indexBuffer->GetView());
+					graphicsContext->SetVertexBuffer(0, vertexBuffer.get());
+					graphicsContext->SetIndexBuffer(indexBuffer.get());
 					currentVB = vertexBuffer.get();
 				}
 				
-				graphicsContext->SetPipelineState(material->GetPSO()->GetNative());
-				graphicsContext->SetRootSignature(material->GetRootSignature()->GetNative());
+				graphicsContext->SetPipelineState(material->GetPSO().get());
+				graphicsContext->SetRootSignature(material->GetRootSignature().get());
 				
 				// Enlazar la tabla de texturas (Parámetro 1 en nuestra Root Signature)
 				graphicsContext->SetDescriptorTable(1, material->GetTextureDescriptorTable());
@@ -196,8 +179,8 @@ namespace Bruno
 				objConstants.WorldViewProjection = wvp;
 				cbv.TransformCB[frameIndex]->Update(&objConstants, sizeof(SceneObjectBuffer));
 				
-				graphicsContext->SetConstantBuffer(0, cbv.TransformCB[frameIndex]->GetGPUAddress());
-				graphicsContext->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				graphicsContext->SetConstantBuffer(0, cbv.TransformCB[frameIndex].get());
+				graphicsContext->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 				graphicsContext->DrawIndexedInstanced(mesh->GetIndexCount(),
 					1,
 					mesh->GetBaseIndex(),

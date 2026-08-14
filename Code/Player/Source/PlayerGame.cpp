@@ -85,40 +85,39 @@ namespace Bruno
 		GraphicsContext context(*m_device, commandList.Get(), allocator.Get(), dynamicAllocator);
 			
 		// 3. Extraer la textura real y su descriptor
-		auto backBuffer = m_surface->GetCurrentBackBuffer();
-		auto rtvHandle = m_surface->GetCurrentRenderTargetView();
+		auto backBuffer = m_surface->GetCurrentRenderTarget();
 
 		// ------------------------------------------------------------------
 		// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
 		// ------------------------------------------------------------------
-		context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-			
+		context.TransitionResource(backBuffer, ResourceState::Present, ResourceState::RenderTarget);
+		
 		// ------------------------------------------------------------------
 		// FASE DE DIBUJO
 		// ------------------------------------------------------------------
 		// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
-		const float clearColor[] = { 0.10f, 0.014f, 0.16f, 1.0f }; 
-		//const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
-		auto dsvHandle = m_surface->GetDepthBufferView();
+		Math::Color clearColor = { 0.10f, 0.014f, 0.16f, 1.0f }; 
+		//Math::Color clearColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+			auto depthBuffer = m_surface->GetDepthBuffer();
 			
 		// Limpiar la pantalla
-		context.ClearRenderTarget(rtvHandle, clearColor);
-		context.ClearDepth(dsvHandle, 1.0f, 0);
-		context.SetRenderTargets(1, &rtvHandle, &dsvHandle);
+		context.ClearRenderTarget(backBuffer, clearColor);
+		context.ClearDepth(depthBuffer, 1.0f, 0);
+		context.SetRenderTargets(1, &backBuffer, depthBuffer);
 			
 		// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
 		context.SetDescriptorHeaps(&m_srvHeap, 1);
-			
+		
 		// Configurar Viewport y Scissor Test explícitamente en este frame
 		context.SetViewport(m_viewport);
 		context.SetScissorRect(m_scissorRect);
-			
+		
 		m_sceneRenderer->OnRender(&context, m_camera, frameIndex);
-			
+		
 		// ------------------------------------------------------------------
 		// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 		// ------------------------------------------------------------------
-		context.TransitionResource(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		context.TransitionResource(backBuffer, ResourceState::RenderTarget, ResourceState::Present);
 
 		// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
 		m_commandQueue->ExecuteCommandList(commandList, frameIndex);

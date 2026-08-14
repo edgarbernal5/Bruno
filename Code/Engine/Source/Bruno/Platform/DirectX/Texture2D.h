@@ -18,19 +18,27 @@ namespace Bruno
     public:
         // Carga una textura desde disco y reserva su lugar en el heap
         Texture2D(GraphicsDevice& device, UploadContext& uploadContext, DescriptorAllocator& srvAllocator, const std::wstring& filename);
-        ~Texture2D() = default;
+        Texture2D() = default;
+        
+        ~Texture2D() override = default;
+        
+        void AttachNativeResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource, D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle);
 
         // Necesario para el Render Loop (Lo lee la GPU al dibujar)
-        [[nodiscard]] D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() const { return m_allocation.GPU; }
+        [[nodiscard]] D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle() const { return m_srvAllocation.GPU; }
         
         // Necesario para el Material (Lo usa la CPU para copiar el descriptor usando CopyDescriptorsSimple)
-        [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return m_allocation.CPU; }
+        //[[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return m_srvAllocation.CPU; }
         
-        [[nodiscard]] ID3D12Resource* GetResource() const { return m_textureResource.Get(); }
-
+        [[nodiscard]] ID3D12Resource* GetResource() const { return m_resource.Get(); }
+        [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetRTV() const { return m_rtvHandle; }
+        [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const { return m_srvAllocation.CPU; }
+        
     private:
-        Microsoft::WRL::ComPtr<ID3D12Resource> m_textureResource;
+        Microsoft::WRL::ComPtr<ID3D12Resource> m_resource;
         std::unique_ptr<UploadHeap> m_uploadHeap; // Necesario para subir datos a VRAM
-        DescriptorAllocation m_allocation; // Nuestro "ticket" del DescriptorAllocator
+        DescriptorAllocation m_srvAllocation; // Nuestro "ticket" del DescriptorAllocator. Para el SRV (Lectura en Shader)
+        
+        D3D12_CPU_DESCRIPTOR_HANDLE m_rtvHandle{};
     };
 }

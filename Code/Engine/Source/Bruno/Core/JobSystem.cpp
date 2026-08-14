@@ -69,7 +69,8 @@ namespace Bruno
     void JobSystem::Wait()
     {
         // Un spin-lock eficiente. Cede el tiempo de CPU mientras espera.
-        while (m_activeJobs.load(std::memory_order_acquire) > 0) {
+        while (m_activeJobs.load(std::memory_order_acquire) > 0)
+        {
             std::this_thread::yield();
         }
     }

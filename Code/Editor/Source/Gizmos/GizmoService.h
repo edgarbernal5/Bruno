@@ -101,8 +101,6 @@ namespace Bruno
         
         void BuildGizmoGeometry(uint32_t frameIndex);
         
-        void RenderBatch(GraphicsContext* context, PrimitiveBatch& primitiveBatch, uint32_t frameIndex, const Math::Matrix& viewProjection);
-        
         GizmoAxis GetAxis(const Math::Vector2& mousePosition);
         
         Math::Vector2 GetScreenPosition(const Math::Vector3& worldPosition);

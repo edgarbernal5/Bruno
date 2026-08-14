@@ -5,6 +5,8 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 
+#include "D3DConstants.h"
+
 //#define D3D12MA_D3D12_HEADERS_ALREADY_INCLUDED
 
 namespace Bruno
@@ -12,9 +14,6 @@ namespace Bruno
 	class CommandQueue 
 	{
 	public:
-		// C++17: Constante global de la clase para el doble buffering
-		static constexpr uint32_t BufferCount = 2;
-
 		CommandQueue(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE type);
 		~CommandQueue();
 
@@ -37,7 +36,7 @@ namespace Bruno
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_commandQueue;
         
 		// EL SECRETO AAA: Un Allocator por cada frame del SwapChain
-		std::array<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>, BufferCount> m_commandAllocators;
+		std::array<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>, Graphics::Core::BACK_BUFFER_COUNT> m_commandAllocators;
 		// Solo necesitamos UN lápiz (CommandList) porque la CPU solo escribe un frame a la vez
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_commandList;
 
@@ -47,6 +46,6 @@ namespace Bruno
 		HANDLE m_fenceEvent;
 
 		// El ticket en el que terminó cada frame individual
-		uint64_t m_frameFenceValues[BufferCount];
+		uint64_t m_frameFenceValues[Graphics::Core::BACK_BUFFER_COUNT];
 	};
 }

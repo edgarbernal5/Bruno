@@ -8,7 +8,7 @@ extern Bruno::Application* Bruno::CreateApplication(int argc, char** argv);
 
 namespace Bruno
 {
-	int Main(int argc, char** argv)
+	inline int Main(int argc, char** argv)
 	{
 		InitializeCore();
 		{
@@ -24,7 +24,7 @@ namespace Bruno
 	}
 }
 
-int main(int argc, char** argv)
+inline int main(int argc, char** argv)
 {
 	return Bruno::Main(argc, argv);
 }

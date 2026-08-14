@@ -13,7 +13,7 @@ namespace Bruno
 		BR_RTTI_DECLARATION(Asset, RTTI);
 
 	public:
-		virtual ~Asset() {}
+		~Asset() override {}
 
 		bool operator==(const Asset& other) const
 		{

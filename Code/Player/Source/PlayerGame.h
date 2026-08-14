@@ -3,6 +3,7 @@
 #include "Bruno.h"
 
 #include "Bruno/Platform/DirectX/VertexTypes.h"
+#include "Bruno/Renderer/RHITypes.h"
 
 namespace Bruno
 {
@@ -44,15 +45,15 @@ namespace Bruno
 		void InitializeSurface();
 		void UpdateCBs(const GameTimer& timer);
 
-		std::unique_ptr<Surface>		m_surface;
-		std::shared_ptr<Scene>			m_scene;
-		std::shared_ptr<FrustumCulling>			m_frustumCulling;
-		std::shared_ptr<SceneRenderer>	m_sceneRenderer;
+		std::unique_ptr<Surface> m_surface;
+		std::shared_ptr<Scene> m_scene;
+		std::shared_ptr<FrustumCulling> m_frustumCulling;
+		std::shared_ptr<SceneRenderer> m_sceneRenderer;
 		CommandQueue* m_commandQueue { nullptr };
 		Math::Viewport m_viewport;
-		D3D12_RECT m_scissorRect;
+		Rect m_scissorRect;
 		ID3D12DescriptorHeap* m_srvHeap;
-		std::unique_ptr<GraphicsContext>	m_graphicsContext;
+		std::unique_ptr<GraphicsContext> m_graphicsContext;
 
 		std::array<std::unique_ptr<LinearAllocator>, 2> m_dynamicAllocators;
 		Math::Int2	m_lastMousePosition;
