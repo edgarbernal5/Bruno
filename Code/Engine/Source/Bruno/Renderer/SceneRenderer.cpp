@@ -72,21 +72,24 @@ namespace Bruno
 	
 	void SceneRenderer::InitializeOpaqueRootSignature(GraphicsDevice* device)
 	{
-		// 1. Configuramos los rangos (Textura)
-		CD3DX12_DESCRIPTOR_RANGE srvTable;
-		srvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-
-		// 2. Configuramos los parámetros (Matriz y Textura)
-		CD3DX12_ROOT_PARAMETER params[2];
-		params[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
-		params[1].InitAsDescriptorTable(1, &srvTable, D3D12_SHADER_VISIBILITY_PIXEL);
-
-		// 3. Sampler
-		CD3DX12_STATIC_SAMPLER_DESC sampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
-
-		// 4. Inicializamos nuestra Root Signature
 		m_opaqueRootSignature = std::make_shared<RootSignature>(*device);
-		m_opaqueRootSignature->Initialize(2, params, 1, &sampler);
+
+		// Parámetro 0: Constant Buffer View en b0 (Matriz MVP)
+		m_opaqueRootSignature->AddConstantBufferView(0, 0, ShaderVisibility::Vertex);
+
+		// Parámetro 1: Tabla de Descriptores para 1 textura en t0 
+		m_opaqueRootSignature->AddDescriptorTableSRV(1, 0, 0, ShaderVisibility::Pixel);
+
+		// Sampler: Filtro lineal en s0
+		m_opaqueRootSignature->AddStaticSampler(
+			0, 
+			0, 
+			TextureFilter::Linear, 
+			TextureAddressMode::Wrap, 
+			ShaderVisibility::Pixel
+		);
+
+		m_opaqueRootSignature->Build();
 	}
 
 	void SceneRenderer::InitializeOpaquePSO(GraphicsDevice* device)

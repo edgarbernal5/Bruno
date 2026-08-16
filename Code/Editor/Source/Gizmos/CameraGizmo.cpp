@@ -22,13 +22,12 @@ namespace Bruno
 
     void CameraGizmo::Initialize()
     {
-        // 16 floats equivalen a una Matriz de 4x4
-        CD3DX12_ROOT_PARAMETER gizmoParams[1];
-        gizmoParams[0].InitAsConstants(16, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
-
-        // Inicializamos la firma sin samplers
         m_rootSignature = std::make_unique<RootSignature>(*m_device);
-        m_rootSignature->Initialize(1, gizmoParams);
+
+        // 16 floats (32-bits c/u) equivalen a una Matriz de 4x4. 
+        // Van al registro b0 y solo el Vertex Shader necesita leerlos.
+        m_rootSignature->AddConstants(16, 0, 0, ShaderVisibility::Vertex);
+        m_rootSignature->Build();
         
         ShaderCompiler compiler; 
 
@@ -46,7 +45,6 @@ namespace Bruno
         psoDesc.VertexShader = vertexShader.get();
         psoDesc.PixelShader = pixelShader.get();
         
-        // 3. Rasterizer para Gizmos (Sin Culling para que siempre se vean)
         psoDesc.RasterizerState.CullMode = CullMode::None;
     
         psoDesc.DepthState.Mode = DepthMode::None;
@@ -59,7 +57,6 @@ namespace Bruno
         psoDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;
         psoDesc.DSVFormat = TextureFormat::D24_Unorm_S8_Uint;
 
-        // 5. Instanciar y configurar la clase genérica
         m_psoDepthOff = std::make_unique<GraphicsPipelineState>(*m_device);
         m_psoDepthOff->Initialize(psoDesc);
     }

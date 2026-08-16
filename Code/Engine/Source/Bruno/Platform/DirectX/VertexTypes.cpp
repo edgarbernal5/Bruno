@@ -85,7 +85,6 @@ namespace Bruno
         };
     }
     
-
     std::vector<InputElementDesc> VertexPositionColor::GetLayout()
     {
         return

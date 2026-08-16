@@ -549,15 +549,10 @@ namespace Bruno
 		std::unique_ptr<ShaderProgram> vertexShader = std::make_unique<ShaderProgram>(ShaderStage::Vertex, vertexShaderByteCode);
 		std::unique_ptr<ShaderProgram> pixelShader = std::make_unique<ShaderProgram>(ShaderStage::Pixel, pixelShaderByteCode);
 		
-		// --- 2. ROOT SIGNATURE ---
-		// En lugar de InitAsConstants, usamos InitAsConstantBufferView.
-		// Esto encaja con context.SetConstantBuffer(0, alloc.GPUAddress) que usamos en el render.
-		CD3DX12_ROOT_PARAMETER rootParams[1];
-		// Visible en ALL porque el VS necesita la posición (RectMin/Max) y el PS necesita los colores
-		rootParams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-
 		m_marqueeRootSig = std::make_unique<RootSignature>(*m_device);
-		m_marqueeRootSig->Initialize(1, rootParams);
+		
+		m_marqueeRootSig->AddConstantBufferView(0, 0, ShaderVisibility::All);
+		m_marqueeRootSig->Build();
 
 		GraphicsPipelineStateDesc psoDesc = {};
 		// CRÍTICO: El input layout queda vacío. No hay Vertex Buffer.
@@ -571,7 +566,6 @@ namespace Bruno
 		psoDesc.RasterizerState.CullMode = CullMode::None;
 		
 		psoDesc.DepthState.Mode = DepthMode::None;
-
 		
 		psoDesc.BlendState.Mode = BlendMode::AlphaBlend;
     
@@ -579,8 +573,7 @@ namespace Bruno
 		psoDesc.NumRenderTargets = 1;
 		psoDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;
 		psoDesc.DSVFormat = TextureFormat::D24_Unorm_S8_Uint;
-
-		// 4. Instanciar PSO
+		
 		m_marqueePSO = std::make_unique<GraphicsPipelineState>(*m_device);
 		m_marqueePSO->Initialize(psoDesc);
 	}

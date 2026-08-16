@@ -13,72 +13,103 @@ namespace Bruno
     {
     }
 
-    void RootSignature::AddConstantBufferView(uint32_t shaderRegister, uint32_t registerSpace,
-        ShaderVisibility visibility)
+    void RootSignature::AddConstants(uint32_t num32BitValues, uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility)
     {
+        CD3DX12_ROOT_PARAMETER param;
+        // Traducimos dinámicamente tu enumerado al nativo de DX12
+        param.InitAsConstants(num32BitValues, shaderRegister, registerSpace, GetDX12Visibility(visibility));
+        m_parameters.push_back(param);
     }
 
-    void RootSignature::AddDescriptorTableSRV(uint32_t numDescriptors, uint32_t shaderRegister,
-        ShaderVisibility visibility)
+    void RootSignature::AddConstantBufferView(uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility)
     {
+        CD3DX12_ROOT_PARAMETER param;
+
+        param.InitAsConstantBufferView(shaderRegister, registerSpace, GetDX12Visibility(visibility));
+        m_parameters.push_back(param);
     }
 
-    void RootSignature::AddStaticSampler(uint32_t shaderRegister, ShaderVisibility visibility)
+    void RootSignature::AddDescriptorTableSRV(uint32_t numDescriptors, uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility)
     {
+        auto range = std::make_unique<CD3DX12_DESCRIPTOR_RANGE[]>(1);
+        range[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, numDescriptors, shaderRegister, registerSpace);
+
+        CD3DX12_ROOT_PARAMETER param;
+        // Traducimos tu enum
+        param.InitAsDescriptorTable(1, range.get(), GetDX12Visibility(visibility));
+
+        m_descriptorRanges.push_back(std::move(range));
+        m_parameters.push_back(param);
     }
 
-    void RootSignature::Build()
+    void RootSignature::AddStaticSampler(uint32_t shaderRegister, uint32_t registerSpace, TextureFilter filter,
+        TextureAddressMode addressMode, ShaderVisibility visibility)
     {
-    }
+        // Traducimos tus enums agnósticos a DX12
+        D3D12_FILTER dxFilter = GetDX12Filter(filter);
+        D3D12_TEXTURE_ADDRESS_MODE dxAddress = GetDX12AddressMode(addressMode);
 
-    void RootSignature::Initialize(
-     UINT numParameters, 
-     const CD3DX12_ROOT_PARAMETER* parameters, 
-     UINT numSamplers, 
-     const CD3DX12_STATIC_SAMPLER_DESC* samplers, 
-     D3D12_ROOT_SIGNATURE_FLAGS flags)
-    {
-        // 1. Ensamblar la estructura base
-        CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
-            numParameters, parameters,
-            numSamplers, samplers,
-            flags
+        // Nota: Si usas Anisotropic, es buena práctica pasar el máximo soportado (16)
+        UINT maxAnisotropy = (filter == TextureFilter::Anisotropic) ? 16 : 1;
+
+        CD3DX12_STATIC_SAMPLER_DESC sampler(
+            shaderRegister,                    // s#
+            dxFilter,                          // Filtro traducido
+            dxAddress, dxAddress, dxAddress,   // Address U, V, W traducidos
+            0.0f,                              // MipLODBias
+            maxAnisotropy,                     // MaxAnisotropy dinámico
+            D3D12_COMPARISON_FUNC_LESS_EQUAL,  
+            D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE, // Color si usas TextureAddressMode::Border
+            0.0f,                              // MinLOD
+            D3D12_FLOAT32_MAX,                 // MaxLOD
+            GetDX12Visibility(visibility), 
+            registerSpace
         );
 
-        // 2. Serializar a un Blob de memoria
-        Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
-        Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-    
-        HRESULT hr = D3D12SerializeRootSignature(
-            &rootSigDesc, 
-            D3D_ROOT_SIGNATURE_VERSION_1, 
-            &serializedRootSig, 
-            &errorBlob
+        m_staticSamplers.push_back(sampler);
+    }
+
+
+    void RootSignature::Build(RootSignatureFlags flags)
+    {
+        // Traducimos tus flags agnósticos a los de DX12
+        D3D12_ROOT_SIGNATURE_FLAGS dxFlags = GetDX12RootSignatureFlags(flags);
+
+        CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;
+        rootSigDesc.Init(
+            static_cast<UINT>(m_parameters.size()),
+            m_parameters.data(),
+            static_cast<UINT>(m_staticSamplers.size()),
+            m_staticSamplers.data(),
+            dxFlags // Pasamos los flags traducidos
         );
 
+        // Serialización
+        Microsoft::WRL::ComPtr<ID3DBlob> serializedSignature;
+        Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+
+        HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, &serializedSignature, &errorBlob);
+
+        // Manejo de errores detallado (vital en DX12)
         if (FAILED(hr))
         {
             if (errorBlob)
             {
-                // Opcional: Imprimir el error del shader (OutputDebugStringA o tu Logger)
                 const char* errorMsg = static_cast<const char*>(errorBlob->GetBufferPointer());
-                // BR_CORE_ERROR("Root Signature Error: {}", errorMsg);
+                // Imprime errorMsg en la consola de tu motor aquí
+                OutputDebugStringA(errorMsg); 
             }
-            throw std::runtime_error("Fallo al serializar la Root Signature");
+            ThrowIfFailed(hr);
         }
-    
-        // 3. Crear el objeto en la GPU
-        hr = m_device.GetNativeDevice()->CreateRootSignature(
-            0, 
-            serializedRootSig->GetBufferPointer(), 
-            serializedRootSig->GetBufferSize(), 
-            IID_PPV_ARGS(&m_rootSignature)
-        );
 
-        if (FAILED(hr))
-        {
-            throw std::runtime_error("Fallo al crear la Root Signature en el Device");
-        }
+        // Creación en el dispositivo nativo
+        ThrowIfFailed(m_device.GetNativeDevice()->CreateRootSignature(
+            0,
+            serializedSignature->GetBufferPointer(),
+            serializedSignature->GetBufferSize(),
+            IID_PPV_ARGS(&m_rootSignature)
+        ));
+        
     }
 
     D3D12_CULL_MODE RootSignature::GetDX12CullMode(CullMode mode)
@@ -91,50 +122,59 @@ namespace Bruno
         return D3D12_CULL_MODE_BACK;
     }
 
-    /*void RootSignature::CreateOpaqueSignature()
+    D3D12_SHADER_VISIBILITY RootSignature::GetDX12Visibility(ShaderVisibility visibility)
     {
-        // 1. Definir los parámetros (El contrato con el shader)
-        CD3DX12_ROOT_PARAMETER rootParameters[2];
+        switch (visibility)
+        {
+        case ShaderVisibility::Vertex:   return D3D12_SHADER_VISIBILITY_VERTEX;
+        case ShaderVisibility::Pixel:    return D3D12_SHADER_VISIBILITY_PIXEL;
+        case ShaderVisibility::Geometry: return D3D12_SHADER_VISIBILITY_GEOMETRY;
+        case ShaderVisibility::All:      
+        default:                         return D3D12_SHADER_VISIBILITY_ALL;
+        }
+    }
 
-        // Parámetro 0: Constant Buffer View (CBV) en el registro b0
-        // Usamos SHADER_VISIBILITY_VERTEX porque solo el Vertex Shader usa la matriz
-        rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+    D3D12_FILTER RootSignature::GetDX12Filter(TextureFilter filter)
+    {
+        switch (filter)
+        {
+        case TextureFilter::Point:       return D3D12_FILTER_MIN_MAG_MIP_POINT;
+        case TextureFilter::Linear:      return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        case TextureFilter::Anisotropic: return D3D12_FILTER_ANISOTROPIC;
+        default:                         return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        }
+    }
 
-        // Parámetro 1: Tabla de Descriptores para la Textura en el registro t0
-        CD3DX12_DESCRIPTOR_RANGE srvTable;
-        srvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // 1 textura, registro t0
+    D3D12_TEXTURE_ADDRESS_MODE RootSignature::GetDX12AddressMode(TextureAddressMode mode)
+    {
+        switch (mode)
+        {
+        case TextureAddressMode::Wrap:   return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        case TextureAddressMode::Clamp:  return D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        case TextureAddressMode::Mirror: return D3D12_TEXTURE_ADDRESS_MODE_MIRROR;
+        case TextureAddressMode::Border: return D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+        default:                         return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        }
+    }
+
+    D3D12_ROOT_SIGNATURE_FLAGS RootSignature::GetDX12RootSignatureFlags(RootSignatureFlags flags)
+    {
+        D3D12_ROOT_SIGNATURE_FLAGS dxFlags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+
+        if (static_cast<uint32_t>(flags) & static_cast<uint32_t>(RootSignatureFlags::AllowInputAssembler))
+        {
+            dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+        }
+
+        // Pro-Tip de Optimización AAA:
+        // En DX12, es buena práctica denegar el acceso a los shaders que no usas 
+        // para que la GPU corra más rápido. Podrías implementar lógica aquí para 
+        // denegar Geometry, Hull y Domain shaders por defecto, a menos que tu motor los use.
     
-        // Usamos SHADER_VISIBILITY_PIXEL porque solo el Pixel Shader lee la textura
-        rootParameters[1].InitAsDescriptorTable(1, &srvTable, D3D12_SHADER_VISIBILITY_PIXEL);
+        // dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS;
+        // dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS;
+        // dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
-        // 2. Definir el Sampler Estático (s0)
-        // Usar un sampler estático es mucho más eficiente que ponerlo en un Descriptor Heap
-        CD3DX12_STATIC_SAMPLER_DESC sampler(
-            0,                                 // s0
-            D3D12_FILTER_MIN_MAG_MIP_LINEAR,   // Filtro bilineal estándar
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,   // WRAP en U
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,   // WRAP en V
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP    // WRAP en W
-        );
-
-        // 3. Ensamblar la Root Signature
-        CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
-            2, rootParameters, 
-            1, &sampler, 
-            D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT // Requisito vital
-        );
-
-        // 4. Serializar y crear (Manejo de errores simplificado)
-        Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
-        Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-    
-        D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, &serializedRootSig, &errorBlob);
-    
-        m_device.GetNativeDevice()->CreateRootSignature(
-            0, 
-            serializedRootSig->GetBufferPointer(), 
-            serializedRootSig->GetBufferSize(), 
-            IID_PPV_ARGS(&m_rootSignature) // Tu puntero interno de la clase
-        );
-    }*/
+        return dxFlags;
+    }
 }

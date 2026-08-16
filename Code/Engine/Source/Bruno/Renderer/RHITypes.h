@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cstdint>
+#include "Bruno/Core/Base.h"
 
 namespace Bruno
 {
@@ -55,6 +56,20 @@ namespace Bruno
         Pixel, 
         Geometry
     };
+    enum class TextureFilter : uint8_t
+    {
+        Point,          // Pixel art, texturas crudas sin interpolación
+        Linear,         // Suavizado estándar (Bilineal/Trilineal)
+        Anisotropic     // Máxima calidad para texturas vistas en ángulo (ej. el suelo)
+    };
+
+    enum class TextureAddressMode : uint8_t
+    {
+        Wrap,           // Repite la textura infinitamente (Tiling)
+        Clamp,          // Estira el último píxel del borde
+        Mirror,         // Repite la textura pero invertida como un espejo
+        Border          // Pinta un color sólido (ej. blanco o negro) fuera del rango
+    };
 
     enum class DepthMode : uint8_t
     { 
@@ -95,6 +110,20 @@ namespace Bruno
         uint32_t Count = 1;   // 1 = Sin Anti-Aliasing. (Opciones: 2, 4, 8)
         uint32_t Quality = 0; // Depende del hardware
     };
+    
+    enum class RootSignatureFlags : uint32_t
+    {
+        None = 0,
+    
+        // Indica que esta firma se usará con un Vertex Buffer / Index Buffer.
+        // En DX12 esto activará ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT.
+        // En Vulkan, simplemente se ignorará (no hace falta).
+        AllowInputAssembler = 1 << 0,
+
+        // (Futuro) Podrías agregar cosas como:
+        // LocalSignatureForRaytracing = 1 << 1
+    };
+    BR_DEFINITION_FLAG_FROM_ENUM(RootSignatureFlags);
 
     struct Rect
     {

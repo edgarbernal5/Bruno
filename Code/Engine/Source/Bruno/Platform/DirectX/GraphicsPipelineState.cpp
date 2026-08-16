@@ -20,7 +20,8 @@ namespace Bruno
         std::vector<D3D12_INPUT_ELEMENT_DESC> dx12Layout;
         dx12Layout.reserve(psoDesc.InputLayout.size());
         
-        for (const auto& element : psoDesc.InputLayout) {
+        for (const auto& element : psoDesc.InputLayout)
+        {
             D3D12_INPUT_ELEMENT_DESC dxDesc = {};
             dxDesc.SemanticName = element.SemanticName;
             dxDesc.SemanticIndex = element.SemanticIndex;
@@ -45,11 +46,12 @@ namespace Bruno
         
         if (psoDesc.VertexShader != nullptr)
         {
-            d3dDesc.VS = { reinterpret_cast<BYTE*>(psoDesc.VertexShader->GetByteCode()->GetBufferPointer()), psoDesc.VertexShader->GetByteCode()->GetBufferSize() };
+            d3dDesc.VS = psoDesc.VertexShader->GetNativeByteCode();
         }
+        
         if (psoDesc.PixelShader != nullptr)
         {
-            d3dDesc.PS = { reinterpret_cast<BYTE*>(psoDesc.PixelShader->GetByteCode()->GetBufferPointer()), psoDesc.PixelShader->GetByteCode()->GetBufferSize() };
+            d3dDesc.PS = psoDesc.PixelShader->GetNativeByteCode();
         }
         
         d3dDesc.RasterizerState = GetDX12RasterizerState(psoDesc.RasterizerState.CullMode , psoDesc.RasterizerState.FillMode);
