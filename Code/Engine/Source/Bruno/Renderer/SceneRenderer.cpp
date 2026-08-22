@@ -4,7 +4,6 @@
 #include "PrimitiveBatch.h"
 #include "PSOCache.h"
 #include "RootSignatureLibrary.h"
-#include "ShaderLibrary.h"
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Renderer/RenderItem.h"
 #include "Bruno/Renderer/Material.h"
@@ -96,19 +95,13 @@ namespace Bruno
 
 	void SceneRenderer::InitializeOpaquePSO(GraphicsDevice* device)
 	{
-		ShaderCompileDesc vsDesc = { L"Shaders/Opaque.hlsl", L"VSMain", L"vs_6_0" };
-		auto vertexShader = ShaderLibrary::GetOrCompile(vsDesc);
-        
-		ShaderCompileDesc psDesc = { L"Shaders/Opaque.hlsl", L"PSMain", L"ps_6_0" };
-		auto pixelShader = ShaderLibrary::GetOrCompile(psDesc);
-		
 		GraphicsPipelineStateDesc psoDesc = {};
 		// Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
 		psoDesc.RootSignature = m_opaqueRootSignature.get();
 		psoDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
 		
-        psoDesc.VertexShaderDesc = vsDesc;
-        psoDesc.PixelShaderDesc = psDesc;
+        psoDesc.VertexShaderDesc = { L"Shaders/Opaque.hlsl", L"VSMain", L"vs_6_0" };
+        psoDesc.PixelShaderDesc = { L"Shaders/Opaque.hlsl", L"PSMain", L"ps_6_0" };
 		
 		psoDesc.RasterizerState.CullMode = CullMode::Back;
 		psoDesc.RasterizerState.FillMode = FillMode::Solid;

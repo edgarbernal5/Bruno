@@ -9,7 +9,6 @@
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/PrimitiveBatch.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
-#include "Bruno/Renderer/ShaderLibrary.h"
 
 namespace Bruno
 {
@@ -41,19 +40,13 @@ namespace Bruno
 
         m_rootSignature = RootSignatureLibrary::GetOrCreate(prototypeSig);
         
-        ShaderCompileDesc vsDesc = { L"Shaders/UnlitColor.hlsl", L"VSMain", L"vs_6_0" };
-        auto vertexShader = ShaderLibrary::GetOrCompile(vsDesc);
-        
-        ShaderCompileDesc psDesc = { L"Shaders/UnlitColor.hlsl", L"PSMain", L"ps_6_0" };
-        auto pixelShader = ShaderLibrary::GetOrCompile(psDesc);
-        
         GraphicsPipelineStateDesc psoDesc = {};
         // Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
         psoDesc.RootSignature = m_rootSignature.get();
         psoDesc.InputLayout = VertexPositionColor::GetLayout();
         
-        psoDesc.VertexShaderDesc = vsDesc;
-        psoDesc.PixelShaderDesc = psDesc;
+        psoDesc.VertexShaderDesc = { L"Shaders/UnlitColor.hlsl", L"VSMain", L"vs_6_0" };
+        psoDesc.PixelShaderDesc = { L"Shaders/UnlitColor.hlsl", L"PSMain", L"ps_6_0" };
         
         psoDesc.RasterizerState.CullMode = CullMode::None;
     

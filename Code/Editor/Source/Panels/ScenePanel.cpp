@@ -13,15 +13,12 @@
 #include "Scene/SceneDocument.h"
 #include "EditorGame.h"
 
-#include <iostream>
 #include <Bruno/Core/Log.h>
 
 #include "SceneHierarchyPanel.h"
 #include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Platform/DirectX/Shader.h"
-#include "Bruno/Platform/DirectX/ShaderCompiler.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
-#include "Bruno/Renderer/ShaderLibrary.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
 #include "Gizmos/CameraGizmo.h"
@@ -543,12 +540,6 @@ namespace Bruno
 
 	void ScenePanel::InitializeMarquee()
 	{
-		ShaderCompileDesc vsDesc = { L"Shaders/Marquee.hlsl", L"VSMain", L"vs_6_0" };
-		auto vertexShader = ShaderLibrary::GetOrCompile(vsDesc);
-        
-		ShaderCompileDesc psDesc = { L"Shaders/Marquee.hlsl", L"PSMain", L"ps_6_0" };
-		auto pixelShader = ShaderLibrary::GetOrCompile(psDesc);
-        
 		auto prototypeSig = std::make_shared<RootSignature>(*m_device);
 		prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::All);
 		
@@ -560,8 +551,8 @@ namespace Bruno
     
 		psoDesc.RootSignature = m_marqueeRootSig.get();
 		
-		psoDesc.VertexShaderDesc = vsDesc;
-		psoDesc.PixelShaderDesc = psDesc;
+		psoDesc.VertexShaderDesc = { L"Shaders/Marquee.hlsl", L"VSMain", L"vs_6_0" };
+		psoDesc.PixelShaderDesc = { L"Shaders/Marquee.hlsl", L"PSMain", L"ps_6_0" };
 		
 		psoDesc.RasterizerState.CullMode = CullMode::None;
 		
