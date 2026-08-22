@@ -35,7 +35,7 @@ struct VertexOut
 // ==========================================
 // VERTEX SHADER
 // ==========================================
-VertexOut VS(VertexIn vin)
+VertexOut VSMain(VertexIn vin)
 {
     VertexOut vout;
     
@@ -51,7 +51,7 @@ VertexOut VS(VertexIn vin)
 // ==========================================
 // PIXEL SHADER
 // ==========================================
-float4 PS(VertexOut pin) : SV_Target
+float4 PSMain(VertexOut pin) : SV_Target
 {
     // Muestrear la textura usando las coordenadas UV
     float4 diffuseAlbedo = gDiffuseMap.Sample(gsamLinear, pin.TexC);

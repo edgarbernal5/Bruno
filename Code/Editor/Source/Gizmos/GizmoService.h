@@ -187,7 +187,7 @@ namespace Bruno
         TransformSpace m_transformSpace = TransformSpace::Local;
         GizmoConfig m_gizmoConfig;
         
-        std::unique_ptr<RootSignature> m_rootSignature;
+        std::shared_ptr<RootSignature> m_rootSignature;
         std::unique_ptr<GraphicsPipelineState> m_psoDepthOff; // Gizmos "X-Ray" dibujados sobre los objetos
 
         std::unique_ptr<Shader> m_vertexShader;

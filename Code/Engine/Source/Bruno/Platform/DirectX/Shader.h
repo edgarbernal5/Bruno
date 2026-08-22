@@ -3,6 +3,7 @@
 #include "D3DHelpers.h"
 #include <dxcapi.h>
 #include "Bruno/Content/Asset.h"
+
 namespace Bruno
 {
     enum class ShaderStage 
@@ -11,12 +12,33 @@ namespace Bruno
         Pixel,
         Compute
     };
+    
+    struct ShaderCompileDesc
+    {
+        std::wstring FilePath;
+        std::wstring EntryPoint;
+        std::wstring Profile; // "vs_6_0" o "ps_6_0"
+
+        operator bool() const;
+        
+        size_t ComputeHash() const;
+
+        bool operator==(const ShaderCompileDesc& other) const
+        {
+            return FilePath == other.FilePath && 
+                   EntryPoint == other.EntryPoint && 
+                   Profile == other.Profile;
+        }
+    };
 
     class ShaderProgram 
     {
     public:
         ShaderProgram(ShaderStage stage, Microsoft::WRL::ComPtr<IDxcBlob> byteCode)
-            : m_stage(stage), m_byteCode(std::move(byteCode)) {}
+            : m_stage(stage), m_byteCode(std::move(byteCode))
+        {
+        }
+        ShaderProgram(const std::wstring& profile, Microsoft::WRL::ComPtr<IDxcBlob> byteCode);
 
         ShaderStage GetStage() const { return m_stage; }
         IDxcBlob* GetByteCode() const { return m_byteCode.Get(); }

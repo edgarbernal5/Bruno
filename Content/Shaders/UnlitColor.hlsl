@@ -15,7 +15,7 @@ struct VertexShaderOutput
     float4 Color     : COLOR0;
 };
 
-VertexShaderOutput VS(VertexPosColorTex IN)
+VertexShaderOutput VSMain(VertexPosColorTex IN)
 {
     VertexShaderOutput OUT;
 
@@ -25,7 +25,7 @@ VertexShaderOutput VS(VertexPosColorTex IN)
     return OUT;
 }
 
-float4 PS(VertexShaderOutput IN) : SV_Target
+float4 PSMain(VertexShaderOutput IN) : SV_Target
 {
     if (IN.Color.a < 0.1f)
     {

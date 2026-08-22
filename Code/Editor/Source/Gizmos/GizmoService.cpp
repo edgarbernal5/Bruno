@@ -5,10 +5,11 @@
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
 #include "Bruno/Platform/DirectX/GraphicsPipelineState.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
-#include "Bruno/Platform/DirectX/ShaderCompiler.h"
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/PrimitiveBatch.h"
+#include "Bruno/Renderer/RootSignatureLibrary.h"
+#include "Bruno/Renderer/ShaderLibrary.h"
 
 namespace Bruno
 {
@@ -30,28 +31,29 @@ namespace Bruno
 
     void GizmoService::Initialize()
     {
+        auto prototypeSig = std::make_shared<RootSignature>(*m_device);
+        
         m_rootSignature = std::make_unique<RootSignature>(*m_device);
 
         // 16 floats (32-bits c/u) equivalen a una Matriz de 4x4. 
         // Van al registro b0 y solo el Vertex Shader necesita leerlos.
-        m_rootSignature->AddConstants(16, 0, 0, ShaderVisibility::Vertex);
-        m_rootSignature->Build();
-        
-        ShaderCompiler compiler; 
+        prototypeSig->AddConstants(sizeof(Math::Matrix) / 4, 0, 0, ShaderVisibility::Vertex);
 
-        auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"VS", L"vs_6_0");
-        auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/UnlitColor.hlsl", L"PS", L"ps_6_0");
-		
-        std::unique_ptr<ShaderProgram> vertexShader = std::make_unique<ShaderProgram>(ShaderStage::Vertex, vertexShaderByteCode);
-        std::unique_ptr<ShaderProgram> pixelShader = std::make_unique<ShaderProgram>(ShaderStage::Pixel, pixelShaderByteCode);
+        m_rootSignature = RootSignatureLibrary::GetOrCreate(prototypeSig);
+        
+        ShaderCompileDesc vsDesc = { L"Shaders/UnlitColor.hlsl", L"VSMain", L"vs_6_0" };
+        auto vertexShader = ShaderLibrary::GetOrCompile(vsDesc);
+        
+        ShaderCompileDesc psDesc = { L"Shaders/UnlitColor.hlsl", L"PSMain", L"ps_6_0" };
+        auto pixelShader = ShaderLibrary::GetOrCompile(psDesc);
         
         GraphicsPipelineStateDesc psoDesc = {};
         // Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
         psoDesc.RootSignature = m_rootSignature.get();
         psoDesc.InputLayout = VertexPositionColor::GetLayout();
         
-        psoDesc.VertexShader = vertexShader.get();
-        psoDesc.PixelShader = pixelShader.get();
+        psoDesc.VertexShaderDesc = vsDesc;
+        psoDesc.PixelShaderDesc = psDesc;
         
         psoDesc.RasterizerState.CullMode = CullMode::None;
     

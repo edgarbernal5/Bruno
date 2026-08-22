@@ -324,6 +324,18 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\DynamicDescriptorAllocator.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\ShaderLibrary.h">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\RootSignatureLibrary.h">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\PSOCache.h">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\RHITypes.h">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -535,6 +547,15 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\DynamicDescriptorAllocator.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\RootSignatureLibrary.cpp">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\ShaderLibrary.cpp">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\PSOCache.cpp">
+      <Filter>Source\Bruno\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

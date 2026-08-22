@@ -14,7 +14,7 @@ struct VSOutput
     float2 PosNDC : TEXCOORD0; // <--- NUEVO: Guardamos la posición absoluta NDC
 };
 
-VSOutput VS(uint vertexID : SV_VertexID)
+VSOutput VSMain(uint vertexID : SV_VertexID)
 {
     VSOutput output;
     
@@ -29,7 +29,7 @@ VSOutput VS(uint vertexID : SV_VertexID)
     return output;
 }
 
-float4 PS(VSOutput input) : SV_TARGET
+float4 PSMain(VSOutput input) : SV_TARGET
 {
     // 1. Identificar los límites reales del rectángulo
     // (min/max protegen el cálculo si el usuario arrastra de derecha a izquierda)

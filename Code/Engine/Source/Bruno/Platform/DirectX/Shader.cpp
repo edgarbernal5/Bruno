@@ -3,7 +3,34 @@
 
 namespace Bruno
 {
-	BR_RTTI_DEFINITIONS(Shader);
+    BR_RTTI_DEFINITIONS(Shader);
+
+    ShaderCompileDesc::operator bool() const
+    {
+        return !FilePath.empty() && !EntryPoint.empty() && !Profile.empty();
+    }
+
+    size_t ShaderCompileDesc::ComputeHash() const
+    {
+        size_t seed = 0;
+        HashCombine(seed, FilePath);
+        HashCombine(seed, EntryPoint);
+        HashCombine(seed, Profile);
+        return seed;
+    }
+
+    ShaderProgram::ShaderProgram(const std::wstring& profile, Microsoft::WRL::ComPtr<IDxcBlob> byteCode) :
+        m_byteCode(std::move(byteCode))
+    {
+        if (profile._Starts_with(L"vs_"))
+        {
+            m_stage = ShaderStage::Vertex;
+        }
+        else if (profile._Starts_with(L"ps_"))
+        {
+            m_stage = ShaderStage::Pixel;
+        }
+    }
     
     void Shader::AddProgram(ShaderProgram&& program)
     {

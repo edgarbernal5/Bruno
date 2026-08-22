@@ -19,6 +19,13 @@ namespace Bruno
         // Traducimos dinámicamente tu enumerado al nativo de DX12
         param.InitAsConstants(num32BitValues, shaderRegister, registerSpace, GetDX12Visibility(visibility));
         m_parameters.push_back(param);
+        
+        // Acumulamos el hash
+        HashCombine(m_hash, static_cast<uint32_t>(4)); // 4 = Tipo 
+        HashCombine(m_hash, num32BitValues);
+        HashCombine(m_hash, shaderRegister);
+        HashCombine(m_hash, registerSpace);
+        HashCombine(m_hash, static_cast<uint32_t>(visibility));
     }
 
     void RootSignature::AddConstantBufferView(uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility)
@@ -27,6 +34,12 @@ namespace Bruno
 
         param.InitAsConstantBufferView(shaderRegister, registerSpace, GetDX12Visibility(visibility));
         m_parameters.push_back(param);
+        
+        // Acumulamos el hash
+        HashCombine(m_hash, static_cast<uint32_t>(1)); // 1 = Tipo CBV
+        HashCombine(m_hash, shaderRegister);
+        HashCombine(m_hash, registerSpace);
+        HashCombine(m_hash, static_cast<uint32_t>(visibility));
     }
 
     void RootSignature::AddDescriptorTableSRV(uint32_t numDescriptors, uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility)
@@ -40,10 +53,15 @@ namespace Bruno
 
         m_descriptorRanges.push_back(std::move(range));
         m_parameters.push_back(param);
+        
+        HashCombine(m_hash, static_cast<uint32_t>(2)); // 2 = Tipo SRV Table
+        HashCombine(m_hash, numDescriptors);
+        HashCombine(m_hash, shaderRegister);
+        HashCombine(m_hash, registerSpace);
+        HashCombine(m_hash, static_cast<uint32_t>(visibility));
     }
 
-    void RootSignature::AddStaticSampler(uint32_t shaderRegister, uint32_t registerSpace, TextureFilter filter,
-        TextureAddressMode addressMode, ShaderVisibility visibility)
+    void RootSignature::AddStaticSampler(uint32_t shaderRegister, uint32_t registerSpace, TextureFilter filter, TextureAddressMode addressMode, ShaderVisibility visibility)
     {
         // Traducimos tus enums agnósticos a DX12
         D3D12_FILTER dxFilter = GetDX12Filter(filter);
@@ -67,9 +85,15 @@ namespace Bruno
         );
 
         m_staticSamplers.push_back(sampler);
+        
+        HashCombine(m_hash, static_cast<uint32_t>(3)); // 3 = Tipo Sampler
+        HashCombine(m_hash, shaderRegister);
+        HashCombine(m_hash, registerSpace);
+        HashCombine(m_hash, static_cast<uint32_t>(filter));
+        HashCombine(m_hash, static_cast<uint32_t>(addressMode));
+        HashCombine(m_hash, static_cast<uint32_t>(visibility));
     }
-
-
+    
     void RootSignature::Build(RootSignatureFlags flags)
     {
         // Traducimos tus flags agnósticos a los de DX12
@@ -110,6 +134,13 @@ namespace Bruno
             IID_PPV_ARGS(&m_rootSignature)
         ));
         
+    }
+
+    size_t RootSignature::ComputeHash(RootSignatureFlags flags) const
+    {
+        size_t finalHash = m_hash;
+        HashCombine(finalHash, static_cast<uint32_t>(flags));
+        return finalHash;
     }
 
     D3D12_CULL_MODE RootSignature::GetDX12CullMode(CullMode mode)

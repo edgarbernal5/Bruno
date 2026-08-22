@@ -103,7 +103,7 @@ namespace Bruno
 		std::shared_ptr<SelectionService> m_selectionService;
 		std::shared_ptr<GizmoService> m_gizmoService;
 		std::unique_ptr<CameraGizmo> m_cameraGizmo;
-		std::unique_ptr<RootSignature> m_marqueeRootSig;
+		std::shared_ptr<RootSignature> m_marqueeRootSig;
 		std::unique_ptr<GraphicsPipelineState> m_marqueePSO;
 		std::unique_ptr<DebugRenderer> m_debugRenderer;
 

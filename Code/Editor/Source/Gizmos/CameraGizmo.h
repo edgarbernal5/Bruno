@@ -38,7 +38,7 @@ namespace Bruno
         GizmoAxis m_cameraGizmoHoveredAxis { GizmoAxis::None };
         bool m_mousePressed = false;
         PrimitiveBatch m_cameraGizmoBatch; // Para la brújula de la esquina
-        std::unique_ptr<RootSignature> m_rootSignature;
+        std::shared_ptr<RootSignature> m_rootSignature;
         std::unique_ptr<GraphicsPipelineState> m_psoDepthOff; // Gizmos "X-Ray" dibujados sobre los objetos
 
         Math::Color m_axisColors[3]{ Math::Color(1.0f,0.0f,0.0f,1.0f),Math::Color(0.0f,1.0f,0.0f,1.0f), Math::Color(0.0f,0.0f,1.0f,1.0f) };

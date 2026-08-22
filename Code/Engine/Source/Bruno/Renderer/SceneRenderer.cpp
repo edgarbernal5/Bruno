@@ -2,6 +2,9 @@
 #include "SceneRenderer.h"
 
 #include "PrimitiveBatch.h"
+#include "PSOCache.h"
+#include "RootSignatureLibrary.h"
+#include "ShaderLibrary.h"
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Renderer/RenderItem.h"
 #include "Bruno/Renderer/Material.h"
@@ -13,7 +16,6 @@
 
 #include "Bruno/Content/AssetManager.h"
 #include "Bruno/Core/Memory.h"
-#include "Bruno/Platform/DirectX/ShaderCompiler.h"
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/Camera.h"
 #include "Bruno/Scene/Systems/FrustumCulling.h"
@@ -72,16 +74,16 @@ namespace Bruno
 	
 	void SceneRenderer::InitializeOpaqueRootSignature(GraphicsDevice* device)
 	{
-		m_opaqueRootSignature = std::make_shared<RootSignature>(*device);
+		auto prototypeSig = std::make_shared<RootSignature>(*device);
 
 		// Parámetro 0: Constant Buffer View en b0 (Matriz MVP)
-		m_opaqueRootSignature->AddConstantBufferView(0, 0, ShaderVisibility::Vertex);
+		prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::Vertex);
 
 		// Parámetro 1: Tabla de Descriptores para 1 textura en t0 
-		m_opaqueRootSignature->AddDescriptorTableSRV(1, 0, 0, ShaderVisibility::Pixel);
+		prototypeSig->AddDescriptorTableSRV(1, 0, 0, ShaderVisibility::Pixel);
 
 		// Sampler: Filtro lineal en s0
-		m_opaqueRootSignature->AddStaticSampler(
+		prototypeSig->AddStaticSampler(
 			0, 
 			0, 
 			TextureFilter::Linear, 
@@ -89,27 +91,24 @@ namespace Bruno
 			ShaderVisibility::Pixel
 		);
 
-		m_opaqueRootSignature->Build();
+		m_opaqueRootSignature = RootSignatureLibrary::GetOrCreate(prototypeSig);
 	}
 
 	void SceneRenderer::InitializeOpaquePSO(GraphicsDevice* device)
 	{
-		// Instanciamos el Pipeline State Object (PSO) pasándole el contrato y shaders
-		ShaderCompiler compiler; 
-
-		auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"VS", L"vs_6_0");
-		auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/Opaque.hlsl", L"PS", L"ps_6_0");
-		
-		std::unique_ptr<ShaderProgram> vertexShader = std::make_unique<ShaderProgram>(ShaderStage::Vertex, vertexShaderByteCode);
-		std::unique_ptr<ShaderProgram> pixelShader = std::make_unique<ShaderProgram>(ShaderStage::Pixel, pixelShaderByteCode);
+		ShaderCompileDesc vsDesc = { L"Shaders/Opaque.hlsl", L"VSMain", L"vs_6_0" };
+		auto vertexShader = ShaderLibrary::GetOrCompile(vsDesc);
+        
+		ShaderCompileDesc psDesc = { L"Shaders/Opaque.hlsl", L"PSMain", L"ps_6_0" };
+		auto pixelShader = ShaderLibrary::GetOrCompile(psDesc);
 		
 		GraphicsPipelineStateDesc psoDesc = {};
 		// Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
 		psoDesc.RootSignature = m_opaqueRootSignature.get();
 		psoDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
 		
-        psoDesc.VertexShader = vertexShader.get();
-        psoDesc.PixelShader = pixelShader.get();
+        psoDesc.VertexShaderDesc = vsDesc;
+        psoDesc.PixelShaderDesc = psDesc;
 		
 		psoDesc.RasterizerState.CullMode = CullMode::Back;
 		psoDesc.RasterizerState.FillMode = FillMode::Solid;
@@ -122,8 +121,7 @@ namespace Bruno
         psoDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;
         psoDesc.DSVFormat = TextureFormat::D24_Unorm_S8_Uint;
 		
-		m_opaquePSO = std::make_shared<GraphicsPipelineState>(*device);
-		m_opaquePSO->Initialize(psoDesc);
+		m_opaquePSO = PSOCache::GetOrCreate(device, psoDesc);
 	}
 
 	void SceneRenderer::OnRender(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)

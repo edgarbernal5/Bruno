@@ -29,7 +29,7 @@ cbuffer FrameData : register(b0)
 // ==========================================
 // VERTEX SHADER
 // ==========================================
-PSInput VS(VSInput input)
+PSInput VSMain(VSInput input)
 {
     PSInput output;
     
@@ -47,7 +47,7 @@ PSInput VS(VSInput input)
 // ==========================================
 // PIXEL SHADER (LA MAGIA VISUAL)
 // ==========================================
-float4 PS(PSInput input) : SV_TARGET
+float4 PSMain(PSInput input) : SV_TARGET
 {
     // Normalizar vectores críticos
     float3 N = normalize(input.Normal);

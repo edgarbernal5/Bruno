@@ -21,7 +21,7 @@ namespace Bruno
     private:
         std::unique_ptr<PrimitiveBatch> m_primitiveBatch;
 		std::shared_ptr<Scene> m_scene;
-        std::unique_ptr<RootSignature> m_rootSignature;
+        std::shared_ptr<RootSignature> m_rootSignature;
         std::unique_ptr<GraphicsPipelineState> m_psoDepthOff;
         GraphicsDevice* m_device;
     };

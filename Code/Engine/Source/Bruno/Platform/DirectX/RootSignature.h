@@ -32,6 +32,8 @@ namespace Bruno
         void AddStaticSampler(uint32_t shaderRegister, uint32_t registerSpace = 0, TextureFilter filter = TextureFilter::Linear, TextureAddressMode addressMode = TextureAddressMode::Wrap, ShaderVisibility visibility = ShaderVisibility::All);
         void Build(RootSignatureFlags flags = RootSignatureFlags::AllowInputAssembler);
         
+        size_t ComputeHash(RootSignatureFlags flags) const;
+        
         [[nodiscard]] ID3D12RootSignature* GetNative() const { return m_rootSignature.Get(); }
         
     private:
@@ -42,7 +44,7 @@ namespace Bruno
         D3D12_ROOT_SIGNATURE_FLAGS GetDX12RootSignatureFlags(RootSignatureFlags flags);
         
         GraphicsDevice& m_device;
-        
+        size_t m_hash = 0;
         Microsoft::WRL::ComPtr<ID3D12RootSignature> m_rootSignature;
         
         std::vector<CD3DX12_ROOT_PARAMETER> m_parameters;

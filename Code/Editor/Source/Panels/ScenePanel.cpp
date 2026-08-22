@@ -20,6 +20,8 @@
 #include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Platform/DirectX/ShaderCompiler.h"
+#include "Bruno/Renderer/RootSignatureLibrary.h"
+#include "Bruno/Renderer/ShaderLibrary.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
 #include "Gizmos/CameraGizmo.h"
@@ -541,18 +543,16 @@ namespace Bruno
 
 	void ScenePanel::InitializeMarquee()
 	{
-		ShaderCompiler compiler; 
-
-		auto vertexShaderByteCode = compiler.CompileFromFile(L"Shaders/Marquee.hlsl", L"VS", L"vs_6_0");
-		auto pixelShaderByteCode  = compiler.CompileFromFile(L"Shaders/Marquee.hlsl", L"PS", L"ps_6_0");
+		ShaderCompileDesc vsDesc = { L"Shaders/Marquee.hlsl", L"VSMain", L"vs_6_0" };
+		auto vertexShader = ShaderLibrary::GetOrCompile(vsDesc);
+        
+		ShaderCompileDesc psDesc = { L"Shaders/Marquee.hlsl", L"PSMain", L"ps_6_0" };
+		auto pixelShader = ShaderLibrary::GetOrCompile(psDesc);
+        
+		auto prototypeSig = std::make_shared<RootSignature>(*m_device);
+		prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::All);
 		
-		std::unique_ptr<ShaderProgram> vertexShader = std::make_unique<ShaderProgram>(ShaderStage::Vertex, vertexShaderByteCode);
-		std::unique_ptr<ShaderProgram> pixelShader = std::make_unique<ShaderProgram>(ShaderStage::Pixel, pixelShaderByteCode);
-		
-		m_marqueeRootSig = std::make_unique<RootSignature>(*m_device);
-		
-		m_marqueeRootSig->AddConstantBufferView(0, 0, ShaderVisibility::All);
-		m_marqueeRootSig->Build();
+		m_marqueeRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
 
 		GraphicsPipelineStateDesc psoDesc = {};
 		// CRÍTICO: El input layout queda vacío. No hay Vertex Buffer.
@@ -560,8 +560,8 @@ namespace Bruno
     
 		psoDesc.RootSignature = m_marqueeRootSig.get();
 		
-		psoDesc.VertexShader = vertexShader.get();
-		psoDesc.PixelShader = pixelShader.get();
+		psoDesc.VertexShaderDesc = vsDesc;
+		psoDesc.PixelShaderDesc = psDesc;
 		
 		psoDesc.RasterizerState.CullMode = CullMode::None;
 		
