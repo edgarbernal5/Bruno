@@ -16,12 +16,11 @@ namespace Bruno
     void RootSignature::AddConstants(uint32_t num32BitValues, uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility)
     {
         CD3DX12_ROOT_PARAMETER param;
-        // Traducimos dinámicamente tu enumerado al nativo de DX12
         param.InitAsConstants(num32BitValues, shaderRegister, registerSpace, GetDX12Visibility(visibility));
         m_parameters.push_back(param);
         
         // Acumulamos el hash
-        HashCombine(m_hash, static_cast<uint32_t>(4)); // 4 = Tipo 
+        HashCombine(m_hash, static_cast<uint32_t>(4)); // 4 = Tipo Constants
         HashCombine(m_hash, num32BitValues);
         HashCombine(m_hash, shaderRegister);
         HashCombine(m_hash, registerSpace);
@@ -48,7 +47,6 @@ namespace Bruno
         range[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, numDescriptors, shaderRegister, registerSpace);
 
         CD3DX12_ROOT_PARAMETER param;
-        // Traducimos tu enum
         param.InitAsDescriptorTable(1, range.get(), GetDX12Visibility(visibility));
 
         m_descriptorRanges.push_back(std::move(range));
@@ -63,7 +61,6 @@ namespace Bruno
 
     void RootSignature::AddStaticSampler(uint32_t shaderRegister, uint32_t registerSpace, TextureFilter filter, TextureAddressMode addressMode, ShaderVisibility visibility)
     {
-        // Traducimos tus enums agnósticos a DX12
         D3D12_FILTER dxFilter = GetDX12Filter(filter);
         D3D12_TEXTURE_ADDRESS_MODE dxAddress = GetDX12AddressMode(addressMode);
 
@@ -96,7 +93,6 @@ namespace Bruno
     
     void RootSignature::Build(RootSignatureFlags flags)
     {
-        // Traducimos tus flags agnósticos a los de DX12
         D3D12_ROOT_SIGNATURE_FLAGS dxFlags = GetDX12RootSignatureFlags(flags);
 
         CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;
@@ -108,13 +104,11 @@ namespace Bruno
             dxFlags // Pasamos los flags traducidos
         );
 
-        // Serialización
         Microsoft::WRL::ComPtr<ID3DBlob> serializedSignature;
         Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 
         HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, &serializedSignature, &errorBlob);
 
-        // Manejo de errores detallado (vital en DX12)
         if (FAILED(hr))
         {
             if (errorBlob)
@@ -126,14 +120,12 @@ namespace Bruno
             ThrowIfFailed(hr);
         }
 
-        // Creación en el dispositivo nativo
         ThrowIfFailed(m_device.GetNativeDevice()->CreateRootSignature(
             0,
             serializedSignature->GetBufferPointer(),
             serializedSignature->GetBufferSize(),
             IID_PPV_ARGS(&m_rootSignature)
         ));
-        
     }
 
     size_t RootSignature::ComputeHash(RootSignatureFlags flags) const
@@ -145,7 +137,8 @@ namespace Bruno
 
     D3D12_CULL_MODE RootSignature::GetDX12CullMode(CullMode mode)
     {
-        switch(mode) {
+        switch(mode)
+        {
         case CullMode::None: return D3D12_CULL_MODE_NONE;
         case CullMode::Front: return D3D12_CULL_MODE_FRONT;
         case CullMode::Back: return D3D12_CULL_MODE_BACK;

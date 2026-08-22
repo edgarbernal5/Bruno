@@ -20,7 +20,7 @@ namespace Bruno
                 {
                     std::function<void()> job;
                     {
-                        std::unique_lock<std::mutex> lock(m_queueMutex);
+                        std::unique_lock lock(m_queueMutex);
                         m_condition.wait(lock, [this]
                         { 
                             return m_stop.load() || !m_jobQueue.empty(); 
@@ -37,7 +37,6 @@ namespace Bruno
 
                     // Ejecutar el trabajo
                     job();
-                    m_activeJobs.fetch_sub(1, std::memory_order_release);
                 }
             });
         }
@@ -56,22 +55,39 @@ namespace Bruno
         }
     }
 
-    void JobSystem::Execute(std::function<void()> job)
+    void JobSystem::Execute(std::function<void()> job, JobDispatchGroup* group)
     {
-        m_activeJobs.fetch_add(1, std::memory_order_acquire);
+        if (group)
         {
-            std::lock_guard<std::mutex> lock(m_queueMutex);
-            m_jobQueue.push(std::move(job));
+            // Incrementamos el contador ANTES de encolar
+            group->pendingJobs.fetch_add(1, std::memory_order_acquire);
+        }
+
+        {
+            std::scoped_lock lock(m_queueMutex);
+            // Si pasamos un grupo, envolvemos el job original para que reduzca el contador al terminar
+            if (group)
+            {
+                m_jobQueue.push([job, group]()
+                {
+                    job(); // Ejecuta la tarea real
+                    group->pendingJobs.fetch_sub(1, std::memory_order_release);
+                });
+            }
+            else
+            {
+                m_jobQueue.push(std::move(job));
+            }
         }
         m_condition.notify_one();
     }
 
-    void JobSystem::Wait()
+    void JobSystem::Wait(const JobDispatchGroup& group)
     {
-        // Un spin-lock eficiente. Cede el tiempo de CPU mientras espera.
-        while (m_activeJobs.load(std::memory_order_acquire) > 0)
+        // Spin-lock que cede la CPU mientras espera que ESTE grupo termine
+        while (group.pendingJobs.load(std::memory_order_acquire) > 0)
         {
-            std::this_thread::yield();
+            std::this_thread::yield(); 
         }
     }
 }

@@ -3,13 +3,19 @@
 #include <DirectXMath.h>
 #include <vector>
 
+#include "Bruno/Scene/Entity.h"
 
 namespace Bruno
 {
     class Camera;
     class Entity;
     class Scene;
-
+    
+    struct alignas(std::hardware_destructive_interference_size) ThreadLocalResult
+    {
+        std::vector<entt::entity> visibleEntities;
+    };
+    
     class FrustumCulling
     {
     public:
@@ -17,10 +23,7 @@ namespace Bruno
         
         void Update();
         
-        const std::vector<Entity>& GetVisibleEntities()
-        {
-            return m_visibleEntities;
-        }
+        const std::vector<Entity>& GetVisibleEntities() { return m_visibleEntities; }
     private:
         void ExtractFrustumPlanes(DirectX::XMVECTOR planesOut[6]);
         

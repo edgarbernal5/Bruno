@@ -123,6 +123,7 @@ namespace Bruno
 		auto& visibleEntities = m_frustumCulling->GetVisibleEntities();
 		
 		VertexBuffer* currentVB = nullptr;
+		GraphicsPipelineState* currentPSO = nullptr;
 		for (Entity entity : visibleEntities)
 		{
 			const auto& modelComponent = entity.GetComponent<ModelComponent>();
@@ -160,7 +161,11 @@ namespace Bruno
 					currentVB = vertexBuffer.get();
 				}
 				
-				graphicsContext->SetPipelineState(material->GetPSO().get());
+				if (currentPSO != material->GetPSO().get())
+				{
+					graphicsContext->SetPipelineState(material->GetPSO().get());
+					currentPSO = material->GetPSO().get();
+				}
 				graphicsContext->SetRootSignature(material->GetRootSignature().get());
 				
 				// Enlazar la tabla de texturas (Parámetro 1 en nuestra Root Signature)

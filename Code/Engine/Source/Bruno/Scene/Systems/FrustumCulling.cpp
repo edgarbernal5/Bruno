@@ -29,9 +29,11 @@ namespace Bruno
         const size_t chunkSize = 1024;
         const size_t numChunks = (totalEntities + chunkSize - 1) / chunkSize;
         
-        // Vector de vectores para guardar resultados SIN mutexes
-        std::vector<std::vector<entt::entity>> threadLocalVisible(numChunks);
+        // Creamos nuestro "Grupo" para este pase de culling
+        JobDispatchGroup cullingGroup;
         
+        // Vector de vectores para guardar resultados SIN mutexes
+        std::vector<ThreadLocalResult> threadLocalVisible(numChunks);
         for (size_t chunkIdx = 0; chunkIdx < numChunks; ++chunkIdx)
         {
             JobSystem::Get().Execute([&, chunkIdx]()
@@ -40,7 +42,7 @@ namespace Bruno
                 size_t endIdx = std::min<size_t>(startIdx + chunkSize, totalEntities);
                 
                 // Reservamos memoria aproximada para evitar allocations
-                threadLocalVisible[chunkIdx].reserve(chunkSize / 2);
+                threadLocalVisible[chunkIdx].visibleEntities.reserve(chunkSize / 2);
                 
                 for (size_t i = startIdx; i < endIdx; ++i)
                 {
@@ -68,26 +70,26 @@ namespace Bruno
 
                     if (result != DirectX::DISJOINT)
                     {
-                        threadLocalVisible[chunkIdx].emplace_back(entt);
+                        threadLocalVisible[chunkIdx].visibleEntities.emplace_back(entt);
                     }
                 }
-            });
+            }, &cullingGroup);
         }
         
-        JobSystem::Get().Wait();
+        JobSystem::Get().Wait(cullingGroup);
         
         m_visibleEntities.clear();
         // Reduce: Unificamos los resultados de manera contigua
         size_t totalVisibleCount = 0;
         for (const auto& localList : threadLocalVisible)
         {
-            totalVisibleCount += localList.size();
+            totalVisibleCount += localList.visibleEntities.size();
         }
     
         m_visibleEntities.reserve(totalVisibleCount);
         for (const auto& localList : threadLocalVisible)
         {
-            for (const auto& entt : localList)
+            for (const auto& entt : localList.visibleEntities)
             {
                 m_visibleEntities.emplace_back(entt, m_scene.get());
             }

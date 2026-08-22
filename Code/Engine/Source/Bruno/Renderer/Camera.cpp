@@ -300,7 +300,7 @@ namespace Bruno
 		m_states.ViewDirty = m_states.ViewProjectionDirty = true;
 	}
 
-	DirectX::BoundingFrustum Camera::GetWorldSpaceFrustum() const
+	[[nodiscard]] DirectX::BoundingFrustum Camera::GetWorldSpaceFrustum() const
 	{
 		DirectX::BoundingFrustum frustum;
     
