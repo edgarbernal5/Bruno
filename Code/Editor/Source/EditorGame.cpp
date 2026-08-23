@@ -13,6 +13,7 @@
 #include "Panels/ContentBrowserPanel.h"
 
 #include "AssetEditors/AssetEditorService.h"
+#include "Panels/ProfilerPanel.h"
 
 namespace Bruno
 {
@@ -157,9 +158,12 @@ namespace Bruno
 			{
 				//		//AssetEditor?
 			});
+		
+		m_profilerPanel = std::make_unique<ProfilerPanel>(form);
 
 		m_layout.AddPaneTab("scene-doc-pane", "tab-scene", std::move(m_sceneDocumentPanel), "", Berta::DockPosition::Tab);
 		m_layout.AddPaneTab("content-browser-pane", "tab-content-browser", std::move(m_contentBrowserPanel), "scene-doc-pane", Berta::DockPosition::Right);
+		m_layout.AddPaneTab("profiler-pane", "tab-profiler", std::move(m_profilerPanel), "content-browser-pane", Berta::DockPosition::Down);
 
 		m_layout.Apply();
 

@@ -13,8 +13,10 @@
 #include <Bruno/Platform/DirectX/Surface.h>
 
 #include "Bruno/Core/JobSystem.h"
+#include "Bruno/Platform/DirectX/CommandQueue.h"
 #include "Bruno/Platform/DirectX/CommandQueueManager.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
+#include "Bruno/Platform/DirectX/Profiler.h"
 
 namespace Bruno
 {
@@ -63,8 +65,7 @@ namespace Bruno
 		SurfaceWindowParameters surfaceParameters;
 
 		JobSystem::Get().Initialize();
-		//m_shaderCache.Initialize();
-		//m_psoCache.Initialize(surfaceParameters.BackBufferFormat, surfaceParameters.DepthBufferFormat);
+		Profiler::Get().Initialize(m_device.get(), m_device->GetDirectCommandQueue().GetNativeQueue().Get());
 	}
 
 	void Game::OnRun()

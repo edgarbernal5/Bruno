@@ -17,6 +17,7 @@
 
 #include "SceneHierarchyPanel.h"
 #include "Bruno/Platform/DirectX/DynamicAllocation.h"
+#include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/Shader.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
@@ -171,7 +172,7 @@ namespace Bruno
 			Math::Matrix gizmoWorld;
 			Math::Vector3 gizmoPivot;
 			
-			m_sceneRenderer->OnRender(&context, m_sceneDocument->GetCamera(), frameIndex);
+			m_sceneRenderer->RenderScene(&context, m_sceneDocument->GetCamera(), frameIndex);
 			
 			if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
 			{
@@ -200,6 +201,8 @@ namespace Bruno
 
 			// 5. Intercambiar los buffers y mostrar en pantalla (VSync activado por ahora)
 			m_surface->Present(true);
+			
+			Profiler::Get().ReadbackGpuTimes();
 		});
 		
 		m_form->Handle()->RenderForAttributes.AutoRefresh = true;

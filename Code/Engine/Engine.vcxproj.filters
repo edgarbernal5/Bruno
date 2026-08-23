@@ -336,6 +336,12 @@
     <ClInclude Include="Source\Bruno\Renderer\RHITypes.h">
       <Filter>Source\Bruno\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Profiler.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Core\ScopedCpuTimer.h">
+      <Filter>Source\Bruno\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -556,6 +562,12 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\PSOCache.cpp">
       <Filter>Source\Bruno\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Profiler.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Core\ScopedCpuTimer.cpp">
+      <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

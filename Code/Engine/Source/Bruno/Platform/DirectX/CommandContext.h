@@ -12,15 +12,11 @@ namespace Bruno
     public:
         ID3D12GraphicsCommandList* GetNative() const { return m_commandList.Get(); }
         
-        // Métodos de ciclo de vida esenciales
         void Close();
         void Reset();
         
     protected:
-        // Constructor 1 (El que ya tienes, usado por UploadContext para crear sus propias listas)
         CommandContext(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE commandType);
-        
-        // Constructor 2 (NUEVO: Usado por GraphicsContext para envolver la lista del RenderLoop)
         CommandContext(GraphicsDevice& device, D3D12_COMMAND_LIST_TYPE commandType, ID3D12GraphicsCommandList* existingList, ID3D12CommandAllocator* existingAllocator);
         
         GraphicsDevice& m_device;

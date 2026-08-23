@@ -15,6 +15,8 @@
 
 #include "Bruno/Content/AssetManager.h"
 #include "Bruno/Core/Memory.h"
+#include "Bruno/Core/ScopedCpuTimer.h"
+#include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/Camera.h"
 #include "Bruno/Scene/Systems/FrustumCulling.h"
@@ -117,13 +119,27 @@ namespace Bruno
 		m_opaquePSO = PSOCache::GetOrCreate(device, psoDesc);
 	}
 
-	void SceneRenderer::OnRender(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
+	void SceneRenderer::RenderScene(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
 	{
-		m_frustumCulling->Update();
+		ScopedCpuTimer totalCpuTimer(&Profiler::Get().Stats.CpuTotalRenderTimeMs);
+		
+		Profiler::Get().Stats.ResetCounters();
+		
+		ID3D12GraphicsCommandList* cmdList = graphicsContext->GetNative();
+		{
+			ScopedCpuTimer cullingTimer(&Profiler::Get().Stats.CpuCullingTimeMs);
+			m_frustumCulling->Update();
+			Profiler::Get().Stats.TotalEntities = m_frustumCulling->GetTotalEntites();
+			Profiler::Get().Stats.RenderedEntities = m_frustumCulling->GetTotalVisibleEntities();
+		}
 		auto& visibleEntities = m_frustumCulling->GetVisibleEntities();
 		
 		VertexBuffer* currentVB = nullptr;
 		GraphicsPipelineState* currentPSO = nullptr;
+		
+		// 2. --- RENDERIZADO GPU ---
+		Profiler::Get().StartGpuTimer(cmdList);
+		
 		for (Entity entity : visibleEntities)
 		{
 			const auto& modelComponent = entity.GetComponent<ModelComponent>();
@@ -185,8 +201,16 @@ namespace Bruno
 					mesh->GetBaseIndex(),
 					mesh->GetBaseVertex(),
 					0);
+				
+				Profiler::Get().Stats.DrawCalls++;
+				Profiler::Get().Stats.TriangleCount += (mesh->GetIndexCount() / 3);
 			}
 		}
+		
+		Profiler::Get().StopGpuTimer(cmdList);
+		
+		// Le ordenamos a la GPU copiar los tiempos al buffer leíble
+		Profiler::Get().ResolveGpuTimestamps(cmdList);
 	}
 
 }

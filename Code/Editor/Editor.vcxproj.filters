@@ -73,6 +73,9 @@
     <ClCompile Include="Source\Panels\Scene\DebugRenderer.cpp">
       <Filter>Source\Panels\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Panels\ProfilerPanel.cpp">
+      <Filter>Source\Panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="Source\Panels\Scene\DebugRenderer.h">
       <Filter>Source\Panels\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\ProfilerPanel.h">
+      <Filter>Source\Panels</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

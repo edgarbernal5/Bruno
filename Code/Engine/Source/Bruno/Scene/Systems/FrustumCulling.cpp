@@ -94,6 +94,8 @@ namespace Bruno
                 m_visibleEntities.emplace_back(entt, m_scene.get());
             }
         }
+        m_totalEntities = totalEntities;
+        m_totalVisibleCount = totalVisibleCount;
     }
 
     void FrustumCulling::ExtractFrustumPlanes(DirectX::XMVECTOR planesOut[6])

@@ -22,7 +22,7 @@ namespace Bruno
 		void InitEntitiesForRender();
 		void InitializeOpaqueRootSignature(GraphicsDevice* device);
 		void InitializeOpaquePSO(GraphicsDevice* device);
-		void OnRender(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
+		void RenderScene(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
 		
 	private:
 		

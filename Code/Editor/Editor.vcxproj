@@ -116,6 +116,7 @@ xcopy /y /d "$(SolutionDir)packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\nat
     <ClCompile Include="Source\Gizmos\CameraGizmo.cpp" />
     <ClCompile Include="Source\Gizmos\GizmoService.cpp" />
     <ClCompile Include="Source\Layouts\PaneManager.cpp" />
+    <ClCompile Include="Source\Panels\ProfilerPanel.cpp" />
     <ClCompile Include="Source\Panels\Properties\PropertyHelpers.cpp" />
     <ClCompile Include="Source\Panels\Scene\DebugRenderer.cpp" />
     <ClCompile Include="Source\Panels\Scene\EditorCameraController.cpp" />
@@ -143,6 +144,7 @@ xcopy /y /d "$(SolutionDir)packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\nat
     <ClInclude Include="Source\Gizmos\CameraGizmo.h" />
     <ClInclude Include="Source\Gizmos\GizmoService.h" />
     <ClInclude Include="Source\Layouts\PaneManager.h" />
+    <ClInclude Include="Source\Panels\ProfilerPanel.h" />
     <ClInclude Include="Source\Panels\Properties\PropertyHelpers.h" />
     <ClInclude Include="Source\Panels\Scene\Components.h" />
     <ClInclude Include="Source\Panels\Scene\DebugRenderer.h" />

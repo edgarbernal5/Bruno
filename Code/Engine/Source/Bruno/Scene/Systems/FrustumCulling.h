@@ -24,10 +24,14 @@ namespace Bruno
         void Update();
         
         const std::vector<Entity>& GetVisibleEntities() { return m_visibleEntities; }
+        size_t GetTotalEntites() { return m_totalEntities; }
+        size_t GetTotalVisibleEntities() { return m_totalVisibleCount; }
     private:
         void ExtractFrustumPlanes(DirectX::XMVECTOR planesOut[6]);
         
         Camera& m_camera;
+        size_t m_totalEntities { 0 };
+        size_t m_totalVisibleCount { 0 };
         std::shared_ptr<Scene> m_scene;
         std::vector<Entity> m_visibleEntities;    
     };

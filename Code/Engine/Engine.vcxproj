@@ -106,6 +106,7 @@
     <ClInclude Include="Source\Bruno\Content\AssetTable.h" />
     <ClInclude Include="Source\Bruno\Content\AssetTypes.h" />
     <ClInclude Include="Source\Bruno\Core\JobSystem.h" />
+    <ClInclude Include="Source\Bruno\Core\ScopedCpuTimer.h" />
     <ClInclude Include="Source\Bruno\Core\UUID.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueueManager.h" />
@@ -119,6 +120,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\Profiler.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderCompiler.h" />
@@ -201,6 +203,7 @@
     <ClCompile Include="Source\Bruno\Content\AssetManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\AssetTable.cpp" />
     <ClCompile Include="Source\Bruno\Core\JobSystem.cpp" />
+    <ClCompile Include="Source\Bruno\Core\ScopedCpuTimer.cpp" />
     <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueueManager.cpp" />
@@ -214,6 +217,83 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\IndexBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueue.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\Profiler.cpp">
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>..\..\Output\Debug_x64_tmp\Engine\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>..\..\Output\Debug_x64_tmp\Engine\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <UseDynamicDebugging>false</UseDynamicDebugging>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>..\..\Output\Debug_x64_tmp\Engine\</ModuleDependenciesFile>
+      <ModuleOutputFile>..\..\Output\Debug_x64_tmp\Engine\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>..\..\Output\Debug_x64_tmp\Engine\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>..\..\Output\Debug_x64\Engine\Engine.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>brpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>..\..\Output\Debug_x64_tmp\Engine\Engine.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>..\..\Output\Debug_x64_tmp\Engine\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>..\..\Output\Debug_x64_tmp\Engine\Engine.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>..\..\Output\Debug_x64_tmp\Engine\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;BR_PLATFORM_WINDOWS;BR_DEBUG;BT_PLATFORM_WINDOWS;BT_DEBUG;_UNICODE;UNICODE;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\User\Documents\Projects\Bruno\Code\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\include;C:\Users\User\Documents\Projects\Bruno\Code\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\include;C:\Users\User\Documents\Projects\Bruno\Code\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\include\d3dx12;C:\Users\User\Documents\Projects\Bruno\Code\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\;Source;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\Berta\Code\Berta\Source;</AdditionalIncludeDirectories>
+      <LibCompiled>true</LibCompiled>
+    </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignature.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderCompiler.cpp" />

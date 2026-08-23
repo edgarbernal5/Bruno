@@ -5,7 +5,6 @@
 
 #include <Berta/Controls/MenuBar.h>
 #include <Berta/GUI/Layout.h>
-#include <Berta/Controls/Panel.h>
 #include <mutex>
 
 #include <thread>
@@ -13,6 +12,7 @@
 
 namespace Bruno
 {
+	class ProfilerPanel;
 	class BertaWindow;
 	class GraphicsDevice;
 	class ScenePanel;
@@ -52,6 +52,7 @@ namespace Bruno
 
 		std::unique_ptr<SceneDocumentPanel> m_sceneDocumentPanel;
 		std::unique_ptr<ContentBrowserPanel> m_contentBrowserPanel;
+		std::unique_ptr<ProfilerPanel> m_profilerPanel;
 		std::vector<ScenePanel*> m_scenePanels;
 		std::mutex m_scenePanelsMutex{};
 
