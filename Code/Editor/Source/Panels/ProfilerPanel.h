@@ -10,7 +10,7 @@ namespace Bruno
     {
     public:
         ProfilerPanel(Berta::Window* window);
-
+        
     private:
 		Berta::Layout m_layout;
         Berta::Label m_visibleEntitiesLabel;
