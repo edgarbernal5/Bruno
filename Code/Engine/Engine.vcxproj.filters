@@ -55,6 +55,9 @@
     <Filter Include="Source\Bruno\Scene\Systems">
       <UniqueIdentifier>{925c742d-3dd0-4af3-92f0-8cea9bfdb914}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Bruno\Renderer\Deferred">
+      <UniqueIdentifier>{544c3fab-0028-43d0-89ea-04355c936e2e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -345,6 +348,9 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DFunctions.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\Deferred\GBuffer.h">
+      <Filter>Source\Bruno\Renderer\Deferred</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -574,6 +580,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\D3DFunctions.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\Deferred\GBuffer.cpp">
+      <Filter>Source\Bruno\Renderer\Deferred</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

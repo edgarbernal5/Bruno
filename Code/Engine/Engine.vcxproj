@@ -133,6 +133,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadHeap.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
+    <ClInclude Include="Source\Bruno\Renderer\Deferred\GBuffer.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
     <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch.h" />
     <ClInclude Include="Source\Bruno\Renderer\PSOCache.h" />
@@ -306,6 +307,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadHeap.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\Deferred\GBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentReader.cpp" />
