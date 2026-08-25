@@ -49,6 +49,7 @@ namespace Bruno
 		std::unique_ptr<UploadContext> m_uploadContext;
 		
 		std::unique_ptr<DescriptorAllocator> m_srvDescriptorAllocator;
+		std::unique_ptr<DescriptorAllocator> m_rtvDescriptorAllocator;
 	};
 }
 

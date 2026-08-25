@@ -111,6 +111,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueueManager.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DFunctions.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DynamicAllocation.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueueManager.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\D3DFunctions.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DynamicAllocation.cpp" />

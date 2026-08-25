@@ -21,10 +21,16 @@ namespace Bruno
         InitializeDXGI();
         CreateDevice();
         
-        // C++14/17: Creación segura de memoria dinámica (RAII)
         m_directCommandQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
         
         m_srvDescriptorAllocator = std::make_unique<DescriptorAllocator>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4096, true);
+        m_rtvDescriptorAllocator = std::make_unique<DescriptorAllocator>(
+            *this, 
+            D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 
+            128,  // Capacidad para 128 Render Targets simultáneos
+            false // Los RTVs NO son Shader Visible (regla de oro de DX12)
+        );
+        
         m_uploadContext = std::make_unique<UploadContext>(*this);
     }
 
@@ -69,10 +75,14 @@ namespace Bruno
             adapter->GetDesc1(&desc);
 
             // Ignoramos el renderizador por software (Basic Render Driver)
-            if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
-
+            if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+            {
+                continue;
+            }
+            
             // Verificamos si soporta DX12 (Feature Level 11_0 es el mínimo para DX12 API)
-            if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr))) {
+            if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
+            {
                 hardwareAdapter = adapter;
                 break;
             }

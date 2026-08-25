@@ -342,6 +342,9 @@
     <ClInclude Include="Source\Bruno\Core\ScopedCpuTimer.h">
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\D3DFunctions.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -568,6 +571,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\ScopedCpuTimer.cpp">
       <Filter>Source\Bruno\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\D3DFunctions.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

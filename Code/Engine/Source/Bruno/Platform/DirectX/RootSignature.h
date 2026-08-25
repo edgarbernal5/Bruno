@@ -25,7 +25,6 @@ namespace Bruno
         explicit RootSignature(GraphicsDevice& device);
         ~RootSignature() = default;
         
-        // Métodos agnósticos para construir la firma
         void AddConstants(uint32_t num32BitValues, uint32_t shaderRegister, uint32_t registerSpace = 0, ShaderVisibility visibility = ShaderVisibility::All);
         void AddConstantBufferView(uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility = ShaderVisibility::All);
         void AddDescriptorTableSRV(uint32_t numDescriptors, uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility = ShaderVisibility::All);
