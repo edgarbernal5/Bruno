@@ -21,9 +21,6 @@ namespace Bruno
         ShaderCompileDesc VertexShaderDesc;
         ShaderCompileDesc PixelShaderDesc;
         
-        std::wstring VertexShaderPath;
-        std::wstring PixelShaderPath;
-        
         std::vector<InputElementDesc> InputLayout;
         
         struct {
@@ -56,8 +53,8 @@ namespace Bruno
         TextureFormat DSVFormat = TextureFormat::D32_Float; 
 
         MultiSampleState MultiSample;
-        size_t ComputeHash() const;
         
+        size_t ComputeHash() const;
     };
     
     class GraphicsPipelineState
@@ -71,8 +68,6 @@ namespace Bruno
         void Initialize(const GraphicsPipelineStateDesc& psoDesc);
         
     private:
-        
-        
         GraphicsDevice& m_device;
         Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pso;
     };

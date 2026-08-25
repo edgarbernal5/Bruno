@@ -26,29 +26,14 @@ namespace Bruno
         return m_swapChain->GetCurrentBackBufferIndex();
     }
 
-    ID3D12Resource* Surface::GetCurrentBackBuffer() const
-    {
-        return m_swapChain->GetCurrentBackBuffer().Get();
-    }
-
     Texture2D* Surface::GetCurrentRenderTarget() const
     {
         return m_swapChain->GetCurrentRenderTarget();
     }
 
-    D3D12_CPU_DESCRIPTOR_HANDLE Surface::GetCurrentRenderTargetView() const
-    {
-        return m_swapChain->GetCurrentRenderTargetView();
-    }
-
     DepthBuffer* Surface::GetDepthBuffer() const
     {
         return m_depthBuffer.get();
-    }
-
-    D3D12_CPU_DESCRIPTOR_HANDLE Surface::GetDepthBufferView() const
-    {
-        return m_depthBuffer->GetView();
     }
 
     void Surface::Present(bool vsync)

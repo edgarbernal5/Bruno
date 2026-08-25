@@ -1,7 +1,7 @@
 ﻿#include "brpch.h"
 #include "CommandQueueManager.h"
 
-#include "GraphicsDevice.h" // Incluye para acceder al dispositivo nativo
+#include "GraphicsDevice.h"
 #include "CommandQueue.h"
 #include "UploadContext.h"
 

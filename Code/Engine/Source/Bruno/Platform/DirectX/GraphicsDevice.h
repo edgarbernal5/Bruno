@@ -29,6 +29,7 @@ namespace Bruno
 		[[nodiscard]] CommandQueue& GetDirectCommandQueue() const { return *m_directCommandQueue; }
 		
 		[[nodiscard]] DescriptorAllocator& GetSRVDescriptorAllocator() const { return *m_srvDescriptorAllocator; }
+		[[nodiscard]] DescriptorAllocator& GetRTVDescriptorAllocator() const { return *m_rtvDescriptorAllocator; }
 		
 		[[nodiscard]] UploadContext& GetUploadContext() const { return *m_uploadContext; }
 		

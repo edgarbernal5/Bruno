@@ -5,7 +5,8 @@ namespace Bruno::D3DFunctions
 {
     DXGI_FORMAT GetDX12VertexFormat(VertexFormat format)
     {
-        switch (format) {
+        switch (format)
+        {
         case VertexFormat::Float:  return DXGI_FORMAT_R32_FLOAT;
         case VertexFormat::Float2: return DXGI_FORMAT_R32G32_FLOAT;
         case VertexFormat::Float3: return DXGI_FORMAT_R32G32B32_FLOAT;
@@ -21,7 +22,8 @@ namespace Bruno::D3DFunctions
         
         desc.FillMode = (fill == FillMode::Wireframe) ? D3D12_FILL_MODE_WIREFRAME : D3D12_FILL_MODE_SOLID;
         
-        switch (cull) {
+        switch (cull)
+        {
         case CullMode::None:  desc.CullMode = D3D12_CULL_MODE_NONE; break;
         case CullMode::Front: desc.CullMode = D3D12_CULL_MODE_FRONT; break;
         case CullMode::Back:  desc.CullMode = D3D12_CULL_MODE_BACK; break;
@@ -122,7 +124,8 @@ namespace Bruno::D3DFunctions
 
     DXGI_FORMAT GetDX12Format(TextureFormat format)
     {
-        switch (format) {
+        switch (format)
+        {
         case TextureFormat::R8G8B8A8_Unorm:      return DXGI_FORMAT_R8G8B8A8_UNORM;
         case TextureFormat::R8G8B8A8_Unorm_SRGB: return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         case TextureFormat::B8G8R8A8_Unorm:      return DXGI_FORMAT_B8G8R8A8_UNORM;

@@ -15,11 +15,8 @@ namespace Bruno
     	~Surface();
     	
     	[[nodiscard]] uint32_t GetCurrentBackBufferIndex() const;
-    	[[nodiscard]] ID3D12Resource* GetCurrentBackBuffer() const;
     	[[nodiscard]] Texture2D* GetCurrentRenderTarget() const;
-    	[[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentRenderTargetView() const;
     	[[nodiscard]] DepthBuffer* GetDepthBuffer() const;
-    	[[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetDepthBufferView() const;
 
     	void Present(bool vsync = true);
     	void Resize(uint32_t width, uint32_t height);
