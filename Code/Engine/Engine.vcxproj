@@ -122,7 +122,6 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\IndexBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueue.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Profiler.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignature.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderCompiler.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Shader.h" />
@@ -297,7 +296,6 @@
       <AdditionalIncludeDirectories>C:\Users\User\Documents\Projects\Bruno\Code\packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\native\include;C:\Users\User\Documents\Projects\Bruno\Code\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\include;C:\Users\User\Documents\Projects\Bruno\Code\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\include\d3dx12;C:\Users\User\Documents\Projects\Bruno\Code\packages\Microsoft.Direct3D.D3D12.1.616.1\build\native\;Source;Dependencies\DirectXTex\include;Dependencies\zlib\include;Dependencies\SimpleMath;Dependencies\D3D12MA;Dependencies\Berta\Code\Berta\Source;</AdditionalIncludeDirectories>
       <LibCompiled>true</LibCompiled>
     </ClCompile>
-    <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignature.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderCompiler.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Shader.cpp" />

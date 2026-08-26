@@ -121,11 +121,10 @@ namespace Bruno
 
 	void SceneRenderer::RenderScene(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
 	{
-		ScopedCpuTimer totalCpuTimer(&Profiler::Get().Stats.CpuTotalRenderTimeMs);
-		
 		Profiler::Get().Stats.ResetCounters();
-		
 		ID3D12GraphicsCommandList* cmdList = graphicsContext->GetNative();
+		
+		ScopedCpuTimer totalCpuTimer(&Profiler::Get().Stats.CpuTotalRenderTimeMs);
 		{
 			ScopedCpuTimer cullingTimer(&Profiler::Get().Stats.CpuCullingTimeMs);
 			m_frustumCulling->Update();

@@ -14,9 +14,8 @@ namespace Bruno
     {
     public:
         CommandQueueManager(GraphicsDevice& device);
-        ~CommandQueueManager(); // Importante para limpiar el evento
+        ~CommandQueueManager();
         
-        // Getters que devuelven tu abstracción, no punteros crudos
         CommandQueue& GetGraphicsQueue() { return *m_directQueue; }
         CommandQueue& GetCopyQueue() { return *m_copyQueue; }
 
@@ -30,7 +29,6 @@ namespace Bruno
         
     private:
         GraphicsDevice& m_device;
-
         
         Microsoft::WRL::ComPtr<ID3D12Fence> m_uploadFence;
         

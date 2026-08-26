@@ -5,9 +5,8 @@
 #include "Bruno/Platform/DirectX/Texture2D.h"
 #include "Bruno/Renderer/RHITypes.h"
 
-
-namespace Bruno {
-
+namespace Bruno
+{
     void GBuffer::Initialize(GraphicsDevice& device, DescriptorAllocator& srvHeap, DescriptorAllocator& rtvHeap, uint32_t width, uint32_t height)
     {
         // 1. Albedo + Metalness (R8G8B8A8)

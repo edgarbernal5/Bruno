@@ -87,7 +87,7 @@ namespace Bruno
             
             // Enchufar la textura en el RTV Heap de DirectX 12
             nativeDevice->CreateRenderTargetView(backBufferResource.Get(), nullptr, m_renderTargets[i].RtvHandle.CPU);
-            m_renderTargets[i].Resource->AttachNativeResource(backBufferResource, m_renderTargets[i].RtvHandle.CPU);
+            m_renderTargets[i].Resource->AttachNativeResource(backBufferResource, m_renderTargets[i].RtvHandle);
         }
     }
 

@@ -15,5 +15,9 @@ namespace Bruno
 		Berta::Layout m_layout;
         Berta::Label m_visibleEntitiesLabel;
         Berta::Label m_totalEntitiesLabel;
+        
+        Berta::Label m_cpuCullingTimeMsLabel;
+        Berta::Label m_cpuTotalRenderTimeMsLabel;
+        Berta::Label m_gpuRenderTimeMsLabel;
     };
 }

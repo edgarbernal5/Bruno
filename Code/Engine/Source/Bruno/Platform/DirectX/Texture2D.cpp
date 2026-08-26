@@ -83,7 +83,6 @@ namespace Bruno
 
     Texture2D::Texture2D(GraphicsDevice& device, uint32_t width, uint32_t height, TextureFormat format, DescriptorAllocator& srvAllocator, DescriptorAllocator& rtvAllocator, const std::wstring& name)
     {
-        /*
         auto nativeDevice = device.GetNativeDevice();
         DXGI_FORMAT dxgiFormat = D3DFunctions::GetDX12Format(format); // Traducimos el enum agnóstico
 
@@ -136,7 +135,7 @@ namespace Bruno
         nativeDevice->CreateRenderTargetView(m_resource.Get(), &rtvDesc, m_rtvAllocation.CPU);
 
         // 5. Crear el SRV (Shader Resource View) en el Mega Heap (Bindless)
-        m_allocation = srvAllocator.Allocate(1); 
+        m_srvAllocation = srvAllocator.Allocate(1); 
         
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -145,14 +144,13 @@ namespace Bruno
         srvDesc.Texture2D.MipLevels = 1;
 
         // Inyectamos el SRV directamente en tu mega-heap
-        nativeDevice->CreateShaderResourceView(m_resource.Get(), &srvDesc, m_allocation.CPU);
-        */
+        nativeDevice->CreateShaderResourceView(m_resource.Get(), &srvDesc, m_srvAllocation.CPU);
     }
 
-    void Texture2D::AttachNativeResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource, D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle)
+    void Texture2D::AttachNativeResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource, const DescriptorAllocation& rtvAllocation)
     {
         m_resource = resource;
-        m_rtvHandle = rtvHandle;
+        m_rtvAllocation = rtvAllocation;
         
         // Opcional pero recomendado: Extraer el ancho y alto directamente del recurso nativo
         // auto desc = m_resource->GetDesc();
