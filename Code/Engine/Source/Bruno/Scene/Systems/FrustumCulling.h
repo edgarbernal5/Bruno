@@ -24,8 +24,9 @@ namespace Bruno
         void Update();
         
         const std::vector<Entity>& GetVisibleEntities() { return m_visibleEntities; }
-        size_t GetTotalEntites() { return m_totalEntities; }
-        size_t GetTotalVisibleEntities() { return m_totalVisibleCount; }
+        size_t GetTotalEntities() const { return m_totalEntities; }
+        size_t GetTotalVisibleEntities() const { return m_totalVisibleCount; }
+        
     private:
         void ExtractFrustumPlanes(DirectX::XMVECTOR planesOut[6]);
         

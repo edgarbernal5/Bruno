@@ -139,6 +139,7 @@
     <ClInclude Include="Source\Bruno\Renderer\RHITypes.h" />
     <ClInclude Include="Source\Bruno\Renderer\RootSignatureLibrary.h" />
     <ClInclude Include="Source\Bruno\Renderer\ShaderLibrary.h" />
+    <ClInclude Include="Source\Bruno\Renderer\Shadows\ShadowMapArray.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />
     <ClInclude Include="Dependencies\D3D12MA\D3D12MemAlloc.h" />
     <ClInclude Include="Dependencies\SimpleMath\SimpleMath.h" />
@@ -186,7 +187,6 @@
     <ClInclude Include="Source\Bruno\Renderer\Camera.h" />
     <ClInclude Include="Source\Bruno\Renderer\Material.h" />
     <ClInclude Include="Source\Bruno\Renderer\Model.h" />
-    <ClInclude Include="Source\Bruno\Renderer\RenderItem.h" />
     <ClInclude Include="Source\Bruno\Content\Readers\TextureReader.h" />
     <ClInclude Include="Source\Bruno\Renderer\SceneRenderer.h" />
     <ClInclude Include="Source\Bruno\Renderer\ShaderCache.h" />
@@ -342,12 +342,12 @@
     <ClCompile Include="Source\Bruno\Renderer\Model.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\PrimitiveBatch.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\PSOCache.cpp" />
-    <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp" />
     <ClCompile Include="Source\Bruno\Content\Readers\TextureReader.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\RootSignatureLibrary.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\SceneRenderer.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\ShaderCache.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\ShaderLibrary.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\Shadows\ShadowMapArray.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Entity.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Scene.cpp" />
     <ClCompile Include="Source\Bruno\Scene\Systems\FrustumCulling.cpp" />

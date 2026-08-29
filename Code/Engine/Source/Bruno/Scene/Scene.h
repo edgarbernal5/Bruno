@@ -12,7 +12,6 @@ namespace Bruno
 	class GameTimer;
 	class Model;
 	struct ModelNode;
-	struct RenderItem;
 
 	struct SceneObjectBuffer
 	{

@@ -1,10 +1,12 @@
 ﻿#pragma once
-#include "GraphicsDevice.h"
+
 #include <wrl.h>
 #include <cstdint>
 
 namespace Bruno
 {
+    class GraphicsDevice;
+    
     class DepthBuffer
     {
     public:

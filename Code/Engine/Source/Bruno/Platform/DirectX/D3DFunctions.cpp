@@ -16,23 +16,24 @@ namespace Bruno::D3DFunctions
         }
     }
 
-    D3D12_RASTERIZER_DESC GetDX12RasterizerState(CullMode cull, FillMode fill)
+    D3D12_RASTERIZER_DESC GetDX12RasterizerState(const RasterizerState& rasterizerState)
     {
-        CD3DX12_RASTERIZER_DESC desc(D3D12_DEFAULT);
+        CD3DX12_RASTERIZER_DESC d3dDesc(D3D12_DEFAULT);
         
-        desc.FillMode = (fill == FillMode::Wireframe) ? D3D12_FILL_MODE_WIREFRAME : D3D12_FILL_MODE_SOLID;
+        d3dDesc.FillMode = (rasterizerState.FillMode == FillMode::Wireframe) ? D3D12_FILL_MODE_WIREFRAME : D3D12_FILL_MODE_SOLID;
+        d3dDesc.DepthBias = rasterizerState.DepthBias;
+        d3dDesc.DepthBiasClamp = rasterizerState.DepthBiasClamp;
+        d3dDesc.SlopeScaledDepthBias = rasterizerState.SlopeScaledDepthBias;
+        d3dDesc.FrontCounterClockwise = rasterizerState.FrontCounterClockwise;
         
-        switch (cull)
+        switch (rasterizerState.CullMode)
         {
-        case CullMode::None:  desc.CullMode = D3D12_CULL_MODE_NONE; break;
-        case CullMode::Front: desc.CullMode = D3D12_CULL_MODE_FRONT; break;
-        case CullMode::Back:  desc.CullMode = D3D12_CULL_MODE_BACK; break;
+        case CullMode::None:  d3dDesc.CullMode = D3D12_CULL_MODE_NONE; break;
+        case CullMode::Front: d3dDesc.CullMode = D3D12_CULL_MODE_FRONT; break;
+        case CullMode::Back:  d3dDesc.CullMode = D3D12_CULL_MODE_BACK; break;
         }
         
-        // La línea mágica para modelos importados de Assimp/Blender
-        desc.FrontCounterClockwise = TRUE; 
-        
-        return desc;
+        return d3dDesc;
     }
 
     D3D12_BLEND_DESC GetDX12BlendState(BlendMode mode)
@@ -136,7 +137,7 @@ namespace Bruno::D3DFunctions
         default: return DXGI_FORMAT_UNKNOWN;
         }
     }
-    
+
     constexpr D3D12_COMPARISON_FUNC GetDX12ComparisonFunc(ComparisonFunc func)
     {
         switch (func)
@@ -151,5 +152,73 @@ namespace Bruno::D3DFunctions
         case ComparisonFunc::Always:       return D3D12_COMPARISON_FUNC_ALWAYS;
         default:                           return D3D12_COMPARISON_FUNC_LESS;
         }
+    }
+
+    D3D12_FILTER GetDX12Filter(TextureFilter filter)
+    {
+        switch (filter)
+        {
+        case TextureFilter::Point:       return D3D12_FILTER_MIN_MAG_MIP_POINT;
+        case TextureFilter::Linear:      return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        case TextureFilter::Anisotropic: return D3D12_FILTER_ANISOTROPIC;
+        case TextureFilter::Comparison_MinMag_Linear_MipPoint: return D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+        default:                         return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        }
+    }
+    
+    D3D12_CULL_MODE GetDX12CullMode(CullMode mode)
+    {
+        switch(mode)
+        {
+        case CullMode::None: return D3D12_CULL_MODE_NONE;
+        case CullMode::Front: return D3D12_CULL_MODE_FRONT;
+        case CullMode::Back: return D3D12_CULL_MODE_BACK;
+        }
+        return D3D12_CULL_MODE_BACK;
+    }
+
+    D3D12_SHADER_VISIBILITY GetDX12Visibility(ShaderVisibility visibility)
+    {
+        switch (visibility)
+        {
+        case ShaderVisibility::Vertex:   return D3D12_SHADER_VISIBILITY_VERTEX;
+        case ShaderVisibility::Pixel:    return D3D12_SHADER_VISIBILITY_PIXEL;
+        case ShaderVisibility::Geometry: return D3D12_SHADER_VISIBILITY_GEOMETRY;
+        case ShaderVisibility::All:      
+        default:                         return D3D12_SHADER_VISIBILITY_ALL;
+        }
+    }
+
+    D3D12_TEXTURE_ADDRESS_MODE GetDX12AddressMode(TextureAddressMode mode)
+    {
+        switch (mode)
+        {
+        case TextureAddressMode::Wrap:   return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        case TextureAddressMode::Clamp:  return D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        case TextureAddressMode::Mirror: return D3D12_TEXTURE_ADDRESS_MODE_MIRROR;
+        case TextureAddressMode::Border: return D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+        default:                         return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        }
+    }
+
+    D3D12_ROOT_SIGNATURE_FLAGS GetDX12RootSignatureFlags(RootSignatureFlags flags)
+    {
+        D3D12_ROOT_SIGNATURE_FLAGS dxFlags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+
+        if (static_cast<uint32_t>(flags) & static_cast<uint32_t>(RootSignatureFlags::AllowInputAssembler))
+        {
+            dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+        }
+
+        // Pro-Tip de Optimización AAA:
+        // En DX12, es buena práctica denegar el acceso a los shaders que no usas 
+        // para que la GPU corra más rápido. Podrías implementar lógica aquí para 
+        // denegar Geometry, Hull y Domain shaders por defecto, a menos que tu motor los use.
+    
+        // dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS;
+        // dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS;
+        // dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+
+        return dxFlags;
     }
 }

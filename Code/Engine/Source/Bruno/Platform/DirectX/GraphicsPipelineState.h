@@ -23,12 +23,8 @@ namespace Bruno
         
         std::vector<InputElementDesc> InputLayout;
         
-        struct {
-            CullMode CullMode = CullMode::Back;
-            FillMode FillMode = FillMode::Solid;
-            bool FrontCounterClockwise = false;
-        } RasterizerState;
-
+        RasterizerState RasterizerDesc;
+        
         struct {
             BlendMode Mode = BlendMode::Opaque;
         } BlendState;

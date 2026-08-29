@@ -3,6 +3,14 @@
 
 namespace Bruno
 {
+    std::vector<InputElementDesc> VertexPosition::GetLayout()
+    {
+        return
+        {
+            { "POSITION", 0, VertexFormat::Float3 }
+        };
+    }
+
     std::vector<InputElementDesc> VertexPositionNormalTexture::GetLayout()
     {
         return
@@ -17,8 +25,8 @@ namespace Bruno
     {
         return
         {
-                { "POSITION", 0, VertexFormat::Float3 },
-                { "COLOR",   0, VertexFormat::Float4 }
+            { "POSITION", 0, VertexFormat::Float3 },
+            { "COLOR",   0, VertexFormat::Float4 }
         };
     }
 }

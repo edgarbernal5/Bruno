@@ -8,6 +8,14 @@
 
 namespace Bruno
 {
+    
+    struct VertexPosition
+    {
+        Math::Vector3 Position;
+
+        static std::vector<InputElementDesc> GetLayout();
+    };
+    
     struct VertexPositionNormalTexture
     {
         Math::Vector3 Position;

@@ -1,6 +1,8 @@
 ﻿#include "brpch.h"
 #include "DepthBuffer.h"
 
+#include "GraphicsDevice.h"
+
 namespace Bruno {
     DepthBuffer::DepthBuffer(GraphicsDevice& device, uint32_t width, uint32_t height)
         : m_device(device), m_width(width), m_height(height) 
@@ -13,7 +15,8 @@ namespace Bruno {
         dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
         dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE; // El DSV no es visible a los shaders de forma directa
         
-        if (FAILED(nativeDevice->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_dsvHeap)))) {
+        if (FAILED(nativeDevice->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_dsvHeap))))
+        {
             throw std::runtime_error("Fallo al crear el DSV Descriptor Heap.");
         }
 

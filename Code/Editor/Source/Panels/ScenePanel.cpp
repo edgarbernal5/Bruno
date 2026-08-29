@@ -550,14 +550,13 @@ namespace Bruno
 
 		GraphicsPipelineStateDesc psoDesc = {};
 		// CRÍTICO: El input layout queda vacío. No hay Vertex Buffer.
-		//psoDesc.InputLayout = { nullptr, 0 };
     
 		psoDesc.RootSignature = m_marqueeRootSig.get();
 		
 		psoDesc.VertexShaderDesc = { L"Shaders/Marquee.hlsl", L"VSMain", L"vs_6_0" };
 		psoDesc.PixelShaderDesc = { L"Shaders/Marquee.hlsl", L"PSMain", L"ps_6_0" };
 		
-		psoDesc.RasterizerState.CullMode = CullMode::None;
+		psoDesc.RasterizerDesc.CullMode = CullMode::None;
 		
 		psoDesc.DepthState.Mode = DepthMode::None;
 		

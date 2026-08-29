@@ -92,6 +92,37 @@ namespace Bruno
 	{
 		AssetHandle ModelHandle;
 		uint32_t MeshIndex{ 0 };
-		std::shared_ptr<MaterialMap> Materials = std::make_shared< MaterialMap>();
+		std::shared_ptr<MaterialMap> Materials = std::make_shared<MaterialMap>();
+	};
+	
+	constexpr uint32_t NUM_CASCADES = 4;
+	
+	struct DirectionalLightComponent
+	{
+		Math::Vector3 Color{ 1.0f, 1.0f, 1.0f };
+		float Intensity{ 1.0f };
+		Math::Vector3 Direction{ 0.0f, -1.0f, 0.0f };
+        
+		bool CastShadows{ true };
+
+		Math::Matrix LightViewProj[NUM_CASCADES];
+		float CascadeSplits[NUM_CASCADES];
+	};
+	
+	struct PointLightComponent
+	{
+		Math::Vector3 Color{ 1.0f, 1.0f, 1.0f };
+		float Intensity{ 1.0f };
+		float Radius{ 10.0f };
+		float Falloff{ 1.0f };
+	};
+
+	struct SpotLightComponent
+	{
+		Math::Vector3 Color{ 1.0f, 1.0f, 1.0f };
+		float Intensity{ 1.0f };
+		float Range{ 15.0f };
+		float InnerCutoffAngle{ 15.0f };
+		float OuterCutoffAngle{ 45.0f };
 	};
 }

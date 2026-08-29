@@ -7,7 +7,6 @@
 #include <Berta/Controls/Button.h>
 
 #include <Bruno/Core/GameTimer.h>
-#include <Bruno/Renderer/RenderItem.h>
 #include <mutex>
 #include <Bruno/Renderer/Camera.h>
 

@@ -16,7 +16,8 @@ namespace Bruno
         // 1. Cargar el archivo fuente
         Microsoft::WRL::ComPtr<IDxcBlobEncoding> sourceBlob;
         HRESULT hr = m_utils->LoadFile(filePath.data(), nullptr, &sourceBlob);
-        if (FAILED(hr)) {
+        if (FAILED(hr))
+        {
             throw std::runtime_error("Fallo al abrir el archivo del shader.");
         }
 

@@ -36,11 +36,6 @@ namespace Bruno
         [[nodiscard]] ID3D12RootSignature* GetNative() const { return m_rootSignature.Get(); }
         
     private:
-        D3D12_CULL_MODE GetDX12CullMode(CullMode mode);
-        D3D12_SHADER_VISIBILITY GetDX12Visibility(ShaderVisibility visibility);
-        D3D12_FILTER GetDX12Filter(TextureFilter filter);
-        D3D12_TEXTURE_ADDRESS_MODE GetDX12AddressMode(TextureAddressMode mode);
-        D3D12_ROOT_SIGNATURE_FLAGS GetDX12RootSignatureFlags(RootSignatureFlags flags);
         
         GraphicsDevice& m_device;
         size_t m_hash = 0;

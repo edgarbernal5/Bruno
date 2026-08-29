@@ -4,6 +4,7 @@
 #include "GraphicsDevice.h"
 #include <stdexcept>
 
+#include "D3DFunctions.h"
 #include "Bruno/Renderer/RHITypes.h"
 
 namespace Bruno
@@ -16,7 +17,7 @@ namespace Bruno
     void RootSignature::AddConstants(uint32_t num32BitValues, uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility)
     {
         CD3DX12_ROOT_PARAMETER param;
-        param.InitAsConstants(num32BitValues, shaderRegister, registerSpace, GetDX12Visibility(visibility));
+        param.InitAsConstants(num32BitValues, shaderRegister, registerSpace, D3DFunctions::GetDX12Visibility(visibility));
         m_parameters.push_back(param);
         
         // Acumulamos el hash
@@ -31,7 +32,7 @@ namespace Bruno
     {
         CD3DX12_ROOT_PARAMETER param;
 
-        param.InitAsConstantBufferView(shaderRegister, registerSpace, GetDX12Visibility(visibility));
+        param.InitAsConstantBufferView(shaderRegister, registerSpace, D3DFunctions::GetDX12Visibility(visibility));
         m_parameters.push_back(param);
         
         // Acumulamos el hash
@@ -47,7 +48,7 @@ namespace Bruno
         range[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, numDescriptors, shaderRegister, registerSpace);
 
         CD3DX12_ROOT_PARAMETER param;
-        param.InitAsDescriptorTable(1, range.get(), GetDX12Visibility(visibility));
+        param.InitAsDescriptorTable(1, range.get(), D3DFunctions::GetDX12Visibility(visibility));
 
         m_descriptorRanges.push_back(std::move(range));
         m_parameters.push_back(param);
@@ -61,8 +62,8 @@ namespace Bruno
 
     void RootSignature::AddStaticSampler(uint32_t shaderRegister, uint32_t registerSpace, TextureFilter filter, TextureAddressMode addressMode, ShaderVisibility visibility)
     {
-        D3D12_FILTER dxFilter = GetDX12Filter(filter);
-        D3D12_TEXTURE_ADDRESS_MODE dxAddress = GetDX12AddressMode(addressMode);
+        D3D12_FILTER dxFilter = D3DFunctions::GetDX12Filter(filter);
+        D3D12_TEXTURE_ADDRESS_MODE dxAddress = D3DFunctions::GetDX12AddressMode(addressMode);
 
         // Nota: Si usas Anisotropic, es buena práctica pasar el máximo soportado (16)
         UINT maxAnisotropy = (filter == TextureFilter::Anisotropic) ? 16 : 1;
@@ -77,7 +78,7 @@ namespace Bruno
             D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE, // Color si usas TextureAddressMode::Border
             0.0f,                              // MinLOD
             D3D12_FLOAT32_MAX,                 // MaxLOD
-            GetDX12Visibility(visibility), 
+            D3DFunctions::GetDX12Visibility(visibility), 
             registerSpace
         );
 
@@ -93,7 +94,7 @@ namespace Bruno
     
     void RootSignature::Build(RootSignatureFlags flags)
     {
-        D3D12_ROOT_SIGNATURE_FLAGS dxFlags = GetDX12RootSignatureFlags(flags);
+        D3D12_ROOT_SIGNATURE_FLAGS dxFlags = D3DFunctions::GetDX12RootSignatureFlags(flags);
 
         CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;
         rootSigDesc.Init(
@@ -133,72 +134,5 @@ namespace Bruno
         size_t finalHash = m_hash;
         HashCombine(finalHash, static_cast<uint32_t>(flags));
         return finalHash;
-    }
-
-    D3D12_CULL_MODE RootSignature::GetDX12CullMode(CullMode mode)
-    {
-        switch(mode)
-        {
-        case CullMode::None: return D3D12_CULL_MODE_NONE;
-        case CullMode::Front: return D3D12_CULL_MODE_FRONT;
-        case CullMode::Back: return D3D12_CULL_MODE_BACK;
-        }
-        return D3D12_CULL_MODE_BACK;
-    }
-
-    D3D12_SHADER_VISIBILITY RootSignature::GetDX12Visibility(ShaderVisibility visibility)
-    {
-        switch (visibility)
-        {
-        case ShaderVisibility::Vertex:   return D3D12_SHADER_VISIBILITY_VERTEX;
-        case ShaderVisibility::Pixel:    return D3D12_SHADER_VISIBILITY_PIXEL;
-        case ShaderVisibility::Geometry: return D3D12_SHADER_VISIBILITY_GEOMETRY;
-        case ShaderVisibility::All:      
-        default:                         return D3D12_SHADER_VISIBILITY_ALL;
-        }
-    }
-
-    D3D12_FILTER RootSignature::GetDX12Filter(TextureFilter filter)
-    {
-        switch (filter)
-        {
-        case TextureFilter::Point:       return D3D12_FILTER_MIN_MAG_MIP_POINT;
-        case TextureFilter::Linear:      return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-        case TextureFilter::Anisotropic: return D3D12_FILTER_ANISOTROPIC;
-        default:                         return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-        }
-    }
-
-    D3D12_TEXTURE_ADDRESS_MODE RootSignature::GetDX12AddressMode(TextureAddressMode mode)
-    {
-        switch (mode)
-        {
-        case TextureAddressMode::Wrap:   return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-        case TextureAddressMode::Clamp:  return D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        case TextureAddressMode::Mirror: return D3D12_TEXTURE_ADDRESS_MODE_MIRROR;
-        case TextureAddressMode::Border: return D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-        default:                         return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-        }
-    }
-
-    D3D12_ROOT_SIGNATURE_FLAGS RootSignature::GetDX12RootSignatureFlags(RootSignatureFlags flags)
-    {
-        D3D12_ROOT_SIGNATURE_FLAGS dxFlags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
-
-        if (static_cast<uint32_t>(flags) & static_cast<uint32_t>(RootSignatureFlags::AllowInputAssembler))
-        {
-            dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-        }
-
-        // Pro-Tip de Optimización AAA:
-        // En DX12, es buena práctica denegar el acceso a los shaders que no usas 
-        // para que la GPU corra más rápido. Podrías implementar lógica aquí para 
-        // denegar Geometry, Hull y Domain shaders por defecto, a menos que tu motor los use.
-    
-        // dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS;
-        // dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS;
-        // dxFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
-
-        return dxFlags;
     }
 }

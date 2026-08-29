@@ -48,7 +48,7 @@ namespace Bruno
         psoDesc.VertexShaderDesc = { L"Shaders/UnlitColor.hlsl", L"VSMain", L"vs_6_0" };
         psoDesc.PixelShaderDesc = { L"Shaders/UnlitColor.hlsl", L"PSMain", L"ps_6_0" };
         
-        psoDesc.RasterizerState.CullMode = CullMode::None;
+        psoDesc.RasterizerDesc.CullMode = CullMode::None;
     
         psoDesc.DepthState.Mode = DepthMode::None;
         

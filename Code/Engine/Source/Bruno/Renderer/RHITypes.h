@@ -36,6 +36,7 @@ namespace Bruno
         Front, 
         Back
     };
+    
     enum class FillMode : uint8_t
     {
         Solid,
@@ -49,6 +50,17 @@ namespace Bruno
         Additive 
     };
     
+    
+    struct RasterizerState
+    {
+        CullMode CullMode = CullMode::Back;
+        FillMode FillMode = FillMode::Solid;
+        int DepthBias = 0;
+        float DepthBiasClamp = 0.0f;
+        float SlopeScaledDepthBias = 0.0f;
+        bool FrontCounterClockwise = true;
+    };
+    
     enum class ShaderVisibility : uint8_t
     {
         All, 
@@ -60,7 +72,8 @@ namespace Bruno
     {
         Point,          // Pixel art, texturas crudas sin interpolación
         Linear,         // Suavizado estándar (Bilineal/Trilineal)
-        Anisotropic     // Máxima calidad para texturas vistas en ángulo (ej. el suelo)
+        Anisotropic,     // Máxima calidad para texturas vistas en ángulo (ej. el suelo)
+        Comparison_MinMag_Linear_MipPoint,
     };
 
     enum class TextureAddressMode : uint8_t
@@ -88,6 +101,7 @@ namespace Bruno
         GreaterEqual,
         Always
     };
+    
     enum class TextureFormat
     {
         Unknown,
@@ -106,7 +120,8 @@ namespace Bruno
     };
 
     // Estructura para el Multi-Sample Anti-Aliasing (MSAA)
-    struct MultiSampleState {
+    struct MultiSampleState
+    {
         uint32_t Count = 1;   // 1 = Sin Anti-Aliasing. (Opciones: 2, 4, 8)
         uint32_t Quality = 0; // Depende del hardware
     };
@@ -155,7 +170,8 @@ namespace Bruno
     // Un valor especial equivalente a D3D12_APPEND_ALIGNED_ELEMENT
     constexpr uint32_t AppendAlignedElement = 0xFFFFFFFF;
     
-    struct InputElementDesc {
+    struct InputElementDesc
+    {
         const char* SemanticName;           // Ej: "POSITION", "TEXCOORD"
         uint32_t SemanticIndex;             // Ej: 0, 1, 2
         VertexFormat Format;                // Ej: VertexFormat::Float3

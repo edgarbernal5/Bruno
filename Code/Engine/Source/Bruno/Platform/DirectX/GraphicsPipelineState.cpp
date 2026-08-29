@@ -21,9 +21,12 @@ namespace Bruno
         HashCombine(seed, VertexShaderDesc.ComputeHash());
         HashCombine(seed, PixelShaderDesc.ComputeHash());
 
-        HashCombine(seed, static_cast<int>(RasterizerState.CullMode));
-        HashCombine(seed, static_cast<int>(RasterizerState.FillMode));
-        HashCombine(seed, RasterizerState.FrontCounterClockwise);
+        HashCombine(seed, static_cast<int>(RasterizerDesc.CullMode));
+        HashCombine(seed, static_cast<int>(RasterizerDesc.FillMode));
+        HashCombine(seed, RasterizerDesc.DepthBias);
+        HashCombine(seed, RasterizerDesc.DepthBiasClamp);
+        HashCombine(seed, RasterizerDesc.SlopeScaledDepthBias);
+        HashCombine(seed, RasterizerDesc.FrontCounterClockwise);
         
         HashCombine(seed, static_cast<int>(BlendState.Mode));
         HashCombine(seed, static_cast<int>(DepthState.Mode));
@@ -101,7 +104,7 @@ namespace Bruno
             d3dDesc.PS = pixelShader->GetNativeByteCode();
         }
         
-        d3dDesc.RasterizerState = D3DFunctions::GetDX12RasterizerState(psoDesc.RasterizerState.CullMode , psoDesc.RasterizerState.FillMode);
+        d3dDesc.RasterizerState = D3DFunctions::GetDX12RasterizerState(psoDesc.RasterizerDesc);
         d3dDesc.DepthStencilState = D3DFunctions::GetDX12DepthState(psoDesc.DepthState.Mode, psoDesc.DepthState.Func);
         d3dDesc.BlendState = D3DFunctions::GetDX12BlendState(psoDesc.BlendState.Mode);
         

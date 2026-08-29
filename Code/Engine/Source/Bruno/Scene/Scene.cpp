@@ -5,7 +5,6 @@
 
 #include "Bruno/Renderer/Model.h"
 #include "Bruno/Renderer/Material.h"
-#include <Bruno/Renderer/RenderItem.h>
 #include <Bruno/Core/GameTimer.h>
 
 #include "Bruno/Scene/Entity.h"
