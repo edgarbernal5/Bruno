@@ -1,11 +1,15 @@
 ﻿#include "brpch.h"
 #include "DepthBuffer.h"
 
+#include "D3DFunctions.h"
 #include "GraphicsDevice.h"
 
 namespace Bruno {
-    DepthBuffer::DepthBuffer(GraphicsDevice& device, uint32_t width, uint32_t height)
-        : m_device(device), m_width(width), m_height(height) 
+    DepthBuffer::DepthBuffer(GraphicsDevice& device, uint32_t width, uint32_t height, TextureFormat format) :
+        m_device(device), 
+        m_width(width),
+        m_height(height),
+        m_format(format)
     {
         auto nativeDevice = m_device.GetNativeDevice();
 
@@ -42,6 +46,7 @@ namespace Bruno {
     {
         auto nativeDevice = m_device.GetNativeDevice();
 
+        auto d3dTextureFormat = D3DFunctions::GetDX12Format(m_format);
         // 2. Describir la memoria de la textura
         D3D12_RESOURCE_DESC depthDesc = {};
         depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -49,13 +54,13 @@ namespace Bruno {
         depthDesc.Height = m_height;
         depthDesc.DepthOrArraySize = 1;
         depthDesc.MipLevels = 1;
-        depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // 32 bits para precisión de profundidad
+        depthDesc.Format = d3dTextureFormat;
         depthDesc.SampleDesc.Count = 1;           // Sin Anti-Aliasing (MSAA) por ahora
         depthDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL; // ¡Vital para que funcione como Depth Buffer!
 
         // Optimizamos la limpieza (Clear) indicando el valor por defecto (1.0f = lo más lejano)
         D3D12_CLEAR_VALUE optClear = {};
-        optClear.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        optClear.Format = d3dTextureFormat;
         optClear.DepthStencil.Depth = 1.0f;
         optClear.DepthStencil.Stencil = 0;
 
@@ -76,7 +81,7 @@ namespace Bruno {
 
         // 4. Crear la vista (Descriptor) que conecta el Heap con la Textura
         D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-        dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        dsvDesc.Format = d3dTextureFormat;
         dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
         dsvDesc.Texture2D.MipSlice = 0;
 

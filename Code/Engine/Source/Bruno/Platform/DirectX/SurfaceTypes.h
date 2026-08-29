@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "D3DConstants.h"
+#include "Bruno/Renderer/RHITypes.h"
 
 namespace Bruno
 {
@@ -8,9 +9,9 @@ namespace Bruno
     {
         uint32_t Width;
         uint32_t Height;
-        DXGI_FORMAT BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+        TextureFormat BackBufferFormat = TextureFormat::R8G8B8A8_Unorm;// DXGI_FORMAT_R8G8B8A8_UNORM;
         uint32_t BackBufferCount = Graphics::Core::BACK_BUFFER_COUNT;
-        DXGI_FORMAT DepthBufferFormat = DXGI_FORMAT_D32_FLOAT;
+        TextureFormat DepthBufferFormat = TextureFormat::D32_Float;
         HWND WindowHandle;
         bool Fullscreen = false;
     };

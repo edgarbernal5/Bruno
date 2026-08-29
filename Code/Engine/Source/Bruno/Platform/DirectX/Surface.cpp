@@ -13,7 +13,7 @@ namespace Bruno
         m_parameters(parameters)
     {
         m_swapChain = std::make_unique<SwapChain>(device, parameters);
-        m_depthBuffer = std::make_unique<DepthBuffer>(device, parameters.Width, parameters.Height);
+        m_depthBuffer = std::make_unique<DepthBuffer>(device, parameters.Width, parameters.Height, parameters.DepthBufferFormat);
     }
 
     Surface::~Surface()

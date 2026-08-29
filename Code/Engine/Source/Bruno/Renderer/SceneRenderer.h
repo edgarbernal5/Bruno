@@ -23,6 +23,7 @@ namespace Bruno
 		void InitEntitiesForRender();
 		
 		void RenderScene(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
+		void Resize(uint32_t width, uint32_t height);
 		
 	private:
 		void RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex);

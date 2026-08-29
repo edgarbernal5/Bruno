@@ -5,12 +5,13 @@
 
 namespace Bruno
 {
+    enum class TextureFormat;
     class GraphicsDevice;
     
     class DepthBuffer
     {
     public:
-        DepthBuffer(GraphicsDevice& device, uint32_t width, uint32_t height);
+        DepthBuffer(GraphicsDevice& device, uint32_t width, uint32_t height, TextureFormat format);
         ~DepthBuffer() = default;
 
         void Resize(uint32_t width, uint32_t height);
@@ -30,5 +31,6 @@ namespace Bruno
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_dsvHeap;
         uint32_t m_width;
         uint32_t m_height;
+        TextureFormat m_format;
     };
 }

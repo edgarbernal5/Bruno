@@ -40,7 +40,7 @@ namespace Bruno
         );
 
         // 4. Depth / Stencil Buffer
-        m_depthBuffer = std::make_unique<DepthBuffer>(device, width, height);
+        m_depthBuffer = std::make_unique<DepthBuffer>(device, width, height, TextureFormat::D32_Float);
     }
 
     void GBuffer::Resize(GraphicsDevice& device, DescriptorAllocator& srvHeap, DescriptorAllocator& rtvHeap, uint32_t width, uint32_t height)

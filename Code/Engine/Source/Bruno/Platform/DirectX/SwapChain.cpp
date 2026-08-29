@@ -2,6 +2,7 @@
 #include "SwapChain.h"
 #include "GraphicsDevice.h"
 #include "CommandQueue.h"
+#include "D3DFunctions.h"
 #include "Texture2D.h"
 
 namespace Bruno
@@ -18,7 +19,7 @@ namespace Bruno
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.Width = parameters.Width;
         swapChainDesc.Height = parameters.Height;
-        swapChainDesc.Format = parameters.BackBufferFormat;
+        swapChainDesc.Format = D3DFunctions::GetDX12Format(parameters.BackBufferFormat);
         swapChainDesc.Stereo = FALSE;
         swapChainDesc.SampleDesc = { 1, 0 }; // DX12 requiere que el SwapChain no tenga MSAA (se hace en otro lado)
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -111,7 +112,7 @@ namespace Bruno
         // 2. Redimensionar el SwapChain
         ThrowIfFailed(m_swapChain->ResizeBuffers(
             Graphics::Core::BACK_BUFFER_COUNT, width, height,
-            m_parameters.BackBufferFormat, 0
+            D3DFunctions::GetDX12Format(m_parameters.BackBufferFormat), 0
         ));
 
         // 3. Sincronizar nuestro índice

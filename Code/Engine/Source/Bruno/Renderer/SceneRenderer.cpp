@@ -174,6 +174,11 @@ namespace Bruno
 		Profiler::Get().ResolveGpuTimestamps(cmdList);
 	}
 
+	void SceneRenderer::Resize(uint32_t width, uint32_t height)
+	{
+		//m_gBuffer->Resize()
+	}
+
 	void SceneRenderer::RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex)
 	{
 		// ==========================================

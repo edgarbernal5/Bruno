@@ -32,8 +32,8 @@ namespace Bruno
 
 	struct SceneSurfaceParameters
 	{
-		DXGI_FORMAT BackBufferFormat{ DXGI_FORMAT_R8G8B8A8_UNORM };
-		DXGI_FORMAT DepthBufferFormat{ DXGI_FORMAT_D32_FLOAT };
+		TextureFormat BackBufferFormat{ TextureFormat::R8G8B8A8_Unorm };
+		TextureFormat DepthBufferFormat{ TextureFormat::D24_Unorm_S8_Uint };
 	};
 
 	class ScenePanel : public Berta::Panel

@@ -84,7 +84,7 @@ namespace Bruno
     Texture2D::Texture2D(GraphicsDevice& device, uint32_t width, uint32_t height, TextureFormat format, DescriptorAllocator& srvAllocator, DescriptorAllocator& rtvAllocator, const std::wstring& name)
     {
         auto nativeDevice = device.GetNativeDevice();
-        DXGI_FORMAT dxgiFormat = D3DFunctions::GetDX12Format(format); // Traducimos el enum agnóstico
+        DXGI_FORMAT dxgiFormat = D3DFunctions::GetDX12Format(format);
 
         // 1. Describir el recurso
         D3D12_RESOURCE_DESC texDesc = {};
