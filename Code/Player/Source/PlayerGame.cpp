@@ -98,7 +98,7 @@ namespace Bruno
 		// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
 		Math::Color clearColor = { 0.10f, 0.014f, 0.16f, 1.0f }; 
 		//Math::Color clearColor = { 1.0f, 1.0f, 0.0f, 1.0f };
-			auto depthBuffer = m_surface->GetDepthBuffer();
+		auto depthBuffer = m_surface->GetDepthBuffer();
 			
 		// Limpiar la pantalla
 		context.ClearRenderTarget(backBuffer, clearColor);

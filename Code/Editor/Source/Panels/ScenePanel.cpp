@@ -611,7 +611,7 @@ namespace Bruno
 		DynamicAllocation alloc = context.AllocateDynamicSpace(sizeof(MarqueeData));
     
 		// Copiar a la memoria persistente (CPU -> Upload Heap)
-		memcpy(alloc.CPUAddress, &data, sizeof(MarqueeData));
+		::memcpy(alloc.CPUAddress, &data, sizeof(MarqueeData));
 
 		// 4. Bindear y Dibujar
 		context.SetConstantBuffer(0, alloc);

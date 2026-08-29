@@ -192,7 +192,7 @@ namespace Bruno
 			m_gBuffer->GetPosition() 
 		};
 		context->SetRenderTargets(3, gbufferTargets, m_gBuffer->GetDepth());
-    
+    /*
 		// Limpiar G-Buffer y Restaurar Viewport de pantalla
 		context->SetViewport(0, 0, 100, 100);
     
@@ -224,7 +224,7 @@ namespace Bruno
 		context->SetConstantBuffer(0, m_lightCB);
 
 		// Disparar el triángulo a pantalla completa sin Vertex Buffer
-		context->DrawInstanced(3, 1, 0, 0);
+		context->DrawInstanced(3, 1, 0, 0);*/
 	}
 
 	void SceneRenderer::InitializeGbuffer(GraphicsDevice* device)

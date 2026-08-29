@@ -39,4 +39,9 @@ namespace Bruno
             m_gpuRenderTimeMsLabel.SetCaption(L"GPU Render Time: " + std::to_wstring(profiler.Stats.GpuRenderTimeMs));
         });
     }
+
+    ProfilerPanel::~ProfilerPanel()
+    {
+        Berta::Foundation::GetInstance().SetOnIdleTickCallback(nullptr);
+    }
 }
