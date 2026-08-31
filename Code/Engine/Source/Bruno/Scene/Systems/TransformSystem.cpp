@@ -8,7 +8,6 @@ namespace Bruno
     void TransformSystem::Update(Scene* scene)
     {
         std::vector<entt::entity> rootEntities = GetRootEntities(scene);
-
         
         for (auto root : rootEntities)
         {
@@ -56,20 +55,16 @@ namespace Bruno
             transform.IsDirty = false;
         }
 
-        // 1. Buscamos si la entidad tiene jerarquía
         const auto* hierarchy = scene->TryGetWith<HierarchyComponent>(entity);
         if (hierarchy)
         {
-            // 2. Iteramos directamente sobre la lista enlazada intrusiva (¡Cero vectores!)
             entt::entity currentChild = hierarchy->FirstChild;
                 
             while (currentChild != entt::null)
             {
                 Entity childEntity { currentChild, scene};
-                // Llamada recursiva al hijo
+
                 UpdateTransformNode(scene, childEntity, transform.WorldTransform, needsUpdate);
-                    
-                // Saltamos al siguiente hermano para la próxima iteración del while
                 currentChild = childEntity.GetComponent<HierarchyComponent>().NextSibling;
             }
         }

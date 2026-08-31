@@ -104,15 +104,12 @@ namespace Bruno
 		context.ClearRenderTarget(backBuffer, clearColor);
 		context.ClearDepth(depthBuffer, 1.0f, 0);
 		context.SetRenderTargets(1, &backBuffer, depthBuffer);
-			
-		// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
-		context.SetDescriptorHeaps(&m_srvHeap, 1);
 		
 		// Configurar Viewport y Scissor Test explícitamente en este frame
 		context.SetViewport(m_viewport);
 		context.SetScissorRect(m_scissorRect);
 		
-		m_sceneRenderer->RenderScene(&context, m_camera, frameIndex);
+		m_sceneRenderer->RenderForward(&context, m_camera, frameIndex);
 		
 		// ------------------------------------------------------------------
 		// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT

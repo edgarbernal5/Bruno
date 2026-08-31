@@ -53,15 +53,12 @@ namespace Bruno
     class DescriptorAllocator
     {
     public:
-        // NUEVO: Constructor que inicializa el Heap
         DescriptorAllocator(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible);
         ~DescriptorAllocator() = default;
 
-        // Prohibimos copias para proteger el recurso COM nativo
         DescriptorAllocator(const DescriptorAllocator&) = delete;
         DescriptorAllocator& operator=(const DescriptorAllocator&) = delete;
 
-        // [[nodiscard]] asegura que no asignemos memoria al vacío por accidente
         [[nodiscard]] DescriptorAllocation Allocate(uint32_t count = 1);
         
         ID3D12DescriptorHeap* GetHeap() const { return m_heap.Get(); }

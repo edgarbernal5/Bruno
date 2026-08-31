@@ -79,7 +79,7 @@ namespace Bruno
 	
 	struct CBVComponent 
 	{
-		std::shared_ptr<ConstantBuffer> TransformCB[2]; 
+		//std::shared_ptr<ConstantBuffer> TransformCB[2]; 
 	};
 	
 	struct BoundingBoxComponent
@@ -93,6 +93,11 @@ namespace Bruno
 		AssetHandle ModelHandle;
 		uint32_t MeshIndex{ 0 };
 		std::shared_ptr<MaterialMap> Materials = std::make_shared<MaterialMap>();
+		
+		// --- CACHÉ DE RENDERIZADO (RUNTIME ONLY) ---
+		// Este es el ID Bindless final. Se actualiza una sola vez al cargar la escena.
+		// Cuesta 0 ciclos de CPU leerlo durante el Render Loop.
+		uint32_t RuntimeMaterialIndex = 0xFFFFFFFF;
 	};
 	
 	constexpr uint32_t NUM_CASCADES = 4;

@@ -9,7 +9,7 @@ namespace Bruno
     {
         uint32_t Width;
         uint32_t Height;
-        TextureFormat BackBufferFormat = TextureFormat::R8G8B8A8_Unorm;// DXGI_FORMAT_R8G8B8A8_UNORM;
+        TextureFormat BackBufferFormat = TextureFormat::R8G8B8A8_Unorm;
         uint32_t BackBufferCount = Graphics::Core::BACK_BUFFER_COUNT;
         TextureFormat DepthBufferFormat = TextureFormat::D32_Float;
         HWND WindowHandle;

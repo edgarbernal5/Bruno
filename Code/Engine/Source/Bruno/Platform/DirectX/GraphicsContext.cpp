@@ -137,14 +137,24 @@ namespace Bruno
         m_commandList->SetGraphicsRootSignature(rootSig->GetNative());
     }
 
-    void GraphicsContext::SetDescriptorHeaps(ID3D12DescriptorHeap** ppHeaps, uint32_t count)
+    void GraphicsContext::SetDescriptorHeaps(std::initializer_list<DescriptorAllocator*> heaps)
     {
-        m_commandList->SetDescriptorHeaps(count, ppHeaps);
-    }
+        // Validación de seguridad nivel AAA: El hardware no soporta más de 2 heaps.
+        if (heaps.size() > 2)
+        {
+            throw std::runtime_error("DirectX 12 solo soporta un maximo de 2 Descriptor Heaps bindeados simultaneamente.");
+        }
+        
+        std::array<ID3D12DescriptorHeap*, 2> nativeHeaps = { nullptr, nullptr };
+    
+        uint32_t i = 0;
+        for (auto* heap : heaps)
+        {
+            nativeHeaps[i] = heap->GetHeap();
+            i++;
+        }
 
-    void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, ConstantBuffer* buffer)
-    {
-        m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, buffer->GetGPUAddress());
+        m_commandList->SetDescriptorHeaps(static_cast<UINT>(heaps.size()), nativeHeaps.data());
     }
 
     void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, const DynamicAllocation& allocation)
@@ -152,9 +162,14 @@ namespace Bruno
         m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, allocation.GPUAddress);
     }
 
-    void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor)
+    void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& descriptorAllocator)
     {
-        m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, baseDescriptor);
+        // En tu arquitectura, el DescriptorAllocator encapsula el heap nativo.
+        // Extraemos el handle de memoria inicial de la GPU (Offset 0)
+        D3D12_GPU_DESCRIPTOR_HANDLE baseHandle = descriptorAllocator.GetHeap()->GetGPUDescriptorHandleForHeapStart();
+        
+        // Lo bindeamos a la Root Signature
+        m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, baseHandle);
     }
 
     void GraphicsContext::SetDynamicDescriptorTable(uint32_t rootParameterIndex, D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor)
@@ -232,6 +247,11 @@ namespace Bruno
     {
         // Inyecta valores crudos (ej. un índice, un color) directo en la firma sin crear buffers
         m_commandList->SetGraphicsRoot32BitConstants(rootParameterIndex, num32BitValues, data, destOffsetIn32BitValues);
+    }
+
+    void GraphicsContext::SetPushConstant(uint32_t rootParameterIndex, uint32_t sourceData,uint32_t destOffsetIn32BitValues)
+    {
+        m_commandList->SetGraphicsRoot32BitConstant(rootParameterIndex, sourceData, destOffsetIn32BitValues);
     }
 
     D3D12_RESOURCE_STATES GraphicsContext::GetDX12ResourceState(ResourceState state)

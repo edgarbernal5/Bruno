@@ -33,16 +33,4 @@ namespace Bruno
         size_t m_offset;
         size_t m_pageSize;
     };
-    
-    struct FrameResource
-    {
-        // El Allocator de comandos que ya tienes
-        Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CommandAllocator;
-    
-        // NUEVO: Nuestro buffer pre-reservado para data dinámica (Upload Heap persistente)
-        std::unique_ptr<LinearAllocator> DynamicAllocator;
-    
-        // Fence value para saber cuándo la GPU terminó con ESTE frame específicamente
-        uint64_t FenceValue = 0;
-    };
 }

@@ -19,8 +19,10 @@ namespace Bruno
     public:
         Texture2D() = default;
         
-        // Carga una textura desde disco y reserva su lugar en el heap
+        // Carga desde disco inyectando el SRV directamente en el Mega Heap global
         Texture2D(GraphicsDevice& device, UploadContext& uploadContext, DescriptorAllocator& srvAllocator, const std::wstring& filename);
+        
+        // Constructor procedural con identidad dual para G-Buffers (RTV temporal + SRV Bindless)
         Texture2D(
             GraphicsDevice& device, 
             uint32_t width, 
@@ -34,10 +36,13 @@ namespace Bruno
         
         void AttachNativeResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource, const DescriptorAllocation& rtvAllocation);
         
+        [[nodiscard]] uint32_t GetBindlessIndex() const { return m_srvAllocation.Index; }
+        
         [[nodiscard]] ID3D12Resource* GetResource() const { return m_resource.Get(); }
         [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetRTV() const { return m_rtvAllocation.CPU; }
         [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const { return m_srvAllocation.CPU; }
-        
+        \
+
     private:
         Microsoft::WRL::ComPtr<ID3D12Resource> m_resource;
         

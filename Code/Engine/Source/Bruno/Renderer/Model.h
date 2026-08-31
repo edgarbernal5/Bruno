@@ -68,7 +68,7 @@ namespace Bruno
 		BR_RTTI_DECLARATION(Model, Asset);
 
 	public:
-		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes);
+		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes, const Math::BoundingBox& modelAABB);
 
 		AssetType GetAssetType() const override { return AssetType::Model; }
 
@@ -94,6 +94,7 @@ namespace Bruno
 
 		std::shared_ptr<VertexBuffer> m_vertexBuffer;
 		std::shared_ptr<IndexBuffer> m_indexBuffer;
+		Math::BoundingBox m_modelAABB;
 	};
 
 	class Mesh

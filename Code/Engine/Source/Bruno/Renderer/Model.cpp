@@ -12,12 +12,13 @@ namespace Bruno
 	BR_RTTI_DEFINITIONS(ModelMaterial);
 	BR_RTTI_DEFINITIONS(Model);
 
-	Model::Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes) :
+	Model::Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes, const Math::BoundingBox& modelAABB) :
 		m_vertices(std::move(vertices)),
 		m_indices(std::move(indices)),
 		m_materials(std::move(materials)),
 		m_meshes(std::move(meshes)),
-		m_modelNodes(std::move(modelNodes))
+		m_modelNodes(std::move(modelNodes)),
+		m_modelAABB(modelAABB)
 	{
 		//m_handle = {};
 		auto device = Bruno::Graphics::GetDevice();

@@ -75,7 +75,7 @@ namespace Bruno
 		// 
 		//int textureHeapSize = ((((width * numBytesPerPixel) + 255) & ~255) * (height - 1)) + (width * numBytesPerPixel);
 		//https://www.braynzarsoft.net/viewtutorial/q16390-directx-12-textures-from-file
-		outputContentItem->DataSizeInBytes = AlignU64(rowPitch, 256) * (metadata.height - 1) + (rowPitch);
+		outputContentItem->DataSizeInBytes = GetAlignedSize<uint64_t>(256) * (metadata.height - 1) + (rowPitch);
 
 		outputContentItem->Pixels.resize(outputContentItem->DataSizeInBytes);
 

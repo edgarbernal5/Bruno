@@ -18,6 +18,7 @@
 #include "Bruno/Content/AssetManager.h"
 #include "Bruno/Core/Memory.h"
 #include "Bruno/Core/ScopedCpuTimer.h"
+#include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/Camera.h"
@@ -31,11 +32,13 @@ namespace Bruno
 		m_frustumCulling(frustumCulling),
 		m_assetManager(assetManager)
 	{
-		auto& device = Bruno::Graphics::GetDevice();
+		auto& device = Graphics::GetDevice();
 		
-		InitializeGbuffer(device);
+		m_globalSrvHeap = &device->GetSRVDescriptorAllocator();
+		
+		InitializeGBuffer(device);
 		InitializeOpaqueRootSignature(device);
-		InitializeGbufferRootSignature(device);
+		InitializeGBufferRootSignature(device);
 		InitializeDeferredRootSignature(device);
 		
 		InitializeOpaquePSO(device);
@@ -45,9 +48,9 @@ namespace Bruno
 
 	void SceneRenderer::InitEntitiesForRender()
 	{
-		auto& device = Bruno::Graphics::GetDevice();
+		auto& device = Graphics::GetDevice();
 		
-		size_t objectSize = AlignU32(sizeof(SceneObjectBuffer), 256);
+		size_t objectSize = GetAlignedConstantBufferSize<SceneObjectBuffer>();
 		
 		// Buscamos todas las entidades que tienen un Mesh y un Transform
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
@@ -61,28 +64,39 @@ namespace Bruno
 				CBVComponent cbv;
 				for (int i = 0; i < 2; ++i)
 				{
-					cbv.TransformCB[i] = std::make_shared<ConstantBuffer>(device, objectSize);
+					//cbv.TransformCB[i] = std::make_shared<ConstantBuffer>(device, objectSize);
 				}
                 
 				// Le "pegamos" el componente de memoria de video a la entidad
 				entity.AddComponent<CBVComponent>(std::move(cbv));
 			}
-			const auto& modelComponent = entities.get<ModelComponent>(entt);
+			
+			auto& modelComponent = entities.get<ModelComponent>(entt);
 			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 			auto& meshes = model->GetMeshes();
 			auto& mesh = meshes[meshIndex];
 			
 			auto materialHandle = modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
-			auto material = m_assetManager->GetAsset<Material>(materialHandle);
-			material->BuildDescriptors(device, &device->GetSRVDescriptorAllocator(), m_assetManager);
-			
-			material->SetPipelineState(m_opaquePSO, m_opaqueRootSignature);
+
+			if (materialHandle != 0)
+			{
+				// Le pedimos el material real al AssetManager
+				std::shared_ptr<Material> materialAsset = m_assetManager->GetAsset<Material>(materialHandle);
+            
+				if (materialAsset)
+				{
+					// ¡AQUÍ ESTÁ LA MAGIA! Guardamos el ID Bindless directo en el componente
+					modelComponent.RuntimeMaterialIndex = materialAsset->RuntimeMaterialIndex;
+				}
+			}
 		}
 	}
 	
-	void SceneRenderer::RenderScene(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
+	void SceneRenderer::RenderForward(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
 	{
+		auto& device = Graphics::GetDevice();
+		
 		Profiler::Get().Stats.ResetCounters();
 		ID3D12GraphicsCommandList* cmdList = graphicsContext->GetNative();
 		
@@ -101,82 +115,57 @@ namespace Bruno
 		// 2. --- RENDERIZADO GPU ---
 		Profiler::Get().StartGpuTimer(cmdList);
 		
+		graphicsContext->SetDescriptorHeaps({ m_globalSrvHeap });
+		graphicsContext->SetDescriptorTable(0, device->GetSRVDescriptorAllocator());
+		
 		for (Entity entity : visibleEntities)
 		{
 			const auto& modelComponent = entity.GetComponent<ModelComponent>();
 			const auto& cbv = entity.GetComponent<CBVComponent>();
 			
+			if (modelComponent.RuntimeMaterialIndex == 0xFFFFFFFF) continue;
+			
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
-
 			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto& meshes = model->GetMeshes();
 			auto& mesh = meshes[meshIndex];
 			
-			auto materialHandle = modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
-			auto material = m_assetManager->GetAsset<Material>(materialHandle);
+			graphicsContext->SetPushConstants(2, modelComponent.RuntimeMaterialIndex, 0);
 			
-			AssetHandle textureHandle{ 0 };
-			
-			if (material)
+			auto& indexBuffer = model->GetIndexBuffer();
+			auto& vertexBuffer = model->GetVertexBuffer();
+			if (currentVB != vertexBuffer.get())
 			{
-				auto textIt = material->TexturesByName.find("Texture");
-				if (textIt != material->TexturesByName.end())
-				{
-					textureHandle = textIt->second;
-				}
+				graphicsContext->SetVertexBuffer(0, vertexBuffer.get());
+				graphicsContext->SetIndexBuffer(indexBuffer.get());
+				currentVB = vertexBuffer.get();
 			}
 			
-			auto texture = m_assetManager->GetAsset<Texture2D>(textureHandle);
-			if (texture != nullptr)
-			{
-				auto& indexBuffer = model->GetIndexBuffer();
-				auto& vertexBuffer = model->GetVertexBuffer();
-				if (currentVB != vertexBuffer.get())
-				{
-					graphicsContext->SetVertexBuffer(0, vertexBuffer.get());
-					graphicsContext->SetIndexBuffer(indexBuffer.get());
-					currentVB = vertexBuffer.get();
-				}
-				
-				if (currentPSO != material->GetPSO().get())
-				{
-					graphicsContext->SetPipelineState(material->GetPSO().get());
-					currentPSO = material->GetPSO().get();
-				}
-				graphicsContext->SetRootSignature(material->GetRootSignature().get());
-				
-				// Enlazar la tabla de texturas (Parámetro 1 en nuestra Root Signature)
-				graphicsContext->SetDescriptorTable(1, material->GetTextureDescriptorTable());
-				
-				Math::Matrix world = m_scene->GetWorldSpaceMatrix(entity);
-				Math::Matrix wvp = (world * camera.GetViewProjection()).Transpose();
-				
-				SceneObjectBuffer objConstants;
-				objConstants.WorldViewProjection = wvp;
-				cbv.TransformCB[frameIndex]->Update(&objConstants, sizeof(SceneObjectBuffer));
-				
-				graphicsContext->SetConstantBuffer(0, cbv.TransformCB[frameIndex].get());
-				graphicsContext->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
-				graphicsContext->DrawIndexedInstanced(mesh->GetIndexCount(),
-				                                      1,
-				                                      mesh->GetBaseIndex(),
-				                                      mesh->GetBaseVertex(),
-				                                      0);
-				
-				Profiler::Get().Stats.DrawCalls++;
-				Profiler::Get().Stats.TriangleCount += (mesh->GetIndexCount() / 3);
-			}
+			
+			Math::Matrix world = m_scene->GetWorldSpaceMatrix(entity);
+			Math::Matrix wvp = (world * camera.GetViewProjection()).Transpose();
+			
+			SceneObjectBuffer objConstants;
+			objConstants.WorldViewProjection = wvp;
+			//cbv.TransformCB[frameIndex]->Update(&objConstants, sizeof(SceneObjectBuffer));
+			
+			//graphicsContext->SetConstantBuffer(0, cbv.TransformCB[frameIndex].get());
+			graphicsContext->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
+			graphicsContext->DrawIndexedInstanced(mesh->GetIndexCount(),
+			                                      1,
+			                                      mesh->GetBaseIndex(),
+			                                      mesh->GetBaseVertex(),
+			                                      0);
+			
+			Profiler::Get().Stats.DrawCalls++;
+			Profiler::Get().Stats.TriangleCount += (mesh->GetIndexCount() / 3);
+			
 		}
 		
 		Profiler::Get().StopGpuTimer(cmdList);
 		
 		// Le ordenamos a la GPU copiar los tiempos al buffer leíble
 		Profiler::Get().ResolveGpuTimestamps(cmdList);
-	}
-
-	void SceneRenderer::Resize(uint32_t width, uint32_t height)
-	{
-		//m_gBuffer->Resize()
 	}
 
 	void SceneRenderer::RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex)
@@ -197,7 +186,7 @@ namespace Bruno
 			m_gBuffer->GetPosition() 
 		};
 		context->SetRenderTargets(3, gbufferTargets, m_gBuffer->GetDepth());
-    /*
+		/*
 		// Limpiar G-Buffer y Restaurar Viewport de pantalla
 		context->SetViewport(0, 0, 100, 100);
     
@@ -232,10 +221,15 @@ namespace Bruno
 		context->DrawInstanced(3, 1, 0, 0);*/
 	}
 
-	void SceneRenderer::InitializeGbuffer(GraphicsDevice* device)
+	void SceneRenderer::Resize(uint32_t width, uint32_t height)
+	{
+		//m_gBuffer->Resize()
+	}
+
+	void SceneRenderer::InitializeGBuffer(GraphicsDevice* device)
 	{
 		m_gBuffer = std::make_shared<GBuffer>();
-		m_gBuffer->Initialize(*device, device->GetSRVDescriptorAllocator(), device->GetRTVDescriptorAllocator(),100,100);
+		m_gBuffer->Initialize(*device, device->GetSRVDescriptorAllocator(), device->GetRTVDescriptorAllocator(), 100, 100);
 	}
 
 	void SceneRenderer::InitializeOpaqueRootSignature(GraphicsDevice* device)
@@ -284,7 +278,7 @@ namespace Bruno
 		m_opaquePSO = PSOCache::GetOrCreate(device, psoDesc);
 	}
 
-	void SceneRenderer::InitializeGbufferRootSignature(GraphicsDevice* device)
+	void SceneRenderer::InitializeGBufferRootSignature(GraphicsDevice* device)
 	{
 		auto prototypeSig = std::make_shared<RootSignature>(*device);
 		
@@ -376,6 +370,7 @@ namespace Bruno
 		gbufferDesc.PixelShaderDesc  = { L"Shaders/GBufferPass.hlsl", L"PSMain", L"ps_6_0" };
 		
 		gbufferDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
+		
 		gbufferDesc.Topology = PrimitiveTopology::TriangleList;
 		gbufferDesc.DepthState.Mode = DepthMode::ReadWrite;
     
@@ -437,4 +432,62 @@ namespace Bruno
 		m_shadowPSO = PSOCache::GetOrCreate(device, shadowDesc);
 	}
 
+	void SceneRenderer::DrawBatch(GraphicsContext* graphicsContext, const std::vector<entt::entity>& visibleEntities)
+	{
+		if (visibleEntities.empty())
+		{
+			return;
+		}
+		
+		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
+		
+		AssetHandle currentModel = 0;
+		for (entt::entity entity : visibleEntities)
+		{
+			const auto& transform = entities.get<TransformComponent>(entity);
+			const auto& modelComp = entities.get<ModelComponent>(entity);
+
+			if (modelComp.RuntimeMaterialIndex == 0xFFFFFFFF)
+			{
+				continue;
+			}
+			
+			auto model = m_assetManager->GetAsset<Model>(modelComp.ModelHandle);
+			uint32_t meshIndex = modelComp.MeshIndex;
+			auto& meshes = model->GetMeshes();
+			auto& mesh = meshes[meshIndex];
+			
+			graphicsContext->SetPushConstants(2, modelComp.RuntimeMaterialIndex, 0);
+			
+			auto& indexBuffer = model->GetIndexBuffer();
+			auto& vertexBuffer = model->GetVertexBuffer();
+			
+			// 4. Optimización de Estado: Solo re-enlazar geometría si cambiamos de asset
+			if (modelComp.ModelHandle != currentModel)
+			{
+				graphicsContext->SetVertexBuffer(0, vertexBuffer.get());
+				graphicsContext->SetIndexBuffer(indexBuffer.get());
+
+				currentModel = modelComp.ModelHandle;
+			}
+
+			// 5. Preparar la memoria dinámica O(1) para la matriz de ESTE objeto
+			// (Asumiendo que el Root Parameter 0 es un ConstantBufferView)
+			Math::Matrix worldMatrix = transform.WorldTransform;
+        
+			DynamicAllocation alloc = graphicsContext->AllocateDynamicSpace(sizeof(Math::Matrix));
+			memcpy(alloc.CPUAddress, &worldMatrix, sizeof(Math::Matrix));
+
+			// 6. Enlazar datos volátiles a la Root Signature
+			graphicsContext->SetConstantBuffer(0, alloc);               
+			graphicsContext->SetPushConstant(1, modelComp.RuntimeMaterialIndex, 0);
+
+			graphicsContext->DrawIndexedInstanced(mesh->GetIndexCount(),
+			                                      1,
+			                                      mesh->GetBaseIndex(),
+			                                      mesh->GetBaseVertex(),
+			                                      0);
+
+		}
+	}
 }

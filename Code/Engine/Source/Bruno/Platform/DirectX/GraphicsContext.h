@@ -3,13 +3,14 @@
 #include <d3d12.h>
 #include <wrl.h>
 
+#include "ConstantBuffer.h"
 #include "Bruno/Math/Math.h"
 #include "Bruno/Platform/DirectX/CommandContext.h"
 #include "Bruno/Renderer/RHITypes.h"
 
 namespace Bruno
 {
-    class ConstantBuffer;
+    class DescriptorAllocator;
     class IndexBuffer;
     class VertexBuffer;
     class GraphicsPipelineState;
@@ -44,10 +45,16 @@ namespace Bruno
         void SetRootSignature(RootSignature* rootSig);
 
         // --- ENLACE DE RECURSOS ---
-        void SetDescriptorHeaps(ID3D12DescriptorHeap** ppHeaps, uint32_t count);
-        void SetConstantBuffer(uint32_t rootParameterIndex, ConstantBuffer* buffer);
+        void SetDescriptorHeaps(std::initializer_list<DescriptorAllocator*> heaps);
+        
+        template<typename T>
+        void SetConstantBuffer(uint32_t rootParameterIndex, const ConstantBuffer<T>& cb)
+        {
+            m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, cb.GetGPUAddress());
+        }
+        
         void SetConstantBuffer(uint32_t rootParameterIndex, const DynamicAllocation& allocation);
-        void SetDescriptorTable(uint32_t rootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor);
+        void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& descriptorAllocator);
         void SetDynamicDescriptorTable(uint32_t rootParameterIndex, D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor);
         void SetTexture(uint32_t rootParameterIndex, Texture2D* texture);
         
@@ -63,6 +70,7 @@ namespace Bruno
         // Sube valores de 32 bits (floats, ints) directamente a la Root Signature
         // Configura Push Constants (Vulkan) / 32-bit Root Constants (DX12)
         void SetPushConstants(uint32_t rootParameterIndex, uint32_t num32BitValues, const void* data, uint32_t destOffsetIn32BitValues = 0);
+        void SetPushConstant(uint32_t rootParameterIndex, uint32_t sourceData, uint32_t destOffsetIn32BitValues = 0);
         
     private:
         inline D3D12_RESOURCE_STATES GetDX12ResourceState(ResourceState state);

@@ -50,11 +50,13 @@ struct GBufferOutput {
 // ==========================================================
 PixelInput VSMain(VertexInput input) {
     PixelInput output;
+    
     float4 posWorld = mul(float4(input.Position, 1.0f), g_World);
     output.PositionWorld = posWorld.xyz;
     output.PositionClip = mul(posWorld, g_ViewProjection);
     output.NormalWorld = normalize(mul(input.Normal, (float3x3)g_World));
     output.UV = input.UV;
+    
     return output;
 }
 

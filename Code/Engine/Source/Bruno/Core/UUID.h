@@ -18,6 +18,16 @@ namespace Bruno
 		{
 			return m_uuid == other.m_uuid;
 		}
+		
+		bool operator== (const uint64_t& other) const
+		{
+			return m_uuid == other;
+		}
+		
+		bool operator== (const int& other) const
+		{
+			return m_uuid == other;
+		}
 	private:
 		uint64_t m_uuid;
 

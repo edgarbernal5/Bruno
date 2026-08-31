@@ -4,8 +4,14 @@
 #include <Bruno/Platform/DirectX/GraphicsPipelineState.h>
 #include <Bruno/Math/Math.h>
 
+namespace entt
+{
+	enum class entity : std::uint32_t;
+}
+
 namespace Bruno
 {
+	class DescriptorAllocator;
 	class GBuffer;
 	class FrustumCulling;
 	class GraphicsContext;
@@ -22,25 +28,29 @@ namespace Bruno
 		// Se llama cuando cargas una escena o agregas un objeto
 		void InitEntitiesForRender();
 		
-		void RenderScene(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
+		void RenderForward(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
+		void RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex);
+		
 		void Resize(uint32_t width, uint32_t height);
 		
 	private:
-		void RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex);
-		void InitializeGbuffer(GraphicsDevice* device);
+		void InitializeGBuffer(GraphicsDevice* device);
 		
 		void InitializeOpaqueRootSignature(GraphicsDevice* device);
 		void InitializeOpaquePSO(GraphicsDevice* device);
 		
-		void InitializeGbufferRootSignature(GraphicsDevice* device);
+		void InitializeGBufferRootSignature(GraphicsDevice* device);
 		void InitializeDeferredRootSignature(GraphicsDevice* device);
 		void InitializeDeferredPSOs(GraphicsDevice* device);
 		void InitializeShadowPipeline(GraphicsDevice* device);
+		
+		void DrawBatch(GraphicsContext* graphicsContext, const std::vector<entt::entity>& visibleEntities);
 		
 		std::shared_ptr<Scene> m_scene;
 		std::shared_ptr<FrustumCulling> m_frustumCulling;
 		AbstractAssetManager* m_assetManager;
 
+		DescriptorAllocator* m_globalSrvHeap;
 		std::shared_ptr<GBuffer> m_gBuffer;
 		std::shared_ptr<RootSignature> m_opaqueRootSignature;
 		std::shared_ptr<RootSignature> m_shadowRootSig;

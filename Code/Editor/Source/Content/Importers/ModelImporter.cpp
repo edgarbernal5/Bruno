@@ -79,7 +79,34 @@ namespace Bruno
 		rootNode.Parent = ModelNode::NullNode;
 		ProcessNode(aiScene->mRootNode, 0, modelNodes, meshes, Math::Matrix::Identity);
 
-		outputAsset = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
+		// ==========================================================
+		// NUEVO: Cálculo del Bounding Box Global del Modelo
+		// ==========================================================
+		Math::BoundingBox modelAABB;
+		bool isFirstMesh = true;
+
+		for (const auto& mesh : meshes)
+		{
+			Math::BoundingBox transformedSubmeshAABB;
+            
+			// 1. Transformar el AABB local por la matriz del Nodo correspondiente.
+			// DirectXMath extrae correctamente la escala y la rotación de la matriz para evitar deformaciones en la caja de colisión[cite: 9].
+			mesh->GetBoundingBox().Transform(transformedSubmeshAABB, mesh->GetTransform());
+
+			// 2. Fusionar secuencialmente las cajas
+			if (isFirstMesh)
+			{
+				modelAABB = transformedSubmeshAABB;
+				isFirstMesh = false;
+			}
+			else
+			{
+				// CreateMerged expande 'modelAABB' para envolver matemáticamente a ambas cajas
+				Math::BoundingBox::CreateMerged(modelAABB, modelAABB, transformedSubmeshAABB);
+			}
+		}
+		
+		outputAsset = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes), modelAABB);
 		outputAsset->SetHandle(metadata.Handle);
 
 		return true;
@@ -93,7 +120,7 @@ namespace Bruno
 		for (uint32_t i = 0; i < aiMesh->mNumVertices; i++)
 		{
 			auto& vertex = vertices.emplace_back();
-			vertex.Position = { aiMesh->mVertices[i].x, aiMesh->mVertices[i].y, aiMesh->mVertices[i].z };
+			vertex.Position = Math::Vector3 { aiMesh->mVertices[i].x, aiMesh->mVertices[i].y, aiMesh->mVertices[i].z };
 
 			aabbMin.x = std::min<float>(aabbMin.x, vertex.Position.x);
 			aabbMin.y = std::min<float>(aabbMin.y, vertex.Position.y);
@@ -103,16 +130,16 @@ namespace Bruno
 			aabbMax.z = std::max<float>(aabbMax.z, vertex.Position.z);
 
 			if (aiMesh->HasNormals())
-				vertex.Normal = { aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z };
+				vertex.Normal = Math::Vector3 { aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z };
 
 			if (aiMesh->HasTangentsAndBitangents())
 			{
-				vertex.Tangent = { aiMesh->mTangents[i].x, aiMesh->mTangents[i].y, aiMesh->mTangents[i].z };
-				vertex.Binormal = { aiMesh->mBitangents[i].x, aiMesh->mBitangents[i].y, aiMesh->mBitangents[i].z };
+				vertex.Tangent = Math::Vector3 { aiMesh->mTangents[i].x, aiMesh->mTangents[i].y, aiMesh->mTangents[i].z };
+				vertex.Binormal = Math::Vector3 { aiMesh->mBitangents[i].x, aiMesh->mBitangents[i].y, aiMesh->mBitangents[i].z };
 			}
 
 			if (aiMesh->HasTextureCoords(0))
-				vertex.Texcoord = { aiMesh->mTextureCoords[0][i].x, aiMesh->mTextureCoords[0][i].y, aiMesh->mTextureCoords[0][i].z };
+				vertex.Texcoord = Math::Vector3 { aiMesh->mTextureCoords[0][i].x, aiMesh->mTextureCoords[0][i].y, aiMesh->mTextureCoords[0][i].z };
 		}
 
 		/*uint32_t colorChannelCount = aiMesh->GetNumColorChannels();
@@ -209,7 +236,64 @@ namespace Bruno
 
 	void ModelImporter::ProcessTexturesForMaterial(Material& materialContentItem, aiMaterial* aiMaterial, const std::wstring& directory, AssetImporterContext& context)
 	{
-		for (auto it = g_textureTypeMappings.begin(); it != g_textureTypeMappings.end(); ++it)
+		// Función Lambda auxiliar para importar texturas sin repetir código
+		auto ImportTextureType = [&](aiTextureType type) -> AssetHandle 
+		{
+			if (aiMaterial->GetTextureCount(type) == 0)
+			{
+				return 0;
+			}
+
+			aiString textureRelativePath;
+			if (aiMaterial->GetTexture(type, 0, &textureRelativePath) == AI_SUCCESS)
+			{
+				std::filesystem::path filenameTexture(directory);
+				filenameTexture /= textureRelativePath.C_Str();
+
+				if (std::filesystem::exists(filenameTexture))
+				{
+					// Importa el asset y devuelve el Handle
+					return context.ImportAsset(filenameTexture);
+				}
+			}
+			return 0;
+		};
+		
+		// 1. Extraer Texturas PBR
+		// Primero intentamos BaseColor (PBR), si no, caemos a Diffuse clásico
+		materialContentItem.AlbedoMap = ImportTextureType(aiTextureType_BASE_COLOR);
+		if (materialContentItem.AlbedoMap == 0)
+		{
+			materialContentItem.AlbedoMap = ImportTextureType(aiTextureType_DIFFUSE);
+		}
+
+		// Normal Map
+		materialContentItem.NormalMap = ImportTextureType(aiTextureType_NORMALS);
+
+		// Metallic / Roughness (Si usas un workflow combinado ej. GLTF)
+		// GLTF suele guardarlo como UNKNOWN o SHININESS en viejas versiones de Assimp.
+		materialContentItem.MetallicRoughnessMap = ImportTextureType(aiTextureType_UNKNOWN); 
+
+		// 2. Extraer Valores Escalares PBR (Colors)
+		aiColor4D color;
+		if (aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
+		{
+			materialContentItem.AlbedoTint = Math::Vector4(color.r, color.g, color.b, color.a);
+		}
+
+		float metallic = 0.0f;
+		if (aiMaterial->Get(AI_MATKEY_METALLIC_FACTOR, metallic) == AI_SUCCESS)
+		{
+			materialContentItem.MetallicFactor = metallic;
+		}
+
+		float roughness = 0.5f;
+		if (aiMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) == AI_SUCCESS)
+		{
+			materialContentItem.RoughnessFactor = roughness;
+		}
+		
+		/*for (auto it = g_textureTypeMappings.begin(); it != g_textureTypeMappings.end(); ++it)
 		{
 			aiTextureType mappedTextureType = static_cast<aiTextureType>(it->second.first);
 			uint32_t textureCount = aiMaterial->GetTextureCount(mappedTextureType);
@@ -239,7 +323,7 @@ namespace Bruno
 					}
 				}
 			}
-		}
+		}*/
 	}
 
 	Math::Matrix ModelImporter::ToMatrix(const aiMatrix4x4& aiMatrix)

@@ -111,8 +111,11 @@ namespace Bruno
 
         // 2. Redimensionar el SwapChain
         ThrowIfFailed(m_swapChain->ResizeBuffers(
-            Graphics::Core::BACK_BUFFER_COUNT, width, height,
-            D3DFunctions::GetDX12Format(m_parameters.BackBufferFormat), 0
+            Graphics::Core::BACK_BUFFER_COUNT, 
+            width,
+            height,
+            D3DFunctions::GetDX12Format(m_parameters.BackBufferFormat),
+            0
         ));
 
         // 3. Sincronizar nuestro índice

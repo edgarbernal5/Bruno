@@ -46,7 +46,7 @@ namespace Bruno
     {
         auto range = std::make_unique<CD3DX12_DESCRIPTOR_RANGE[]>(1);
         range[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, numDescriptors, shaderRegister, registerSpace);
-
+        
         CD3DX12_ROOT_PARAMETER param;
         param.InitAsDescriptorTable(1, range.get(), D3DFunctions::GetDX12Visibility(visibility));
 

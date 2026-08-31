@@ -156,9 +156,6 @@ namespace Bruno
 			context.ClearDepth(depthBuffer, 1.0f, 0);
 			context.SetRenderTargets(1, &backBuffer, depthBuffer);
 			
-			// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
-			context.SetDescriptorHeaps(&m_srvHeap, 1);
-			
 			SetupCameraGizmoViewport();
 			
 			// Configurar Viewport y Scissor Test explícitamente en este frame
@@ -172,7 +169,7 @@ namespace Bruno
 			Math::Matrix gizmoWorld;
 			Math::Vector3 gizmoPivot;
 			
-			m_sceneRenderer->RenderScene(&context, m_sceneDocument->GetCamera(), frameIndex);
+			m_sceneRenderer->RenderDeferred(&context, m_sceneDocument->GetCamera(), frameIndex);
 			
 			if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
 			{
