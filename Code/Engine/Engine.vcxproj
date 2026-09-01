@@ -111,6 +111,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueueManager.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBufferBase.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DFunctions.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DepthBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.h" />
@@ -174,7 +175,7 @@
     <ClInclude Include="Source\Bruno\Math\Math.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DConstants.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DHelpers.h" />
-    <ClInclude Include="Source\Bruno\Platform\DirectX\Resource.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsResource.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\D3DCore.h" />
     <ClInclude Include="Source\Bruno\Core\Window.h" />
     <ClInclude Include="Source\brpch.h" />
@@ -209,7 +210,7 @@
     <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueueManager.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBuffer.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBufferBase.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\D3DFunctions.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DepthBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.cpp" />
@@ -328,7 +329,7 @@
     <ClCompile Include="Source\Bruno\Core\Stream.cpp" />
     <ClCompile Include="Source\Bruno\Core\StringHelpers.cpp" />
     <ClCompile Include="Source\Bruno\Math\Math.cpp" />
-    <ClCompile Include="Source\Bruno\Platform\DirectX\Resource.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsResource.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\D3DCore.cpp" />
     <ClCompile Include="Source\Bruno\Core\Window.cpp" />
     <ClCompile Include="Source\brpch.cpp">

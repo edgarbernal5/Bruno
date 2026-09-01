@@ -58,6 +58,9 @@
     <Filter Include="Source\Bruno\Renderer\Deferred">
       <UniqueIdentifier>{544c3fab-0028-43d0-89ea-04355c936e2e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Bruno\Renderer\Shadows">
+      <UniqueIdentifier>{ab0caf1a-83a6-409b-976a-f3344132a8c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -122,9 +125,6 @@
     </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Renderer\RenderItem.h">
-      <Filter>Source\Bruno\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Core\GameTimer.h">
       <Filter>Source\Bruno\Core</Filter>
@@ -193,9 +193,6 @@
       <Filter>Source\Bruno\Core</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext.h">
-      <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Bruno\Platform\DirectX\Resource.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h">
@@ -291,9 +288,6 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.h">
-      <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Bruno\Platform\DirectX\ShaderCompiler.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
@@ -351,6 +345,18 @@
     <ClInclude Include="Source\Bruno\Renderer\Deferred\GBuffer.h">
       <Filter>Source\Bruno\Renderer\Deferred</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\MaterialManager.h">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsResource.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBufferBase.h">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\Shadows\ShadowMapArray.h">
+      <Filter>Source\Bruno\Renderer\Shadows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -403,9 +409,6 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexTypes.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Renderer\RenderItem.cpp">
-      <Filter>Source\Bruno\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Core\GameTimer.cpp">
       <Filter>Source\Bruno\Core</Filter>
@@ -462,9 +465,6 @@
       <Filter>Source\Bruno\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsContext.cpp">
-      <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Platform\DirectX\Resource.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp">
@@ -527,9 +527,6 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Bruno\Platform\DirectX\RootSignatureBuilder.cpp">
-      <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\ShaderCompiler.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
@@ -540,9 +537,6 @@
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadHeap.cpp">
-      <Filter>Source\Bruno\Platform\DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBuffer.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Source\Bruno\Scene\Systems\TransformSystem.cpp">
@@ -583,6 +577,18 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Renderer\Deferred\GBuffer.cpp">
       <Filter>Source\Bruno\Renderer\Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\MaterialManager.cpp">
+      <Filter>Source\Bruno\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsResource.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBufferBase.cpp">
+      <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\Shadows\ShadowMapArray.cpp">
+      <Filter>Source\Bruno\Renderer\Shadows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 
 #include "ConstantBuffer.h"
+#include "ConstantBufferBase.h"
 #include "DepthBuffer.h"
 #include "DynamicAllocation.h"
 #include "DynamicDescriptorAllocator.h"
@@ -155,6 +156,11 @@ namespace Bruno
         }
 
         m_commandList->SetDescriptorHeaps(static_cast<UINT>(heaps.size()), nativeHeaps.data());
+    }
+
+    void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, const ConstantBufferBase& cb)
+    {
+        m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, cb.GetGPUAddress());
     }
 
     void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, const DynamicAllocation& allocation)

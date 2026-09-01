@@ -3,13 +3,13 @@
 #include <d3d12.h>
 #include <wrl.h>
 
-#include "ConstantBuffer.h"
 #include "Bruno/Math/Math.h"
 #include "Bruno/Platform/DirectX/CommandContext.h"
 #include "Bruno/Renderer/RHITypes.h"
 
 namespace Bruno
 {
+    class ConstantBufferBase;
     class DescriptorAllocator;
     class IndexBuffer;
     class VertexBuffer;
@@ -47,13 +47,9 @@ namespace Bruno
         // --- ENLACE DE RECURSOS ---
         void SetDescriptorHeaps(std::initializer_list<DescriptorAllocator*> heaps);
         
-        template<typename T>
-        void SetConstantBuffer(uint32_t rootParameterIndex, const ConstantBuffer<T>& cb)
-        {
-            m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, cb.GetGPUAddress());
-        }
-        
+        void SetConstantBuffer(uint32_t rootParameterIndex, const ConstantBufferBase& cb);
         void SetConstantBuffer(uint32_t rootParameterIndex, const DynamicAllocation& allocation);
+        
         void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& descriptorAllocator);
         void SetDynamicDescriptorTable(uint32_t rootParameterIndex, D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor);
         void SetTexture(uint32_t rootParameterIndex, Texture2D* texture);

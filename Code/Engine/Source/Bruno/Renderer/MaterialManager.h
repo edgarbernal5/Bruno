@@ -1,34 +1,41 @@
 ﻿#pragma once
+#include "Bruno/Platform/DirectX/DescriptorAllocator.h"
 
 namespace Bruno
 {
-    class UploadContext;
+    class DescriptorAllocator;
+    class GraphicsContext;
     struct MaterialData;
 
     class MaterialManager
     {
     public:
-        MaterialManager(GraphicsDevice& device);
+        MaterialManager(GraphicsDevice& device, DescriptorAllocator& globalSrvHeap);
         
-        // Crea un nuevo material y devuelve su ID (índice)
         uint32_t CreateMaterial(const MaterialData& data);
-        
-        // Obtiene la referencia para modificar un material en tiempo real (ej. desde el Editor UI)
         MaterialData& GetMaterial(uint32_t index);
-        void MarkAsDirty(); // Llama a esto si modificas un material
+        void MarkAsDirty(); 
         
-        // Sincroniza la CPU con la GPU al inicio del frame
-        void UpdateGPUBuffer(UploadContext& uploadContext);
+        // AHORA USA EL CONTEXTO DIRECTO PARA NO ROMPER EL PARALELISMO
+        void UpdateGPUBuffer(GraphicsContext& context);
         
-        // Devuelve el buffer de GPU para bindearlo en el RenderLoop
         ID3D12Resource* GetGPUBuffer() const { return m_gpuBuffer.Get(); }
 
     private:
         GraphicsDevice& m_device;
+        DescriptorAllocator& m_globalSrvHeap;
+        
         std::vector<MaterialData> m_materials;
         bool m_isDirty = true;
 
+        // El gemelo de alto rendimiento (VRAM)
         Microsoft::WRL::ComPtr<ID3D12Resource> m_gpuBuffer;
+        
+        // El gemelo de alta accesibilidad (RAM mapeada)
+        Microsoft::WRL::ComPtr<ID3D12Resource> m_stagingBuffer;
+        void* m_mappedStagingData = nullptr; // Puntero permanente a la RAM
+
+        DescriptorAllocation m_srvAllocation;
         uint32_t m_gpuBufferSize = 0;
         
         void ResizeGPUBuffer(uint32_t newElementCount);

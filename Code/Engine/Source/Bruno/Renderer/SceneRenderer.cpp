@@ -56,29 +56,13 @@ namespace Bruno
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
 		for (auto& entt : entities)
 		{
-			Entity entity = { entt, m_scene.get() };
-			
-			// Si la entidad no tiene sus Constant Buffers, se los creamos
-			if (!entity.HasComponent<CBVComponent>()) 
-			{
-				CBVComponent cbv;
-				for (int i = 0; i < 2; ++i)
-				{
-					//cbv.TransformCB[i] = std::make_shared<ConstantBuffer>(device, objectSize);
-				}
-                
-				// Le "pegamos" el componente de memoria de video a la entidad
-				entity.AddComponent<CBVComponent>(std::move(cbv));
-			}
-			
 			auto& modelComponent = entities.get<ModelComponent>(entt);
 			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 			auto& meshes = model->GetMeshes();
 			auto& mesh = meshes[meshIndex];
 			
-			auto materialHandle = modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
-
+			auto materialHandle= modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
 			if (materialHandle != 0)
 			{
 				// Le pedimos el material real al AssetManager
@@ -86,7 +70,7 @@ namespace Bruno
             
 				if (materialAsset)
 				{
-					// ¡AQUÍ ESTÁ LA MAGIA! Guardamos el ID Bindless directo en el componente
+					// Guardamos el ID Bindless directo en el componente
 					modelComponent.RuntimeMaterialIndex = materialAsset->RuntimeMaterialIndex;
 				}
 			}
@@ -121,9 +105,11 @@ namespace Bruno
 		for (Entity entity : visibleEntities)
 		{
 			const auto& modelComponent = entity.GetComponent<ModelComponent>();
-			const auto& cbv = entity.GetComponent<CBVComponent>();
 			
-			if (modelComponent.RuntimeMaterialIndex == 0xFFFFFFFF) continue;
+			if (modelComponent.RuntimeMaterialIndex == 0xFFFFFFFF)
+			{
+				continue;
+			}
 			
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 			uint32_t meshIndex = modelComponent.MeshIndex;

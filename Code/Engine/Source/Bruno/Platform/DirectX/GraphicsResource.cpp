@@ -1,14 +1,14 @@
 #include "brpch.h"
-#include "Resource.h"
+#include "GraphicsResource.h"
 
 #include "D3DHelpers.h"
 #include "D3D12MemAlloc.h"
 
 namespace Bruno
 {
-	BR_RTTI_DEFINITIONS(Resource);
+	BR_RTTI_DEFINITIONS(GraphicsResource);
 
-	Resource::~Resource()
+	GraphicsResource::~GraphicsResource()
 	{
 		SafeRelease(m_resource);
 		SafeRelease(m_allocation);

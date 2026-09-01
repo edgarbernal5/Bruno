@@ -19,6 +19,7 @@
 #include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/Shader.h"
+#include "Bruno/Renderer/MaterialManager.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
@@ -127,7 +128,7 @@ namespace Bruno
 			//BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
 			
 			// 2. Pedirle a nuestra cola el "lápiz" (CommandList). 
-			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
+			// Esto automáticamente espera si la GPU sigue ocupada con este frame.
 			auto commandList = m_commandQueue->GetCommandList(frameIndex);
 			auto allocator = m_commandQueue->GetAllocator(frameIndex);
 			auto dynamicAllocator = m_dynamicAllocators[frameIndex].get();
@@ -581,6 +582,11 @@ namespace Bruno
 			gizmoCameraSize
 		};
 		m_cameraGizmo->SetCameraGizmoViewport(gizmoCameraViewport);
+	}
+
+	void ScenePanel::InitializeMaterialManager()
+	{
+		m_materialManager = std::make_unique<MaterialManager>(*m_device);
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)

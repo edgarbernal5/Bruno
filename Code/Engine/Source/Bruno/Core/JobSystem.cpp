@@ -68,7 +68,7 @@ namespace Bruno
             // Si pasamos un grupo, envolvemos el job original para que reduzca el contador al terminar
             if (group)
             {
-                m_jobQueue.push([job, group]()
+                m_jobQueue.emplace([job, group]()
                 {
                     job(); // Ejecuta la tarea real
                     group->pendingJobs.fetch_sub(1, std::memory_order_release);

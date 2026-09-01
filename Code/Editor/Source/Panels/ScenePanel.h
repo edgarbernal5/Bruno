@@ -17,6 +17,7 @@
 
 namespace Bruno
 {
+	class MaterialManager;
 	class DebugRenderer;
 	class LinearAllocator;
 	class Model;
@@ -77,6 +78,7 @@ namespace Bruno
 		void InitializeSceneRenderer();
 		void InitializeMarquee();
 		void SetupCameraGizmoViewport();
+		void InitializeMaterialManager();
 		void UpdateCBs(const GameTimer& timer);
 		void RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax);
 		
@@ -112,6 +114,8 @@ namespace Bruno
 		Math::Viewport m_viewport;
 		Rect m_scissorRect;
 
+		std::unique_ptr<MaterialManager> m_materialManager;
+		
 		ID3D12DescriptorHeap* m_srvHeap;
 		
 		Math::Int2 m_lastMousePosition;
