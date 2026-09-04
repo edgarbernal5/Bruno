@@ -5,6 +5,7 @@
 
 #include "ConstantBuffer.h"
 #include "ConstantBufferBase.h"
+#include "D3DFunctions.h"
 #include "DepthBuffer.h"
 #include "DynamicAllocation.h"
 #include "DynamicDescriptorAllocator.h"
@@ -28,42 +29,32 @@ namespace Bruno
         return m_dynamicAllocator->Allocate(sizeInBytes); 
     }
 
-    void GraphicsContext::TransitionResource(Texture2D* texture, ResourceState stateBefore, ResourceState stateAfter)
+    void GraphicsContext::TransitionResource(GraphicsResource* resource, ResourceState newState)
     {
-        if (stateBefore == stateAfter)
+        if (!resource) return;
+
+        ResourceState stateBefore = resource->GetCurrentState();
+        
+        // Evitamos emitir barreras nulas en la GPU si el recurso ya está en el estado correcto
+        if (stateBefore == newState)
         {
             return;
         }
         
-        D3D12_RESOURCE_STATES dxBefore = GetDX12ResourceState(stateBefore);
-        D3D12_RESOURCE_STATES dxAfter = GetDX12ResourceState(stateAfter);
+        D3D12_RESOURCE_STATES dxStateBefore = D3DFunctions::GetDX12ResourceState(stateBefore);
+        D3D12_RESOURCE_STATES dxNewState = D3DFunctions::GetDX12ResourceState(newState);
 
-        // Extraemos el ID3D12Resource nativo de nuestra clase Texture2D
-        ID3D12Resource* nativeResource = texture->GetResource();
-
-        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-            nativeResource,
-            dxBefore,
-            dxAfter
-        );
-
-        m_commandList->ResourceBarrier(1, &barrier);
-    }
-
-    void GraphicsContext::TransitionResource(DepthBuffer* depthBuffer, ResourceState stateBefore, ResourceState stateAfter)
-    {
-        D3D12_RESOURCE_STATES dxBefore = GetDX12ResourceState(stateBefore);
-        D3D12_RESOURCE_STATES dxAfter = GetDX12ResourceState(stateAfter);
-
-        ID3D12Resource* nativeResource = depthBuffer->GetResource();
+        ID3D12Resource* nativeResource = resource->GetNativeResource();
 
         CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
             nativeResource,
-            dxBefore,
-            dxAfter
+            dxStateBefore,
+            dxNewState
         );
 
         m_commandList->ResourceBarrier(1, &barrier);
+        
+        resource->SetCurrentState(newState);
     }
 
     void GraphicsContext::ClearRenderTarget(Texture2D* renderTarget, const Math::Color& color)
@@ -74,7 +65,7 @@ namespace Bruno
         m_commandList->ClearRenderTargetView(rtvHandle, color, 0, nullptr);
     }
 
-    void GraphicsContext::ClearDepth(DepthBuffer* depthBuffer, float depth, uint8_t stencil)
+    void GraphicsContext::ClearDepth(const DepthBuffer* depthBuffer, float depth, uint8_t stencil)
     {
         // Extraemos el Descriptor Handle (D3D12_CPU_DESCRIPTOR_HANDLE)
         D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = depthBuffer->GetView();
@@ -223,20 +214,42 @@ namespace Bruno
         m_commandList->IASetVertexBuffers(startSlot, 1, &view);
     }
 
-    void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer* views)
+    void GraphicsContext::SetVertexBuffers(uint32_t startSlot, std::initializer_list<const VertexBuffer*> buffers)
     {
-        /*D3D12_VERTEX_BUFFER_VIEW d3dViews[count];
-        for (uint32_t i = 0; i < count; i++)
+        // DX12 soporta múltiples slots, usamos un array fijo rápido
+        std::array<D3D12_VERTEX_BUFFER_VIEW, 8> views = {};
+        uint32_t i = 0;
+    
+        for (const auto* vb : buffers)
         {
-            d3dViews[i] = views->GetView();
+            views[i++] = vb->GetView();
         }
-        m_commandList->IASetVertexBuffers(startSlot, count, d3dViews);*/
+    
+        m_commandList->IASetVertexBuffers(startSlot, static_cast<UINT>(buffers.size()), views.data());
     }
 
     void GraphicsContext::SetIndexBuffer(IndexBuffer* indexBuffer)
     {
-        D3D12_INDEX_BUFFER_VIEW view = indexBuffer->GetView();
+        auto view = indexBuffer->GetView();
         m_commandList->IASetIndexBuffer(&view);
+    }
+
+    void GraphicsContext::CopyBuffer(GraphicsResource* dest, GraphicsResource* src, size_t size)
+    {
+        // 1. Validación estricta AAA para evitar pantallazos azules (TDRs)
+        if (!dest || !src)
+        {
+            throw std::invalid_argument("Punteros nulos pasados a CopyBuffer.");
+        }
+
+        if (size == 0) 
+        {
+            return; 
+        }
+        
+        // Encolar la transferencia masiva de datos en la CommandList del contexto
+        // Parámetros: Destino, Offset Destino, Origen, Offset Origen, Tamaño
+        m_commandList->CopyBufferRegion(dest->GetNativeResource(), 0, src->GetNativeResource(), 0, size);
     }
 
     void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation)
@@ -258,25 +271,5 @@ namespace Bruno
     void GraphicsContext::SetPushConstant(uint32_t rootParameterIndex, uint32_t sourceData,uint32_t destOffsetIn32BitValues)
     {
         m_commandList->SetGraphicsRoot32BitConstant(rootParameterIndex, sourceData, destOffsetIn32BitValues);
-    }
-
-    D3D12_RESOURCE_STATES GraphicsContext::GetDX12ResourceState(ResourceState state)
-    {
-        switch (state)
-        {
-        case ResourceState::Common:                   return D3D12_RESOURCE_STATE_COMMON;
-        case ResourceState::VertexAndConstantBuffer:  return D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-        case ResourceState::IndexBuffer:              return D3D12_RESOURCE_STATE_INDEX_BUFFER;
-        case ResourceState::RenderTarget:             return D3D12_RESOURCE_STATE_RENDER_TARGET;
-        case ResourceState::UnorderedAccess:          return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-        case ResourceState::DepthWrite:               return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-        case ResourceState::DepthRead:                return D3D12_RESOURCE_STATE_DEPTH_READ;
-        case ResourceState::NonPixelShaderResource:   return D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-        case ResourceState::PixelShaderResource:      return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-        case ResourceState::CopyDest:                 return D3D12_RESOURCE_STATE_COPY_DEST;
-        case ResourceState::CopySource:               return D3D12_RESOURCE_STATE_COPY_SOURCE;
-        case ResourceState::Present:                  return D3D12_RESOURCE_STATE_PRESENT;
-        default:                                      return D3D12_RESOURCE_STATE_COMMON;
-        }
     }
 }

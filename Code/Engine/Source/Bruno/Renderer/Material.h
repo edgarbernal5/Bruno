@@ -6,7 +6,6 @@
 
 #include "Bruno/Math/Math.h"
 #include "Bruno/Platform/DirectX/DescriptorAllocator.h"
-#include "Bruno/Platform/DirectX/GraphicsPipelineState.h"
 
 namespace Bruno
 {
@@ -16,27 +15,6 @@ namespace Bruno
 {
 	class Texture;
 	class AbstractAssetManager;
-	
-	// Constante para indicar que no hay textura asignada
-	constexpr uint32_t INVALID_TEXTURE_INDEX = 0xFFFFFFFF;
-
-	// ALINEACIÓN ESTRICTA DE 16 BYTES PARA GPU
-	__declspec(align(16)) struct MaterialData {
-		Math::Vector4 AlbedoTint;       // 16 bytes
-		float MetallicFactor;           // 4 bytes
-		float RoughnessFactor;          // 4 bytes
-		uint32_t AlbedoTextureIndex;    // 4 bytes
-		uint32_t NormalTextureIndex;    // 4 bytes
-		// Total: 32 bytes (Perfectamente alineado)
-        
-		// Constructor por defecto (Material de plástico blanco básico)
-		MaterialData() 
-			: AlbedoTint(1.0f, 1.0f, 1.0f, 1.0f), 
-			  MetallicFactor(0.0f), 
-			  RoughnessFactor(0.5f),
-			  AlbedoTextureIndex(INVALID_TEXTURE_INDEX),
-			  NormalTextureIndex(INVALID_TEXTURE_INDEX) {}
-	};
 	
 	class Material : public Asset
 	{
@@ -62,7 +40,7 @@ namespace Bruno
 		
 		// --- ENLACE CON EL RENDERER (LA LLAVE BINDLESS) ---
 		// Este es el ID que el sistema le asignará al instanciarse en la GPU.
-		// Lo inicializamos en un valor inválido[cite: 1].
+		// Lo inicializamos en un valor inválido.
 		uint32_t RuntimeMaterialIndex = 0xFFFFFFFF;
 		
 	private:

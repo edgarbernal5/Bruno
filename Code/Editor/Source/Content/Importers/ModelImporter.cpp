@@ -90,7 +90,7 @@ namespace Bruno
 			Math::BoundingBox transformedSubmeshAABB;
             
 			// 1. Transformar el AABB local por la matriz del Nodo correspondiente.
-			// DirectXMath extrae correctamente la escala y la rotación de la matriz para evitar deformaciones en la caja de colisión[cite: 9].
+			// DirectXMath extrae correctamente la escala y la rotación de la matriz para evitar deformaciones en la caja de colisión.
 			mesh->GetBoundingBox().Transform(transformedSubmeshAABB, mesh->GetTransform());
 
 			// 2. Fusionar secuencialmente las cajas

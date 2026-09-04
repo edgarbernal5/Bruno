@@ -117,6 +117,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DynamicAllocation.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\DynamicDescriptorAllocator.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\GpuBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsDevice.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.h" />
@@ -134,6 +135,7 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadHeap.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
     <ClInclude Include="Source\Bruno\Renderer\Deferred\GBuffer.h" />
+    <ClInclude Include="Source\Bruno\Renderer\MaterialData.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialManager.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
     <ClInclude Include="Source\Bruno\Renderer\PrimitiveBatch.h" />
@@ -216,6 +218,7 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\DescriptorAllocator.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DynamicAllocation.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\DynamicDescriptorAllocator.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\GpuBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsDevice.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\GraphicsPipelineState.cpp" />

@@ -19,4 +19,5 @@ namespace Bruno::D3DFunctions
     D3D12_TEXTURE_ADDRESS_MODE GetDX12AddressMode(TextureAddressMode mode);
     D3D12_ROOT_SIGNATURE_FLAGS GetDX12RootSignatureFlags(RootSignatureFlags flags);
     
+    D3D12_RESOURCE_STATES GetDX12ResourceState(ResourceState state);
 }

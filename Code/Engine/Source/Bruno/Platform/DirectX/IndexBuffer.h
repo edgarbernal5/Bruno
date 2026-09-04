@@ -4,36 +4,31 @@
 #include <wrl.h>
 #include <vector>
 
+#include "GpuBuffer.h"
+
 namespace Bruno
 {
     class UploadContext;
     
-    class IndexBuffer
+    class IndexBuffer : public GpuBuffer
     {
     public:
-        // Constructor Original (Estático - DEFAULT HEAP)
+        // Constructor Dinámico (Ej: Para PrimitiveBatch)
+        IndexBuffer(GraphicsDevice& device, size_t indexCount, bool use16BitIndices = false);
+        
+        // Constructor Estático (Ej: Para Modelos Importados)
         IndexBuffer(GraphicsDevice& device, UploadContext& uploadContext, const std::vector<uint32_t>& indices);
-
-        // Constructor Dinámico (UPLOAD HEAP)
-        // No necesita UploadContext ni datos iniciales, solo el tamaño máximo en bytes.
-        IndexBuffer(GraphicsDevice& device, size_t bufferSize, bool isDynamic = true);
-        
-        ~IndexBuffer() = default;
-        
-        // Método para actualizar los datos desde la CPU
-        void Update(const void* data, size_t size);
         
         [[nodiscard]] const D3D12_INDEX_BUFFER_VIEW& GetView() const { return m_view; }
         [[nodiscard]] uint32_t GetIndicesCount() const { return m_indicesCount; }
-
-        [[nodiscard]] ID3D12Resource* GetBuffer() const { return m_buffer.Get(); }
         
         UINT GetSizeInBytes() const;
         
     private:
-        Microsoft::WRL::ComPtr<ID3D12Resource> m_buffer;
-        D3D12_INDEX_BUFFER_VIEW m_view;
-        uint32_t m_indicesCount;
-        bool m_isDynamic { false };
+        void InitializeView();
+        
+        D3D12_INDEX_BUFFER_VIEW m_view{};
+        uint32_t m_indicesCount = 0;
+        DXGI_FORMAT m_format;
     };
 }

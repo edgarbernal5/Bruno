@@ -11,7 +11,7 @@
 #include "Bruno/Renderer/SceneRenderer.h"
 #include "Bruno/Renderer/PrimitiveBatch.h"
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
-#include "Bruno/Platform/DirectX/Shader.h"
+#include "Bruno/Platform/DirectX/Texture2D.h"
 #include "Bruno/Scene/Systems/FrustumCulling.h"
 
 namespace Bruno
@@ -90,7 +90,7 @@ namespace Bruno
 		// ------------------------------------------------------------------
 		// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
 		// ------------------------------------------------------------------
-		context.TransitionResource(backBuffer, ResourceState::Present, ResourceState::RenderTarget);
+		context.TransitionResource(backBuffer, ResourceState::RenderTarget);
 		
 		// ------------------------------------------------------------------
 		// FASE DE DIBUJO
@@ -114,7 +114,7 @@ namespace Bruno
 		// ------------------------------------------------------------------
 		// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 		// ------------------------------------------------------------------
-		context.TransitionResource(backBuffer, ResourceState::RenderTarget, ResourceState::Present);
+		context.TransitionResource(backBuffer,  ResourceState::Present);
 
 		// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
 		m_commandQueue->ExecuteCommandList(commandList, frameIndex);

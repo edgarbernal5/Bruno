@@ -2,8 +2,10 @@
 #include "MaterialManager.h"
 
 #include "Material.h"
+#include "Bruno/Platform/DirectX/GpuBuffer.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
+#include "Bruno/Platform/DirectX/UploadHeap.h"
 
 namespace Bruno
 {
@@ -38,39 +40,25 @@ namespace Bruno
         if (!m_isDirty || m_materials.empty()) return;
         
         size_t requiredSize = m_materials.size() * sizeof(MaterialData);
+        if (requiredSize > m_gpuBufferSize) { /* Resize... */ }
 
-        if (requiredSize > m_gpuBufferSize)
-        {
-            ResizeGPUBuffer(static_cast<uint32_t>(m_materials.size() * 1.5f)); 
-        }
+        // Copia directa usando el puntero persistente de tu UploadHeap
+        std::memcpy(m_stagingBuffer->GetMappedData(), m_materials.data(), requiredSize);
 
-        // 1. Copia instantánea de tu vector C++ a la RAM mapeada de la GPU
-        std::memcpy(m_mappedStagingData, m_materials.data(), requiredSize);
+        // ¡Sinergia total! Ahora usamos tu método TransitionResource con la clase base agnóstica
+        context.TransitionResource(m_gpuBuffer.get(), ResourceState::CopyDest);
 
-        // 2. Barrera: Preparamos el buffer de VRAM para recibir datos
-        // Asume que tienes un método TransitionResource en GraphicsContext
-        context.TransitionResource(m_gpuBuffer.Get(), 
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, 
-            D3D12_RESOURCE_STATE_COPY_DEST);
+        // Encolamos la copia asumiendo que agregas un método abstracto CopyBuffer al contexto
+        context.CopyBuffer(m_gpuBuffer.get(), m_stagingBuffer.get(), requiredSize);
 
-        // 3. ¡LA MAGIA! Encolamos la copia en el CommandList Directo
-        context.GetCommandList()->CopyBufferRegion(
-            m_gpuBuffer.Get(), 0, 
-            m_stagingBuffer.Get(), 0, 
-            requiredSize
-        );
-
-        // 4. Barrera: Regresamos el buffer a estado de lectura para el Shader
-        context.TransitionResource(m_gpuBuffer.Get(), 
-            D3D12_RESOURCE_STATE_COPY_DEST, 
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        context.TransitionResource(m_gpuBuffer.get(), ResourceState::PixelShaderResource);
         
         m_isDirty = false;
     }
 
     void MaterialManager::ResizeGPUBuffer(uint32_t newElementCount)
     {
-        m_gpuBufferSize = newElementCount * sizeof(MaterialData);
+        /*m_gpuBufferSize = newElementCount * sizeof(MaterialData);
         auto nativeDevice = m_device.GetNativeDevice();
         
         // 1. Crear el Buffer Principal en VRAM (DEFAULT_HEAP)
@@ -108,7 +96,7 @@ namespace Bruno
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         
-        // Obligatorio: DXGI_FORMAT_UNKNOWN para Structured Buffers[cite: 4]
+        // Obligatorio: DXGI_FORMAT_UNKNOWN para Structured Buffers
         srvDesc.Format = DXGI_FORMAT_UNKNOWN;
         
         srvDesc.Buffer.NumElements = newElementCount;
@@ -120,6 +108,6 @@ namespace Bruno
             m_gpuBuffer.Get(), 
             &srvDesc, 
             m_srvAllocation.GetCPUHandle() // ¡Tu método mágico de offsets!
-        );
+        );*/
     }
 }

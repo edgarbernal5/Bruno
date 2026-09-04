@@ -7,10 +7,4 @@
 namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(GraphicsResource);
-
-	GraphicsResource::~GraphicsResource()
-	{
-		SafeRelease(m_resource);
-		SafeRelease(m_allocation);
-	}
 }

@@ -27,7 +27,8 @@ namespace Bruno
         PixelShaderResource,
         CopyDest,
         CopySource,
-        Present
+        Present,
+        GenericRead
     };
     
     enum class CullMode : uint8_t

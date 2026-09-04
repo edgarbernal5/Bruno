@@ -159,7 +159,7 @@ namespace Bruno
 		// ==========================================
 		// FASE 2: G-BUFFER PASS (Geometría Opaca)
 		// ==========================================
-		context->TransitionResource(m_gBuffer->GetAlbedoMetalness(), ResourceState::PixelShaderResource, ResourceState::RenderTarget);
+		/*context->TransitionResource(m_gBuffer->GetAlbedoMetalness(), ResourceState::PixelShaderResource, ResourceState::RenderTarget);
 		// ... transicionar Normal y Position también ...
 
 		context->SetPipelineState(m_gbufferPSO.get());
@@ -172,7 +172,7 @@ namespace Bruno
 			m_gBuffer->GetPosition() 
 		};
 		context->SetRenderTargets(3, gbufferTargets, m_gBuffer->GetDepth());
-		/*
+		
 		// Limpiar G-Buffer y Restaurar Viewport de pantalla
 		context->SetViewport(0, 0, 100, 100);
     
@@ -205,6 +205,7 @@ namespace Bruno
 
 		// Disparar el triángulo a pantalla completa sin Vertex Buffer
 		context->DrawInstanced(3, 1, 0, 0);*/
+		
 	}
 
 	void SceneRenderer::Resize(uint32_t width, uint32_t height)
@@ -272,7 +273,7 @@ namespace Bruno
 		// 2. CONSTANT BUFFERS (Transformaciones y Materiales)
 		// =========================================================
 		// b0: TransformBuffer (g_World, g_ViewProjection)
-		// Exclusivo para el Vertex Shader para evitar procesamientos innecesarios en el Pixel Shader[cite: 1, 7].
+		// Exclusivo para el Vertex Shader para evitar procesamientos innecesarios en el Pixel Shader
 		prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::Vertex);
 
 		// b1: MaterialConstant (g_MaterialIndex)
@@ -294,7 +295,7 @@ namespace Bruno
 		// 4. SAMPLERS ESTÁTICOS
 		// =========================================================
 		// s0: Sampler principal (g_Sampler)
-		// Configurado como Anisotrópico y Wrap para máxima calidad visual en los modelos 3D[cite: 3, 7].
+		// Configurado como Anisotrópico y Wrap para máxima calidad visual en los modelos 3D
 		prototypeSig->AddStaticSampler(
 			0, 
 			0, 

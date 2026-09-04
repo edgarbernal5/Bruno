@@ -1,11 +1,14 @@
 ﻿#pragma once
 #include "Bruno/Platform/DirectX/DescriptorAllocator.h"
 
+#include "Bruno/Renderer/MaterialData.h"
+
 namespace Bruno
 {
+    class GpuBuffer;
+    class UploadHeap;
     class DescriptorAllocator;
     class GraphicsContext;
-    struct MaterialData;
 
     class MaterialManager
     {
@@ -19,7 +22,6 @@ namespace Bruno
         // AHORA USA EL CONTEXTO DIRECTO PARA NO ROMPER EL PARALELISMO
         void UpdateGPUBuffer(GraphicsContext& context);
         
-        ID3D12Resource* GetGPUBuffer() const { return m_gpuBuffer.Get(); }
 
     private:
         GraphicsDevice& m_device;
@@ -27,16 +29,15 @@ namespace Bruno
         
         std::vector<MaterialData> m_materials;
         bool m_isDirty = true;
+        uint32_t m_gpuBufferSize = 0;
 
-        // El gemelo de alto rendimiento (VRAM)
-        Microsoft::WRL::ComPtr<ID3D12Resource> m_gpuBuffer;
+        // VRAM Pura (GpuBuffer heredaría de GraphicsResource también)
+        std::unique_ptr<GpuBuffer> m_gpuBuffer;
         
-        // El gemelo de alta accesibilidad (RAM mapeada)
-        Microsoft::WRL::ComPtr<ID3D12Resource> m_stagingBuffer;
-        void* m_mappedStagingData = nullptr; // Puntero permanente a la RAM
+        // RAM Mapeada encapsulada elegantemente
+        std::unique_ptr<UploadHeap> m_stagingBuffer;
 
         DescriptorAllocation m_srvAllocation;
-        uint32_t m_gpuBufferSize = 0;
         
         void ResizeGPUBuffer(uint32_t newElementCount);
     };

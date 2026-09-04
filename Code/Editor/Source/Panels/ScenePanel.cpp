@@ -19,6 +19,7 @@
 #include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/Shader.h"
+#include "Bruno/Platform/DirectX/Texture2D.h"
 #include "Bruno/Renderer/MaterialManager.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
@@ -142,7 +143,7 @@ namespace Bruno
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
 			// ------------------------------------------------------------------
-			context.TransitionResource(backBuffer, ResourceState::Present, ResourceState::RenderTarget);
+			context.TransitionResource(backBuffer, ResourceState::RenderTarget);
 			
 			// ------------------------------------------------------------------
 			// FASE DE DIBUJO
@@ -170,7 +171,7 @@ namespace Bruno
 			Math::Matrix gizmoWorld;
 			Math::Vector3 gizmoPivot;
 			
-			m_sceneRenderer->RenderDeferred(&context, m_sceneDocument->GetCamera(), frameIndex);
+			m_sceneRenderer->RenderForward(&context, m_sceneDocument->GetCamera(), frameIndex);
 			
 			if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
 			{
@@ -192,7 +193,7 @@ namespace Bruno
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 			// ------------------------------------------------------------------
-			context.TransitionResource(backBuffer, ResourceState::RenderTarget, ResourceState::Present);
+			context.TransitionResource(backBuffer, ResourceState::Present);
 
 			// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
 			m_commandQueue->ExecuteCommandList(commandList, frameIndex);
@@ -586,7 +587,7 @@ namespace Bruno
 
 	void ScenePanel::InitializeMaterialManager()
 	{
-		m_materialManager = std::make_unique<MaterialManager>(*m_device);
+		m_materialManager = std::make_unique<MaterialManager>(*m_device, m_device->GetSRVDescriptorAllocator());
 	}
 
 	void ScenePanel::UpdateCBs(const GameTimer& timer)

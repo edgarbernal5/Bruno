@@ -5,6 +5,7 @@
 #include <wrl/client.h>
 #include <string>
 
+#include "GraphicsResource.h"
 #include "UploadHeap.h"
 
 namespace Bruno 
@@ -12,9 +13,9 @@ namespace Bruno
     enum class TextureFormat;
     class UploadContext;
     
-    class Texture2D : public Asset
+    class Texture2D : public GraphicsResource
     {
-        BR_RTTI_DECLARATION(Texture2D, Asset);
+        BR_RTTI_DECLARATION(Texture2D, GraphicsResource);
     
     public:
         Texture2D() = default;
@@ -38,14 +39,10 @@ namespace Bruno
         
         [[nodiscard]] uint32_t GetBindlessIndex() const { return m_srvAllocation.Index; }
         
-        [[nodiscard]] ID3D12Resource* GetResource() const { return m_resource.Get(); }
         [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetRTV() const { return m_rtvAllocation.CPU; }
         [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const { return m_srvAllocation.CPU; }
-        \
 
     private:
-        Microsoft::WRL::ComPtr<ID3D12Resource> m_resource;
-        
         DescriptorAllocation m_srvAllocation; // Nuestro "ticket" del DescriptorAllocator. Para el SRV (Lectura en Shader)
         DescriptorAllocation m_rtvAllocation; // NUEVO: Ticket del RTV (En el Heap de Render Targets)
     };

@@ -9,6 +9,7 @@
 
 namespace Bruno
 {
+    class GraphicsResource;
     class ConstantBufferBase;
     class DescriptorAllocator;
     class IndexBuffer;
@@ -30,12 +31,11 @@ namespace Bruno
         DynamicAllocation AllocateDynamicSpace(size_t sizeInBytes);
         
         // --- BARRERAS Y ESTADOS ---
-        void TransitionResource(Texture2D* texture, ResourceState stateBefore, ResourceState stateAfter);
-        void TransitionResource(DepthBuffer* depthBuffer, ResourceState stateBefore, ResourceState stateAfter);
+        void TransitionResource(GraphicsResource* resource, ResourceState newState);
         
         // --- CLEAR Y RENDER TARGETS ---
         void ClearRenderTarget(Texture2D* renderTarget, const Math::Color& color);
-        void ClearDepth(DepthBuffer* depthBuffer, float depth = 1.0f, uint8_t stencil = 0);
+        void ClearDepth(const DepthBuffer* depthBuffer, float depth = 1.0f, uint8_t stencil = 0);
         void SetRenderTargets(uint32_t numRTVs, Texture2D** renderTargets, DepthBuffer* depthBuffer = nullptr);
         
         // --- PIPELINE Y ESTADO GLOBAL ---
@@ -57,9 +57,10 @@ namespace Bruno
         // --- DIBUJO ---
         void SetPrimitiveTopology(PrimitiveTopology topology);
         void SetVertexBuffer(uint32_t startSlot, VertexBuffer* vertexBuffer);
-        void SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer* views);
+        void SetVertexBuffers(uint32_t startSlot, std::initializer_list<const VertexBuffer*> buffers);
         void SetIndexBuffer(IndexBuffer* indexBuffer);
         
+        void CopyBuffer(GraphicsResource* dest, GraphicsResource* src, size_t size);
         void DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation);
         void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation);
 
@@ -69,7 +70,6 @@ namespace Bruno
         void SetPushConstant(uint32_t rootParameterIndex, uint32_t sourceData, uint32_t destOffsetIn32BitValues = 0);
         
     private:
-        inline D3D12_RESOURCE_STATES GetDX12ResourceState(ResourceState state);
         
         LinearAllocator* m_dynamicAllocator = nullptr;
         DynamicDescriptorAllocator* m_dynamicDescriptorAllocator = nullptr;

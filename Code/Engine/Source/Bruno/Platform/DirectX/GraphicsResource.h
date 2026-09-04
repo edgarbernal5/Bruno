@@ -19,16 +19,22 @@ namespace Bruno
 		BR_RTTI_DECLARATION(GraphicsResource, Asset);
 
 	public:
-		virtual ~GraphicsResource();
+		GraphicsResource() = default;
+		virtual ~GraphicsResource() = default;
 		
 		GraphicsResource(const GraphicsResource&) = delete;
 		GraphicsResource& operator=(const GraphicsResource&) = delete;
 		
-		constexpr ID3D12Resource* GetResource() { return m_resource; }
+		[[nodiscard]] ResourceState GetCurrentState() const { return m_currentState; }
+		void SetCurrentState(ResourceState state) { m_currentState = state; }
+		
+		[[nodiscard]] const std::wstring& GetName() const { return m_name; }
+		
+		[[nodiscard]] ID3D12Resource* GetNativeResource() const { return m_resource.Get(); }
 	
 	protected:
-		ID3D12Resource* m_resource;
-		ResourceState m_state = ResourceState::Common;
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_resource = nullptr;
+		ResourceState m_currentState = ResourceState::Common;
 		std::wstring m_name;
 		
 	};
