@@ -19,10 +19,9 @@ namespace Bruno
         MaterialData& GetMaterial(uint32_t index);
         void MarkAsDirty(); 
         
-        // AHORA USA EL CONTEXTO DIRECTO PARA NO ROMPER EL PARALELISMO
         void UpdateGPUBuffer(GraphicsContext& context);
         
-
+        DescriptorAllocation GetSRVAllocation() const { return m_srvAllocation; }
     private:
         GraphicsDevice& m_device;
         DescriptorAllocator& m_globalSrvHeap;

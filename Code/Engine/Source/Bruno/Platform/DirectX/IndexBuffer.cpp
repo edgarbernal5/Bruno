@@ -28,7 +28,6 @@ namespace Bruno
 
     void IndexBuffer::InitializeView()
     {
-        // Preparar la vista (El "Ticket" para el RenderLoop)[cite: 1]
         m_view.BufferLocation = GetGPUAddress();
         m_view.Format = m_format;
         m_view.SizeInBytes = static_cast<UINT>(m_size);

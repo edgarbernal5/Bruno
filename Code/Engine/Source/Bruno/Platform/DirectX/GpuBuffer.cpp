@@ -57,6 +57,27 @@ namespace Bruno {
         // Delegar TODA la lógica de subida y memoria temporal a nuestro UploadContext
         uploadContext.UploadBuffer(m_resource.Get(), data, m_size);
     }
+    
+    // Constructor de VRAM Pura (DEFAULT_HEAP vacío)
+    GpuBuffer::GpuBuffer(GraphicsDevice& device, size_t sizeInBytes, ResourceState initialState, const std::wstring& name)
+        : m_size(sizeInBytes), m_isDynamic(false)
+    {
+        m_name = name;
+        // DirectX 12 recomienda nacer en COMMON para buffers en DEFAULT_HEAP
+        m_currentState = ResourceState::Common; 
+
+        auto nativeDevice = device.GetNativeDevice();
+        auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT); // ¡Memoria 100% de GPU!
+        auto desc = CD3DX12_RESOURCE_DESC::Buffer(m_size);
+
+        ThrowIfFailed(nativeDevice->CreateCommittedResource(
+            &heapProps, D3D12_HEAP_FLAG_NONE, &desc,
+            D3D12_RESOURCE_STATE_COMMON, nullptr,
+            IID_PPV_ARGS(&m_resource)
+        ));
+
+        m_resource->SetName(m_name.c_str());
+    }
 
     GpuBuffer::~GpuBuffer()
     {

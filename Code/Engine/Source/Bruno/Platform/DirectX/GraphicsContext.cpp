@@ -159,14 +159,28 @@ namespace Bruno
         m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, allocation.GPUAddress);
     }
 
-    void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& descriptorAllocator)
+    void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& allocator)
     {
         // En tu arquitectura, el DescriptorAllocator encapsula el heap nativo.
         // Extraemos el handle de memoria inicial de la GPU (Offset 0)
-        D3D12_GPU_DESCRIPTOR_HANDLE baseHandle = descriptorAllocator.GetHeap()->GetGPUDescriptorHandleForHeapStart();
-        
-        // Lo bindeamos a la Root Signature
+        D3D12_GPU_DESCRIPTOR_HANDLE baseHandle = allocator.GetHeap()->GetGPUDescriptorHandleForHeapStart();
         m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, baseHandle);
+    }
+
+    void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocation& allocation)
+    {
+        // Extraemos el handle de GPU exacto (con el offset ya calculado internamente por la asignación)
+        D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = allocation.GetGPUHandle();
+        
+        m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, gpuHandle);
+    }
+
+    void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocation& allocation, uint32_t offset)
+    {
+        // Extraemos el handle desplazado dinámicamente usando la matemática de punteros de tu struct
+        D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = allocation.GetGPUHandle(offset);
+        
+        m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, gpuHandle);
     }
 
     void GraphicsContext::SetDynamicDescriptorTable(uint32_t rootParameterIndex, D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor)

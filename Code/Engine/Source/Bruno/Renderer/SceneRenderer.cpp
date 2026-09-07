@@ -1,6 +1,8 @@
 #include "brpch.h"
 #include "SceneRenderer.h"
 
+#include "Bruno/Renderer/MaterialData.h"
+#include "Bruno/Renderer/MaterialManager.h"
 #include "Model.h"
 #include "PrimitiveBatch.h"
 #include "PSOCache.h"
@@ -25,6 +27,7 @@
 #include "Bruno/Scene/Systems/FrustumCulling.h"
 #include "Deferred/GBuffer.h"
 
+
 namespace Bruno
 {
 	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<FrustumCulling> frustumCulling, AbstractAssetManager* assetManager) :
@@ -37,22 +40,21 @@ namespace Bruno
 		m_globalSrvHeap = &device->GetSRVDescriptorAllocator();
 		
 		InitializeGBuffer(device);
-		InitializeOpaqueRootSignature(device);
+		InitializeForwardRootSignature(device);
 		InitializeGBufferRootSignature(device);
 		InitializeDeferredRootSignature(device);
 		
-		InitializeOpaquePSO(device);
+		InitializeForwardPSO(device);
 		InitializeDeferredPSOs(device);
 		InitializeShadowPipeline(device);
+		
+		m_materialManager = std::make_unique<MaterialManager>(*device, device->GetSRVDescriptorAllocator());
 	}
+	
+	SceneRenderer::~SceneRenderer() = default;
 
 	void SceneRenderer::InitEntitiesForRender()
 	{
-		auto& device = Graphics::GetDevice();
-		
-		size_t objectSize = GetAlignedConstantBufferSize<SceneObjectBuffer>();
-		
-		// Buscamos todas las entidades que tienen un Mesh y un Transform
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
 		for (auto& entt : entities)
 		{
@@ -70,7 +72,7 @@ namespace Bruno
             
 				if (materialAsset)
 				{
-					// Guardamos el ID Bindless directo en el componente
+					RegisterMaterialToGPU(materialAsset);
 					modelComponent.RuntimeMaterialIndex = materialAsset->RuntimeMaterialIndex;
 				}
 			}
@@ -98,13 +100,62 @@ namespace Bruno
 		
 		// 2. --- RENDERIZADO GPU ---
 		Profiler::Get().StartGpuTimer(cmdList);
+
+		m_materialManager->UpdateGPUBuffer(*graphicsContext);
 		
+		graphicsContext->SetPipelineState(m_forwardPSO.get());
+		graphicsContext->SetRootSignature(m_forwardRootSig.get());
+		
+		ForwardLightingBuffer lightData = {};
+		lightData.CameraPosition = camera.GetPosition();
+
+		// 1. Luz Ambiental (muy baja para no matar el contraste de las sombras PBR)
+		lightData.GlobalAmbientColor = Math::Vector3(0.8f, 0.02f, 0.02f); 
+		lightData.ActiveLightCount = 3;
+
+		// =========================================================
+		// LUZ 0: Key Light (Luz Principal)
+		// Posicionada arriba, a la derecha y al frente. Tono cálido.
+		// =========================================================
+		lightData.Lights[0].Position = Math::Vector3(5.0f, 5.0f, -5.0f);
+		lightData.Lights[0].Color = Math::Vector3(1.0f, 0.9f, 0.8f); // Ligeramente naranja/cálido
+		lightData.Lights[0].Radius = 50.0f;
+		lightData.Lights[0].Intensity = 500.0f; // Suficientemente alta para vencer el 1/d^2
+
+		// =========================================================
+		// LUZ 1: Fill Light (Luz de Relleno)
+		// Posicionada en el lado opuesto, más baja. Tono frío.
+		// Evita que las sombras sean 100% negras y añade contraste.
+		// =========================================================
+		lightData.Lights[1].Position = Math::Vector3(-8.0f, 2.0f, -3.0f);
+		lightData.Lights[1].Color = Math::Vector3(0.6f, 0.8f, 1.0f); // Ligeramente azul/celeste
+		lightData.Lights[1].Radius = 50.0f;
+		lightData.Lights[1].Intensity = 200.0f; // Menos intensa que la luz principal
+
+		// =========================================================
+		// LUZ 2: Rim / Back Light (Luz de Contraluz)
+		// Posicionada detrás del modelo. Blanca y brillante.
+		// FUNDAMENTAL en PBR: Resalta los bordes (Fresnel) de los materiales.
+		// =========================================================
+		lightData.Lights[2].Position = Math::Vector3(0.0f, 6.0f, 8.0f);
+		lightData.Lights[2].Color = Math::Vector3(1.0f, 1.0f, 1.0f);
+		lightData.Lights[2].Radius = 50.0f;
+		lightData.Lights[2].Intensity = 800.0f; // Muy alta para que los bordes destaquen
+		
+		m_forwardLightsCB.Update(*graphicsContext, lightData);
+		
+		// Setear Luces en el Índice 2 (b2)
+		graphicsContext->SetConstantBuffer(2, m_forwardLightsCB);
 		graphicsContext->SetDescriptorHeaps({ m_globalSrvHeap });
-		graphicsContext->SetDescriptorTable(0, device->GetSRVDescriptorAllocator());
+		
+		// Vincular el StructuredBuffer de Materiales a 't0' (Índice 3) usando su Allocation específica
+		graphicsContext->SetDescriptorTable(3, m_materialManager->GetSRVAllocation());
+		graphicsContext->SetDescriptorTable(4, device->GetSRVDescriptorAllocator());
 		
 		for (Entity entity : visibleEntities)
 		{
 			const auto& modelComponent = entity.GetComponent<ModelComponent>();
+			const auto& transformComponent = entity.GetComponent<TransformComponent>();
 			
 			if (modelComponent.RuntimeMaterialIndex == 0xFFFFFFFF)
 			{
@@ -115,9 +166,7 @@ namespace Bruno
 			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto& meshes = model->GetMeshes();
 			auto& mesh = meshes[meshIndex];
-			
-			graphicsContext->SetPushConstants(2, modelComponent.RuntimeMaterialIndex, 0);
-			
+						
 			auto& indexBuffer = model->GetIndexBuffer();
 			auto& vertexBuffer = model->GetVertexBuffer();
 			if (currentVB != vertexBuffer.get())
@@ -126,16 +175,22 @@ namespace Bruno
 				graphicsContext->SetIndexBuffer(indexBuffer.get());
 				currentVB = vertexBuffer.get();
 			}
-			
-			
-			Math::Matrix world = m_scene->GetWorldSpaceMatrix(entity);
-			Math::Matrix wvp = (world * camera.GetViewProjection()).Transpose();
+			// Preparar las transformaciones (b0) - ¡Ahora sin la cámara!
+			const Math::Matrix& world = transformComponent.WorldTransform;
+			//Math::Matrix wvp = (world * camera.GetViewProjection()).Transpose();
 			
 			SceneObjectBuffer objConstants;
-			objConstants.WorldViewProjection = wvp;
-			//cbv.TransformCB[frameIndex]->Update(&objConstants, sizeof(SceneObjectBuffer));
+			objConstants.World = world.Transpose();
+			objConstants.ViewProjection = camera.GetViewProjection().Transpose();
 			
-			//graphicsContext->SetConstantBuffer(0, cbv.TransformCB[frameIndex].get());
+			// Alocar dinámicamente y bindear al Root Parameter 0 (b0)
+			ConstantBuffer<SceneObjectBuffer> transformCB;
+			transformCB.Update(*graphicsContext, objConstants);
+			graphicsContext->SetConstantBuffer(0, transformCB);
+
+			// 7. Bindear el ID Bindless del material (b1)
+			graphicsContext->SetPushConstant(1, modelComponent.RuntimeMaterialIndex, 0);
+			
 			graphicsContext->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 			graphicsContext->DrawIndexedInstanced(mesh->GetIndexCount(),
 			                                      1,
@@ -219,33 +274,41 @@ namespace Bruno
 		m_gBuffer->Initialize(*device, device->GetSRVDescriptorAllocator(), device->GetRTVDescriptorAllocator(), 100, 100);
 	}
 
-	void SceneRenderer::InitializeOpaqueRootSignature(GraphicsDevice* device)
+	void SceneRenderer::InitializeForwardRootSignature(GraphicsDevice* device)
 	{
 		auto prototypeSig = std::make_shared<RootSignature>(*device);
 
-		// Parámetro 0: Constant Buffer View en b0 (Matriz MVP)
+		// b0: Transformaciones. ¡Visible SOLO para el Vertex Shader recuperado!
 		prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::Vertex);
 
-		// Parámetro 1: Tabla de Descriptores para 1 textura en t0 
+		// b1: ID del Material Bindless.
+		prototypeSig->AddConstants(1, 1, 0, ShaderVisibility::Pixel);
+
+		// b2: Arreglo de Luces Fijas Y Posición de la Cámara (Datos de Iluminación).
+		prototypeSig->AddConstantBufferView(2, 0, ShaderVisibility::Pixel);
+
+		// t0: StructuredBuffer de Materiales (1 solo descriptor)
 		prototypeSig->AddDescriptorTableSRV(1, 0, 0, ShaderVisibility::Pixel);
 
-		// Sampler: Filtro lineal en s0
+		// t1: Arreglo infinito de Texturas Bindless (-1 / UINT_MAX)
+		prototypeSig->AddDescriptorTableSRV(UINT_MAX, 1, 0, ShaderVisibility::Pixel);
+
+		// s0: Sampler principal (Wrap, Anisotrópico, etc.)
 		prototypeSig->AddStaticSampler(
-			0, 
-			0, 
-			TextureFilter::Linear, 
-			TextureAddressMode::Wrap, 
+			0, 0,
+			TextureFilter::Anisotropic,
+			TextureAddressMode::Wrap,
 			ShaderVisibility::Pixel
 		);
 
-		m_opaqueRootSignature = RootSignatureLibrary::GetOrCreate(prototypeSig);
+		m_forwardRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
 	}
 
-	void SceneRenderer::InitializeOpaquePSO(GraphicsDevice* device)
+	void SceneRenderer::InitializeForwardPSO(GraphicsDevice* device)
 	{
 		GraphicsPipelineStateDesc psoDesc = {};
 		// Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
-		psoDesc.RootSignature = m_opaqueRootSignature.get();
+		psoDesc.RootSignature = m_forwardRootSig.get();
 		psoDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
 		
 		psoDesc.VertexShaderDesc = { L"Shaders/Opaque.hlsl", L"VSMain", L"vs_6_0" };
@@ -262,7 +325,7 @@ namespace Bruno
 		psoDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;
 		psoDesc.DSVFormat = TextureFormat::D24_Unorm_S8_Uint;
 		
-		m_opaquePSO = PSOCache::GetOrCreate(device, psoDesc);
+		m_forwardPSO = PSOCache::GetOrCreate(device, psoDesc);
 	}
 
 	void SceneRenderer::InitializeGBufferRootSignature(GraphicsDevice* device)
@@ -417,6 +480,38 @@ namespace Bruno
 		shadowDesc.RasterizerDesc.SlopeScaledDepthBias = 1.5f; // Mayor inclinación = Mayor Bias
 
 		m_shadowPSO = PSOCache::GetOrCreate(device, shadowDesc);
+	}
+
+	void SceneRenderer::RegisterMaterialToGPU(std::shared_ptr<Material> matAsset)
+	{
+		// Si ya tiene un índice válido en caché, lo ignoramos
+		if (matAsset->RuntimeMaterialIndex != 0xFFFFFFFF) 
+		{
+			return; 
+		}
+
+		// 1. Creamos la estructura alineada para la GPU
+		MaterialData gpuData = {};
+		gpuData.AlbedoTint = matAsset->AlbedoTint;
+		gpuData.MetallicFactor = matAsset->MetallicFactor;
+		gpuData.RoughnessFactor = matAsset->RoughnessFactor;
+
+		// 2. Resolvemos las texturas reales buscando en tu AssetManager
+		if (matAsset->AlbedoMap != 0) 
+		{
+			auto tex = m_assetManager->GetAsset<Texture2D>(matAsset->AlbedoMap);
+			// Obtenemos el índice Bindless que la textura guardó al nacer en el Mega Heap
+			gpuData.AlbedoTextureIndex = tex->GetBindlessIndex();
+		}
+		else 
+		{
+			gpuData.AlbedoTextureIndex = 0xFFFFFFFF; // El shader debe ignorarlo
+		}
+
+		// ... (Haces lo mismo para NormalTextureIndex y otros mapas) ...
+
+		// 3. Enviamos esta data al MaterialManager global y guardamos la llave
+		matAsset->RuntimeMaterialIndex = m_materialManager->CreateMaterial(gpuData);
 	}
 
 	void SceneRenderer::DrawBatch(GraphicsContext* graphicsContext, const std::vector<entt::entity>& visibleEntities)

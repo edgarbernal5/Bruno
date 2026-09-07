@@ -585,11 +585,6 @@ namespace Bruno
 		m_cameraGizmo->SetCameraGizmoViewport(gizmoCameraViewport);
 	}
 
-	void ScenePanel::InitializeMaterialManager()
-	{
-		m_materialManager = std::make_unique<MaterialManager>(*m_device, m_device->GetSRVDescriptorAllocator());
-	}
-
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
 	{
 		m_scene->OnUpdate(timer, m_sceneDocument->GetCamera());

@@ -7,24 +7,6 @@
 
 namespace Bruno
 {
-	std::map<ModelImporter::TextureType, std::pair<uint32_t, std::string>> ModelImporter::g_textureTypeMappings;
-
-	ModelImporter::ModelImporter()
-	{
-		if (g_textureTypeMappings.size() > 0)
-			return;
-
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeDiffuse] = std::make_pair(aiTextureType_DIFFUSE, "Texture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeSpecularMap] = std::make_pair(aiTextureType_SPECULAR, "SpecularTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeAmbient] = std::make_pair(aiTextureType_AMBIENT, "AmbientTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeEmissive] = std::make_pair(aiTextureType_EMISSIVE, "EmissiveTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeHeightmap] = std::make_pair(aiTextureType_HEIGHT, "HeightTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeNormalMap] = std::make_pair(aiTextureType_NORMALS, "NormalTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeSpecularPowerMap] = std::make_pair(aiTextureType_SHININESS, "SpecularPowerTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeDisplacementMap] = std::make_pair(aiTextureType_DISPLACEMENT, "DisplacementTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeLightMap] = std::make_pair(aiTextureType_LIGHTMAP, "LightMapTexture");
-	}
-
 	bool ModelImporter::TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset)
 	{
 		Assimp::Importer importer;
@@ -80,7 +62,7 @@ namespace Bruno
 		ProcessNode(aiScene->mRootNode, 0, modelNodes, meshes, Math::Matrix::Identity);
 
 		// ==========================================================
-		// NUEVO: Cálculo del Bounding Box Global del Modelo
+		// Cálculo del Bounding Box Global del Modelo
 		// ==========================================================
 		Math::BoundingBox modelAABB;
 		bool isFirstMesh = true;
@@ -88,12 +70,8 @@ namespace Bruno
 		for (const auto& mesh : meshes)
 		{
 			Math::BoundingBox transformedSubmeshAABB;
-            
-			// 1. Transformar el AABB local por la matriz del Nodo correspondiente.
-			// DirectXMath extrae correctamente la escala y la rotación de la matriz para evitar deformaciones en la caja de colisión.
 			mesh->GetBoundingBox().Transform(transformedSubmeshAABB, mesh->GetTransform());
 
-			// 2. Fusionar secuencialmente las cajas
 			if (isFirstMesh)
 			{
 				modelAABB = transformedSubmeshAABB;
@@ -101,7 +79,6 @@ namespace Bruno
 			}
 			else
 			{
-				// CreateMerged expande 'modelAABB' para envolver matemáticamente a ambas cajas
 				Math::BoundingBox::CreateMerged(modelAABB, modelAABB, transformedSubmeshAABB);
 			}
 		}
@@ -236,7 +213,6 @@ namespace Bruno
 
 	void ModelImporter::ProcessTexturesForMaterial(Material& materialContentItem, aiMaterial* aiMaterial, const std::wstring& directory, AssetImporterContext& context)
 	{
-		// Función Lambda auxiliar para importar texturas sin repetir código
 		auto ImportTextureType = [&](aiTextureType type) -> AssetHandle 
 		{
 			if (aiMaterial->GetTextureCount(type) == 0)

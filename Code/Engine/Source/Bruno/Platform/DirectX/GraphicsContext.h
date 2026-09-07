@@ -9,6 +9,7 @@
 
 namespace Bruno
 {
+    struct DescriptorAllocation;
     class GraphicsResource;
     class ConstantBufferBase;
     class DescriptorAllocator;
@@ -50,7 +51,9 @@ namespace Bruno
         void SetConstantBuffer(uint32_t rootParameterIndex, const ConstantBufferBase& cb);
         void SetConstantBuffer(uint32_t rootParameterIndex, const DynamicAllocation& allocation);
         
-        void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& descriptorAllocator);
+        void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& allocator);
+        void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocation& allocation);
+        void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocation& allocation, uint32_t offset);
         void SetDynamicDescriptorTable(uint32_t rootParameterIndex, D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor);
         void SetTexture(uint32_t rootParameterIndex, Texture2D* texture);
         

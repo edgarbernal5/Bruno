@@ -13,12 +13,15 @@ namespace Bruno {
     class GpuBuffer : public GraphicsResource
     {
     public:
-        // 1. Constructor Dinámico (UPLOAD_HEAP): Para geometría que cambia por frame (Ej: PrimitiveBatch)
+        // 1. Constructor Dinámico (UPLOAD_HEAP)
         GpuBuffer(GraphicsDevice& device, size_t sizeInBytes, const std::wstring& name = L"Dynamic_Buffer");
 
-        // 2. Constructor Estático (DEFAULT_HEAP): Para geometría inmutable (Ej: Modelos 3D)
+        // 2. Constructor Estático (DEFAULT_HEAP + Subida inmediata)
         GpuBuffer(GraphicsDevice& device, UploadContext& uploadContext, const void* data, size_t sizeInBytes, const std::wstring& name = L"Static_Buffer");
 
+        // 3. Constructor VRAM Pura (DEFAULT_HEAP vacío)
+        GpuBuffer(GraphicsDevice& device, size_t sizeInBytes, ResourceState initialState, const std::wstring& name = L"VRAM_Buffer");
+        
         virtual ~GpuBuffer();
 
         // Prohibimos copias para proteger el recurso nativo
@@ -31,6 +34,8 @@ namespace Bruno {
         [[nodiscard]] D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddress() const { return m_resource->GetGPUVirtualAddress(); }
         [[nodiscard]] size_t GetSizeInBytes() const { return m_size; }
         [[nodiscard]] bool IsDynamic() const { return m_isDynamic; }
+
+        [[nodiscard]] void* GetMappedData() const { return m_mappedData; }
 
     protected:
         size_t m_size = 0;

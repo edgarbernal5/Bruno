@@ -13,8 +13,13 @@ namespace Bruno
         m_device(device),
         m_globalSrvHeap(globalSrvHeap)
     {
-        // Crear un material por defecto (ID 0) para que ninguna entidad se quede sin material
-        CreateMaterial(MaterialData());
+        MaterialData defaultMat;
+        defaultMat.AlbedoTint = Math::Vector4 {1.0f, 1.0f, 1.0f, 1.0f};
+        defaultMat.MetallicFactor = 0.0f;
+        defaultMat.RoughnessFactor = 0.5f;
+        defaultMat.AlbedoTextureIndex = 0xFFFFFFFF;
+        defaultMat.NormalTextureIndex = 0xFFFFFFFF;
+        CreateMaterial(defaultMat);
     }
 
     uint32_t MaterialManager::CreateMaterial(const MaterialData& data)
@@ -37,10 +42,16 @@ namespace Bruno
 
     void MaterialManager::UpdateGPUBuffer(GraphicsContext& context)
     {
-        if (!m_isDirty || m_materials.empty()) return;
+        if (!m_isDirty || m_materials.empty())
+        {
+            return;
+        }
         
         size_t requiredSize = m_materials.size() * sizeof(MaterialData);
-        if (requiredSize > m_gpuBufferSize) { /* Resize... */ }
+        if (requiredSize > m_gpuBufferSize)
+        {
+            ResizeGPUBuffer(static_cast<uint32_t>(m_materials.size() * 1.5f));
+        }
 
         // Copia directa usando el puntero persistente de tu UploadHeap
         std::memcpy(m_stagingBuffer->GetMappedData(), m_materials.data(), requiredSize);
@@ -58,56 +69,39 @@ namespace Bruno
 
     void MaterialManager::ResizeGPUBuffer(uint32_t newElementCount)
     {
-        /*m_gpuBufferSize = newElementCount * sizeof(MaterialData);
-        auto nativeDevice = m_device.GetNativeDevice();
-        
-        // 1. Crear el Buffer Principal en VRAM (DEFAULT_HEAP)
-        auto defaultHeap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-        auto bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(m_gpuBufferSize);
-        
-        nativeDevice->CreateCommittedResource(
-            &defaultHeap, D3D12_HEAP_FLAG_NONE, &bufferDesc, 
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // Nace listo para leerse
-            nullptr, IID_PPV_ARGS(&m_gpuBuffer)
-        );
+        m_gpuBufferSize = newElementCount * sizeof(MaterialData);
+    
+        // 1. Instanciar VRAM PURA (Ahora sí llamamos al constructor correcto)
+        m_gpuBuffer = std::make_unique<GpuBuffer>(m_device, m_gpuBufferSize, ResourceState::Common, L"Material_Structured_Buffer");
 
-        // 2. Crear el Gemelo Puente en RAM (UPLOAD_HEAP)
-        auto uploadHeap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-        
-        // Importante desmapear el anterior si existía
-        if (m_stagingBuffer) m_stagingBuffer->Unmap(0, nullptr);
-
-        nativeDevice->CreateCommittedResource(
-            &uploadHeap, D3D12_HEAP_FLAG_NONE, &bufferDesc, 
-            D3D12_RESOURCE_STATE_GENERIC_READ, 
-            nullptr, IID_PPV_ARGS(&m_stagingBuffer)
-        );
-
-        // 3. Mapear permanentemente el puntero para acceso instantáneo
-        CD3DX12_RANGE readRange(0, 0); // No leeremos desde la CPU
-        m_stagingBuffer->Map(0, &readRange, &m_mappedStagingData);
-        
+        // 2. Instanciar RAM (Staging Buffer)
+        m_stagingBuffer = std::make_unique<UploadHeap>(m_device, m_gpuBufferSize);
+    
+        // 3. ACTUALIZAR LA VISTA BINDLESS SRV GLOBAL
+    
+        // Pedimos un hueco en el Mega Heap (solo la primera vez que creamos el buffer)
         if (m_srvAllocation.Count == 0)
         {
             m_srvAllocation = m_globalSrvHeap.Allocate(1);
         }
-        
+
+        // Configuramos la vista como un StructuredBuffer (Arreglo de MaterialData)
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        
-        // Obligatorio: DXGI_FORMAT_UNKNOWN para Structured Buffers
+    
+        // ¡Crítico!: DXGI_FORMAT_UNKNOWN es obligatorio para Structured Buffers
         srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-        
+    
         srvDesc.Buffer.NumElements = newElementCount;
         srvDesc.Buffer.StructureByteStride = sizeof(MaterialData);
         srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
-        // 3. Inyectamos la vista sobreescribiendo el espacio en el Mega Heap
+        // Sobreescribimos el descriptor en el Mega Heap
         m_device.GetNativeDevice()->CreateShaderResourceView(
-            m_gpuBuffer.Get(), 
+            static_cast<ID3D12Resource*>(m_gpuBuffer->GetNativeResource()), 
             &srvDesc, 
-            m_srvAllocation.GetCPUHandle() // ¡Tu método mágico de offsets!
-        );*/
+            m_srvAllocation.GetCPUHandle() // Tu método mágico de offsets
+        );
     }
 }
