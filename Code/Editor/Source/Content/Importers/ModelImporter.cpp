@@ -18,6 +18,7 @@ namespace Bruno
 			//aiProcess_SortByPType | 
 			aiProcess_FindInvalidData |
 			aiProcess_FindDegenerates |
+			aiProcess_GenSmoothNormals |
 			aiProcess_ConvertToLeftHanded |
 			aiProcess_FlipUVs;
 
@@ -60,7 +61,10 @@ namespace Bruno
 		auto& rootNode = modelNodes.emplace_back();
 		rootNode.Parent = ModelNode::NullNode;
 		ProcessNode(aiScene->mRootNode, 0, modelNodes, meshes, Math::Matrix::Identity);
-
+		
+		std::vector<ModelLight> modelLights;
+		ProcessLights(aiScene, modelLights);
+		
 		// ==========================================================
 		// Cálculo del Bounding Box Global del Modelo
 		// ==========================================================
@@ -83,9 +87,12 @@ namespace Bruno
 			}
 		}
 		
-		outputAsset = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes), modelAABB);
-		outputAsset->SetHandle(metadata.Handle);
+		std::wstring name = Berta::StringUtils::UTF8ToWide(aiScene->mName.C_Str());
+		auto newModel = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes), std::move(modelLights), modelAABB);
+		newModel->SetHandle(metadata.Handle);
+		newModel->SetName(name);
 
+		outputAsset = std::move(newModel);
 		return true;
 	}
 
@@ -107,8 +114,10 @@ namespace Bruno
 			aabbMax.z = std::max<float>(aabbMax.z, vertex.Position.z);
 
 			if (aiMesh->HasNormals())
+			{
 				vertex.Normal = Math::Vector3 { aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z };
-
+			}
+				
 			if (aiMesh->HasTangentsAndBitangents())
 			{
 				vertex.Tangent = Math::Vector3 { aiMesh->mTangents[i].x, aiMesh->mTangents[i].y, aiMesh->mTangents[i].z };
@@ -116,7 +125,9 @@ namespace Bruno
 			}
 
 			if (aiMesh->HasTextureCoords(0))
+			{
 				vertex.Texcoord = Math::Vector3 { aiMesh->mTextureCoords[0][i].x, aiMesh->mTextureCoords[0][i].y, aiMesh->mTextureCoords[0][i].z };
+			}
 		}
 
 		/*uint32_t colorChannelCount = aiMesh->GetNumColorChannels();
@@ -300,6 +311,82 @@ namespace Bruno
 				}
 			}
 		}*/
+	}
+
+	void ModelImporter::ProcessLights(const aiScene* aiScene, std::vector<ModelLight>& outLights)
+	{
+		if (!aiScene->HasLights())
+		{
+			return;
+		}
+		
+		for (uint32_t i = 0; i < aiScene->mNumLights; i++)
+		{
+			aiLight* aiLight = aiScene->mLights[i];
+			
+			if (aiLight->mType == aiLightSource_DIRECTIONAL)
+			{
+				auto& newLight = outLights.emplace_back();
+				
+				newLight.NodeName = Berta::StringUtils::UTF8ToWide(aiLight->mName.C_Str());
+				// 1. Extraer Color e Intensidad
+				// Assimp a veces premultiplica la intensidad en el color difuso. 
+				// Separamos la intensidad normalizando el color.
+				Math::Vector3 rawColor(aiLight->mColorDiffuse.r, aiLight->mColorDiffuse.g, aiLight->mColorDiffuse.b);
+            
+				newLight.Intensity = rawColor.Length();
+				if (newLight.Intensity > 0.0001f)
+				{
+					rawColor.Normalize();
+				}
+				newLight.Color = rawColor;
+
+				// 2. Extraer Dirección Local
+				Math::Vector3 localDirection(aiLight->mDirection.x, aiLight->mDirection.y, aiLight->mDirection.z);
+            
+				// 3. Resolver Transformación Absoluta desde la Jerarquía de Nodos
+				aiNode* lightNode = aiScene->mRootNode->FindNode(aiLight->mName);
+				Math::Matrix globalTransform = Math::Matrix::Identity;
+            
+				if (lightNode)
+				{
+					Math::Matrix localTransform = ToMatrix(lightNode->mTransformation);
+
+					// 4. Descomponer la matriz para extraer Traslación y Rotación (Cuaternión) puras
+					DirectX::XMVECTOR scale;
+					DirectX::XMVECTOR rotation;
+					DirectX::XMVECTOR translation;
+            
+					DirectX::XMMatrixDecompose(&scale, &rotation, &translation, localTransform);
+
+					newLight.LocalPosition = translation;
+					newLight.LocalRotation = rotation;
+					
+					aiNode* currentNode = lightNode;
+					while (currentNode != nullptr)
+					{
+						Math::Matrix nodeTransform = ToMatrix(currentNode->mTransformation);
+						// Acumular transformación (Local * Parent)
+						globalTransform = globalTransform * nodeTransform; 
+						currentNode = currentNode->mParent;
+					}
+				}
+				else
+				{
+					// Fallback de seguridad por si el exportador (ej. Blender/Maya) rompió el enlace del nodo
+					newLight.LocalPosition = Math::Vector3 { aiLight->mPosition.x, aiLight->mPosition.y, aiLight->mPosition.z };
+					newLight.LocalRotation = Math::Quaternion::Identity; 
+				}
+
+				// 4. Transformar la normal al espacio global
+				// TransformNormal aplica rotación y escala, pero ignora la traslación, 
+				// lo cual es matemáticamente correcto para un vector de dirección[cite: 2].
+				Math::Vector3 worldDirection = Math::Vector3::TransformNormal(localDirection, globalTransform);
+				worldDirection.Normalize(); // Limpiar estiramientos por escalas
+            
+				newLight.Direction = worldDirection;
+			}
+		}
 	}
 
 	Math::Matrix ModelImporter::ToMatrix(const aiMatrix4x4& aiMatrix)

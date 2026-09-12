@@ -27,23 +27,29 @@ namespace Bruno
 	// Datos Puros de Iluminación
 #define MAX_FORWARD_LIGHTS 8
 
-	struct ForwardLightData
+	struct PointLightData
 	{
 		Math::Vector3 Position;
 		float Radius;
 		Math::Vector3 Color;
 		float Intensity;
 	};
+	
+	struct DirectionalLightData {
+		Math::Vector3 Direction;
+		float Intensity;
+		Math::Vector3 Color;
+		float Padding; // Relleno obligatorio
+	};
 
 	struct ForwardLightingBuffer
 	{
-		ForwardLightData Lights[MAX_FORWARD_LIGHTS];
+		DirectionalLightData Sun; // La luz direccional global
+		PointLightData Lights[MAX_FORWARD_LIGHTS]; // Tu arreglo actual de luces locales
 		Math::Vector3 GlobalAmbientColor;
 		uint32_t ActiveLightCount;
-    
-		// ¡La cámara se muda a la iluminación!
-		Math::Vector3 CameraPosition; 
-		float Padding; // Relleno obligatorio de 4 bytes para cerrar el registro de 16 bytes
+		Math::Vector3 CameraPosition;
+		float Padding;
 	};
 
 	class SceneRenderer

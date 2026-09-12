@@ -46,9 +46,54 @@ namespace Bruno
 
 	Entity Scene::InstantiateModel(std::shared_ptr<Model> model)
 	{
-		Entity rootEntity = CreateEntity(L"Mesh test");
-		CreateModelEntityHierarchy(rootEntity, model, model->GetRootNode());
+		Entity rootEntity = CreateEntity(L"Model_" + model->GetName());
+		
+		std::unordered_map<std::wstring, Entity> nodeEntityMap;
+		
+		CreateModelEntityHierarchy(rootEntity, model, model->GetRootNode(), nodeEntityMap);
 
+		auto& lights = model->GetLights();
+		
+		if (lights.empty())
+		{
+			Entity lightParent = rootEntity;
+			Entity lightEntity = CreateEntity(lightParent, L"Light_0");
+        
+			auto& transform = lightEntity.GetComponent<TransformComponent>();
+			transform.Position = Math::Vector3 { 0.0f, 0.0f, 0.0f };
+			transform.Rotation = Math::Quaternion::Identity;
+			
+			auto& comp = lightEntity.AddComponent<DirectionalLightComponent>();
+			comp.Color = Math::Vector3 { 1.0f, 1.0f, 1.0f };
+			comp.Intensity = 1.0f;
+			comp.Direction = Math::Vector3(0.5f, -1.0f, 0.5f);
+			comp.Direction.Normalize();
+			
+			return rootEntity;
+		}
+		
+		for (const auto& light : lights)
+		{
+			// Si la luz viene amarrada a un nodo (FBX/GLTF), la colgamos de ese nodo.
+			// Si no, la colgamos de la raíz del modelo.
+			Entity lightParent = rootEntity;
+			if (nodeEntityMap.find(light.NodeName) != nodeEntityMap.end())
+			{
+				lightParent = nodeEntityMap[light.NodeName];
+			}
+
+			Entity lightEntity = CreateEntity(lightParent, L"Light_" + light.NodeName);
+        
+			auto& transform = lightEntity.GetComponent<TransformComponent>();
+			transform.Position = light.LocalPosition;
+			transform.Rotation = light.LocalRotation; // Vital para Spot y Directional
+			
+			auto& comp = lightEntity.AddComponent<DirectionalLightComponent>();
+			comp.Color = light.Color;
+			comp.Intensity = light.Intensity;
+			comp.Direction = light.Direction;
+		}
+		
 		return rootEntity;
 	}
 
@@ -87,7 +132,7 @@ namespace Bruno
 		return Entity{};
 	}
 
-	void Scene::CreateModelEntityHierarchy(Entity parent, std::shared_ptr<Model> model, const ModelNode& node)
+	void Scene::CreateModelEntityHierarchy(Entity parent, std::shared_ptr<Model> model, const ModelNode& node, std::unordered_map<std::wstring, Entity>& nodeEntityMap)
 	{
 		const auto& nodes = model->GetNodes();
 
@@ -95,7 +140,7 @@ namespace Bruno
 		{
 			for (uint32_t child : node.Children)
 			{
-				CreateModelEntityHierarchy(parent, model, nodes[child]);
+				CreateModelEntityHierarchy(parent, model, nodes[child], nodeEntityMap);
 			}
 
 			return;
@@ -104,50 +149,35 @@ namespace Bruno
 		Entity nodeEntity = CreateEntity(parent, node.Name);
 		nodeEntity.GetComponent<TransformComponent>().ApplyTransform(node.LocalTransform);
 
+		nodeEntityMap[node.Name] = nodeEntity;
+		
 		auto& meshes = model->GetMeshes();
-		if (node.Meshes.size() == 1)
+		auto& materials = model->GetMaterials();
+
+		for (size_t i = 0; i < node.Meshes.size(); i++)
 		{
-			uint32_t submeshIndex = node.Meshes[0];
-			auto& modelComponent = nodeEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
-			auto& boundingBoxComponent = nodeEntity.AddComponent<BoundingBoxComponent>();
+			uint32_t submeshIndex = node.Meshes[i]; 
+        
+			// Si hay más de una malla, creamos sub-entidades. Si es solo una, reusamos el nodo actual.
+			Entity targetEntity = (node.Meshes.size() == 1) ? nodeEntity : CreateEntity(nodeEntity, node.Name + L"_Submesh" + std::to_wstring(i));
+        
+			auto& modelComponent = targetEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
+			auto& boundingBoxComponent = targetEntity.AddComponent<BoundingBoxComponent>();
 
 			auto& mesh = meshes[submeshIndex];
 			auto bbox = mesh->GetBoundingBox();
 			boundingBoxComponent.Center = bbox.Center;
 			boundingBoxComponent.Extents = bbox.Extents;
-			
-			for (size_t j = 0; j < model->GetMaterials().size(); ++j)
+        
+			for (size_t j = 0; j < materials.size(); ++j)
 			{
-				auto& material = model->GetMaterials()[j];
-				modelComponent.Materials->SetMaterial(j, material->GetHandle());
+				modelComponent.Materials->SetMaterial(static_cast<uint32_t>(j), materials[j]->GetHandle());
 			}
 		}
-		else if (node.Meshes.size() > 1)
-		{
-			for (size_t i = 0; i < node.Meshes.size(); i++)
-			{
-				uint32_t submeshIndex = node.Meshes[i]; 
-
-				Entity childEntity = CreateEntity(nodeEntity, node.Name);
-				auto& modelComponent = childEntity.AddComponent<ModelComponent>(model->GetHandle(), submeshIndex);
-				auto& boundingBoxComponent = childEntity.AddComponent<BoundingBoxComponent>();
-
-				auto& mesh = meshes[submeshIndex];
-				auto bbox = mesh->GetBoundingBox();
-				boundingBoxComponent.Center = bbox.Center;
-				boundingBoxComponent.Extents = bbox.Extents;
-				
-				for (size_t j = 0; j < model->GetMaterials().size(); ++j)
-				{
-					auto& material = model->GetMaterials()[j];
-					modelComponent.Materials->SetMaterial(j, material->GetHandle());
-				}
-			}
-		}
-
+		
 		for (uint32_t child : node.Children)
 		{
-			CreateModelEntityHierarchy(nodeEntity, model, nodes[child]);
+			CreateModelEntityHierarchy(nodeEntity, model, nodes[child], nodeEntityMap);
 		}
 	}
 

@@ -28,6 +28,8 @@ namespace Bruno
 		{
 			return m_uuid == other;
 		}
+		
+		static UUID None;
 	private:
 		uint64_t m_uuid;
 

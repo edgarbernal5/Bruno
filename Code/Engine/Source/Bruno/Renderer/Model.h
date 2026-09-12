@@ -50,6 +50,17 @@ namespace Bruno
 		Unknown = 0,
 		DiffuseColor
 	};
+	
+	struct ModelLight
+	{
+		Math::Vector3 Color{ 1.0f, 1.0f, 1.0f };
+		float Intensity{ 1.0f };
+		Math::Vector3 Direction{ 0.0f, -1.0f, 0.0f };
+		
+		std::wstring NodeName;
+		Math::Vector3 LocalPosition;
+		Math::Quaternion LocalRotation;
+	};
 
 	class ModelMaterial : public RTTI
 	{
@@ -68,7 +79,7 @@ namespace Bruno
 		BR_RTTI_DECLARATION(Model, Asset);
 
 	public:
-		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes, const Math::BoundingBox& modelAABB);
+		Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes, std::vector<ModelLight>&& modelLights, const Math::BoundingBox& modelAABB);
 
 		AssetType GetAssetType() const override { return AssetType::Model; }
 
@@ -81,20 +92,27 @@ namespace Bruno
 		const std::vector<std::shared_ptr<Mesh>>& GetMeshes() { return m_meshes; }
 		std::shared_ptr<Material>& GetMaterial(uint32_t materialIndex);
 		std::vector<std::shared_ptr<Material>>& GetMaterials() { return m_materials; }
+		std::vector<ModelLight>& GetLights() { return m_modelLights; }
 
 		const ModelNode& GetRootNode() const { return m_modelNodes[0]; }
 		const std::vector<ModelNode>& GetNodes() const { return m_modelNodes; }
-	
+		const Math::BoundingBox& GetBoundingBox() const { return m_modelAABB; }
+		
+		const std::wstring& GetName() const { return m_name; }
+		void SetName(const std::wstring& name) { m_name = name; }
+		
 	private:
 		std::vector<std::shared_ptr<Material>> m_materials;
 		std::vector<std::shared_ptr<Mesh>> m_meshes;
 		std::vector<ModelVertex> m_vertices;
 		std::vector<uint32_t> m_indices;
 		std::vector<ModelNode> m_modelNodes;
+		std::vector<ModelLight> m_modelLights;
 
 		std::shared_ptr<VertexBuffer> m_vertexBuffer;
 		std::shared_ptr<IndexBuffer> m_indexBuffer;
 		Math::BoundingBox m_modelAABB;
+		std::wstring m_name;
 	};
 
 	class Mesh

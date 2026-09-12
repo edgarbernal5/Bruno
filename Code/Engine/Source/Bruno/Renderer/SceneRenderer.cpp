@@ -109,10 +109,22 @@ namespace Bruno
 		ForwardLightingBuffer lightData = {};
 		lightData.CameraPosition = camera.GetPosition();
 
-		// 1. Luz Ambiental (muy baja para no matar el contraste de las sombras PBR)
-		lightData.GlobalAmbientColor = Math::Vector3(0.8f, 0.02f, 0.02f); 
-		lightData.ActiveLightCount = 3;
+		// 1. Luz Ambiental Fuerte para forzar visibilidad[cite: 1]
+		lightData.GlobalAmbientColor = Math::Vector3(0.05f, 0.05f, 0.05f); 
 
+		auto entitiesLightsGroup = m_scene->GetAllEntitiesWith<TransformComponent, DirectionalLightComponent>();
+		for (auto lightEntity : entitiesLightsGroup)
+		{
+			auto [transformComponent, directionalLight] = entitiesLightsGroup.get<TransformComponent, DirectionalLightComponent>(lightEntity);
+			
+			lightData.Sun.Direction = directionalLight.Direction;
+			lightData.Sun.Intensity = directionalLight.Intensity;
+			lightData.Sun.Color = directionalLight.Color;
+			break;
+		}
+		lightData.ActiveLightCount = 0;
+		
+		/*
 		// =========================================================
 		// LUZ 0: Key Light (Luz Principal)
 		// Posicionada arriba, a la derecha y al frente. Tono cálido.
@@ -141,7 +153,7 @@ namespace Bruno
 		lightData.Lights[2].Color = Math::Vector3(1.0f, 1.0f, 1.0f);
 		lightData.Lights[2].Radius = 50.0f;
 		lightData.Lights[2].Intensity = 800.0f; // Muy alta para que los bordes destaquen
-		
+		*/
 		m_forwardLightsCB.Update(*graphicsContext, lightData);
 		
 		// Setear Luces en el Índice 2 (b2)
@@ -311,8 +323,8 @@ namespace Bruno
 		psoDesc.RootSignature = m_forwardRootSig.get();
 		psoDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
 		
-		psoDesc.VertexShaderDesc = { L"Shaders/Opaque.hlsl", L"VSMain", L"vs_6_0" };
-		psoDesc.PixelShaderDesc = { L"Shaders/Opaque.hlsl", L"PSMain", L"ps_6_0" };
+		psoDesc.VertexShaderDesc = { L"Shaders/ForwardOpaque.hlsl", L"VSMain", L"vs_6_0" };
+		psoDesc.PixelShaderDesc = { L"Shaders/ForwardOpaque.hlsl", L"PSMain", L"ps_6_0" };
 		
 		psoDesc.RasterizerDesc.CullMode = CullMode::Back;
 		psoDesc.RasterizerDesc.FillMode = FillMode::Solid;

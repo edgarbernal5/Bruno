@@ -219,7 +219,7 @@ namespace Bruno
 						[entity, index, &assetManager]() -> std::wstring
 						{
 							UUID currentHandle = entity.GetComponent<ModelComponent>().Materials->GetMaterial(index);
-							if (currentHandle == static_cast<UUID>(0))
+							if (currentHandle == UUID::None)
 							{
 								return L"None";
 							}
@@ -263,6 +263,56 @@ namespace Bruno
 							Berta::GUI::ShowContextMenu(std::move(menuContext), ownerWindow, Berta::GUI::GetMousePositionToWindow(ownerWindow));
 						});
 				}
+			}
+			
+			if (entity.HasComponent<DirectionalLightComponent>())
+			{
+				auto directionalLightCategory = m_propertyGrid.Append("Directional Light");
+				
+				directionalLightCategory.EmplaceProperty<Berta::PropertyGridFieldFloat>(
+					"Intensity", 
+					[entity]()
+					{
+						return entity.GetComponent<DirectionalLightComponent>().Intensity;
+					},
+					[entity](const float& val) mutable
+					{
+						auto &directionalLightComp = entity.GetComponent<DirectionalLightComponent>();
+						directionalLightComp.Intensity = val;
+					}
+				);
+				directionalLightCategory.EmplaceProperty<Berta::PropertyGridFieldColor>(
+					"Color", 
+					[entity]()
+					{
+						Berta::Color colorUI;
+						auto& color = entity.GetComponent<DirectionalLightComponent>().Color;
+						colorUI.SetA(color.x * 255.0f);
+						colorUI.y = color.y;
+						colorUI.z = color.z;
+						
+						return opt;
+					},
+					[entity](const Berta::OptionalVector3& val) mutable
+					{
+						auto &directionalLightComp = entity.GetComponent<DirectionalLightComponent>();
+						auto& color = directionalLightComp.Color;
+						if (val.x.has_value())
+						{
+							color.x = val.x.value();
+						}
+						
+						if (val.y.has_value())
+						{
+							color.y = val.y.value();
+						}
+						
+						if (val.z.has_value())
+						{
+							color.z = val.z.value();
+						}
+					}
+				);
 			}
 		});
 		

@@ -12,18 +12,19 @@ namespace Bruno
 	BR_RTTI_DEFINITIONS(ModelMaterial);
 	BR_RTTI_DEFINITIONS(Model);
 
-	Model::Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes, const Math::BoundingBox& modelAABB) :
+	Model::Model(std::vector<ModelVertex>&& vertices, std::vector<uint32_t>&& indices, std::vector<std::shared_ptr<Material>>&& materials, std::vector<std::shared_ptr<Mesh>>&& meshes, std::vector<ModelNode>&& modelNodes, std::vector<ModelLight>&& modelLights, const Math::BoundingBox& modelAABB) :
 		m_vertices(std::move(vertices)),
 		m_indices(std::move(indices)),
 		m_materials(std::move(materials)),
 		m_meshes(std::move(meshes)),
 		m_modelNodes(std::move(modelNodes)),
+		m_modelLights(std::move(modelLights)),
 		m_modelAABB(modelAABB)
 	{
 		//m_handle = {};
-		auto device = Bruno::Graphics::GetDevice();
+		auto device = Graphics::GetDevice();
 
-		std::vector< VertexPositionNormalTexture> verticesPNT;
+		std::vector<VertexPositionNormalTexture> verticesPNT;
 		verticesPNT.reserve(m_vertices.size());
 		for (size_t i = 0; i < m_vertices.size(); i++)
 		{

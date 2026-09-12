@@ -6,7 +6,8 @@ namespace Bruno
 	std::random_device UUID::g_RandomDevice{};
 	std::mt19937_64 UUID::g_mtEng{ (g_RandomDevice()) };
 	std::uniform_int_distribution<uint64_t> UUID::g_UniformDistribution{};
-
+	UUID UUID::None { 0ULL };
+	
 	UUID::UUID()
 		: m_uuid(g_UniformDistribution(g_mtEng))
 	{

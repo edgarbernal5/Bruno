@@ -23,11 +23,12 @@ namespace Bruno
 		bool TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset) override;
 
 	private:
-
 		void ProcessMesh(aiMesh* aiMesh, std::vector<ModelVertex>& vertices, std::vector<uint32_t>& indices, std::vector<std::shared_ptr<Mesh>>& meshes, uint32_t& baseVertex, uint32_t& baseIndex);
 		void ProcessNode(aiNode* aiNode, uint32_t nodeIndex, std::vector<ModelNode>& modelNodes, std::vector<std::shared_ptr<Mesh>>& meshes, const Math::Matrix& parentTransform);
 		void ProcessMaterials(const aiScene* aiScene, const std::wstring& directory, std::vector<std::shared_ptr<Material>>& materials, AssetImporterContext& context);
 		void ProcessTexturesForMaterial(Material& materialContentItem, aiMaterial* aiMaterial, const std::wstring& directory, AssetImporterContext& context);
+		void ProcessLights(const aiScene* aiScene, std::vector<ModelLight>& outLights);
+		
 		Math::Matrix ToMatrix(const aiMatrix4x4& aiMatrix);
 	};
 }
