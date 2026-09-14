@@ -287,30 +287,39 @@ namespace Bruno
 					{
 						Berta::Color colorUI;
 						auto& color = entity.GetComponent<DirectionalLightComponent>().Color;
-						colorUI.SetA(color.x * 255.0f);
-						colorUI.y = color.y;
-						colorUI.z = color.z;
+						colorUI.SetA(1.0f);
+						colorUI.SetR(color.x);
+						colorUI.SetG(color.y);
+						colorUI.SetB(color.z);
 						
-						return opt;
+						return colorUI;
 					},
-					[entity](const Berta::OptionalVector3& val) mutable
+					[entity](const Berta::Color& val) mutable
 					{
 						auto &directionalLightComp = entity.GetComponent<DirectionalLightComponent>();
 						auto& color = directionalLightComp.Color;
-						if (val.x.has_value())
-						{
-							color.x = val.x.value();
-						}
-						
-						if (val.y.has_value())
-						{
-							color.y = val.y.value();
-						}
-						
-						if (val.z.has_value())
-						{
-							color.z = val.z.value();
-						}
+						color.x = val.GetR() / 255.0f;
+						color.y = val.GetG() / 255.0f;
+						color.z = val.GetB() / 255.0f;
+					},
+					[](std::optional<Berta::Color> currentColor) -> std::optional<Berta::Color>
+					{
+						std::cout << "Opening color picker...." << std::endl;
+						std::cout << "ERROR...." << std::endl;
+
+						return std::nullopt;
+					}
+				);
+				
+				directionalLightCategory.EmplaceProperty<Berta::PropertyGridFieldCheck>(
+					"Cast Shadows", 
+					[entity]()
+					{
+						return entity.GetComponent<DirectionalLightComponent>().CastShadows;
+					},
+					[entity](const bool& val) mutable
+					{
+						entity.GetComponent<DirectionalLightComponent>().CastShadows = val;
 					}
 				);
 			}
