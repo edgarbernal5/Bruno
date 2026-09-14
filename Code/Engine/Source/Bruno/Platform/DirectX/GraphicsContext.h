@@ -33,6 +33,7 @@ namespace Bruno
         
         // --- BARRERAS Y ESTADOS ---
         void TransitionResource(GraphicsResource* resource, ResourceState newState);
+        void FlushBarriers();
         
         // --- CLEAR Y RENDER TARGETS ---
         void ClearRenderTarget(Texture2D* renderTarget, const Math::Color& color);
@@ -73,6 +74,10 @@ namespace Bruno
         void SetPushConstant(uint32_t rootParameterIndex, uint32_t sourceData, uint32_t destOffsetIn32BitValues = 0);
         
     private:
+        static constexpr uint32_t MAX_BARRIERS = 16;
+        
+        D3D12_RESOURCE_BARRIER m_resourceBarriers[MAX_BARRIERS];
+        uint32_t m_numBarriersToFlush = 0;
         
         LinearAllocator* m_dynamicAllocator = nullptr;
         DynamicDescriptorAllocator* m_dynamicDescriptorAllocator = nullptr;

@@ -35,7 +35,8 @@ namespace Bruno
 		float Intensity;
 	};
 	
-	struct DirectionalLightData {
+	struct DirectionalLightData
+	{
 		Math::Vector3 Direction;
 		float Intensity;
 		Math::Vector3 Color;

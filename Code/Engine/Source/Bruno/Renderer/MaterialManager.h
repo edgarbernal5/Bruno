@@ -23,6 +23,8 @@ namespace Bruno
         
         DescriptorAllocation GetSRVAllocation() const { return m_srvAllocation; }
     private:
+        void ResizeGPUBuffer(uint32_t newElementCount);
+        
         GraphicsDevice& m_device;
         DescriptorAllocator& m_globalSrvHeap;
         
@@ -38,6 +40,5 @@ namespace Bruno
 
         DescriptorAllocation m_srvAllocation;
         
-        void ResizeGPUBuffer(uint32_t newElementCount);
     };
 }

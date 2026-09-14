@@ -99,9 +99,9 @@ namespace Bruno
 
         // Sobreescribimos el descriptor en el Mega Heap
         m_device.GetNativeDevice()->CreateShaderResourceView(
-            static_cast<ID3D12Resource*>(m_gpuBuffer->GetNativeResource()), 
+            m_gpuBuffer->GetNativeResource(), 
             &srvDesc, 
-            m_srvAllocation.GetCPUHandle() // Tu método mágico de offsets
+            m_srvAllocation.GetCPUHandle()
         );
     }
 }

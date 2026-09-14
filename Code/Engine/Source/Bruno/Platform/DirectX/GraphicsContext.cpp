@@ -31,8 +31,10 @@ namespace Bruno
 
     void GraphicsContext::TransitionResource(GraphicsResource* resource, ResourceState newState)
     {
-        if (!resource) return;
-
+        if (!resource)
+        {
+            return;
+        }
         ResourceState stateBefore = resource->GetCurrentState();
         
         // Evitamos emitir barreras nulas en la GPU si el recurso ya está en el estado correcto
@@ -46,15 +48,31 @@ namespace Bruno
 
         ID3D12Resource* nativeResource = resource->GetNativeResource();
 
-        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        D3D12_RESOURCE_BARRIER& barrier = m_resourceBarriers[m_numBarriersToFlush++];
+        
+        barrier = CD3DX12_RESOURCE_BARRIER::Transition(
             nativeResource,
             dxStateBefore,
             dxNewState
         );
-
-        m_commandList->ResourceBarrier(1, &barrier);
         
         resource->SetCurrentState(newState);
+        
+        // Seguridad: Si saturamos el buffer interno, forzamos un envío anticipado
+        if (m_numBarriersToFlush >= MAX_BARRIERS)
+        {
+            FlushBarriers();
+        }
+    }
+
+    void GraphicsContext::FlushBarriers()
+    {
+        if (m_numBarriersToFlush > 0)
+        {
+            // Enviamos todo el lote en una sola instrucción nativa súper rápida
+            m_commandList->ResourceBarrier(m_numBarriersToFlush, m_resourceBarriers);
+            m_numBarriersToFlush = 0;
+        }
     }
 
     void GraphicsContext::ClearRenderTarget(Texture2D* renderTarget, const Math::Color& color)
@@ -104,6 +122,8 @@ namespace Bruno
             pDsvHandle = &dsvHandle;
         }
 
+        FlushBarriers();
+        
         // Llamada nativa
         // Parámetros: Num RTVs, Puntero al array, RTs Contiguos (FALSE porque los sacamos manualmente), Puntero al DSV
         m_commandList->OMSetRenderTargets(numRTVs, rtvHandles, FALSE, pDsvHandle);
@@ -258,8 +278,10 @@ namespace Bruno
 
         if (size == 0) 
         {
-            return; 
+            return;
         }
+        
+        FlushBarriers();
         
         // Encolar la transferencia masiva de datos en la CommandList del contexto
         // Parámetros: Destino, Offset Destino, Origen, Offset Origen, Tamaño
@@ -268,11 +290,13 @@ namespace Bruno
 
     void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation)
     {
+        FlushBarriers();
         m_commandList->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
     }
 
     void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation)
     {
+        FlushBarriers();
         m_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
     }
 

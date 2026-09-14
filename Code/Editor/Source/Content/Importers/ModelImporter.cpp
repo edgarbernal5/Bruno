@@ -279,38 +279,6 @@ namespace Bruno
 		{
 			materialContentItem.RoughnessFactor = roughness;
 		}
-		
-		/*for (auto it = g_textureTypeMappings.begin(); it != g_textureTypeMappings.end(); ++it)
-		{
-			aiTextureType mappedTextureType = static_cast<aiTextureType>(it->second.first);
-			uint32_t textureCount = aiMaterial->GetTextureCount(mappedTextureType);
-
-			for (uint32_t textureIndex = 0; textureIndex < textureCount; textureIndex++)
-			{
-				aiString textureRelativePath;
-				aiTextureMapping mapping = aiTextureMapping::aiTextureMapping_UV;
-				uint32_t uvIndex = 0;
-				float blend = 0.0f;
-				aiTextureOp operation = aiTextureOp::aiTextureOp_Multiply;
-				aiTextureMapMode mapMode = aiTextureMapMode::aiTextureMapMode_Wrap;
-
-				if (aiMaterial->GetTexture(mappedTextureType, textureIndex, &textureRelativePath, &mapping, &uvIndex, &blend, &operation, &mapMode) == AI_SUCCESS)
-				{
-					std::filesystem::path filenameTexture(directory);
-					filenameTexture /= textureRelativePath.C_Str();
-
-					if (std::filesystem::exists(filenameTexture))
-					{
-						std::wstringstream relativePathToTextureW;
-						relativePathToTextureW << textureRelativePath.C_Str();
-						std::string textureName = (it->second.second);
-
-						auto textureHandle = context.ImportAsset(filenameTexture);
-						materialContentItem.TexturesByName[textureName] = textureHandle;
-					}
-				}
-			}
-		}*/
 	}
 
 	void ModelImporter::ProcessLights(const aiScene* aiScene, std::vector<ModelLight>& outLights)
@@ -380,7 +348,7 @@ namespace Bruno
 
 				// 4. Transformar la normal al espacio global
 				// TransformNormal aplica rotación y escala, pero ignora la traslación, 
-				// lo cual es matemáticamente correcto para un vector de dirección[cite: 2].
+				// lo cual es matemáticamente correcto para un vector de dirección.
 				Math::Vector3 worldDirection = Math::Vector3::TransformNormal(localDirection, globalTransform);
 				worldDirection.Normalize(); // Limpiar estiramientos por escalas
             

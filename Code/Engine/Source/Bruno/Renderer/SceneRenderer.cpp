@@ -109,7 +109,7 @@ namespace Bruno
 		ForwardLightingBuffer lightData = {};
 		lightData.CameraPosition = camera.GetPosition();
 
-		// 1. Luz Ambiental Fuerte para forzar visibilidad[cite: 1]
+		// 1. Luz Ambiental Fuerte para forzar visibilidad
 		lightData.GlobalAmbientColor = Math::Vector3(0.05f, 0.05f, 0.05f); 
 
 		auto entitiesLightsGroup = m_scene->GetAllEntitiesWith<TransformComponent, DirectionalLightComponent>();
@@ -189,7 +189,6 @@ namespace Bruno
 			}
 			// Preparar las transformaciones (b0) - ¡Ahora sin la cámara!
 			const Math::Matrix& world = transformComponent.WorldTransform;
-			//Math::Matrix wvp = (world * camera.GetViewProjection()).Transpose();
 			
 			SceneObjectBuffer objConstants;
 			objConstants.World = world.Transpose();
@@ -200,7 +199,7 @@ namespace Bruno
 			transformCB.Update(*graphicsContext, objConstants);
 			graphicsContext->SetConstantBuffer(0, transformCB);
 
-			// 7. Bindear el ID Bindless del material (b1)
+			// Bindear el ID Bindless del material (b1)
 			graphicsContext->SetPushConstant(1, modelComponent.RuntimeMaterialIndex, 0);
 			
 			graphicsContext->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
@@ -517,10 +516,18 @@ namespace Bruno
 		}
 		else 
 		{
-			gpuData.AlbedoTextureIndex = 0xFFFFFFFF; // El shader debe ignorarlo
+			gpuData.AlbedoTextureIndex = 0xFFFFFFFF;
 		}
-
-		// ... (Haces lo mismo para NormalTextureIndex y otros mapas) ...
+		
+		if (matAsset->NormalMap != 0) 
+		{
+			auto tex = m_assetManager->GetAsset<Texture2D>(matAsset->NormalMap);
+			gpuData.NormalTextureIndex = tex->GetBindlessIndex();
+		}
+		else 
+		{
+			gpuData.NormalTextureIndex = 0xFFFFFFFF;
+		}
 
 		// 3. Enviamos esta data al MaterialManager global y guardamos la llave
 		matAsset->RuntimeMaterialIndex = m_materialManager->CreateMaterial(gpuData);
