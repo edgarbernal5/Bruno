@@ -297,7 +297,7 @@ namespace Bruno
 				auto& newLight = outLights.emplace_back();
 				
 				newLight.NodeName = Berta::StringUtils::UTF8ToWide(aiLight->mName.C_Str());
-				// 1. Extraer Color e Intensidad
+				
 				// Assimp a veces premultiplica la intensidad en el color difuso. 
 				// Separamos la intensidad normalizando el color.
 				Math::Vector3 rawColor(aiLight->mColorDiffuse.r, aiLight->mColorDiffuse.g, aiLight->mColorDiffuse.b);
@@ -309,10 +309,8 @@ namespace Bruno
 				}
 				newLight.Color = rawColor;
 
-				// 2. Extraer Dirección Local
 				Math::Vector3 localDirection(aiLight->mDirection.x, aiLight->mDirection.y, aiLight->mDirection.z);
             
-				// 3. Resolver Transformación Absoluta desde la Jerarquía de Nodos
 				aiNode* lightNode = aiScene->mRootNode->FindNode(aiLight->mName);
 				Math::Matrix globalTransform = Math::Matrix::Identity;
             
@@ -320,7 +318,6 @@ namespace Bruno
 				{
 					Math::Matrix localTransform = ToMatrix(lightNode->mTransformation);
 
-					// 4. Descomponer la matriz para extraer Traslación y Rotación (Cuaternión) puras
 					DirectX::XMVECTOR scale;
 					DirectX::XMVECTOR rotation;
 					DirectX::XMVECTOR translation;
@@ -346,11 +343,9 @@ namespace Bruno
 					newLight.LocalRotation = Math::Quaternion::Identity; 
 				}
 
-				// 4. Transformar la normal al espacio global
-				// TransformNormal aplica rotación y escala, pero ignora la traslación, 
-				// lo cual es matemáticamente correcto para un vector de dirección.
+				// Transformar la normal al espacio global
 				Math::Vector3 worldDirection = Math::Vector3::TransformNormal(localDirection, globalTransform);
-				worldDirection.Normalize(); // Limpiar estiramientos por escalas
+				worldDirection.Normalize();
             
 				newLight.Direction = worldDirection;
 			}

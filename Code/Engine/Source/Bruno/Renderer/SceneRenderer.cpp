@@ -117,12 +117,15 @@ namespace Bruno
 		{
 			auto [transformComponent, directionalLight] = entitiesLightsGroup.get<TransformComponent, DirectionalLightComponent>(lightEntity);
 			
-			lightData.Sun.Direction = directionalLight.Direction;
+			auto forward = transformComponent.WorldTransform.Forward();
+			forward.Normalize();
+			lightData.Sun.Direction = forward;
 			lightData.Sun.Intensity = directionalLight.Intensity;
 			lightData.Sun.Color = directionalLight.Color;
 			break;
 		}
-		lightData.ActiveLightCount = 0;
+		lightData.ActivePointLightCount = 0;
+		lightData.ActiveSpotLightCount = 0;
 		
 		/*
 		// =========================================================

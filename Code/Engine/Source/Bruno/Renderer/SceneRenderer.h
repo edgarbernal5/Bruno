@@ -26,14 +26,6 @@ namespace Bruno
 	
 	// Datos Puros de Iluminación
 #define MAX_FORWARD_LIGHTS 8
-
-	struct PointLightData
-	{
-		Math::Vector3 Position;
-		float Radius;
-		Math::Vector3 Color;
-		float Intensity;
-	};
 	
 	struct DirectionalLightData
 	{
@@ -42,13 +34,34 @@ namespace Bruno
 		Math::Vector3 Color;
 		float Padding; // Relleno obligatorio
 	};
+	
+	struct PointLightData
+	{
+		Math::Vector3 Position;
+		float Radius;
+		Math::Vector3 Color;
+		float Intensity;
+	};
+	
+	struct SpotLightData {
+		Math::Vector3 Position;
+		float Radius; // Distancia máxima de influencia (como la Point Light)
+		Math::Vector3 Direction;
+		float Intensity;
+		Math::Vector3 Color;
+		float InnerConeCos; // std::cos(InnerCutoffAngle)
+		float OuterConeCos; // std::cos(OuterCutoffAngle)
+		Math::Vector3 Padding; // Relleno para 16-bytes
+	};
 
 	struct ForwardLightingBuffer
 	{
 		DirectionalLightData Sun; // La luz direccional global
-		PointLightData Lights[MAX_FORWARD_LIGHTS]; // Tu arreglo actual de luces locales
+		PointLightData PointLights[MAX_FORWARD_LIGHTS]; // Tu arreglo actual de luces locales
+		SpotLightData SpotLights[MAX_FORWARD_LIGHTS]; // Tu arreglo actual de luces locales
 		Math::Vector3 GlobalAmbientColor;
-		uint32_t ActiveLightCount;
+		uint32_t ActivePointLightCount;
+		uint32_t ActiveSpotLightCount;
 		Math::Vector3 CameraPosition;
 		float Padding;
 	};

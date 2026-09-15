@@ -101,12 +101,13 @@ namespace Bruno
 	{
 		Math::Vector3 Color{ 1.0f, 1.0f, 1.0f };
 		float Intensity{ 1.0f };
-		Math::Vector3 Direction{ 0.0f, -1.0f, 0.0f };
+		
+		Math::Vector3 Direction{ 0.0f, -1.0f, 0.0f }; //Runtime
         
 		bool CastShadows{ true };
 
-		Math::Matrix LightViewProj[NUM_CASCADES];
-		float CascadeSplits[NUM_CASCADES];
+		Math::Matrix LightViewProj[NUM_CASCADES]; //Runtime
+		float CascadeSplits[NUM_CASCADES]; //Runtime
 	};
 	
 	struct PointLightComponent

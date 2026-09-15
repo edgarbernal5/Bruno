@@ -66,12 +66,26 @@ struct PointLight
     float Intensity;
 };
 
+struct SpotLight
+{
+    float3 Position;
+    float Radius;
+    float3 Direction;
+    float Intensity;
+    float3 Color;
+    float InnerConeCos;
+    float OuterConeCos;
+    float3 Padding;
+};
+
 cbuffer ForwardLights : register(b2)
 {
     DirectionalLight g_Sun;
-    PointLight g_Lights[MAX_LIGHTS];
+    PointLight g_PointLights[MAX_LIGHTS];
+    SpotLight g_SpotLights[MAX_LIGHTS];
     float3 g_AmbientColor;
-    uint g_ActiveLightCount;
+    uint g_ActivePointLightCount;
+    uint g_ActiveSpotLightCount;
     float3 g_CameraPosition;
     float g_Padding;
 };
@@ -90,14 +104,13 @@ PixelInput VSMain(VertexInput input)
     
     // 2. Normal y UVs para el Pixel Shader
     output.NormalWorld = normalize(mul(input.Normal, (float3x3) g_World));
-    //output.NormalWorld = input.Normal;
     output.UV = input.UV;
     
     return output;
 }
 
 // ==========================================================
-// CONSTANTES Y FUNCIONES PBR (GGX / Schlick-GGX)
+// MATEMÁTICA PBR (Cook-Torrance)
 // ==========================================================
 static const float PI = 3.14159265359f;
 
@@ -144,58 +157,115 @@ float3 FresnelSchlick(float cosTheta, float3 F0)
     return F0 + (1.0f - F0) * pow(clamp(1.0f - cosTheta, 0.0f, 1.0f), 5.0f);
 }
 
+// ----------------------------------------------------------
+// FUNCIÓN MAESTRA: Evalúa la luz de cualquier fuente
+// ----------------------------------------------------------
+float3 CalculatePBRIllumination(float3 F0, float3 albedo, float metallic, float roughness, float3 N, float3 V, float3 L, float3 radiance)
+{
+    float3 H = normalize(V + L);
+    float NdotL = max(dot(N, L), 0.0f);
+    float NdotV = max(dot(N, V), 0.0f);
+    
+    // Evitar divisiones por cero con superficies rasantes
+    if (NdotL <= 0.0f) return float3(0.0f, 0.0f, 0.0f);
+
+    float NDF = DistributionGGX(N, H, roughness);
+    float G   = GeometrySmith(N, V, L, roughness);
+    float3 F  = FresnelSchlick(max(dot(H, V), 0.0f), F0);
+
+    float3 numerator    = NDF * G * F;
+    float denominator   = 4.0f * NdotV * NdotL;
+    float3 specular     = numerator / max(denominator, 0.0000001f);
+
+    // Conservación de energía: kS (Especular) + kD (Difuso) = 1.0
+    float3 kS = F;
+    float3 kD = float3(1.0f, 1.0f, 1.0f) - kS;
+    kD *= 1.0f - metallic; // Los metales puros absorben la luz difusa
+
+    return (kD * albedo / PI + specular) * radiance * NdotL;
+}
+
 // ==========================================================
 // PIXEL SHADER
 // ==========================================================
 float4 PSMain(PixelInput input) : SV_TARGET
 {
-    // 1. Extraer propiedades físicas del búfer gigante (Bindless)
+    // 1. Extraer propiedades materiales (Bindless)
     MaterialData mat = g_MaterialBuffer[g_MaterialIndex];
     float4 albedo = mat.AlbedoTint;
-    float3 normal = normalize(input.NormalWorld);
     
     if (mat.AlbedoTextureIndex != 0xFFFFFFFF)
     {
         albedo *= g_Textures[NonUniformResourceIndex(mat.AlbedoTextureIndex)].Sample(g_Sampler, input.UV);
     }
     
-    float3 viewDir = normalize(g_CameraPosition - input.PositionWorld);
-    float3 finalColor = g_AmbientColor * albedo.rgb;
+    // Limitar roughness para evitar divisiones por cero en GGX
+    float roughness = max(mat.RoughnessFactor, 0.04f);
+    float metallic = mat.MetallicFactor;
+    
+    float3 N = normalize(input.NormalWorld);
+    float3 V = normalize(g_CameraPosition - input.PositionWorld);
+    
+    // F0: Reflectividad base en ángulo de incidencia 0
+    float3 F0 = float3(0.04f, 0.04f, 0.04f);
+    F0 = lerp(F0, albedo.rgb, metallic);
 
-    // 2. ILUMINACIÓN DIRECCIONAL (Fija, sin atenuación de radio)
-    float3 sunDir = normalize(-g_Sun.Direction); // Invertir para que apunte hacia el sol
-    float sunNdotL = max(dot(normal, sunDir), 0.0f);
-    
-    // Specular simplificado
-    float3 sunHalfVector = normalize(sunDir + viewDir);
-    float sunNdotH = max(dot(normal, sunHalfVector), 0.0f);
-    float sunSpecPower = exp2(10.0f * (1.0f - mat.RoughnessFactor) + 1.0f);
-    float sunSpecular = pow(sunNdotH, sunSpecPower) * (1.0f - mat.RoughnessFactor);
-    
-    float3 sunSpecColor = lerp(float3(1.0f, 1.0f, 1.0f), albedo.rgb, mat.MetallicFactor) * sunSpecular;
-    
-    // Sumar el impacto del sol
-    finalColor += (albedo.rgb * sunNdotL + sunSpecColor) * g_Sun.Color * g_Sun.Intensity;
+    // 2. Luz Ambiental
+    float3 finalColor = g_AmbientColor * albedo.rgb * (1.0f - metallic); // Opcional: escalar por Ambient Occlusion si lo tienes
 
-    // 3. LUCES PUNTUALES (Iteración sobre el ECS)
-    for (uint i = 0; i < g_ActiveLightCount; ++i)
+    // 3. ILUMINACIÓN DIRECCIONAL (Sol)
+    float3 sunDir = normalize(-g_Sun.Direction);
+    float3 sunRadiance = g_Sun.Color * g_Sun.Intensity;
+    finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, sunDir, sunRadiance);
+
+    // 4. LUCES PUNTUALES
+    for (uint i = 0; i < g_ActivePointLightCount; ++i)
     {
-        float3 lightVec = g_Lights[i].Position - input.PositionWorld;
+        float3 lightVec = g_PointLights[i].Position - input.PositionWorld;
         float distance = length(lightVec);
         
-        // Culling matemático: solo iluminar si el píxel está dentro del radio de la luz
-        if(distance < g_Lights[i].Radius)
+        if(distance < g_PointLights[i].Radius)
         {
             float3 lightDir = lightVec / distance;
-            float attenuation = pow(max(1.0f - (distance / g_Lights[i].Radius), 0.0f), 2.0f); // Atenuación inversa 
             
-            float nDotL = max(dot(normal, lightDir), 0.0f);
+            // Atenuación PBR físicamente correcta (Inversa del Cuadrado con caída suave)
+            float distRatio = distance / g_PointLights[i].Radius;
+            float attenuation = pow(saturate(1.0f - pow(distRatio, 4.0f)), 2.0f) / (distance * distance + 1.0f);
             
-            // ... (Calcular Specular local idéntico al bloque del Sol pero usando lightDir) ...
-            // finalColor += (diffuse + specularColor) * g_Lights[i].Color * g_Lights[i].Intensity * attenuation;
+            float3 pointRadiance = g_PointLights[i].Color * g_PointLights[i].Intensity * attenuation;
+            finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, lightDir, pointRadiance);
         }
     }
     
+    // 5. LUCES SPOT
+    for (uint j = 0; j < g_ActiveSpotLightCount; ++j)
+    {
+        float3 lightVec = g_SpotLights[j].Position - input.PositionWorld;
+        float distance = length(lightVec);
+    
+        if (distance < g_SpotLights[j].Radius)
+        {
+            float3 lightDir = lightVec / distance;
+        
+            // Atenuación PBR de Distancia
+            float distRatio = distance / g_SpotLights[j].Radius;
+            float distanceAttenuation = pow(saturate(1.0f - pow(distRatio, 4.0f)), 2.0f) / (distance * distance + 1.0f);
+        
+            // Atenuación Angular (Cono)
+            float theta = dot(-lightDir, normalize(g_SpotLights[j].Direction));
+            float epsilon = g_SpotLights[j].InnerConeCos - g_SpotLights[j].OuterConeCos;
+            float spotAttenuation = saturate((theta - g_SpotLights[j].OuterConeCos) / epsilon);
+            spotAttenuation *= spotAttenuation; // Suavizado smoothstep
+        
+            float3 spotRadiance = g_SpotLights[j].Color * g_SpotLights[j].Intensity * (distanceAttenuation * spotAttenuation);
+            finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, lightDir, spotRadiance);
+        }
+    }
+    
+    // HDR Tonemapping (Reinhard) y Gamma Correction (2.2) 
+    // Esenciales ya que la luz PBR genera valores superiores a 1.0
+    //finalColor = finalColor / (finalColor + float3(1.0f, 1.0f, 1.0f));
+    //finalColor = pow(finalColor, float3(1.0f / 2.2f, 1.0f / 2.2f, 1.0f / 2.2f));
     
     return float4(finalColor, albedo.a);
 }

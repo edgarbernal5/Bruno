@@ -36,7 +36,6 @@ namespace Bruno
 		{
 			BR_CORE_TRACE << "selection changed / selection.size = " << selection.size() << std::endl;
 
-			//TODO: si no hay cambios no refrescar.
 			Berta::ControlDrawBatch batchGuard(m_propertyGrid);
 			
 			m_propertyGrid.Clear();

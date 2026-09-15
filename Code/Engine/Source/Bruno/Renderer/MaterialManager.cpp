@@ -55,11 +55,10 @@ namespace Bruno
 
         // Copia directa usando el puntero persistente de tu UploadHeap
         std::memcpy(m_stagingBuffer->GetMappedData(), m_materials.data(), requiredSize);
-
-        // ¡Sinergia total! Ahora usamos tu método TransitionResource con la clase base agnóstica
+        
         context.TransitionResource(m_gpuBuffer.get(), ResourceState::CopyDest);
 
-        // Encolamos la copia asumiendo que agregas un método abstracto CopyBuffer al contexto
+        // Encolamos la copia
         context.CopyBuffer(m_gpuBuffer.get(), m_stagingBuffer.get(), requiredSize);
 
         context.TransitionResource(m_gpuBuffer.get(), ResourceState::PixelShaderResource);
