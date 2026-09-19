@@ -72,7 +72,7 @@ namespace Bruno
                 );
             
             DirectX::BoundingOrientedBox obb;
-            DirectX::BoundingOrientedBox::CreateFromBoundingBox(obb,localAABB);
+            DirectX::BoundingOrientedBox::CreateFromBoundingBox(obb, localAABB);
             obb.Transform(obb, worldMatrix); 
 
             m_primitiveBatch->DrawWireBox(obb, boxColor);

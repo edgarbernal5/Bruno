@@ -51,8 +51,16 @@ namespace Bruno
 		DiffuseColor
 	};
 	
+	enum class ModelLightType : uint8_t
+	{
+		DirectionalLight,
+		SpotLight,
+		PointLight,
+	};
+	
 	struct ModelLight
 	{
+		ModelLightType LightType { ModelLightType::DirectionalLight };
 		Math::Vector3 Color{ 1.0f, 1.0f, 1.0f };
 		float Intensity{ 1.0f };
 		Math::Vector3 Direction{ 0.0f, -1.0f, 0.0f };

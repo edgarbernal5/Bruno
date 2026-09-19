@@ -19,14 +19,16 @@ namespace Bruno
                 while (true)
                 {
                     std::function<void()> job;
+                    
+                    // Esperar a que haya trabajo
                     {
-                        std::unique_lock lock(m_queueMutex);
+                        std::unique_lock<std::mutex> lock(m_queueMutex);
                         m_condition.wait(lock, [this]
                         { 
-                            return m_stop.load() || !m_jobQueue.empty(); 
+                            return m_stop.load(std::memory_order_acquire) || !m_jobQueue.empty(); 
                         });
 
-                        if (m_stop.load() && m_jobQueue.empty())
+                        if (m_stop.load(std::memory_order_acquire) && m_jobQueue.empty())
                         {
                             return;
                         }
@@ -34,8 +36,8 @@ namespace Bruno
                         job = std::move(m_jobQueue.front());
                         m_jobQueue.pop();
                     }
-
-                    // Ejecutar el trabajo
+                    
+                    // Ejecutar fuera del lock
                     job();
                 }
             });
@@ -59,18 +61,16 @@ namespace Bruno
     {
         if (group)
         {
-            // Incrementamos el contador ANTES de encolar
-            group->pendingJobs.fetch_add(1, std::memory_order_acquire);
+            group->pendingJobs.fetch_add(1, std::memory_order_relaxed);
         }
 
         {
             std::scoped_lock lock(m_queueMutex);
-            // Si pasamos un grupo, envolvemos el job original para que reduzca el contador al terminar
-            if (group)
-            {
-                m_jobQueue.emplace([job, group]()
+            if (group) {
+                m_jobQueue.emplace([job = std::move(job), group]()
                 {
-                    job(); // Ejecuta la tarea real
+                    job();
+                    // Release semánticamente asegura que la memoria se publique al terminar
                     group->pendingJobs.fetch_sub(1, std::memory_order_release);
                 });
             }
@@ -82,12 +82,70 @@ namespace Bruno
         m_condition.notify_one();
     }
 
+    void JobSystem::Dispatch(uint32_t jobCount, uint32_t groupSize, const std::function<void(uint32_t start, uint32_t end)> &job, JobDispatchGroup* group)
+    {
+        if (jobCount == 0)
+        {
+            return;
+        }
+        
+        uint32_t groupCount = (jobCount + groupSize - 1) / groupSize;
+        
+        if (group)
+        {
+            group->pendingJobs.fetch_add(groupCount, std::memory_order_relaxed);
+        }
+
+        {
+            std::scoped_lock lock(m_queueMutex);
+            for (uint32_t i = 0; i < groupCount; ++i)
+            {
+                uint32_t start = i * groupSize;
+                uint32_t end = std::min<uint32_t>(start + groupSize, jobCount);
+
+                m_jobQueue.emplace([job, start, end, group]()
+                {
+                    job(start, end);
+                    if (group)
+                    {
+                        group->pendingJobs.fetch_sub(1, std::memory_order_release);
+                    }
+                });
+            }
+        }
+        
+        // Despertamos a todos los hilos posibles para este trabajo masivo
+        m_condition.notify_all();
+    }
+
     void JobSystem::Wait(const JobDispatchGroup& group)
     {
-        // Spin-lock que cede la CPU mientras espera que ESTE grupo termine
+        // Mientras haya tareas en este grupo...
         while (group.pendingJobs.load(std::memory_order_acquire) > 0)
         {
-            std::this_thread::yield(); 
+            std::function<void()> job;
+            // ... el hilo principal roba una tarea de la cola general y la ejecuta
+            if (TryPop(job))
+            {
+                job();
+            }
+            else 
+            {
+                // Si la cola está vacía pero el grupo no ha terminado, cedemos ciclos
+                std::this_thread::yield();
+            }
         }
+    }
+
+    bool JobSystem::TryPop(std::function<void()>& outJob)
+    {
+        std::scoped_lock lock(m_queueMutex);
+        if (m_jobQueue.empty() || m_stop.load(std::memory_order_relaxed))
+        {
+            return false;
+        }
+        outJob = std::move(m_jobQueue.front());
+        m_jobQueue.pop();
+        return true;
     }
 }

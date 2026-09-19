@@ -6,7 +6,7 @@
 #include "EditorCameraController.h"
 #include "SelectionService.h"
 #include "Bruno/Renderer/SceneRenderer.h"
-#include "Bruno/Scene/Systems/FrustumCulling.h"
+#include "Bruno/Scene/Systems/CullingSystem.h"
 #include "Content/EditorAssetManager.h"
 #include "Gizmos/GizmoService.h"
 #include "Bruno/Platform/DirectX/Shader.h"
@@ -186,7 +186,7 @@ namespace Bruno
 
 	void SceneDocument::InitializeSceneRenderer()
 	{
-		m_frustumCulling = std::make_shared<FrustumCulling>(m_camera, m_scene);
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_frustumCulling, m_assetManager);
+		m_cullingSystem = std::make_shared<CullingSystem>(m_camera, m_scene);
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_cullingSystem, m_assetManager);
 	}
 }

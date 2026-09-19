@@ -22,6 +22,8 @@ namespace Bruno
 			return "Model";
 		case Bruno::AssetType::Texture:
 			return "Texture";
+		case Bruno::AssetType::Material:
+			return "Material";
 		default:
 			return "Unknown";
 		}

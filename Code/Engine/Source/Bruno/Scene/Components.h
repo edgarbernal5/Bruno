@@ -7,6 +7,7 @@
 #include <string>
 #include <entt/entt.hpp>
 
+#include "Constants.h"
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
 
 namespace Bruno
@@ -94,8 +95,6 @@ namespace Bruno
 		// Cuesta 0 ciclos de CPU leerlo durante el Render Loop.
 		uint32_t RuntimeMaterialIndex = 0xFFFFFFFF;
 	};
-	
-	constexpr uint32_t NUM_CASCADES = 4;
 	
 	struct DirectionalLightComponent
 	{

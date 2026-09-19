@@ -7,7 +7,7 @@
 
 namespace Bruno
 {
-	class FrustumCulling;
+	class CullingSystem;
 	class LinearAllocator;
 	class Surface;
 	class GraphicsContext;
@@ -47,7 +47,7 @@ namespace Bruno
 
 		std::unique_ptr<Surface> m_surface;
 		std::shared_ptr<Scene> m_scene;
-		std::shared_ptr<FrustumCulling> m_frustumCulling;
+		std::shared_ptr<CullingSystem> m_frustumCulling;
 		std::shared_ptr<SceneRenderer> m_sceneRenderer;
 		CommandQueue* m_commandQueue { nullptr };
 		Math::Viewport m_viewport;

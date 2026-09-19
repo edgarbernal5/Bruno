@@ -3,8 +3,10 @@
 #include <Bruno/Platform/DirectX/RootSignature.h>
 #include <Bruno/Platform/DirectX/GraphicsPipelineState.h>
 #include <Bruno/Math/Math.h>
+#include <entt/entt.hpp>
 
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
+#include "Bruno/Scene/Constants.h"
 
 namespace entt
 {
@@ -17,102 +19,47 @@ namespace Bruno
 	class Material;
 	class DescriptorAllocator;
 	class GBuffer;
-	class FrustumCulling;
+	class CullingSystem;
 	class GraphicsContext;
 	class Scene;
 	class Shader;
 	class AbstractAssetManager;
 	class Camera;
 	
-	// Datos Puros de Iluminación
-#define MAX_FORWARD_LIGHTS 8
-	
-	struct DirectionalLightData
-	{
-		Math::Vector3 Direction;
-		float Intensity;
-		Math::Vector3 Color;
-		float Padding; // Relleno obligatorio
-	};
-	
-	struct PointLightData
-	{
-		Math::Vector3 Position;
-		float Radius;
-		Math::Vector3 Color;
-		float Intensity;
-	};
-	
-	struct SpotLightData {
-		Math::Vector3 Position;
-		float Radius; // Distancia máxima de influencia (como la Point Light)
-		Math::Vector3 Direction;
-		float Intensity;
-		Math::Vector3 Color;
-		float InnerConeCos; // std::cos(InnerCutoffAngle)
-		float OuterConeCos; // std::cos(OuterCutoffAngle)
-		Math::Vector3 Padding; // Relleno para 16-bytes
-	};
-
-	struct ForwardLightingBuffer
-	{
-		DirectionalLightData Sun; // La luz direccional global
-		PointLightData PointLights[MAX_FORWARD_LIGHTS]; // Tu arreglo actual de luces locales
-		SpotLightData SpotLights[MAX_FORWARD_LIGHTS]; // Tu arreglo actual de luces locales
-		Math::Vector3 GlobalAmbientColor;
-		uint32_t ActivePointLightCount;
-		uint32_t ActiveSpotLightCount;
-		Math::Vector3 CameraPosition;
-		float Padding;
-	};
-
 	class SceneRenderer
 	{
 	public:
-		SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<FrustumCulling> frustumCulling, AbstractAssetManager* assetManager);
+		SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<CullingSystem> frustumCulling, AbstractAssetManager* assetManager);
 		~SceneRenderer();
 		
 		// Se llama cuando cargas una escena o agregas un objeto
 		void InitEntitiesForRender();
 		
-		void RenderForward(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
 		void RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex);
 		
 		void Resize(uint32_t width, uint32_t height);
 		
+		void ExecuteMassiveCulling(const Camera& camera);
+	
 	private:
-		void InitializeGBuffer(GraphicsDevice* device);
-		
-		void InitializeForwardRootSignature(GraphicsDevice* device);
-		void InitializeForwardPSO(GraphicsDevice* device);
-		
-		void InitializeGBufferRootSignature(GraphicsDevice* device);
-		void InitializeDeferredRootSignature(GraphicsDevice* device);
-		void InitializeDeferredPSOs(GraphicsDevice* device);
 		void InitializeShadowPipeline(GraphicsDevice* device);
 		
 		void RegisterMaterialToGPU(std::shared_ptr<Material> matAsset);
 		void DrawBatch(GraphicsContext* graphicsContext, const std::vector<entt::entity>& visibleEntities);
 		
+		// Función matemática puente
+		DirectX::BoundingOrientedBox CreateOBBFromOrthographicMatrix(const Math::Matrix& viewProj);
+		void PrepareCullingChunks(uint32_t numChunks, uint32_t chunkSize);
+		void ConsolidateFinalLists(uint32_t numChunks);
+		
 		std::shared_ptr<Scene> m_scene;
-		std::shared_ptr<FrustumCulling> m_frustumCulling;
+		std::shared_ptr<CullingSystem> m_frustumCulling;
 		AbstractAssetManager* m_assetManager;
 
 		DescriptorAllocator* m_globalSrvHeap;
-		std::shared_ptr<GBuffer> m_gBuffer;
-		std::shared_ptr<RootSignature> m_forwardRootSig;
 		std::shared_ptr<RootSignature> m_shadowRootSig;
-		std::shared_ptr<RootSignature> m_gbufferRootSig;
-		std::shared_ptr<RootSignature> m_deferredLightingRootSig;
+        std::shared_ptr<GraphicsPipelineState> m_shadowPSO;
 		
 		std::unique_ptr<MaterialManager> m_materialManager;
-		std::unique_ptr<Shader> m_opaqueShader;
-		
-		std::shared_ptr<GraphicsPipelineState> m_forwardPSO;
-		std::shared_ptr<GraphicsPipelineState> m_shadowPSO;
-		std::shared_ptr<GraphicsPipelineState> m_gbufferPSO;
-		std::shared_ptr<GraphicsPipelineState> m_deferredLightingPSO;
-		
-		ConstantBuffer<ForwardLightingBuffer> m_forwardLightsCB;
 	};
 }

@@ -295,7 +295,7 @@ namespace Bruno
 			if (aiLight->mType == aiLightSource_DIRECTIONAL)
 			{
 				auto& newLight = outLights.emplace_back();
-				
+				newLight.LightType = ModelLightType::DirectionalLight;
 				newLight.NodeName = Berta::StringUtils::UTF8ToWide(aiLight->mName.C_Str());
 				
 				// Assimp a veces premultiplica la intensidad en el color difuso. 

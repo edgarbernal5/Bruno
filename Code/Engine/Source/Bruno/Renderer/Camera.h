@@ -16,6 +16,7 @@ namespace Bruno
 
 		bool IsOrthographic() const { return m_isOrthographic; }
 		float GetNearPlane() const { return m_nearPlane; }
+		float GetFarPlane() const { return m_farPlane; }
 		float GetFieldOfView() const { return m_fovY; }
 		Math::Vector3 GetPosition() const { return m_position; }
 		Math::Vector3 GetTarget() const { return m_target; }

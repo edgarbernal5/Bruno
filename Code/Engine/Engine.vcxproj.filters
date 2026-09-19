@@ -61,6 +61,9 @@
     <Filter Include="Source\Bruno\Renderer\Shadows">
       <UniqueIdentifier>{ab0caf1a-83a6-409b-976a-f3344132a8c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Bruno\Renderer\Forward">
+      <UniqueIdentifier>{02d08e9e-7b45-4ff0-9ec2-4f1b9af63107}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -363,6 +366,19 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\GpuBuffer.h">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Scene\Constants.h" />
+    <ClInclude Include="Source\Bruno\Renderer\Forward\ForwardRenderer.h">
+      <Filter>Source\Bruno\Renderer\Forward</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\Deferred\SceneRendererDeferred.h">
+      <Filter>Source\Bruno\Renderer\Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\Shadows\CascadedShadows.h">
+      <Filter>Source\Bruno\Renderer\Shadows</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\Shadows\CascadedShadowRenderer.h">
+      <Filter>Source\Bruno\Renderer\Shadows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -598,6 +614,18 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Platform\DirectX\GpuBuffer.cpp">
       <Filter>Source\Bruno\Platform\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\Forward\ForwardRenderer.cpp">
+      <Filter>Source\Bruno\Renderer\Forward</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\Deferred\SceneRendererDeferred.cpp">
+      <Filter>Source\Bruno\Renderer\Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\Shadows\CascadedShadowRenderer.cpp">
+      <Filter>Source\Bruno\Renderer\Shadows</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\Shadows\CascadedShadows.cpp">
+      <Filter>Source\Bruno\Renderer\Shadows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -18,19 +18,20 @@
 #include "Bruno/Platform/DirectX/Shader.h"
 
 #include "Bruno/Content/AssetManager.h"
+#include "Bruno/Core/JobSystem.h"
 #include "Bruno/Core/Memory.h"
 #include "Bruno/Core/ScopedCpuTimer.h"
 #include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/Camera.h"
-#include "Bruno/Scene/Systems/FrustumCulling.h"
-#include "Deferred/GBuffer.h"
+#include "Bruno/Scene/Systems/CullingSystem.h"
+#include "Shadows/CascadedShadows.h"
 
 
 namespace Bruno
 {
-	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<FrustumCulling> frustumCulling, AbstractAssetManager* assetManager) :
+	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<CullingSystem> frustumCulling, AbstractAssetManager* assetManager) :
 		m_scene(scene),
 		m_frustumCulling(frustumCulling),
 		m_assetManager(assetManager)
@@ -39,13 +40,6 @@ namespace Bruno
 		
 		m_globalSrvHeap = &device->GetSRVDescriptorAllocator();
 		
-		InitializeGBuffer(device);
-		InitializeForwardRootSignature(device);
-		InitializeGBufferRootSignature(device);
-		InitializeDeferredRootSignature(device);
-		
-		InitializeForwardPSO(device);
-		InitializeDeferredPSOs(device);
 		InitializeShadowPipeline(device);
 		
 		m_materialManager = std::make_unique<MaterialManager>(*device, device->GetSRVDescriptorAllocator());
@@ -79,150 +73,6 @@ namespace Bruno
 		}
 	}
 	
-	void SceneRenderer::RenderForward(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
-	{
-		auto& device = Graphics::GetDevice();
-		
-		Profiler::Get().Stats.ResetCounters();
-		ID3D12GraphicsCommandList* cmdList = graphicsContext->GetNative();
-		
-		ScopedCpuTimer totalCpuTimer(&Profiler::Get().Stats.CpuTotalRenderTimeMs);
-		{
-			ScopedCpuTimer cullingTimer(&Profiler::Get().Stats.CpuCullingTimeMs);
-			m_frustumCulling->Update();
-			Profiler::Get().Stats.TotalEntities = m_frustumCulling->GetTotalEntities();
-			Profiler::Get().Stats.RenderedEntities = m_frustumCulling->GetTotalVisibleEntities();
-		}
-		auto& visibleEntities = m_frustumCulling->GetVisibleEntities();
-		
-		VertexBuffer* currentVB = nullptr;
-		GraphicsPipelineState* currentPSO = nullptr;
-		
-		// 2. --- RENDERIZADO GPU ---
-		Profiler::Get().StartGpuTimer(cmdList);
-
-		m_materialManager->UpdateGPUBuffer(*graphicsContext);
-		
-		graphicsContext->SetPipelineState(m_forwardPSO.get());
-		graphicsContext->SetRootSignature(m_forwardRootSig.get());
-		
-		ForwardLightingBuffer lightData = {};
-		lightData.CameraPosition = camera.GetPosition();
-
-		// 1. Luz Ambiental Fuerte para forzar visibilidad
-		lightData.GlobalAmbientColor = Math::Vector3(0.05f, 0.05f, 0.05f); 
-
-		auto entitiesLightsGroup = m_scene->GetAllEntitiesWith<TransformComponent, DirectionalLightComponent>();
-		for (auto lightEntity : entitiesLightsGroup)
-		{
-			auto [transformComponent, directionalLight] = entitiesLightsGroup.get<TransformComponent, DirectionalLightComponent>(lightEntity);
-			
-			auto forward = transformComponent.WorldTransform.Forward();
-			forward.Normalize();
-			lightData.Sun.Direction = forward;
-			lightData.Sun.Intensity = directionalLight.Intensity;
-			lightData.Sun.Color = directionalLight.Color;
-			break;
-		}
-		lightData.ActivePointLightCount = 0;
-		lightData.ActiveSpotLightCount = 0;
-		
-		/*
-		// =========================================================
-		// LUZ 0: Key Light (Luz Principal)
-		// Posicionada arriba, a la derecha y al frente. Tono cálido.
-		// =========================================================
-		lightData.Lights[0].Position = Math::Vector3(5.0f, 5.0f, -5.0f);
-		lightData.Lights[0].Color = Math::Vector3(1.0f, 0.9f, 0.8f); // Ligeramente naranja/cálido
-		lightData.Lights[0].Radius = 50.0f;
-		lightData.Lights[0].Intensity = 500.0f; // Suficientemente alta para vencer el 1/d^2
-
-		// =========================================================
-		// LUZ 1: Fill Light (Luz de Relleno)
-		// Posicionada en el lado opuesto, más baja. Tono frío.
-		// Evita que las sombras sean 100% negras y añade contraste.
-		// =========================================================
-		lightData.Lights[1].Position = Math::Vector3(-8.0f, 2.0f, -3.0f);
-		lightData.Lights[1].Color = Math::Vector3(0.6f, 0.8f, 1.0f); // Ligeramente azul/celeste
-		lightData.Lights[1].Radius = 50.0f;
-		lightData.Lights[1].Intensity = 200.0f; // Menos intensa que la luz principal
-
-		// =========================================================
-		// LUZ 2: Rim / Back Light (Luz de Contraluz)
-		// Posicionada detrás del modelo. Blanca y brillante.
-		// FUNDAMENTAL en PBR: Resalta los bordes (Fresnel) de los materiales.
-		// =========================================================
-		lightData.Lights[2].Position = Math::Vector3(0.0f, 6.0f, 8.0f);
-		lightData.Lights[2].Color = Math::Vector3(1.0f, 1.0f, 1.0f);
-		lightData.Lights[2].Radius = 50.0f;
-		lightData.Lights[2].Intensity = 800.0f; // Muy alta para que los bordes destaquen
-		*/
-		m_forwardLightsCB.Update(*graphicsContext, lightData);
-		
-		// Setear Luces en el Índice 2 (b2)
-		graphicsContext->SetConstantBuffer(2, m_forwardLightsCB);
-		graphicsContext->SetDescriptorHeaps({ m_globalSrvHeap });
-		
-		// Vincular el StructuredBuffer de Materiales a 't0' (Índice 3) usando su Allocation específica
-		graphicsContext->SetDescriptorTable(3, m_materialManager->GetSRVAllocation());
-		graphicsContext->SetDescriptorTable(4, device->GetSRVDescriptorAllocator());
-		
-		for (Entity entity : visibleEntities)
-		{
-			const auto& modelComponent = entity.GetComponent<ModelComponent>();
-			const auto& transformComponent = entity.GetComponent<TransformComponent>();
-			
-			if (modelComponent.RuntimeMaterialIndex == 0xFFFFFFFF)
-			{
-				continue;
-			}
-			
-			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
-			uint32_t meshIndex = modelComponent.MeshIndex;
-			auto& meshes = model->GetMeshes();
-			auto& mesh = meshes[meshIndex];
-						
-			auto& indexBuffer = model->GetIndexBuffer();
-			auto& vertexBuffer = model->GetVertexBuffer();
-			if (currentVB != vertexBuffer.get())
-			{
-				graphicsContext->SetVertexBuffer(0, vertexBuffer.get());
-				graphicsContext->SetIndexBuffer(indexBuffer.get());
-				currentVB = vertexBuffer.get();
-			}
-			// Preparar las transformaciones (b0) - ¡Ahora sin la cámara!
-			const Math::Matrix& world = transformComponent.WorldTransform;
-			
-			SceneObjectBuffer objConstants;
-			objConstants.World = world.Transpose();
-			objConstants.ViewProjection = camera.GetViewProjection().Transpose();
-			
-			// Alocar dinámicamente y bindear al Root Parameter 0 (b0)
-			ConstantBuffer<SceneObjectBuffer> transformCB;
-			transformCB.Update(*graphicsContext, objConstants);
-			graphicsContext->SetConstantBuffer(0, transformCB);
-
-			// Bindear el ID Bindless del material (b1)
-			graphicsContext->SetPushConstant(1, modelComponent.RuntimeMaterialIndex, 0);
-			
-			graphicsContext->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
-			graphicsContext->DrawIndexedInstanced(mesh->GetIndexCount(),
-			                                      1,
-			                                      mesh->GetBaseIndex(),
-			                                      mesh->GetBaseVertex(),
-			                                      0);
-			
-			Profiler::Get().Stats.DrawCalls++;
-			Profiler::Get().Stats.TriangleCount += (mesh->GetIndexCount() / 3);
-			
-		}
-		
-		Profiler::Get().StopGpuTimer(cmdList);
-		
-		// Le ordenamos a la GPU copiar los tiempos al buffer leíble
-		Profiler::Get().ResolveGpuTimestamps(cmdList);
-	}
-
 	void SceneRenderer::RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex)
 	{
 		// ==========================================
@@ -281,187 +131,87 @@ namespace Bruno
 	{
 		//m_gBuffer->Resize()
 	}
-
-	void SceneRenderer::InitializeGBuffer(GraphicsDevice* device)
+	
+	void SceneRenderer::ExecuteMassiveCulling(const Camera& camera)
 	{
-		m_gBuffer = std::make_shared<GBuffer>();
-		m_gBuffer->Initialize(*device, device->GetSRVDescriptorAllocator(), device->GetRTVDescriptorAllocator(), 100, 100);
-	}
+		/*
+		// 1. Frustum de Cámara Principal
+		DirectX::BoundingFrustum cameraFrustum(camera.GetProjection());
+		cameraFrustum.Transform(cameraFrustum, camera.GetViewInverse());
 
-	void SceneRenderer::InitializeForwardRootSignature(GraphicsDevice* device)
-	{
-		auto prototypeSig = std::make_shared<RootSignature>(*device);
+		DirectX::BoundingOrientedBox cascadeOBBs[NUM_CASCADES];
+		for (uint32_t i = 0; i < NUM_CASCADES; ++i)
+		{
+			// 2. Convertimos tu matriz de cascada en una caja 3D sólida
+			cascadeOBBs[i] = CreateOBBFromOrthographicMatrix(cascades[i].LightViewProj);
+		}
 
-		// b0: Transformaciones. ¡Visible SOLO para el Vertex Shader recuperado!
-		prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::Vertex);
+		//auto group = registry.group<BoundingBoxComponent>(entt::get<TransformComponent>);
+		//const entt::entity* entities = group.data();
+		auto entitiesGroup = m_scene->GetAllEntitiesWith<TransformComponent, BoundingBoxComponent>();
+		std::vector<entt::entity> entities(entitiesGroup.begin(), entitiesGroup.end());
+		const size_t entityCount = entities.size();
+		if (entityCount == 0)
+		{
+			return;
+		}
 
-		// b1: ID del Material Bindless.
-		prototypeSig->AddConstants(1, 1, 0, ShaderVisibility::Pixel);
-
-		// b2: Arreglo de Luces Fijas Y Posición de la Cámara (Datos de Iluminación).
-		prototypeSig->AddConstantBufferView(2, 0, ShaderVisibility::Pixel);
-
-		// t0: StructuredBuffer de Materiales (1 solo descriptor)
-		prototypeSig->AddDescriptorTableSRV(1, 0, 0, ShaderVisibility::Pixel);
-
-		// t1: Arreglo infinito de Texturas Bindless (-1 / UINT_MAX)
-		prototypeSig->AddDescriptorTableSRV(UINT_MAX, 1, 0, ShaderVisibility::Pixel);
-
-		// s0: Sampler principal (Wrap, Anisotrópico, etc.)
-		prototypeSig->AddStaticSampler(
-			0, 0,
-			TextureFilter::Anisotropic,
-			TextureAddressMode::Wrap,
-			ShaderVisibility::Pixel
-		);
-
-		m_forwardRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
-	}
-
-	void SceneRenderer::InitializeForwardPSO(GraphicsDevice* device)
-	{
-		GraphicsPipelineStateDesc psoDesc = {};
-		// Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
-		psoDesc.RootSignature = m_forwardRootSig.get();
-		psoDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
-		
-		psoDesc.VertexShaderDesc = { L"Shaders/ForwardOpaque.hlsl", L"VSMain", L"vs_6_0" };
-		psoDesc.PixelShaderDesc = { L"Shaders/ForwardOpaque.hlsl", L"PSMain", L"ps_6_0" };
-		
-		psoDesc.RasterizerDesc.CullMode = CullMode::Back;
-		psoDesc.RasterizerDesc.FillMode = FillMode::Solid;
-		psoDesc.RasterizerDesc.FrontCounterClockwise = true;
-        
-		psoDesc.Topology = PrimitiveTopology::TriangleList;
+		const uint32_t chunkSize = 1024;
+		const uint32_t numChunks = (entityCount + chunkSize - 1) / chunkSize;
     
-		// Formatos de Salida (DEBEN coincidir con tu SwapChain y DepthBuffer)
-		psoDesc.NumRenderTargets = 1;
-		psoDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;
-		psoDesc.DSVFormat = TextureFormat::D24_Unorm_S8_Uint;
-		
-		m_forwardPSO = PSOCache::GetOrCreate(device, psoDesc);
+		// Resize y Clear rápido de los vectores pre-alojados (Omitido por brevedad, igual que antes)
+		PrepareCullingChunks(numChunks, chunkSize);
+
+		JobDispatchGroup cullingGroup;
+
+		// ==========================================
+		// FASE MAP: Evaluamos TODO en un solo barrido de caché
+		// ==========================================
+		JobSystem::Get().Dispatch(entityCount, chunkSize, [&](uint32_t start, uint32_t end) {
+			uint32_t chunkIndex = start / chunkSize;
+			auto& localResult = m_cullingChunks[chunkIndex];
+
+			for (uint32_t i = start; i < end; ++i)
+			{
+				entt::entity entity = entities[i];
+				const auto& [transform, bbox] = entitiesGroup.get<TransformComponent, BoundingBoxComponent>(entity);
+				
+				DirectX::BoundingBox localAABB(
+				DirectX::XMFLOAT3(bbox.Center.x, bbox.Center.y, bbox.Center.z),
+				DirectX::XMFLOAT3(bbox.Extents.x, bbox.Extents.y, bbox.Extents.z)
+				);
+            
+				DirectX::BoundingOrientedBox worldOBB;
+				DirectX::BoundingOrientedBox::CreateFromBoundingBox(worldOBB, localAABB);
+				worldOBB.Transform(worldOBB, transform.WorldTransform); 
+
+				// A. ¿Es visible por la cámara principal?
+				if (cameraFrustum.Intersects(worldOBB))
+				{
+					localResult.VisibleEntities.push_back(entity);
+				}
+
+				// B. ¿Proyecta sombra en alguna cascada?
+				for (uint32_t c = 0; c < NUM_CASCADES; ++c)
+				{
+					// Intersección Caja contra Caja (SIMD Ultra rápido)
+					if (cascadeOBBs[c].Intersects(worldOBB))
+					{
+						localResult.ShadowCascades[c].push_back(entity);
+					}
+				}
+			}
+		}, &cullingGroup);
+
+		// Espera Activa
+		JobSystem::Get().Wait(cullingGroup);
+
+		// ==========================================
+		// FASE REDUCE: Consolidamos TODAS las listas
+		// ==========================================
+		ConsolidateFinalLists(numChunks);*/
 	}
-
-	void SceneRenderer::InitializeGBufferRootSignature(GraphicsDevice* device)
-	{
-		auto prototypeSig = std::make_shared<RootSignature>(*device);
-		
-		// =========================================================
-		// 2. CONSTANT BUFFERS (Transformaciones y Materiales)
-		// =========================================================
-		// b0: TransformBuffer (g_World, g_ViewProjection)
-		// Exclusivo para el Vertex Shader para evitar procesamientos innecesarios en el Pixel Shader
-		prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::Vertex);
-
-		// b1: MaterialConstant (g_MaterialIndex)
-		// Un único valor Root Constant de 32-bits que indica qué material del buffer usar.
-		prototypeSig->AddConstants(1, 1, 0, ShaderVisibility::Pixel);
-
-		// =========================================================
-		// 3. TABLAS DE DESCRIPTORES (Ecosistema Bindless)
-		// =========================================================
-		// t0: StructuredBuffer<MaterialData> (g_MaterialBuffer)
-		// Tabla con 1 solo descriptor que apunta al búfer estructurado de materiales.
-		prototypeSig->AddDescriptorTableSRV(1, 0, 0, ShaderVisibility::Pixel);
-
-		// t1: Texture2D g_Textures[] (Arreglo Infinito Bindless)
-		// Usamos UINT_MAX (-1) para instruir a DirectX 12 que el tamaño de este arreglo es ilimitado.
-		prototypeSig->AddDescriptorTableSRV(UINT_MAX, 1, 0, ShaderVisibility::Pixel);
-
-		// =========================================================
-		// 4. SAMPLERS ESTÁTICOS
-		// =========================================================
-		// s0: Sampler principal (g_Sampler)
-		// Configurado como Anisotrópico y Wrap para máxima calidad visual en los modelos 3D
-		prototypeSig->AddStaticSampler(
-			0, 
-			0, 
-			TextureFilter::Anisotropic, 
-			TextureAddressMode::Wrap, 
-			ShaderVisibility::Pixel
-		);
-		
-		m_gbufferRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
-	}
-
-	void SceneRenderer::InitializeDeferredRootSignature(GraphicsDevice* device)
-	{
-		auto prototypeSig = std::make_shared<RootSignature>(*device);
-		
-		// =========================================================
-		// 1. CONSTANT BUFFERS
-		// =========================================================
-		// b0: Datos de la Luz, Cámara y Matrices ortográficas de sombras
-		prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::Pixel);
-		// =========================================================
-		// 2. TABLAS DE DESCRIPTORES (TEXTURAS)
-		// =========================================================
-		// t0, t1, t2: Texturas del G-Buffer (Albedo, Normales, Posición)
-		// Pedimos 3 descriptores contiguos comenzando en el registro 0
-		prototypeSig->AddDescriptorTableSRV(3, 0, 0, ShaderVisibility::Pixel);
-
-		// t3: Texture2DArray de Sombras en Cascada (CSM)
-		prototypeSig->AddDescriptorTableSRV(1, 3, 0, ShaderVisibility::Pixel);
-
-		// =========================================================
-		// 3. SAMPLERS ESTÁTICOS
-		// =========================================================
-		// s0: Shadow Comparison Sampler (Muestreo PCF por Hardware)
-		prototypeSig->AddStaticSampler(
-			0, 0, 
-			TextureFilter::Comparison_MinMag_Linear_MipPoint, 
-			TextureAddressMode::Border, // Borde blanco fuera del mapa para que no haya sombras
-			ShaderVisibility::Pixel
-		);
-
-		// s1: Linear Sampler (Para leer el G-Buffer con suavizado)
-		prototypeSig->AddStaticSampler(
-			1, 0, 
-			TextureFilter::Linear, 
-			TextureAddressMode::Clamp, 
-			ShaderVisibility::Pixel
-		);
-		
-		m_deferredLightingRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
-	}
-
-	void SceneRenderer::InitializeDeferredPSOs(GraphicsDevice* device)
-	{
-		GraphicsPipelineStateDesc gbufferDesc = {};
-		gbufferDesc.RootSignature = m_gbufferRootSig.get();
-		
-		gbufferDesc.VertexShaderDesc = { L"Shaders/GBufferPass.hlsl", L"VSMain", L"vs_6_0" };
-		gbufferDesc.PixelShaderDesc  = { L"Shaders/GBufferPass.hlsl", L"PSMain", L"ps_6_0" };
-		
-		gbufferDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
-		
-		gbufferDesc.Topology = PrimitiveTopology::TriangleList;
-		gbufferDesc.DepthState.Mode = DepthMode::ReadWrite;
-    
-		// Múltiples Render Targets (MRT)
-		gbufferDesc.NumRenderTargets = 3;
-		gbufferDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;       // Albedo + Metal
-		gbufferDesc.RTVFormats[1] = TextureFormat::R16G16B16A16_Float;   // Normal + Rough
-		gbufferDesc.RTVFormats[2] = TextureFormat::R16G16B16A16_Float;   // Position
-		gbufferDesc.DSVFormat = TextureFormat::D32_Float;
-    
-		m_gbufferPSO = PSOCache::GetOrCreate(device, gbufferDesc);
-		
-		// PSO de Iluminación Diferida (Full-Screen Triangle)
-		GraphicsPipelineStateDesc deferredDesc = {};
-		deferredDesc.RootSignature = m_deferredLightingRootSig.get();
-		deferredDesc.VertexShaderDesc = { L"Shaders/DeferredLighting.hlsl", L"VSMain", L"vs_6_0" }; // Genera el triángulo con SV_VertexID
-		deferredDesc.PixelShaderDesc  = { L"Shaders/DeferredLighting.hlsl", L"PSMain", L"ps_6_0" };
-    
-		// Escribimos a la pantalla, sin Depth Buffer
-		deferredDesc.NumRenderTargets = 1;
-		deferredDesc.RTVFormats[0] = TextureFormat::B8G8R8A8_Unorm; 
-		deferredDesc.DSVFormat = TextureFormat::Unknown;
-		deferredDesc.DepthState.Mode = DepthMode::None;
-    
-		m_deferredLightingPSO = PSOCache::GetOrCreate(device, deferredDesc);
-	}
-
+	
 	void SceneRenderer::InitializeShadowPipeline(GraphicsDevice* device)
 	{
 		auto prototypeSig = std::make_shared<RootSignature>(*device);
@@ -593,5 +343,93 @@ namespace Bruno
 			                                      0);
 
 		}
+	}
+
+	DirectX::BoundingOrientedBox SceneRenderer::CreateOBBFromOrthographicMatrix(const Math::Matrix& viewProj)
+	{
+		// Esquinas exactas del espacio NDC de DirectX 12
+		Math::Vector3 ndcCorners[8] = {
+			Math::Vector3(-1.0f,  1.0f, 0.0f), Math::Vector3( 1.0f,  1.0f, 0.0f),
+			Math::Vector3( 1.0f, -1.0f, 0.0f), Math::Vector3(-1.0f, -1.0f, 0.0f),
+			Math::Vector3(-1.0f,  1.0f, 1.0f), Math::Vector3( 1.0f,  1.0f, 1.0f),
+			Math::Vector3( 1.0f, -1.0f, 1.0f), Math::Vector3(-1.0f, -1.0f, 1.0f)
+		};
+
+		Math::Matrix invViewProj = viewProj.Invert();
+		Math::Vector3 worldCorners[8];
+
+		// Llevamos las esquinas del cubo hacia el espacio del mundo real
+		for (int i = 0; i < 8; ++i) {
+			worldCorners[i] = Math::Vector3::Transform(ndcCorners[i], invViewProj);
+		}
+
+		// Dejamos que DirectXMath calcule el Centro, la Rotación y las Extensiones de esa caja
+		DirectX::BoundingOrientedBox cascadeOBB;
+		DirectX::BoundingOrientedBox::CreateFromPoints(cascadeOBB, 8, (const DirectX::XMFLOAT3*)worldCorners, sizeof(Math::Vector3));
+    
+		return cascadeOBB;
+	}
+
+	void SceneRenderer::PrepareCullingChunks(uint32_t numChunks, uint32_t chunkSize)
+	{
+		/*
+		if (m_cullingChunks.size() < numChunks) {
+			m_cullingChunks.resize(numChunks);
+		}
+
+		for (uint32_t i = 0; i < numChunks; ++i) {
+			// Limpiamos resultados del frame anterior sin liberar la capacidad de RAM subyacente
+			m_cullingChunks[i].VisibleEntities.clear();
+			m_cullingChunks[i].VisibleEntities.reserve(chunkSize);
+            
+			for (uint32_t c = 0; c < NUM_CASCADES; ++c) {
+				m_cullingChunks[i].ShadowCascades[c].clear();
+				// Una reserva generosa, ya que cada cascada verá una fracción de la escena
+				m_cullingChunks[i].ShadowCascades[c].reserve(chunkSize);
+			}
+		}
+		*/
+	}
+
+	void SceneRenderer::ConsolidateFinalLists(uint32_t numChunks)
+	{
+		/*
+		m_finalVisibleEntities.clear();
+		for (uint32_t c = 0; c < NUM_CASCADES; ++c) {
+			m_finalShadowEntities[c].clear();
+		}
+
+		// 1. Contar totales para hacer una sola alocación exacta de memoria maestra
+		size_t totalVisible = 0;
+		size_t totalShadows[NUM_CASCADES] = { 0 };
+
+		for (uint32_t i = 0; i < numChunks; ++i) {
+			totalVisible += m_cullingChunks[i].VisibleEntities.size();
+			for (uint32_t c = 0; c < NUM_CASCADES; ++c) {
+				totalShadows[c] += m_cullingChunks[i].ShadowCascades[c].size();
+			}
+		}
+
+		m_finalVisibleEntities.reserve(totalVisible);
+		for (uint32_t c = 0; c < NUM_CASCADES; ++c) {
+			m_finalShadowEntities[c].reserve(totalShadows[c]);
+		}
+
+		// 2. Fusión masiva ultra rápida (Inserción O(n) contigua)
+		for (uint32_t i = 0; i < numChunks; ++i) {
+			m_finalVisibleEntities.insert(
+				m_finalVisibleEntities.end(),
+				m_cullingChunks[i].VisibleEntities.begin(),
+				m_cullingChunks[i].VisibleEntities.end()
+			);
+
+			for (uint32_t c = 0; c < NUM_CASCADES; ++c) {
+				m_finalShadowEntities[c].insert(
+					m_finalShadowEntities[c].end(),
+					m_cullingChunks[i].ShadowCascades[c].begin(),
+					m_cullingChunks[i].ShadowCascades[c].end()
+				);
+			}
+		}*/
 	}
 }
