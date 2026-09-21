@@ -26,7 +26,7 @@
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/Camera.h"
 #include "Bruno/Scene/Systems/CullingSystem.h"
-#include "Shadows/CascadedShadows.h"
+#include "Shadows/ShadowMapArray.h"
 
 
 namespace Bruno
@@ -40,6 +40,7 @@ namespace Bruno
 		
 		m_globalSrvHeap = &device->GetSRVDescriptorAllocator();
 		
+		InitializeShadowArray(device);
 		InitializeShadowPipeline(device);
 		
 		m_materialManager = std::make_unique<MaterialManager>(*device, device->GetSRVDescriptorAllocator());
@@ -127,6 +128,60 @@ namespace Bruno
 		
 	}
 
+	void SceneRenderer::RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex)
+	{
+		/*
+		// 1. Transicionar todo el Texture2DArray a estado de escritura de profundidad[cite: 1]
+    context->TransitionResource(m_shadowMapArray.get(), 
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, 
+        D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+    context->SetPipelineState(m_shadowPSO.get());
+    context->SetRootSignature(m_shadowRootSig.get());
+
+    // Iterar por las 4 cascadas[cite: 1]
+    for (uint32_t i = 0; i < NUM_CASCADES; ++i) 
+    {
+        // 2. Enlazar SOLO la capa de esta cascada (FirstArraySlice)[cite: 1]
+        D3D12_CPU_DESCRIPTOR_HANDLE cascadeDSV = m_shadowMapArray->GetDSV(i);
+        context->SetRenderTargetsRaw(0, nullptr, &cascadeDSV);
+        
+        // 3. Limpiar el Depth Buffer de la cascada[cite: 1]
+        context->ClearDepth(cascadeDSV);
+
+        // 4. Configurar el Viewport para abarcar toda la resolución de sombra (ej. 2048x2048)[cite: 1]
+        context->SetViewport(0, 0, SHADOW_MAP_RES, SHADOW_MAP_RES);[cite: 1]
+
+        // 5. Dibujar las entidades visibles para ESTA cascada (Lista proveniente del Job System)[cite: 1, 6]
+        const auto& visibleEntities = m_cullingResults.ShadowCascades[i];[cite: 1, 6]
+        
+        for (auto entity : visibleEntities) 
+        {
+            const auto& transform = scene->GetRegistry().get<TransformComponent>(entity);
+            const auto& modelComp = scene->GetRegistry().get<ModelComponent>(entity);
+
+            // Estructura para alinear con el cbuffer ShadowConstants
+            struct ShadowConstants {
+                Math::Matrix World;
+                Math::Matrix LightViewProj;
+            } constants;
+
+            constants.World = transform.WorldMatrix;
+            constants.LightViewProj = cascades[i].LightViewProj;
+
+            // Enviar a la GPU (b0)[cite: 1]
+            context->SetGraphicsRoot32BitConstants(0, sizeof(ShadowConstants) / 4, &constants, 0);
+
+            // Extraer buffers y dibujar
+            auto mesh = AssetManager::GetMesh(modelComp.ModelHandle);
+            context->SetVertexBuffer(mesh->GetVertexBuffer());
+            context->SetIndexBuffer(mesh->GetIndexBuffer());
+            
+            context->DrawIndexedInstanced(mesh->GetIndexCount(), 1, 0, 0, 0);
+        }
+    }*/
+	}
+
 	void SceneRenderer::Resize(uint32_t width, uint32_t height)
 	{
 		//m_gBuffer->Resize()
@@ -211,7 +266,13 @@ namespace Bruno
 		// ==========================================
 		ConsolidateFinalLists(numChunks);*/
 	}
-	
+
+	void SceneRenderer::InitializeShadowArray(GraphicsDevice* device)
+	{
+		m_shadowMapArray = std::make_unique<ShadowMapArray>();
+		//m_shadowMapArray->Initialize(device, 2048, 4);
+	}
+
 	void SceneRenderer::InitializeShadowPipeline(GraphicsDevice* device)
 	{
 		auto prototypeSig = std::make_shared<RootSignature>(*device);
@@ -225,7 +286,7 @@ namespace Bruno
 		shadowDesc.RootSignature = m_shadowRootSig.get();
     
 		// Solo cargamos el Vertex Shader. El Pixel Shader queda en nullptr/vacío.
-		shadowDesc.VertexShaderDesc = { L"Shaders/ShadowMaps.hlsl", L"VSMain", L"vs_6_0" };
+		shadowDesc.VertexShaderDesc = { L"Shaders/ShadowMap.hlsl", L"VSMain", L"vs_6_0" };
     
 		shadowDesc.InputLayout = VertexPosition::GetLayout();
 		shadowDesc.Topology = PrimitiveTopology::TriangleList;

@@ -4,7 +4,8 @@
 #include "D3DFunctions.h"
 #include "GraphicsDevice.h"
 
-namespace Bruno {
+namespace Bruno
+{
     DepthBuffer::DepthBuffer(GraphicsDevice& device, uint32_t width, uint32_t height, TextureFormat format) :
         m_device(device), 
         m_width(width),
@@ -13,18 +14,13 @@ namespace Bruno {
     {
         auto nativeDevice = m_device.GetNativeDevice();
 
-        // 1. Crear el Descriptor Heap para el Depth Stencil View (DSV)
-        D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
-        dsvHeapDesc.NumDescriptors = 1;
-        dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-        dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE; // El DSV no es visible a los shaders de forma directa
-        
-        if (FAILED(nativeDevice->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_dsvHeap))))
-        {
-            throw std::runtime_error("Fallo al crear el DSV Descriptor Heap.");
-        }
-
+        auto& dsvAllocator = m_device.GetDSVDescriptorAllocator();
+        m_dsvHandle = dsvAllocator.Allocate(1);
         CreateResourceAndDescriptor();
+    }
+
+    DepthBuffer::~DepthBuffer()
+    {
     }
 
     void DepthBuffer::Resize(uint32_t width, uint32_t height)
@@ -38,7 +34,7 @@ namespace Bruno {
         m_height = height;
         
         // Liberar la textura actual antes de redimensionar
-        m_depthTexture.Reset();
+        m_resource.Reset();
         CreateResourceAndDescriptor();
     }
 
@@ -74,7 +70,7 @@ namespace Bruno {
             &depthDesc,
             D3D12_RESOURCE_STATE_DEPTH_WRITE, // Estado inicial listo para escribir profundidad
             &optClear,
-            IID_PPV_ARGS(&m_depthTexture)))) 
+            IID_PPV_ARGS(&m_resource)))) 
         {
             throw std::runtime_error("Fallo al crear el recurso de textura del Depth Buffer.");
         }
@@ -85,6 +81,6 @@ namespace Bruno {
         dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
         dsvDesc.Texture2D.MipSlice = 0;
 
-        nativeDevice->CreateDepthStencilView(m_depthTexture.Get(), &dsvDesc, GetView());
+        nativeDevice->CreateDepthStencilView(m_resource.Get(), &dsvDesc, m_dsvHandle.CPU);
     }
 }

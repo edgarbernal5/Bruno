@@ -30,6 +30,7 @@ namespace Bruno
 		
 		[[nodiscard]] DescriptorAllocator& GetSRVDescriptorAllocator() const { return *m_srvDescriptorAllocator; }
 		[[nodiscard]] DescriptorAllocator& GetRTVDescriptorAllocator() const { return *m_rtvDescriptorAllocator; }
+		[[nodiscard]] DescriptorAllocator& GetDSVDescriptorAllocator() const { return *m_dsvDescriptorAllocator; }
 		
 		[[nodiscard]] UploadContext& GetUploadContext() const { return *m_uploadContext; }
 		
@@ -51,6 +52,7 @@ namespace Bruno
 		
 		std::unique_ptr<DescriptorAllocator> m_srvDescriptorAllocator;
 		std::unique_ptr<DescriptorAllocator> m_rtvDescriptorAllocator;
+		std::unique_ptr<DescriptorAllocator> m_dsvDescriptorAllocator;
 	};
 }
 

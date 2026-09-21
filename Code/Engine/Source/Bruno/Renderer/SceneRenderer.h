@@ -15,6 +15,7 @@ namespace entt
 
 namespace Bruno
 {
+	class ShadowMapArray;
 	class MaterialManager;
 	class Material;
 	class DescriptorAllocator;
@@ -36,12 +37,14 @@ namespace Bruno
 		void InitEntitiesForRender();
 		
 		void RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex);
+		void RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex);
 		
 		void Resize(uint32_t width, uint32_t height);
 		
 		void ExecuteMassiveCulling(const Camera& camera);
 	
 	private:
+		void InitializeShadowArray(GraphicsDevice* device);
 		void InitializeShadowPipeline(GraphicsDevice* device);
 		
 		void RegisterMaterialToGPU(std::shared_ptr<Material> matAsset);
@@ -61,5 +64,6 @@ namespace Bruno
         std::shared_ptr<GraphicsPipelineState> m_shadowPSO;
 		
 		std::unique_ptr<MaterialManager> m_materialManager;
+		std::unique_ptr<ShadowMapArray> m_shadowMapArray;
 	};
 }

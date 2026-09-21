@@ -171,7 +171,7 @@ namespace Bruno
 			Math::Matrix gizmoWorld;
 			Math::Vector3 gizmoPivot;
 			
-			m_sceneRenderer->RenderForward(&context, m_sceneDocument->GetCamera(), frameIndex);
+			//m_sceneRenderer->RenderForward(&context, m_sceneDocument->GetCamera(), frameIndex);
 			
 			if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
 			{

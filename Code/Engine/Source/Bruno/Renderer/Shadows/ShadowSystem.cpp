@@ -1,7 +1,6 @@
 ﻿#include "brpch.h"
 #include "ShadowSystem.h"
 
-#include "CascadedShadows.h"
 #include "Bruno/Renderer/Camera.h"
 
 namespace Bruno
@@ -14,7 +13,7 @@ namespace Bruno
     void ShadowSystem::Execute()
     {
         // 1. Extraemos las matrices de tu método robusto
-        auto cascades = CalculateCascadeMatrices(m_camera, m_directionalLightDir, m_numCascades, m_shadowMapResolution, m_cascadeLambda);
+        //auto cascades = CalculateCascadeMatrices(m_camera, m_directionalLightDir, m_numCascades, m_shadowMapResolution, m_cascadeLambda);
 
     }
 
@@ -43,13 +42,12 @@ namespace Bruno
 
         Math::Matrix camViewInv = camera.GetViewInverse();
 
-        // 2. Iterar por cada cascada
         for (uint32_t i = 0; i < numCascades; ++i)
         {
             float cascadeNear = splitDistances[i];
             float cascadeFar  = splitDistances[i + 1];
 
-            // 3. Extraer las 8 esquinas del sub-frustum en Espacio de Vista mediante trigonometría
+            // Extraer las 8 esquinas del sub-frustum en Espacio de Vista mediante trigonometría
             float tanHalfFov = std::tan(fov * 0.5f);
             float nearY = cascadeNear * tanHalfFov;
             float nearX = nearY * aspect;
@@ -63,7 +61,6 @@ namespace Bruno
                 Math::Vector3( farX, -farY, cascadeFar),  Math::Vector3(-farX, -farY, cascadeFar)
             };
 
-            // 4. Centro geométrico en Espacio de Mundo
             Math::Vector3 center = Math::Vector3::Zero;
             for (int j = 0; j < 8; ++j)
             {
@@ -72,11 +69,11 @@ namespace Bruno
             }
             center /= 8.0f;
 
-            // 5. Matriz View de la Luz (mirando al centro del sub-frustum)
+            // Matriz View de la Luz (mirando al centro del sub-frustum)
             Math::Vector3 lightPos = center - (lightDir * (farClip - nearClip)); 
             Math::Matrix lightView = Math::Matrix::CreateLookAt(lightPos, center, Math::Vector3::Up);
 
-            // 6. Encontrar el Bounding Box en el Espacio de la Luz
+            // Encontrar el Bounding Box en el Espacio de la Luz
             float minX = (std::numeric_limits<float>::max)();
             float maxX = (std::numeric_limits<float>::lowest());
             float minY =  (std::numeric_limits<float>::max)();
@@ -95,7 +92,7 @@ namespace Bruno
             }
 
             // ==========================================
-            // 7. LA MAGIA AAA 1: TEXEL SNAPPING
+            // LA MAGIA AAA 1: TEXEL SNAPPING
             // ==========================================
             float shadowOrthoSizeX = maxX - minX;
             float shadowOrthoSizeY = maxY - minY;
@@ -110,13 +107,12 @@ namespace Bruno
             maxY = std::floor(maxY / worldUnitsPerTexelY) * worldUnitsPerTexelY;
 
             // ==========================================
-            // 8. LA MAGIA AAA 2: Z-PULLBACK (Shadow Popping Fix)
+            // LA MAGIA AAA 2: Z-PULLBACK (Shadow Popping Fix)
             // ==========================================
             // Tiramos el plano cercano artificialmente hacia atrás hacia la luz
             float lightNearZ = minZ - 150.0f; 
             float lightFarZ  = maxZ;
 
-            // 9. Construir proyección final[cite: 4]
             Math::Matrix lightProj = Math::Matrix::CreateOrthographicOffCenter(
                 minX, maxX, minY, maxY, lightNearZ, lightFarZ
             );

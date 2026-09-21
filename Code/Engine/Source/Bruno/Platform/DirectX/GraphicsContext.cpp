@@ -86,7 +86,7 @@ namespace Bruno
     void GraphicsContext::ClearDepth(const DepthBuffer* depthBuffer, float depth, uint8_t stencil)
     {
         // Extraemos el Descriptor Handle (D3D12_CPU_DESCRIPTOR_HANDLE)
-        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = depthBuffer->GetView();
+        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = depthBuffer->GetDSV();
 
         m_commandList->ClearDepthStencilView(
             dsvHandle,
@@ -118,7 +118,7 @@ namespace Bruno
 
         if (depthBuffer)
         {
-            dsvHandle = depthBuffer->GetView();
+            dsvHandle = depthBuffer->GetDSV();
             pDsvHandle = &dsvHandle;
         }
 
@@ -127,6 +127,32 @@ namespace Bruno
         // Llamada nativa
         // Parámetros: Num RTVs, Puntero al array, RTs Contiguos (FALSE porque los sacamos manualmente), Puntero al DSV
         m_commandList->OMSetRenderTargets(numRTVs, rtvHandles, FALSE, pDsvHandle);
+    }
+
+    void GraphicsContext::SetRenderTargetsSlice(uint32_t numRTVs, GraphicsResource** renderTargets, GraphicsResource* depthResource, uint32_t depthArraySlice)
+    {
+        D3D12_CPU_DESCRIPTOR_HANDLE* dsvHandle = nullptr;
+    
+        if (depthResource)
+        {
+            // Recuperamos el handle agnóstico y lo casteamos a DX12
+            //dsvHandle = static_cast<D3D12_CPU_DESCRIPTOR_HANDLE*>(depthResource->GetNativeDSV(depthArraySlice));
+        }
+
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[8];
+    
+        for (uint32_t i = 0; i < numRTVs; ++i)
+        {
+            // Extraemos el Handle nativo de cada textura agnóstica
+            //rtvHandles[i] = renderTargets[i]->GetRTV();
+        }
+
+        // Llamada nativa a la API
+        m_commandList->OMSetRenderTargets(numRTVs, /*rtvHandles*/ nullptr, FALSE, dsvHandle);
+    }
+
+    void GraphicsContext::ClearDepthSlice(GraphicsResource* depthResource, uint32_t arraySlice, float depth, uint8_t stencil)
+    {
     }
 
     void GraphicsContext::SetViewport(const Math::Viewport& viewport)

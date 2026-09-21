@@ -36,7 +36,6 @@ namespace Bruno
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_resource = nullptr;
 		ResourceState m_currentState = ResourceState::Common;
 		std::wstring m_name;
-		
 	};
 }
 

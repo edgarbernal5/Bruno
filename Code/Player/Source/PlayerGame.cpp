@@ -109,7 +109,7 @@ namespace Bruno
 		context.SetViewport(m_viewport);
 		context.SetScissorRect(m_scissorRect);
 		
-		m_sceneRenderer->RenderForward(&context, m_camera, frameIndex);
+		//m_sceneRenderer->RenderForward(&context, m_camera, frameIndex);
 		
 		// ------------------------------------------------------------------
 		// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT

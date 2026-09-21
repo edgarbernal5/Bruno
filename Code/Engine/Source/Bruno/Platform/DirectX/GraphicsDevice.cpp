@@ -23,18 +23,28 @@ namespace Bruno
         
         m_directCommandQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
         
-        m_srvDescriptorAllocator = std::make_unique<DescriptorAllocator>(
+        m_srvDescriptorAllocator = std::make_unique<DescriptorAllocator>
+        (
             *this,
             D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 
             8192, //4096 
             true
         );
         
-        m_rtvDescriptorAllocator = std::make_unique<DescriptorAllocator>(
+        m_rtvDescriptorAllocator = std::make_unique<DescriptorAllocator>
+        (
             *this, 
             D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 
             128,  // Capacidad para 128 Render Targets simultáneos
             false // Los RTVs NO son Shader Visible (regla de oro de DX12)
+        );
+        
+        m_dsvDescriptorAllocator = std::make_unique<DescriptorAllocator>
+        (
+            *this, 
+            D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 
+            32,
+            false
         );
         
         m_uploadContext = std::make_unique<UploadContext>(*this);

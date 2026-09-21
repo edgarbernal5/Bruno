@@ -5,38 +5,72 @@
 
 namespace Bruno
 {
-    void ShadowMapArray::Initialize(GraphicsDevice* device, uint32_t resolution, uint32_t numCascades)
+    void ShadowMapArray::Initialize(GraphicsDevice* device, DescriptorAllocator& srvHeap, DescriptorAllocator& dsvHeap, uint32_t resolution, uint32_t numCascades)
     {
-        m_width = resolution;
-        m_height = resolution;
+        m_resolution = resolution;
         m_numCascades = numCascades;
+        
+        auto nativeDevice = device->GetNativeDevice();
 
-        auto d3dDevice = device->GetNativeDevice();
+        D3D12_RESOURCE_DESC texDesc = {};
+        texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        texDesc.Width = resolution;
+        texDesc.Height = resolution;
+        texDesc.DepthOrArraySize = numCascades; // ¡El tamaño del Array coincide con el número de cascadas![cite: 1]
+        texDesc.MipLevels = 1;
+        texDesc.Format = DXGI_FORMAT_R32_TYPELESS; // Memoria sin tipo definido para permitir flexibilidad de lectura/escritura[cite: 1]
+        texDesc.SampleDesc.Count = 1;
+        texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
-        // 1. Crear el Recurso como TYPELESS
-        // ArraySize es numCascades (4)
-        CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
-            DXGI_FORMAT_R32_TYPELESS, // ¡Importante! No usar D32_FLOAT aquí
-            m_width, m_height, 
-            m_numCascades, 
-            1, 1, 0, 
-            D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL
-        );
+        // El Clear Value DEBE coincidir con el formato del DSV (D32_FLOAT), no con el del recurso base
+        D3D12_CLEAR_VALUE clearValue = {};
+        clearValue.Format = DXGI_FORMAT_D32_FLOAT;
+        clearValue.DepthStencil.Depth = 1.0f;
+        clearValue.DepthStencil.Stencil = 0;
 
-        // 2. El Clear Value DEBE coincidir con el formato del DSV, no del recurso
-        CD3DX12_CLEAR_VALUE clearValue(DXGI_FORMAT_D32_FLOAT, 1.0f, 0);
-
-        // Alojamos la memoria en la VRAM (Default Heap)
-        CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT);
-        d3dDevice->CreateCommittedResource(
+        auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+        ThrowIfFailed(nativeDevice->CreateCommittedResource(
             &heapProps,
             D3D12_HEAP_FLAG_NONE,
-            &resourceDesc,
-            D3D12_RESOURCE_STATE_DEPTH_WRITE, // Estado inicial
+            &texDesc,
+            D3D12_RESOURCE_STATE_DEPTH_WRITE, // Estado inicial optimizado para escribir las sombras
             &clearValue,
             IID_PPV_ARGS(&m_resource)
-        );
+        ));
+        m_resource->SetName(L"Cascaded_Shadow_Map_Array");
             
-        //CreateViews(device);
+        // ==========================================
+        // 2. CREAR LOS 4 DSVs (Uno para cada Cascada)[cite: 1]
+        // ==========================================
+        m_dsvAllocations.resize(numCascades);
+            
+        D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+        dsvDesc.Format = DXGI_FORMAT_D32_FLOAT; // Lente de Profundidad[cite: 1]
+        dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
+        dsvDesc.Texture2DArray.ArraySize = 1; // Solo renderizamos a UNA capa a la vez durante el pase de geometría[cite: 1]
+        dsvDesc.Texture2DArray.MipSlice = 0;
+
+        for (uint32_t i = 0; i < numCascades; ++i) {
+            dsvDesc.Texture2DArray.FirstArraySlice = i; // Seleccionamos la capa específica 'i' de la cascada actual[cite: 1]
+                
+            m_dsvAllocations[i] = dsvHeap.Allocate(1); // Pedimos hueco en el DSV Heap[cite: 1]
+            nativeDevice->CreateDepthStencilView(m_resource.Get(), &dsvDesc, m_dsvAllocations[i].GetCPUHandle());
+        }
+
+        // ==========================================
+        // 3. CREAR 1 SRV (Que abarca todo el Array)[cite: 1]
+        // ==========================================
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Format = DXGI_FORMAT_R32_FLOAT; // Lente de Lectura para usar en el Deferred Shader[cite: 1]
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srvDesc.Texture2DArray.FirstArraySlice = 0;
+        srvDesc.Texture2DArray.ArraySize = numCascades; // El SRV abarca las 4 capas juntas[cite: 1]
+        srvDesc.Texture2DArray.MipLevels = 1;
+        srvDesc.Texture2DArray.MostDetailedMip = 0;
+
+        m_srvAllocation = srvHeap.Allocate(1); // Alocamos directamente en tu Mega Heap Bindless global[cite: 1]
+        nativeDevice->CreateShaderResourceView(m_resource.Get(), &srvDesc, m_srvAllocation.GetCPUHandle());
     }
 }
