@@ -4,6 +4,7 @@
 
 namespace Bruno
 {
+    class ColorBuffer;
     class GraphicsDevice;
     class Texture2D;
     class DepthBuffer;
@@ -22,15 +23,15 @@ namespace Bruno
         
         void Resize(GraphicsDevice& device, DescriptorAllocator& srvHeap, DescriptorAllocator& rtvHeap, uint32_t width, uint32_t height);
 
-        Texture2D* GetAlbedoMetalness() const { return m_albedoMetalness.get(); }
-        Texture2D* GetNormalRoughness() const { return m_normalRoughness.get(); }
-        Texture2D* GetPosition() const        { return m_position.get(); }
-        DepthBuffer* GetDepth() const         { return m_depthBuffer.get(); }
+        ColorBuffer* GetAlbedoMetalness() const { return m_albedoMetalness.get(); }
+        ColorBuffer* GetNormalRoughness() const { return m_normalRoughness.get(); }
+        ColorBuffer* GetPosition() const { return m_position.get(); }
+        DepthBuffer* GetDepth() const { return m_depthBuffer.get(); }
 
     private:
-        std::unique_ptr<Texture2D> m_albedoMetalness; // SV_Target0
-        std::unique_ptr<Texture2D> m_normalRoughness; // SV_Target1
-        std::unique_ptr<Texture2D> m_position;        // SV_Target2
+        std::unique_ptr<ColorBuffer> m_albedoMetalness; // SV_Target0
+        std::unique_ptr<ColorBuffer> m_normalRoughness; // SV_Target1
+        std::unique_ptr<ColorBuffer> m_position;        // SV_Target2
         
         std::unique_ptr<DepthBuffer> m_depthBuffer;   // Z-Buffer
     };

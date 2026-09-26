@@ -1,6 +1,7 @@
 ﻿#include "brpch.h"
 #include "GBuffer.h"
 
+#include "Bruno/Platform/DirectX/ColorBuffer.h"
 #include "Bruno/Platform/DirectX/DepthBuffer.h"
 #include "Bruno/Platform/DirectX/Texture2D.h"
 #include "Bruno/Renderer/RHITypes.h"
@@ -11,7 +12,7 @@ namespace Bruno
     {
         // 1. Albedo + Metalness (R8G8B8A8)
         // RGB = Color Base, A = Factor Metálico
-        m_albedoMetalness = std::make_unique<Texture2D>(
+        m_albedoMetalness = std::make_unique<ColorBuffer>(
             device, 
             width, height, 
             TextureFormat::R8G8B8A8_Unorm, // Usando tu enum agnóstico
@@ -21,7 +22,7 @@ namespace Bruno
 
         // 2. Normal + Roughness (R16G16B16A16_FLOAT)
         // Alta precisión necesaria para evitar artefactos (banding) en la iluminación y normales correctas
-        m_normalRoughness = std::make_unique<Texture2D>(
+        m_normalRoughness = std::make_unique<ColorBuffer>(
             device, 
             width, height, 
             TextureFormat::R16G16B16A16_Float, 
@@ -31,7 +32,7 @@ namespace Bruno
 
         // 3. Posición en el Mundo (R16G16B16A16_FLOAT)
         // Float de 16-bits suele ser suficiente, pero si tu mundo es masivo, podrías necesitar 32-bits
-        m_position = std::make_unique<Texture2D>(
+        m_position = std::make_unique<ColorBuffer>(
             device, 
             width, height, 
             TextureFormat::R16G16B16A16_Float, 
@@ -55,5 +56,4 @@ namespace Bruno
 
         Initialize(device, srvHeap, rtvHeap, width, height);
     }
-
 }

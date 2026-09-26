@@ -66,10 +66,11 @@ namespace Bruno
 
             const Math::Matrix& worldMatrix = transform.WorldTransform;
 
-            DirectX::BoundingBox localAABB(
+            DirectX::BoundingBox localAABB
+            (
                 DirectX::XMFLOAT3(bbox.Center.x, bbox.Center.y, bbox.Center.z),
                 DirectX::XMFLOAT3(bbox.Extents.x, bbox.Extents.y, bbox.Extents.z)
-                );
+            );
             
             DirectX::BoundingOrientedBox obb;
             DirectX::BoundingOrientedBox::CreateFromBoundingBox(obb, localAABB);

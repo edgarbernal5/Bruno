@@ -129,7 +129,7 @@ namespace Bruno
             {
                 job();
             }
-            else 
+            else
             {
                 // Si la cola está vacía pero el grupo no ha terminado, cedemos ciclos
                 std::this_thread::yield();

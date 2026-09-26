@@ -108,6 +108,7 @@
     <ClInclude Include="Source\Bruno\Core\JobSystem.h" />
     <ClInclude Include="Source\Bruno\Core\ScopedCpuTimer.h" />
     <ClInclude Include="Source\Bruno\Core\UUID.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\ColorBuffer.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\CommandQueueManager.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\ConstantBuffer.h" />
@@ -131,6 +132,8 @@
     <ClInclude Include="Source\Bruno\Platform\DirectX\Surface.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\SwapChain.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\Texture2D.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\TextureArrayResource.h" />
+    <ClInclude Include="Source\Bruno\Platform\DirectX\TextureResource.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadContext.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\UploadHeap.h" />
     <ClInclude Include="Source\Bruno\Platform\DirectX\VertexBuffer.h" />
@@ -145,6 +148,7 @@
     <ClInclude Include="Source\Bruno\Renderer\RHITypes.h" />
     <ClInclude Include="Source\Bruno\Renderer\RootSignatureLibrary.h" />
     <ClInclude Include="Source\Bruno\Renderer\ShaderLibrary.h" />
+    <ClInclude Include="Source\Bruno\Renderer\Shadows\EnumTypes.h" />
     <ClInclude Include="Source\Bruno\Renderer\Shadows\ShadowSystem.h" />
     <ClInclude Include="Source\Bruno\Renderer\Shadows\ShadowMapArray.h" />
     <ClInclude Include="Source\Bruno\Scene\Components.h" />
@@ -214,6 +218,7 @@
     <ClCompile Include="Source\Bruno\Core\JobSystem.cpp" />
     <ClCompile Include="Source\Bruno\Core\ScopedCpuTimer.cpp" />
     <ClCompile Include="Source\Bruno\Core\UUID.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\ColorBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\CommandQueueManager.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\ConstantBufferBase.cpp" />
@@ -311,6 +316,8 @@
     <ClCompile Include="Source\Bruno\Platform\DirectX\Surface.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\SwapChain.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\Texture2D.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\TextureArrayResource.cpp" />
+    <ClCompile Include="Source\Bruno\Platform\DirectX\TextureResource.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadContext.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\UploadHeap.cpp" />
     <ClCompile Include="Source\Bruno\Platform\DirectX\VertexBuffer.cpp" />

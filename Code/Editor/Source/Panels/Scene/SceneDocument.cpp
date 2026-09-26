@@ -10,6 +10,7 @@
 #include "Content/EditorAssetManager.h"
 #include "Gizmos/GizmoService.h"
 #include "Bruno/Platform/DirectX/Shader.h"
+#include "Bruno/Renderer/Shadows/ShadowSystem.h"
 
 namespace Bruno
 {
@@ -84,8 +85,11 @@ namespace Bruno
 			for (auto& uuid : m_selectionService->GetSelections())
 			{
 				Entity entity = m_scene->GetEntityWithUUID(uuid);
-				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
-
+				if (!entity || !entity.HasComponent<TransformComponent>())
+				{
+					continue;
+				}
+				
 				// Usamos 'patch' para que EnTT dispare el evento 'on_update<TransformComponent>'
 				entity.Patch<TransformComponent>([this, entity, &newPosition](auto& transform) 
 				{
@@ -117,8 +121,11 @@ namespace Bruno
 			for (auto& uuid : m_selectionService->GetSelections())
 			{
 				Entity entity = m_scene->GetEntityWithUUID(uuid);
-				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
-
+				if (!entity || !entity.HasComponent<TransformComponent>())
+				{
+					continue;
+				}
+				
 				entity.Patch<TransformComponent>([this, entity, &delta](auto& transform) 
 				{
 					Math::Matrix parentWorldMatrix = Math::Matrix::Identity;
@@ -155,7 +162,10 @@ namespace Bruno
 			for (auto& uuid : m_selectionService->GetSelections())
 			{
 				Entity entity = m_scene->GetEntityWithUUID(uuid);
-				if (!entity || !entity.HasComponent<TransformComponent>()) continue;
+				if (!entity || !entity.HasComponent<TransformComponent>()) 
+				{
+					continue;
+				}
 
 				entity.Patch<TransformComponent>([newDelta, isUniform](auto& transform) 
 				{
@@ -186,7 +196,8 @@ namespace Bruno
 
 	void SceneDocument::InitializeSceneRenderer()
 	{
-		m_cullingSystem = std::make_shared<CullingSystem>(m_camera, m_scene);
+		m_shadowSystem = std::make_shared<ShadowSystem>(m_camera, m_scene);
+		m_cullingSystem = std::make_shared<CullingSystem>(m_camera, m_scene, m_shadowSystem);
 		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_cullingSystem, m_assetManager);
 	}
 }

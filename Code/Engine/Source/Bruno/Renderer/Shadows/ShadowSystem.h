@@ -4,6 +4,7 @@
 
 namespace Bruno
 {
+    class Scene;
     class Camera;
     
     struct CascadeData
@@ -15,22 +16,20 @@ namespace Bruno
     class ShadowSystem
     {
     public:
-        ShadowSystem(Camera& camera);
+        ShadowSystem(Camera& camera, std::shared_ptr<Scene> scene);
         
         void Execute();
+        
+        const std::vector<CascadeData>& GetCascades() const { return m_cascadesData; }
         void SetCascadeLambda(float lambda) { m_cascadeLambda = lambda; }
     private:
-        std::vector<CascadeData> CalculateCascadeMatrices(
-            const Camera& camera, 
-            const Math::Vector3& lightDir, 
-            uint32_t numCascades, 
-            float shadowMapResolution, // Ej. 2048.0f
-            float cascadeLambda = 0.5f);
+        void CalculateCascadeMatrices(const Math::Vector3& lightDir);
         
         Camera& m_camera;
-        
+        std::shared_ptr<Scene> m_scene;
+        std::vector<CascadeData> m_cascadesData;
         uint32_t m_numCascades = NUM_CASCADES;
         float m_cascadeLambda = 0.5f; // 0.0 = Uniforme, 1.0 = Logarítmico
-        uint32_t m_shadowMapResolution = 2048; // Resolución de tu textura de sombras
+        uint32_t m_shadowMapResolution = SHADOW_MAP_RES; // Resolución de tu textura de sombras
     };
 }

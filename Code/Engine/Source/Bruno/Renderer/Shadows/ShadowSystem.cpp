@@ -2,47 +2,54 @@
 #include "ShadowSystem.h"
 
 #include "Bruno/Renderer/Camera.h"
+#include "Bruno/Scene/Scene.h"
 
 namespace Bruno
 {
-    ShadowSystem::ShadowSystem(Camera& camera) : 
-        m_camera(camera)
+    ShadowSystem::ShadowSystem(Camera& camera, std::shared_ptr<Scene> scene) : 
+        m_camera(camera),
+        m_scene(scene)
     {
     }
 
     void ShadowSystem::Execute()
     {
+        auto lightView = m_scene->GetAllEntitiesWith<DirectionalLightComponent>();
+        
+        Math::Vector3 directionalLightDir;
+        for (auto entity : lightView)
+        {
+            const auto& light = lightView.get<DirectionalLightComponent>(entity);
+            directionalLightDir=light.Direction;
+            break; // Asumimos un solo Sol
+        }
+        
         // 1. Extraemos las matrices de tu método robusto
-        //auto cascades = CalculateCascadeMatrices(m_camera, m_directionalLightDir, m_numCascades, m_shadowMapResolution, m_cascadeLambda);
-
+        CalculateCascadeMatrices(directionalLightDir);
     }
 
-    std::vector<CascadeData> ShadowSystem::CalculateCascadeMatrices(const Camera& camera, 
-        const Math::Vector3& lightDir, 
-        uint32_t numCascades, 
-        float shadowMapResolution,
-        float cascadeLambda)
+   void ShadowSystem::CalculateCascadeMatrices(const Math::Vector3& lightDir)
     {
-        std::vector<CascadeData> cascades(numCascades);
+        m_cascadesData.resize(m_numCascades);
         
-        float nearClip = camera.GetNearPlane();
-        float farClip = camera.GetFarPlane();
-        float fov = camera.GetFieldOfView();
-        float aspect = camera.GetViewport().AspectRatio();
+        float nearClip = m_camera.GetNearPlane();
+        float farClip = m_camera.GetFarPlane();
+        float fov = m_camera.GetFieldOfView();
+        float aspect = m_camera.GetViewport().AspectRatio();
 
         // 1. Calcular las distancias Z de cada corte (Practical Split Scheme)
-        std::vector<float> splitDistances(numCascades + 1);
-        for (uint32_t i = 0; i <= numCascades; ++i)
+        std::vector<float> splitDistances(m_numCascades + 1);
+        for (uint32_t i = 0; i <= m_numCascades; ++i)
         {
-            float p = static_cast<float>(i) / static_cast<float>(numCascades);
+            float p = static_cast<float>(i) / static_cast<float>(m_numCascades);
             float logC = nearClip * std::pow(farClip / nearClip, p);
             float uniC = nearClip + (farClip - nearClip) * p;
-            splitDistances[i] = logC * cascadeLambda + uniC * (1.0f - cascadeLambda);
+            splitDistances[i] = logC * m_cascadeLambda + uniC * (1.0f - m_cascadeLambda);
         }
 
-        Math::Matrix camViewInv = camera.GetViewInverse();
+        Math::Matrix camViewInv = m_camera.GetViewInverse();
 
-        for (uint32_t i = 0; i < numCascades; ++i)
+        for (uint32_t i = 0; i < m_numCascades; ++i)
         {
             float cascadeNear = splitDistances[i];
             float cascadeFar  = splitDistances[i + 1];
@@ -81,8 +88,9 @@ namespace Bruno
             float minZ =  (std::numeric_limits<float>::max)();
             float maxZ = (std::numeric_limits<float>::lowest());
 
-            for (int j = 0; j < 8; ++j) {
-                Math::Vector3 cornerLightSpace = Math::Vector3::Transform(frustumCorners[j], lightView);
+            for (auto frustumCorner : frustumCorners)
+            {
+                Math::Vector3 cornerLightSpace = Math::Vector3::Transform(frustumCorner, lightView);
                 minX = std::min<float>(minX, cornerLightSpace.x);
                 maxX = std::max<float>(maxX, cornerLightSpace.x);
                 minY = std::min<float>(minY, cornerLightSpace.y);
@@ -97,8 +105,8 @@ namespace Bruno
             float shadowOrthoSizeX = maxX - minX;
             float shadowOrthoSizeY = maxY - minY;
             
-            float worldUnitsPerTexelX = shadowOrthoSizeX / shadowMapResolution;
-            float worldUnitsPerTexelY = shadowOrthoSizeY / shadowMapResolution;
+            float worldUnitsPerTexelX = shadowOrthoSizeX / m_shadowMapResolution;
+            float worldUnitsPerTexelY = shadowOrthoSizeY / m_shadowMapResolution;
 
             // Anclamos los bordes a múltiplos exactos del texel para anular el parpadeo
             minX = std::floor(minX / worldUnitsPerTexelX) * worldUnitsPerTexelX;
@@ -117,10 +125,10 @@ namespace Bruno
                 minX, maxX, minY, maxY, lightNearZ, lightFarZ
             );
 
-            cascades[i].LightViewProj = lightView * lightProj;
-            cascades[i].SplitDistance = cascadeFar; 
+            auto& cascade = m_cascadesData[i];
+            
+            cascade.LightViewProj = lightView * lightProj;
+            cascade.SplitDistance = cascadeFar; 
         }
-
-        return cascades;
     }
 }

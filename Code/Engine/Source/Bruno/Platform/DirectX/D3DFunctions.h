@@ -11,6 +11,7 @@ namespace Bruno::D3DFunctions
     D3D12_DEPTH_STENCIL_DESC GetDX12DepthState(DepthMode mode, ComparisonFunc func);
     D3D12_PRIMITIVE_TOPOLOGY_TYPE GetPrimitiveTopologyType(PrimitiveTopology topology);
     DXGI_FORMAT GetDX12Format(TextureFormat format);
+    TextureFormat GetFromDX12Format(DXGI_FORMAT format);
     constexpr D3D12_COMPARISON_FUNC GetDX12ComparisonFunc(ComparisonFunc func);
     
     D3D12_FILTER GetDX12Filter(TextureFilter filter);

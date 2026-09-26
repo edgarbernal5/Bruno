@@ -11,7 +11,8 @@
 #include "Bruno/Renderer/SceneRenderer.h"
 #include "Bruno/Renderer/PrimitiveBatch.h"
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
-#include "Bruno/Platform/DirectX/Texture2D.h"
+#include "Bruno/Platform/DirectX/ColorBuffer.h"
+#include "Bruno/Renderer/Shadows/ShadowSystem.h"
 #include "Bruno/Scene/Systems/CullingSystem.h"
 
 namespace Bruno
@@ -115,7 +116,8 @@ namespace Bruno
 		// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 		// ------------------------------------------------------------------
 		context.TransitionResource(backBuffer,  ResourceState::Present);
-
+		context.FlushBarriers();
+		
 		// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
 		m_commandQueue->ExecuteCommandList(commandList, frameIndex);
 
@@ -214,7 +216,8 @@ namespace Bruno
 
 		//m_scene->InstantiateModel(model);
 
-		m_frustumCulling = std::make_shared<CullingSystem>(m_camera, m_scene);
+		m_shadowSystem = std::make_shared<ShadowSystem>(m_camera, m_scene);
+		m_frustumCulling = std::make_shared<CullingSystem>(m_camera, m_scene, m_shadowSystem);
 		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_frustumCulling, m_assetManager.get());
 	}
 

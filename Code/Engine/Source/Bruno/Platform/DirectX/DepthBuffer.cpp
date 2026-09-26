@@ -3,25 +3,27 @@
 
 #include "D3DFunctions.h"
 #include "GraphicsDevice.h"
+#include "Bruno/Renderer/Material.h"
 
 namespace Bruno
 {
+    BR_RTTI_DEFINITIONS(DepthBuffer);
+    
     DepthBuffer::DepthBuffer(GraphicsDevice& device, uint32_t width, uint32_t height, TextureFormat format) :
-        m_device(device), 
-        m_width(width),
-        m_height(height),
-        m_format(format)
+        m_device(device)
     {
         auto nativeDevice = m_device.GetNativeDevice();
 
+        m_width = width;
+        m_height = height;
+        m_format = format;
+        
         auto& dsvAllocator = m_device.GetDSVDescriptorAllocator();
         m_dsvHandle = dsvAllocator.Allocate(1);
         CreateResourceAndDescriptor();
     }
 
-    DepthBuffer::~DepthBuffer()
-    {
-    }
+    DepthBuffer::~DepthBuffer() = default;
 
     void DepthBuffer::Resize(uint32_t width, uint32_t height)
     {
@@ -43,6 +45,7 @@ namespace Bruno
         auto nativeDevice = m_device.GetNativeDevice();
 
         auto d3dTextureFormat = D3DFunctions::GetDX12Format(m_format);
+        
         // 2. Describir la memoria de la textura
         D3D12_RESOURCE_DESC depthDesc = {};
         depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;

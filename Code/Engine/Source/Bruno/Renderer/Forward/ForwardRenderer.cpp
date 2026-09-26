@@ -1,25 +1,35 @@
 ﻿#include "brpch.h"
 #include "ForwardRenderer.h"
 
+#include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Bruno/Platform/DirectX/GraphicsPipelineState.h"
+#include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/VertexTypes.h"
+#include "Bruno/Renderer/MaterialManager.h"
 #include "Bruno/Renderer/PSOCache.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
+#include "Bruno/Scene/Components.h"
+#include "Bruno/Scene/Scene.h"
+#include "Bruno/Scene/Systems/CullingSystem.h"
 
 namespace Bruno
 {
-    ForwardRenderer::ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene) :
-        m_scene(scene)
+    ForwardRenderer::ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager) :
+        m_scene(scene),
+		m_materialManager(materialManager)
     {
+    	InitializeForwardRootSignature(device);
+    	InitializeForwardPSO(device);
+    	
+    	m_globalSrvHeap = &device->GetSRVDescriptorAllocator();
     }
 
-    void ForwardRenderer::Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
+    void ForwardRenderer::Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex, const FrameCullingResults& cullingData)
     {
-    	/*
 		auto& device = Graphics::GetDevice();
 		
-		Profiler::Get().Stats.ResetCounters();
+		/*Profiler::Get().Stats.ResetCounters();
 		ID3D12GraphicsCommandList* cmdList = graphicsContext->GetNative();
 		
 		ScopedCpuTimer totalCpuTimer(&Profiler::Get().Stats.CpuTotalRenderTimeMs);
@@ -29,14 +39,14 @@ namespace Bruno
 			ExecuteMassiveCulling(camera);
 			Profiler::Get().Stats.TotalEntities = m_frustumCulling->GetTotalEntities();
 			Profiler::Get().Stats.RenderedEntities = m_frustumCulling->GetTotalVisibleEntities();
-		}
-		auto& visibleEntities = m_frustumCulling->GetVisibleEntities();
+		}*/
+		auto& visibleEntities = cullingData.MainCamera;
 		
 		VertexBuffer* currentVB = nullptr;
 		GraphicsPipelineState* currentPSO = nullptr;
 		
 		// 2. --- RENDERIZADO GPU ---
-		Profiler::Get().StartGpuTimer(cmdList);
+		//Profiler::Get().StartGpuTimer(cmdList);
 
 		m_materialManager->UpdateGPUBuffer(*graphicsContext);
 		
@@ -130,7 +140,6 @@ namespace Bruno
 		
 		// Le ordenamos a la GPU copiar los tiempos al buffer leíble
 		Profiler::Get().ResolveGpuTimestamps(cmdList);
-    	*/
 	}
 
     void ForwardRenderer::InitializeForwardRootSignature(GraphicsDevice* device)

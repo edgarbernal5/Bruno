@@ -15,6 +15,9 @@ namespace entt
 
 namespace Bruno
 {
+	class ForwardRenderer;
+	struct FrameCullingResults;
+	struct CascadeData;
 	class ShadowMapArray;
 	class MaterialManager;
 	class Material;
@@ -37,7 +40,8 @@ namespace Bruno
 		void InitEntitiesForRender();
 		
 		void RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex);
-		void RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex);
+		void RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const FrameCullingResults& cullingData);
+		void RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
 		
 		void Resize(uint32_t width, uint32_t height);
 		
@@ -50,11 +54,6 @@ namespace Bruno
 		void RegisterMaterialToGPU(std::shared_ptr<Material> matAsset);
 		void DrawBatch(GraphicsContext* graphicsContext, const std::vector<entt::entity>& visibleEntities);
 		
-		// Función matemática puente
-		DirectX::BoundingOrientedBox CreateOBBFromOrthographicMatrix(const Math::Matrix& viewProj);
-		void PrepareCullingChunks(uint32_t numChunks, uint32_t chunkSize);
-		void ConsolidateFinalLists(uint32_t numChunks);
-		
 		std::shared_ptr<Scene> m_scene;
 		std::shared_ptr<CullingSystem> m_frustumCulling;
 		AbstractAssetManager* m_assetManager;
@@ -65,5 +64,6 @@ namespace Bruno
 		
 		std::unique_ptr<MaterialManager> m_materialManager;
 		std::unique_ptr<ShadowMapArray> m_shadowMapArray;
+		std::unique_ptr<ForwardRenderer> m_forwardRenderer;
 	};
 }

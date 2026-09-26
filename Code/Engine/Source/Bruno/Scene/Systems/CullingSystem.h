@@ -7,6 +7,7 @@
 
 namespace Bruno
 {
+    class ShadowSystem;
     class Camera;
     class Entity;
     class Scene;
@@ -15,7 +16,6 @@ namespace Bruno
     {
         std::vector<entt::entity> visibleEntities;
     };
-    
     
     struct alignas(64) CullingChunkResult
     {
@@ -32,7 +32,7 @@ namespace Bruno
     class CullingSystem
     {
     public:
-        CullingSystem(Camera& camera, std::shared_ptr<Scene> scene);
+        CullingSystem(Camera& camera, std::shared_ptr<Scene> scene, std::shared_ptr<ShadowSystem> shadowSystem);
         
         void Execute();
         
@@ -54,13 +54,9 @@ namespace Bruno
         size_t m_totalVisibleCount { 0 };
         std::shared_ptr<Scene> m_scene;
         std::vector<Entity> m_visibleEntities;
+        std::shared_ptr<ShadowSystem> m_shadowSystem;
         
         std::vector<CullingChunkResult> m_cullingChunks;
-        
-        std::vector<CullingChunkResult> m_workerChunks;
         FrameCullingResults m_finalResults;
-        
-        std::vector<entt::entity> m_finalVisibleEntities;
-        std::vector<entt::entity> m_finalShadowEntities[NUM_CASCADES];
     };
 }

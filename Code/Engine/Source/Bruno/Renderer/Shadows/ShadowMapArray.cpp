@@ -5,13 +5,19 @@
 
 namespace Bruno
 {
+    BR_RTTI_DEFINITIONS(ShadowMapArray);
+    
     void ShadowMapArray::Initialize(GraphicsDevice* device, DescriptorAllocator& srvHeap, DescriptorAllocator& dsvHeap, uint32_t resolution, uint32_t numCascades)
     {
         m_resolution = resolution;
         m_numCascades = numCascades;
+        m_currentState = ResourceState::DepthWrite;
         
         auto nativeDevice = device->GetNativeDevice();
 
+        // ==========================================
+        // 1. CREACIÓN DEL RECURSO (R32_TYPELESS)
+        // ==========================================
         D3D12_RESOURCE_DESC texDesc = {};
         texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
         texDesc.Width = resolution;
@@ -41,25 +47,26 @@ namespace Bruno
         m_resource->SetName(L"Cascaded_Shadow_Map_Array");
             
         // ==========================================
-        // 2. CREAR LOS 4 DSVs (Uno para cada Cascada)[cite: 1]
+        // 2. CREAR LOS 4 DSVs (Uno para cada Cascada)
         // ==========================================
         m_dsvAllocations.resize(numCascades);
             
         D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-        dsvDesc.Format = DXGI_FORMAT_D32_FLOAT; // Lente de Profundidad[cite: 1]
+        dsvDesc.Format = DXGI_FORMAT_D32_FLOAT; // Lente de Profundidad
         dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
-        dsvDesc.Texture2DArray.ArraySize = 1; // Solo renderizamos a UNA capa a la vez durante el pase de geometría[cite: 1]
+        dsvDesc.Texture2DArray.ArraySize = 1; // Solo renderizamos a UNA capa a la vez durante el pase de geometría
         dsvDesc.Texture2DArray.MipSlice = 0;
 
-        for (uint32_t i = 0; i < numCascades; ++i) {
-            dsvDesc.Texture2DArray.FirstArraySlice = i; // Seleccionamos la capa específica 'i' de la cascada actual[cite: 1]
+        for (uint32_t i = 0; i < numCascades; ++i)
+        {
+            dsvDesc.Texture2DArray.FirstArraySlice = i; // Seleccionamos la capa específica 'i' de la cascada actual
                 
-            m_dsvAllocations[i] = dsvHeap.Allocate(1); // Pedimos hueco en el DSV Heap[cite: 1]
+            m_dsvAllocations[i] = dsvHeap.Allocate(1); // Pedimos hueco en el DSV Heap
             nativeDevice->CreateDepthStencilView(m_resource.Get(), &dsvDesc, m_dsvAllocations[i].GetCPUHandle());
         }
 
         // ==========================================
-        // 3. CREAR 1 SRV (Que abarca todo el Array)[cite: 1]
+        // 3. CREAR 1 SRV (Que abarca todo el Array)
         // ==========================================
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         srvDesc.Format = DXGI_FORMAT_R32_FLOAT; // Lente de Lectura para usar en el Deferred Shader[cite: 1]

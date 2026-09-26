@@ -23,8 +23,6 @@ namespace Bruno
         [[nodiscard]] uint32_t GetVertexCount() const { return m_vertexCount; }
         [[nodiscard]] uint32_t GetStride() const { return m_stride; }
         
-        UINT GetSizeInBytes() const;
-        
     private:
         void InitializeView();
         

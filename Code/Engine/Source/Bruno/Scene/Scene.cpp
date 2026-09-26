@@ -86,12 +86,15 @@ namespace Bruno
         
 			auto& transform = lightEntity.GetComponent<TransformComponent>();
 			transform.Position = light.LocalPosition;
-			transform.Rotation = light.LocalRotation; // Vital para Spot y Directional
+			transform.Rotation = light.LocalRotation;
 			
-			auto& comp = lightEntity.AddComponent<DirectionalLightComponent>();
-			comp.Color = light.Color;
-			comp.Intensity = light.Intensity;
-			comp.Direction = light.Direction;
+			if (light.LightType == ModelLightType::DirectionalLight)
+			{
+				auto& comp = lightEntity.AddComponent<DirectionalLightComponent>();
+				comp.Color = light.Color;
+				comp.Intensity = light.Intensity;
+				comp.Direction = light.Direction;
+			}
 		}
 		
 		return rootEntity;

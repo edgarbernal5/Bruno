@@ -9,6 +9,8 @@
 
 namespace Bruno
 {
+    class TextureArrayResource;
+    class ColorBuffer;
     struct DescriptorAllocation;
     class GraphicsResource;
     class ConstantBufferBase;
@@ -36,13 +38,13 @@ namespace Bruno
         void FlushBarriers();
         
         // --- CLEAR Y RENDER TARGETS ---
-        void ClearRenderTarget(Texture2D* renderTarget, const Math::Color& color);
+        void ClearRenderTarget(ColorBuffer* renderTarget, const Math::Color& color);
         void ClearDepth(const DepthBuffer* depthBuffer, float depth = 1.0f, uint8_t stencil = 0);
-        void SetRenderTargets(uint32_t numRTVs, Texture2D** renderTargets, DepthBuffer* depthBuffer = nullptr);
-        void SetRenderTargetsSlice(uint32_t numRTVs, GraphicsResource** renderTargets, GraphicsResource* depthResource, uint32_t depthArraySlice);
+        void SetRenderTargets(uint32_t numRTVs, ColorBuffer** renderTargets, DepthBuffer* depthBuffer = nullptr);
+        void SetRenderTargetsSlice(uint32_t numRTVs, ColorBuffer** renderTargets, TextureArrayResource* depthResource, uint32_t depthArraySlice);
         
         // Limpia una capa específica de un recurso de profundidad
-        void ClearDepthSlice(GraphicsResource* depthResource, uint32_t arraySlice, float depth = 1.0f, uint8_t stencil = 0);
+        void ClearDepthSlice(TextureArrayResource* depthResource, uint32_t arraySlice, float depth = 1.0f, uint8_t stencil = 0);
         
         // --- PIPELINE Y ESTADO GLOBAL ---
         void SetViewport(const Math::Viewport& viewport);

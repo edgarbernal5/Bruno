@@ -8,6 +8,7 @@
 
 namespace Bruno
 {
+	class ShadowSystem;
 	class Shader;
 	class CullingSystem;
 	class SceneRenderer;
@@ -43,6 +44,7 @@ namespace Bruno
 		SceneRenderer* GetSceneRenderer() const { return m_sceneRenderer.get(); }
 		EditorCameraController* GetCameraController() const { return m_cameraController.get(); }
 		CullingSystem* GetCullingSystem() const { return m_cullingSystem.get(); }
+		ShadowSystem* GetShadowSystem() const { return m_shadowSystem.get(); }
 		
 		void UpdateSelection();
 
@@ -62,6 +64,7 @@ namespace Bruno
 		std::shared_ptr<GizmoService> m_gizmoService;
 		std::shared_ptr<EditorCameraController> m_cameraController;
 		std::shared_ptr<CullingSystem> m_cullingSystem;
+		std::shared_ptr<ShadowSystem> m_shadowSystem;
 
 		EventHandlerId m_selectionChangedHandleId{ 0 };
 	};

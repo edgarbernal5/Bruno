@@ -20,11 +20,6 @@ namespace Bruno
     {
         InitializeView();
     }
-    
-    UINT IndexBuffer::GetSizeInBytes() const
-    {
-        return m_view.SizeInBytes;
-    }
 
     void IndexBuffer::InitializeView()
     {

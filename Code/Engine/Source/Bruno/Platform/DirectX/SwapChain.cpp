@@ -1,5 +1,7 @@
 ﻿#include "brpch.h"
 #include "SwapChain.h"
+
+#include "ColorBuffer.h"
 #include "GraphicsDevice.h"
 #include "CommandQueue.h"
 #include "D3DFunctions.h"
@@ -83,7 +85,7 @@ namespace Bruno
             
             if (!m_renderTargets[i].Resource)
             {
-                m_renderTargets[i].Resource = std::make_shared<Texture2D>();
+                m_renderTargets[i].Resource = std::make_shared<ColorBuffer>();
             }
             
             // Enchufar la textura en el RTV Heap de DirectX 12
@@ -149,7 +151,7 @@ namespace Bruno
         return m_currentBufferIndex;
     }
 
-    Texture2D* SwapChain::GetCurrentRenderTarget() const
+    ColorBuffer* SwapChain::GetCurrentRenderTarget() const
     {
         return m_renderTargets[m_currentBufferIndex].Resource.get();
     }

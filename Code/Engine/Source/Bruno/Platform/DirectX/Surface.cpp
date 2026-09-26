@@ -26,7 +26,7 @@ namespace Bruno
         return m_swapChain->GetCurrentBackBufferIndex();
     }
 
-    Texture2D* Surface::GetCurrentRenderTarget() const
+    ColorBuffer* Surface::GetCurrentRenderTarget() const
     {
         return m_swapChain->GetCurrentRenderTarget();
     }

@@ -19,9 +19,11 @@
 #include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/Shader.h"
-#include "Bruno/Platform/DirectX/Texture2D.h"
+#include "Bruno/Platform/DirectX/ColorBuffer.h"
 #include "Bruno/Renderer/MaterialManager.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
+#include "Bruno/Renderer/Shadows/ShadowSystem.h"
+#include "Bruno/Scene/Systems/CullingSystem.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
 #include "Gizmos/CameraGizmo.h"
@@ -137,6 +139,18 @@ namespace Bruno
 			
 			dynamicAllocator->Reset();
 			
+			
+			
+			TransformSystem::Update(m_scene.get());
+			
+			m_shadowSystem->Execute();
+			m_cullingSystem->Execute();
+			
+			const auto& cullingData = m_cullingSystem->GetCullingResults();
+			const auto& cascadeData = m_shadowSystem->GetCascades();
+			
+			m_sceneRenderer->RenderShadows(&context, m_sceneDocument->GetCamera(), frameIndex, cascadeData, cullingData);
+			
 			// 3. Extraer la textura real y su descriptor
 			auto backBuffer = m_surface->GetCurrentRenderTarget();
 
@@ -164,37 +178,21 @@ namespace Bruno
 			context.SetViewport(m_viewport);
 			context.SetScissorRect(m_scissorRect);
 			
-			TransformSystem::Update(m_scene.get());
+			m_sceneRenderer->RenderForward(&context, m_sceneDocument->GetCamera(), frameIndex, cullingData);
 			
-			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
-			
-			Math::Matrix gizmoWorld;
-			Math::Vector3 gizmoPivot;
-			
-			//m_sceneRenderer->RenderForward(&context, m_sceneDocument->GetCamera(), frameIndex);
-			
-			if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
-			{
-				m_gizmoService->SetGizmoPosition(gizmoPivot);
-				m_gizmoService->SetGizmoWorldMatrix(gizmoWorld);
-			}
+			RenderGizmo(context, frameIndex);
 			m_debugRenderer->RenderBoundingBoxes(&context, m_sceneDocument->GetCamera(), frameIndex);
 			if (m_marqueeInteraction.m_dragRectangle)
 			{
 				RenderMarquee(context, m_marqueeInteraction.m_ndcMin, m_marqueeInteraction.m_ndcMax);
 			}
-			m_gizmoService->Update();
-			m_gizmoService->BuildGeometry(frameIndex);
-			m_gizmoService->Render(&context, frameIndex, viewProj);
-			
-			m_cameraGizmo->BuildCameraGizmoGeometry(frameIndex);
-			m_cameraGizmo->RenderCameraGizmo(&context, frameIndex, m_viewport);
 			
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 			// ------------------------------------------------------------------
 			context.TransitionResource(backBuffer, ResourceState::Present);
-
+			context.FlushBarriers();
+			
 			// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
 			m_commandQueue->ExecuteCommandList(commandList, frameIndex);
 
@@ -538,6 +536,8 @@ namespace Bruno
 	void ScenePanel::InitializeSceneRenderer()
 	{
 		m_sceneRenderer = m_sceneDocument->GetSceneRenderer();
+		m_shadowSystem = m_sceneDocument->GetShadowSystem();
+		m_cullingSystem = m_sceneDocument->GetCullingSystem();
 	}
 
 	void ScenePanel::InitializeMarquee()
@@ -588,6 +588,27 @@ namespace Bruno
 	void ScenePanel::UpdateCBs(const GameTimer& timer)
 	{
 		m_scene->OnUpdate(timer, m_sceneDocument->GetCamera());
+	}
+
+	void ScenePanel::RenderGizmo(GraphicsContext& context, uint32_t frameIndex)
+	{
+		Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
+			
+		Math::Matrix gizmoWorld;
+		Math::Vector3 gizmoPivot;
+			
+		if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
+		{
+			m_gizmoService->SetGizmoPosition(gizmoPivot);
+			m_gizmoService->SetGizmoWorldMatrix(gizmoWorld);
+		}
+		
+		m_gizmoService->Update();
+		m_gizmoService->BuildGeometry(frameIndex);
+		m_gizmoService->Render(&context, frameIndex, viewProj);
+		
+		m_cameraGizmo->BuildCameraGizmoGeometry(frameIndex);
+		m_cameraGizmo->RenderCameraGizmo(&context, frameIndex, m_viewport);
 	}
 
 	void ScenePanel::RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax)

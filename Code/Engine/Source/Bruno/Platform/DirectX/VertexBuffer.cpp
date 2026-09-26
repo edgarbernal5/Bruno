@@ -22,11 +22,6 @@ namespace Bruno
         InitializeView();
     }
 
-    UINT VertexBuffer::GetSizeInBytes() const
-    {
-        return m_view.SizeInBytes;
-    }
-
     void VertexBuffer::InitializeView()
     {
         m_view.BufferLocation = GetGPUAddress();

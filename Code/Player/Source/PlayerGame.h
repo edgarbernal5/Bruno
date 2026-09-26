@@ -7,6 +7,7 @@
 
 namespace Bruno
 {
+	class ShadowSystem;
 	class CullingSystem;
 	class LinearAllocator;
 	class Surface;
@@ -47,6 +48,7 @@ namespace Bruno
 
 		std::unique_ptr<Surface> m_surface;
 		std::shared_ptr<Scene> m_scene;
+		std::shared_ptr<ShadowSystem> m_shadowSystem;
 		std::shared_ptr<CullingSystem> m_frustumCulling;
 		std::shared_ptr<SceneRenderer> m_sceneRenderer;
 		CommandQueue* m_commandQueue { nullptr };

@@ -8,14 +8,21 @@
 
 namespace Bruno
 {
-    CullingSystem::CullingSystem(Camera& camera, std::shared_ptr<Scene> scene) : 
+    CullingSystem::CullingSystem(Camera& camera, std::shared_ptr<Scene> scene, std::shared_ptr<ShadowSystem> shadowSystem) : 
         m_camera(camera),
-        m_scene(scene)
+        m_scene(scene),
+        m_shadowSystem(shadowSystem)
     {
     }
 
     void CullingSystem::Execute()
     {
+        m_finalResults.MainCamera.clear();
+        for (int i = 0; i < NUM_CASCADES; ++i)
+        {
+            m_finalResults.Cascades[i].clear();
+        }
+        
         // Calcular ViewProjection y extraer los 6 planos universales
         DirectX::XMVECTOR frustumPlanes[6];
         ExtractFrustumPlanes(frustumPlanes);
@@ -55,7 +62,7 @@ namespace Bruno
         JobSystem::Get().Dispatch(entityCount, chunkSize, [&](uint32_t start, uint32_t end)
         {
             uint32_t chunkIndex = start / chunkSize;
-            auto& localResult = m_workerChunks[chunkIndex];
+            auto& localResult = m_cullingChunks[chunkIndex];
             
             for (uint32_t i = start; i < end; ++i)
             {
@@ -207,10 +214,10 @@ namespace Bruno
 
     void CullingSystem::ConsolidateResults(uint32_t numChunks)
     {
-        m_finalVisibleEntities.clear();
+        m_finalResults.MainCamera.clear();
         for (uint32_t c = 0; c < NUM_CASCADES; ++c)
         {
-            m_finalShadowEntities[c].clear();
+            m_finalResults.Cascades[c].clear();
         }
 
         // 1. Contar totales para hacer una sola alocación exacta de memoria maestra
@@ -226,25 +233,25 @@ namespace Bruno
             }
         }
 
-        m_finalVisibleEntities.reserve(totalVisible);
+        m_finalResults.MainCamera.reserve(totalVisible);
         for (uint32_t c = 0; c < NUM_CASCADES; ++c)
         {
-            m_finalShadowEntities[c].reserve(totalShadows[c]);
+            m_finalResults.Cascades[c].reserve(totalShadows[c]);
         }
 
         // 2. Fusión masiva ultra rápida (Inserción O(n) contigua)
         for (uint32_t i = 0; i < numChunks; ++i)
         {
-            m_finalVisibleEntities.insert(
-                m_finalVisibleEntities.end(),
+            m_finalResults.MainCamera.insert(
+                m_finalResults.MainCamera.end(),
                 m_cullingChunks[i].VisibleEntities.begin(),
                 m_cullingChunks[i].VisibleEntities.end()
             );
 
             for (uint32_t c = 0; c < NUM_CASCADES; ++c)
             {
-                m_finalShadowEntities[c].insert(
-                    m_finalShadowEntities[c].end(),
+                m_finalResults.Cascades[c].insert(
+                    m_finalResults.Cascades[c].end(),
                     m_cullingChunks[i].ShadowCascades[c].begin(),
                     m_cullingChunks[i].ShadowCascades[c].end()
                 );

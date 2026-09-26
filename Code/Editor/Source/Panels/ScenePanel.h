@@ -17,6 +17,8 @@
 
 namespace Bruno
 {
+	class CullingSystem;
+	class ShadowSystem;
 	class DebugRenderer;
 	class LinearAllocator;
 	class Model;
@@ -78,6 +80,7 @@ namespace Bruno
 		void InitializeMarquee();
 		void SetupCameraGizmoViewport();
 		void UpdateCBs(const GameTimer& timer);
+		void RenderGizmo(GraphicsContext& context, uint32_t frameIndex);
 		void RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax);
 		
 		std::unique_ptr<Berta::NestedForm> m_form;
@@ -89,6 +92,8 @@ namespace Bruno
 		EditorGame* m_editorGame;
 		std::shared_ptr<SceneDocument> m_sceneDocument;
 		std::shared_ptr<Scene> m_scene;
+		ShadowSystem* m_shadowSystem;
+		CullingSystem* m_cullingSystem;
 		SceneRenderer* m_sceneRenderer { nullptr };
 		
 		std::array<std::unique_ptr<LinearAllocator>, 2> m_dynamicAllocators;

@@ -137,6 +137,21 @@ namespace Bruno::D3DFunctions
         default: return DXGI_FORMAT_UNKNOWN;
         }
     }
+    
+    TextureFormat GetFromDX12Format(DXGI_FORMAT format)
+    {
+        switch (format)
+        {
+        case DXGI_FORMAT_R8G8B8A8_UNORM:      return TextureFormat::R8G8B8A8_Unorm;
+        case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB: return TextureFormat::R8G8B8A8_Unorm_SRGB;
+        case DXGI_FORMAT_B8G8R8A8_UNORM:      return TextureFormat::B8G8R8A8_Unorm;
+        case DXGI_FORMAT_R16G16B16A16_FLOAT:  return TextureFormat::R16G16B16A16_Float;
+        case DXGI_FORMAT_R32G32B32A32_FLOAT:  return TextureFormat::R32G32B32A32_Float;
+        case DXGI_FORMAT_D32_FLOAT:           return TextureFormat::D32_Float;
+        case DXGI_FORMAT_D24_UNORM_S8_UINT:   return TextureFormat::D24_Unorm_S8_Uint;
+        default: return TextureFormat::Unknown;
+        }
+    }
 
     constexpr D3D12_COMPARISON_FUNC GetDX12ComparisonFunc(ComparisonFunc func)
     {

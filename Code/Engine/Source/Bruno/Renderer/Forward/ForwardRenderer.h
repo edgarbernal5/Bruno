@@ -4,6 +4,8 @@
 
 namespace Bruno
 {
+    class MaterialManager;
+    struct FrameCullingResults;
     class RootSignature;
     class GraphicsPipelineState;
     class Scene;
@@ -57,8 +59,9 @@ namespace Bruno
     class ForwardRenderer
     {
     public:
-        ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene);
-        void Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
+        ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager);
+        
+        void Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex, const FrameCullingResults& cullingData);
 		
     private:
         void InitializeForwardRootSignature(GraphicsDevice* device);
@@ -67,8 +70,10 @@ namespace Bruno
         std::shared_ptr<Scene> m_scene;
         std::unique_ptr<Shader> m_opaqueShader;
 		
+        DescriptorAllocator* m_globalSrvHeap;
         std::shared_ptr<RootSignature> m_forwardRootSig;
         std::shared_ptr<GraphicsPipelineState> m_forwardPSO;
+        std::shared_ptr<MaterialManager> m_materialManager;
         
         Math::Vector3 m_directionalLightDir { 1.0f, 0.0f, 0.0f};
         ConstantBuffer<ForwardLightingBuffer> m_forwardLightsCB;

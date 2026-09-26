@@ -2,6 +2,7 @@
 #include "SceneRendererDeferred.h"
 
 #include "GBuffer.h"
+#include "Bruno/Platform/DirectX/ColorBuffer.h"
 #include "Bruno/Platform/DirectX/DepthBuffer.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Bruno/Platform/DirectX/GraphicsPipelineState.h"
@@ -9,7 +10,6 @@
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/PSOCache.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
-#include "Bruno/Platform/DirectX/Texture2D.h"
 
 namespace Bruno
 {

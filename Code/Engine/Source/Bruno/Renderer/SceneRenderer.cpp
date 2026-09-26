@@ -26,7 +26,10 @@
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/Camera.h"
 #include "Bruno/Scene/Systems/CullingSystem.h"
+#include "Forward/ForwardRenderer.h"
+#include "Shadows/EnumTypes.h"
 #include "Shadows/ShadowMapArray.h"
+#include "Shadows/ShadowSystem.h"
 
 
 namespace Bruno
@@ -44,6 +47,8 @@ namespace Bruno
 		InitializeShadowPipeline(device);
 		
 		m_materialManager = std::make_unique<MaterialManager>(*device, device->GetSRVDescriptorAllocator());
+		
+		m_forwardRenderer = std::make_unique<ForwardRenderer>(device, scene);
 	}
 	
 	SceneRenderer::~SceneRenderer() = default;
@@ -125,61 +130,72 @@ namespace Bruno
 
 		// Disparar el triángulo a pantalla completa sin Vertex Buffer
 		context->DrawInstanced(3, 1, 0, 0);*/
-		
 	}
 
-	void SceneRenderer::RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex)
+	void SceneRenderer::RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const FrameCullingResults& cullingData)
 	{
-		/*
+		m_forwardRenderer->Render(context, camera, frameIndex, cullingData);
+	}
+
+	void SceneRenderer::RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)
+	{
 		// 1. Transicionar todo el Texture2DArray a estado de escritura de profundidad[cite: 1]
-    context->TransitionResource(m_shadowMapArray.get(), 
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, 
-        D3D12_RESOURCE_STATE_DEPTH_WRITE);
+		context->TransitionResource(m_shadowMapArray.get(), ResourceState::DepthWrite);
 
-    context->SetPipelineState(m_shadowPSO.get());
-    context->SetRootSignature(m_shadowRootSig.get());
+		context->SetPipelineState(m_shadowPSO.get());
+		context->SetRootSignature(m_shadowRootSig.get());
 
-    // Iterar por las 4 cascadas[cite: 1]
-    for (uint32_t i = 0; i < NUM_CASCADES; ++i) 
-    {
-        // 2. Enlazar SOLO la capa de esta cascada (FirstArraySlice)[cite: 1]
-        D3D12_CPU_DESCRIPTOR_HANDLE cascadeDSV = m_shadowMapArray->GetDSV(i);
-        context->SetRenderTargetsRaw(0, nullptr, &cascadeDSV);
+		Math::Viewport cascadeViewport = { 0, 0, SHADOW_MAP_RES, SHADOW_MAP_RES, 0.0f, 1.0f };
+		// Iterar por las 4 cascadas[cite: 1]
+		for (uint32_t i = 0; i < NUM_CASCADES; ++i) 
+		{
+			// 2. Enlazar SOLO la capa de esta cascada (FirstArraySlice)[cite: 1]
+			context->SetRenderTargetsSlice(0, nullptr, m_shadowMapArray.get(), i);
         
-        // 3. Limpiar el Depth Buffer de la cascada[cite: 1]
-        context->ClearDepth(cascadeDSV);
+			// 3. Limpiar el Depth Buffer de la cascada[cite: 1]
+			context->ClearDepthSlice(m_shadowMapArray.get(), i);
 
-        // 4. Configurar el Viewport para abarcar toda la resolución de sombra (ej. 2048x2048)[cite: 1]
-        context->SetViewport(0, 0, SHADOW_MAP_RES, SHADOW_MAP_RES);[cite: 1]
+			// 4. Configurar el Viewport para abarcar toda la resolución de sombra (ej. 2048x2048)[cite: 1]
+			context->SetViewport(cascadeViewport);
 
-        // 5. Dibujar las entidades visibles para ESTA cascada (Lista proveniente del Job System)[cite: 1, 6]
-        const auto& visibleEntities = m_cullingResults.ShadowCascades[i];[cite: 1, 6]
+			// 5. Dibujar las entidades visibles para ESTA cascada (Lista proveniente del Job System)[cite: 1, 6]
+			const auto& visibleEntities = cullingData.Cascades[i];
         
-        for (auto entity : visibleEntities) 
-        {
-            const auto& transform = scene->GetRegistry().get<TransformComponent>(entity);
-            const auto& modelComp = scene->GetRegistry().get<ModelComponent>(entity);
+			for (auto entt : visibleEntities) 
+			{
+				Entity entity { entt, m_scene.get() };
+				const auto& transform = entity.GetComponent<TransformComponent>();
+				const auto& modelComp = entity.GetComponent<ModelComponent>();
 
-            // Estructura para alinear con el cbuffer ShadowConstants
-            struct ShadowConstants {
-                Math::Matrix World;
-                Math::Matrix LightViewProj;
-            } constants;
+				ShadowConstants constants;
 
-            constants.World = transform.WorldMatrix;
-            constants.LightViewProj = cascades[i].LightViewProj;
+				constants.World = transform.WorldTransform;
+				constants.LightViewProj = cascades[i].LightViewProj;
 
-            // Enviar a la GPU (b0)[cite: 1]
-            context->SetGraphicsRoot32BitConstants(0, sizeof(ShadowConstants) / 4, &constants, 0);
+				// Enviar a la GPU (b0)[cite: 1]
+				context->SetPushConstants(0, sizeof(ShadowConstants) / 4, &constants, 0);
 
-            // Extraer buffers y dibujar
-            auto mesh = AssetManager::GetMesh(modelComp.ModelHandle);
-            context->SetVertexBuffer(mesh->GetVertexBuffer());
-            context->SetIndexBuffer(mesh->GetIndexBuffer());
-            
-            context->DrawIndexedInstanced(mesh->GetIndexCount(), 1, 0, 0, 0);
-        }
-    }*/
+				// Extraer buffers y dibujar				
+				auto model = m_assetManager->GetAsset<Model>(modelComp.ModelHandle);
+				uint32_t meshIndex = modelComp.MeshIndex;
+				auto& meshes = model->GetMeshes();
+				auto& mesh = meshes[meshIndex];
+				
+				auto& indexBuffer = model->GetIndexBuffer();
+				auto& vertexBuffer = model->GetVertexBuffer();
+				
+				context->SetVertexBuffer(0, vertexBuffer.get());
+				context->SetIndexBuffer(indexBuffer.get());
+				
+				context->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
+				
+				context->DrawIndexedInstanced(mesh->GetIndexCount(),
+												  1,
+												  mesh->GetBaseIndex(),
+												  mesh->GetBaseVertex(),
+												  0);
+			}
+		}
 	}
 
 	void SceneRenderer::Resize(uint32_t width, uint32_t height)
@@ -270,7 +286,7 @@ namespace Bruno
 	void SceneRenderer::InitializeShadowArray(GraphicsDevice* device)
 	{
 		m_shadowMapArray = std::make_unique<ShadowMapArray>();
-		//m_shadowMapArray->Initialize(device, 2048, 4);
+		m_shadowMapArray->Initialize(device, device->GetSRVDescriptorAllocator(), device->GetDSVDescriptorAllocator(), 2048, 4);
 	}
 
 	void SceneRenderer::InitializeShadowPipeline(GraphicsDevice* device)
@@ -278,7 +294,7 @@ namespace Bruno
 		auto prototypeSig = std::make_shared<RootSignature>(*device);
 		
 		// b0: ShadowConstants (Contiene World y LightViewProj)
-		prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::Vertex);
+		prototypeSig->AddConstants(sizeof(ShadowConstants) / 4, 0, 0, ShaderVisibility::Vertex);
     
 		m_shadowRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
 		
@@ -297,13 +313,16 @@ namespace Bruno
     
 		shadowDesc.DepthState.Mode = DepthMode::ReadWrite;
 		shadowDesc.DepthState.Func = ComparisonFunc::Less;
-
+		
+		shadowDesc.RasterizerDesc.FillMode = FillMode::Solid;
+		shadowDesc.RasterizerDesc.CullMode = CullMode::Back;
+		
 		// Ajustes AAA: Hardware Depth Bias
 		// Desplaza ligeramente la geometría hacia atrás desde el punto de vista de la luz
 		shadowDesc.RasterizerDesc.DepthBias = 100000;         // Unidades internas
 		shadowDesc.RasterizerDesc.DepthBiasClamp = 0.0f;
 		shadowDesc.RasterizerDesc.SlopeScaledDepthBias = 1.5f; // Mayor inclinación = Mayor Bias
-
+		
 		m_shadowPSO = PSOCache::GetOrCreate(device, shadowDesc);
 	}
 
@@ -404,93 +423,5 @@ namespace Bruno
 			                                      0);
 
 		}
-	}
-
-	DirectX::BoundingOrientedBox SceneRenderer::CreateOBBFromOrthographicMatrix(const Math::Matrix& viewProj)
-	{
-		// Esquinas exactas del espacio NDC de DirectX 12
-		Math::Vector3 ndcCorners[8] = {
-			Math::Vector3(-1.0f,  1.0f, 0.0f), Math::Vector3( 1.0f,  1.0f, 0.0f),
-			Math::Vector3( 1.0f, -1.0f, 0.0f), Math::Vector3(-1.0f, -1.0f, 0.0f),
-			Math::Vector3(-1.0f,  1.0f, 1.0f), Math::Vector3( 1.0f,  1.0f, 1.0f),
-			Math::Vector3( 1.0f, -1.0f, 1.0f), Math::Vector3(-1.0f, -1.0f, 1.0f)
-		};
-
-		Math::Matrix invViewProj = viewProj.Invert();
-		Math::Vector3 worldCorners[8];
-
-		// Llevamos las esquinas del cubo hacia el espacio del mundo real
-		for (int i = 0; i < 8; ++i) {
-			worldCorners[i] = Math::Vector3::Transform(ndcCorners[i], invViewProj);
-		}
-
-		// Dejamos que DirectXMath calcule el Centro, la Rotación y las Extensiones de esa caja
-		DirectX::BoundingOrientedBox cascadeOBB;
-		DirectX::BoundingOrientedBox::CreateFromPoints(cascadeOBB, 8, (const DirectX::XMFLOAT3*)worldCorners, sizeof(Math::Vector3));
-    
-		return cascadeOBB;
-	}
-
-	void SceneRenderer::PrepareCullingChunks(uint32_t numChunks, uint32_t chunkSize)
-	{
-		/*
-		if (m_cullingChunks.size() < numChunks) {
-			m_cullingChunks.resize(numChunks);
-		}
-
-		for (uint32_t i = 0; i < numChunks; ++i) {
-			// Limpiamos resultados del frame anterior sin liberar la capacidad de RAM subyacente
-			m_cullingChunks[i].VisibleEntities.clear();
-			m_cullingChunks[i].VisibleEntities.reserve(chunkSize);
-            
-			for (uint32_t c = 0; c < NUM_CASCADES; ++c) {
-				m_cullingChunks[i].ShadowCascades[c].clear();
-				// Una reserva generosa, ya que cada cascada verá una fracción de la escena
-				m_cullingChunks[i].ShadowCascades[c].reserve(chunkSize);
-			}
-		}
-		*/
-	}
-
-	void SceneRenderer::ConsolidateFinalLists(uint32_t numChunks)
-	{
-		/*
-		m_finalVisibleEntities.clear();
-		for (uint32_t c = 0; c < NUM_CASCADES; ++c) {
-			m_finalShadowEntities[c].clear();
-		}
-
-		// 1. Contar totales para hacer una sola alocación exacta de memoria maestra
-		size_t totalVisible = 0;
-		size_t totalShadows[NUM_CASCADES] = { 0 };
-
-		for (uint32_t i = 0; i < numChunks; ++i) {
-			totalVisible += m_cullingChunks[i].VisibleEntities.size();
-			for (uint32_t c = 0; c < NUM_CASCADES; ++c) {
-				totalShadows[c] += m_cullingChunks[i].ShadowCascades[c].size();
-			}
-		}
-
-		m_finalVisibleEntities.reserve(totalVisible);
-		for (uint32_t c = 0; c < NUM_CASCADES; ++c) {
-			m_finalShadowEntities[c].reserve(totalShadows[c]);
-		}
-
-		// 2. Fusión masiva ultra rápida (Inserción O(n) contigua)
-		for (uint32_t i = 0; i < numChunks; ++i) {
-			m_finalVisibleEntities.insert(
-				m_finalVisibleEntities.end(),
-				m_cullingChunks[i].VisibleEntities.begin(),
-				m_cullingChunks[i].VisibleEntities.end()
-			);
-
-			for (uint32_t c = 0; c < NUM_CASCADES; ++c) {
-				m_finalShadowEntities[c].insert(
-					m_finalShadowEntities[c].end(),
-					m_cullingChunks[i].ShadowCascades[c].begin(),
-					m_cullingChunks[i].ShadowCascades[c].end()
-				);
-			}
-		}*/
 	}
 }

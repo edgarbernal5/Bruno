@@ -7,7 +7,8 @@
 
 namespace Bruno
 {
-    class Texture2D;
+    class ColorBuffer;
+    class TextureResource;
     class GraphicsDevice;
     
     class SwapChain
@@ -21,12 +22,12 @@ namespace Bruno
 
         [[nodiscard]] uint32_t GetCurrentBackBufferIndex() const;
         
-        Texture2D* GetCurrentRenderTarget() const;
+        ColorBuffer* GetCurrentRenderTarget() const;
 
     private:
         struct RenderTargetData
         {
-            std::shared_ptr<Texture2D> Resource{ nullptr };
+            std::shared_ptr<ColorBuffer> Resource{ nullptr };
             DescriptorAllocation RtvHandle{};
         };
         
