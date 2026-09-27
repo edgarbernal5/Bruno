@@ -115,7 +115,7 @@ namespace Bruno
 		std::unique_ptr<Surface> m_surface;
 		CommandQueue* m_commandQueue { nullptr };
 		Math::Viewport m_viewport;
-		Rect m_scissorRect;
+		Math::Rectangle m_scissorRect;
 		
 		ID3D12DescriptorHeap* m_srvHeap;
 		

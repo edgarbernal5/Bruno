@@ -14,9 +14,9 @@ namespace Bruno
     {
         D3D12_CPU_DESCRIPTOR_HANDLE CPU;
         D3D12_GPU_DESCRIPTOR_HANDLE GPU;
-        uint32_t Index;
-        uint32_t Count;          // Cuántos descriptores tiene este bloque
-        uint32_t DescriptorSize; // Tamaño en bytes de cada descriptor
+        uint32_t Index{ 0 };
+        uint32_t Count{ 0 };          // Cuántos descriptores tiene este bloque
+        uint32_t DescriptorSize{ 0 }; // Tamaño en bytes de cada descriptor
 
         // Obtener el handle base (offset 0)
         D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return CPU; }

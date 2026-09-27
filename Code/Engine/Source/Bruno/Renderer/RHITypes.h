@@ -140,17 +140,6 @@ namespace Bruno
         // LocalSignatureForRaytracing = 1 << 1
     };
     BR_DEFINITION_FLAG_FROM_ENUM(RootSignatureFlags);
-
-    struct Rect
-    {
-        long Left = 0;
-        long Top = 0;
-        long Right = 0;
-        long Bottom = 0;
-
-        explicit operator D3D12_RECT() const noexcept { return *reinterpret_cast<const D3D12_RECT*>(this); }
-        const D3D12_RECT* Get12() const noexcept { return reinterpret_cast<const D3D12_RECT*>(this); }
-    };
     
     enum class VertexFormat : uint8_t
     {

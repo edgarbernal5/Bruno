@@ -31,7 +31,6 @@
 #include "Shadows/ShadowMapArray.h"
 #include "Shadows/ShadowSystem.h"
 
-
 namespace Bruno
 {
 	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<CullingSystem> frustumCulling, AbstractAssetManager* assetManager) :
@@ -46,9 +45,9 @@ namespace Bruno
 		InitializeShadowArray(device);
 		InitializeShadowPipeline(device);
 		
-		m_materialManager = std::make_unique<MaterialManager>(*device, device->GetSRVDescriptorAllocator());
+		m_materialManager = std::make_shared<MaterialManager>(*device, device->GetSRVDescriptorAllocator());
 		
-		m_forwardRenderer = std::make_unique<ForwardRenderer>(device, scene);
+		m_forwardRenderer = std::make_unique<ForwardRenderer>(device, scene, m_materialManager, assetManager);
 	}
 	
 	SceneRenderer::~SceneRenderer() = default;
@@ -146,6 +145,8 @@ namespace Bruno
 		context->SetRootSignature(m_shadowRootSig.get());
 
 		Math::Viewport cascadeViewport = { 0, 0, SHADOW_MAP_RES, SHADOW_MAP_RES, 0.0f, 1.0f };
+		Math::Rectangle cascadeScissor = { 0, 0, static_cast<long>(SHADOW_MAP_RES), static_cast<long>(SHADOW_MAP_RES) };
+		
 		// Iterar por las 4 cascadas[cite: 1]
 		for (uint32_t i = 0; i < NUM_CASCADES; ++i) 
 		{
@@ -157,6 +158,7 @@ namespace Bruno
 
 			// 4. Configurar el Viewport para abarcar toda la resolución de sombra (ej. 2048x2048)[cite: 1]
 			context->SetViewport(cascadeViewport);
+			context->SetScissorRect(cascadeScissor);
 
 			// 5. Dibujar las entidades visibles para ESTA cascada (Lista proveniente del Job System)[cite: 1, 6]
 			const auto& visibleEntities = cullingData.Cascades[i];
@@ -285,7 +287,7 @@ namespace Bruno
 
 	void SceneRenderer::InitializeShadowArray(GraphicsDevice* device)
 	{
-		m_shadowMapArray = std::make_unique<ShadowMapArray>();
+		m_shadowMapArray = std::make_shared<ShadowMapArray>();
 		m_shadowMapArray->Initialize(device, device->GetSRVDescriptorAllocator(), device->GetDSVDescriptorAllocator(), 2048, 4);
 	}
 

@@ -62,8 +62,8 @@ namespace Bruno
 		std::shared_ptr<RootSignature> m_shadowRootSig;
         std::shared_ptr<GraphicsPipelineState> m_shadowPSO;
 		
-		std::unique_ptr<MaterialManager> m_materialManager;
-		std::unique_ptr<ShadowMapArray> m_shadowMapArray;
+		std::shared_ptr<MaterialManager> m_materialManager;
+		std::shared_ptr<ShadowMapArray> m_shadowMapArray;
 		std::unique_ptr<ForwardRenderer> m_forwardRenderer;
 	};
 }

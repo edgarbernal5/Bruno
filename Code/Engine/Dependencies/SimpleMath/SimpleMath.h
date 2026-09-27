@@ -65,6 +65,8 @@ namespace DirectX
             Rectangle& operator=(Rectangle&&) = default;
 
             operator RECT() noexcept { RECT rct; rct.left = x; rct.top = y; rct.right = (x + width); rct.bottom = (y + height); return rct; }
+            
+            explicit operator D3D12_RECT() const noexcept { RECT rct; rct.left = x; rct.top = y; rct.right = (x + width); rct.bottom = (y + height); return rct; }
 #ifdef __cplusplus_winrt
             operator Windows::Foundation::Rect() noexcept { return Windows::Foundation::Rect(float(x), float(y), float(width), float(height)); }
 #endif

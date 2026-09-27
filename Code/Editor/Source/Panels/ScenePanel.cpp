@@ -138,8 +138,7 @@ namespace Bruno
 			GraphicsContext context(*m_device, commandList.Get(), allocator.Get(), dynamicAllocator);
 			
 			dynamicAllocator->Reset();
-			
-			
+			Profiler::Get().Stats.ResetCounters();
 			
 			TransformSystem::Update(m_scene.get());
 			

@@ -48,7 +48,7 @@ namespace Bruno
         
         // --- PIPELINE Y ESTADO GLOBAL ---
         void SetViewport(const Math::Viewport& viewport);
-        void SetScissorRect(const Rect& rect);
+        void SetScissorRect(const Math::Rectangle& rect);
         void SetPipelineState(GraphicsPipelineState* pso);
         void SetRootSignature(RootSignature* rootSig);
 

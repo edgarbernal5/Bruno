@@ -53,7 +53,7 @@ namespace Bruno
 		std::shared_ptr<SceneRenderer> m_sceneRenderer;
 		CommandQueue* m_commandQueue { nullptr };
 		Math::Viewport m_viewport;
-		Rect m_scissorRect;
+		Math::Rectangle m_scissorRect;
 		ID3D12DescriptorHeap* m_srvHeap;
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
 

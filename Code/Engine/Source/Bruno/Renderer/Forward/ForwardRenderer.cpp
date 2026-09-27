@@ -1,12 +1,14 @@
 ﻿#include "brpch.h"
 #include "ForwardRenderer.h"
 
+#include "Bruno/Content/AssetManager.h"
 #include "Bruno/Platform/DirectX/GraphicsDevice.h"
 #include "Bruno/Platform/DirectX/GraphicsPipelineState.h"
 #include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/RootSignature.h"
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/MaterialManager.h"
+#include "Bruno/Renderer/Model.h"
 #include "Bruno/Renderer/PSOCache.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
 #include "Bruno/Scene/Components.h"
@@ -15,9 +17,10 @@
 
 namespace Bruno
 {
-    ForwardRenderer::ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager) :
+    ForwardRenderer::ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager, AbstractAssetManager* assetManager) :
         m_scene(scene),
-		m_materialManager(materialManager)
+		m_materialManager(materialManager),
+		m_assetManager(assetManager)
     {
     	InitializeForwardRootSignature(device);
     	InitializeForwardPSO(device);
@@ -29,7 +32,7 @@ namespace Bruno
     {
 		auto& device = Graphics::GetDevice();
 		
-		/*Profiler::Get().Stats.ResetCounters();
+		/*
 		ID3D12GraphicsCommandList* cmdList = graphicsContext->GetNative();
 		
 		ScopedCpuTimer totalCpuTimer(&Profiler::Get().Stats.CpuTotalRenderTimeMs);
@@ -86,8 +89,9 @@ namespace Bruno
 		graphicsContext->SetDescriptorTable(3, m_materialManager->GetSRVAllocation());
 		graphicsContext->SetDescriptorTable(4, device->GetSRVDescriptorAllocator());
 		
-		for (Entity entity : visibleEntities)
+		for (auto entt : visibleEntities)
 		{
+			Entity entity { entt, m_scene.get()};
 			const auto& modelComponent = entity.GetComponent<ModelComponent>();
 			const auto& transformComponent = entity.GetComponent<TransformComponent>();
 			
@@ -133,13 +137,12 @@ namespace Bruno
 			
 			Profiler::Get().Stats.DrawCalls++;
 			Profiler::Get().Stats.TriangleCount += (mesh->GetIndexCount() / 3);
-			
 		}
 		
-		Profiler::Get().StopGpuTimer(cmdList);
+		//Profiler::Get().StopGpuTimer(cmdList);
 		
 		// Le ordenamos a la GPU copiar los tiempos al buffer leíble
-		Profiler::Get().ResolveGpuTimestamps(cmdList);
+		//Profiler::Get().ResolveGpuTimestamps(cmdList);
 	}
 
     void ForwardRenderer::InitializeForwardRootSignature(GraphicsDevice* device)

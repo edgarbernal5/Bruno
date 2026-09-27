@@ -181,9 +181,10 @@ namespace Bruno
         m_commandList->RSSetViewports(1, viewport.Get12());
     }
 
-    void GraphicsContext::SetScissorRect(const Rect& rect)
+    void GraphicsContext::SetScissorRect(const Math::Rectangle& rect)
     {
-        m_commandList->RSSetScissorRects(1, rect.Get12());
+        D3D12_RECT d3dRect = static_cast<D3D12_RECT>(rect);
+        m_commandList->RSSetScissorRects(1, &d3dRect);
     }
 
     void GraphicsContext::SetPipelineState(GraphicsPipelineState* pso)

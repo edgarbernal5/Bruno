@@ -59,7 +59,7 @@ namespace Bruno
     class ForwardRenderer
     {
     public:
-        ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager);
+        ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager, AbstractAssetManager* assetManager);
         
         void Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex, const FrameCullingResults& cullingData);
 		
@@ -69,6 +69,7 @@ namespace Bruno
         
         std::shared_ptr<Scene> m_scene;
         std::unique_ptr<Shader> m_opaqueShader;
+        AbstractAssetManager* m_assetManager;
 		
         DescriptorAllocator* m_globalSrvHeap;
         std::shared_ptr<RootSignature> m_forwardRootSig;
