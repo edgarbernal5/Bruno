@@ -40,7 +40,7 @@ namespace Bruno
 		void InitEntitiesForRender();
 		
 		void RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex);
-		void RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const FrameCullingResults& cullingData);
+		void RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
 		void RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
 		
 		void Resize(uint32_t width, uint32_t height);

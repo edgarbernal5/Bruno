@@ -176,7 +176,10 @@ namespace Bruno::D3DFunctions
         case TextureFilter::Point:       return D3D12_FILTER_MIN_MAG_MIP_POINT;
         case TextureFilter::Linear:      return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
         case TextureFilter::Anisotropic: return D3D12_FILTER_ANISOTROPIC;
+        case TextureFilter::Comparison_Point:                  return D3D12_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+        case TextureFilter::Comparison_Linear:                 return D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
         case TextureFilter::Comparison_MinMag_Linear_MipPoint: return D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+        case TextureFilter::Comparison_Anisotropic:            return D3D12_FILTER_COMPARISON_ANISOTROPIC;
         default:                         return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
         }
     }

@@ -229,7 +229,7 @@ namespace Bruno
 
     void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& allocator)
     {
-        // En tu arquitectura, el DescriptorAllocator encapsula el heap nativo.
+        // El DescriptorAllocator encapsula el heap nativo.
         // Extraemos el handle de memoria inicial de la GPU (Offset 0)
         D3D12_GPU_DESCRIPTOR_HANDLE baseHandle = allocator.GetHeap()->GetGPUDescriptorHandleForHeapStart();
         m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, baseHandle);
@@ -279,7 +279,8 @@ namespace Bruno
         D3D_PRIMITIVE_TOPOLOGY dxTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
     
         // Traducción estática ultra rápida
-        switch (topology) {
+        switch (topology)
+        {
         case PrimitiveTopology::PointList:     dxTopology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST; break;
         case PrimitiveTopology::LineList:      dxTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
         case PrimitiveTopology::LineStrip:     dxTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP; break;
@@ -354,7 +355,7 @@ namespace Bruno
         m_commandList->SetGraphicsRoot32BitConstants(rootParameterIndex, num32BitValues, data, destOffsetIn32BitValues);
     }
 
-    void GraphicsContext::SetPushConstant(uint32_t rootParameterIndex, uint32_t sourceData,uint32_t destOffsetIn32BitValues)
+    void GraphicsContext::SetPushConstant(uint32_t rootParameterIndex, uint32_t sourceData, uint32_t destOffsetIn32BitValues)
     {
         m_commandList->SetGraphicsRoot32BitConstant(rootParameterIndex, sourceData, destOffsetIn32BitValues);
     }

@@ -4,6 +4,8 @@
 
 namespace Bruno
 {
+    struct CascadeData;
+    class ShadowMapArray;
     class MaterialManager;
     struct FrameCullingResults;
     class RootSignature;
@@ -43,7 +45,7 @@ namespace Bruno
         float OuterConeCos; // std::cos(OuterCutoffAngle)
         Math::Vector3 Padding; // Relleno para 16-bytes
     };
-
+    
     struct ForwardLightingBuffer
     {
         DirectionalLightData Sun; // La luz direccional global
@@ -53,15 +55,21 @@ namespace Bruno
         uint32_t ActivePointLightCount;
         uint32_t ActiveSpotLightCount;
         Math::Vector3 CameraPosition;
-        float Padding;
+        float Padding;                      // 4 bytes
+        Math::Vector3 ExplicitPadding;      // NUEVO: 12 bytes para forzar alineación a 16 bytes
+        
+        Math::Matrix LightSpaceMatrices[4];
+        Math::Vector4 CascadeSplits; // [Split0, Split1, Split2, Split3]
+        uint32_t NumCascades;
+        Math::Vector3 CsmPadding;    // Para alineación a 16 bytes
     };
     
     class ForwardRenderer
     {
     public:
-        ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager, AbstractAssetManager* assetManager);
+        ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<ShadowMapArray>, AbstractAssetManager* assetManager);
         
-        void Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex, const FrameCullingResults& cullingData);
+        void Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
 		
     private:
         void InitializeForwardRootSignature(GraphicsDevice* device);
@@ -75,7 +83,7 @@ namespace Bruno
         std::shared_ptr<RootSignature> m_forwardRootSig;
         std::shared_ptr<GraphicsPipelineState> m_forwardPSO;
         std::shared_ptr<MaterialManager> m_materialManager;
-        
+        std::shared_ptr<ShadowMapArray> m_shadowMapArray;
         Math::Vector3 m_directionalLightDir { 1.0f, 0.0f, 0.0f};
         ConstantBuffer<ForwardLightingBuffer> m_forwardLightsCB;
     };

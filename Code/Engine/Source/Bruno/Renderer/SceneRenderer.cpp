@@ -47,7 +47,7 @@ namespace Bruno
 		
 		m_materialManager = std::make_shared<MaterialManager>(*device, device->GetSRVDescriptorAllocator());
 		
-		m_forwardRenderer = std::make_unique<ForwardRenderer>(device, scene, m_materialManager, assetManager);
+		m_forwardRenderer = std::make_unique<ForwardRenderer>(device, scene, m_materialManager, m_shadowMapArray, assetManager);
 	}
 	
 	SceneRenderer::~SceneRenderer() = default;
@@ -131,14 +131,14 @@ namespace Bruno
 		context->DrawInstanced(3, 1, 0, 0);*/
 	}
 
-	void SceneRenderer::RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const FrameCullingResults& cullingData)
+	void SceneRenderer::RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)
 	{
-		m_forwardRenderer->Render(context, camera, frameIndex, cullingData);
+		m_forwardRenderer->Render(context, camera, frameIndex, cascades, cullingData);
 	}
 
 	void SceneRenderer::RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)
 	{
-		// 1. Transicionar todo el Texture2DArray a estado de escritura de profundidad[cite: 1]
+		// 1. Transicionar todo el Texture2DArray a estado de escritura de profundidad
 		context->TransitionResource(m_shadowMapArray.get(), ResourceState::DepthWrite);
 
 		context->SetPipelineState(m_shadowPSO.get());
@@ -147,20 +147,20 @@ namespace Bruno
 		Math::Viewport cascadeViewport = { 0, 0, SHADOW_MAP_RES, SHADOW_MAP_RES, 0.0f, 1.0f };
 		Math::Rectangle cascadeScissor = { 0, 0, static_cast<long>(SHADOW_MAP_RES), static_cast<long>(SHADOW_MAP_RES) };
 		
-		// Iterar por las 4 cascadas[cite: 1]
+		// Iterar por las 4 cascadas
 		for (uint32_t i = 0; i < NUM_CASCADES; ++i) 
 		{
-			// 2. Enlazar SOLO la capa de esta cascada (FirstArraySlice)[cite: 1]
+			// 2. Enlazar SOLO la capa de esta cascada (FirstArraySlice)
 			context->SetRenderTargetsSlice(0, nullptr, m_shadowMapArray.get(), i);
         
-			// 3. Limpiar el Depth Buffer de la cascada[cite: 1]
+			// 3. Limpiar el Depth Buffer de la cascada
 			context->ClearDepthSlice(m_shadowMapArray.get(), i);
 
-			// 4. Configurar el Viewport para abarcar toda la resolución de sombra (ej. 2048x2048)[cite: 1]
+			// 4. Configurar el Viewport para abarcar toda la resolución de sombra (ej. 2048x2048)
 			context->SetViewport(cascadeViewport);
 			context->SetScissorRect(cascadeScissor);
 
-			// 5. Dibujar las entidades visibles para ESTA cascada (Lista proveniente del Job System)[cite: 1, 6]
+			// 5. Dibujar las entidades visibles para ESTA cascada (Lista proveniente del Job System)
 			const auto& visibleEntities = cullingData.Cascades[i];
         
 			for (auto entt : visibleEntities) 
@@ -171,10 +171,10 @@ namespace Bruno
 
 				ShadowConstants constants;
 
-				constants.World = transform.WorldTransform;
-				constants.LightViewProj = cascades[i].LightViewProj;
+				constants.World = transform.WorldTransform.Transpose();
+				constants.LightViewProj = cascades[i].LightViewProj.Transpose();
 
-				// Enviar a la GPU (b0)[cite: 1]
+				// Enviar a la GPU (b0)
 				context->SetPushConstants(0, sizeof(ShadowConstants) / 4, &constants, 0);
 
 				// Extraer buffers y dibujar				

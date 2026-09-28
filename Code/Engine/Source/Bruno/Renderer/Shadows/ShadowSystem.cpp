@@ -14,13 +14,17 @@ namespace Bruno
 
     void ShadowSystem::Execute()
     {
-        auto lightView = m_scene->GetAllEntitiesWith<DirectionalLightComponent>();
+        auto lightView = m_scene->GetAllEntitiesWith<TransformComponent, DirectionalLightComponent>();
         
         Math::Vector3 directionalLightDir;
-        for (auto entity : lightView)
+        for (auto lightEntity : lightView)
         {
-            const auto& light = lightView.get<DirectionalLightComponent>(entity);
-            directionalLightDir=light.Direction;
+			auto [transformComponent, directionalLight] = lightView.get<TransformComponent, DirectionalLightComponent>(lightEntity);
+            //directionalLightDir = directionalLight.Direction;
+            
+            auto forward = transformComponent.WorldTransform.Forward();
+            forward.Normalize();
+            directionalLightDir = forward;
             break; // Asumimos un solo Sol
         }
         
@@ -83,9 +87,9 @@ namespace Bruno
             // Encontrar el Bounding Box en el Espacio de la Luz
             float minX = (std::numeric_limits<float>::max)();
             float maxX = (std::numeric_limits<float>::lowest());
-            float minY =  (std::numeric_limits<float>::max)();
+            float minY = (std::numeric_limits<float>::max)();
             float maxY = (std::numeric_limits<float>::lowest());
-            float minZ =  (std::numeric_limits<float>::max)();
+            float minZ = (std::numeric_limits<float>::max)();
             float maxZ = (std::numeric_limits<float>::lowest());
 
             for (auto frustumCorner : frustumCorners)

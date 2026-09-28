@@ -26,12 +26,11 @@ namespace Bruno
 		AssetType GetAssetType() const override { return AssetType::Material; }
 
 		std::string Name;
-		//std::map<std::string, AssetHandle> TexturesByName;
 
 		// --- PROPIEDADES PBR (Asset Handles apuntando al AssetManager) ---
-		AssetHandle AlbedoMap = 0;       // 0 significa sin textura
-		AssetHandle NormalMap = 0;       //
-		AssetHandle MetallicRoughnessMap = 0; //
+		AssetHandle AlbedoMap = 0;
+		AssetHandle NormalMap = 0;
+		AssetHandle MetallicRoughnessMap = 0;
 
 		// --- FACTORES ESCALARES (Por si el modelo no tiene texturas) ---
 		Math::Vector4 AlbedoTint = { 1.0f, 1.0f, 1.0f, 1.0f }; //
@@ -44,8 +43,5 @@ namespace Bruno
 		uint32_t RuntimeMaterialIndex = 0xFFFFFFFF;
 		
 	private:
-
-		// La reserva de memoria en el Heap de Descriptores para las texturas de ESTE material
-		DescriptorAllocation m_textureDescriptorAllocation;
 	};
 }

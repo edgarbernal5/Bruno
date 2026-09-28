@@ -69,12 +69,18 @@ namespace Bruno
         Pixel, 
         Geometry
     };
+    
     enum class TextureFilter : uint8_t
     {
         Point,          // Pixel art, texturas crudas sin interpolación
         Linear,         // Suavizado estándar (Bilineal/Trilineal)
         Anisotropic,     // Máxima calidad para texturas vistas en ángulo (ej. el suelo)
-        Comparison_MinMag_Linear_MipPoint,
+        
+        // --- Filtros de Comparación (Para Shadow Maps / PCF) ---
+        Comparison_Point,                   // Sombras duras (sin interpolación PCF)
+        Comparison_Linear,                  // Sombras suaves PCF (Bilineal con Mipmaps lineales)
+        Comparison_MinMag_Linear_MipPoint,  // Sombras suaves PCF optimizado (Bilineal sin Mipmaps)
+        Comparison_Anisotropic              // Comparación anisotrópica (muy poco común para sombras)
     };
 
     enum class TextureAddressMode : uint8_t
@@ -91,6 +97,7 @@ namespace Bruno
         ReadOnly,  // Z-Buffer activado pero no escribe (Partículas, UI transparente)
         None       // Z-Buffer desactivado (UI, Gizmos sobrepuestos)
     };
+    
     enum class ComparisonFunc : uint8_t
     {
         Never,

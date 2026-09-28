@@ -9,7 +9,7 @@ namespace Bruno
 {
 	BR_RTTI_DEFINITIONS(Material);
 
-	Material::Material() : m_textureDescriptorAllocation()
+	Material::Material()
 	{
 		m_handle = {};
 	}

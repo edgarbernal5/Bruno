@@ -22,9 +22,9 @@ namespace Bruno
         texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
         texDesc.Width = resolution;
         texDesc.Height = resolution;
-        texDesc.DepthOrArraySize = numCascades; // ¡El tamaño del Array coincide con el número de cascadas![cite: 1]
+        texDesc.DepthOrArraySize = numCascades; // ¡El tamaño del Array coincide con el número de cascadas!
         texDesc.MipLevels = 1;
-        texDesc.Format = DXGI_FORMAT_R32_TYPELESS; // Memoria sin tipo definido para permitir flexibilidad de lectura/escritura[cite: 1]
+        texDesc.Format = DXGI_FORMAT_R32_TYPELESS; // Memoria sin tipo definido para permitir flexibilidad de lectura/escritura
         texDesc.SampleDesc.Count = 1;
         texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
         texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
@@ -69,15 +69,15 @@ namespace Bruno
         // 3. CREAR 1 SRV (Que abarca todo el Array)
         // ==========================================
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Format = DXGI_FORMAT_R32_FLOAT; // Lente de Lectura para usar en el Deferred Shader[cite: 1]
+        srvDesc.Format = DXGI_FORMAT_R32_FLOAT; // Lente de Lectura para usar en el Deferred Shader
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         srvDesc.Texture2DArray.FirstArraySlice = 0;
-        srvDesc.Texture2DArray.ArraySize = numCascades; // El SRV abarca las 4 capas juntas[cite: 1]
+        srvDesc.Texture2DArray.ArraySize = numCascades; // El SRV abarca las 4 capas juntas
         srvDesc.Texture2DArray.MipLevels = 1;
         srvDesc.Texture2DArray.MostDetailedMip = 0;
 
-        m_srvAllocation = srvHeap.Allocate(1); // Alocamos directamente en tu Mega Heap Bindless global[cite: 1]
+        m_srvAllocation = srvHeap.Allocate(1); // Alocamos directamente en tu Mega Heap Bindless global
         nativeDevice->CreateShaderResourceView(m_resource.Get(), &srvDesc, m_srvAllocation.GetCPUHandle());
     }
 }

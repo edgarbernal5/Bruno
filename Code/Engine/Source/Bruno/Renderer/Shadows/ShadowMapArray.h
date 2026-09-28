@@ -23,7 +23,7 @@ namespace Bruno
         void Initialize(GraphicsDevice* device, DescriptorAllocator& srvHeap, DescriptorAllocator& dsvHeap, uint32_t resolution, uint32_t numCascades = NUM_CASCADES);
     
         const DescriptorAllocation& GetDSVHandle(uint32_t index) const override { return m_dsvAllocations[index]; }
-        
+        uint32_t GetNumCascades() const { return m_numCascades; }
     private:
         std::vector<DescriptorAllocation> m_dsvAllocations;
         

@@ -42,9 +42,9 @@ cbuffer MaterialConstant : register(b1)
     uint g_MaterialIndex;
 };
 
-// t0 y t1: El Mega Heap Bindless
-StructuredBuffer<MaterialData> g_MaterialBuffer : register(t0);
-Texture2D g_Textures[] : register(t1);
+// space0: Recursos Bindless y Materiales
+StructuredBuffer<MaterialData> g_MaterialBuffer : register(t0, space0);
+Texture2D g_Textures[]                          : register(t1, space0);
 SamplerState g_Sampler : register(s0);
 
 // b2: Luces y Cámara para el cálculo PBR del Pixel Shader
@@ -78,6 +78,7 @@ struct SpotLight
     float3 Padding;
 };
 
+#define MAX_CASCADES 4
 cbuffer ForwardLights : register(b2)
 {
     DirectionalLight g_Sun;
@@ -88,7 +89,18 @@ cbuffer ForwardLights : register(b2)
     uint g_ActiveSpotLightCount;
     float3 g_CameraPosition;
     float g_Padding;
+    float3 g_Padding3;
+    
+    matrix g_LightSpaceMatrices[MAX_CASCADES]; // Matrices ViewProjection de la luz por cascada
+    float4 g_CascadeSplits;                    // Distancias límite de cada cascada (usualmente 4)
+    uint g_NumCascades;                        // Cantidad activa de cascadas
+    float3 g_CsmPadding;                       // Padding para alineación a 16 bytes
 };
+
+/// space1: Recursos específicos de iluminación/sombras
+Texture2DArray g_ShadowMap                      : register(t0, space1);
+// s1: Sampler de comparación para Hardware PCF
+SamplerComparisonState g_ShadowSampler : register(s1);
 
 // ==========================================================
 // VERTEX SHADER (Clásico y Ligero)
@@ -185,6 +197,73 @@ float3 CalculatePBRIllumination(float3 F0, float3 albedo, float metallic, float 
     return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
+float3 CalculateDirectionalShadow(float3 worldPos, float viewDistance)
+{
+    uint cascadeIndex = 0;
+
+    // Solo calculamos si realmente hay cascadas activas enviadas desde C++
+    if (g_NumCascades > 0)
+    {
+        // Usar max() y un casteo a int evita el underflow de uint de forma segura
+        uint limit = (uint)max(0, (int)g_NumCascades - 1);
+    
+        for (uint i = 0; i < limit; ++i)
+        {
+            if (viewDistance > g_CascadeSplits[i])
+            {
+                cascadeIndex = i + 1;
+            }
+        }
+    }
+    else
+    {
+        // Si no hay cascadas, no hay sombra
+        return float3(1.0f, 1.0f, 1.0f);
+    }
+    
+    // 2. Transformar la posición del mundo al Light Space de la cascada seleccionada
+    float4 lightSpacePos = mul(float4(worldPos, 1.0f), g_LightSpaceMatrices[cascadeIndex]);
+    
+    // Perspective divide (en luces direccionales ortográficas w es 1, pero es buena práctica)
+    float3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+
+    // 3. Convertir de NDC [-1, 1] a coordenadas UV [0, 1]
+    projCoords.x = projCoords.x * 0.5f + 0.5f;
+    projCoords.y = -projCoords.y * 0.5f + 0.5f;
+
+    // Si el fragmento está fuera del frustum de la luz, no tiene sombra (sombra = 1.0)
+    // X o Y fuera de los límites de la textura de sombras
+    if (projCoords.x < 0.0f || projCoords.x > 1.0f) float3(1.0f, 1.0f, 1.0f); 
+    if (projCoords.y < 0.0f || projCoords.y > 1.0f) float3(1.0f, 1.0f, 1.0f);
+
+    // Z fuera de los límites (Detrás del Near o más allá del Far)
+    if (projCoords.z < 0.0f) return float3(1.0f, 1.0f, 1.0f); 
+    if (projCoords.z > 1.0f) return float3(1.0f, 1.0f, 1.0f);
+    
+    /*
+    //DEBUG
+    // X o Y fuera de los límites de la textura de sombras (Frustum muy pequeño o matriz invertida)
+    if (projCoords.x < 0.0f || projCoords.x > 1.0f) return float3(1.0f, 0.0f, 0.0f); // ROJO
+    if (projCoords.y < 0.0f || projCoords.y > 1.0f) return float3(0.0f, 1.0f, 0.0f); // VERDE
+
+    // Z fuera de los límites (Problema con el Near/Far plane de la luz)
+    if (projCoords.z < 0.0f) return float3(0.0f, 0.0f, 1.0f); // AZUL (Detrás del Near plane)
+    if (projCoords.z > 1.0f) return float3(1.0f, 1.0f, 0.0f); // AMARILLO (Más allá del Far plane)
+    */
+    
+    // 4. Muestreo con PCF por Hardware (Percentage-Closer Filtering)
+    // Usamos la coordenada Z como valor de referencia para la comparación de profundidad
+    // Se le aplica un pequeño bias (por ejemplo, restar 0.005) para evitar el "Shadow Acne"
+    float bias = 0.001f; // Ajusta este valor empíricamente
+    float shadow = g_ShadowMap.SampleCmpLevelZero(
+        g_ShadowSampler, 
+        float3(projCoords.xy, cascadeIndex), 
+        projCoords.z - bias
+    );
+
+    return float3(shadow, shadow, shadow);
+}
+
 // ==========================================================
 // PIXEL SHADER
 // ==========================================================
@@ -215,9 +294,19 @@ float4 PSMain(PixelInput input) : SV_TARGET
 
     // 3. ILUMINACIÓN DIRECCIONAL (Sol)
     float3 sunDir = normalize(-g_Sun.Direction);
-    float3 sunRadiance = g_Sun.Color * g_Sun.Intensity;
-    finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, sunDir, sunRadiance);
-
+    
+    // Calcular distancia desde la cámara al fragmento para seleccionar la cascada
+    float viewDistance = length(g_CameraPosition - input.PositionWorld);
+    
+    // Obtener factor de sombra (1.0 = iluminado, 0.0 = sombra total)
+    float3 shadowFactor = CalculateDirectionalShadow(input.PositionWorld, viewDistance);
+    
+    // Multiplicar la intensidad por el factor de sombra
+    float3 sunRadiance = g_Sun.Color * g_Sun.Intensity * shadowFactor;
+    
+    //finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, sunDir, sunRadiance);
+    finalColor.rgb = sunRadiance;
+    
     // 4. LUCES PUNTUALES
     for (uint i = 0; i < g_ActivePointLightCount; ++i)
     {

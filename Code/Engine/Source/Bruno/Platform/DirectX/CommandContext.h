@@ -22,7 +22,6 @@ namespace Bruno
         GraphicsDevice& m_device;
         D3D12_COMMAND_LIST_TYPE m_commandType;
         
-        // Usar ComPtr para que manejen su propio conteo de referencias (Release)
         Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_commandList;
         Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_commandAllocator;
     };

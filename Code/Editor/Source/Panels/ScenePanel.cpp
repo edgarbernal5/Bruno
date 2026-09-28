@@ -177,7 +177,7 @@ namespace Bruno
 			context.SetViewport(m_viewport);
 			context.SetScissorRect(m_scissorRect);
 			
-			m_sceneRenderer->RenderForward(&context, m_sceneDocument->GetCamera(), frameIndex, cullingData);
+			m_sceneRenderer->RenderForward(&context, m_sceneDocument->GetCamera(), frameIndex, cascadeData, cullingData);
 			
 			RenderGizmo(context, frameIndex);
 			m_debugRenderer->RenderBoundingBoxes(&context, m_sceneDocument->GetCamera(), frameIndex);

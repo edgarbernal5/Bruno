@@ -98,7 +98,7 @@ namespace Bruno
                 // B. ¿Cascadas de Sombras? (SIMD Ultra Rápido sin locks)
                 for (uint32_t c = 0; c < NUM_CASCADES; ++c)
                 {
-                    //if (cascadeOBBs[c].Intersects(worldOBB))
+                    if (cascadeOBBs[c].Intersects(worldObb))
                     {
                         localResult.ShadowCascades[c].emplace_back(entity);
                     }
@@ -106,51 +106,6 @@ namespace Bruno
             }
         }, &cullingGroup);
         
-        // Vector de vectores para guardar resultados SIN mutexes
-        /*
-        std::vector<ThreadLocalResult> threadLocalVisible(numChunks);
-        for (size_t chunkIdx = 0; chunkIdx < numChunks; ++chunkIdx)
-        {
-            JobSystem::Get().Execute([&, chunkIdx]()
-            {
-                size_t startIdx = chunkIdx * chunkSize;
-                size_t endIdx = std::min<size_t>(startIdx + chunkSize, totalEntities);
-                
-                // Reservamos memoria aproximada para evitar allocations
-                threadLocalVisible[chunkIdx].visibleEntities.reserve(chunkSize / 2);
-                
-                for (size_t i = startIdx; i < endIdx; ++i)
-                {
-                    entt::entity entt = entitiesToCull[i];
-                    const auto& [transform, modelComponent, bbox] = entitiesGroup.get<TransformComponent, ModelComponent, BoundingBoxComponent>(entt);
-                    
-                    DirectX::BoundingOrientedBox localObb;
-                    localObb.Center = DirectX::XMFLOAT3(bbox.Center.x, bbox.Center.y, bbox.Center.z);
-                    localObb.Extents = DirectX::XMFLOAT3(bbox.Extents.x, bbox.Extents.y, bbox.Extents.z);
-                    localObb.Orientation = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-
-                    Math::Matrix worldMat = transform.WorldTransform;
-                    const DirectX::XMFLOAT4X4* worldMatFloat = reinterpret_cast<const DirectX::XMFLOAT4X4*>(&worldMat);
-                    DirectX::XMMATRIX xmWorld = DirectX::XMLoadFloat4x4(worldMatFloat);
-            
-                    DirectX::BoundingOrientedBox worldObb;
-                    localObb.Transform(worldObb, xmWorld);
-                    
-                    // Usamos la función nativa ContainedBy contra nuestros planos perfectos
-                    // Orden: Near, Far, Right, Left, Top, Bottom
-                    DirectX::ContainmentType result = worldObb.ContainedBy(
-                        frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], 
-                        frustumPlanes[3], frustumPlanes[4], frustumPlanes[5]
-                    );
-
-                    if (result != DirectX::DISJOINT)
-                    {
-                        threadLocalVisible[chunkIdx].visibleEntities.emplace_back(entt);
-                    }
-                }
-            }, &cullingGroup);
-        }
-        */
         JobSystem::Get().Wait(cullingGroup);
         
         // FASE REDUCE: Unimos todos los WorkerChunks en m_finalResults
@@ -220,7 +175,6 @@ namespace Bruno
             m_finalResults.Cascades[c].clear();
         }
 
-        // 1. Contar totales para hacer una sola alocación exacta de memoria maestra
         size_t totalVisible = 0;
         size_t totalShadows[NUM_CASCADES] = { 0 };
 
@@ -239,7 +193,7 @@ namespace Bruno
             m_finalResults.Cascades[c].reserve(totalShadows[c]);
         }
 
-        // 2. Fusión masiva ultra rápida (Inserción O(n) contigua)
+        //Fusión masiva ultra rápida (Inserción O(n) contigua)
         for (uint32_t i = 0; i < numChunks; ++i)
         {
             m_finalResults.MainCamera.insert(

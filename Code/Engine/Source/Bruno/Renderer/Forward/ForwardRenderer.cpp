@@ -11,15 +11,18 @@
 #include "Bruno/Renderer/Model.h"
 #include "Bruno/Renderer/PSOCache.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
+#include "Bruno/Renderer/Shadows/ShadowMapArray.h"
+#include "Bruno/Renderer/Shadows/ShadowSystem.h"
 #include "Bruno/Scene/Components.h"
 #include "Bruno/Scene/Scene.h"
 #include "Bruno/Scene/Systems/CullingSystem.h"
 
 namespace Bruno
 {
-    ForwardRenderer::ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager, AbstractAssetManager* assetManager) :
+    ForwardRenderer::ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<ShadowMapArray> shadowMapArray, AbstractAssetManager* assetManager) :
         m_scene(scene),
 		m_materialManager(materialManager),
+		m_shadowMapArray(shadowMapArray),
 		m_assetManager(assetManager)
     {
     	InitializeForwardRootSignature(device);
@@ -28,10 +31,10 @@ namespace Bruno
     	m_globalSrvHeap = &device->GetSRVDescriptorAllocator();
     }
 
-    void ForwardRenderer::Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex, const FrameCullingResults& cullingData)
+    void ForwardRenderer::Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)
     {
 		auto& device = Graphics::GetDevice();
-		
+    	graphicsContext->TransitionResource(m_shadowMapArray.get(), ResourceState::PixelShaderResource);
 		/*
 		ID3D12GraphicsCommandList* cmdList = graphicsContext->GetNative();
 		
@@ -61,7 +64,8 @@ namespace Bruno
 
 		// 1. Luz Ambiental Fuerte para forzar visibilidad
 		lightData.GlobalAmbientColor = Math::Vector3(0.05f, 0.05f, 0.05f); 
-
+    	lightData.NumCascades = m_shadowMapArray->GetNumCascades(); // ej. 4
+    	
 		auto entitiesLightsGroup = m_scene->GetAllEntitiesWith<TransformComponent, DirectionalLightComponent>();
 		for (auto lightEntity : entitiesLightsGroup)
 		{
@@ -74,6 +78,13 @@ namespace Bruno
 			lightData.Sun.Color = directionalLight.Color;
 			
 			m_directionalLightDir = forward;
+			float splitsDistances[4];
+			for (uint32_t i = 0; i < lightData.NumCascades; i++)
+			{
+				lightData.LightSpaceMatrices[i] = cascades[i].LightViewProj.Transpose();
+				splitsDistances[i]=cascades[i].SplitDistance;
+			}
+			lightData.CascadeSplits = Math::Vector4(splitsDistances);
 			break;
 		}
 		lightData.ActivePointLightCount = 0;
@@ -81,14 +92,19 @@ namespace Bruno
 		
 		m_forwardLightsCB.Update(*graphicsContext, lightData);
 		
+    	graphicsContext->SetDescriptorHeaps({ m_globalSrvHeap });
+    	
 		// Setear Luces en el Índice 2 (b2)
 		graphicsContext->SetConstantBuffer(2, m_forwardLightsCB);
-		graphicsContext->SetDescriptorHeaps({ m_globalSrvHeap });
 		
 		// Vincular el StructuredBuffer de Materiales a 't0' (Índice 3) usando su Allocation específica
 		graphicsContext->SetDescriptorTable(3, m_materialManager->GetSRVAllocation());
 		graphicsContext->SetDescriptorTable(4, device->GetSRVDescriptorAllocator());
 		
+    	// Bindear la textura Array de sombras y el Sampler de comparación
+    	// Tendrás que exponer en tu Root Signature el t2 y el s1, o manejarlo vía descriptores dinámicos.
+    	graphicsContext->SetDescriptorTable(5, m_shadowMapArray->GetSVRAllocation());
+    	
 		for (auto entt : visibleEntities)
 		{
 			Entity entity { entt, m_scene.get()};
@@ -163,14 +179,24 @@ namespace Bruno
 
         // t1: Arreglo infinito de Texturas Bindless (-1 / UINT_MAX)
         prototypeSig->AddDescriptorTableSRV(UINT_MAX, 1, 0, ShaderVisibility::Pixel);
+    	
+    	// t0: Arreglo de shadow map, space = 1;
+        prototypeSig->AddDescriptorTableSRV(1, 0, 1, ShaderVisibility::Pixel);
 
-        // s0: Sampler principal (Wrap, Anisotrópico, etc.)
-        prototypeSig->AddStaticSampler(
-            0, 0,
-            TextureFilter::Anisotropic,
-            TextureAddressMode::Wrap,
-            ShaderVisibility::Pixel
-        );
+    	// s0: Sampler principal (Wrap, Anisotrópico, etc.)
+    	prototypeSig->AddStaticSampler(
+			0, 0, // s0, space 0
+			TextureFilter::Anisotropic,
+			TextureAddressMode::Wrap,
+			ShaderVisibility::Pixel
+		);
+    	
+    	prototypeSig->AddStaticSampler(
+			1, 0, // s1, space 0
+			TextureFilter::Comparison_MinMag_Linear_MipPoint, // IMPORTANTE: Debe ser un filtro de comparación para PCF
+			TextureAddressMode::Clamp,       // IMPORTANTE: Clamp o Border para que la sombra no se repita en los bordes
+			ShaderVisibility::Pixel
+		);
 
         m_forwardRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
     }
@@ -178,7 +204,7 @@ namespace Bruno
     void ForwardRenderer::InitializeForwardPSO(GraphicsDevice* device)
     {
         GraphicsPipelineStateDesc psoDesc = {};
-        // Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
+        
         psoDesc.RootSignature = m_forwardRootSig.get();
         psoDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
 		

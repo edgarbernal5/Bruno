@@ -7,13 +7,13 @@ namespace Bruno
     constexpr uint32_t INVALID_TEXTURE_INDEX = 0xFFFFFFFF;
 
     // ALINEACIÓN ESTRICTA DE 16 BYTES PARA GPU
-    __declspec(align(16)) struct MaterialData {
-        Math::Vector4 AlbedoTint;       // 16 bytes
-        float MetallicFactor;           // 4 bytes
-        float RoughnessFactor;          // 4 bytes
-        uint32_t AlbedoTextureIndex;    // 4 bytes
-        uint32_t NormalTextureIndex;    // 4 bytes
-        // Total: 32 bytes (Perfectamente alineado)
+    __declspec(align(16)) struct MaterialData
+    {
+        Math::Vector4 AlbedoTint;
+        float MetallicFactor;
+        float RoughnessFactor;
+        uint32_t AlbedoTextureIndex;
+        uint32_t NormalTextureIndex;
         
         // Constructor por defecto (Material de plástico blanco básico)
         MaterialData() 

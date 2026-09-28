@@ -16,8 +16,8 @@ namespace Bruno
         CommandQueueManager(GraphicsDevice& device);
         ~CommandQueueManager();
         
-        CommandQueue& GetGraphicsQueue() { return *m_directQueue; }
-        CommandQueue& GetCopyQueue() { return *m_copyQueue; }
+        CommandQueue& GetGraphicsQueue() const { return *m_directQueue; }
+        CommandQueue& GetCopyQueue() const { return *m_copyQueue; }
 
         // Ejecuta el UploadContext en la cola de copia y devuelve el Fence Value a esperar
         uint64_t ExecuteAndReturnFence(UploadContext& uploadContext);
