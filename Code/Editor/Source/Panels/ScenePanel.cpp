@@ -22,6 +22,7 @@
 #include "Bruno/Platform/DirectX/ColorBuffer.h"
 #include "Bruno/Renderer/MaterialManager.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
+#include "Bruno/Renderer/Lighting/LightSystem.h"
 #include "Bruno/Renderer/Shadows/ShadowSystem.h"
 #include "Bruno/Scene/Systems/CullingSystem.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
@@ -141,6 +142,7 @@ namespace Bruno
 			Profiler::Get().Stats.ResetCounters();
 			
 			TransformSystem::Update(m_scene.get());
+			LightSystem::Update(m_scene.get());
 			
 			m_shadowSystem->Execute();
 			m_cullingSystem->Execute();
@@ -181,6 +183,7 @@ namespace Bruno
 			
 			RenderGizmo(context, frameIndex);
 			m_debugRenderer->RenderBoundingBoxes(&context, m_sceneDocument->GetCamera(), frameIndex);
+			m_debugRenderer->RenderDirectionalLightGizmos(&context, m_sceneDocument->GetCamera(), frameIndex);
 			if (m_marqueeInteraction.m_dragRectangle)
 			{
 				RenderMarquee(context, m_marqueeInteraction.m_ndcMin, m_marqueeInteraction.m_ndcMax);

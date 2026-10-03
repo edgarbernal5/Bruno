@@ -16,12 +16,14 @@ namespace Bruno
         uint32_t NormalTextureIndex;
         
         // Constructor por defecto (Material de plástico blanco básico)
-        MaterialData() 
-            : AlbedoTint(1.0f, 1.0f, 1.0f, 1.0f), 
-              MetallicFactor(0.0f), 
-              RoughnessFactor(0.5f),
-              AlbedoTextureIndex(INVALID_TEXTURE_INDEX),
-              NormalTextureIndex(INVALID_TEXTURE_INDEX) {}
+        MaterialData() :
+            AlbedoTint(1.0f, 1.0f, 1.0f, 1.0f), 
+            MetallicFactor(0.0f), 
+            RoughnessFactor(0.5f),
+            AlbedoTextureIndex(INVALID_TEXTURE_INDEX),
+            NormalTextureIndex(INVALID_TEXTURE_INDEX)
+        {
+        }
     };
 	
 }

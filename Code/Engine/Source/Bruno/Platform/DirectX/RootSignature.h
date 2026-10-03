@@ -28,7 +28,7 @@ namespace Bruno
         void AddConstants(uint32_t num32BitValues, uint32_t shaderRegister, uint32_t registerSpace = 0, ShaderVisibility visibility = ShaderVisibility::All);
         void AddConstantBufferView(uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility = ShaderVisibility::All);
         void AddDescriptorTableSRV(uint32_t numDescriptors, uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility = ShaderVisibility::All);
-        void AddStaticSampler(uint32_t shaderRegister, uint32_t registerSpace = 0, TextureFilter filter = TextureFilter::Linear, TextureAddressMode addressMode = TextureAddressMode::Wrap, ShaderVisibility visibility = ShaderVisibility::All);
+        void AddStaticSampler(uint32_t shaderRegister, uint32_t registerSpace = 0, TextureFilter filter = TextureFilter::Linear, TextureAddressMode addressMode = TextureAddressMode::Wrap, ShaderVisibility visibility = ShaderVisibility::All, ComparisonFunc compFunc = ComparisonFunc::None);
         void Build(RootSignatureFlags flags = RootSignatureFlags::AllowInputAssembler);
         
         size_t ComputeHash(RootSignatureFlags flags) const;

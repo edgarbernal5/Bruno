@@ -20,11 +20,9 @@ namespace Bruno
         for (auto lightEntity : lightView)
         {
 			auto [transformComponent, directionalLight] = lightView.get<TransformComponent, DirectionalLightComponent>(lightEntity);
-            //directionalLightDir = directionalLight.Direction;
+
+            directionalLightDir = directionalLight.WorldDirection;
             
-            auto forward = transformComponent.WorldTransform.Forward();
-            forward.Normalize();
-            directionalLightDir = forward;
             break; // Asumimos un solo Sol
         }
         
@@ -79,7 +77,25 @@ namespace Bruno
                 center += frustumCorners[j];
             }
             center /= 8.0f;
+            
+            float sphereRadius = 0.0f;
+            for (int j = 0; j < 8; ++j)
+            {
+                float dist = Math::Vector3::Distance(center, frustumCorners[j]);
+                sphereRadius = std::max<float>(sphereRadius, dist);
+            }
 
+            float texelPerUnit = m_shadowMapResolution / (sphereRadius * 2.0f);
+            Math::Matrix scalar = Math::Matrix::CreateScale(texelPerUnit, texelPerUnit, texelPerUnit);
+            Math::Vector3 baseLookAt = center - (lightDir * sphereRadius);
+            Math::Matrix lightView = Math::Matrix::CreateLookAt(baseLookAt, center, Math::Vector3::Up);
+            
+            lightView = lightView * scalar;
+            lightView.m[3][0] = std::floor(lightView.m[3][0]);
+            lightView.m[3][1] = std::floor(lightView.m[3][1]);
+            lightView.m[3][2] = std::floor(lightView.m[3][2]);
+            lightView = lightView * scalar.Invert();
+            /*
             // Matriz View de la Luz (mirando al centro del sub-frustum)
             Math::Vector3 lightPos = center - (lightDir * (farClip - nearClip)); 
             Math::Matrix lightView = Math::Matrix::CreateLookAt(lightPos, center, Math::Vector3::Up);
@@ -121,14 +137,28 @@ namespace Bruno
             // ==========================================
             // LA MAGIA AAA 2: Z-PULLBACK (Shadow Popping Fix)
             // ==========================================
+            
+            // En CalculateCascadeMatrices, infla la caja para debugear
+            float margin = 2000.0f; // Ajusta según la escala de tu motor
+            
             // Tiramos el plano cercano artificialmente hacia atrás hacia la luz
-            float lightNearZ = minZ - 150.0f; 
-            float lightFarZ  = maxZ;
-
+            float lightNearZ = minZ - margin; 
+            float lightFarZ  = maxZ + margin;
+            
+            //minX -= margin; maxX += margin;
+            //minY -= margin; maxY += margin;
+            
             Math::Matrix lightProj = Math::Matrix::CreateOrthographicOffCenter(
                 minX, maxX, minY, maxY, lightNearZ, lightFarZ
-            );
+            );*/
 
+            Math::Matrix lightProj = Math::Matrix::CreateOrthographicOffCenter(
+            -sphereRadius, sphereRadius, 
+            -sphereRadius, sphereRadius, 
+            -sphereRadius * 6.0f, // Con DepthClipEnable=FALSE, este valor puede ser compacto
+            sphereRadius * 6.0f
+        );
+            
             auto& cascade = m_cascadesData[i];
             
             cascade.LightViewProj = lightView * lightProj;

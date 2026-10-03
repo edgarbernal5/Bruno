@@ -326,15 +326,6 @@ namespace Bruno
 
 					newLight.LocalPosition = translation;
 					newLight.LocalRotation = rotation;
-					
-					aiNode* currentNode = lightNode;
-					while (currentNode != nullptr)
-					{
-						Math::Matrix nodeTransform = ToMatrix(currentNode->mTransformation);
-						// Acumular transformación (Local * Parent)
-						globalTransform = globalTransform * nodeTransform; 
-						currentNode = currentNode->mParent;
-					}
 				}
 				else
 				{
@@ -342,12 +333,6 @@ namespace Bruno
 					newLight.LocalPosition = Math::Vector3 { aiLight->mPosition.x, aiLight->mPosition.y, aiLight->mPosition.z };
 					newLight.LocalRotation = Math::Quaternion::Identity; 
 				}
-
-				// Transformar la normal al espacio global
-				Math::Vector3 worldDirection = Math::Vector3::TransformNormal(localDirection, globalTransform);
-				worldDirection.Normalize();
-            
-				newLight.Direction = worldDirection;
 			}
 		}
 	}

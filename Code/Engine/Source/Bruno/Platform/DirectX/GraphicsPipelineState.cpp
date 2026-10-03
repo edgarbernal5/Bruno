@@ -27,6 +27,7 @@ namespace Bruno
         HashCombine(seed, RasterizerDesc.DepthBiasClamp);
         HashCombine(seed, RasterizerDesc.SlopeScaledDepthBias);
         HashCombine(seed, RasterizerDesc.FrontCounterClockwise);
+        HashCombine(seed, RasterizerDesc.DepthClipEnable);
         
         HashCombine(seed, static_cast<int>(BlendState.Mode));
         HashCombine(seed, static_cast<int>(DepthState.Mode));

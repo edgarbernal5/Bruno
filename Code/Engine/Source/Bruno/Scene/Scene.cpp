@@ -66,8 +66,8 @@ namespace Bruno
 			auto& comp = lightEntity.AddComponent<DirectionalLightComponent>();
 			comp.Color = Math::Vector3 { 1.0f, 1.0f, 1.0f };
 			comp.Intensity = 1.0f;
-			comp.Direction = Math::Vector3(0.5f, -1.0f, 0.5f);
-			comp.Direction.Normalize();
+			comp.LocalDirection = Math::Vector3(0.5f, -1.0f, 0.5f);
+			comp.LocalDirection.Normalize();
 			
 			return rootEntity;
 		}
@@ -93,7 +93,7 @@ namespace Bruno
 				auto& comp = lightEntity.AddComponent<DirectionalLightComponent>();
 				comp.Color = light.Color;
 				comp.Intensity = light.Intensity;
-				comp.Direction = light.Direction;
+				comp.LocalDirection = light.Direction;
 			}
 		}
 		

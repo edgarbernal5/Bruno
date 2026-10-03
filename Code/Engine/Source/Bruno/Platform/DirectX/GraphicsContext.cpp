@@ -155,7 +155,12 @@ namespace Bruno
         FlushBarriers();
         
         // Llamada nativa a la API
-        m_commandList->OMSetRenderTargets(numRTVs, rtvHandles, FALSE, pDsvHandle);
+        m_commandList->OMSetRenderTargets(
+            numRTVs, 
+            numRTVs > 0 ? rtvHandles : nullptr, 
+            FALSE, 
+            pDsvHandle
+        );
     }
 
     void GraphicsContext::ClearDepthSlice(TextureArrayResource* depthResource, uint32_t arraySlice, float depth, uint8_t stencil)

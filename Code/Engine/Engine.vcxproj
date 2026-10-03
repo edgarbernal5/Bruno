@@ -140,6 +140,7 @@
     <ClInclude Include="Source\Bruno\Renderer\Deferred\GBuffer.h" />
     <ClInclude Include="Source\Bruno\Renderer\Deferred\SceneRendererDeferred.h" />
     <ClInclude Include="Source\Bruno\Renderer\Forward\ForwardRenderer.h" />
+    <ClInclude Include="Source\Bruno\Renderer\Lighting\LightSystem.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialData.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialManager.h" />
     <ClInclude Include="Source\Bruno\Renderer\MaterialMap.h" />
@@ -324,6 +325,7 @@
     <ClCompile Include="Source\Bruno\Renderer\Deferred\GBuffer.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Deferred\SceneRendererDeferred.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\Forward\ForwardRenderer.cpp" />
+    <ClCompile Include="Source\Bruno\Renderer\Lighting\LightSystem.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\MaterialManager.cpp" />
     <ClCompile Include="Source\Bruno\Renderer\MaterialMap.cpp" />
     <ClCompile Include="Source\Bruno\Content\ContentManager.cpp" />

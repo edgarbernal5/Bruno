@@ -89,7 +89,7 @@ cbuffer ForwardLights : register(b2)
     uint g_ActiveSpotLightCount;
     float3 g_CameraPosition;
     float g_Padding;
-    float3 g_Padding3;
+    float3 g_ExplicitPadding;
     
     matrix g_LightSpaceMatrices[MAX_CASCADES]; // Matrices ViewProjection de la luz por cascada
     float4 g_CascadeSplits;                    // Distancias límite de cada cascada (usualmente 4)
@@ -98,7 +98,7 @@ cbuffer ForwardLights : register(b2)
 };
 
 /// space1: Recursos específicos de iluminación/sombras
-Texture2DArray g_ShadowMap                      : register(t0, space1);
+Texture2DArray g_ShadowMap : register(t0, space1);
 // s1: Sampler de comparación para Hardware PCF
 SamplerComparisonState g_ShadowSampler : register(s1);
 
@@ -197,71 +197,67 @@ float3 CalculatePBRIllumination(float3 F0, float3 albedo, float metallic, float 
     return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
-float3 CalculateDirectionalShadow(float3 worldPos, float viewDistance)
+// Función auxiliar para muestrear una cascada específica
+float SampleShadowCascade(float3 worldPos, uint cascadeIndex)
 {
-    uint cascadeIndex = 0;
-
-    // Solo calculamos si realmente hay cascadas activas enviadas desde C++
-    if (g_NumCascades > 0)
-    {
-        // Usar max() y un casteo a int evita el underflow de uint de forma segura
-        uint limit = (uint)max(0, (int)g_NumCascades - 1);
-    
-        for (uint i = 0; i < limit; ++i)
-        {
-            if (viewDistance > g_CascadeSplits[i])
-            {
-                cascadeIndex = i + 1;
-            }
-        }
-    }
-    else
-    {
-        // Si no hay cascadas, no hay sombra
-        return float3(1.0f, 1.0f, 1.0f);
-    }
-    
-    // 2. Transformar la posición del mundo al Light Space de la cascada seleccionada
     float4 lightSpacePos = mul(float4(worldPos, 1.0f), g_LightSpaceMatrices[cascadeIndex]);
-    
-    // Perspective divide (en luces direccionales ortográficas w es 1, pero es buena práctica)
     float3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
-
-    // 3. Convertir de NDC [-1, 1] a coordenadas UV [0, 1]
+    
     projCoords.x = projCoords.x * 0.5f + 0.5f;
     projCoords.y = -projCoords.y * 0.5f + 0.5f;
 
-    // Si el fragmento está fuera del frustum de la luz, no tiene sombra (sombra = 1.0)
-    // X o Y fuera de los límites de la textura de sombras
-    if (projCoords.x < 0.0f || projCoords.x > 1.0f) float3(1.0f, 1.0f, 1.0f); 
-    if (projCoords.y < 0.0f || projCoords.y > 1.0f) float3(1.0f, 1.0f, 1.0f);
-
-    // Z fuera de los límites (Detrás del Near o más allá del Far)
-    if (projCoords.z < 0.0f) return float3(1.0f, 1.0f, 1.0f); 
-    if (projCoords.z > 1.0f) return float3(1.0f, 1.0f, 1.0f);
+    // Si sale de los límites, no hay sombra
+    if (projCoords.x < 0.0f || projCoords.x > 1.0f || 
+        projCoords.y < 0.0f || projCoords.y > 1.0f || 
+        projCoords.z < 0.0f || projCoords.z > 1.0f)
+    {
+        return 1.0f;
+    }
     
-    /*
-    //DEBUG
-    // X o Y fuera de los límites de la textura de sombras (Frustum muy pequeño o matriz invertida)
-    if (projCoords.x < 0.0f || projCoords.x > 1.0f) return float3(1.0f, 0.0f, 0.0f); // ROJO
-    if (projCoords.y < 0.0f || projCoords.y > 1.0f) return float3(0.0f, 1.0f, 0.0f); // VERDE
+    // Bias fijo temporal (idealmente debe escalar según la cascada)
+    float bias = 0.001f; 
+    return g_ShadowMap.SampleCmpLevelZero(g_ShadowSampler, float3(projCoords.xy, cascadeIndex), projCoords.z - bias);
+}
 
-    // Z fuera de los límites (Problema con el Near/Far plane de la luz)
-    if (projCoords.z < 0.0f) return float3(0.0f, 0.0f, 1.0f); // AZUL (Detrás del Near plane)
-    if (projCoords.z > 1.0f) return float3(1.0f, 1.0f, 0.0f); // AMARILLO (Más allá del Far plane)
-    */
+float CalculateDirectionalShadow(float3 worldPos, float viewDistance)
+{
+    // Si no hay cascadas, no hay sombra
+    if (g_NumCascades == 0) return 1.0f; 
     
-    // 4. Muestreo con PCF por Hardware (Percentage-Closer Filtering)
-    // Usamos la coordenada Z como valor de referencia para la comparación de profundidad
-    // Se le aplica un pequeño bias (por ejemplo, restar 0.005) para evitar el "Shadow Acne"
-    float bias = 0.001f; // Ajusta este valor empíricamente
-    float shadow = g_ShadowMap.SampleCmpLevelZero(
-        g_ShadowSampler, 
-        float3(projCoords.xy, cascadeIndex), 
-        projCoords.z - bias
-    );
+    // Solo calculamos si realmente hay cascadas activas enviadas desde C++
+    uint cascadeIndex = 0;
+    // Usar max() y un casteo a int evita el underflow de uint de forma segura
+    uint limit = (uint)max(0, (int)g_NumCascades - 1);
 
-    return float3(shadow, shadow, shadow);
+    for (uint i = 0; i < limit; ++i)
+    {
+        if (viewDistance > g_CascadeSplits[i])
+        {
+            cascadeIndex = i + 1;
+        }
+    }
+    
+    // 1. Tomar muestra de la cascada principal
+    float shadow = SampleShadowCascade(worldPos, cascadeIndex);
+
+    // 2. Cascade Blending (Transición Suave)
+    if (cascadeIndex < limit)
+    {
+        float splitDistance = g_CascadeSplits[cascadeIndex];
+        float blendBand = 10.0f; // Unidades del mundo donde ambas cascadas se mezclan
+        
+        // Calcula qué tan adentrado está el fragmento en la banda de transición (0.0 a 1.0)
+        float blendFactor = smoothstep(splitDistance - blendBand, splitDistance, viewDistance);
+        
+        if (blendFactor > 0.0f)
+        {
+            // Tomar muestra de la SIGUIENTE cascada y mezclar
+            float nextShadow = SampleShadowCascade(worldPos, cascadeIndex + 1);
+            shadow = lerp(shadow, nextShadow, blendFactor);
+        }
+    }
+
+    return shadow;
 }
 
 // ==========================================================
@@ -299,16 +295,16 @@ float4 PSMain(PixelInput input) : SV_TARGET
     float viewDistance = length(g_CameraPosition - input.PositionWorld);
     
     // Obtener factor de sombra (1.0 = iluminado, 0.0 = sombra total)
-    float3 shadowFactor = CalculateDirectionalShadow(input.PositionWorld, viewDistance);
+    float shadowFactor = CalculateDirectionalShadow(input.PositionWorld, viewDistance);
     
     // Multiplicar la intensidad por el factor de sombra
     float3 sunRadiance = g_Sun.Color * g_Sun.Intensity * shadowFactor;
     
     //finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, sunDir, sunRadiance);
-    finalColor.rgb = sunRadiance;
+    finalColor.rgb = shadowFactor;
     
     // 4. LUCES PUNTUALES
-    for (uint i = 0; i < g_ActivePointLightCount; ++i)
+    /*for (uint i = 0; i < g_ActivePointLightCount; ++i)
     {
         float3 lightVec = g_PointLights[i].Position - input.PositionWorld;
         float distance = length(lightVec);
@@ -349,7 +345,7 @@ float4 PSMain(PixelInput input) : SV_TARGET
             float3 spotRadiance = g_SpotLights[j].Color * g_SpotLights[j].Intensity * (distanceAttenuation * spotAttenuation);
             finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, lightDir, spotRadiance);
         }
-    }
+    }*/
     
     // HDR Tonemapping (Reinhard) y Gamma Correction (2.2) 
     // Esenciales ya que la luz PBR genera valores superiores a 1.0

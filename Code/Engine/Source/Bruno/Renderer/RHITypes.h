@@ -60,6 +60,7 @@ namespace Bruno
         float DepthBiasClamp = 0.0f;
         float SlopeScaledDepthBias = 0.0f;
         bool FrontCounterClockwise = true;
+        bool DepthClipEnable = true;
     };
     
     enum class ShaderVisibility : uint8_t
@@ -100,6 +101,7 @@ namespace Bruno
     
     enum class ComparisonFunc : uint8_t
     {
+        None,
         Never,
         Less,
         Equal,

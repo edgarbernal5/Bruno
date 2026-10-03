@@ -60,10 +60,11 @@ namespace Bruno
         HashCombine(m_hash, static_cast<uint32_t>(visibility));
     }
 
-    void RootSignature::AddStaticSampler(uint32_t shaderRegister, uint32_t registerSpace, TextureFilter filter, TextureAddressMode addressMode, ShaderVisibility visibility)
+    void RootSignature::AddStaticSampler(uint32_t shaderRegister, uint32_t registerSpace, TextureFilter filter, TextureAddressMode addressMode, ShaderVisibility visibility, ComparisonFunc compFunc)
     {
         D3D12_FILTER dxFilter = D3DFunctions::GetDX12Filter(filter);
         D3D12_TEXTURE_ADDRESS_MODE dxAddress = D3DFunctions::GetDX12AddressMode(addressMode);
+        D3D12_COMPARISON_FUNC dxComparison = D3DFunctions::GetDX12ComparisonFunc(compFunc);
 
         // Nota: Si usas Anisotropic, es buena práctica pasar el máximo soportado (16)
         UINT maxAnisotropy = (filter == TextureFilter::Anisotropic) ? 16 : 1;
@@ -74,7 +75,7 @@ namespace Bruno
             dxAddress, dxAddress, dxAddress,   // Address U, V, W traducidos
             0.0f,                              // MipLODBias
             maxAnisotropy,                     // MaxAnisotropy dinámico
-            D3D12_COMPARISON_FUNC_LESS_EQUAL,  
+            dxComparison,  
             D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE, // Color si usas TextureAddressMode::Border
             0.0f,                              // MinLOD
             D3D12_FLOAT32_MAX,                 // MaxLOD
@@ -90,6 +91,7 @@ namespace Bruno
         HashCombine(m_hash, static_cast<uint32_t>(filter));
         HashCombine(m_hash, static_cast<uint32_t>(addressMode));
         HashCombine(m_hash, static_cast<uint32_t>(visibility));
+        HashCombine(m_hash, static_cast<uint32_t>(compFunc));
     }
     
     void RootSignature::Build(RootSignatureFlags flags)

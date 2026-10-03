@@ -64,6 +64,9 @@
     <Filter Include="Source\Bruno\Renderer\Forward">
       <UniqueIdentifier>{02d08e9e-7b45-4ff0-9ec2-4f1b9af63107}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Bruno\Renderer\Lighting">
+      <UniqueIdentifier>{0ddb2390-7982-4636-8e4e-39af3f781b49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Bruno.h">
@@ -387,6 +390,12 @@
     <ClInclude Include="Source\Bruno\Scene\Constants.h">
       <Filter>Source\Bruno\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\Shadows\EnumTypes.h">
+      <Filter>Source\Bruno\Renderer\Shadows</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\Lighting\LightSystem.h">
+      <Filter>Source\Bruno\Renderer\Lighting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">
@@ -640,6 +649,9 @@
     </ClCompile>
     <ClCompile Include="Source\Bruno\Scene\Systems\CullingSystem.cpp">
       <Filter>Source\Bruno\Scene\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Bruno\Renderer\Lighting\LightSystem.cpp">
+      <Filter>Source\Bruno\Renderer\Lighting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

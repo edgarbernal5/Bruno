@@ -101,7 +101,8 @@ namespace Bruno
 		Math::Vector3 Color{ 1.0f, 1.0f, 1.0f };
 		float Intensity{ 1.0f };
 		
-		Math::Vector3 Direction{ 0.0f, -1.0f, 0.0f }; //Runtime
+		Math::Vector3 LocalDirection{ 0.0f, 0.0f, -1.0f }; // Inmutable (del importador)
+		Math::Vector3 WorldDirection{ 0.0f, 0.0f, -1.0f }; // Runtime (cacheado cada frame)
         
 		bool CastShadows{ true };
 

@@ -25,6 +25,8 @@ namespace Bruno
 		m_shadowMapArray(shadowMapArray),
 		m_assetManager(assetManager)
     {
+    	static_assert(offsetof(ForwardLightingBuffer, LightSpaceMatrices) == 848, "Error de alineación en el Constant Buffer");
+    	
     	InitializeForwardRootSignature(device);
     	InitializeForwardPSO(device);
     	
@@ -33,8 +35,8 @@ namespace Bruno
 
     void ForwardRenderer::Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)
     {
-		auto& device = Graphics::GetDevice();
     	graphicsContext->TransitionResource(m_shadowMapArray.get(), ResourceState::PixelShaderResource);
+		auto& device = Graphics::GetDevice();
 		/*
 		ID3D12GraphicsCommandList* cmdList = graphicsContext->GetNative();
 		
@@ -71,20 +73,23 @@ namespace Bruno
 		{
 			auto [transformComponent, directionalLight] = entitiesLightsGroup.get<TransformComponent, DirectionalLightComponent>(lightEntity);
 			
-			auto forward = transformComponent.WorldTransform.Forward();
-			forward.Normalize();
-			lightData.Sun.Direction = forward;
+			lightData.Sun.Direction = directionalLight.WorldDirection;
 			lightData.Sun.Intensity = directionalLight.Intensity;
 			lightData.Sun.Color = directionalLight.Color;
 			
-			m_directionalLightDir = forward;
+			m_directionalLightDir = directionalLight.WorldDirection;
 			float splitsDistances[4];
 			for (uint32_t i = 0; i < lightData.NumCascades; i++)
 			{
 				lightData.LightSpaceMatrices[i] = cascades[i].LightViewProj.Transpose();
-				splitsDistances[i]=cascades[i].SplitDistance;
+				splitsDistances[i] = cascades[i].SplitDistance;
 			}
-			lightData.CascadeSplits = Math::Vector4(splitsDistances);
+			lightData.CascadeSplits = Math::Vector4(
+				splitsDistances[0], 
+				splitsDistances[1], 
+				splitsDistances[2], 
+				splitsDistances[3]
+			);
 			break;
 		}
 		lightData.ActivePointLightCount = 0;
@@ -129,7 +134,7 @@ namespace Bruno
 				graphicsContext->SetIndexBuffer(indexBuffer.get());
 				currentVB = vertexBuffer.get();
 			}
-			// Preparar las transformaciones (b0) - ¡Ahora sin la cámara!
+			// Preparar las transformaciones (b0)
 			const Math::Matrix& world = transformComponent.WorldTransform;
 			
 			SceneObjectBuffer objConstants;
@@ -195,7 +200,8 @@ namespace Bruno
 			1, 0, // s1, space 0
 			TextureFilter::Comparison_MinMag_Linear_MipPoint, // IMPORTANTE: Debe ser un filtro de comparación para PCF
 			TextureAddressMode::Clamp,       // IMPORTANTE: Clamp o Border para que la sombra no se repita en los bordes
-			ShaderVisibility::Pixel
+			ShaderVisibility::Pixel,
+			ComparisonFunc::LessEqual
 		);
 
         m_forwardRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);

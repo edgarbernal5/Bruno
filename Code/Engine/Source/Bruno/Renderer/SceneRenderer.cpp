@@ -321,9 +321,10 @@ namespace Bruno
 		
 		// Ajustes AAA: Hardware Depth Bias
 		// Desplaza ligeramente la geometría hacia atrás desde el punto de vista de la luz
-		shadowDesc.RasterizerDesc.DepthBias = 100000;         // Unidades internas
+		shadowDesc.RasterizerDesc.DepthBias = 50000;         // Unidades internas
 		shadowDesc.RasterizerDesc.DepthBiasClamp = 0.0f;
-		shadowDesc.RasterizerDesc.SlopeScaledDepthBias = 1.5f; // Mayor inclinación = Mayor Bias
+		shadowDesc.RasterizerDesc.SlopeScaledDepthBias = 1.0f; // Mayor inclinación = Mayor Bias
+		shadowDesc.RasterizerDesc.DepthClipEnable = false;
 		
 		m_shadowPSO = PSOCache::GetOrCreate(device, shadowDesc);
 	}
@@ -331,7 +332,7 @@ namespace Bruno
 	void SceneRenderer::RegisterMaterialToGPU(std::shared_ptr<Material> matAsset)
 	{
 		// Si ya tiene un índice válido en caché, lo ignoramos
-		if (matAsset->RuntimeMaterialIndex != 0xFFFFFFFF) 
+		if (matAsset->RuntimeMaterialIndex != 0xFFFFFFFF)
 		{
 			return; 
 		}

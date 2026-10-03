@@ -25,6 +25,7 @@ namespace Bruno::D3DFunctions
         d3dDesc.DepthBiasClamp = rasterizerState.DepthBiasClamp;
         d3dDesc.SlopeScaledDepthBias = rasterizerState.SlopeScaledDepthBias;
         d3dDesc.FrontCounterClockwise = rasterizerState.FrontCounterClockwise;
+        d3dDesc.DepthClipEnable = rasterizerState.DepthClipEnable;
         
         switch (rasterizerState.CullMode)
         {
@@ -157,6 +158,7 @@ namespace Bruno::D3DFunctions
     {
         switch (func)
         {
+        case ComparisonFunc::None:         return D3D12_COMPARISON_FUNC_NONE;
         case ComparisonFunc::Never:        return D3D12_COMPARISON_FUNC_NEVER;
         case ComparisonFunc::Less:         return D3D12_COMPARISON_FUNC_LESS;
         case ComparisonFunc::Equal:        return D3D12_COMPARISON_FUNC_EQUAL;
