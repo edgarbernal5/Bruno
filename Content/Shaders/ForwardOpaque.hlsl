@@ -300,8 +300,8 @@ float4 PSMain(PixelInput input) : SV_TARGET
     // Multiplicar la intensidad por el factor de sombra
     float3 sunRadiance = g_Sun.Color * g_Sun.Intensity * shadowFactor;
     
-    //finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, sunDir, sunRadiance);
-    finalColor.rgb = shadowFactor;
+    finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, sunDir, sunRadiance);
+    //finalColor.rgb = shadowFactor;
     
     // 4. LUCES PUNTUALES
     /*for (uint i = 0; i < g_ActivePointLightCount; ++i)

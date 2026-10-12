@@ -27,7 +27,7 @@ namespace Bruno
         m_visibleEntitiesLabel.SetCaption("Visible Entities:");
         m_totalEntitiesLabel.SetCaption("Total Entities:");
         
-        Berta::Foundation::GetInstance().SetOnIdleTickCallback([this]()
+        m_tickCallbackId = Berta::Foundation::GetInstance().GetIdleTick().Connect([this](const Berta::ArgIdleTick& arg)
         {
             auto& profiler = Profiler::Get();
         
@@ -42,6 +42,6 @@ namespace Bruno
 
     ProfilerPanel::~ProfilerPanel()
     {
-        Berta::Foundation::GetInstance().SetOnIdleTickCallback(nullptr);
+        Berta::Foundation::GetInstance().GetIdleTick().Disconnect(m_tickCallbackId);
     }
 }

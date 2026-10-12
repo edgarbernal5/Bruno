@@ -15,7 +15,7 @@ namespace Bruno
     class ShadowMapArray : public TextureResource, public TextureArrayResource
     {
         BR_RTTI_DECLARATION(ShadowMapArray, TextureResource);
-        
+        //TODO: fix posible problema de rtti con la herencia mùltiple.
     public:
         ShadowMapArray() = default;
         ~ShadowMapArray() override = default;
@@ -24,6 +24,7 @@ namespace Bruno
     
         const DescriptorAllocation& GetDSVHandle(uint32_t index) const override { return m_dsvAllocations[index]; }
         uint32_t GetNumCascades() const { return m_numCascades; }
+        
     private:
         std::vector<DescriptorAllocation> m_dsvAllocations;
         

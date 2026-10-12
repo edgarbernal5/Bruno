@@ -20,5 +20,7 @@ namespace Bruno
         Berta::Label m_cpuCullingTimeMsLabel;
         Berta::Label m_cpuTotalRenderTimeMsLabel;
         Berta::Label m_gpuRenderTimeMsLabel;
+        
+        Berta::EventHandlerId m_tickCallbackId;
     };
 }
