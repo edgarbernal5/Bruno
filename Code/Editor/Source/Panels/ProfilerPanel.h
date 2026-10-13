@@ -10,7 +10,7 @@ namespace Bruno
     {
     public:
         ProfilerPanel(Berta::Window* window);
-        ~ProfilerPanel();
+        ~ProfilerPanel() override;
         
     private:
 		Berta::Layout m_layout;

@@ -44,8 +44,6 @@ namespace Bruno
 		void RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
 		
 		void Resize(uint32_t width, uint32_t height);
-		
-		void ExecuteMassiveCulling(const Camera& camera);
 	
 	private:
 		void InitializeShadowArray(GraphicsDevice* device);

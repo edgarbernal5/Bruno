@@ -6,6 +6,8 @@
 #include <Bruno/Renderer/Camera.h>
 #include <Bruno/Core/UUID.h>
 
+#include "Bruno/Renderer/Shadows/EnumTypes.h"
+
 namespace Bruno
 {
 	class ShadowSystem;
@@ -45,6 +47,7 @@ namespace Bruno
 		EditorCameraController* GetCameraController() const { return m_cameraController.get(); }
 		CullingSystem* GetCullingSystem() const { return m_cullingSystem.get(); }
 		ShadowSystem* GetShadowSystem() const { return m_shadowSystem.get(); }
+		ShadowProperties* GetShadowProperties() { return &m_shadowProperties; }
 		
 		void UpdateSelection();
 
@@ -65,6 +68,7 @@ namespace Bruno
 		std::shared_ptr<EditorCameraController> m_cameraController;
 		std::shared_ptr<CullingSystem> m_cullingSystem;
 		std::shared_ptr<ShadowSystem> m_shadowSystem;
+		ShadowProperties m_shadowProperties {};
 
 		EventHandlerId m_selectionChangedHandleId{ 0 };
 	};

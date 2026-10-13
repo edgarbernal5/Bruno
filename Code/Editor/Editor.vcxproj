@@ -138,6 +138,7 @@ xcopy /y /d "$(SolutionDir)packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\nat
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Panels\ScenePanel.cpp" />
     <ClCompile Include="Source\Panels\Scene\SelectionService.cpp" />
+    <ClCompile Include="Source\Panels\Shadows\ShadowsPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\AssetEditors\AssetEditor.h" />
@@ -170,6 +171,7 @@ xcopy /y /d "$(SolutionDir)packages\Microsoft.Direct3D.DXC.1.9.2602.24\build\nat
     <ClInclude Include="Source\Panels\SceneHierarchyPanel.h" />
     <ClInclude Include="Source\Panels\ScenePanel.h" />
     <ClInclude Include="Source\Panels\Scene\SelectionService.h" />
+    <ClInclude Include="Source\Panels\Shadows\ShadowsPanel.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

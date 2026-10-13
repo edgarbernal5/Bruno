@@ -22,6 +22,7 @@ namespace Bruno
         
         const std::vector<CascadeData>& GetCascades() const { return m_cascadesData; }
         void SetCascadeLambda(float lambda) { m_cascadeLambda = lambda; }
+        
     private:
         void CalculateCascadeMatrices(const Math::Vector3& lightDir);
         
