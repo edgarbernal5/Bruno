@@ -166,7 +166,7 @@ namespace Bruno
 		m_layout.AddPaneTab("scene-doc-pane", "tab-scene", std::move(m_sceneDocumentPanel), "", Berta::DockPosition::Tab);
 		m_layout.AddPaneTab("content-browser-pane", "tab-content-browser", std::move(m_contentBrowserPanel), "scene-doc-pane", Berta::DockPosition::Right);
 		m_layout.AddPaneTab("profiler-pane", "tab-profiler", std::move(m_profilerPanel), "content-browser-pane", Berta::DockPosition::Down);
-		m_layout.AddPaneTab("shadow-props-pane", "tab-shadow-props", std::move(m_shadowsPanel), "profiler-pane", Berta::DockPosition::Tab);
+		m_layout.AddPaneTab("profiler-pane", "tab-shadow-props", std::move(m_shadowsPanel));
 		m_layout.Apply();
 
 		form.GetEvents().KeyReleased.Connect([this](const Berta::ArgKeyboard& args)
