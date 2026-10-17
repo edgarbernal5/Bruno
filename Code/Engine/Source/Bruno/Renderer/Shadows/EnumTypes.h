@@ -17,7 +17,7 @@ namespace Bruno
     {
         PCF3x3,
         PCF5x5,
-        
+        PCSS
     };
     
     struct ShadowProperties
