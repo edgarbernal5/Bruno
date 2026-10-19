@@ -22,12 +22,12 @@ namespace Bruno
     
     struct ShadowProperties
     {
-        uint32_t m_numCascades = NUM_CASCADES;
+        uint32_t m_numCascades = MAX_CASCADES;
         float m_maxShadowDistance = FLT_MAX;
-        uint32_t m_resolution = 2048;
+        uint32_t m_resolution = SHADOW_MAP_RES;
         float m_cascadeLambda = 0.5f;
         int m_depthBias = 50000;
-        float m_slopeScaledDepthBias = 2048;
+        float m_slopeScaledDepthBias = 1.0f;
         ShadowFilterQuality m_filterQuality = ShadowFilterQuality::PCF3x3;
     };
 }

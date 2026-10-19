@@ -15,10 +15,10 @@ namespace Bruno
     {
     }
 
-    void CullingSystem::Execute()
+    void CullingSystem::Execute(const uint32_t& numCascades)
     {
         m_finalResults.MainCamera.clear();
-        for (int i = 0; i < NUM_CASCADES; ++i)
+        for (int i = 0; i < numCascades; ++i)
         {
             m_finalResults.Cascades[i].clear();
         }
@@ -27,13 +27,13 @@ namespace Bruno
         DirectX::XMVECTOR frustumPlanes[6];
         ExtractFrustumPlanes(frustumPlanes);
         
-        DirectX::BoundingOrientedBox cascadeOBBs[NUM_CASCADES];
+        DirectX::BoundingOrientedBox cascadeOBBs[MAX_CASCADES];
         auto lightView = m_scene->GetAllEntitiesWith<DirectionalLightComponent>();
         
         for (auto entity : lightView)
         {
             const auto& light = lightView.get<DirectionalLightComponent>(entity);
-            for (uint32_t i = 0; i < NUM_CASCADES; ++i)
+            for (uint32_t i = 0; i < numCascades; ++i)
             {
                 cascadeOBBs[i] = CreateOBBFromMatrix(light.LightViewProj[i]);
             }
@@ -54,7 +54,7 @@ namespace Bruno
         const uint32_t numChunks = (entityCount + chunkSize - 1) / chunkSize;
         
         // FASE SETUP: Pre-alojar memoria para los hilos (Lock-free)
-        PrepareMemoryChunks(numChunks, chunkSize);
+        PrepareMemoryChunks(numChunks, chunkSize, numCascades);
         
         // Creamos nuestro "Grupo" para este pase de culling
         JobDispatchGroup cullingGroup;
@@ -96,7 +96,7 @@ namespace Bruno
                 }
 
                 // B. ¿Cascadas de Sombras? (SIMD Ultra Rápido sin locks)
-                for (uint32_t c = 0; c < NUM_CASCADES; ++c)
+                for (uint32_t c = 0; c < numCascades; ++c)
                 {
                     if (cascadeOBBs[c].Intersects(worldObb))
                     {
@@ -109,7 +109,7 @@ namespace Bruno
         JobSystem::Get().Wait(cullingGroup);
         
         // FASE REDUCE: Unimos todos los WorkerChunks en m_finalResults
-        ConsolidateResults(numChunks);
+        ConsolidateResults(numChunks, numCascades);
     }
 
     void CullingSystem::ExtractFrustumPlanes(DirectX::XMVECTOR planesOut[6])
@@ -145,7 +145,7 @@ namespace Bruno
         }
     }
 
-    void CullingSystem::PrepareMemoryChunks(uint32_t numChunks, uint32_t chunkSize)
+    void CullingSystem::PrepareMemoryChunks(uint32_t numChunks, uint32_t chunkSize, const uint32_t& numCascades)
     {
         if (m_cullingChunks.size() < numChunks)
         {
@@ -158,7 +158,7 @@ namespace Bruno
             m_cullingChunks[i].VisibleEntities.clear();
             m_cullingChunks[i].VisibleEntities.reserve(chunkSize);
             
-            for (uint32_t c = 0; c < NUM_CASCADES; ++c)
+            for (uint32_t c = 0; c < numCascades; ++c)
             {
                 m_cullingChunks[i].ShadowCascades[c].clear();
                 // Una reserva generosa, ya que cada cascada verá una fracción de la escena
@@ -167,28 +167,28 @@ namespace Bruno
         }
     }
 
-    void CullingSystem::ConsolidateResults(uint32_t numChunks)
+    void CullingSystem::ConsolidateResults(uint32_t numChunks, const uint32_t& numCascades)
     {
         m_finalResults.MainCamera.clear();
-        for (uint32_t c = 0; c < NUM_CASCADES; ++c)
+        for (uint32_t c = 0; c < numCascades; ++c)
         {
             m_finalResults.Cascades[c].clear();
         }
 
         size_t totalVisible = 0;
-        size_t totalShadows[NUM_CASCADES] = { 0 };
+        size_t totalShadows[MAX_CASCADES] = { 0 };
 
         for (uint32_t i = 0; i < numChunks; ++i)
         {
             totalVisible += m_cullingChunks[i].VisibleEntities.size();
-            for (uint32_t c = 0; c < NUM_CASCADES; ++c)
+            for (uint32_t c = 0; c < numCascades; ++c)
             {
                 totalShadows[c] += m_cullingChunks[i].ShadowCascades[c].size();
             }
         }
 
         m_finalResults.MainCamera.reserve(totalVisible);
-        for (uint32_t c = 0; c < NUM_CASCADES; ++c)
+        for (uint32_t c = 0; c < numCascades; ++c)
         {
             m_finalResults.Cascades[c].reserve(totalShadows[c]);
         }
@@ -202,7 +202,7 @@ namespace Bruno
                 m_cullingChunks[i].VisibleEntities.end()
             );
 
-            for (uint32_t c = 0; c < NUM_CASCADES; ++c)
+            for (uint32_t c = 0; c < numCascades; ++c)
             {
                 m_finalResults.Cascades[c].insert(
                     m_finalResults.Cascades[c].end(),

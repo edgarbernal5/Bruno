@@ -20,9 +20,11 @@ namespace Bruno
         ShadowMapArray() = default;
         ~ShadowMapArray() override = default;
         
-        void Initialize(GraphicsDevice* device, DescriptorAllocator& srvHeap, DescriptorAllocator& dsvHeap, uint32_t resolution, uint32_t numCascades = NUM_CASCADES);
+        void Initialize(GraphicsDevice* device, DescriptorAllocator& srvHeap, DescriptorAllocator& dsvHeap, uint32_t resolution, uint32_t numCascades = MAX_CASCADES);
+        void Resize(GraphicsDevice* device, DescriptorAllocator& srvHeap, DescriptorAllocator& dsvHeap, uint32_t newResolution, uint32_t newNumCascades);
     
         const DescriptorAllocation& GetDSVHandle(uint32_t index) const override { return m_dsvAllocations[index]; }
+        uint32_t GetResolution() const { return m_resolution; }
         uint32_t GetNumCascades() const { return m_numCascades; }
         
     private:

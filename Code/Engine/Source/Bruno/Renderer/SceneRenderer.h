@@ -15,6 +15,7 @@ namespace entt
 
 namespace Bruno
 {
+	struct ShadowProperties;
 	class ForwardRenderer;
 	struct FrameCullingResults;
 	struct CascadeData;
@@ -33,12 +34,13 @@ namespace Bruno
 	class SceneRenderer
 	{
 	public:
-		SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<CullingSystem> frustumCulling, AbstractAssetManager* assetManager);
+		SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<CullingSystem> frustumCulling, AbstractAssetManager* assetManager, ShadowProperties* shadowProperties);
 		~SceneRenderer();
 		
 		// Se llama cuando cargas una escena o agregas un objeto
 		void InitEntitiesForRender();
 		
+		void RecreateShadowMaps(GraphicsDevice* device);
 		void RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex);
 		void RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
 		void RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
@@ -55,6 +57,7 @@ namespace Bruno
 		std::shared_ptr<Scene> m_scene;
 		std::shared_ptr<CullingSystem> m_frustumCulling;
 		AbstractAssetManager* m_assetManager;
+		ShadowProperties* m_shadowProperties;
 
 		DescriptorAllocator* m_globalSrvHeap;
 		std::shared_ptr<RootSignature> m_shadowRootSig;

@@ -33,10 +33,11 @@
 
 namespace Bruno
 {
-	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<CullingSystem> frustumCulling, AbstractAssetManager* assetManager) :
+	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<CullingSystem> frustumCulling, AbstractAssetManager* assetManager, ShadowProperties* shadowProperties) :
 		m_scene(scene),
 		m_frustumCulling(frustumCulling),
-		m_assetManager(assetManager)
+		m_assetManager(assetManager),
+		m_shadowProperties(shadowProperties)
 	{
 		auto& device = Graphics::GetDevice();
 		
@@ -77,7 +78,16 @@ namespace Bruno
 			}
 		}
 	}
-	
+
+	void SceneRenderer::RecreateShadowMaps(GraphicsDevice* device)
+	{
+		if (m_shadowMapArray->GetNumCascades() != m_shadowProperties->m_numCascades || m_shadowMapArray->GetResolution() != m_shadowProperties->m_resolution)
+		{
+			device->Flush();
+			m_shadowMapArray->Resize(device, device->GetSRVDescriptorAllocator(), device->GetDSVDescriptorAllocator(), m_shadowProperties->m_resolution, m_shadowProperties->m_numCascades);
+		}
+	}
+
 	void SceneRenderer::RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex)
 	{
 		// ==========================================
@@ -144,23 +154,20 @@ namespace Bruno
 		context->SetPipelineState(m_shadowPSO.get());
 		context->SetRootSignature(m_shadowRootSig.get());
 
-		Math::Viewport cascadeViewport = { 0, 0, SHADOW_MAP_RES, SHADOW_MAP_RES, 0.0f, 1.0f };
-		Math::Rectangle cascadeScissor = { 0, 0, static_cast<long>(SHADOW_MAP_RES), static_cast<long>(SHADOW_MAP_RES) };
+		Math::Viewport cascadeViewport = { 0, 0, (float)m_shadowProperties->m_resolution, (float)m_shadowProperties->m_resolution, 0.0f, 1.0f };
+		Math::Rectangle cascadeScissor = { 0, 0, static_cast<long>(m_shadowProperties->m_resolution), static_cast<long>(m_shadowProperties->m_resolution) };
 		
 		// Iterar por las 4 cascadas
-		for (uint32_t i = 0; i < NUM_CASCADES; ++i) 
+		for (uint32_t i = 0; i < m_shadowProperties->m_numCascades; ++i) 
 		{
-			// 2. Enlazar SOLO la capa de esta cascada (FirstArraySlice)
+			// Enlazar SOLO la capa de esta cascada (FirstArraySlice)
 			context->SetRenderTargetsSlice(0, nullptr, m_shadowMapArray.get(), i);
         
-			// 3. Limpiar el Depth Buffer de la cascada
 			context->ClearDepthSlice(m_shadowMapArray.get(), i);
 
-			// 4. Configurar el Viewport para abarcar toda la resolución de sombra (ej. 2048x2048)
 			context->SetViewport(cascadeViewport);
 			context->SetScissorRect(cascadeScissor);
 
-			// 5. Dibujar las entidades visibles para ESTA cascada (Lista proveniente del Job System)
 			const auto& visibleEntities = cullingData.Cascades[i];
         
 			for (auto entt : visibleEntities) 
@@ -208,7 +215,7 @@ namespace Bruno
 	void SceneRenderer::InitializeShadowArray(GraphicsDevice* device)
 	{
 		m_shadowMapArray = std::make_shared<ShadowMapArray>();
-		m_shadowMapArray->Initialize(device, device->GetSRVDescriptorAllocator(), device->GetDSVDescriptorAllocator(), 2048, 4);
+		m_shadowMapArray->Initialize(device, device->GetSRVDescriptorAllocator(), device->GetDSVDescriptorAllocator(), m_shadowProperties->m_resolution, m_shadowProperties->m_numCascades);
 	}
 
 	void SceneRenderer::InitializeShadowPipeline(GraphicsDevice* device)

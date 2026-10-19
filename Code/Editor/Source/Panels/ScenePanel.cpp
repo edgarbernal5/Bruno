@@ -126,6 +126,8 @@ namespace Bruno
 				return;
 			}
 			
+			m_sceneRenderer->RecreateShadowMaps(m_device);
+			
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
 			uint32_t frameIndex = m_surface->GetCurrentBackBufferIndex();
 
@@ -144,8 +146,8 @@ namespace Bruno
 			TransformSystem::Update(m_scene.get());
 			LightSystem::Update(m_scene.get());
 			
-			m_shadowSystem->Execute();
-			m_cullingSystem->Execute();
+			m_shadowSystem->Execute(m_shadowProperties->m_resolution, m_shadowProperties->m_numCascades, m_shadowProperties->m_cascadeLambda);
+			m_cullingSystem->Execute(m_shadowProperties->m_numCascades);
 			
 			const auto& cullingData = m_cullingSystem->GetCullingResults();
 			const auto& cascadeData = m_shadowSystem->GetCascades();
@@ -540,6 +542,8 @@ namespace Bruno
 		m_sceneRenderer = m_sceneDocument->GetSceneRenderer();
 		m_shadowSystem = m_sceneDocument->GetShadowSystem();
 		m_cullingSystem = m_sceneDocument->GetCullingSystem();
+		
+		m_shadowProperties = m_sceneDocument->GetShadowProperties();
 	}
 
 	void ScenePanel::InitializeMarquee()
@@ -549,9 +553,7 @@ namespace Bruno
 		
 		m_marqueeRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
 
-		GraphicsPipelineStateDesc psoDesc = {};
-		// CRÍTICO: El input layout queda vacío. No hay Vertex Buffer.
-    
+		GraphicsPipelineStateDesc psoDesc = {};    
 		psoDesc.RootSignature = m_marqueeRootSig.get();
 		
 		psoDesc.VertexShaderDesc = { L"Shaders/Marquee.hlsl", L"VSMain", L"vs_6_0" };

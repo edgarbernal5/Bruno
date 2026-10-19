@@ -17,6 +17,7 @@
 
 namespace Bruno
 {
+	struct ShadowProperties;
 	class CullingSystem;
 	class ShadowSystem;
 	class DebugRenderer;
@@ -93,6 +94,7 @@ namespace Bruno
 		std::shared_ptr<SceneDocument> m_sceneDocument;
 		std::shared_ptr<Scene> m_scene;
 		ShadowSystem* m_shadowSystem;
+		ShadowProperties* m_shadowProperties;
 		CullingSystem* m_cullingSystem;
 		SceneRenderer* m_sceneRenderer { nullptr };
 		

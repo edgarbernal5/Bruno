@@ -50,7 +50,7 @@ namespace Bruno
         // 2. CREAR LOS 4 DSVs (Uno para cada Cascada)
         // ==========================================
         m_dsvAllocations.resize(numCascades);
-            
+        
         D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
         dsvDesc.Format = DXGI_FORMAT_D32_FLOAT; // Lente de Profundidad
         dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
@@ -79,5 +79,19 @@ namespace Bruno
 
         m_srvAllocation = srvHeap.Allocate(1); // Alocamos directamente en tu Mega Heap Bindless global
         nativeDevice->CreateShaderResourceView(m_resource.Get(), &srvDesc, m_srvAllocation.GetCPUHandle());
+    }
+
+    void ShadowMapArray::Resize(GraphicsDevice* device, DescriptorAllocator& srvHeap, DescriptorAllocator& dsvHeap, uint32_t newResolution, uint32_t newNumCascades)
+    {
+        if (m_resolution == newResolution && m_numCascades == newNumCascades)
+        {
+            return;
+        }
+        
+        m_resource.Reset();
+        
+        m_resolution = newResolution;
+        m_numCascades = newNumCascades;
+        Initialize(device, srvHeap, dsvHeap, newResolution, newNumCascades);
     }
 }

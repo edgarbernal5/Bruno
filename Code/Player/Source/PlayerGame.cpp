@@ -218,7 +218,7 @@ namespace Bruno
 
 		m_shadowSystem = std::make_shared<ShadowSystem>(m_camera, m_scene);
 		m_frustumCulling = std::make_shared<CullingSystem>(m_camera, m_scene, m_shadowSystem);
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_frustumCulling, m_assetManager.get());
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_frustumCulling, m_assetManager.get(), &m_shadowProperties);
 	}
 
 	void PlayerGame::InitializeSurface()

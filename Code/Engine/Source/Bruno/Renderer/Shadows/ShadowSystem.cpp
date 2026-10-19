@@ -12,8 +12,12 @@ namespace Bruno
     {
     }
 
-    void ShadowSystem::Execute()
+    void ShadowSystem::Execute(uint32_t resolution, uint32_t numCascades, float lambda)
     {
+        m_shadowMapResolution = resolution;
+        m_numCascades = numCascades;
+        m_cascadeLambda = lambda;
+        
         auto lightView = m_scene->GetAllEntitiesWith<TransformComponent, DirectionalLightComponent>();
         
         Math::Vector3 directionalLightDir;
@@ -85,7 +89,7 @@ namespace Bruno
                 sphereRadius = std::max<float>(sphereRadius, dist);
             }
 
-            float texelPerUnit = m_shadowMapResolution / (sphereRadius * 2.0f);
+            float texelPerUnit = static_cast<float>(m_shadowMapResolution) / (sphereRadius * 2.0f);
             Math::Matrix scalar = Math::Matrix::CreateScale(texelPerUnit, texelPerUnit, texelPerUnit);
             Math::Vector3 baseLookAt = center - (lightDir * sphereRadius);
             Math::Matrix lightView = Math::Matrix::CreateLookAt(baseLookAt, center, Math::Vector3::Up);
@@ -95,63 +99,7 @@ namespace Bruno
             lightView.m[3][1] = std::floor(lightView.m[3][1]);
             lightView.m[3][2] = std::floor(lightView.m[3][2]);
             lightView = lightView * scalar.Invert();
-            /*
-            // Matriz View de la Luz (mirando al centro del sub-frustum)
-            Math::Vector3 lightPos = center - (lightDir * (farClip - nearClip)); 
-            Math::Matrix lightView = Math::Matrix::CreateLookAt(lightPos, center, Math::Vector3::Up);
-
-            // Encontrar el Bounding Box en el Espacio de la Luz
-            float minX = (std::numeric_limits<float>::max)();
-            float maxX = (std::numeric_limits<float>::lowest());
-            float minY = (std::numeric_limits<float>::max)();
-            float maxY = (std::numeric_limits<float>::lowest());
-            float minZ = (std::numeric_limits<float>::max)();
-            float maxZ = (std::numeric_limits<float>::lowest());
-
-            for (auto frustumCorner : frustumCorners)
-            {
-                Math::Vector3 cornerLightSpace = Math::Vector3::Transform(frustumCorner, lightView);
-                minX = std::min<float>(minX, cornerLightSpace.x);
-                maxX = std::max<float>(maxX, cornerLightSpace.x);
-                minY = std::min<float>(minY, cornerLightSpace.y);
-                maxY = std::max<float>(maxY, cornerLightSpace.y);
-                minZ = std::min<float>(minZ, cornerLightSpace.z);
-                maxZ = std::max<float>(maxZ, cornerLightSpace.z);
-            }
-
-            // ==========================================
-            // LA MAGIA AAA 1: TEXEL SNAPPING
-            // ==========================================
-            float shadowOrthoSizeX = maxX - minX;
-            float shadowOrthoSizeY = maxY - minY;
             
-            float worldUnitsPerTexelX = shadowOrthoSizeX / m_shadowMapResolution;
-            float worldUnitsPerTexelY = shadowOrthoSizeY / m_shadowMapResolution;
-
-            // Anclamos los bordes a múltiplos exactos del texel para anular el parpadeo
-            minX = std::floor(minX / worldUnitsPerTexelX) * worldUnitsPerTexelX;
-            maxX = std::floor(maxX / worldUnitsPerTexelX) * worldUnitsPerTexelX;
-            minY = std::floor(minY / worldUnitsPerTexelY) * worldUnitsPerTexelY;
-            maxY = std::floor(maxY / worldUnitsPerTexelY) * worldUnitsPerTexelY;
-
-            // ==========================================
-            // LA MAGIA AAA 2: Z-PULLBACK (Shadow Popping Fix)
-            // ==========================================
-            
-            // En CalculateCascadeMatrices, infla la caja para debugear
-            float margin = 2000.0f; // Ajusta según la escala de tu motor
-            
-            // Tiramos el plano cercano artificialmente hacia atrás hacia la luz
-            float lightNearZ = minZ - margin; 
-            float lightFarZ  = maxZ + margin;
-            
-            //minX -= margin; maxX += margin;
-            //minY -= margin; maxY += margin;
-            
-            Math::Matrix lightProj = Math::Matrix::CreateOrthographicOffCenter(
-                minX, maxX, minY, maxY, lightNearZ, lightFarZ
-            );*/
-
             Math::Matrix lightProj = Math::Matrix::CreateOrthographicOffCenter(
             -sphereRadius, sphereRadius, 
             -sphereRadius, sphereRadius, 

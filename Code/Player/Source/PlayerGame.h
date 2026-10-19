@@ -4,9 +4,11 @@
 
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/RHITypes.h"
+#include "Bruno/Renderer/Shadows/EnumTypes.h"
 
 namespace Bruno
 {
+	struct ShadowProperties;
 	class ShadowSystem;
 	class CullingSystem;
 	class LinearAllocator;
@@ -56,7 +58,8 @@ namespace Bruno
 		Math::Rectangle m_scissorRect;
 		ID3D12DescriptorHeap* m_srvHeap;
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
-
+		ShadowProperties m_shadowProperties;
+		
 		std::array<std::unique_ptr<LinearAllocator>, 2> m_dynamicAllocators;
 		Math::Int2	m_lastMousePosition;
 		Camera		m_camera;

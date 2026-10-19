@@ -20,13 +20,13 @@ namespace Bruno
     struct alignas(64) CullingChunkResult
     {
         std::vector<entt::entity> VisibleEntities;
-        std::vector<entt::entity> ShadowCascades[NUM_CASCADES];
+        std::vector<entt::entity> ShadowCascades[MAX_CASCADES];
     };
     
     struct FrameCullingResults
     {
         std::vector<entt::entity> MainCamera;
-        std::vector<entt::entity> Cascades[NUM_CASCADES];
+        std::vector<entt::entity> Cascades[MAX_CASCADES];
     };
     
     class CullingSystem
@@ -34,7 +34,7 @@ namespace Bruno
     public:
         CullingSystem(Camera& camera, std::shared_ptr<Scene> scene, std::shared_ptr<ShadowSystem> shadowSystem);
         
-        void Execute();
+        void Execute(const uint32_t& numCascades);
         
         const std::vector<Entity>& GetVisibleEntities() { return m_visibleEntities; }
         size_t GetTotalEntities() const { return m_totalEntities; }
@@ -44,8 +44,8 @@ namespace Bruno
         void ExtractFrustumPlanes(DirectX::XMVECTOR planesOut[6]);
         
         // Métodos internos de Map-Reduce (Cero alocaciones dinámicas en el bucle)
-        void PrepareMemoryChunks(uint32_t numChunks, uint32_t chunkSize);
-        void ConsolidateResults(uint32_t numChunks);
+        void PrepareMemoryChunks(uint32_t numChunks, uint32_t chunkSize, const uint32_t& numCascades);
+        void ConsolidateResults(uint32_t numChunks, const uint32_t& numCascades);
         
         DirectX::BoundingOrientedBox CreateOBBFromMatrix(const Math::Matrix& viewProj);
         

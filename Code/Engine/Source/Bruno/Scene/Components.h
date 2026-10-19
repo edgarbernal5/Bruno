@@ -106,8 +106,8 @@ namespace Bruno
         
 		bool CastShadows{ true };
 
-		Math::Matrix LightViewProj[NUM_CASCADES]; //Runtime
-		float CascadeSplits[NUM_CASCADES]; //Runtime
+		Math::Matrix LightViewProj[MAX_CASCADES]; //Runtime
+		float CascadeSplits[MAX_CASCADES]; //Runtime
 	};
 	
 	struct PointLightComponent
