@@ -1,9 +1,11 @@
 ﻿#pragma once
 #include "Bruno/Math/Math.h"
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
+#include "Bruno/Renderer/Shadows/EnumTypes.h"
 
 namespace Bruno
 {
+    struct ShadowProperties;
     struct CascadeData;
     class ShadowMapArray;
     class MaterialManager;
@@ -61,13 +63,18 @@ namespace Bruno
         Math::Matrix LightSpaceMatrices[4];
         Math::Vector4 CascadeSplits; // [Split0, Split1, Split2, Split3]
         uint32_t NumCascades;
-        Math::Vector3 CsmPadding;    // Para alineación a 16 bytes
+        
+        // --- VARIABLES INYECTADAS DESDE C++ (ShadowProperties) ---
+        uint32_t FilterQuality;       // 0: PCF3x3, 1: PCF5x5, 2: PCSS
+        float ShadowMapResolution; // ej: 2048.0
+        float ShadowLightSize;     // Tamaño aparente de la luz para PCSS (ej: 0.05)
+        float CsmPadding;          // Padding de alineación
     };
     
     class ForwardRenderer
     {
     public:
-        ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<ShadowMapArray>, AbstractAssetManager* assetManager);
+        ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<ShadowMapArray>, AbstractAssetManager* assetManager, ShadowProperties* shadowProperties);
         
         void Render(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
 		
@@ -78,7 +85,9 @@ namespace Bruno
         std::shared_ptr<Scene> m_scene;
         std::unique_ptr<Shader> m_opaqueShader;
         AbstractAssetManager* m_assetManager;
-		
+        ShadowProperties* m_shadowProperties;
+        ShadowFilterQuality m_lastShadowFilterQuality;
+        
         DescriptorAllocator* m_globalSrvHeap;
         std::shared_ptr<RootSignature> m_forwardRootSig;
         std::shared_ptr<GraphicsPipelineState> m_forwardPSO;

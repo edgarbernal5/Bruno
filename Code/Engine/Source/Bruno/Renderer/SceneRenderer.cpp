@@ -48,7 +48,7 @@ namespace Bruno
 		
 		m_materialManager = std::make_shared<MaterialManager>(*device, device->GetSRVDescriptorAllocator());
 		
-		m_forwardRenderer = std::make_unique<ForwardRenderer>(device, scene, m_materialManager, m_shadowMapArray, assetManager);
+		m_forwardRenderer = std::make_unique<ForwardRenderer>(device, scene, m_materialManager, m_shadowMapArray, assetManager, shadowProperties);
 	}
 	
 	SceneRenderer::~SceneRenderer() = default;
@@ -85,6 +85,11 @@ namespace Bruno
 		{
 			device->Flush();
 			m_shadowMapArray->Resize(device, device->GetSRVDescriptorAllocator(), device->GetDSVDescriptorAllocator(), m_shadowProperties->m_resolution, m_shadowProperties->m_numCascades);
+		}
+		
+		if (m_shadowProperties->m_depthBias != m_lastDepthBias || m_shadowProperties->m_slopeScaledDepthBias != m_lastSlopeScaledDepthBias)
+		{
+			InitializeShadowPipeline(device);
 		}
 	}
 
@@ -154,7 +159,7 @@ namespace Bruno
 		context->SetPipelineState(m_shadowPSO.get());
 		context->SetRootSignature(m_shadowRootSig.get());
 
-		Math::Viewport cascadeViewport = { 0, 0, (float)m_shadowProperties->m_resolution, (float)m_shadowProperties->m_resolution, 0.0f, 1.0f };
+		Math::Viewport cascadeViewport = { 0, 0, static_cast<float>(m_shadowProperties->m_resolution), static_cast<float>(m_shadowProperties->m_resolution), 0.0f, 1.0f };
 		Math::Rectangle cascadeScissor = { 0, 0, static_cast<long>(m_shadowProperties->m_resolution), static_cast<long>(m_shadowProperties->m_resolution) };
 		
 		// Iterar por las 4 cascadas
@@ -248,10 +253,13 @@ namespace Bruno
 		
 		// Ajustes AAA: Hardware Depth Bias
 		// Desplaza ligeramente la geometría hacia atrás desde el punto de vista de la luz
-		shadowDesc.RasterizerDesc.DepthBias = 50000;         // Unidades internas
+		shadowDesc.RasterizerDesc.DepthBias = m_shadowProperties->m_depthBias;         // Unidades internas
 		shadowDesc.RasterizerDesc.DepthBiasClamp = 0.0f;
-		shadowDesc.RasterizerDesc.SlopeScaledDepthBias = 1.0f; // Mayor inclinación = Mayor Bias
+		shadowDesc.RasterizerDesc.SlopeScaledDepthBias = m_shadowProperties->m_slopeScaledDepthBias; // Mayor inclinación = Mayor Bias
 		shadowDesc.RasterizerDesc.DepthClipEnable = false;
+		
+		m_lastDepthBias = m_shadowProperties->m_depthBias;
+		m_lastSlopeScaledDepthBias = m_shadowProperties->m_slopeScaledDepthBias;
 		
 		m_shadowPSO = PSOCache::GetOrCreate(device, shadowDesc);
 	}

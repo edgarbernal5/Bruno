@@ -86,10 +86,22 @@ namespace Bruno
 			
             std::vector<std::pair<std::wstring, ShadowFilterQuality>>
             {
+                { L"None", ShadowFilterQuality::None },
                 { L"PCF3x3", ShadowFilterQuality::PCF3x3 },
                 { L"PCF5x5", ShadowFilterQuality::PCF5x5 },
                 { L"PCSS", ShadowFilterQuality::PCSS }
             }
         );
+        
+        
+        configuration.EmplaceProperty<Berta::PropertyGridFieldFloat>("Shadow Size",
+            [this]()
+            {
+                return m_shadowProperties->m_ShadowLightSize;
+            },
+            [this](const float& val) mutable
+            {
+                m_shadowProperties->m_ShadowLightSize = val;
+            });
     }
 }

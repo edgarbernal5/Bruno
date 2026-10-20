@@ -94,13 +94,21 @@ cbuffer ForwardLights : register(b2)
     matrix g_LightSpaceMatrices[MAX_CASCADES]; // Matrices ViewProjection de la luz por cascada
     float4 g_CascadeSplits;                    // Distancias límite de cada cascada (usualmente 4)
     uint g_NumCascades;                        // Cantidad activa de cascadas
-    float3 g_CsmPadding;                       // Padding para alineación a 16 bytes
+    
+    // --- VARIABLES INYECTADAS DESDE C++ (ShadowProperties) ---
+    uint g_FilterQuality;       // 0: PCF3x3, 1: PCF5x5, 2: PCSS
+    float g_ShadowMapResolution; // ej: 2048.0
+    float g_ShadowLightSize;     // Tamaño aparente de la luz para PCSS (ej: 0.05)
+    float g_CsmPadding;          // Padding de alineación
 };
 
 /// space1: Recursos específicos de iluminación/sombras
 Texture2DArray g_ShadowMap : register(t0, space1);
 // s1: Sampler de comparación para Hardware PCF
 SamplerComparisonState g_ShadowSampler : register(s1);
+
+static const float PI = 3.14159265359f;
+#include "Shadows.hlsl"
 
 // ==========================================================
 // VERTEX SHADER (Clásico y Ligero)
@@ -124,7 +132,6 @@ PixelInput VSMain(VertexInput input)
 // ==========================================================
 // MATEMÁTICA PBR (Cook-Torrance)
 // ==========================================================
-static const float PI = 3.14159265359f;
 
 // Función de Distribución Normal (GGX)
 float DistributionGGX(float3 N, float3 H, float roughness)
@@ -219,7 +226,7 @@ float SampleShadowCascade(float3 worldPos, uint cascadeIndex)
     return g_ShadowMap.SampleCmpLevelZero(g_ShadowSampler, float3(projCoords.xy, cascadeIndex), projCoords.z - bias);
 }
 
-float CalculateDirectionalShadow(float3 worldPos, float viewDistance)
+/*float CalculateDirectionalShadow(float3 worldPos, float viewDistance)
 {
     // Si no hay cascadas, no hay sombra
     if (g_NumCascades == 0) return 1.0f; 
@@ -258,7 +265,7 @@ float CalculateDirectionalShadow(float3 worldPos, float viewDistance)
     }
 
     return shadow;
-}
+}*/
 
 // ==========================================================
 // PIXEL SHADER
@@ -295,7 +302,7 @@ float4 PSMain(PixelInput input) : SV_TARGET
     float viewDistance = length(g_CameraPosition - input.PositionWorld);
     
     // Obtener factor de sombra (1.0 = iluminado, 0.0 = sombra total)
-    float shadowFactor = CalculateDirectionalShadow(input.PositionWorld, viewDistance);
+    float shadowFactor = CalculateDirectionalShadow(input.PositionWorld, viewDistance, N, sunDir, input.PositionClip.xy);
     
     // Multiplicar la intensidad por el factor de sombra
     float3 sunRadiance = g_Sun.Color * g_Sun.Intensity * shadowFactor;

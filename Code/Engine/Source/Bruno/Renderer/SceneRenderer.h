@@ -58,6 +58,8 @@ namespace Bruno
 		std::shared_ptr<CullingSystem> m_frustumCulling;
 		AbstractAssetManager* m_assetManager;
 		ShadowProperties* m_shadowProperties;
+		float m_lastSlopeScaledDepthBias;
+		int m_lastDepthBias;
 
 		DescriptorAllocator* m_globalSrvHeap;
 		std::shared_ptr<RootSignature> m_shadowRootSig;

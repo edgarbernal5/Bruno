@@ -11,6 +11,7 @@
 #include "Bruno/Renderer/Model.h"
 #include "Bruno/Renderer/PSOCache.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
+#include "Bruno/Renderer/Shadows/EnumTypes.h"
 #include "Bruno/Renderer/Shadows/ShadowMapArray.h"
 #include "Bruno/Renderer/Shadows/ShadowSystem.h"
 #include "Bruno/Scene/Components.h"
@@ -19,11 +20,12 @@
 
 namespace Bruno
 {
-    ForwardRenderer::ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<ShadowMapArray> shadowMapArray, AbstractAssetManager* assetManager) :
+    ForwardRenderer::ForwardRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<ShadowMapArray> shadowMapArray, AbstractAssetManager* assetManager, ShadowProperties* shadowProperties) :
         m_scene(scene),
 		m_materialManager(materialManager),
 		m_shadowMapArray(shadowMapArray),
-		m_assetManager(assetManager)
+		m_assetManager(assetManager),
+		m_shadowProperties(shadowProperties)
     {
     	static_assert(offsetof(ForwardLightingBuffer, LightSpaceMatrices) == 848, "Error de alineación en el Constant Buffer");
     	
@@ -37,6 +39,7 @@ namespace Bruno
     {
     	graphicsContext->TransitionResource(m_shadowMapArray.get(), ResourceState::PixelShaderResource);
 		auto& device = Graphics::GetDevice();
+    	
 		/*
 		ID3D12GraphicsCommandList* cmdList = graphicsContext->GetNative();
 		
@@ -48,6 +51,12 @@ namespace Bruno
 			Profiler::Get().Stats.TotalEntities = m_frustumCulling->GetTotalEntities();
 			Profiler::Get().Stats.RenderedEntities = m_frustumCulling->GetTotalVisibleEntities();
 		}*/
+    	
+    	if (m_lastShadowFilterQuality != m_shadowProperties->m_filterQuality)
+    	{
+    		InitializeForwardRootSignature(device);
+    	}
+    	
 		auto& visibleEntities = cullingData.MainCamera;
 		
 		VertexBuffer* currentVB = nullptr;
@@ -67,6 +76,9 @@ namespace Bruno
 		// 1. Luz Ambiental Fuerte para forzar visibilidad
 		lightData.GlobalAmbientColor = Math::Vector3(0.05f, 0.05f, 0.05f); 
     	lightData.NumCascades = m_shadowMapArray->GetNumCascades(); // ej. 4
+    	lightData.FilterQuality = static_cast<uint32_t>(m_shadowProperties->m_filterQuality);
+    	lightData.ShadowLightSize = m_shadowProperties->m_ShadowLightSize;
+    	lightData.ShadowMapResolution = static_cast<float>(m_shadowProperties->m_resolution);
     	
 		auto entitiesLightsGroup = m_scene->GetAllEntitiesWith<TransformComponent, DirectionalLightComponent>();
 		for (auto lightEntity : entitiesLightsGroup)
@@ -196,14 +208,28 @@ namespace Bruno
 			ShaderVisibility::Pixel
 		);
     	
-    	prototypeSig->AddStaticSampler(
-			1, 0, // s1, space 0
-			TextureFilter::Comparison_MinMag_Linear_MipPoint, // IMPORTANTE: Debe ser un filtro de comparación para PCF
-			TextureAddressMode::Clamp,       // IMPORTANTE: Clamp o Border para que la sombra no se repita en los bordes
-			ShaderVisibility::Pixel,
-			ComparisonFunc::LessEqual
-		);
-
+    	if (m_shadowProperties->m_filterQuality == ShadowFilterQuality::None)
+    	{
+    		prototypeSig->AddStaticSampler(
+				1, 0, // s1, space 0
+				TextureFilter::Comparison_Point,
+				TextureAddressMode::Clamp,       
+				ShaderVisibility::Pixel,
+				ComparisonFunc::LessEqual
+			);
+    	}
+    	else
+    	{
+    		prototypeSig->AddStaticSampler(
+				1, 0, // s1, space 0
+				TextureFilter::Comparison_MinMag_Linear_MipPoint, // IMPORTANTE: Debe ser un filtro de comparación para PCF
+				TextureAddressMode::Clamp,       // IMPORTANTE: Clamp o Border para que la sombra no se repita en los bordes
+				ShaderVisibility::Pixel,
+				ComparisonFunc::LessEqual
+			);
+    	}
+    	m_lastShadowFilterQuality = m_shadowProperties->m_filterQuality;
+    	
         m_forwardRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
     }
 
