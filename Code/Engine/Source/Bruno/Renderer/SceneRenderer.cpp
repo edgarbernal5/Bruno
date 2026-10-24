@@ -79,7 +79,7 @@ namespace Bruno
 		}
 	}
 
-	void SceneRenderer::RecreateShadowMaps(GraphicsDevice* device)
+	void SceneRenderer::BeginFrame(GraphicsDevice* device)
 	{
 		if (m_shadowMapArray->GetNumCascades() != m_shadowProperties->m_numCascades || m_shadowMapArray->GetResolution() != m_shadowProperties->m_resolution)
 		{
@@ -153,7 +153,6 @@ namespace Bruno
 
 	void SceneRenderer::RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)
 	{
-		// 1. Transicionar todo el Texture2DArray a estado de escritura de profundidad
 		context->TransitionResource(m_shadowMapArray.get(), ResourceState::DepthWrite);
 
 		context->SetPipelineState(m_shadowPSO.get());
@@ -162,7 +161,6 @@ namespace Bruno
 		Math::Viewport cascadeViewport = { 0, 0, static_cast<float>(m_shadowProperties->m_resolution), static_cast<float>(m_shadowProperties->m_resolution), 0.0f, 1.0f };
 		Math::Rectangle cascadeScissor = { 0, 0, static_cast<long>(m_shadowProperties->m_resolution), static_cast<long>(m_shadowProperties->m_resolution) };
 		
-		// Iterar por las 4 cascadas
 		for (uint32_t i = 0; i < m_shadowProperties->m_numCascades; ++i) 
 		{
 			// Enlazar SOLO la capa de esta cascada (FirstArraySlice)
@@ -273,7 +271,7 @@ namespace Bruno
 		}
 
 		// 1. Creamos la estructura alineada para la GPU
-		MaterialData gpuData = {};
+		MaterialData gpuData;
 		gpuData.AlbedoTint = matAsset->AlbedoTint;
 		gpuData.MetallicFactor = matAsset->MetallicFactor;
 		gpuData.RoughnessFactor = matAsset->RoughnessFactor;
@@ -334,7 +332,6 @@ namespace Bruno
 			auto& indexBuffer = model->GetIndexBuffer();
 			auto& vertexBuffer = model->GetVertexBuffer();
 			
-			// 4. Optimización de Estado: Solo re-enlazar geometría si cambiamos de asset
 			if (modelComp.ModelHandle != currentModel)
 			{
 				graphicsContext->SetVertexBuffer(0, vertexBuffer.get());
@@ -342,15 +339,12 @@ namespace Bruno
 
 				currentModel = modelComp.ModelHandle;
 			}
-
-			// 5. Preparar la memoria dinámica O(1) para la matriz de ESTE objeto
-			// (Asumiendo que el Root Parameter 0 es un ConstantBufferView)
+			
 			Math::Matrix worldMatrix = transform.WorldTransform;
         
 			DynamicAllocation alloc = graphicsContext->AllocateDynamicSpace(sizeof(Math::Matrix));
 			memcpy(alloc.CPUAddress, &worldMatrix, sizeof(Math::Matrix));
 
-			// 6. Enlazar datos volátiles a la Root Signature
 			graphicsContext->SetConstantBuffer(0, alloc);               
 			graphicsContext->SetPushConstant(1, modelComp.RuntimeMaterialIndex, 0);
 

@@ -109,9 +109,13 @@ float EvaluatePCSS(float3 projCoords, uint cascadeIndex, float bias, float2 scre
     return shadow / (float)pcfSamples;
 }
 
-float CalculateDirectionalShadow(float3 worldPos, float viewDistance, float3 normal, float3 lightDir, float2 screenPos)
+float CalculateDirectionalShadow(float3 worldPos, float viewDistance, float3 normal, float3 lightDir, float2 screenPos, out uint outCascadeIndex)
 {
-    if (g_NumCascades == 0) return 1.0f; 
+    if (g_NumCascades == 0) 
+    {
+        outCascadeIndex = 0;
+        return 1.0f; 
+    }
     
     uint cascadeIndex = 0;
     uint limit = (uint)max(0, (int)g_NumCascades - 1);
@@ -123,6 +127,9 @@ float CalculateDirectionalShadow(float3 worldPos, float viewDistance, float3 nor
             cascadeIndex = i + 1;
         }
     }
+    
+    // Exportamos el índice de la cascada activa hacia el Pixel Shader
+    outCascadeIndex = cascadeIndex;
     
     float4 lightSpacePos = mul(float4(worldPos, 1.0f), g_LightSpaceMatrices[cascadeIndex]);
     float3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
@@ -141,7 +148,10 @@ float CalculateDirectionalShadow(float3 worldPos, float viewDistance, float3 nor
     // AAA Slope-Scaled Depth Bias: Aumenta el bias si la luz resbala sobre la superficie
     float cosTheta = clamp(dot(normal, lightDir), 0.0f, 1.0f);
     float currentBias = clamp(0.001f * tan(acos(cosTheta)), 0.001f, 0.01f);
-
+    
+    // El hardware ya hizo el Slope-Scale Bias, solo aplicamos un umbral diminuto de seguridad
+    //float currentBias = 0.0005f;
+    
     float texelSize = 1.0f / g_ShadowMapResolution;
 
     // Selección de Calidad de Filtro

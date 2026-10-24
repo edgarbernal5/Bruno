@@ -126,7 +126,7 @@ namespace Bruno
 				return;
 			}
 			
-			m_sceneRenderer->RecreateShadowMaps(m_device);
+			m_sceneRenderer->BeginFrame(m_device);
 			
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
 			uint32_t frameIndex = m_surface->GetCurrentBackBufferIndex();

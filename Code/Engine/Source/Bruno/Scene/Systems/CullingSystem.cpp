@@ -50,13 +50,11 @@ namespace Bruno
         }
         
         // Definir el tamaño del chunk (ej. 1024 entidades por Hilo)
-        const uint32_t chunkSize = 1024;
+        constexpr uint32_t chunkSize = 1024;
         const uint32_t numChunks = (entityCount + chunkSize - 1) / chunkSize;
         
-        // FASE SETUP: Pre-alojar memoria para los hilos (Lock-free)
         PrepareMemoryChunks(numChunks, chunkSize, numCascades);
         
-        // Creamos nuestro "Grupo" para este pase de culling
         JobDispatchGroup cullingGroup;
         
         JobSystem::Get().Dispatch(entityCount, chunkSize, [&](uint32_t start, uint32_t end)
@@ -82,7 +80,6 @@ namespace Bruno
                 DirectX::BoundingOrientedBox worldObb;
                 localObb.Transform(worldObb, xmWorld);
 
-                // A. ¿Cámara Principal?
                 // Usamos la función nativa ContainedBy contra nuestros planos perfectos
                 // Orden: Near, Far, Right, Left, Top, Bottom
                 DirectX::ContainmentType result = worldObb.ContainedBy(
@@ -108,7 +105,6 @@ namespace Bruno
         
         JobSystem::Get().Wait(cullingGroup);
         
-        // FASE REDUCE: Unimos todos los WorkerChunks en m_finalResults
         ConsolidateResults(numChunks, numCascades);
     }
 

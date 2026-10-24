@@ -40,7 +40,7 @@ namespace Bruno
 		// Se llama cuando cargas una escena o agregas un objeto
 		void InitEntitiesForRender();
 		
-		void RecreateShadowMaps(GraphicsDevice* device);
+		void BeginFrame(GraphicsDevice* device);
 		void RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex);
 		void RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
 		void RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);

@@ -30,7 +30,6 @@ namespace Bruno
             break; // Asumimos un solo Sol
         }
         
-        // 1. Extraemos las matrices de tu método robusto
         CalculateCascadeMatrices(directionalLightDir);
     }
 
@@ -43,7 +42,7 @@ namespace Bruno
         float fov = m_camera.GetFieldOfView();
         float aspect = m_camera.GetViewport().AspectRatio();
 
-        // 1. Calcular las distancias Z de cada corte (Practical Split Scheme)
+        // Calcular las distancias Z de cada corte (Practical Split Scheme)
         std::vector<float> splitDistances(m_numCascades + 1);
         for (uint32_t i = 0; i <= m_numCascades; ++i)
         {
@@ -101,11 +100,11 @@ namespace Bruno
             lightView = lightView * scalar.Invert();
             
             Math::Matrix lightProj = Math::Matrix::CreateOrthographicOffCenter(
-            -sphereRadius, sphereRadius, 
-            -sphereRadius, sphereRadius, 
-            -sphereRadius * 6.0f, // Con DepthClipEnable=FALSE, este valor puede ser compacto
-            sphereRadius * 6.0f
-        );
+                -sphereRadius, sphereRadius, 
+                -sphereRadius, sphereRadius, 
+                -sphereRadius * 6.0f, // Con DepthClipEnable=FALSE, este valor puede ser compacto
+                sphereRadius * 6.0f
+            );
             
             auto& cascade = m_cascadesData[i];
             

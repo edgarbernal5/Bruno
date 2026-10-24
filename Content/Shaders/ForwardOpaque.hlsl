@@ -226,50 +226,12 @@ float SampleShadowCascade(float3 worldPos, uint cascadeIndex)
     return g_ShadowMap.SampleCmpLevelZero(g_ShadowSampler, float3(projCoords.xy, cascadeIndex), projCoords.z - bias);
 }
 
-/*float CalculateDirectionalShadow(float3 worldPos, float viewDistance)
-{
-    // Si no hay cascadas, no hay sombra
-    if (g_NumCascades == 0) return 1.0f; 
-    
-    // Solo calculamos si realmente hay cascadas activas enviadas desde C++
-    uint cascadeIndex = 0;
-    // Usar max() y un casteo a int evita el underflow de uint de forma segura
-    uint limit = (uint)max(0, (int)g_NumCascades - 1);
-
-    for (uint i = 0; i < limit; ++i)
-    {
-        if (viewDistance > g_CascadeSplits[i])
-        {
-            cascadeIndex = i + 1;
-        }
-    }
-    
-    // 1. Tomar muestra de la cascada principal
-    float shadow = SampleShadowCascade(worldPos, cascadeIndex);
-
-    // 2. Cascade Blending (Transición Suave)
-    if (cascadeIndex < limit)
-    {
-        float splitDistance = g_CascadeSplits[cascadeIndex];
-        float blendBand = 10.0f; // Unidades del mundo donde ambas cascadas se mezclan
-        
-        // Calcula qué tan adentrado está el fragmento en la banda de transición (0.0 a 1.0)
-        float blendFactor = smoothstep(splitDistance - blendBand, splitDistance, viewDistance);
-        
-        if (blendFactor > 0.0f)
-        {
-            // Tomar muestra de la SIGUIENTE cascada y mezclar
-            float nextShadow = SampleShadowCascade(worldPos, cascadeIndex + 1);
-            shadow = lerp(shadow, nextShadow, blendFactor);
-        }
-    }
-
-    return shadow;
-}*/
-
 // ==========================================================
 // PIXEL SHADER
 // ==========================================================
+// Interruptor maestro para activar/desactivar el Debug de Cascadas
+#define DEBUG_SHOW_CASCADES 1
+
 float4 PSMain(PixelInput input) : SV_TARGET
 {
     // 1. Extraer propiedades materiales (Bindless)
@@ -301,14 +263,16 @@ float4 PSMain(PixelInput input) : SV_TARGET
     // Calcular distancia desde la cámara al fragmento para seleccionar la cascada
     float viewDistance = length(g_CameraPosition - input.PositionWorld);
     
+	// Declaramos la variable que recibirá el índice de la cascada
+    uint cascadeIndex = 0;
+
     // Obtener factor de sombra (1.0 = iluminado, 0.0 = sombra total)
-    float shadowFactor = CalculateDirectionalShadow(input.PositionWorld, viewDistance, N, sunDir, input.PositionClip.xy);
+    float shadowFactor = CalculateDirectionalShadow(input.PositionWorld, viewDistance, N, sunDir, input.PositionClip.xy, cascadeIndex);
     
     // Multiplicar la intensidad por el factor de sombra
     float3 sunRadiance = g_Sun.Color * g_Sun.Intensity * shadowFactor;
-    
-    finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, sunDir, sunRadiance);
-    //finalColor.rgb = shadowFactor;
+    finalColor.rgb =  albedo.rgb * sunRadiance;
+    //finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, sunDir, sunRadiance);
     
     // 4. LUCES PUNTUALES
     /*for (uint i = 0; i < g_ActivePointLightCount; ++i)
@@ -354,6 +318,26 @@ float4 PSMain(PixelInput input) : SV_TARGET
         }
     }*/
     
+// ==========================================================
+    // DEBUG: VISUALIZACIÓN DE CASCADAS (Overlay Inteligente)
+    // ==========================================================
+    #if DEBUG_SHOW_CASCADES
+        // Colores distintivos: Rojo (Cerca), Verde (Medio), Azul (Lejos), Amarillo (Muy lejos)
+        float3 cascadeColors[4] = {
+            float3(1.0f, 0.25f, 0.25f),
+            float3(0.25f, 1.0f, 0.25f),
+            float3(0.25f, 0.5f, 1.0f),
+            float3(1.0f, 1.0f, 0.25f)
+        };
+        
+        // Protección para evitar accesos fuera de rango
+        uint safeIndex = min(cascadeIndex, 3);
+        
+        // Mezclamos el color final de la escena con el tinte de la cascada.
+        // Al multiplicar, seguimos viendo el detalle del PBR y la silueta de las sombras (shadowFactor).
+        finalColor = lerp(finalColor, finalColor * cascadeColors[safeIndex] * 2.0f, 0.6f);
+    #endif
+
     // HDR Tonemapping (Reinhard) y Gamma Correction (2.2) 
     // Esenciales ya que la luz PBR genera valores superiores a 1.0
     //finalColor = finalColor / (finalColor + float3(1.0f, 1.0f, 1.0f));
