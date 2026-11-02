@@ -280,35 +280,40 @@ namespace Bruno
 						directionalLightComp.Intensity = val;
 					}
 				);
-				directionalLightCategory.EmplaceProperty<Berta::PropertyGridFieldColor>(
-					"Color", 
-					[entity]()
-					{
-						Berta::Color colorUI;
-						auto& color = entity.GetComponent<DirectionalLightComponent>().Color;
-						colorUI.SetA(1.0f);
-						colorUI.SetR(color.x);
-						colorUI.SetG(color.y);
-						colorUI.SetB(color.z);
-						
-						return colorUI;
-					},
-					[entity](const Berta::Color& val) mutable
-					{
-						auto &directionalLightComp = entity.GetComponent<DirectionalLightComponent>();
-						auto& color = directionalLightComp.Color;
-						color.x = val.GetR() / 255.0f;
-						color.y = val.GetG() / 255.0f;
-						color.z = val.GetB() / 255.0f;
-					},
-					[](std::optional<Berta::Color> currentColor) -> std::optional<Berta::Color>
-					{
-						std::cout << "Opening color picker...." << std::endl;
-						std::cout << "ERROR...." << std::endl;
+				
+				directionalLightCategory.EmplaceColor(
+				"Color",
+				[entity]()
+				{
+					auto& color = entity.GetComponent<DirectionalLightComponent>().Color;
+					
+					Berta::OptionalColor opt;
+					opt.r = color.x * 255.0f;
+					opt.g = color.y * 255.0f;
+					opt.b = color.z * 255.0f;
+					return opt;
+				},
+				[entity](const Berta::OptionalColor& val) mutable
+				{
+					auto &directionalLightComp = entity.GetComponent<DirectionalLightComponent>();
+					auto &color = directionalLightComp.Color;
+					if (val.r.has_value())
+						color.x = val.r.value() / 255.0f;
+					
+					if (val.g.has_value())
+						color.y = val.g.value() / 255.0f;
+					
+					if (val.b.has_value())
+						color.z = val.b.value() / 255.0f;
+					
+				},
+				[](std::optional<Berta::OptionalColor> currentColor) -> std::optional<Berta::OptionalColor>
+				{
+					std::cout << "Opening color picker...." << std::endl;
+					std::cout << "ERROR...." << std::endl;
 
-						return std::nullopt;
-					}
-				);
+					return std::nullopt;
+				}, false);
 				
 				directionalLightCategory.EmplaceProperty<Berta::PropertyGridFieldCheck>(
 					"Cast Shadows", 
