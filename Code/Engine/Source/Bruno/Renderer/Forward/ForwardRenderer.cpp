@@ -73,6 +73,11 @@ namespace Bruno
 		ForwardLightingBuffer lightData = {};
 		lightData.CameraPosition = camera.GetPosition();
 
+    	// EXTRAER VECTOR FORWARD DE LA CÁMARA
+    	Math::Vector3 camForward = camera.GetViewInverse().Forward();
+    	camForward.Normalize();
+    	lightData.CameraForward = camForward;
+    	
 		// 1. Luz Ambiental Fuerte para forzar visibilidad
 		lightData.GlobalAmbientColor = Math::Vector3(0.05f, 0.05f, 0.05f); 
     	lightData.NumCascades = m_shadowMapArray->GetNumCascades(); // ej. 4

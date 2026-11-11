@@ -89,7 +89,7 @@ cbuffer ForwardLights : register(b2)
     uint g_ActiveSpotLightCount;
     float3 g_CameraPosition;
     float g_Padding;
-    float3 g_ExplicitPadding;
+    float3 g_CameraForward;
     
     matrix g_LightSpaceMatrices[MAX_CASCADES]; // Matrices ViewProjection de la luz por cascada
     float4 g_CascadeSplits;                    // Distancias límite de cada cascada (usualmente 4)
@@ -260,14 +260,14 @@ float4 PSMain(PixelInput input) : SV_TARGET
     // 3. ILUMINACIÓN DIRECCIONAL (Sol)
     float3 sunDir = normalize(-g_Sun.Direction);
     
-    // Calcular distancia desde la cámara al fragmento para seleccionar la cascada
-    float viewDistance = length(g_CameraPosition - input.PositionWorld);
+    // Proyectar la distancia a lo largo del eje Z de visión de la cámara
+    float viewZ = dot(input.PositionWorld - g_CameraPosition, g_CameraForward);
     
 	// Declaramos la variable que recibirá el índice de la cascada
     uint cascadeIndex = 0;
 
     // Obtener factor de sombra (1.0 = iluminado, 0.0 = sombra total)
-    float shadowFactor = CalculateDirectionalShadow(input.PositionWorld, viewDistance, N, sunDir, input.PositionClip.xy, cascadeIndex);
+    float shadowFactor = CalculateDirectionalShadow(input.PositionWorld, viewZ, N, sunDir, input.PositionClip.xy, cascadeIndex);
     
     // Multiplicar la intensidad por el factor de sombra
     float3 sunRadiance = g_Sun.Color * g_Sun.Intensity * shadowFactor;

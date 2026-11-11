@@ -36,13 +36,20 @@ namespace Bruno
    void ShadowSystem::CalculateCascadeMatrices(const Math::Vector3& lightDir)
     {
         m_cascadesData.resize(m_numCascades);
-        
+
+        // 1. Garantizar dirección unitaria (evita colapsar la distancia de baseLookAt)
+        Math::Vector3 lightDirNormalized = lightDir;
+        lightDirNormalized.Normalize();
+
         float nearClip = m_camera.GetNearPlane();
-        float farClip = m_camera.GetFarPlane();
-        float fov = m_camera.GetFieldOfView();
+        float farClip  = m_camera.GetFarPlane();
+        // Si tienes m_maxShadowDistance configurado a un valor finito (ej. 150.0f - 500.0f):
+        // farClip = (std::min)(farClip, m_maxShadowDistance);
+
+        float fov    = m_camera.GetFieldOfView();
         float aspect = m_camera.GetViewport().AspectRatio();
 
-        // Calcular las distancias Z de cada corte (Practical Split Scheme)
+        // 2. Practical Split Scheme
         std::vector<float> splitDistances(m_numCascades + 1);
         for (uint32_t i = 0; i <= m_numCascades; ++i)
         {
@@ -59,18 +66,19 @@ namespace Bruno
             float cascadeNear = splitDistances[i];
             float cascadeFar  = splitDistances[i + 1];
 
-            // Extraer las 8 esquinas del sub-frustum en Espacio de Vista mediante trigonometría
+            // 3. Esquinas del sub-frustum en View Space (RH: cámara mira hacia -Z)
             float tanHalfFov = std::tan(fov * 0.5f);
             float nearY = cascadeNear * tanHalfFov;
             float nearX = nearY * aspect;
             float farY  = cascadeFar * tanHalfFov;
             float farX  = farY * aspect;
 
+            //Calcular frustums usando sistema RH
             Math::Vector3 frustumCorners[8] = {
-                Math::Vector3(-nearX,  nearY, cascadeNear), Math::Vector3( nearX,  nearY, cascadeNear),
-                Math::Vector3( nearX, -nearY, cascadeNear), Math::Vector3(-nearX, -nearY, cascadeNear),
-                Math::Vector3(-farX,  farY, cascadeFar),  Math::Vector3( farX,  farY, cascadeFar),
-                Math::Vector3( farX, -farY, cascadeFar),  Math::Vector3(-farX, -farY, cascadeFar)
+                Math::Vector3(-nearX,  nearY, -cascadeNear), Math::Vector3( nearX,  nearY, -cascadeNear),
+                Math::Vector3( nearX, -nearY, -cascadeNear), Math::Vector3(-nearX, -nearY, -cascadeNear),
+                Math::Vector3(-farX,   farY,  -cascadeFar),  Math::Vector3( farX,   farY,  -cascadeFar),
+                Math::Vector3( farX,  -farY,  -cascadeFar),  Math::Vector3(-farX,  -farY,  -cascadeFar)
             };
 
             Math::Vector3 center = Math::Vector3::Zero;
@@ -80,7 +88,7 @@ namespace Bruno
                 center += frustumCorners[j];
             }
             center /= 8.0f;
-            
+
             float sphereRadius = 0.0f;
             for (int j = 0; j < 8; ++j)
             {
@@ -88,28 +96,37 @@ namespace Bruno
                 sphereRadius = std::max<float>(sphereRadius, dist);
             }
 
+            // Estabilizar el radio para evitar oscilaciones al rotar
+            sphereRadius = std::ceil(sphereRadius * 16.0f) / 16.0f;
+
+            // 4. Texel Snapping exclusivamente en X e Y (sin alterar la profundidad Z)
             float texelPerUnit = static_cast<float>(m_shadowMapResolution) / (sphereRadius * 2.0f);
-            Math::Matrix scalar = Math::Matrix::CreateScale(texelPerUnit, texelPerUnit, texelPerUnit);
-            Math::Vector3 baseLookAt = center - (lightDir * sphereRadius);
-            Math::Matrix lightView = Math::Matrix::CreateLookAt(baseLookAt, center, Math::Vector3::Up);
-            
+            Math::Matrix scalar = Math::Matrix::CreateScale(texelPerUnit, texelPerUnit, 1.0f);
+
+            Math::Vector3 upDir = (std::abs(lightDirNormalized.y) > 0.99f) ? Math::Vector3::Forward : Math::Vector3::Up;
+            Math::Vector3 baseLookAt = center - (lightDirNormalized * sphereRadius);
+            Math::Matrix lightView = Math::Matrix::CreateLookAt(baseLookAt, center, upDir);
+
             lightView = lightView * scalar;
             lightView.m[3][0] = std::floor(lightView.m[3][0]);
             lightView.m[3][1] = std::floor(lightView.m[3][1]);
-            lightView.m[3][2] = std::floor(lightView.m[3][2]);
             lightView = lightView * scalar.Invert();
-            
+
+            // 5. Holgura de 2 texeles para absorber el floor() + rango Z amplio para oclusores altos
+            float worldUnitsPerTexel = 1.0f / texelPerUnit;
+            float paddedRadius = sphereRadius + (worldUnitsPerTexel * 2.0f);
+            float zMargin = std::max<float>(sphereRadius * 6.0f, 1000.0f);
+
             Math::Matrix lightProj = Math::Matrix::CreateOrthographicOffCenter(
-                -sphereRadius, sphereRadius, 
-                -sphereRadius, sphereRadius, 
-                -sphereRadius * 6.0f, // Con DepthClipEnable=FALSE, este valor puede ser compacto
-                sphereRadius * 6.0f
+                -paddedRadius, paddedRadius,
+                -paddedRadius, paddedRadius,
+                -zMargin,
+                zMargin
             );
-            
+
             auto& cascade = m_cascadesData[i];
-            
             cascade.LightViewProj = lightView * lightProj;
-            cascade.SplitDistance = cascadeFar; 
+            cascade.SplitDistance = cascadeFar;
         }
     }
 }

@@ -45,28 +45,28 @@ namespace Bruno
         Math::Vector3 Color;
         float InnerConeCos; // std::cos(InnerCutoffAngle)
         float OuterConeCos; // std::cos(OuterCutoffAngle)
-        Math::Vector3 Padding; // Relleno para 16-bytes
+        Math::Vector3 Padding;
     };
     
     struct ForwardLightingBuffer
     {
-        DirectionalLightData Sun; // La luz direccional global
-        PointLightData PointLights[MAX_FORWARD_LIGHTS]; // Tu arreglo actual de luces locales
-        SpotLightData SpotLights[MAX_FORWARD_LIGHTS]; // Tu arreglo actual de luces locales
+        DirectionalLightData Sun;
+        PointLightData PointLights[MAX_FORWARD_LIGHTS];
+        SpotLightData SpotLights[MAX_FORWARD_LIGHTS];
         Math::Vector3 GlobalAmbientColor;
         uint32_t ActivePointLightCount;
         uint32_t ActiveSpotLightCount;
         Math::Vector3 CameraPosition;
-        float Padding;                      // 4 bytes
-        Math::Vector3 ExplicitPadding;      // NUEVO: 12 bytes para forzar alineación a 16 bytes
+        float Padding;
+        Math::Vector3 CameraForward;
         
         Math::Matrix LightSpaceMatrices[4];
         Math::Vector4 CascadeSplits; // [Split0, Split1, Split2, Split3]
         uint32_t NumCascades;
         
         // --- VARIABLES INYECTADAS DESDE C++ (ShadowProperties) ---
-        uint32_t FilterQuality;       // 0: PCF3x3, 1: PCF5x5, 2: PCSS
-        float ShadowMapResolution; // ej: 2048.0
+        uint32_t FilterQuality;
+        float ShadowMapResolution;
         float ShadowLightSize;     // Tamaño aparente de la luz para PCSS (ej: 0.05)
         float CsmPadding;          // Padding de alineación
     };
