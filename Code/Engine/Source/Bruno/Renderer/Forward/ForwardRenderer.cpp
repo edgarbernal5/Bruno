@@ -111,7 +111,10 @@ namespace Bruno
 		}
 		lightData.ActivePointLightCount = 0;
 		lightData.ActiveSpotLightCount = 0;
-		
+    	for (uint32_t i = 0; i < lightData.NumCascades; ++i)
+    	{
+    		//lightData.CascadeTexelBias.x[i] = cascades[i].TexelDepthBias;
+    	}
 		m_forwardLightsCB.Update(*graphicsContext, lightData);
 		
     	graphicsContext->SetDescriptorHeaps({ m_globalSrvHeap });

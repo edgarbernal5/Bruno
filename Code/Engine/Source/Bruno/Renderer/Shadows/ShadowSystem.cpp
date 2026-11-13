@@ -66,17 +66,25 @@ namespace Bruno
             float cascadeNear = splitDistances[i];
             float cascadeFar  = splitDistances[i + 1];
 
+            // Solapamos el plano cercano de las cascadas 1..N un 15% hacia atrás para cubrir el blendBand
+            float frustumNear = cascadeNear;
+            if (i > 0)
+            {
+                float prevDepth = splitDistances[i] - splitDistances[i - 1];
+                frustumNear = (std::max)(nearClip, cascadeNear - prevDepth * 0.15f);
+            }
+            
             // 3. Esquinas del sub-frustum en View Space (RH: cámara mira hacia -Z)
             float tanHalfFov = std::tan(fov * 0.5f);
-            float nearY = cascadeNear * tanHalfFov;
+            float nearY = frustumNear * tanHalfFov;
             float nearX = nearY * aspect;
             float farY  = cascadeFar * tanHalfFov;
             float farX  = farY * aspect;
 
             //Calcular frustums usando sistema RH
             Math::Vector3 frustumCorners[8] = {
-                Math::Vector3(-nearX,  nearY, -cascadeNear), Math::Vector3( nearX,  nearY, -cascadeNear),
-                Math::Vector3( nearX, -nearY, -cascadeNear), Math::Vector3(-nearX, -nearY, -cascadeNear),
+                Math::Vector3(-nearX,  nearY, -frustumNear), Math::Vector3( nearX,  nearY, -frustumNear),
+                Math::Vector3( nearX, -nearY, -frustumNear), Math::Vector3(-nearX, -nearY, -frustumNear),
                 Math::Vector3(-farX,   farY,  -cascadeFar),  Math::Vector3( farX,   farY,  -cascadeFar),
                 Math::Vector3( farX,  -farY,  -cascadeFar),  Math::Vector3(-farX,  -farY,  -cascadeFar)
             };

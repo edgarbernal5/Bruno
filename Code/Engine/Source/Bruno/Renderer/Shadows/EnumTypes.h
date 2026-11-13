@@ -28,8 +28,9 @@ namespace Bruno
         uint32_t m_resolution = SHADOW_MAP_RES;
         float m_ShadowLightSize = 0.05f;
         float m_cascadeLambda = 0.85f;
-        int m_depthBias = 50000;
-        float m_slopeScaledDepthBias = 1.0f;
+        int m_depthBias = 3000;
+        float m_slopeScaledDepthBias = 1.25f;
+        //float m_normalBiasScale = 1.5f;
         ShadowFilterQuality m_filterQuality = ShadowFilterQuality::None;
     };
 }

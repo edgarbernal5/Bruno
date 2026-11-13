@@ -54,7 +54,10 @@ namespace Bruno
     CommandQueue::~CommandQueue()
     {
         Flush();
-        ::CloseHandle(m_fenceEvent);
+        if (m_fenceEvent)
+        {
+            ::CloseHandle(m_fenceEvent);
+        }
     }
 
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CommandQueue::GetCommandList(uint32_t frameIndex)

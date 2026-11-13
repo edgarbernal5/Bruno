@@ -100,6 +100,7 @@ cbuffer ForwardLights : register(b2)
     float g_ShadowMapResolution; // ej: 2048.0
     float g_ShadowLightSize;     // Tamaño aparente de la luz para PCSS (ej: 0.05)
     float g_CsmPadding;          // Padding de alineación
+    float4 g_CascadeTexelBias; //(16 bytes exactos, 1 componente por cascada)
 };
 
 /// space1: Recursos específicos de iluminación/sombras

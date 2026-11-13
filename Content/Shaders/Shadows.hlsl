@@ -59,6 +59,26 @@ float EvaluatePCF5x5(float3 projCoords, uint cascadeIndex, float bias, float tex
     return shadow / 9.0f;
 }
 
+float ComputeCascadeBias(uint cascadeIndex, float3 normal, float3 lightDir)
+{
+    float unitBias = g_CascadeTexelBias[cascadeIndex];
+
+    // Escala según el alcance del kernel de muestreo activo
+    float filterRadiusScale = 1.0f;
+    if (g_FilterQuality == 1)      filterRadiusScale = 1.5f; // PCF 3x3
+    else if (g_FilterQuality >= 2) filterRadiusScale = 2.5f; // PCF 5x5 y PCSS
+
+    float cosTheta = clamp(dot(normal, lightDir), 0.05f, 1.0f);
+    float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
+    float slope = sinTheta / cosTheta; // tan(theta) sin trigonometría
+
+    float baseBias  = unitBias * filterRadiusScale;
+    float slopeBias = baseBias * min(slope, 3.0f);
+
+    // Acotamos entre 0.5 y 5 texeles de profundidad propios de esa cascada
+    return clamp(baseBias + slopeBias, unitBias * 0.5f, unitBias * 5.0f);
+}
+
 // --- Percentage-Closer Soft Shadows (PCSS) ---
 float EvaluatePCSS(float3 projCoords, uint cascadeIndex, float bias, float2 screenPos)
 {
@@ -108,15 +128,65 @@ float EvaluatePCSS(float3 projCoords, uint cascadeIndex, float bias, float2 scre
 
     return shadow / (float)pcfSamples;
 }
+// Evalúa una cascada individual y devuelve false si el punto cae fuera de su volumen
+bool SampleCascadeFiltered(
+    float3 worldPos,
+    uint cascadeIndex,
+    float bias,
+    float texelSize,
+    float2 screenPos,
+    bool isSecondaryTap,
+    out float outShadow)
+{
+    float4 lightSpacePos = mul(float4(worldPos, 1.0f), g_LightSpaceMatrices[cascadeIndex]);
+    float3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+
+    projCoords.x = projCoords.x * 0.5f + 0.5f;
+    projCoords.y = -projCoords.y * 0.5f + 0.5f;
+
+    if (projCoords.x < 0.0f || projCoords.x > 1.0f ||
+        projCoords.y < 0.0f || projCoords.y > 1.0f ||
+        projCoords.z < 0.0f || projCoords.z > 1.0f)
+    {
+        outShadow = 1.0f;
+        return false;
+    }
+
+    // En la cascada secundaria degradamos PCF5x5 (9 taps) o PCSS (32 taps) a PCF3x3 (4 taps)
+    uint quality = g_FilterQuality;
+    if (isSecondaryTap && quality > 1)
+    {
+        quality = 1;
+    }
+
+    if (quality == 0)
+    {
+        outShadow = EvaluateHardShadow(projCoords, cascadeIndex, bias);
+    }
+    else if (quality == 1)
+    {
+        outShadow = EvaluatePCF3x3(projCoords, cascadeIndex, bias, texelSize);
+    }
+    else if (quality == 2)
+    {
+        outShadow = EvaluatePCF5x5(projCoords, cascadeIndex, bias, texelSize);
+    }
+    else
+    {
+        outShadow = EvaluatePCSS(projCoords, cascadeIndex, bias, screenPos);
+    }
+
+    return true;
+}
 
 float CalculateDirectionalShadow(float3 worldPos, float viewDistance, float3 normal, float3 lightDir, float2 screenPos, out uint outCascadeIndex)
 {
-    if (g_NumCascades == 0) 
+    if (g_NumCascades == 0)
     {
         outCascadeIndex = 0;
-        return 1.0f; 
+        return 1.0f;
     }
-    
+
     uint cascadeIndex = 0;
     uint limit = (uint)max(0, (int)g_NumCascades - 1);
 
@@ -127,48 +197,47 @@ float CalculateDirectionalShadow(float3 worldPos, float viewDistance, float3 nor
             cascadeIndex = i + 1;
         }
     }
-    
-    // Exportamos el índice de la cascada activa hacia el Pixel Shader
-    outCascadeIndex = cascadeIndex;
-    
-    float4 lightSpacePos = mul(float4(worldPos, 1.0f), g_LightSpaceMatrices[cascadeIndex]);
-    float3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
-    
-    projCoords.x = projCoords.x * 0.5f + 0.5f;
-    projCoords.y = -projCoords.y * 0.5f + 0.5f;
 
-    // Descarte fuera del Frustum de la luz
-    if (projCoords.x < 0.0f || projCoords.x > 1.0f || 
-        projCoords.y < 0.0f || projCoords.y > 1.0f || 
-        projCoords.z < 0.0f || projCoords.z > 1.0f)
+    outCascadeIndex = cascadeIndex;
+
+    // Slope-Scaled Depth Bias
+    float cosTheta = clamp(dot(normal, lightDir), 0.0f, 1.0f);
+    float currentBias = clamp(0.001f * tan(acos(cosTheta)), 0.001f, 0.01f);
+    float texelSize = 1.0f / g_ShadowMapResolution;
+
+    // 1. Evaluación de la cascada principal
+    float shadow = 1.0f;
+    if (!SampleCascadeFiltered(worldPos, cascadeIndex, currentBias, texelSize, screenPos, false, shadow))
     {
         return 1.0f;
     }
-    
-    // AAA Slope-Scaled Depth Bias: Aumenta el bias si la luz resbala sobre la superficie
-    float cosTheta = clamp(dot(normal, lightDir), 0.0f, 1.0f);
-    float currentBias = clamp(0.001f * tan(acos(cosTheta)), 0.001f, 0.01f);
-    
-    // El hardware ya hizo el Slope-Scale Bias, solo aplicamos un umbral diminuto de seguridad
-    //float currentBias = 0.0005f;
-    
-    float texelSize = 1.0f / g_ShadowMapResolution;
 
-    // Selección de Calidad de Filtro
-    if (g_FilterQuality == 0) // Supongamos que 0 ahora es "None/Hard"
+    // 2. Cascade Blending en el último 15% de profundidad de la cascada actual
+    if (cascadeIndex < limit)
     {
-        return EvaluateHardShadow(projCoords, cascadeIndex, currentBias);
+        float splitFar  = g_CascadeSplits[cascadeIndex];
+        float splitNear = (cascadeIndex == 0) ? 0.0f : g_CascadeSplits[cascadeIndex - 1];
+        float cascadeDepth = max(splitFar - splitNear, 0.001f);
+
+        float blendBand = cascadeDepth * 0.15f;
+        float blendFactor = smoothstep(splitFar - blendBand, splitFar, viewDistance);
+
+		/*
+		if (blendFactor > InterleavedGradientNoise(screenPos))
+    	{
+        	cascadeIndex += 1;
+    	}
+		*/
+        [branch]
+        if (blendFactor > 0.0f)
+        {
+            float nextShadow = 1.0f;
+            if (SampleCascadeFiltered(worldPos, cascadeIndex + 1, currentBias, texelSize, screenPos, true, nextShadow))
+            {
+                shadow = lerp(shadow, nextShadow, blendFactor);
+            }
+        }
     }
-    else if (g_FilterQuality == 1) // PCF3x3
-    {
-        return EvaluatePCF3x3(projCoords, cascadeIndex, currentBias, texelSize);
-    }
-    else if (g_FilterQuality == 2) // PCF5x5
-    {
-        return EvaluatePCF5x5(projCoords, cascadeIndex, currentBias, texelSize);
-    }
-    else // PCSS
-    {
-        return EvaluatePCSS(projCoords, cascadeIndex, currentBias, screenPos);
-    }
+
+    return shadow;
 }

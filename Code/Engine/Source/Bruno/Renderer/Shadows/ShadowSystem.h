@@ -11,6 +11,8 @@ namespace Bruno
     {
         Math::Matrix LightViewProj;
         float SplitDistance; // Distancia Z en espacio de vista donde termina la cascada
+        float TexelDepthBias = 0.0f; // Cuánto equivale 1 texel en profundidad NDC [0, 1]
+        float WorldTexelSize = 0.0f; // Tamaño físico del texel en el mundo (útil para Normal Offset)
     };
 
     class ShadowSystem

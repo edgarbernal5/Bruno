@@ -69,6 +69,7 @@ namespace Bruno
         float ShadowMapResolution;
         float ShadowLightSize;     // Tamaño aparente de la luz para PCSS (ej: 0.05)
         float CsmPadding;          // Padding de alineación
+        Math::Vector4 CascadeTexelBias;
     };
     
     class ForwardRenderer
