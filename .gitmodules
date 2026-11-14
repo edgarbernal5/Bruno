@@ -1,4 +1,4 @@
 [submodule "Code/Engine/Dependencies"]
 	path = Code/Engine/Dependencies
-	url = git@github.com-personal:edgarbernal5/Bruno-Dependencies.git
+	url = git@github.com:edgarbernal5/Bruno-Dependencies.git
 	branch = main
