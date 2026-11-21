@@ -1,3 +1,26 @@
+#ifndef SHADOWS_COMMON_HLSLI
+#define SHADOWS_COMMON_HLSLI
+
+#ifndef MAX_CASCADES
+#define MAX_CASCADES 4
+#endif
+
+// ==============================================================================
+// CONTRATO DE PARÁMETROS CSM (Agnóstico a la Root Signature)
+// ==============================================================================
+struct CSMParams
+{
+    float4x4 LightSpaceMatrices[MAX_CASCADES];
+    float4   CascadeSplits;
+    uint     NumCascades;
+    uint     FilterQuality;         // 0 = Hard, 1 = PCF 3x3, 2 = PCF 5x5, 3 = PCSS
+    float    ShadowMapResolution;
+    float    ShadowLightSize;
+    float    NormalBiasScale;
+    float4   CascadeTexelBias;
+    float4   CascadeWorldTexelSize;
+};
+
 // Interleaved Gradient Noise (IGN)
 float InterleavedGradientNoise(float2 pixelPos)
 {
@@ -11,6 +34,26 @@ float2 VogelDiskSample(int sampleIndex, int samplesCount, float noiseAngle)
     float r = sqrt((float)sampleIndex + 0.5f) / sqrt((float)samplesCount);
     float theta = sampleIndex * 2.4f + noiseAngle; // 2.4 rad es el ángulo dorado
     return float2(cos(theta), sin(theta)) * r;
+}
+
+float ComputeCascadeBias(uint cascadeIndex, float3 normal, float3 lightDir)
+{
+    float unitBias = g_CascadeTexelBias[cascadeIndex];
+
+    // Escala según el alcance del kernel de muestreo activo
+    float filterRadiusScale = 1.0f;
+    if (g_FilterQuality == 1)      filterRadiusScale = 1.5f; // PCF 3x3
+    else if (g_FilterQuality >= 2) filterRadiusScale = 2.5f; // PCF 5x5 y PCSS
+
+    float cosTheta = clamp(dot(normal, lightDir), 0.05f, 1.0f);
+    float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
+    float slope = sinTheta / cosTheta; // tan(theta) sin trigonometría
+
+    float baseBias  = unitBias * filterRadiusScale;
+    float slopeBias = baseBias * min(slope, 3.0f);
+
+    // Acotamos entre 0.5 y 5 texeles de profundidad propios de esa cascada
+    return clamp(baseBias + slopeBias, unitBias * 0.5f, unitBias * 5.0f);
 }
 
 // --- Hard Shadows (Sin Filtrado PCF) ---
@@ -57,26 +100,6 @@ float EvaluatePCF5x5(float3 projCoords, uint cascadeIndex, float bias, float tex
         }
     }
     return shadow / 9.0f;
-}
-
-float ComputeCascadeBias(uint cascadeIndex, float3 normal, float3 lightDir)
-{
-    float unitBias = g_CascadeTexelBias[cascadeIndex];
-
-    // Escala según el alcance del kernel de muestreo activo
-    float filterRadiusScale = 1.0f;
-    if (g_FilterQuality == 1)      filterRadiusScale = 1.5f; // PCF 3x3
-    else if (g_FilterQuality >= 2) filterRadiusScale = 2.5f; // PCF 5x5 y PCSS
-
-    float cosTheta = clamp(dot(normal, lightDir), 0.05f, 1.0f);
-    float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
-    float slope = sinTheta / cosTheta; // tan(theta) sin trigonometría
-
-    float baseBias  = unitBias * filterRadiusScale;
-    float slopeBias = baseBias * min(slope, 3.0f);
-
-    // Acotamos entre 0.5 y 5 texeles de profundidad propios de esa cascada
-    return clamp(baseBias + slopeBias, unitBias * 0.5f, unitBias * 5.0f);
 }
 
 // --- Percentage-Closer Soft Shadows (PCSS) ---
@@ -148,7 +171,7 @@ bool SampleCascadeFiltered(
         projCoords.y < 0.0f || projCoords.y > 1.0f ||
         projCoords.z < 0.0f || projCoords.z > 1.0f)
     {
-        outShadow = 1.0f;
+        outShadow = 0.25f;
         return false;
     }
 
@@ -179,6 +202,9 @@ bool SampleCascadeFiltered(
     return true;
 }
 
+// ==========================================================
+// CASCADED SHADOW MAPS (CSM)
+// ==========================================================
 float CalculateDirectionalShadow(float3 worldPos, float viewDistance, float3 normal, float3 lightDir, float2 screenPos, out uint outCascadeIndex)
 {
     if (g_NumCascades == 0)
@@ -209,7 +235,7 @@ float CalculateDirectionalShadow(float3 worldPos, float viewDistance, float3 nor
     float shadow = 1.0f;
     if (!SampleCascadeFiltered(worldPos, cascadeIndex, currentBias, texelSize, screenPos, false, shadow))
     {
-        return 1.0f;
+        return 0.25f;
     }
 
     // 2. Cascade Blending en el último 15% de profundidad de la cascada actual
@@ -241,3 +267,5 @@ float CalculateDirectionalShadow(float3 worldPos, float viewDistance, float3 nor
 
     return shadow;
 }
+
+#endif // SHADOWS_COMMON_HLSLI

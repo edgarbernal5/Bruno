@@ -1,11 +1,12 @@
 ﻿#include "brpch.h"
 #include "GpuBuffer.h"
 
-namespace Bruno {
-
+namespace Bruno
+{
     // Constructor Dinámico
-    GpuBuffer::GpuBuffer(GraphicsDevice& device, size_t sizeInBytes, const std::wstring& name) 
-        : m_size(sizeInBytes), m_isDynamic(true)
+    GpuBuffer::GpuBuffer(GraphicsDevice& device, size_t sizeInBytes, const std::wstring& name) : 
+        m_size(sizeInBytes),
+        m_isDynamic(true)
     {
         m_name = name;
         m_currentState = ResourceState::GenericRead; // ¡Diferente al COMMON del estático!
@@ -31,8 +32,9 @@ namespace Bruno {
     }
 
     // Constructor Estático
-    GpuBuffer::GpuBuffer(GraphicsDevice& device, UploadContext& uploadContext, const void* data, size_t sizeInBytes, const std::wstring& name) 
-        : m_size(sizeInBytes), m_isDynamic(false)
+    GpuBuffer::GpuBuffer(GraphicsDevice& device, UploadContext& uploadContext, const void* data, size_t sizeInBytes, const std::wstring& name) : 
+        m_size(sizeInBytes),
+        m_isDynamic(false)
     {
         m_name = name;
         m_currentState = ResourceState::Common; // Nace en COMMON para evitar los warnings
@@ -59,8 +61,9 @@ namespace Bruno {
     }
     
     // Constructor de VRAM Pura (DEFAULT_HEAP vacío)
-    GpuBuffer::GpuBuffer(GraphicsDevice& device, size_t sizeInBytes, ResourceState initialState, const std::wstring& name)
-        : m_size(sizeInBytes), m_isDynamic(false)
+    GpuBuffer::GpuBuffer(GraphicsDevice& device, size_t sizeInBytes, ResourceState initialState, const std::wstring& name) :
+        m_size(sizeInBytes),
+        m_isDynamic(false)
     {
         m_name = name;
         // DirectX 12 recomienda nacer en COMMON para buffers en DEFAULT_HEAP

@@ -15,6 +15,7 @@ namespace entt
 
 namespace Bruno
 {
+	class SceneRendererDeferred;
 	struct ShadowProperties;
 	class ForwardRenderer;
 	struct FrameCullingResults;
@@ -68,5 +69,6 @@ namespace Bruno
 		std::shared_ptr<MaterialManager> m_materialManager;
 		std::shared_ptr<ShadowMapArray> m_shadowMapArray;
 		std::unique_ptr<ForwardRenderer> m_forwardRenderer;
+		std::unique_ptr<SceneRendererDeferred> m_deferredRenderer;
 	};
 }

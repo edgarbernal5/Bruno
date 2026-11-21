@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Bruno/Math/Math.h"
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
+#include "Bruno/Renderer/Lighting/EnumTypes.h"
 #include "Bruno/Renderer/Shadows/EnumTypes.h"
 
 namespace Bruno
@@ -19,34 +20,6 @@ namespace Bruno
     
     // Datos Puros de Iluminación
 #define MAX_FORWARD_LIGHTS 8
-	
-    struct DirectionalLightData
-    {
-        Math::Vector3 Direction;
-        float Intensity;
-        Math::Vector3 Color;
-        float Padding; // Relleno obligatorio
-    };
-	
-    struct PointLightData
-    {
-        Math::Vector3 Position;
-        float Radius;
-        Math::Vector3 Color;
-        float Intensity;
-    };
-	
-    struct SpotLightData
-    {
-        Math::Vector3 Position;
-        float Radius; // Distancia máxima de influencia (como la Point Light)
-        Math::Vector3 Direction;
-        float Intensity;
-        Math::Vector3 Color;
-        float InnerConeCos; // std::cos(InnerCutoffAngle)
-        float OuterConeCos; // std::cos(OuterCutoffAngle)
-        Math::Vector3 Padding;
-    };
     
     struct ForwardLightingBuffer
     {
@@ -68,7 +41,7 @@ namespace Bruno
         uint32_t FilterQuality;
         float ShadowMapResolution;
         float ShadowLightSize;     // Tamaño aparente de la luz para PCSS (ej: 0.05)
-        float CsmPadding;          // Padding de alineación
+        //float CsmPadding;          // Padding de alineación
         Math::Vector4 CascadeTexelBias;
     };
     

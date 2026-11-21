@@ -51,12 +51,13 @@ namespace Bruno
         void SetScissorRect(const Math::Rectangle& rect);
         void SetPipelineState(GraphicsPipelineState* pso);
         void SetRootSignature(RootSignature* rootSig);
-
         // --- ENLACE DE RECURSOS ---
         void SetDescriptorHeaps(std::initializer_list<DescriptorAllocator*> heaps);
         
         void SetConstantBuffer(uint32_t rootParameterIndex, const ConstantBufferBase& cb);
         void SetConstantBuffer(uint32_t rootParameterIndex, const DynamicAllocation& allocation);
+        
+        void SetShaderResourceView(uint32_t rootParameterIndex, const DynamicAllocation& allocation);
         
         void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& allocator);
         void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocation& allocation);

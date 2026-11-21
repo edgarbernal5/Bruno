@@ -14,10 +14,11 @@ namespace Bruno
     {
     public:
         // Constructor Dinámico (Ej: Para PrimitiveBatch)
-        IndexBuffer(GraphicsDevice& device, size_t indexCount, bool use16BitIndices = false);
+        IndexBuffer(GraphicsDevice& device, size_t indexCount, bool use16BitIndices = false, const std::wstring& debugName = L"Dynamic_IB");
         
         // Constructor Estático (Ej: Para Modelos Importados)
-        IndexBuffer(GraphicsDevice& device, UploadContext& uploadContext, const std::vector<uint32_t>& indices);
+        IndexBuffer(GraphicsDevice& device, UploadContext& uploadContext, const std::vector<uint32_t>& indices, const std::wstring& debugName = L"Static_IB_32");
+        IndexBuffer(GraphicsDevice& device, UploadContext& uploadContext, const std::vector<uint16_t>& indices, const std::wstring& debugName = L"Static_IB_16");
         
         [[nodiscard]] const D3D12_INDEX_BUFFER_VIEW& GetView() const { return m_view; }
         [[nodiscard]] uint32_t GetIndicesCount() const { return m_indicesCount; }
@@ -27,6 +28,6 @@ namespace Bruno
         
         D3D12_INDEX_BUFFER_VIEW m_view{};
         uint32_t m_indicesCount = 0;
-        DXGI_FORMAT m_format;
+        DXGI_FORMAT m_format{ DXGI_FORMAT_R32_UINT };
     };
 }

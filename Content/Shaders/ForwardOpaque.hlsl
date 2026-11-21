@@ -99,7 +99,7 @@ cbuffer ForwardLights : register(b2)
     uint g_FilterQuality;       // 0: PCF3x3, 1: PCF5x5, 2: PCSS
     float g_ShadowMapResolution; // ej: 2048.0
     float g_ShadowLightSize;     // Tamaño aparente de la luz para PCSS (ej: 0.05)
-    float g_CsmPadding;          // Padding de alineación
+    //float g_CsmPadding;          // Padding de alineación
     float4 g_CascadeTexelBias; //(16 bytes exactos, 1 componente por cascada)
 };
 
@@ -108,8 +108,8 @@ Texture2DArray g_ShadowMap : register(t0, space1);
 // s1: Sampler de comparación para Hardware PCF
 SamplerComparisonState g_ShadowSampler : register(s1);
 
-static const float PI = 3.14159265359f;
-#include "Shadows.hlsl"
+#include "ShadowsCommon.hlsli"
+#include "PBRCommon.hlsli"
 
 // ==========================================================
 // VERTEX SHADER (Clásico y Ligero)
@@ -128,81 +128,6 @@ PixelInput VSMain(VertexInput input)
     output.UV = input.UV;
     
     return output;
-}
-
-// ==========================================================
-// MATEMÁTICA PBR (Cook-Torrance)
-// ==========================================================
-
-// Función de Distribución Normal (GGX)
-float DistributionGGX(float3 N, float3 H, float roughness)
-{
-    float a = roughness * roughness;
-    float a2 = a * a;
-    float NdotH = max(dot(N, H), 0.0f);
-    float NdotH2 = NdotH * NdotH;
-    
-    float num = a2;
-    float denom = (NdotH2 * (a2 - 1.0f) + 1.0f);
-    denom = PI * denom * denom;
-    
-    return num / max(denom, 0.0000001f);
-}
-
-// Función de Geometría (Schlick-GGX)
-float GeometrySchlickGGX(float NdotV, float roughness)
-{
-    float r = (roughness + 1.0f);
-    float k = (r * r) / 8.0f;
-
-    float num = NdotV;
-    float denom = NdotV * (1.0f - k) + k;
-    
-    return num / denom;
-}
-
-float GeometrySmith(float3 N, float3 V, float3 L, float roughness)
-{
-    float NdotV = max(dot(N, V), 0.0f);
-    float NdotL = max(dot(N, L), 0.0f);
-    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
-    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
-    
-    return ggx1 * ggx2;
-}
-
-// Ecuación de Fresnel (Schlick)
-float3 FresnelSchlick(float cosTheta, float3 F0)
-{
-    return F0 + (1.0f - F0) * pow(clamp(1.0f - cosTheta, 0.0f, 1.0f), 5.0f);
-}
-
-// ----------------------------------------------------------
-// FUNCIÓN MAESTRA: Evalúa la luz de cualquier fuente
-// ----------------------------------------------------------
-float3 CalculatePBRIllumination(float3 F0, float3 albedo, float metallic, float roughness, float3 N, float3 V, float3 L, float3 radiance)
-{
-    float3 H = normalize(V + L);
-    float NdotL = max(dot(N, L), 0.0f);
-    float NdotV = max(dot(N, V), 0.0f);
-    
-    // Evitar divisiones por cero con superficies rasantes
-    if (NdotL <= 0.0f) return float3(0.0f, 0.0f, 0.0f);
-
-    float NDF = DistributionGGX(N, H, roughness);
-    float G   = GeometrySmith(N, V, L, roughness);
-    float3 F  = FresnelSchlick(max(dot(H, V), 0.0f), F0);
-
-    float3 numerator    = NDF * G * F;
-    float denominator   = 4.0f * NdotV * NdotL;
-    float3 specular     = numerator / max(denominator, 0.0000001f);
-
-    // Conservación de energía: kS (Especular) + kD (Difuso) = 1.0
-    float3 kS = F;
-    float3 kD = float3(1.0f, 1.0f, 1.0f) - kS;
-    kD *= 1.0f - metallic; // Los metales puros absorben la luz difusa
-
-    return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
 // Función auxiliar para muestrear una cascada específica
@@ -231,7 +156,7 @@ float SampleShadowCascade(float3 worldPos, uint cascadeIndex)
 // PIXEL SHADER
 // ==========================================================
 // Interruptor maestro para activar/desactivar el Debug de Cascadas
-#define DEBUG_SHOW_CASCADES 1
+//#define DEBUG_SHOW_CASCADES 1
 
 float4 PSMain(PixelInput input) : SV_TARGET
 {
@@ -272,8 +197,8 @@ float4 PSMain(PixelInput input) : SV_TARGET
     
     // Multiplicar la intensidad por el factor de sombra
     float3 sunRadiance = g_Sun.Color * g_Sun.Intensity * shadowFactor;
-    finalColor.rgb =  albedo.rgb * sunRadiance;
-    //finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, sunDir, sunRadiance);
+    //finalColor.rgb = albedo.rgb * sunRadiance;
+    finalColor += CalculatePBRIllumination(F0, albedo.rgb, metallic, roughness, N, V, sunDir, sunRadiance);
     
     // 4. LUCES PUNTUALES
     /*for (uint i = 0; i < g_ActivePointLightCount; ++i)
@@ -319,7 +244,7 @@ float4 PSMain(PixelInput input) : SV_TARGET
         }
     }*/
     
-// ==========================================================
+	// ==========================================================
     // DEBUG: VISUALIZACIÓN DE CASCADAS (Overlay Inteligente)
     // ==========================================================
     #if DEBUG_SHOW_CASCADES

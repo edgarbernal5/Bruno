@@ -13,10 +13,10 @@ namespace Bruno
     {
     public:
         // Constructor Dinámico
-        VertexBuffer(GraphicsDevice& device, size_t vertexCount, size_t stride);
+        VertexBuffer(GraphicsDevice& device, size_t vertexCount, size_t stride, const std::wstring& debugName = L"Dynamic_VB");
         
         // Constructor Estático
-        VertexBuffer(GraphicsDevice& device, UploadContext& uploadContext, const void* data, size_t vertexCount, size_t stride);
+        VertexBuffer(GraphicsDevice& device, UploadContext& uploadContext, const void* data, size_t vertexCount, size_t stride, const std::wstring& debugName = L"Static_VB");
         
         [[nodiscard]] const D3D12_VERTEX_BUFFER_VIEW& GetView() const { return m_view; }
 

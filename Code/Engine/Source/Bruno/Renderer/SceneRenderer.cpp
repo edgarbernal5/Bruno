@@ -26,6 +26,7 @@
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/Camera.h"
 #include "Bruno/Scene/Systems/CullingSystem.h"
+#include "Deferred/SceneRendererDeferred.h"
 #include "Forward/ForwardRenderer.h"
 #include "Shadows/EnumTypes.h"
 #include "Shadows/ShadowMapArray.h"
@@ -47,8 +48,20 @@ namespace Bruno
 		InitializeShadowPipeline(device);
 		
 		m_materialManager = std::make_shared<MaterialManager>(*device, device->GetSRVDescriptorAllocator());
-		
+		/*
+		*SceneRendererDeferred(
+			GraphicsDevice* device,
+			std::shared_ptr<Scene> scene,
+			std::shared_ptr<MaterialManager> materialManager,
+			std::shared_ptr<ShadowMapArray> shadowMapArray,
+			AbstractAssetManager* assetManager,
+			ShadowProperties* shadowProperties,
+			uint32_t initialWidth = 1280,
+			uint32_t initialHeight = 720
+		);
+		 */
 		m_forwardRenderer = std::make_unique<ForwardRenderer>(device, scene, m_materialManager, m_shadowMapArray, assetManager, shadowProperties);
+		m_deferredRenderer = std::make_unique<SceneRendererDeferred>(device, scene, m_materialManager, m_shadowMapArray, assetManager, shadowProperties);
 	}
 	
 	SceneRenderer::~SceneRenderer() = default;
@@ -225,7 +238,7 @@ namespace Bruno
 	{
 		auto prototypeSig = std::make_shared<RootSignature>(*device);
 		
-		// b0: ShadowConstants (Contiene World y LightViewProj)
+		// b0: ShadowConstants
 		prototypeSig->AddConstants(sizeof(ShadowConstants) / 4, 0, 0, ShaderVisibility::Vertex);
     
 		m_shadowRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
@@ -239,7 +252,7 @@ namespace Bruno
 		shadowDesc.InputLayout = VertexPosition::GetLayout();
 		shadowDesc.Topology = PrimitiveTopology::TriangleList;
     
-		// ¡CRÍTICO! Cero Render Targets, solo usamos el Depth Stencil
+		// Cero Render Targets, solo usamos el Depth Stencil
 		shadowDesc.NumRenderTargets = 0;
 		shadowDesc.DSVFormat = TextureFormat::D32_Float;
     

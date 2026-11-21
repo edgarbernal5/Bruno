@@ -93,7 +93,20 @@ namespace Bruno
         HashCombine(m_hash, static_cast<uint32_t>(visibility));
         HashCombine(m_hash, static_cast<uint32_t>(compFunc));
     }
-    
+
+    void RootSignature::AddShaderResourceView(uint32_t shaderRegister, uint32_t registerSpace, ShaderVisibility visibility)
+    {
+        CD3DX12_ROOT_PARAMETER param;
+        param.InitAsShaderResourceView(shaderRegister, registerSpace, D3DFunctions::GetDX12Visibility(visibility));
+        m_parameters.push_back(param);
+
+        // Acumulamos el hash (Tags actuales: 1=CBV, 2=SRV Table, 3=Sampler, 4=Constants, 5=Root SRV)
+        HashCombine(m_hash, static_cast<uint32_t>(5));
+        HashCombine(m_hash, shaderRegister);
+        HashCombine(m_hash, registerSpace);
+        HashCombine(m_hash, static_cast<uint32_t>(visibility));
+    }
+
     void RootSignature::Build(RootSignatureFlags flags)
     {
         D3D12_ROOT_SIGNATURE_FLAGS dxFlags = D3DFunctions::GetDX12RootSignatureFlags(flags);

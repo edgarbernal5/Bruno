@@ -232,6 +232,11 @@ namespace Bruno
         m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, allocation.GPUAddress);
     }
 
+    void GraphicsContext::SetShaderResourceView(uint32_t rootParameterIndex, const DynamicAllocation& allocation)
+    {
+        m_commandList->SetGraphicsRootShaderResourceView(rootParameterIndex, allocation.GPUAddress);
+    }
+
     void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& allocator)
     {
         // El DescriptorAllocator encapsula el heap nativo.
