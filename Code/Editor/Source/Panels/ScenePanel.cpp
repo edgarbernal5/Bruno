@@ -182,7 +182,7 @@ namespace Bruno
 			context.SetScissorRect(m_scissorRect);
 			
 			//m_sceneRenderer->RenderForward(&context, m_sceneDocument->GetCamera(), frameIndex, cascadeData, cullingData);
-			m_sceneRenderer->RenderDeferred(&context, m_sceneDocument->GetCamera(), frameIndex);
+			m_sceneRenderer->RenderDeferred(&context, m_sceneDocument->GetCamera(), frameIndex, backBuffer, cascadeData, cullingData);
 			
 			RenderGizmo(context, frameIndex);
 			m_debugRenderer->RenderBoundingBoxes(&context, m_sceneDocument->GetCamera(), frameIndex);
@@ -262,6 +262,7 @@ namespace Bruno
 			m_viewport.width = formSize.Width;
 			m_scissorRect = { 0, 0, static_cast<LONG>(formSize.Width), static_cast<LONG>(formSize.Height) };
 			
+			m_sceneRenderer->Resize(formSize.Width, formSize.Height);
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, static_cast<float>(formSize.Width), static_cast<float>(formSize.Height)));
 			m_isSizingMoving = false;
 		});

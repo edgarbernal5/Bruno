@@ -51,6 +51,7 @@ namespace Bruno
             IID_PPV_ARGS(&m_resource)
         ));
 
+        SetCurrentState(ResourceState::RenderTarget);
         // Nombrar el recurso para que PIX / RenderDoc muestren el nombre del G-Buffer
         m_resource->SetName(name.c_str());
 

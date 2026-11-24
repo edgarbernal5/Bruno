@@ -1,7 +1,7 @@
 #ifndef PBR_COMMON_HLSLI
 #define PBR_COMMON_HLSLI
 
-static const float PI = 3.14159265359f;
+#include "Common.hlsli"
 
 // ==============================================================================
 // FUNCIONES DE DISTRIBUCIÓN, GEOMETRÍA Y FRESNEL (Cook-Torrance)

@@ -396,6 +396,9 @@
     <ClInclude Include="Source\Bruno\Renderer\Lighting\LightSystem.h">
       <Filter>Source\Bruno\Renderer\Lighting</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Bruno\Renderer\Lighting\EnumTypes.h">
+      <Filter>Source\Bruno\Renderer\Lighting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\brpch.cpp">

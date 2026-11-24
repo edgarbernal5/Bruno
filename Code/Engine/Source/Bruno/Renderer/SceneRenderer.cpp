@@ -106,57 +106,9 @@ namespace Bruno
 		}
 	}
 
-	void SceneRenderer::RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex)
+	void SceneRenderer::RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex, ColorBuffer* targetRenderTarget, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)
 	{
-		// ==========================================
-		// FASE 2: G-BUFFER PASS (Geometría Opaca)
-		// ==========================================
-		/*context->TransitionResource(m_gBuffer->GetAlbedoMetalness(), ResourceState::PixelShaderResource, ResourceState::RenderTarget);
-		// ... transicionar Normal y Position también ...
-
-		context->SetPipelineState(m_gbufferPSO.get());
-		context->SetRootSignature(m_gbufferRootSig.get());
-
-		// Enlazar los 3 RTVs y el DSV principal
-		Texture2D* gbufferTargets[] = { 
-			m_gBuffer->GetAlbedoMetalness(), 
-			m_gBuffer->GetNormalRoughness(), 
-			m_gBuffer->GetPosition() 
-		};
-		context->SetRenderTargets(3, gbufferTargets, m_gBuffer->GetDepth());
-		
-		// Limpiar G-Buffer y Restaurar Viewport de pantalla
-		context->SetViewport(0, 0, 100, 100);
-    
-		m_cameraCB.Update(*context, m_camera.GetViewProj());
-		context->SetConstantBuffer(0, m_cameraCB);
-
-		DrawBatch(context, registry, m_cullingResults.VisibleEntities);
-		
-		// ==========================================
-		// FASE 3: DEFERRED LIGHTING PASS
-		// ==========================================
-		// Retornar recursos a estado de lectura
-		context->TransitionResource(m_gBuffer->GetAlbedoMetalness()->GetResource(), ResourceState::RenderTarget, ResourceState::PixelShaderResource);
-		context->TransitionResource(m_shadowMapArray->GetResource(), ResourceState::DepthWrite, ResourceState::PixelShaderResource);
-
-		context->SetPipelineState(m_deferredLightingPSO.get());
-		context->SetRootSignature(m_deferredLightingRootSig.get());
-
-		// Enlazar el SwapChain (Pantalla final)
-		auto backBuffer = m_surface->GetCurrentRenderTarget();
-		context->SetRenderTargets(1, &backBuffer, nullptr);
-
-		// Enlazar el Mega Heap Global y las constantes de iluminación
-		context->SetDescriptorHeaps(m_globalSrvHeap.get());
-    
-		LightData cbData;
-		// Rellenar cbData con LightViewProj, CascadeSplits, LightDir, etc.
-		m_lightCB.Update(*context, cbData);
-		context->SetConstantBuffer(0, m_lightCB);
-
-		// Disparar el triángulo a pantalla completa sin Vertex Buffer
-		context->DrawInstanced(3, 1, 0, 0);*/
+		m_deferredRenderer->Render(context, camera, frameIndex, targetRenderTarget, cascades, cullingData);
 	}
 
 	void SceneRenderer::RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)

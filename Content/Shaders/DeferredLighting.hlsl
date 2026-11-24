@@ -1,3 +1,7 @@
+#include "Common.hlsli"
+#include "PBRCommon.hlsli"
+#include "ShadowsCommon.hlsli"
+
 // ==========================================================
 // TEXTURAS Y SAMPLERS (Sincronizados con InitializeDeferredRootSignature)
 // ==========================================================
@@ -20,46 +24,42 @@ struct DirectionalLightData
 cbuffer DeferredLightingBuffer : register(b0)
 {
     DirectionalLightData g_Sun;
+
     float3               g_GlobalAmbientColor;
-    uint                 g_ActivePointLightCount;
-    uint                 g_ActiveSpotLightCount;
+    float                g_AmbientPadding;
+
     float3               g_CameraPosition;
-    float                g_Padding;
+    float                g_CameraPadding;
+
     float3               g_CameraForward;
+    uint                 g_NumCascades;
 
     float4x4             g_LightSpaceMatrices[MAX_CASCADES];
     float4               g_CascadeSplits;
-    uint                 g_NumCascades;
 
     uint                 g_FilterQuality;
     float                g_ShadowMapResolution;
     float                g_ShadowLightSize;
     float                g_NormalBiasScale;
+
     float4               g_CascadeTexelBias;
     float4               g_CascadeWorldTexelSize;
 };
 
-struct PSInput {
+struct PSInput
+{
     float4 Position : SV_POSITION;
     float2 UV       : TEXCOORD;
 };
 
-#include "PBRCommon.hlsli"
-
 // ==========================================================
 // VERTEX SHADER (Generación Procedural del Triángulo)
 // ==========================================================
-PSInput VSMain(uint vertexID : SV_VertexID) 
+PSInput VSMain(uint vertexID : SV_VertexID)
 {
     PSInput output;
-    
-    // Genera un triángulo que excede la pantalla para cubrir todo el rectángulo (NDC)
-    // Vértice 0: (-1,  1) -> UV (0, 0) Arriba Izquierda
-    // Vértice 1: ( 3,  1) -> UV (2, 0) Arriba Derecha (fuera de pantalla)
-    // Vértice 2: (-1, -3) -> UV (0, 2) Abajo Izquierda (fuera de pantalla)
     output.UV = float2((vertexID << 1) & 2, vertexID & 2);
     output.Position = float4(output.UV * float2(2.0f, -2.0f) + float2(-1.0f, 1.0f), 0.0f, 1.0f);
-    
     return output;
 }
 
@@ -87,32 +87,36 @@ float4 PSMain(PSInput input) : SV_TARGET
 
     float3 V = normalize(g_CameraPosition - worldPos);
     float3 L = normalize(-g_Sun.Direction);
-    float3 H = normalize(V + L);
 
-    // Profundidad planar a lo largo del eje de visión de la cámara
+    CSMParams csm;
+    csm.LightSpaceMatrices  = g_LightSpaceMatrices;
+    csm.CascadeSplits       = g_CascadeSplits;
+    csm.NumCascades         = g_NumCascades;
+    csm.FilterQuality       = g_FilterQuality;
+    csm.ShadowMapResolution = g_ShadowMapResolution;
+    csm.ShadowLightSize     = g_ShadowLightSize;
+    csm.CascadeTexelBias    = g_CascadeTexelBias;
+
     float viewDepth    = dot(worldPos - g_CameraPosition, normalize(g_CameraForward));
-    float shadowFactor = CalculateDirectionalShadow(worldPos, viewDepth, N, L);
+    uint  cascadeIndex = 0;
+    float shadowFactor = CalculateDirectionalShadow(
+        g_ShadowMap,
+        g_ShadowSampler,
+        g_LinearSampler,
+        worldPos,
+        viewDepth,
+        N,
+        L,
+        input.Position.xy,
+        csm,
+        cascadeIndex
+    );
 
-    // BRDF Cook-Torrance
-    float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo, metallic);
+    float3 F0          = lerp(float3(0.04f, 0.04f, 0.04f), albedo, metallic);
+    float3 sunRadiance = g_Sun.Color * g_Sun.Intensity * shadowFactor;
 
-    float  NDF = DistributionGGX(N, H, roughness);
-    float  G   = GeometrySmith(N, V, L, roughness);
-    float3 F   = FresnelSchlick(max(dot(H, V), 0.0f), F0);
+    float3 directLight = CalculatePBRIllumination(F0, albedo, metallic, roughness, N, V, L, sunRadiance);
+    float3 ambient     = g_GlobalAmbientColor * albedo * (1.0f - metallic);
 
-    float3 numerator   = NDF * G * F;
-    float  denominator = 4.0f * max(dot(N, V), 0.0f) * max(dot(N, L), 0.0f) + 0.0001f;
-    float3 specular    = numerator / denominator;
-
-    float3 kS = F;
-    float3 kD = (1.0f - kS) * (1.0f - metallic);
-
-    float  NdotL    = max(dot(N, L), 0.0f);
-    float3 radiance = g_Sun.Color * g_Sun.Intensity;
-    float3 Lo       = (kD * albedo / PI + specular) * radiance * NdotL * shadowFactor;
-
-    float3 ambient    = g_GlobalAmbientColor * albedo;
-    float3 finalColor = ambient + Lo;
-
-    return float4(finalColor, 1.0f);
+    return float4(ambient + directLight, 1.0f);
 }

@@ -128,6 +128,7 @@ namespace Bruno::D3DFunctions
     {
         switch (format)
         {
+        case TextureFormat::Unknown:             return DXGI_FORMAT_UNKNOWN;
         case TextureFormat::R8G8B8A8_Unorm:      return DXGI_FORMAT_R8G8B8A8_UNORM;
         case TextureFormat::R8G8B8A8_Unorm_SRGB: return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         case TextureFormat::B8G8R8A8_Unorm:      return DXGI_FORMAT_B8G8R8A8_UNORM;

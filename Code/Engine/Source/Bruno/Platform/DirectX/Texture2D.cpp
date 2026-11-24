@@ -64,7 +64,8 @@ namespace Bruno
             nullptr, 
             IID_PPV_ARGS(&m_resource)
         ));
-
+        SetCurrentState(ResourceState::RenderTarget);
+        
         // 3. Subir los datos asíncronamente usando nuestro motor DMA
         D3D12_SUBRESOURCE_DATA subresourceData{};
         subresourceData.pData = image.GetPixels();

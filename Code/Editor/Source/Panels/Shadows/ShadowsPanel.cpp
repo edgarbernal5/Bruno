@@ -93,7 +93,6 @@ namespace Bruno
             }
         );
         
-        
         configuration.EmplaceProperty<Berta::PropertyGridFieldFloat>("Shadow Size",
             [this]()
             {
