@@ -72,11 +72,11 @@ namespace Bruno
             debugController->EnableDebugLayer();
             dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG; // Opcional en DXGI 1.3+
             
-            Microsoft::WRL::ComPtr<ID3D12Debug1> debugController1;
+            /*Microsoft::WRL::ComPtr<ID3D12Debug1> debugController1;
             if (SUCCEEDED(debugController.As(&debugController1)))
             {
                 debugController1->SetEnableGPUBasedValidation(TRUE);
-            }
+            }*/
         }
         
         Microsoft::WRL::ComPtr<ID3D12DeviceRemovedExtendedDataSettings> dredSettings;

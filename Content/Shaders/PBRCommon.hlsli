@@ -95,7 +95,7 @@ float CalculateSpotAttenuation(float3 L, float3 spotDirection, float innerConeCo
     float epsilon = max(innerConeCos - outerConeCos, 0.0001f);
     float spot    = saturate((theta - outerConeCos) / epsilon);
 
-    return spot * spot; // Suavizado smoothstep[cite: 6]
+    return spot * spot; // Suavizado smoothstep
 }
 
 #endif // PBR_COMMON_HLSLI
