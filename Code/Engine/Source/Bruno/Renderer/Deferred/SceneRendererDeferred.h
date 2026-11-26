@@ -30,9 +30,9 @@ namespace Bruno
         Math::Vector3 Direction;
         float InnerConeCos;
         float OuterConeCos;
-        float Padding;
+        float Padding[3];
     };
-
+    static_assert(sizeof(LightInstanceData) == 128, "Desajuste de stride en LightInstanceData.");
     struct LocalLightsCameraBuffer
     {
         Math::Matrix ViewProjection;
@@ -40,27 +40,32 @@ namespace Bruno
         float Padding;
     };
     
-    struct DeferredLightingBuffer
+    struct alignas(16) DeferredLightingBuffer
     {
-        DirectionalLightData Sun;
-        Math::Vector3 GlobalAmbientColor;
-        uint32_t ActivePointLightCount;
-        uint32_t ActiveSpotLightCount;
-        Math::Vector3 CameraPosition;
-        float Padding;
-        Math::Vector3 CameraForward;
-        
-        Math::Matrix LightSpaceMatrices[4];
-        Math::Vector4 CascadeSplits; // [Split0, Split1, Split2, Split3]
-        uint32_t NumCascades;
-        
-        // --- VARIABLES INYECTADAS DESDE C++ (ShadowProperties) ---
-        uint32_t FilterQuality;
-        float ShadowMapResolution;
-        float ShadowLightSize;     // Tamaño aparente de la luz para PCSS (ej: 0.05)
-        //float CsmPadding;          // Padding de alineación
-        Math::Vector4 CascadeTexelBias;
+        DirectionalLightData Sun;                     // offset 0   (32 B)
+
+        Math::Vector3        GlobalAmbientColor;      // offset 32  (12 B)
+        float                AmbientPadding;          // offset 44  (4 B)
+
+        Math::Vector3        CameraPosition;          // offset 48  (12 B)
+        float                CameraPadding;           // offset 60  (4 B)
+
+        Math::Vector3        CameraForward;           // offset 64  (12 B)
+        uint32_t             NumCascades;             // offset 76  (4 B)
+
+        Math::Matrix         LightSpaceMatrices[4];   // offset 80  (256 B)
+        Math::Vector4        CascadeSplits;           // offset 336 (16 B)
+
+        uint32_t             FilterQuality;           // offset 352 (4 B)
+        float                ShadowMapResolution;     // offset 356 (4 B)
+        float                ShadowLightSize;         // offset 360 (4 B)
+        float                NormalBiasScale;         // offset 364 (4 B)
+
+        Math::Vector4        CascadeTexelBias;        // offset 368 (16 B)
+        Math::Vector4        CascadeWorldTexelSize;   // offset 384 (16 B)
     };
+    
+    static_assert(sizeof(DeferredLightingBuffer) == 400, "DeferredLightingBuffer debe medir 400 bytes igual que en DeferredLighting.hlsl.");
     
     class SceneRendererDeferred
     {

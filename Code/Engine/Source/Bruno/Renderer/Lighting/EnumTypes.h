@@ -4,7 +4,7 @@
 
 namespace Bruno
 {
-    struct DirectionalLightData
+    struct alignas(16) DirectionalLightData
     {
         Math::Vector3 Direction;
         float Intensity;

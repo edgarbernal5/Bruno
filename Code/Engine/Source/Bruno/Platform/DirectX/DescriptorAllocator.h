@@ -12,8 +12,8 @@ namespace Bruno
     // Representa un bloque de memoria concedido dentro del Heap
     struct DescriptorAllocation
     {
-        D3D12_CPU_DESCRIPTOR_HANDLE CPU;
-        D3D12_GPU_DESCRIPTOR_HANDLE GPU;
+        D3D12_CPU_DESCRIPTOR_HANDLE CPU { 0 };
+        D3D12_GPU_DESCRIPTOR_HANDLE GPU { 0 };
         uint32_t Index{ 0 };
         uint32_t Count{ 0 };          // Cuántos descriptores tiene este bloque
         uint32_t DescriptorSize{ 0 }; // Tamaño en bytes de cada descriptor
@@ -47,6 +47,8 @@ namespace Bruno
             handle.ptr += (static_cast<SIZE_T>(offset) * DescriptorSize);
             return handle;
         }
+        bool IsValid() const { return Count > 0 && CPU.ptr != 0; }
+        bool IsShaderVisible() const { return IsValid() && GPU.ptr != 0; }
     };
 
     //DescriptorAllocator o DescriptorHeap o DescriptorHeapAllocator

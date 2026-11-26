@@ -8,7 +8,7 @@
 Texture2D<float4>      g_AlbedoMetal   : register(t0);
 Texture2D<float4>      g_NormalRough   : register(t1);
 Texture2D<float4>      g_Position      : register(t2);
-Texture2DArray<float>  g_ShadowMap     : register(t3);
+Texture2DArray<float>  g_ShadowMap     : register(t3, space0);
 
 SamplerComparisonState g_ShadowSampler : register(s0);
 SamplerState           g_LinearSampler : register(s1);
@@ -68,16 +68,15 @@ PSInput VSMain(uint vertexID : SV_VertexID)
 // ==========================================================
 float4 PSMain(PSInput input) : SV_TARGET
 {
-    float4 posData = g_Position.Sample(g_LinearSampler, input.UV);
-
-    // Descartar píxeles de fondo/cielo (w == 0) para conservar el ClearColor del BackBuffer
+    int3 pixelCoord = int3(input.Position.xy, 0);
+    float4 posData  = g_Position.Load(pixelCoord);
     if (posData.w == 0.0f)
     {
         discard;
     }
 
-    float4 albedoMetal = g_AlbedoMetal.Sample(g_LinearSampler, input.UV);
-    float4 normalRough = g_NormalRough.Sample(g_LinearSampler, input.UV);
+    float4 albedoMetal = g_AlbedoMetal.Load(pixelCoord);
+    float4 normalRough = g_NormalRough.Load(pixelCoord);
 
     float3 albedo    = albedoMetal.rgb;
     float  metallic  = albedoMetal.a;

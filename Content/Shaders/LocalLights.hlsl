@@ -10,7 +10,7 @@ struct LightInstanceData
     float3   Direction;
     float    InnerConeCos;
     float    OuterConeCos;
-    float    Padding;
+    float3   _pad;
 };
 
 cbuffer CameraBuffer : register(b0)
@@ -30,8 +30,6 @@ SamplerState      g_LinearSampler : register(s0);
 struct VSInput
 {
     float3 Position   : POSITION;
-    float3 Normal     : NORMAL;
-    float2 UV         : TEXCOORD;
     uint   InstanceID : SV_InstanceID;
 };
 

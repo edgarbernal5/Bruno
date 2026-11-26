@@ -79,6 +79,7 @@ namespace Bruno
         }
 
         SetCurrentState(ResourceState::DepthWrite);
+        
         // 4. Crear la vista (Descriptor) que conecta el Heap con la Textura
         D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
         dsvDesc.Format = d3dTextureFormat;

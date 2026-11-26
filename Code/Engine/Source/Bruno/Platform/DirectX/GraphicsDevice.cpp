@@ -64,13 +64,26 @@ namespace Bruno
     {
         UINT dxgiFactoryFlags = 0;
 
-#if defined(_DEBUG)
+#if defined(BT_DEBUG)
         // Encender la capa de depuración de DX12. ¡Te salvará horas de dolores de cabeza!
         Microsoft::WRL::ComPtr<ID3D12Debug> debugController;
         if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
         {
             debugController->EnableDebugLayer();
             dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG; // Opcional en DXGI 1.3+
+            
+            Microsoft::WRL::ComPtr<ID3D12Debug1> debugController1;
+            if (SUCCEEDED(debugController.As(&debugController1)))
+            {
+                debugController1->SetEnableGPUBasedValidation(TRUE);
+            }
+        }
+        
+        Microsoft::WRL::ComPtr<ID3D12DeviceRemovedExtendedDataSettings> dredSettings;
+        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings))))
+        {
+            dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+            dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
         }
 #endif
 

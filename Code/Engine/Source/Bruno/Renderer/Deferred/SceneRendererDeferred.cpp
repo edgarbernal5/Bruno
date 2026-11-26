@@ -54,6 +54,7 @@ namespace Bruno
         if (m_lastShadowFilterQuality != m_shadowProperties->m_filterQuality)
         {
             InitializeDeferredRootSignature(m_device);
+            InitializeDeferredPSOs(m_device);
         }
 
         m_materialManager->UpdateGPUBuffer(*graphicsContext);
@@ -90,7 +91,7 @@ namespace Bruno
     void SceneRendererDeferred::InitializeGBuffer(GraphicsDevice* device, uint32_t width, uint32_t height)
     {
         m_gBuffer = std::make_shared<GBuffer>();
-        m_gBuffer->Initialize(*device, device->GetSRVDescriptorAllocator(), device->GetRTVDescriptorAllocator(), width, height);
+        m_gBuffer->Initialize(*device, *m_globalSrvHeap, device->GetRTVDescriptorAllocator(), width, height);
     }
 
     void SceneRendererDeferred::InitializeGBufferRootSignature(GraphicsDevice* device)
@@ -119,38 +120,26 @@ namespace Bruno
     {
         auto prototypeSig = std::make_shared<RootSignature>(*device);
 
-        // b0: ForwardLightingBuffer (Luz Direccional, Cámara, Matrices y Splits CSM)
+        // 0: b0 -> DeferredLightingBuffer
         prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::Pixel);
 
-        // t0, t1, t2: G-Buffer (AlbedoMetal, NormalRough, Position)
-        prototypeSig->AddDescriptorTableSRV(3, 0, 0, ShaderVisibility::Pixel);
+        // 1, 2, 3: t0, t1, t2 -> Cada textura del G-Buffer en su propia tabla de 1 SRV
+        prototypeSig->AddDescriptorTableSRV(1, 0, 0, ShaderVisibility::Pixel); // t0: AlbedoMetal
+        prototypeSig->AddDescriptorTableSRV(1, 1, 0, ShaderVisibility::Pixel); // t1: NormalRough
+        prototypeSig->AddDescriptorTableSRV(1, 2, 0, ShaderVisibility::Pixel); // t2: Position
 
-        // t3: Texture2DArray de Cascaded Shadow Maps
+        // 4: t3 -> Texture2DArray de Cascaded Shadow Maps
         prototypeSig->AddDescriptorTableSRV(1, 3, 0, ShaderVisibility::Pixel);
 
-        // s0: Shadow Comparison Sampler (Sincronizado con ShadowProperties igual que ForwardRenderer)
+        // Samplers estáticos (sin cambios)
         if (m_shadowProperties->m_filterQuality == ShadowFilterQuality::None)
         {
-            prototypeSig->AddStaticSampler(
-                0, 0,
-                TextureFilter::Comparison_Point,
-                TextureAddressMode::Clamp,
-                ShaderVisibility::Pixel,
-                ComparisonFunc::LessEqual
-            );
+            prototypeSig->AddStaticSampler(0, 0, TextureFilter::Comparison_Point, TextureAddressMode::Clamp, ShaderVisibility::Pixel, ComparisonFunc::LessEqual);
         }
         else
         {
-            prototypeSig->AddStaticSampler(
-                0, 0,
-                TextureFilter::Comparison_MinMag_Linear_MipPoint,
-                TextureAddressMode::Clamp,
-                ShaderVisibility::Pixel,
-                ComparisonFunc::LessEqual
-            );
+            prototypeSig->AddStaticSampler(0, 0, TextureFilter::Comparison_MinMag_Linear_MipPoint, TextureAddressMode::Clamp, ShaderVisibility::Pixel, ComparisonFunc::LessEqual);
         }
-
-        // s1: Linear Sampler para lectura del G-Buffer
         prototypeSig->AddStaticSampler(1, 0, TextureFilter::Linear, TextureAddressMode::Clamp, ShaderVisibility::Pixel);
 
         m_lastShadowFilterQuality = m_shadowProperties->m_filterQuality;
@@ -161,14 +150,16 @@ namespace Bruno
     {
         auto prototypeSig = std::make_shared<RootSignature>(*device);
 
-        // b0: LocalLightsCameraBuffer (ViewProjection, CameraPosition)
+        // 0: b0 -> LocalLightsCameraBuffer
         prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::All);
 
-        // t0: StructuredBuffer<LightInstanceData> (Root SRV dinámico por AllocateDynamicSpace)
+        // 1: t0 -> StructuredBuffer<LightInstanceData>
         prototypeSig->AddShaderResourceView(0, 0, ShaderVisibility::All);
 
-        // t1, t2, t3: G-Buffer (AlbedoMetal, NormalRough, Position)
-        prototypeSig->AddDescriptorTableSRV(3, 1, 0, ShaderVisibility::Pixel);
+        // 2, 3, 4: t1, t2, t3 -> G-Buffer individual
+        prototypeSig->AddDescriptorTableSRV(1, 1, 0, ShaderVisibility::Pixel); // t1: AlbedoMetal
+        prototypeSig->AddDescriptorTableSRV(1, 2, 0, ShaderVisibility::Pixel); // t2: NormalRough
+        prototypeSig->AddDescriptorTableSRV(1, 3, 0, ShaderVisibility::Pixel); // t3: Position
 
         // s0: Linear Sampler
         prototypeSig->AddStaticSampler(0, 0, TextureFilter::Linear, TextureAddressMode::Clamp, ShaderVisibility::Pixel);
@@ -224,7 +215,7 @@ namespace Bruno
         localLightDesc.RootSignature = m_localLightsRootSig.get();
         localLightDesc.VertexShaderDesc = { L"Shaders/LocalLights.hlsl", L"VSMain", L"vs_6_0" };
         localLightDesc.PixelShaderDesc  = { L"Shaders/LocalLights.hlsl", L"PSMain", L"ps_6_0" };
-        localLightDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
+        localLightDesc.InputLayout = VertexPosition::GetLayout();
 
         localLightDesc.Topology = PrimitiveTopology::TriangleList;
         localLightDesc.BlendState.Mode = BlendMode::Additive;
@@ -500,7 +491,12 @@ namespace Bruno
         lightData.FilterQuality       = static_cast<uint32_t>(m_shadowProperties->m_filterQuality);
         lightData.ShadowLightSize     = m_shadowProperties->m_ShadowLightSize;
         lightData.ShadowMapResolution = static_cast<float>(m_shadowProperties->m_resolution);
-
+        lightData.NormalBiasScale     = 1.0f;
+        
+        const float baseTexel = 1.0f / (std::max)(lightData.ShadowMapResolution, 1.0f);
+        lightData.CascadeTexelBias      = Math::Vector4(baseTexel, baseTexel * 1.5f, baseTexel * 2.0f, baseTexel * 3.0f);
+        lightData.CascadeWorldTexelSize = Math::Vector4(baseTexel, baseTexel, baseTexel, baseTexel);
+        
         auto entitiesLightsGroup = m_scene->GetAllEntitiesWith<TransformComponent, DirectionalLightComponent>();
         for (auto lightEntity : entitiesLightsGroup)
         {
@@ -527,10 +523,12 @@ namespace Bruno
 
         m_deferredLightsCB.Update(*graphicsContext, lightData);
 
-        // 4. Enlazar b0 (Luz + Cascadas), t0..t2 (G-Buffer contiguo) y t3 (ShadowMapArray)
+        // 4. Enlazar b0, t0 (AlbedoMetal), t1 (NormalRough), t2 (Position) y t3 (ShadowMapArray)
         graphicsContext->SetConstantBuffer(0, m_deferredLightsCB);
         graphicsContext->SetDescriptorTable(1, m_gBuffer->GetAlbedoMetalness()->GetSVRAllocation());
-        graphicsContext->SetDescriptorTable(2, m_shadowMapArray->GetSVRAllocation());
+        graphicsContext->SetDescriptorTable(2, m_gBuffer->GetNormalRoughness()->GetSVRAllocation());
+        graphicsContext->SetDescriptorTable(3, m_gBuffer->GetPosition()->GetSVRAllocation());
+        graphicsContext->SetDescriptorTable(4, m_shadowMapArray->GetSVRAllocation());
 
         // 5. Triángulo procedural a pantalla completa (SV_VertexID)
         graphicsContext->DrawInstanced(3, 1, 0, 0);
@@ -636,10 +634,12 @@ namespace Bruno
 
         graphicsContext->SetConstantBuffer(0, m_localLightsCameraCB);
         graphicsContext->SetDescriptorTable(2, m_gBuffer->GetAlbedoMetalness()->GetSVRAllocation());
+        graphicsContext->SetDescriptorTable(3, m_gBuffer->GetNormalRoughness()->GetSVRAllocation());
+        graphicsContext->SetDescriptorTable(4, m_gBuffer->GetPosition()->GetSVRAllocation());
 
         auto dispatchLightBatch = [&](const std::vector<LightInstanceData>& batch, GraphicsPipelineState* pso, VertexBuffer* vb, IndexBuffer* ib, uint32_t indexCount)
         {
-            if (batch.empty())
+            if (batch.empty() || !vb || !ib || indexCount == 0)
             {
                 return;
             }

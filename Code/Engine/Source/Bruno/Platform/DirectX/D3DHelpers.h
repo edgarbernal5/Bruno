@@ -7,6 +7,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 
+//#include "GraphicsDevice.h"
 #include "Bruno/Core/Assert.h"
 
 namespace Bruno
@@ -27,13 +28,7 @@ namespace Bruno
         HRESULT result;
     };
 
-    inline void ThrowIfFailed(HRESULT hr)
-    {
-        if (FAILED(hr))
-        {
-            throw com_exception(hr);
-        }
-    }
+    void ThrowIfFailed(HRESULT hr);
 
     inline void AssertIfFailed(HRESULT hr)
     {

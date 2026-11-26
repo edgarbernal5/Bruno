@@ -16,6 +16,7 @@
 #include "Texture2D.h"
 #include "TextureArrayResource.h"
 #include "VertexBuffer.h"
+#include "Berta/Core/Assert.h"
 
 namespace Bruno
 {
@@ -234,19 +235,27 @@ namespace Bruno
 
     void GraphicsContext::SetShaderResourceView(uint32_t rootParameterIndex, const DynamicAllocation& allocation)
     {
+        BT_ASSERT(allocation.GPUAddress != 0, "Root SRV con GPUAddress nula.");
+        BT_ASSERT((allocation.GPUAddress % 4) == 0, "Root SRV desalineado.");
         m_commandList->SetGraphicsRootShaderResourceView(rootParameterIndex, allocation.GPUAddress);
     }
 
     void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& allocator)
     {
+        BT_ASSERT(allocator.GetHeap() != nullptr, "DescriptorAllocator sin ID3D12DescriptorHeap.");
+        
         // El DescriptorAllocator encapsula el heap nativo.
         // Extraemos el handle de memoria inicial de la GPU (Offset 0)
         D3D12_GPU_DESCRIPTOR_HANDLE baseHandle = allocator.GetHeap()->GetGPUDescriptorHandleForHeapStart();
+        BT_ASSERT(baseHandle.ptr != 0, "DescriptorAllocator no es Shader-Visible.");
+        
         m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, baseHandle);
     }
 
     void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocation& allocation)
     {
+        BT_ASSERT(allocation.IsShaderVisible(), "DescriptorAllocation inválido o no Shader-Visible en rootParameterIndex.");
+        
         // Extraemos el handle de GPU exacto (con el offset ya calculado internamente por la asignación)
         D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = allocation.GetGPUHandle();
         

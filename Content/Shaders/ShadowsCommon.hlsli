@@ -143,7 +143,8 @@ float EvaluatePCSS(
     int blockerCount = 0;
     float blockerSum = 0.0f;
 
-    float searchRadius = params.ShadowLightSize * projCoords.z;
+    //float searchRadius = params.ShadowLightSize * projCoords.z;
+	float searchRadius = clamp(params.ShadowLightSize * projCoords.z, 0.0f, 0.04f);
     const int searchSamples = 16;
 
     for (int i = 0; i < searchSamples; ++i)
@@ -164,8 +165,10 @@ float EvaluatePCSS(
     float avgBlockerDepth = blockerSum / (float)blockerCount;
 
     // 2. Estimación de Penumbra
-    float penumbraRatio = max(projCoords.z - avgBlockerDepth, 0.0f) / max(avgBlockerDepth, 0.0001f);
-    float filterRadius = penumbraRatio * params.ShadowLightSize;
+    //float penumbraRatio = max(projCoords.z - avgBlockerDepth, 0.0f) / max(avgBlockerDepth, 0.0001f);
+    //float filterRadius = penumbraRatio * params.ShadowLightSize;
+	float penumbraRatio = max(projCoords.z - avgBlockerDepth, 0.0f) / max(avgBlockerDepth, 0.001f);
+	float filterRadius  = clamp(penumbraRatio * params.ShadowLightSize, 0.0f, 0.04f);
 
     // 3. Filtrado PCF estocástico
     float shadow = 0.0f;
@@ -253,22 +256,24 @@ float CalculateDirectionalShadow(
     CSMParams params,
     out uint outCascadeIndex)
 {
-    if (params.NumCascades == 0)
-    {
-        outCascadeIndex = 0;
-        return 1.0f;
-    }
+    uint numCascades = min(params.NumCascades, (uint)MAX_CASCADES);
+	if (numCascades == 0)
+	{
+    	outCascadeIndex = 0;
+    	return 1.0f;
+	}
 
     uint cascadeIndex = 0;
-    uint limit = (uint)max(0, (int)params.NumCascades - 1);
+    uint limit = numCascades - 1;
 
-    for (uint i = 0; i < limit; ++i)
-    {
-        if (viewDistance > params.CascadeSplits[i])
-        {
-            cascadeIndex = i + 1;
-        }
-    }
+    [unroll]
+	for (uint i = 0; i < MAX_CASCADES - 1; ++i)
+	{
+    	if (i < limit && viewDistance > params.CascadeSplits[i])
+    	{
+			cascadeIndex = i + 1;
+    	}
+	}
 
     outCascadeIndex = cascadeIndex;
 

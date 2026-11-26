@@ -184,9 +184,14 @@ namespace Bruno
 			//m_sceneRenderer->RenderForward(&context, m_sceneDocument->GetCamera(), frameIndex, cascadeData, cullingData);
 			m_sceneRenderer->RenderDeferred(&context, m_sceneDocument->GetCamera(), frameIndex, backBuffer, cascadeData, cullingData);
 			
+			context.TransitionResource(backBuffer, ResourceState::RenderTarget);
+			context.TransitionResource(depthBuffer, ResourceState::DepthWrite);
+			context.SetRenderTargets(1, &backBuffer, depthBuffer);
+			
 			RenderGizmo(context, frameIndex);
-			m_debugRenderer->RenderBoundingBoxes(&context, m_sceneDocument->GetCamera(), frameIndex);
+			//m_debugRenderer->RenderBoundingBoxes(&context, m_sceneDocument->GetCamera(), frameIndex);
 			m_debugRenderer->RenderDirectionalLightGizmos(&context, m_sceneDocument->GetCamera(), frameIndex);
+			
 			if (m_marqueeInteraction.m_dragRectangle)
 			{
 				RenderMarquee(context, m_marqueeInteraction.m_ndcMin, m_marqueeInteraction.m_ndcMax);
@@ -272,8 +277,7 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			//BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << m_form->native_handle() << ". w=" << args.width << "; h=" << args.height << std::endl;
-
+			
 			if (m_isSizingMoving)
 			{
 				return;
@@ -284,7 +288,7 @@ namespace Bruno
 			m_viewport.width = args.NewSize.Width;
 			m_scissorRect = { 0, 0, static_cast<LONG>(args.NewSize.Width), static_cast<LONG>(args.NewSize.Height) };
 			m_surface->Resize(args.NewSize.Width, args.NewSize.Height);
-
+			m_sceneRenderer->Resize(args.NewSize.Width, args.NewSize.Height);
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, static_cast<float>(args.NewSize.Width), static_cast<float>(args.NewSize.Height)));
 			m_isResizing = false;
 		});

@@ -20,6 +20,7 @@ namespace Bruno
         defaultMat.AlbedoTextureIndex = 0xFFFFFFFF;
         defaultMat.NormalTextureIndex = 0xFFFFFFFF;
         CreateMaterial(defaultMat);
+        //ResizeGPUBuffer(1);
     }
 
     uint32_t MaterialManager::CreateMaterial(const MaterialData& data)
