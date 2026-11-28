@@ -6,7 +6,7 @@
 namespace Bruno
 {
     LinearAllocator::LinearAllocator(GraphicsDevice& device, size_t pageSize) 
-                : m_pageSize(pageSize), m_offset(0), m_mappedPtr(nullptr)
+        : m_pageSize(pageSize), m_offset(0), m_mappedPtr(nullptr)
     {
         auto nativeDevice = device.GetNativeDevice();
 

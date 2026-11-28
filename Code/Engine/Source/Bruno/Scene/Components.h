@@ -7,6 +7,7 @@
 #include <string>
 #include <entt/entt.hpp>
 
+#include "Constants.h"
 #include "Bruno/Platform/DirectX/ConstantBuffer.h"
 
 namespace Bruno
@@ -77,11 +78,6 @@ namespace Bruno
 		}
 	};
 	
-	struct CBVComponent 
-	{
-		std::shared_ptr<ConstantBuffer> TransformCB[2]; 
-	};
-	
 	struct BoundingBoxComponent
 	{
 		Math::Vector3 Center;  // En espacio local
@@ -92,6 +88,42 @@ namespace Bruno
 	{
 		AssetHandle ModelHandle;
 		uint32_t MeshIndex{ 0 };
-		std::shared_ptr<MaterialMap> Materials = std::make_shared< MaterialMap>();
+		std::shared_ptr<MaterialMap> Materials = std::make_shared<MaterialMap>();
+		
+		// --- CACHÉ DE RENDERIZADO (RUNTIME ONLY) ---
+		// Este es el ID Bindless final. Se actualiza una sola vez al cargar la escena.
+		// Cuesta 0 ciclos de CPU leerlo durante el Render Loop.
+		uint32_t RuntimeMaterialIndex = 0xFFFFFFFF;
+	};
+	
+	struct DirectionalLightComponent
+	{
+		Math::Vector3 Color{ 1.0f, 1.0f, 1.0f };
+		float Intensity{ 1.0f };
+		
+		Math::Vector3 LocalDirection{ 0.0f, 0.0f, -1.0f }; // Inmutable (del importador)
+		Math::Vector3 WorldDirection{ 0.0f, 0.0f, -1.0f }; // Runtime (cacheado cada frame)
+        
+		bool CastShadows{ true };
+
+		Math::Matrix LightViewProj[MAX_CASCADES]; //Runtime
+		float CascadeSplits[MAX_CASCADES]; //Runtime
+	};
+	
+	struct PointLightComponent
+	{
+		Math::Vector3 Color{ 1.0f, 1.0f, 1.0f };
+		float Intensity{ 1.0f };
+		float Radius{ 10.0f };
+		float Falloff{ 1.0f };
+	};
+
+	struct SpotLightComponent
+	{
+		Math::Vector3 Color{ 1.0f, 1.0f, 1.0f };
+		float Intensity{ 1.0f };
+		float Range{ 15.0f };
+		float InnerCutoffAngle{ 15.0f };
+		float OuterCutoffAngle{ 45.0f };
 	};
 }

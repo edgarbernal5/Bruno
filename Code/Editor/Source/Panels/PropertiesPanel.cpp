@@ -36,7 +36,6 @@ namespace Bruno
 		{
 			BR_CORE_TRACE << "selection changed / selection.size = " << selection.size() << std::endl;
 
-			//TODO: si no hay cambios no refrescar.
 			Berta::ControlDrawBatch batchGuard(m_propertyGrid);
 			
 			m_propertyGrid.Clear();
@@ -219,7 +218,7 @@ namespace Bruno
 						[entity, index, &assetManager]() -> std::wstring
 						{
 							UUID currentHandle = entity.GetComponent<ModelComponent>().Materials->GetMaterial(index);
-							if (currentHandle == static_cast<UUID>(0))
+							if (currentHandle == UUID::None)
 							{
 								return L"None";
 							}
@@ -263,6 +262,70 @@ namespace Bruno
 							Berta::GUI::ShowContextMenu(std::move(menuContext), ownerWindow, Berta::GUI::GetMousePositionToWindow(ownerWindow));
 						});
 				}
+			}
+			
+			if (entity.HasComponent<DirectionalLightComponent>())
+			{
+				auto directionalLightCategory = m_propertyGrid.Append("Directional Light");
+				
+				directionalLightCategory.EmplaceProperty<Berta::PropertyGridFieldFloat>(
+					"Intensity", 
+					[entity]()
+					{
+						return entity.GetComponent<DirectionalLightComponent>().Intensity;
+					},
+					[entity](const float& val) mutable
+					{
+						auto &directionalLightComp = entity.GetComponent<DirectionalLightComponent>();
+						directionalLightComp.Intensity = val;
+					}
+				);
+				
+				directionalLightCategory.EmplaceColor(
+				"Color",
+				[entity]()
+				{
+					auto& color = entity.GetComponent<DirectionalLightComponent>().Color;
+					
+					Berta::OptionalColor opt;
+					opt.r = color.x * 255.0f;
+					opt.g = color.y * 255.0f;
+					opt.b = color.z * 255.0f;
+					return opt;
+				},
+				[entity](const Berta::OptionalColor& val) mutable
+				{
+					auto &directionalLightComp = entity.GetComponent<DirectionalLightComponent>();
+					auto &color = directionalLightComp.Color;
+					if (val.r.has_value())
+						color.x = val.r.value() / 255.0f;
+					
+					if (val.g.has_value())
+						color.y = val.g.value() / 255.0f;
+					
+					if (val.b.has_value())
+						color.z = val.b.value() / 255.0f;
+					
+				},
+				[](std::optional<Berta::OptionalColor> currentColor) -> std::optional<Berta::OptionalColor>
+				{
+					std::cout << "Opening color picker...." << std::endl;
+					std::cout << "ERROR...." << std::endl;
+
+					return std::nullopt;
+				}, false);
+				
+				directionalLightCategory.EmplaceProperty<Berta::PropertyGridFieldCheck>(
+					"Cast Shadows", 
+					[entity]()
+					{
+						return entity.GetComponent<DirectionalLightComponent>().CastShadows;
+					},
+					[entity](const bool& val) mutable
+					{
+						entity.GetComponent<DirectionalLightComponent>().CastShadows = val;
+					}
+				);
 			}
 		});
 		

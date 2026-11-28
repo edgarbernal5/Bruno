@@ -3,7 +3,10 @@
 
 #include <entt/entt.hpp>
 
+#include "ColorBuffer.h"
 #include "ConstantBuffer.h"
+#include "ConstantBufferBase.h"
+#include "D3DFunctions.h"
 #include "DepthBuffer.h"
 #include "DynamicAllocation.h"
 #include "DynamicDescriptorAllocator.h"
@@ -11,7 +14,9 @@
 #include "IndexBuffer.h"
 #include "RootSignature.h"
 #include "Texture2D.h"
+#include "TextureArrayResource.h"
 #include "VertexBuffer.h"
+#include "Berta/Core/Assert.h"
 
 namespace Bruno
 {
@@ -27,56 +32,66 @@ namespace Bruno
         return m_dynamicAllocator->Allocate(sizeInBytes); 
     }
 
-    void GraphicsContext::TransitionResource(Texture2D* texture, ResourceState stateBefore, ResourceState stateAfter)
+    void GraphicsContext::TransitionResource(GraphicsResource* resource, ResourceState newState)
     {
-        if (stateBefore == stateAfter)
+        if (!resource)
+        {
+            return;
+        }
+        ResourceState stateBefore = resource->GetCurrentState();
+        
+        // Evitamos emitir barreras nulas en la GPU si el recurso ya está en el estado correcto
+        if (stateBefore == newState)
         {
             return;
         }
         
-        D3D12_RESOURCE_STATES dxBefore = GetDX12ResourceState(stateBefore);
-        D3D12_RESOURCE_STATES dxAfter = GetDX12ResourceState(stateAfter);
+        D3D12_RESOURCE_STATES dxStateBefore = D3DFunctions::GetDX12ResourceState(stateBefore);
+        D3D12_RESOURCE_STATES dxNewState = D3DFunctions::GetDX12ResourceState(newState);
 
-        // Extraemos el ID3D12Resource nativo de nuestra clase Texture2D
-        ID3D12Resource* nativeResource = texture->GetResource();
+        ID3D12Resource* nativeResource = resource->GetNativeResource();
 
-        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        D3D12_RESOURCE_BARRIER& barrier = m_resourceBarriers[m_numBarriersToFlush++];
+        
+        barrier = CD3DX12_RESOURCE_BARRIER::Transition(
             nativeResource,
-            dxBefore,
-            dxAfter
+            dxStateBefore,
+            dxNewState
         );
-
-        m_commandList->ResourceBarrier(1, &barrier);
+        
+        resource->SetCurrentState(newState);
+        
+        // Seguridad: Si saturamos el buffer interno, forzamos un envío anticipado
+        if (m_numBarriersToFlush >= MAX_BARRIERS)
+        {
+            FlushBarriers();
+        }
     }
 
-    void GraphicsContext::TransitionResource(DepthBuffer* depthBuffer, ResourceState stateBefore, ResourceState stateAfter)
+    void GraphicsContext::FlushBarriers()
     {
-        D3D12_RESOURCE_STATES dxBefore = GetDX12ResourceState(stateBefore);
-        D3D12_RESOURCE_STATES dxAfter = GetDX12ResourceState(stateAfter);
-
-        ID3D12Resource* nativeResource = depthBuffer->GetResource();
-
-        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-            nativeResource,
-            dxBefore,
-            dxAfter
-        );
-
-        m_commandList->ResourceBarrier(1, &barrier);
+        if (m_numBarriersToFlush > 0)
+        {
+            // Enviamos todo el lote en una sola instrucción nativa súper rápida
+            m_commandList->ResourceBarrier(m_numBarriersToFlush, m_resourceBarriers);
+            m_numBarriersToFlush = 0;
+        }
     }
 
-    void GraphicsContext::ClearRenderTarget(Texture2D* renderTarget, const Math::Color& color)
+    void GraphicsContext::ClearRenderTarget(ColorBuffer* renderTarget, const Math::Color& color)
     {
+        FlushBarriers();
+        
         // Extraemos el Descriptor Handle (D3D12_CPU_DESCRIPTOR_HANDLE)
-        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget->GetRTV();
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget->GetRTVAllocation().CPU;
 
         m_commandList->ClearRenderTargetView(rtvHandle, color, 0, nullptr);
     }
 
-    void GraphicsContext::ClearDepth(DepthBuffer* depthBuffer, float depth, uint8_t stencil)
+    void GraphicsContext::ClearDepth(const DepthBuffer* depthBuffer, float depth, uint8_t stencil)
     {
         // Extraemos el Descriptor Handle (D3D12_CPU_DESCRIPTOR_HANDLE)
-        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = depthBuffer->GetView();
+        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = depthBuffer->GetDSVAllocation().CPU;
 
         m_commandList->ClearDepthStencilView(
             dsvHandle,
@@ -88,7 +103,7 @@ namespace Bruno
         );
     }
 
-    void GraphicsContext::SetRenderTargets(uint32_t numRTVs, Texture2D** renderTargets, DepthBuffer* depthBuffer)
+    void GraphicsContext::SetRenderTargets(uint32_t numRTVs, ColorBuffer** renderTargets, DepthBuffer* depthBuffer)
     {
         // DirectX 12 permite un máximo de 8 Render Targets simultáneos por lo general.
         BR_ASSERT(numRTVs <= 8, "Se superó el límite máximo de Render Targets.");
@@ -99,7 +114,7 @@ namespace Bruno
         for (uint32_t i = 0; i < numRTVs; ++i)
         {
             // Extraemos el Handle nativo de cada textura agnóstica
-            rtvHandles[i] = renderTargets[i]->GetRTV();
+            rtvHandles[i] = renderTargets[i]->GetRTVAllocation().CPU;
         }
 
         // Preparamos el Depth Stencil (si existe)
@@ -108,13 +123,63 @@ namespace Bruno
 
         if (depthBuffer)
         {
-            dsvHandle = depthBuffer->GetView();
+            dsvHandle = depthBuffer->GetDSVAllocation().CPU;
             pDsvHandle = &dsvHandle;
         }
 
+        FlushBarriers();
+        
         // Llamada nativa
         // Parámetros: Num RTVs, Puntero al array, RTs Contiguos (FALSE porque los sacamos manualmente), Puntero al DSV
         m_commandList->OMSetRenderTargets(numRTVs, rtvHandles, FALSE, pDsvHandle);
+    }
+
+    void GraphicsContext::SetRenderTargetsSlice(uint32_t numRTVs, ColorBuffer** renderTargets, TextureArrayResource* depthResource, uint32_t depthArraySlice)
+    {
+        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
+        D3D12_CPU_DESCRIPTOR_HANDLE* pDsvHandle = nullptr;
+        if (depthResource)
+        {
+            // Recuperamos el handle agnóstico y lo casteamos a DX12
+            dsvHandle = depthResource->GetDSVHandle(depthArraySlice).CPU;
+            pDsvHandle = &dsvHandle;
+        }
+
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[8];
+    
+        for (uint32_t i = 0; i < numRTVs; ++i)
+        {
+            // Extraemos el Handle nativo de cada textura agnóstica
+            rtvHandles[i] = renderTargets[i]->GetRTVAllocation().CPU;
+        }
+
+        FlushBarriers();
+        
+        // Llamada nativa a la API
+        m_commandList->OMSetRenderTargets(
+            numRTVs, 
+            numRTVs > 0 ? rtvHandles : nullptr, 
+            FALSE, 
+            pDsvHandle
+        );
+    }
+
+    void GraphicsContext::ClearDepthSlice(TextureArrayResource* depthResource, uint32_t arraySlice, float depth, uint8_t stencil)
+    {
+        FlushBarriers();
+        
+        // 1. Recuperamos el puntero agnóstico (void*) y lo casteamos a su tipo real en DX12
+        auto dsvHandle = depthResource->GetDSVHandle(arraySlice).CPU;
+
+        // 2. Limpiamos exclusivamente la vista (Slice) seleccionada
+        m_commandList->ClearDepthStencilView(
+            dsvHandle,
+            D3D12_CLEAR_FLAG_DEPTH, // O D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL si usas el stencil
+            depth,
+            stencil,
+            0,
+            nullptr
+        );
     }
 
     void GraphicsContext::SetViewport(const Math::Viewport& viewport)
@@ -122,9 +187,10 @@ namespace Bruno
         m_commandList->RSSetViewports(1, viewport.Get12());
     }
 
-    void GraphicsContext::SetScissorRect(const Rect& rect)
+    void GraphicsContext::SetScissorRect(const Math::Rectangle& rect)
     {
-        m_commandList->RSSetScissorRects(1, rect.Get12());
+        D3D12_RECT d3dRect = static_cast<D3D12_RECT>(rect);
+        m_commandList->RSSetScissorRects(1, &d3dRect);
     }
 
     void GraphicsContext::SetPipelineState(GraphicsPipelineState* pso)
@@ -137,14 +203,29 @@ namespace Bruno
         m_commandList->SetGraphicsRootSignature(rootSig->GetNative());
     }
 
-    void GraphicsContext::SetDescriptorHeaps(ID3D12DescriptorHeap** ppHeaps, uint32_t count)
+    void GraphicsContext::SetDescriptorHeaps(std::initializer_list<DescriptorAllocator*> heaps)
     {
-        m_commandList->SetDescriptorHeaps(count, ppHeaps);
+        // Validación de seguridad nivel AAA: El hardware no soporta más de 2 heaps.
+        if (heaps.size() > 2)
+        {
+            throw std::runtime_error("DirectX 12 solo soporta un maximo de 2 Descriptor Heaps bindeados simultaneamente.");
+        }
+        
+        std::array<ID3D12DescriptorHeap*, 2> nativeHeaps = { nullptr, nullptr };
+    
+        uint32_t i = 0;
+        for (auto* heap : heaps)
+        {
+            nativeHeaps[i] = heap->GetHeap();
+            i++;
+        }
+
+        m_commandList->SetDescriptorHeaps(static_cast<UINT>(heaps.size()), nativeHeaps.data());
     }
 
-    void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, ConstantBuffer* buffer)
+    void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, const ConstantBufferBase& cb)
     {
-        m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, buffer->GetGPUAddress());
+        m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, cb.GetGPUAddress());
     }
 
     void GraphicsContext::SetConstantBuffer(uint32_t rootParameterIndex, const DynamicAllocation& allocation)
@@ -152,9 +233,41 @@ namespace Bruno
         m_commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, allocation.GPUAddress);
     }
 
-    void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor)
+    void GraphicsContext::SetShaderResourceView(uint32_t rootParameterIndex, const DynamicAllocation& allocation)
     {
-        m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, baseDescriptor);
+        BT_ASSERT(allocation.GPUAddress != 0, "Root SRV con GPUAddress nula.");
+        BT_ASSERT((allocation.GPUAddress % 4) == 0, "Root SRV desalineado.");
+        m_commandList->SetGraphicsRootShaderResourceView(rootParameterIndex, allocation.GPUAddress);
+    }
+
+    void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& allocator)
+    {
+        BT_ASSERT(allocator.GetHeap() != nullptr, "DescriptorAllocator sin ID3D12DescriptorHeap.");
+        
+        // El DescriptorAllocator encapsula el heap nativo.
+        // Extraemos el handle de memoria inicial de la GPU (Offset 0)
+        D3D12_GPU_DESCRIPTOR_HANDLE baseHandle = allocator.GetHeap()->GetGPUDescriptorHandleForHeapStart();
+        BT_ASSERT(baseHandle.ptr != 0, "DescriptorAllocator no es Shader-Visible.");
+        
+        m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, baseHandle);
+    }
+
+    void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocation& allocation)
+    {
+        BT_ASSERT(allocation.IsShaderVisible(), "DescriptorAllocation inválido o no Shader-Visible en rootParameterIndex.");
+        
+        // Extraemos el handle de GPU exacto (con el offset ya calculado internamente por la asignación)
+        D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = allocation.GetGPUHandle();
+        
+        m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, gpuHandle);
+    }
+
+    void GraphicsContext::SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocation& allocation, uint32_t offset)
+    {
+        // Extraemos el handle desplazado dinámicamente usando la matemática de punteros de tu struct
+        D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = allocation.GetGPUHandle(offset);
+        
+        m_commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, gpuHandle);
     }
 
     void GraphicsContext::SetDynamicDescriptorTable(uint32_t rootParameterIndex, D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor)
@@ -173,7 +286,7 @@ namespace Bruno
     void GraphicsContext::SetTexture(uint32_t rootParameterIndex, Texture2D* texture)
     {
         // 1. Extraemos el Descriptor Handle nativo (CPU) de la textura agnóstica.
-        D3D12_CPU_DESCRIPTOR_HANDLE srv = texture->GetSRV();
+        D3D12_CPU_DESCRIPTOR_HANDLE srv = texture->GetSVRAllocation().CPU;
 
         // 2. Usamos tu método existente que copia este descriptor a un Heap dinámico 
         //    visible por la GPU y enlaza el Descriptor Table.
@@ -185,7 +298,8 @@ namespace Bruno
         D3D_PRIMITIVE_TOPOLOGY dxTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
     
         // Traducción estática ultra rápida
-        switch (topology) {
+        switch (topology)
+        {
         case PrimitiveTopology::PointList:     dxTopology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST; break;
         case PrimitiveTopology::LineList:      dxTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
         case PrimitiveTopology::LineStrip:     dxTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP; break;
@@ -202,29 +316,55 @@ namespace Bruno
         m_commandList->IASetVertexBuffers(startSlot, 1, &view);
     }
 
-    void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer* views)
+    void GraphicsContext::SetVertexBuffers(uint32_t startSlot, std::initializer_list<const VertexBuffer*> buffers)
     {
-        /*D3D12_VERTEX_BUFFER_VIEW d3dViews[count];
-        for (uint32_t i = 0; i < count; i++)
+        // DX12 soporta múltiples slots, usamos un array fijo rápido
+        std::array<D3D12_VERTEX_BUFFER_VIEW, 8> views = {};
+        uint32_t i = 0;
+    
+        for (const auto* vb : buffers)
         {
-            d3dViews[i] = views->GetView();
+            views[i++] = vb->GetView();
         }
-        m_commandList->IASetVertexBuffers(startSlot, count, d3dViews);*/
+    
+        m_commandList->IASetVertexBuffers(startSlot, static_cast<UINT>(buffers.size()), views.data());
     }
 
     void GraphicsContext::SetIndexBuffer(IndexBuffer* indexBuffer)
     {
-        D3D12_INDEX_BUFFER_VIEW view = indexBuffer->GetView();
+        auto view = indexBuffer->GetView();
         m_commandList->IASetIndexBuffer(&view);
+    }
+
+    void GraphicsContext::CopyBuffer(GraphicsResource* dest, GraphicsResource* src, size_t size)
+    {
+        // 1. Validación estricta AAA para evitar pantallazos azules (TDRs)
+        if (!dest || !src)
+        {
+            throw std::invalid_argument("Punteros nulos pasados a CopyBuffer.");
+        }
+
+        if (size == 0) 
+        {
+            return;
+        }
+        
+        FlushBarriers();
+        
+        // Encolar la transferencia masiva de datos en la CommandList del contexto
+        // Parámetros: Destino, Offset Destino, Origen, Offset Origen, Tamaño
+        m_commandList->CopyBufferRegion(dest->GetNativeResource(), 0, src->GetNativeResource(), 0, size);
     }
 
     void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation)
     {
+        FlushBarriers();
         m_commandList->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
     }
 
     void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation)
     {
+        FlushBarriers();
         m_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
     }
 
@@ -234,23 +374,8 @@ namespace Bruno
         m_commandList->SetGraphicsRoot32BitConstants(rootParameterIndex, num32BitValues, data, destOffsetIn32BitValues);
     }
 
-    D3D12_RESOURCE_STATES GraphicsContext::GetDX12ResourceState(ResourceState state)
+    void GraphicsContext::SetPushConstant(uint32_t rootParameterIndex, uint32_t sourceData, uint32_t destOffsetIn32BitValues)
     {
-        switch (state)
-        {
-        case ResourceState::Common:                   return D3D12_RESOURCE_STATE_COMMON;
-        case ResourceState::VertexAndConstantBuffer:  return D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-        case ResourceState::IndexBuffer:              return D3D12_RESOURCE_STATE_INDEX_BUFFER;
-        case ResourceState::RenderTarget:             return D3D12_RESOURCE_STATE_RENDER_TARGET;
-        case ResourceState::UnorderedAccess:          return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-        case ResourceState::DepthWrite:               return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-        case ResourceState::DepthRead:                return D3D12_RESOURCE_STATE_DEPTH_READ;
-        case ResourceState::NonPixelShaderResource:   return D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-        case ResourceState::PixelShaderResource:      return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-        case ResourceState::CopyDest:                 return D3D12_RESOURCE_STATE_COPY_DEST;
-        case ResourceState::CopySource:               return D3D12_RESOURCE_STATE_COPY_SOURCE;
-        case ResourceState::Present:                  return D3D12_RESOURCE_STATE_PRESENT;
-        default:                                      return D3D12_RESOURCE_STATE_COMMON;
-        }
+        m_commandList->SetGraphicsRoot32BitConstant(rootParameterIndex, sourceData, destOffsetIn32BitValues);
     }
 }

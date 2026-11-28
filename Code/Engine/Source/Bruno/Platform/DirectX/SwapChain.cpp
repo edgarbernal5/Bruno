@@ -1,7 +1,10 @@
 ﻿#include "brpch.h"
 #include "SwapChain.h"
+
+#include "ColorBuffer.h"
 #include "GraphicsDevice.h"
 #include "CommandQueue.h"
+#include "D3DFunctions.h"
 #include "Texture2D.h"
 
 namespace Bruno
@@ -18,7 +21,7 @@ namespace Bruno
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.Width = parameters.Width;
         swapChainDesc.Height = parameters.Height;
-        swapChainDesc.Format = parameters.BackBufferFormat;
+        swapChainDesc.Format = D3DFunctions::GetDX12Format(parameters.BackBufferFormat);
         swapChainDesc.Stereo = FALSE;
         swapChainDesc.SampleDesc = { 1, 0 }; // DX12 requiere que el SwapChain no tenga MSAA (se hace en otro lado)
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -32,7 +35,7 @@ namespace Bruno
         // DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING si quisieras FPS ilimitados (G-Sync/FreeSync)
         swapChainDesc.Flags = 0;
 
-        // 2. Crear el SwapChain original
+        // Crear el SwapChain original
         Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain1;
         ThrowIfFailed(dxgiFactory->CreateSwapChainForHwnd(
             commandQueue.Get(), // DX12 exige que le pases la cola de comandos aquí, no el Device
@@ -43,27 +46,22 @@ namespace Bruno
             &swapChain1
         ));
 
-        // 3. Castear a IDXGISwapChain4 (nuestra versión moderna)
         ThrowIfFailed(swapChain1.As(&m_swapChain));
         
         // Actualizar el índice del buffer actual (0 o 1)
         m_currentBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
-
-        // 4. Crear el Heap (Montículo) para guardar los descriptores de los Render Targets
-        D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-        rtvHeapDesc.NumDescriptors = Graphics::Core::BACK_BUFFER_COUNT;
-        rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV; // Render Target View
-        rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
         
-        ThrowIfFailed(nativeDevice->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_rtvHeap)));
+        m_rtvAllocator = std::make_unique<DescriptorAllocator>(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, swapChainDesc.BufferCount, false);
         
-        // Preguntarle a la GPU cuánto mide un RTV en su arquitectura particular
-        m_rtvDescriptorSize = nativeDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-        // 5. Vincular las texturas reales a los descriptores
+        for (uint32_t i = 0; i < swapChainDesc.BufferCount; i++)
+        {
+            m_renderTargets[i].RtvHandle = m_rtvAllocator->Allocate(1);
+        }
+        
+        // Vincular las texturas reales a los descriptores
         UpdateRenderTargetViews();
         
-        // 6. Prohibir a DXGI que intercepte Alt+Enter (Nosotros lo manejaremos si queremos fullscreen)
+        // Prohibir a DXGI que intercepte Alt+Enter (Nosotros lo manejaremos si queremos fullscreen)
         ThrowIfFailed(dxgiFactory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER));
     }
 
@@ -78,9 +76,6 @@ namespace Bruno
     {
         auto nativeDevice = m_device.GetNativeDevice();
         
-        // Obtenemos el inicio de la lista de descriptores en la memoria de la GPU
-        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_rtvHeap->GetCPUDescriptorHandleForHeapStart();
-
         for (uint32_t i = 0; i < Graphics::Core::BACK_BUFFER_COUNT; i++)
         {
             Microsoft::WRL::ComPtr<ID3D12Resource> backBufferResource;
@@ -90,16 +85,12 @@ namespace Bruno
             
             if (!m_renderTargets[i].Resource)
             {
-                m_renderTargets[i].Resource = std::make_shared<Texture2D>();
+                m_renderTargets[i].Resource = std::make_shared<ColorBuffer>();
             }
             
             // Enchufar la textura en el RTV Heap de DirectX 12
-            nativeDevice->CreateRenderTargetView(backBufferResource.Get(), nullptr, rtvHandle);
-            m_renderTargets[i].Resource->AttachNativeResource(backBufferResource, rtvHandle);
-            m_renderTargets[i].RtvHandle.CPU = rtvHandle;
-            
-            // Mover el puntero al siguiente bloque de memoria (Pointer Arithmetic)
-            rtvHandle.ptr += m_rtvDescriptorSize;
+            nativeDevice->CreateRenderTargetView(backBufferResource.Get(), nullptr, m_renderTargets[i].RtvHandle.CPU);
+            m_renderTargets[i].Resource->AttachNativeResource(backBufferResource, m_renderTargets[i].RtvHandle);
         }
     }
 
@@ -122,8 +113,11 @@ namespace Bruno
 
         // 2. Redimensionar el SwapChain
         ThrowIfFailed(m_swapChain->ResizeBuffers(
-            Graphics::Core::BACK_BUFFER_COUNT, width, height,
-            m_parameters.BackBufferFormat, 0
+            Graphics::Core::BACK_BUFFER_COUNT, 
+            width,
+            height,
+            D3DFunctions::GetDX12Format(m_parameters.BackBufferFormat),
+            0
         ));
 
         // 3. Sincronizar nuestro índice
@@ -157,23 +151,7 @@ namespace Bruno
         return m_currentBufferIndex;
     }
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> SwapChain::GetCurrentBackBuffer() const
-    {
-        Microsoft::WRL::ComPtr<ID3D12Resource> resource = m_renderTargets[m_currentBufferIndex].Resource->GetResource();
-        return resource;
-    }
-
-    D3D12_CPU_DESCRIPTOR_HANDLE SwapChain::GetCurrentRenderTargetView() const
-    {
-        // Magia de C++ y DX12: Aritmética de punteros extremadamente rápida
-        return m_renderTargets[m_currentBufferIndex].Resource->GetRTV();
-        /*return D3D12_CPU_DESCRIPTOR_HANDLE
-        { 
-            m_rtvHeap->GetCPUDescriptorHandleForHeapStart().ptr + (m_currentBufferIndex * m_rtvDescriptorSize) 
-        };*/
-    }
-
-    Texture2D* SwapChain::GetCurrentRenderTarget() const
+    ColorBuffer* SwapChain::GetCurrentRenderTarget() const
     {
         return m_renderTargets[m_currentBufferIndex].Resource.get();
     }

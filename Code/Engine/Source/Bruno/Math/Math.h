@@ -21,6 +21,7 @@ namespace Bruno::Math
     using Quaternion = DirectX::SimpleMath::Quaternion;
     using Color = DirectX::SimpleMath::Color;
 
+    using Rectangle = DirectX::SimpleMath::Rectangle;
     using Viewport = DirectX::SimpleMath::Viewport;
     using Ray = DirectX::SimpleMath::Ray;
     using Plane = DirectX::SimpleMath::Plane;

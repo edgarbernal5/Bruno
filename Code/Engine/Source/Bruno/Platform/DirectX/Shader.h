@@ -59,7 +59,7 @@ namespace Bruno
         Microsoft::WRL::ComPtr<IDxcBlob> m_byteCode;
     };
     
-    class Shader : public Asset // Puede ser un Asset administrado por tu AssetManager
+    class Shader : public Asset
     {
         BR_RTTI_DECLARATION(Shader, Asset);
         

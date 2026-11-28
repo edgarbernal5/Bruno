@@ -11,8 +11,9 @@
 #include "Bruno/Renderer/SceneRenderer.h"
 #include "Bruno/Renderer/PrimitiveBatch.h"
 #include "Bruno/Platform/DirectX/GraphicsContext.h"
-#include "Bruno/Platform/DirectX/Shader.h"
-#include "Bruno/Scene/Systems/FrustumCulling.h"
+#include "Bruno/Platform/DirectX/ColorBuffer.h"
+#include "Bruno/Renderer/Shadows/ShadowSystem.h"
+#include "Bruno/Scene/Systems/CullingSystem.h"
 
 namespace Bruno
 {
@@ -90,7 +91,7 @@ namespace Bruno
 		// ------------------------------------------------------------------
 		// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
 		// ------------------------------------------------------------------
-		context.TransitionResource(backBuffer, ResourceState::Present, ResourceState::RenderTarget);
+		context.TransitionResource(backBuffer, ResourceState::RenderTarget);
 		
 		// ------------------------------------------------------------------
 		// FASE DE DIBUJO
@@ -98,27 +99,25 @@ namespace Bruno
 		// Un azul oscuro/grisáceo muy estilo editor AAA (R, G, B, A)
 		Math::Color clearColor = { 0.10f, 0.014f, 0.16f, 1.0f }; 
 		//Math::Color clearColor = { 1.0f, 1.0f, 0.0f, 1.0f };
-			auto depthBuffer = m_surface->GetDepthBuffer();
+		auto depthBuffer = m_surface->GetDepthBuffer();
 			
 		// Limpiar la pantalla
 		context.ClearRenderTarget(backBuffer, clearColor);
 		context.ClearDepth(depthBuffer, 1.0f, 0);
 		context.SetRenderTargets(1, &backBuffer, depthBuffer);
-			
-		// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
-		context.SetDescriptorHeaps(&m_srvHeap, 1);
 		
 		// Configurar Viewport y Scissor Test explícitamente en este frame
 		context.SetViewport(m_viewport);
 		context.SetScissorRect(m_scissorRect);
 		
-		m_sceneRenderer->RenderScene(&context, m_camera, frameIndex);
+		//m_sceneRenderer->RenderForward(&context, m_camera, frameIndex);
 		
 		// ------------------------------------------------------------------
 		// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 		// ------------------------------------------------------------------
-		context.TransitionResource(backBuffer, ResourceState::RenderTarget, ResourceState::Present);
-
+		context.TransitionResource(backBuffer,  ResourceState::Present);
+		context.FlushBarriers();
+		
 		// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
 		m_commandQueue->ExecuteCommandList(commandList, frameIndex);
 
@@ -217,8 +216,9 @@ namespace Bruno
 
 		//m_scene->InstantiateModel(model);
 
-		m_frustumCulling = std::make_shared<FrustumCulling>(m_camera, m_scene);
-		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_frustumCulling, m_assetManager.get());
+		m_shadowSystem = std::make_shared<ShadowSystem>(m_camera, m_scene);
+		m_frustumCulling = std::make_shared<CullingSystem>(m_camera, m_scene, m_shadowSystem);
+		m_sceneRenderer = std::make_shared<SceneRenderer>(m_scene, m_frustumCulling, m_assetManager.get(), &m_shadowProperties);
 	}
 
 	void PlayerGame::InitializeSurface()

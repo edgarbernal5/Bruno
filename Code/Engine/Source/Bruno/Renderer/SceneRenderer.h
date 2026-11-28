@@ -3,35 +3,72 @@
 #include <Bruno/Platform/DirectX/RootSignature.h>
 #include <Bruno/Platform/DirectX/GraphicsPipelineState.h>
 #include <Bruno/Math/Math.h>
+#include <entt/entt.hpp>
+
+#include "Bruno/Platform/DirectX/ConstantBuffer.h"
+#include "Bruno/Scene/Constants.h"
+
+namespace entt
+{
+	enum class entity : std::uint32_t;
+}
 
 namespace Bruno
 {
-	class FrustumCulling;
+	class SceneRendererDeferred;
+	struct ShadowProperties;
+	class ForwardRenderer;
+	struct FrameCullingResults;
+	struct CascadeData;
+	class ShadowMapArray;
+	class MaterialManager;
+	class Material;
+	class DescriptorAllocator;
+	class GBuffer;
+	class CullingSystem;
 	class GraphicsContext;
 	class Scene;
 	class Shader;
 	class AbstractAssetManager;
 	class Camera;
-
+	
 	class SceneRenderer
 	{
 	public:
-		SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<FrustumCulling> frustumCulling, AbstractAssetManager* assetManager);
-
+		SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<CullingSystem> frustumCulling, AbstractAssetManager* assetManager, ShadowProperties* shadowProperties);
+		~SceneRenderer();
+		
 		// Se llama cuando cargas una escena o agregas un objeto
 		void InitEntitiesForRender();
-		void InitializeOpaqueRootSignature(GraphicsDevice* device);
-		void InitializeOpaquePSO(GraphicsDevice* device);
-		void RenderScene(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex);
 		
+		void BeginFrame(GraphicsDevice* device);
+		void RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex, ColorBuffer* targetRenderTarget, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
+		void RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
+		void RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData);
+		
+		void Resize(uint32_t width, uint32_t height);
+	
 	private:
+		void InitializeShadowArray(GraphicsDevice* device);
+		void InitializeShadowPipeline(GraphicsDevice* device);
+		
+		void RegisterMaterialToGPU(std::shared_ptr<Material> matAsset);
+		void DrawBatch(GraphicsContext* graphicsContext, const std::vector<entt::entity>& visibleEntities);
 		
 		std::shared_ptr<Scene> m_scene;
-		std::shared_ptr<FrustumCulling> m_frustumCulling;
+		std::shared_ptr<CullingSystem> m_frustumCulling;
 		AbstractAssetManager* m_assetManager;
+		ShadowProperties* m_shadowProperties;
+		float m_lastSlopeScaledDepthBias;
+		int m_lastDepthBias;
 
-		std::shared_ptr<RootSignature> m_opaqueRootSignature;
-		std::unique_ptr<Shader> m_opaqueShader;
-		std::shared_ptr<GraphicsPipelineState> m_opaquePSO;
+		DescriptorAllocator* m_globalSrvHeap;
+		std::shared_ptr<RootSignature> m_shadowRootSig;
+        std::shared_ptr<GraphicsPipelineState> m_shadowPSO;
+		
+		std::shared_ptr<MaterialManager> m_materialManager;
+		std::shared_ptr<ShadowMapArray> m_shadowMapArray;
+		std::unique_ptr<ForwardRenderer> m_forwardRenderer;
+		std::unique_ptr<SceneRendererDeferred> m_deferredRenderer;
 	};
 }

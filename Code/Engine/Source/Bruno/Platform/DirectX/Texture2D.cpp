@@ -6,6 +6,8 @@
 
 #include <DirectXTex.h> // Necesario para cargar texturas
 
+#include "D3DFunctions.h"
+
 namespace Bruno 
 {
     BR_RTTI_DEFINITIONS(Texture2D);
@@ -34,6 +36,11 @@ namespace Bruno
 
         const auto& metadata = image.GetMetadata();
 
+        m_width = metadata.width;
+        m_height = metadata.height;
+        m_format = D3DFunctions::GetFromDX12Format(metadata.format);
+        m_mipMapLevels = 1;
+        
         // 2. Crear el recurso en Default Heap (VRAM pura)
         D3D12_RESOURCE_DESC texDesc = {};
         texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -57,7 +64,8 @@ namespace Bruno
             nullptr, 
             IID_PPV_ARGS(&m_resource)
         ));
-
+        SetCurrentState(ResourceState::RenderTarget);
+        
         // 3. Subir los datos asíncronamente usando nuestro motor DMA
         D3D12_SUBRESOURCE_DATA subresourceData{};
         subresourceData.pData = image.GetPixels();
@@ -77,16 +85,5 @@ namespace Bruno
         srvDesc.Texture2D.MipLevels = 1;
 
         nativeDevice->CreateShaderResourceView(m_resource.Get(), &srvDesc, m_srvAllocation.CPU);
-    }
-
-    void Texture2D::AttachNativeResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource, D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle)
-    {
-        m_resource = resource;
-        m_rtvHandle = rtvHandle;
-        
-        // Opcional pero recomendado: Extraer el ancho y alto directamente del recurso nativo
-        // auto desc = m_resource->GetDesc();
-        // m_width = static_cast<uint32_t>(desc.Width);
-        // m_height = desc.Height;
     }
 }

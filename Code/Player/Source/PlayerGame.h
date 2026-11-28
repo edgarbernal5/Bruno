@@ -4,10 +4,13 @@
 
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/RHITypes.h"
+#include "Bruno/Renderer/Shadows/EnumTypes.h"
 
 namespace Bruno
 {
-	class FrustumCulling;
+	struct ShadowProperties;
+	class ShadowSystem;
+	class CullingSystem;
 	class LinearAllocator;
 	class Surface;
 	class GraphicsContext;
@@ -47,14 +50,16 @@ namespace Bruno
 
 		std::unique_ptr<Surface> m_surface;
 		std::shared_ptr<Scene> m_scene;
-		std::shared_ptr<FrustumCulling> m_frustumCulling;
+		std::shared_ptr<ShadowSystem> m_shadowSystem;
+		std::shared_ptr<CullingSystem> m_frustumCulling;
 		std::shared_ptr<SceneRenderer> m_sceneRenderer;
 		CommandQueue* m_commandQueue { nullptr };
 		Math::Viewport m_viewport;
-		Rect m_scissorRect;
+		Math::Rectangle m_scissorRect;
 		ID3D12DescriptorHeap* m_srvHeap;
 		std::unique_ptr<GraphicsContext> m_graphicsContext;
-
+		ShadowProperties m_shadowProperties;
+		
 		std::array<std::unique_ptr<LinearAllocator>, 2> m_dynamicAllocators;
 		Math::Int2	m_lastMousePosition;
 		Camera		m_camera;

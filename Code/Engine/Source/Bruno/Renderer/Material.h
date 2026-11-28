@@ -4,8 +4,8 @@
 #include <string>
 #include <map>
 
+#include "Bruno/Math/Math.h"
 #include "Bruno/Platform/DirectX/DescriptorAllocator.h"
-#include "Bruno/Platform/DirectX/GraphicsPipelineState.h"
 
 namespace Bruno
 {
@@ -26,29 +26,22 @@ namespace Bruno
 		AssetType GetAssetType() const override { return AssetType::Material; }
 
 		std::string Name;
-		std::map<std::string, AssetHandle> TexturesByName;
 
-		// --- NUEVA INTERFAZ PARA DIRECTX 12 ---
+		// --- PROPIEDADES PBR (Asset Handles apuntando al AssetManager) ---
+		AssetHandle AlbedoMap = 0;
+		AssetHandle NormalMap = 0;
+		AssetHandle MetallicRoughnessMap = 0;
 
-		// 1. Asignar el Pipeline y Root Signature (Compartidos entre muchos materiales)
-		void SetPipelineState(std::shared_ptr<GraphicsPipelineState> pso, std::shared_ptr<RootSignature> rootSig);
-    
-		std::shared_ptr<GraphicsPipelineState> GetPSO() const { return m_pso; }
-		std::shared_ptr<RootSignature> GetRootSignature() const { return m_rootSignature; }
-
-		// 2. Construir la tabla de descriptores para este material específico
-		void BuildDescriptors(GraphicsDevice* device, DescriptorAllocator* srvAllocator, AbstractAssetManager* assetManager);
-
-		// 3. Obtener el handle para el RenderLoop
-		D3D12_GPU_DESCRIPTOR_HANDLE GetTextureDescriptorTable() const;
+		// --- FACTORES ESCALARES (Por si el modelo no tiene texturas) ---
+		Math::Vector4 AlbedoTint = { 1.0f, 1.0f, 1.0f, 1.0f }; //
+		float MetallicFactor = 0.0f;                           //
+		float RoughnessFactor = 0.5f;
+		
+		// --- ENLACE CON EL RENDERER (LA LLAVE BINDLESS) ---
+		// Este es el ID que el sistema le asignará al instanciarse en la GPU.
+		// Lo inicializamos en un valor inválido.
+		uint32_t RuntimeMaterialIndex = 0xFFFFFFFF;
 		
 	private:
-		// Punteros a los objetos compartidos (No se crean aquí, se inyectan)
-		std::shared_ptr<GraphicsPipelineState> m_pso;
-		std::shared_ptr<RootSignature> m_rootSignature;
-
-		// La reserva de memoria en el Heap de Descriptores para las texturas de ESTE material
-		DescriptorAllocation m_textureDescriptorAllocation;
-		bool m_descriptorsBuilt = false;
 	};
 }

@@ -14,11 +14,10 @@ namespace Bruno
     {
     public:
         CommandQueueManager(GraphicsDevice& device);
-        ~CommandQueueManager(); // Importante para limpiar el evento
+        ~CommandQueueManager();
         
-        // Getters que devuelven tu abstracción, no punteros crudos
-        CommandQueue& GetGraphicsQueue() { return *m_directQueue; }
-        CommandQueue& GetCopyQueue() { return *m_copyQueue; }
+        CommandQueue& GetGraphicsQueue() const { return *m_directQueue; }
+        CommandQueue& GetCopyQueue() const { return *m_copyQueue; }
 
         // Ejecuta el UploadContext en la cola de copia y devuelve el Fence Value a esperar
         uint64_t ExecuteAndReturnFence(UploadContext& uploadContext);
@@ -30,23 +29,19 @@ namespace Bruno
         
     private:
         GraphicsDevice& m_device;
-
-        // --- MIEMBROS DE SINCRONIZACIÓN ---
         
-        // ¡CRÍTICO! Usar ComPtr para el Fence nativo
         Microsoft::WRL::ComPtr<ID3D12Fence> m_uploadFence;
         
         // Tracks el valor a señalizar *siguiente*
         uint64_t m_nextFenceValue{ 1 }; 
         
-        // Evento de Windows para esperas CPU-side. *KISS: manual CloseHandle*
         HANDLE m_fenceEvent{ nullptr }; 
 
-        // --- LAS COLAS NATIVAS ABSTRAÍDAS ---
         std::unique_ptr<CommandQueue> m_directQueue;
         std::unique_ptr<CommandQueue> m_copyQueue;
     };
 }
+
 namespace Bruno::Graphics
 {
     inline CommandQueueManager*& GetCommandQueueManager()

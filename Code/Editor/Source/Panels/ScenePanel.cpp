@@ -19,7 +19,12 @@
 #include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/Shader.h"
+#include "Bruno/Platform/DirectX/ColorBuffer.h"
+#include "Bruno/Renderer/MaterialManager.h"
 #include "Bruno/Renderer/RootSignatureLibrary.h"
+#include "Bruno/Renderer/Lighting/LightSystem.h"
+#include "Bruno/Renderer/Shadows/ShadowSystem.h"
+#include "Bruno/Scene/Systems/CullingSystem.h"
 #include "Bruno/Scene/Systems/TransformSystem.h"
 #include "Gizmos/GizmoService.h"
 #include "Gizmos/CameraGizmo.h"
@@ -121,19 +126,33 @@ namespace Bruno
 				return;
 			}
 			
+			m_sceneRenderer->BeginFrame(m_device);
+			
 			// 1. Preguntarle al SwapChain en qué frame (0 o 1) estamos trabajando hoy
 			uint32_t frameIndex = m_surface->GetCurrentBackBufferIndex();
 
 			//BT_CORE_TRACE << "Scene / delta time = " << m_timer.GetDeltaTime() << ". frameid= "<< frameIndex <<std::endl;
 			
 			// 2. Pedirle a nuestra cola el "lápiz" (CommandList). 
-			// Magia: Esto automáticamente espera si la GPU sigue ocupada con este frame.
+			// Esto automáticamente espera si la GPU sigue ocupada con este frame.
 			auto commandList = m_commandQueue->GetCommandList(frameIndex);
 			auto allocator = m_commandQueue->GetAllocator(frameIndex);
 			auto dynamicAllocator = m_dynamicAllocators[frameIndex].get();
 			GraphicsContext context(*m_device, commandList.Get(), allocator.Get(), dynamicAllocator);
 			
 			dynamicAllocator->Reset();
+			Profiler::Get().Stats.ResetCounters();
+			
+			TransformSystem::Update(m_scene.get());
+			LightSystem::Update(m_scene.get());
+			
+			m_shadowSystem->Execute(m_shadowProperties->m_resolution, m_shadowProperties->m_numCascades, m_shadowProperties->m_cascadeLambda);
+			m_cullingSystem->Execute(m_shadowProperties->m_numCascades);
+			
+			const auto& cullingData = m_cullingSystem->GetCullingResults();
+			const auto& cascadeData = m_shadowSystem->GetCascades();
+			
+			m_sceneRenderer->RenderShadows(&context, m_sceneDocument->GetCamera(), frameIndex, cascadeData, cullingData);
 			
 			// 3. Extraer la textura real y su descriptor
 			auto backBuffer = m_surface->GetCurrentRenderTarget();
@@ -141,7 +160,7 @@ namespace Bruno
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: PRESENT -> RENDER_TARGET
 			// ------------------------------------------------------------------
-			context.TransitionResource(backBuffer, ResourceState::Present, ResourceState::RenderTarget);
+			context.TransitionResource(backBuffer, ResourceState::RenderTarget);
 			
 			// ------------------------------------------------------------------
 			// FASE DE DIBUJO
@@ -156,46 +175,34 @@ namespace Bruno
 			context.ClearDepth(depthBuffer, 1.0f, 0);
 			context.SetRenderTargets(1, &backBuffer, depthBuffer);
 			
-			// Setear SRV Heaps (Indispensable para que la GPU encuentre la textura)
-			context.SetDescriptorHeaps(&m_srvHeap, 1);
-			
 			SetupCameraGizmoViewport();
 			
 			// Configurar Viewport y Scissor Test explícitamente en este frame
 			context.SetViewport(m_viewport);
 			context.SetScissorRect(m_scissorRect);
 			
-			TransformSystem::Update(m_scene.get());
+			//m_sceneRenderer->RenderForward(&context, m_sceneDocument->GetCamera(), frameIndex, cascadeData, cullingData);
+			m_sceneRenderer->RenderDeferred(&context, m_sceneDocument->GetCamera(), frameIndex, backBuffer, cascadeData, cullingData);
 			
-			Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
+			context.TransitionResource(backBuffer, ResourceState::RenderTarget);
+			context.TransitionResource(depthBuffer, ResourceState::DepthWrite);
+			context.SetRenderTargets(1, &backBuffer, depthBuffer);
 			
-			Math::Matrix gizmoWorld;
-			Math::Vector3 gizmoPivot;
+			RenderGizmo(context, frameIndex);
+			//m_debugRenderer->RenderBoundingBoxes(&context, m_sceneDocument->GetCamera(), frameIndex);
+			m_debugRenderer->RenderDirectionalLightGizmos(&context, m_sceneDocument->GetCamera(), frameIndex);
 			
-			m_sceneRenderer->RenderScene(&context, m_sceneDocument->GetCamera(), frameIndex);
-			
-			if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
-			{
-				m_gizmoService->SetGizmoPosition(gizmoPivot);
-				m_gizmoService->SetGizmoWorldMatrix(gizmoWorld);
-			}
-			m_debugRenderer->RenderBoundingBoxes(&context, m_sceneDocument->GetCamera(), frameIndex);
 			if (m_marqueeInteraction.m_dragRectangle)
 			{
 				RenderMarquee(context, m_marqueeInteraction.m_ndcMin, m_marqueeInteraction.m_ndcMax);
 			}
-			m_gizmoService->Update();
-			m_gizmoService->BuildGeometry(frameIndex);
-			m_gizmoService->Render(&context, frameIndex, viewProj);
-			
-			m_cameraGizmo->BuildCameraGizmoGeometry(frameIndex);
-			m_cameraGizmo->RenderCameraGizmo(&context, frameIndex, m_viewport);
 			
 			// ------------------------------------------------------------------
 			// FASE DE TRANSICIÓN: RENDER_TARGET -> PRESENT
 			// ------------------------------------------------------------------
-			context.TransitionResource(backBuffer, ResourceState::RenderTarget, ResourceState::Present);
-
+			context.TransitionResource(backBuffer, ResourceState::Present);
+			context.FlushBarriers();
+			
 			// 4. Cerrar el lápiz y enviarlo a la GPU para que lo ejecute
 			m_commandQueue->ExecuteCommandList(commandList, frameIndex);
 
@@ -260,6 +267,7 @@ namespace Bruno
 			m_viewport.width = formSize.Width;
 			m_scissorRect = { 0, 0, static_cast<LONG>(formSize.Width), static_cast<LONG>(formSize.Height) };
 			
+			m_sceneRenderer->Resize(formSize.Width, formSize.Height);
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, static_cast<float>(formSize.Width), static_cast<float>(formSize.Height)));
 			m_isSizingMoving = false;
 		});
@@ -269,8 +277,7 @@ namespace Bruno
 #ifndef BR_SINGLE_THREAD_RENDERING
 			std::lock_guard lock{ m_mutex };
 #endif
-			//BR_CORE_TRACE << "Resized panel id = " << idxx << ". hwnd = " << m_form->native_handle() << ". w=" << args.width << "; h=" << args.height << std::endl;
-
+			
 			if (m_isSizingMoving)
 			{
 				return;
@@ -281,7 +288,7 @@ namespace Bruno
 			m_viewport.width = args.NewSize.Width;
 			m_scissorRect = { 0, 0, static_cast<LONG>(args.NewSize.Width), static_cast<LONG>(args.NewSize.Height) };
 			m_surface->Resize(args.NewSize.Width, args.NewSize.Height);
-
+			m_sceneRenderer->Resize(args.NewSize.Width, args.NewSize.Height);
 			m_sceneDocument->GetCamera().SetViewport(Math::Viewport(0.0f, 0.0f, static_cast<float>(args.NewSize.Width), static_cast<float>(args.NewSize.Height)));
 			m_isResizing = false;
 		});
@@ -539,6 +546,10 @@ namespace Bruno
 	void ScenePanel::InitializeSceneRenderer()
 	{
 		m_sceneRenderer = m_sceneDocument->GetSceneRenderer();
+		m_shadowSystem = m_sceneDocument->GetShadowSystem();
+		m_cullingSystem = m_sceneDocument->GetCullingSystem();
+		
+		m_shadowProperties = m_sceneDocument->GetShadowProperties();
 	}
 
 	void ScenePanel::InitializeMarquee()
@@ -548,16 +559,13 @@ namespace Bruno
 		
 		m_marqueeRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
 
-		GraphicsPipelineStateDesc psoDesc = {};
-		// CRÍTICO: El input layout queda vacío. No hay Vertex Buffer.
-		//psoDesc.InputLayout = { nullptr, 0 };
-    
+		GraphicsPipelineStateDesc psoDesc = {};    
 		psoDesc.RootSignature = m_marqueeRootSig.get();
 		
 		psoDesc.VertexShaderDesc = { L"Shaders/Marquee.hlsl", L"VSMain", L"vs_6_0" };
 		psoDesc.PixelShaderDesc = { L"Shaders/Marquee.hlsl", L"PSMain", L"ps_6_0" };
 		
-		psoDesc.RasterizerState.CullMode = CullMode::None;
+		psoDesc.RasterizerDesc.CullMode = CullMode::None;
 		
 		psoDesc.DepthState.Mode = DepthMode::None;
 		
@@ -592,6 +600,27 @@ namespace Bruno
 		m_scene->OnUpdate(timer, m_sceneDocument->GetCamera());
 	}
 
+	void ScenePanel::RenderGizmo(GraphicsContext& context, uint32_t frameIndex)
+	{
+		Math::Matrix viewProj = m_sceneDocument->GetCamera().GetViewProjection();
+			
+		Math::Matrix gizmoWorld;
+		Math::Vector3 gizmoPivot;
+			
+		if (m_selectionService->GetGizmoTransform(gizmoWorld, gizmoPivot))
+		{
+			m_gizmoService->SetGizmoPosition(gizmoPivot);
+			m_gizmoService->SetGizmoWorldMatrix(gizmoWorld);
+		}
+		
+		m_gizmoService->Update();
+		m_gizmoService->BuildGeometry(frameIndex);
+		m_gizmoService->Render(&context, frameIndex, viewProj);
+		
+		m_cameraGizmo->BuildCameraGizmoGeometry(frameIndex);
+		m_cameraGizmo->RenderCameraGizmo(&context, frameIndex, m_viewport);
+	}
+
 	void ScenePanel::RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax)
 	{
 		// 1. Setear Pipeline
@@ -612,7 +641,7 @@ namespace Bruno
 		DynamicAllocation alloc = context.AllocateDynamicSpace(sizeof(MarqueeData));
     
 		// Copiar a la memoria persistente (CPU -> Upload Heap)
-		memcpy(alloc.CPUAddress, &data, sizeof(MarqueeData));
+		::memcpy(alloc.CPUAddress, &data, sizeof(MarqueeData));
 
 		// 4. Bindear y Dibujar
 		context.SetConstantBuffer(0, alloc);

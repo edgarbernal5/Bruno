@@ -12,11 +12,11 @@ namespace Bruno
     // Representa un bloque de memoria concedido dentro del Heap
     struct DescriptorAllocation
     {
-        D3D12_CPU_DESCRIPTOR_HANDLE CPU;
-        D3D12_GPU_DESCRIPTOR_HANDLE GPU;
-        uint32_t Index;
-        uint32_t Count;          // Cuántos descriptores tiene este bloque
-        uint32_t DescriptorSize; // Tamaño en bytes de cada descriptor
+        D3D12_CPU_DESCRIPTOR_HANDLE CPU { 0 };
+        D3D12_GPU_DESCRIPTOR_HANDLE GPU { 0 };
+        uint32_t Index{ 0 };
+        uint32_t Count{ 0 };          // Cuántos descriptores tiene este bloque
+        uint32_t DescriptorSize{ 0 }; // Tamaño en bytes de cada descriptor
 
         // Obtener el handle base (offset 0)
         D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return CPU; }
@@ -47,21 +47,20 @@ namespace Bruno
             handle.ptr += (static_cast<SIZE_T>(offset) * DescriptorSize);
             return handle;
         }
+        bool IsValid() const { return Count > 0 && CPU.ptr != 0; }
+        bool IsShaderVisible() const { return IsValid() && GPU.ptr != 0; }
     };
 
     //DescriptorAllocator o DescriptorHeap o DescriptorHeapAllocator
     class DescriptorAllocator
     {
     public:
-        // NUEVO: Constructor que inicializa el Heap
         DescriptorAllocator(GraphicsDevice& device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t capacity, bool isShaderVisible);
         ~DescriptorAllocator() = default;
 
-        // Prohibimos copias para proteger el recurso COM nativo
         DescriptorAllocator(const DescriptorAllocator&) = delete;
         DescriptorAllocator& operator=(const DescriptorAllocator&) = delete;
 
-        // [[nodiscard]] asegura que no asignemos memoria al vacío por accidente
         [[nodiscard]] DescriptorAllocation Allocate(uint32_t count = 1);
         
         ID3D12DescriptorHeap* GetHeap() const { return m_heap.Get(); }

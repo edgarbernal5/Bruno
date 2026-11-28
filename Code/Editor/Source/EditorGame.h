@@ -12,6 +12,7 @@
 
 namespace Bruno
 {
+	class ShadowsPanel;
 	class ProfilerPanel;
 	class BertaWindow;
 	class GraphicsDevice;
@@ -53,6 +54,7 @@ namespace Bruno
 		std::unique_ptr<SceneDocumentPanel> m_sceneDocumentPanel;
 		std::unique_ptr<ContentBrowserPanel> m_contentBrowserPanel;
 		std::unique_ptr<ProfilerPanel> m_profilerPanel;
+		std::unique_ptr<ShadowsPanel> m_shadowsPanel;
 		std::vector<ScenePanel*> m_scenePanels;
 		std::mutex m_scenePanelsMutex{};
 

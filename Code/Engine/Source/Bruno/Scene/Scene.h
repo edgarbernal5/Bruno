@@ -12,11 +12,11 @@ namespace Bruno
 	class GameTimer;
 	class Model;
 	struct ModelNode;
-	struct RenderItem;
 
 	struct SceneObjectBuffer
 	{
-		Math::Matrix WorldViewProjection;
+		Math::Matrix World;
+		Math::Matrix ViewProjection;
 	};
 
 	class Scene
@@ -68,7 +68,7 @@ namespace Bruno
 		friend class Entity;
 
 	private:
-		void CreateModelEntityHierarchy(Entity parent, std::shared_ptr<Model> model, const ModelNode& node);
+		void CreateModelEntityHierarchy(Entity parent, std::shared_ptr<Model> model, const ModelNode& node, std::unordered_map<std::wstring, Entity>& nodeEntityMap);
 		void SortEntities();
 
 		entt::registry m_registry;

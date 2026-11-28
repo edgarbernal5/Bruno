@@ -41,9 +41,7 @@ namespace Bruno
 		for (auto& textBox : m_xyz)
 		{
 			textBox.Create(parent);
-			textBox.SetMultiLine(false);
 			textBox.SetFocusBehavior(Berta::TextFocusBehavior::SelectOnClick);
-			textBox.SetScrollBarVisibility(Berta::ScrollBarVisibility::Hidden);
 
 			Refresh();
 			

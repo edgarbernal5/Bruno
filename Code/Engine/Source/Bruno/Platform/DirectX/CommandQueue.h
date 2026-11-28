@@ -22,7 +22,6 @@ namespace Bruno
 
 		[[nodiscard]] Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetNativeQueue() const { return m_commandQueue; }
         
-		// FIRMAS CORREGIDAS: Reciben en qué frame estamos trabajando
 		[[nodiscard]] Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList(uint32_t frameIndex);
 		[[nodiscard]] Microsoft::WRL::ComPtr<ID3D12CommandAllocator> GetAllocator(uint32_t frameIndex);
 		

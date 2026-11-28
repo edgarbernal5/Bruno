@@ -7,7 +7,6 @@
 #include <Berta/Controls/Button.h>
 
 #include <Bruno/Core/GameTimer.h>
-#include <Bruno/Renderer/RenderItem.h>
 #include <mutex>
 #include <Bruno/Renderer/Camera.h>
 
@@ -18,6 +17,9 @@
 
 namespace Bruno
 {
+	struct ShadowProperties;
+	class CullingSystem;
+	class ShadowSystem;
 	class DebugRenderer;
 	class LinearAllocator;
 	class Model;
@@ -33,8 +35,8 @@ namespace Bruno
 
 	struct SceneSurfaceParameters
 	{
-		DXGI_FORMAT BackBufferFormat{ DXGI_FORMAT_R8G8B8A8_UNORM };
-		DXGI_FORMAT DepthBufferFormat{ DXGI_FORMAT_D32_FLOAT };
+		TextureFormat BackBufferFormat{ TextureFormat::R8G8B8A8_Unorm };
+		TextureFormat DepthBufferFormat{ TextureFormat::D24_Unorm_S8_Uint };
 	};
 
 	class ScenePanel : public Berta::Panel
@@ -79,6 +81,7 @@ namespace Bruno
 		void InitializeMarquee();
 		void SetupCameraGizmoViewport();
 		void UpdateCBs(const GameTimer& timer);
+		void RenderGizmo(GraphicsContext& context, uint32_t frameIndex);
 		void RenderMarquee(GraphicsContext& context, const Math::Vector2& ndcMin, const Math::Vector2& ndcMax);
 		
 		std::unique_ptr<Berta::NestedForm> m_form;
@@ -90,6 +93,9 @@ namespace Bruno
 		EditorGame* m_editorGame;
 		std::shared_ptr<SceneDocument> m_sceneDocument;
 		std::shared_ptr<Scene> m_scene;
+		ShadowSystem* m_shadowSystem;
+		ShadowProperties* m_shadowProperties;
+		CullingSystem* m_cullingSystem;
 		SceneRenderer* m_sceneRenderer { nullptr };
 		
 		std::array<std::unique_ptr<LinearAllocator>, 2> m_dynamicAllocators;
@@ -111,8 +117,8 @@ namespace Bruno
 		std::unique_ptr<Surface> m_surface;
 		CommandQueue* m_commandQueue { nullptr };
 		Math::Viewport m_viewport;
-		Rect m_scissorRect;
-
+		Math::Rectangle m_scissorRect;
+		
 		ID3D12DescriptorHeap* m_srvHeap;
 		
 		Math::Int2 m_lastMousePosition;

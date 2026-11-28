@@ -8,16 +8,25 @@ namespace Bruno
     void HierarchySystem::SetParent(entt::registry& registry, entt::entity child, entt::entity newParent)
     {
         // 1. Validaciones básicas
-        if (child == newParent || child == entt::null) return;
-
+        if (child == newParent || child == entt::null)
+        {
+            return;
+        }
+        
         // 2. Evitar ciclos infinitos en el árbol
-        if (IsDescendantOf(registry, newParent, child)) return;
-
+        if (IsDescendantOf(registry, newParent, child)) 
+        {
+            return;
+        }
+        
         // 3. Remover de la jerarquía anterior si ya tenía un padre
         Unparent(registry, child);
 
         // Si el objetivo era simplemente quitarle el padre, terminamos.
-        if (newParent == entt::null) return;
+        if (newParent == entt::null)
+        {
+            return;
+        }
 
         // 4. Asegurar que ambas entidades tengan el componente (C++17 feature de EnTT)
         auto& childHierarchy = registry.get_or_emplace<HierarchyComponent>(child);
@@ -45,11 +54,17 @@ namespace Bruno
 
     void HierarchySystem::Unparent(entt::registry& registry, entt::entity child)
     {
-        if (child == entt::null) return;
+        if (child == entt::null) 
+        {
+            return;
+        }
 
         // Si no tiene componente o no tiene padre, no hay nada que hacer
         auto* childHierarchy = registry.try_get<HierarchyComponent>(child);
-        if (!childHierarchy || childHierarchy->Parent == entt::null) return;
+        if (!childHierarchy || childHierarchy->Parent == entt::null)
+        {
+            return;
+        }
 
         entt::entity parent = childHierarchy->Parent;
         auto& parentHierarchy = registry.get<HierarchyComponent>(parent);
@@ -87,7 +102,10 @@ namespace Bruno
 
     bool HierarchySystem::IsDescendantOf(entt::registry& registry, entt::entity child, entt::entity prospectiveParent)
     {
-        if (child == entt::null || prospectiveParent == entt::null) return false;
+        if (child == entt::null || prospectiveParent == entt::null)
+        {
+            return false;
+        }
         
         // Subimos por el árbol verificando si encontramos al 'prospectiveParent'
         entt::entity current = child;

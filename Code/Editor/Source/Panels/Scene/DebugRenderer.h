@@ -16,8 +16,10 @@ namespace Bruno
     public:
         DebugRenderer(GraphicsDevice* device, std::shared_ptr<Scene> scene);
         
+        void DrawDirectionalLightGizmo(const Math::Vector3& position, const Math::Vector3& direction, float scale, const Math::Color& color);
         void RenderBoundingBoxes(GraphicsContext* context, const Camera& camera, uint32_t frameIndex);
-    
+        void RenderDirectionalLightGizmos(GraphicsContext* context, const Camera& camera, uint32_t frameIndex);
+        
     private:
         std::unique_ptr<PrimitiveBatch> m_primitiveBatch;
 		std::shared_ptr<Scene> m_scene;

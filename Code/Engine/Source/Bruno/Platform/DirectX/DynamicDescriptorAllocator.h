@@ -4,7 +4,6 @@
 
 namespace Bruno
 {
-    
     class DynamicDescriptorAllocator : public DescriptorAllocator
     {
     public:

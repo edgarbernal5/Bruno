@@ -1,28 +1,32 @@
 ﻿#pragma once
 
 #include <d3d12.h>
-#include <wrl/client.h>
+
+#include "ConstantBufferBase.h"
+#include "DynamicAllocation.h"
+#include "GraphicsContext.h"
+#include "Bruno/Core/Memory.h"
 
 namespace Bruno
 {
-    class GraphicsDevice;
-    
-    class ConstantBuffer
+    template<typename T>
+    class ConstantBuffer : public ConstantBufferBase
     {
     public:
-        ConstantBuffer(GraphicsDevice* device, size_t bufferSize);
-        ~ConstantBuffer();
+        ConstantBuffer() = default;
+        ~ConstantBuffer() = default;
 
-        // Actualiza los datos desde C++ hacia la GPU (sin bloqueos)
-        void Update(const void* data, size_t dataSize);
-
-        [[nodiscard]] D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddress() const
-        { 
-            return m_buffer->GetGPUVirtualAddress(); 
+        // Cero inicializaciones nativas. Todo ocurre al vuelo en O(1)
+        void Update(GraphicsContext& context, const T& data)
+        {
+            constexpr uint32_t alignedSize = GetAlignedConstantBufferSize<T>();
+            
+            DynamicAllocation alloc = context.AllocateDynamicSpace(alignedSize);
+            
+            std::memcpy(alloc.CPUAddress, &data, sizeof(T));
+            
+            // Guardamos la dirección en la variable protegida de la clase base
+            m_gpuAddress = alloc.GPUAddress;
         }
-
-    private:
-        Microsoft::WRL::ComPtr<ID3D12Resource> m_buffer;
-        void* m_mappedData = nullptr;
     };
 }

@@ -7,24 +7,6 @@
 
 namespace Bruno
 {
-	std::map<ModelImporter::TextureType, std::pair<uint32_t, std::string>> ModelImporter::g_textureTypeMappings;
-
-	ModelImporter::ModelImporter()
-	{
-		if (g_textureTypeMappings.size() > 0)
-			return;
-
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeDiffuse] = std::make_pair(aiTextureType_DIFFUSE, "Texture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeSpecularMap] = std::make_pair(aiTextureType_SPECULAR, "SpecularTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeAmbient] = std::make_pair(aiTextureType_AMBIENT, "AmbientTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeEmissive] = std::make_pair(aiTextureType_EMISSIVE, "EmissiveTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeHeightmap] = std::make_pair(aiTextureType_HEIGHT, "HeightTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeNormalMap] = std::make_pair(aiTextureType_NORMALS, "NormalTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeSpecularPowerMap] = std::make_pair(aiTextureType_SHININESS, "SpecularPowerTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeDisplacementMap] = std::make_pair(aiTextureType_DISPLACEMENT, "DisplacementTexture");
-		g_textureTypeMappings[ModelImporter::TextureType::TextureTypeLightMap] = std::make_pair(aiTextureType_LIGHTMAP, "LightMapTexture");
-	}
-
 	bool ModelImporter::TryImport(const AssetMetadata& metadata, AssetImporterContext& context, std::shared_ptr<Asset>& outputAsset)
 	{
 		Assimp::Importer importer;
@@ -36,6 +18,7 @@ namespace Bruno
 			//aiProcess_SortByPType | 
 			aiProcess_FindInvalidData |
 			aiProcess_FindDegenerates |
+			aiProcess_GenSmoothNormals |
 			aiProcess_ConvertToLeftHanded |
 			aiProcess_FlipUVs;
 
@@ -78,10 +61,38 @@ namespace Bruno
 		auto& rootNode = modelNodes.emplace_back();
 		rootNode.Parent = ModelNode::NullNode;
 		ProcessNode(aiScene->mRootNode, 0, modelNodes, meshes, Math::Matrix::Identity);
+		
+		std::vector<ModelLight> modelLights;
+		ProcessLights(aiScene, modelLights);
+		
+		// ==========================================================
+		// Cálculo del Bounding Box Global del Modelo
+		// ==========================================================
+		Math::BoundingBox modelAABB;
+		bool isFirstMesh = true;
 
-		outputAsset = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes));
-		outputAsset->SetHandle(metadata.Handle);
+		for (const auto& mesh : meshes)
+		{
+			Math::BoundingBox transformedSubmeshAABB;
+			mesh->GetBoundingBox().Transform(transformedSubmeshAABB, mesh->GetTransform());
 
+			if (isFirstMesh)
+			{
+				modelAABB = transformedSubmeshAABB;
+				isFirstMesh = false;
+			}
+			else
+			{
+				Math::BoundingBox::CreateMerged(modelAABB, modelAABB, transformedSubmeshAABB);
+			}
+		}
+		
+		std::wstring name = Berta::StringUtils::UTF8ToWide(aiScene->mName.C_Str());
+		auto newModel = std::make_shared<Model>(std::move(vertices), std::move(indices), std::move(materials), std::move(meshes), std::move(modelNodes), std::move(modelLights), modelAABB);
+		newModel->SetHandle(metadata.Handle);
+		newModel->SetName(name);
+
+		outputAsset = std::move(newModel);
 		return true;
 	}
 
@@ -93,7 +104,7 @@ namespace Bruno
 		for (uint32_t i = 0; i < aiMesh->mNumVertices; i++)
 		{
 			auto& vertex = vertices.emplace_back();
-			vertex.Position = { aiMesh->mVertices[i].x, aiMesh->mVertices[i].y, aiMesh->mVertices[i].z };
+			vertex.Position = Math::Vector3 { aiMesh->mVertices[i].x, aiMesh->mVertices[i].y, aiMesh->mVertices[i].z };
 
 			aabbMin.x = std::min<float>(aabbMin.x, vertex.Position.x);
 			aabbMin.y = std::min<float>(aabbMin.y, vertex.Position.y);
@@ -103,16 +114,20 @@ namespace Bruno
 			aabbMax.z = std::max<float>(aabbMax.z, vertex.Position.z);
 
 			if (aiMesh->HasNormals())
-				vertex.Normal = { aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z };
-
+			{
+				vertex.Normal = Math::Vector3 { aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z };
+			}
+				
 			if (aiMesh->HasTangentsAndBitangents())
 			{
-				vertex.Tangent = { aiMesh->mTangents[i].x, aiMesh->mTangents[i].y, aiMesh->mTangents[i].z };
-				vertex.Binormal = { aiMesh->mBitangents[i].x, aiMesh->mBitangents[i].y, aiMesh->mBitangents[i].z };
+				vertex.Tangent = Math::Vector3 { aiMesh->mTangents[i].x, aiMesh->mTangents[i].y, aiMesh->mTangents[i].z };
+				vertex.Binormal = Math::Vector3 { aiMesh->mBitangents[i].x, aiMesh->mBitangents[i].y, aiMesh->mBitangents[i].z };
 			}
 
 			if (aiMesh->HasTextureCoords(0))
-				vertex.Texcoord = { aiMesh->mTextureCoords[0][i].x, aiMesh->mTextureCoords[0][i].y, aiMesh->mTextureCoords[0][i].z };
+			{
+				vertex.Texcoord = Math::Vector3 { aiMesh->mTextureCoords[0][i].x, aiMesh->mTextureCoords[0][i].y, aiMesh->mTextureCoords[0][i].z };
+			}
 		}
 
 		/*uint32_t colorChannelCount = aiMesh->GetNumColorChannels();
@@ -209,34 +224,114 @@ namespace Bruno
 
 	void ModelImporter::ProcessTexturesForMaterial(Material& materialContentItem, aiMaterial* aiMaterial, const std::wstring& directory, AssetImporterContext& context)
 	{
-		for (auto it = g_textureTypeMappings.begin(); it != g_textureTypeMappings.end(); ++it)
+		auto ImportTextureType = [&](aiTextureType type) -> AssetHandle 
 		{
-			aiTextureType mappedTextureType = static_cast<aiTextureType>(it->second.first);
-			uint32_t textureCount = aiMaterial->GetTextureCount(mappedTextureType);
-
-			for (uint32_t textureIndex = 0; textureIndex < textureCount; textureIndex++)
+			if (aiMaterial->GetTextureCount(type) == 0)
 			{
-				aiString textureRelativePath;
-				aiTextureMapping mapping = aiTextureMapping::aiTextureMapping_UV;
-				uint32_t uvIndex = 0;
-				float blend = 0.0f;
-				aiTextureOp operation = aiTextureOp::aiTextureOp_Multiply;
-				aiTextureMapMode mapMode = aiTextureMapMode::aiTextureMapMode_Wrap;
+				return 0;
+			}
 
-				if (aiMaterial->GetTexture(mappedTextureType, textureIndex, &textureRelativePath, &mapping, &uvIndex, &blend, &operation, &mapMode) == AI_SUCCESS)
+			aiString textureRelativePath;
+			if (aiMaterial->GetTexture(type, 0, &textureRelativePath) == AI_SUCCESS)
+			{
+				std::filesystem::path filenameTexture(directory);
+				filenameTexture /= textureRelativePath.C_Str();
+
+				if (std::filesystem::exists(filenameTexture))
 				{
-					std::filesystem::path filenameTexture(directory);
-					filenameTexture /= textureRelativePath.C_Str();
+					// Importa el asset y devuelve el Handle
+					return context.ImportAsset(filenameTexture);
+				}
+			}
+			return 0;
+		};
+		
+		// 1. Extraer Texturas PBR
+		// Primero intentamos BaseColor (PBR), si no, caemos a Diffuse clásico
+		materialContentItem.AlbedoMap = ImportTextureType(aiTextureType_BASE_COLOR);
+		if (materialContentItem.AlbedoMap == 0)
+		{
+			materialContentItem.AlbedoMap = ImportTextureType(aiTextureType_DIFFUSE);
+		}
 
-					if (std::filesystem::exists(filenameTexture))
-					{
-						std::wstringstream relativePathToTextureW;
-						relativePathToTextureW << textureRelativePath.C_Str();
-						std::string textureName = (it->second.second);
+		// Normal Map
+		materialContentItem.NormalMap = ImportTextureType(aiTextureType_NORMALS);
 
-						auto textureHandle = context.ImportAsset(filenameTexture);
-						materialContentItem.TexturesByName[textureName] = textureHandle;
-					}
+		// Metallic / Roughness (Si usas un workflow combinado ej. GLTF)
+		// GLTF suele guardarlo como UNKNOWN o SHININESS en viejas versiones de Assimp.
+		materialContentItem.MetallicRoughnessMap = ImportTextureType(aiTextureType_UNKNOWN); 
+
+		// 2. Extraer Valores Escalares PBR (Colors)
+		aiColor4D color;
+		if (aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
+		{
+			materialContentItem.AlbedoTint = Math::Vector4(color.r, color.g, color.b, color.a);
+		}
+
+		float metallic = 0.0f;
+		if (aiMaterial->Get(AI_MATKEY_METALLIC_FACTOR, metallic) == AI_SUCCESS)
+		{
+			materialContentItem.MetallicFactor = metallic;
+		}
+
+		float roughness = 0.5f;
+		if (aiMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) == AI_SUCCESS)
+		{
+			materialContentItem.RoughnessFactor = roughness;
+		}
+	}
+
+	void ModelImporter::ProcessLights(const aiScene* aiScene, std::vector<ModelLight>& outLights)
+	{
+		if (!aiScene->HasLights())
+		{
+			return;
+		}
+		
+		for (uint32_t i = 0; i < aiScene->mNumLights; i++)
+		{
+			aiLight* aiLight = aiScene->mLights[i];
+			
+			if (aiLight->mType == aiLightSource_DIRECTIONAL)
+			{
+				auto& newLight = outLights.emplace_back();
+				newLight.LightType = ModelLightType::DirectionalLight;
+				newLight.NodeName = Berta::StringUtils::UTF8ToWide(aiLight->mName.C_Str());
+				
+				// Assimp a veces premultiplica la intensidad en el color difuso. 
+				// Separamos la intensidad normalizando el color.
+				Math::Vector3 rawColor(aiLight->mColorDiffuse.r, aiLight->mColorDiffuse.g, aiLight->mColorDiffuse.b);
+            
+				newLight.Intensity = rawColor.Length();
+				if (newLight.Intensity > 0.0001f)
+				{
+					rawColor.Normalize();
+				}
+				newLight.Color = rawColor;
+
+				Math::Vector3 localDirection(aiLight->mDirection.x, aiLight->mDirection.y, aiLight->mDirection.z);
+            
+				aiNode* lightNode = aiScene->mRootNode->FindNode(aiLight->mName);
+				Math::Matrix globalTransform = Math::Matrix::Identity;
+            
+				if (lightNode)
+				{
+					Math::Matrix localTransform = ToMatrix(lightNode->mTransformation);
+
+					DirectX::XMVECTOR scale;
+					DirectX::XMVECTOR rotation;
+					DirectX::XMVECTOR translation;
+            
+					DirectX::XMMatrixDecompose(&scale, &rotation, &translation, localTransform);
+
+					newLight.LocalPosition = translation;
+					newLight.LocalRotation = rotation;
+				}
+				else
+				{
+					// Fallback de seguridad por si el exportador (ej. Blender/Maya) rompió el enlace del nodo
+					newLight.LocalPosition = Math::Vector3 { aiLight->mPosition.x, aiLight->mPosition.y, aiLight->mPosition.z };
+					newLight.LocalRotation = Math::Quaternion::Identity; 
 				}
 			}
 		}

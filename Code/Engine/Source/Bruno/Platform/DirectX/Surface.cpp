@@ -13,7 +13,7 @@ namespace Bruno
         m_parameters(parameters)
     {
         m_swapChain = std::make_unique<SwapChain>(device, parameters);
-        m_depthBuffer = std::make_unique<DepthBuffer>(device, parameters.Width, parameters.Height);
+        m_depthBuffer = std::make_unique<DepthBuffer>(device, parameters.Width, parameters.Height, parameters.DepthBufferFormat);
     }
 
     Surface::~Surface()
@@ -26,29 +26,14 @@ namespace Bruno
         return m_swapChain->GetCurrentBackBufferIndex();
     }
 
-    ID3D12Resource* Surface::GetCurrentBackBuffer() const
-    {
-        return m_swapChain->GetCurrentBackBuffer().Get();
-    }
-
-    Texture2D* Surface::GetCurrentRenderTarget() const
+    ColorBuffer* Surface::GetCurrentRenderTarget() const
     {
         return m_swapChain->GetCurrentRenderTarget();
-    }
-
-    D3D12_CPU_DESCRIPTOR_HANDLE Surface::GetCurrentRenderTargetView() const
-    {
-        return m_swapChain->GetCurrentRenderTargetView();
     }
 
     DepthBuffer* Surface::GetDepthBuffer() const
     {
         return m_depthBuffer.get();
-    }
-
-    D3D12_CPU_DESCRIPTOR_HANDLE Surface::GetDepthBufferView() const
-    {
-        return m_depthBuffer->GetView();
     }
 
     void Surface::Present(bool vsync)

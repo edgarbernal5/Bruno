@@ -10,10 +10,17 @@ namespace Bruno
     {
     public:
         ProfilerPanel(Berta::Window* window);
+        ~ProfilerPanel() override;
         
     private:
 		Berta::Layout m_layout;
         Berta::Label m_visibleEntitiesLabel;
         Berta::Label m_totalEntitiesLabel;
+        
+        Berta::Label m_cpuCullingTimeMsLabel;
+        Berta::Label m_cpuTotalRenderTimeMsLabel;
+        Berta::Label m_gpuRenderTimeMsLabel;
+        
+        Berta::EventHandlerId m_tickCallbackId;
     };
 }

@@ -14,6 +14,7 @@
 
 #include "AssetEditors/AssetEditorService.h"
 #include "Panels/ProfilerPanel.h"
+#include "Panels/Shadows/ShadowsPanel.h"
 
 namespace Bruno
 {
@@ -148,7 +149,7 @@ namespace Bruno
 		auto scene = std::make_shared<Scene>();
 		auto sceneDocument = std::make_shared<SceneDocument>(scene, GetEditorAssetManager());
 		//auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\Car\\Car.fbx").Handle);
-		auto model = m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\sponza\\sponza.obj").Handle);
+		auto model= m_assetManager->GetAsset<Model>(m_editorAssetManager->GetMetadata(L"Models\\sponza\\sponza.obj").Handle);
 		sceneDocument->InstantiateModel(model);
 		
 		m_sceneDocumentPanel = std::make_unique<SceneDocumentPanel>(form, this, sceneDocument);
@@ -160,11 +161,12 @@ namespace Bruno
 			});
 		
 		m_profilerPanel = std::make_unique<ProfilerPanel>(form);
+		m_shadowsPanel = std::make_unique<ShadowsPanel>(form, sceneDocument->GetShadowProperties());
 
 		m_layout.AddPaneTab("scene-doc-pane", "tab-scene", std::move(m_sceneDocumentPanel), "", Berta::DockPosition::Tab);
 		m_layout.AddPaneTab("content-browser-pane", "tab-content-browser", std::move(m_contentBrowserPanel), "scene-doc-pane", Berta::DockPosition::Right);
 		m_layout.AddPaneTab("profiler-pane", "tab-profiler", std::move(m_profilerPanel), "content-browser-pane", Berta::DockPosition::Down);
-
+		m_layout.AddPaneTab("profiler-pane", "tab-shadow-props", std::move(m_shadowsPanel));
 		m_layout.Apply();
 
 		form.GetEvents().KeyReleased.Connect([this](const Berta::ArgKeyboard& args)

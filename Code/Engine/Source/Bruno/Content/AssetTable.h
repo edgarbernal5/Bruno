@@ -13,11 +13,11 @@ namespace Bruno
 		auto begin() const { return m_assetTable.cbegin(); }
 		auto end() const { return m_assetTable.cend(); }
 
-		AssetMetadata& operator[](const AssetHandle handle);
-		AssetMetadata& Get(const AssetHandle handle);
-		const AssetMetadata& Get(const AssetHandle handle) const;
+		AssetMetadata& operator[](const AssetHandle& handle);
+		AssetMetadata& Get(const AssetHandle& handle);
+		const AssetMetadata& Get(const AssetHandle& handle) const;
 
-		bool Contains(const AssetHandle handle) const;
+		bool Contains(const AssetHandle& handle) const;
 
 	private:
 		std::unordered_map<AssetHandle, AssetMetadata> m_assetTable;

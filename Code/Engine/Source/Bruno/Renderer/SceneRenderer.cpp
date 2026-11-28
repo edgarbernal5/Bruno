@@ -1,11 +1,15 @@
 #include "brpch.h"
 #include "SceneRenderer.h"
 
+#include "Bruno/Renderer/MaterialData.h"
+#include "Bruno/Renderer/MaterialManager.h"
+#include "Model.h"
 #include "PrimitiveBatch.h"
 #include "PSOCache.h"
 #include "RootSignatureLibrary.h"
 #include "Bruno/Scene/Scene.h"
-#include "Bruno/Renderer/RenderItem.h"
+
+#include "Bruno/Platform/DirectX/DepthBuffer.h"
 #include "Bruno/Renderer/Material.h"
 
 #include "Bruno/Platform/DirectX/Texture2D.h"
@@ -14,203 +18,310 @@
 #include "Bruno/Platform/DirectX/Shader.h"
 
 #include "Bruno/Content/AssetManager.h"
+#include "Bruno/Core/JobSystem.h"
 #include "Bruno/Core/Memory.h"
 #include "Bruno/Core/ScopedCpuTimer.h"
+#include "Bruno/Platform/DirectX/DynamicAllocation.h"
 #include "Bruno/Platform/DirectX/Profiler.h"
 #include "Bruno/Platform/DirectX/VertexTypes.h"
 #include "Bruno/Renderer/Camera.h"
-#include "Bruno/Scene/Systems/FrustumCulling.h"
+#include "Bruno/Scene/Systems/CullingSystem.h"
+#include "Deferred/SceneRendererDeferred.h"
+#include "Forward/ForwardRenderer.h"
+#include "Shadows/EnumTypes.h"
+#include "Shadows/ShadowMapArray.h"
+#include "Shadows/ShadowSystem.h"
 
 namespace Bruno
 {
-	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<FrustumCulling> frustumCulling, AbstractAssetManager* assetManager) :
+	SceneRenderer::SceneRenderer(std::shared_ptr<Scene> scene, std::shared_ptr<CullingSystem> frustumCulling, AbstractAssetManager* assetManager, ShadowProperties* shadowProperties) :
 		m_scene(scene),
 		m_frustumCulling(frustumCulling),
-		m_assetManager(assetManager)
+		m_assetManager(assetManager),
+		m_shadowProperties(shadowProperties)
 	{
-		auto& device = Bruno::Graphics::GetDevice();
+		auto& device = Graphics::GetDevice();
 		
-		InitializeOpaqueRootSignature(device);
-
-		InitializeOpaquePSO(device);
+		m_globalSrvHeap = &device->GetSRVDescriptorAllocator();
+		
+		InitializeShadowArray(device);
+		InitializeShadowPipeline(device);
+		
+		m_materialManager = std::make_shared<MaterialManager>(*device, device->GetSRVDescriptorAllocator());
+		/*
+		*SceneRendererDeferred(
+			GraphicsDevice* device,
+			std::shared_ptr<Scene> scene,
+			std::shared_ptr<MaterialManager> materialManager,
+			std::shared_ptr<ShadowMapArray> shadowMapArray,
+			AbstractAssetManager* assetManager,
+			ShadowProperties* shadowProperties,
+			uint32_t initialWidth = 1280,
+			uint32_t initialHeight = 720
+		);
+		 */
+		m_forwardRenderer = std::make_unique<ForwardRenderer>(device, scene, m_materialManager, m_shadowMapArray, assetManager, shadowProperties);
+		m_deferredRenderer = std::make_unique<SceneRendererDeferred>(device, scene, m_materialManager, m_shadowMapArray, assetManager, shadowProperties);
 	}
+	
+	SceneRenderer::~SceneRenderer() = default;
 
 	void SceneRenderer::InitEntitiesForRender()
 	{
-		auto& device = Bruno::Graphics::GetDevice();
-		
-		size_t objectSize = AlignU32(sizeof(SceneObjectBuffer), 256);
-		
-		// Buscamos todas las entidades que tienen un Mesh y un Transform
 		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
 		for (auto& entt : entities)
 		{
-			Entity entity = { entt, m_scene.get() };
-			
-			// Si la entidad no tiene sus Constant Buffers, se los creamos
-			if (!entity.HasComponent<CBVComponent>()) 
-			{
-				CBVComponent cbv;
-				for (int i = 0; i < 2; ++i)
-				{
-					cbv.TransformCB[i] = std::make_shared<ConstantBuffer>(device, objectSize);
-				}
-                
-				// Le "pegamos" el componente de memoria de video a la entidad
-				entity.AddComponent<CBVComponent>(std::move(cbv));
-			}
-			const auto& modelComponent = entities.get<ModelComponent>(entt);
+			auto& modelComponent = entities.get<ModelComponent>(entt);
 			uint32_t meshIndex = modelComponent.MeshIndex;
 			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
 			auto& meshes = model->GetMeshes();
 			auto& mesh = meshes[meshIndex];
 			
-			auto materialHandle = modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
-			auto material = m_assetManager->GetAsset<Material>(materialHandle);
-			material->BuildDescriptors(device, &device->GetSRVDescriptorAllocator(), m_assetManager);
-			
-			material->SetPipelineState(m_opaquePSO, m_opaqueRootSignature);
+			auto materialHandle= modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
+			if (materialHandle != 0)
+			{
+				// Le pedimos el material real al AssetManager
+				std::shared_ptr<Material> materialAsset = m_assetManager->GetAsset<Material>(materialHandle);
+            
+				if (materialAsset)
+				{
+					RegisterMaterialToGPU(materialAsset);
+					modelComponent.RuntimeMaterialIndex = materialAsset->RuntimeMaterialIndex;
+				}
+			}
 		}
 	}
-	
-	void SceneRenderer::InitializeOpaqueRootSignature(GraphicsDevice* device)
+
+	void SceneRenderer::BeginFrame(GraphicsDevice* device)
 	{
-		auto prototypeSig = std::make_shared<RootSignature>(*device);
-
-		// Parámetro 0: Constant Buffer View en b0 (Matriz MVP)
-		prototypeSig->AddConstantBufferView(0, 0, ShaderVisibility::Vertex);
-
-		// Parámetro 1: Tabla de Descriptores para 1 textura en t0 
-		prototypeSig->AddDescriptorTableSRV(1, 0, 0, ShaderVisibility::Pixel);
-
-		// Sampler: Filtro lineal en s0
-		prototypeSig->AddStaticSampler(
-			0, 
-			0, 
-			TextureFilter::Linear, 
-			TextureAddressMode::Wrap, 
-			ShaderVisibility::Pixel
-		);
-
-		m_opaqueRootSignature = RootSignatureLibrary::GetOrCreate(prototypeSig);
+		if (m_shadowMapArray->GetNumCascades() != m_shadowProperties->m_numCascades || m_shadowMapArray->GetResolution() != m_shadowProperties->m_resolution)
+		{
+			device->Flush();
+			m_shadowMapArray->Resize(device, device->GetSRVDescriptorAllocator(), device->GetDSVDescriptorAllocator(), m_shadowProperties->m_resolution, m_shadowProperties->m_numCascades);
+		}
+		
+		if (m_shadowProperties->m_depthBias != m_lastDepthBias || m_shadowProperties->m_slopeScaledDepthBias != m_lastSlopeScaledDepthBias)
+		{
+			InitializeShadowPipeline(device);
+		}
 	}
 
-	void SceneRenderer::InitializeOpaquePSO(GraphicsDevice* device)
+	void SceneRenderer::RenderDeferred(GraphicsContext* context, Camera& camera, uint32_t frameIndex, ColorBuffer* targetRenderTarget, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)
 	{
-		GraphicsPipelineStateDesc psoDesc = {};
-		// Definir el Input Layout (DEBE COINCIDIR CON ModelVertex Y CON EL HLSL)
-		psoDesc.RootSignature = m_opaqueRootSignature.get();
-		psoDesc.InputLayout = VertexPositionNormalTexture::GetLayout();
+		m_deferredRenderer->Render(context, camera, frameIndex, targetRenderTarget, cascades, cullingData);
+	}
+
+	void SceneRenderer::RenderForward(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)
+	{
+		m_forwardRenderer->Render(context, camera, frameIndex, cascades, cullingData);
+	}
+
+	void SceneRenderer::RenderShadows(GraphicsContext* context, Camera& camera, uint32_t frameIndex, const std::vector<CascadeData>& cascades, const FrameCullingResults& cullingData)
+	{
+		context->TransitionResource(m_shadowMapArray.get(), ResourceState::DepthWrite);
+
+		context->SetPipelineState(m_shadowPSO.get());
+		context->SetRootSignature(m_shadowRootSig.get());
+
+		Math::Viewport cascadeViewport = { 0, 0, static_cast<float>(m_shadowProperties->m_resolution), static_cast<float>(m_shadowProperties->m_resolution), 0.0f, 1.0f };
+		Math::Rectangle cascadeScissor = { 0, 0, static_cast<long>(m_shadowProperties->m_resolution), static_cast<long>(m_shadowProperties->m_resolution) };
 		
-        psoDesc.VertexShaderDesc = { L"Shaders/Opaque.hlsl", L"VSMain", L"vs_6_0" };
-        psoDesc.PixelShaderDesc = { L"Shaders/Opaque.hlsl", L"PSMain", L"ps_6_0" };
-		
-		psoDesc.RasterizerState.CullMode = CullMode::Back;
-		psoDesc.RasterizerState.FillMode = FillMode::Solid;
-		psoDesc.RasterizerState.FrontCounterClockwise = true;
+		for (uint32_t i = 0; i < m_shadowProperties->m_numCascades; ++i) 
+		{
+			// Enlazar SOLO la capa de esta cascada (FirstArraySlice)
+			context->SetRenderTargetsSlice(0, nullptr, m_shadowMapArray.get(), i);
         
-        psoDesc.Topology = PrimitiveTopology::TriangleList;
-    
-        // Formatos de Salida (DEBEN coincidir con tu SwapChain y DepthBuffer)
-        psoDesc.NumRenderTargets = 1;
-        psoDesc.RTVFormats[0] = TextureFormat::R8G8B8A8_Unorm;
-        psoDesc.DSVFormat = TextureFormat::D24_Unorm_S8_Uint;
-		
-		m_opaquePSO = PSOCache::GetOrCreate(device, psoDesc);
-	}
+			context->ClearDepthSlice(m_shadowMapArray.get(), i);
 
-	void SceneRenderer::RenderScene(GraphicsContext* graphicsContext, Camera& camera, uint32_t frameIndex)
-	{
-		ScopedCpuTimer totalCpuTimer(&Profiler::Get().Stats.CpuTotalRenderTimeMs);
-		
-		Profiler::Get().Stats.ResetCounters();
-		
-		ID3D12GraphicsCommandList* cmdList = graphicsContext->GetNative();
-		{
-			ScopedCpuTimer cullingTimer(&Profiler::Get().Stats.CpuCullingTimeMs);
-			m_frustumCulling->Update();
-			Profiler::Get().Stats.TotalEntities = m_frustumCulling->GetTotalEntites();
-			Profiler::Get().Stats.RenderedEntities = m_frustumCulling->GetTotalVisibleEntities();
-		}
-		auto& visibleEntities = m_frustumCulling->GetVisibleEntities();
-		
-		VertexBuffer* currentVB = nullptr;
-		GraphicsPipelineState* currentPSO = nullptr;
-		
-		// 2. --- RENDERIZADO GPU ---
-		Profiler::Get().StartGpuTimer(cmdList);
-		
-		for (Entity entity : visibleEntities)
-		{
-			const auto& modelComponent = entity.GetComponent<ModelComponent>();
-			const auto& cbv = entity.GetComponent<CBVComponent>();
-			
-			auto model = m_assetManager->GetAsset<Model>(modelComponent.ModelHandle);
+			context->SetViewport(cascadeViewport);
+			context->SetScissorRect(cascadeScissor);
 
-			uint32_t meshIndex = modelComponent.MeshIndex;
-			auto& meshes = model->GetMeshes();
-			auto& mesh = meshes[meshIndex];
-			
-			auto materialHandle = modelComponent.Materials->GetMaterial(mesh->GetMaterialIndex());
-			auto material = m_assetManager->GetAsset<Material>(materialHandle);
-			
-			AssetHandle textureHandle{ 0 };
-			
-			if (material)
+			const auto& visibleEntities = cullingData.Cascades[i];
+        
+			for (auto entt : visibleEntities) 
 			{
-				auto textIt = material->TexturesByName.find("Texture");
-				if (textIt != material->TexturesByName.end())
-				{
-					textureHandle = textIt->second;
-				}
-			}
-			
-			auto texture = m_assetManager->GetAsset<Texture2D>(textureHandle);
-			if (texture != nullptr)
-			{
+				Entity entity { entt, m_scene.get() };
+				const auto& transform = entity.GetComponent<TransformComponent>();
+				const auto& modelComp = entity.GetComponent<ModelComponent>();
+
+				ShadowConstants constants;
+
+				constants.World = transform.WorldTransform.Transpose();
+				constants.LightViewProj = cascades[i].LightViewProj.Transpose();
+
+				// Enviar a la GPU (b0)
+				context->SetPushConstants(0, sizeof(ShadowConstants) / 4, &constants, 0);
+
+				// Extraer buffers y dibujar				
+				auto model = m_assetManager->GetAsset<Model>(modelComp.ModelHandle);
+				uint32_t meshIndex = modelComp.MeshIndex;
+				auto& meshes = model->GetMeshes();
+				auto& mesh = meshes[meshIndex];
+				
 				auto& indexBuffer = model->GetIndexBuffer();
 				auto& vertexBuffer = model->GetVertexBuffer();
-				if (currentVB != vertexBuffer.get())
-				{
-					graphicsContext->SetVertexBuffer(0, vertexBuffer.get());
-					graphicsContext->SetIndexBuffer(indexBuffer.get());
-					currentVB = vertexBuffer.get();
-				}
 				
-				if (currentPSO != material->GetPSO().get())
-				{
-					graphicsContext->SetPipelineState(material->GetPSO().get());
-					currentPSO = material->GetPSO().get();
-				}
-				graphicsContext->SetRootSignature(material->GetRootSignature().get());
+				context->SetVertexBuffer(0, vertexBuffer.get());
+				context->SetIndexBuffer(indexBuffer.get());
 				
-				// Enlazar la tabla de texturas (Parámetro 1 en nuestra Root Signature)
-				graphicsContext->SetDescriptorTable(1, material->GetTextureDescriptorTable());
+				context->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 				
-				Math::Matrix world = m_scene->GetWorldSpaceMatrix(entity);
-				Math::Matrix wvp = (world * camera.GetViewProjection()).Transpose();
-				
-				SceneObjectBuffer objConstants;
-				objConstants.WorldViewProjection = wvp;
-				cbv.TransformCB[frameIndex]->Update(&objConstants, sizeof(SceneObjectBuffer));
-				
-				graphicsContext->SetConstantBuffer(0, cbv.TransformCB[frameIndex].get());
-				graphicsContext->SetPrimitiveTopology(PrimitiveTopology::TriangleList);
-				graphicsContext->DrawIndexedInstanced(mesh->GetIndexCount(),
-					1,
-					mesh->GetBaseIndex(),
-					mesh->GetBaseVertex(),
-					0);
-				
-				Profiler::Get().Stats.DrawCalls++;
-				Profiler::Get().Stats.TriangleCount += (mesh->GetIndexCount() / 3);
+				context->DrawIndexedInstanced(mesh->GetIndexCount(),
+												  1,
+												  mesh->GetBaseIndex(),
+												  mesh->GetBaseVertex(),
+												  0);
 			}
 		}
-		
-		Profiler::Get().StopGpuTimer(cmdList);
-		
-		// Le ordenamos a la GPU copiar los tiempos al buffer leíble
-		Profiler::Get().ResolveGpuTimestamps(cmdList);
 	}
 
+	void SceneRenderer::Resize(uint32_t width, uint32_t height)
+	{
+		if (m_deferredRenderer)
+		{
+			m_deferredRenderer->Resize(width, height);
+		}
+	}
+
+	void SceneRenderer::InitializeShadowArray(GraphicsDevice* device)
+	{
+		m_shadowMapArray = std::make_shared<ShadowMapArray>();
+		m_shadowMapArray->Initialize(device, device->GetSRVDescriptorAllocator(), device->GetDSVDescriptorAllocator(), m_shadowProperties->m_resolution, m_shadowProperties->m_numCascades);
+	}
+
+	void SceneRenderer::InitializeShadowPipeline(GraphicsDevice* device)
+	{
+		auto prototypeSig = std::make_shared<RootSignature>(*device);
+		
+		// b0: ShadowConstants
+		prototypeSig->AddConstants(sizeof(ShadowConstants) / 4, 0, 0, ShaderVisibility::Vertex);
+    
+		m_shadowRootSig = RootSignatureLibrary::GetOrCreate(prototypeSig);
+		
+		GraphicsPipelineStateDesc shadowDesc = {};
+		shadowDesc.RootSignature = m_shadowRootSig.get();
+    
+		// Solo cargamos el Vertex Shader. El Pixel Shader queda en nullptr/vacío.
+		shadowDesc.VertexShaderDesc = { L"Shaders/ShadowMap.hlsl", L"VSMain", L"vs_6_0" };
+    
+		shadowDesc.InputLayout = VertexPosition::GetLayout();
+		shadowDesc.Topology = PrimitiveTopology::TriangleList;
+    
+		// Cero Render Targets, solo usamos el Depth Stencil
+		shadowDesc.NumRenderTargets = 0;
+		shadowDesc.DSVFormat = TextureFormat::D32_Float;
+    
+		shadowDesc.DepthState.Mode = DepthMode::ReadWrite;
+		shadowDesc.DepthState.Func = ComparisonFunc::Less;
+		
+		shadowDesc.RasterizerDesc.FillMode = FillMode::Solid;
+		shadowDesc.RasterizerDesc.CullMode = CullMode::Back;
+		
+		// Ajustes AAA: Hardware Depth Bias
+		// Desplaza ligeramente la geometría hacia atrás desde el punto de vista de la luz
+		shadowDesc.RasterizerDesc.DepthBias = m_shadowProperties->m_depthBias;         // Unidades internas
+		shadowDesc.RasterizerDesc.DepthBiasClamp = 0.0f;
+		shadowDesc.RasterizerDesc.SlopeScaledDepthBias = m_shadowProperties->m_slopeScaledDepthBias; // Mayor inclinación = Mayor Bias
+		shadowDesc.RasterizerDesc.DepthClipEnable = false;
+		
+		m_lastDepthBias = m_shadowProperties->m_depthBias;
+		m_lastSlopeScaledDepthBias = m_shadowProperties->m_slopeScaledDepthBias;
+		
+		m_shadowPSO = PSOCache::GetOrCreate(device, shadowDesc);
+	}
+
+	void SceneRenderer::RegisterMaterialToGPU(std::shared_ptr<Material> matAsset)
+	{
+		// Si ya tiene un índice válido en caché, lo ignoramos
+		if (matAsset->RuntimeMaterialIndex != 0xFFFFFFFF)
+		{
+			return; 
+		}
+
+		// 1. Creamos la estructura alineada para la GPU
+		MaterialData gpuData;
+		gpuData.AlbedoTint = matAsset->AlbedoTint;
+		gpuData.MetallicFactor = matAsset->MetallicFactor;
+		gpuData.RoughnessFactor = matAsset->RoughnessFactor;
+
+		// 2. Resolvemos las texturas reales buscando en tu AssetManager
+		if (matAsset->AlbedoMap != 0) 
+		{
+			auto tex = m_assetManager->GetAsset<Texture2D>(matAsset->AlbedoMap);
+			// Obtenemos el índice Bindless que la textura guardó al nacer en el Mega Heap
+			gpuData.AlbedoTextureIndex = tex->GetBindlessIndex();
+		}
+		else 
+		{
+			gpuData.AlbedoTextureIndex = 0xFFFFFFFF;
+		}
+		
+		if (matAsset->NormalMap != 0) 
+		{
+			auto tex = m_assetManager->GetAsset<Texture2D>(matAsset->NormalMap);
+			gpuData.NormalTextureIndex = tex->GetBindlessIndex();
+		}
+		else 
+		{
+			gpuData.NormalTextureIndex = 0xFFFFFFFF;
+		}
+
+		// 3. Enviamos esta data al MaterialManager global y guardamos la llave
+		matAsset->RuntimeMaterialIndex = m_materialManager->CreateMaterial(gpuData);
+	}
+
+	void SceneRenderer::DrawBatch(GraphicsContext* graphicsContext, const std::vector<entt::entity>& visibleEntities)
+	{
+		if (visibleEntities.empty())
+		{
+			return;
+		}
+		
+		auto entities = m_scene->GetAllEntitiesWith<TransformComponent, ModelComponent>();
+		
+		AssetHandle currentModel = 0;
+		for (entt::entity entity : visibleEntities)
+		{
+			const auto& transform = entities.get<TransformComponent>(entity);
+			const auto& modelComp = entities.get<ModelComponent>(entity);
+
+			if (modelComp.RuntimeMaterialIndex == 0xFFFFFFFF)
+			{
+				continue;
+			}
+			
+			auto model = m_assetManager->GetAsset<Model>(modelComp.ModelHandle);
+			uint32_t meshIndex = modelComp.MeshIndex;
+			auto& meshes = model->GetMeshes();
+			auto& mesh = meshes[meshIndex];
+			
+			graphicsContext->SetPushConstants(2, modelComp.RuntimeMaterialIndex, 0);
+			
+			auto& indexBuffer = model->GetIndexBuffer();
+			auto& vertexBuffer = model->GetVertexBuffer();
+			
+			if (modelComp.ModelHandle != currentModel)
+			{
+				graphicsContext->SetVertexBuffer(0, vertexBuffer.get());
+				graphicsContext->SetIndexBuffer(indexBuffer.get());
+
+				currentModel = modelComp.ModelHandle;
+			}
+			
+			Math::Matrix worldMatrix = transform.WorldTransform;
+        
+			DynamicAllocation alloc = graphicsContext->AllocateDynamicSpace(sizeof(Math::Matrix));
+			memcpy(alloc.CPUAddress, &worldMatrix, sizeof(Math::Matrix));
+
+			graphicsContext->SetConstantBuffer(0, alloc);               
+			graphicsContext->SetPushConstant(1, modelComp.RuntimeMaterialIndex, 0);
+
+			graphicsContext->DrawIndexedInstanced(mesh->GetIndexCount(),
+			                                      1,
+			                                      mesh->GetBaseIndex(),
+			                                      mesh->GetBaseVertex(),
+			                                      0);
+
+		}
+	}
 }

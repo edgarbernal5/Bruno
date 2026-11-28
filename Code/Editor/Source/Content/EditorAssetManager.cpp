@@ -78,7 +78,7 @@ namespace Bruno
 
 	void EditorAssetManager::ProcessDirectory(const std::wstring& directoryPath)
 	{
-		for (auto entry : std::filesystem::directory_iterator(directoryPath))
+		for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
 		{
 			if (entry.is_directory())
 			{
@@ -105,7 +105,7 @@ namespace Bruno
 		return g_nullMetadata;
 	}
 
-	AssetMetadata& EditorAssetManager::GetMetadata(AssetHandle handle)
+	AssetMetadata& EditorAssetManager::GetMetadata(const AssetHandle& handle)
 	{
 		if (m_assetTable.Contains(handle))
 		{
@@ -153,7 +153,7 @@ namespace Bruno
 		return AssetType::None;
 	}
 
-	bool EditorAssetManager::IsMemoryAsset(AssetHandle handle)
+	bool EditorAssetManager::IsMemoryAsset(const AssetHandle& handle)
 	{
 		return (m_memoryAssets.find(handle) != m_memoryAssets.end());
 	}

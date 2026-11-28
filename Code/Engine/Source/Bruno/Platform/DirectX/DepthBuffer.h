@@ -1,32 +1,38 @@
 ﻿#pragma once
-#include "GraphicsDevice.h"
+
 #include <wrl.h>
 #include <cstdint>
 
+#include "DescriptorAllocator.h"
+#include "Texture2D.h"
+
 namespace Bruno
 {
-    class DepthBuffer
+    enum class TextureFormat;
+    class GraphicsDevice;
+    
+    class DepthBuffer : public Texture2D
     {
+        BR_RTTI_DECLARATION(DepthBuffer, Texture2D);
+        
     public:
-        DepthBuffer(GraphicsDevice& device, uint32_t width, uint32_t height);
-        ~DepthBuffer() = default;
+        DepthBuffer(GraphicsDevice& device, uint32_t width, uint32_t height, TextureFormat format);
+        ~DepthBuffer() override;
 
         void Resize(uint32_t width, uint32_t height);
 
-        [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetView() const
-        {
-            return m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
-        }
+        // Devuelve un handle ligero asignado desde un pool global en la inicialización
+        [[nodiscard]] const DescriptorAllocation& GetDSVAllocation() const { return m_dsvHandle; }
+    
+        // Si necesitas leerlo en un shader (SSAO, Shadows)
+        //[[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const { return m_srvHandle.CPU; }
         
-        [[nodiscard]] ID3D12Resource* GetResource() const { return m_depthTexture.Get(); }
-
     private:
         void CreateResourceAndDescriptor();
         
         GraphicsDevice& m_device;
-        Microsoft::WRL::ComPtr<ID3D12Resource> m_depthTexture;
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_dsvHeap;
-        uint32_t m_width;
-        uint32_t m_height;
+       
+        DescriptorAllocation m_dsvHandle;
+        
     };
 }

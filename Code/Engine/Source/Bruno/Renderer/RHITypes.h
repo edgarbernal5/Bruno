@@ -27,7 +27,8 @@ namespace Bruno
         PixelShaderResource,
         CopyDest,
         CopySource,
-        Present
+        Present,
+        GenericRead
     };
     
     enum class CullMode : uint8_t
@@ -36,6 +37,7 @@ namespace Bruno
         Front, 
         Back
     };
+    
     enum class FillMode : uint8_t
     {
         Solid,
@@ -49,6 +51,18 @@ namespace Bruno
         Additive 
     };
     
+    
+    struct RasterizerState
+    {
+        CullMode CullMode = CullMode::Back;
+        FillMode FillMode = FillMode::Solid;
+        int DepthBias = 0;
+        float DepthBiasClamp = 0.0f;
+        float SlopeScaledDepthBias = 0.0f;
+        bool FrontCounterClockwise = true;
+        bool DepthClipEnable = true;
+    };
+    
     enum class ShaderVisibility : uint8_t
     {
         All, 
@@ -56,11 +70,18 @@ namespace Bruno
         Pixel, 
         Geometry
     };
+    
     enum class TextureFilter : uint8_t
     {
         Point,          // Pixel art, texturas crudas sin interpolación
         Linear,         // Suavizado estándar (Bilineal/Trilineal)
-        Anisotropic     // Máxima calidad para texturas vistas en ángulo (ej. el suelo)
+        Anisotropic,     // Máxima calidad para texturas vistas en ángulo (ej. el suelo)
+        
+        // --- Filtros de Comparación (Para Shadow Maps / PCF) ---
+        Comparison_Point,                   // Sombras duras (sin interpolación PCF)
+        Comparison_Linear,                  // Sombras suaves PCF (Bilineal con Mipmaps lineales)
+        Comparison_MinMag_Linear_MipPoint,  // Sombras suaves PCF optimizado (Bilineal sin Mipmaps)
+        Comparison_Anisotropic              // Comparación anisotrópica (muy poco común para sombras)
     };
 
     enum class TextureAddressMode : uint8_t
@@ -77,8 +98,10 @@ namespace Bruno
         ReadOnly,  // Z-Buffer activado pero no escribe (Partículas, UI transparente)
         None       // Z-Buffer desactivado (UI, Gizmos sobrepuestos)
     };
+    
     enum class ComparisonFunc : uint8_t
     {
+        None,
         Never,
         Less,
         Equal,
@@ -88,6 +111,7 @@ namespace Bruno
         GreaterEqual,
         Always
     };
+    
     enum class TextureFormat
     {
         Unknown,
@@ -106,7 +130,8 @@ namespace Bruno
     };
 
     // Estructura para el Multi-Sample Anti-Aliasing (MSAA)
-    struct MultiSampleState {
+    struct MultiSampleState
+    {
         uint32_t Count = 1;   // 1 = Sin Anti-Aliasing. (Opciones: 2, 4, 8)
         uint32_t Quality = 0; // Depende del hardware
     };
@@ -124,17 +149,6 @@ namespace Bruno
         // LocalSignatureForRaytracing = 1 << 1
     };
     BR_DEFINITION_FLAG_FROM_ENUM(RootSignatureFlags);
-
-    struct Rect
-    {
-        long Left = 0;
-        long Top = 0;
-        long Right = 0;
-        long Bottom = 0;
-
-        explicit operator D3D12_RECT() const noexcept { return *reinterpret_cast<const D3D12_RECT*>(this); }
-        const D3D12_RECT* Get12() const noexcept { return reinterpret_cast<const D3D12_RECT*>(this); }
-    };
     
     enum class VertexFormat : uint8_t
     {
@@ -155,7 +169,8 @@ namespace Bruno
     // Un valor especial equivalente a D3D12_APPEND_ALIGNED_ELEMENT
     constexpr uint32_t AppendAlignedElement = 0xFFFFFFFF;
     
-    struct InputElementDesc {
+    struct InputElementDesc
+    {
         const char* SemanticName;           // Ej: "POSITION", "TEXCOORD"
         uint32_t SemanticIndex;             // Ej: 0, 1, 2
         VertexFormat Format;                // Ej: VertexFormat::Float3

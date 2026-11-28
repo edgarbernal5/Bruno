@@ -4,7 +4,7 @@
 
 #include "Berta/Controls/Properties/TypedPropertyField.h"
 #include <Berta/Controls/Button.h>
-#include <Berta/Controls/TextBox.h>
+#include <Berta/Controls/LineTextBox.h>
 #include <Bruno/Math/Math.h>
 
 namespace Bruno
@@ -31,6 +31,6 @@ namespace Bruno
 		void SetValueInternal(const Math::Vector3& value) override;
 		void SetMixedValuesInternal() override;
 
-		Berta::TextBox m_xyz[3];
+		Berta::LineTextBox m_xyz[3];
 	};
 }

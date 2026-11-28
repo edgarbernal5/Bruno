@@ -9,7 +9,12 @@
 
 namespace Bruno
 {
-    class ConstantBuffer;
+    class TextureArrayResource;
+    class ColorBuffer;
+    struct DescriptorAllocation;
+    class GraphicsResource;
+    class ConstantBufferBase;
+    class DescriptorAllocator;
     class IndexBuffer;
     class VertexBuffer;
     class GraphicsPipelineState;
@@ -29,43 +34,57 @@ namespace Bruno
         DynamicAllocation AllocateDynamicSpace(size_t sizeInBytes);
         
         // --- BARRERAS Y ESTADOS ---
-        void TransitionResource(Texture2D* texture, ResourceState stateBefore, ResourceState stateAfter);
-        void TransitionResource(DepthBuffer* depthBuffer, ResourceState stateBefore, ResourceState stateAfter);
+        void TransitionResource(GraphicsResource* resource, ResourceState newState);
+        void FlushBarriers();
         
         // --- CLEAR Y RENDER TARGETS ---
-        void ClearRenderTarget(Texture2D* renderTarget, const Math::Color& color);
-        void ClearDepth(DepthBuffer* depthBuffer, float depth = 1.0f, uint8_t stencil = 0);
-        void SetRenderTargets(uint32_t numRTVs, Texture2D** renderTargets, DepthBuffer* depthBuffer = nullptr);
+        void ClearRenderTarget(ColorBuffer* renderTarget, const Math::Color& color);
+        void ClearDepth(const DepthBuffer* depthBuffer, float depth = 1.0f, uint8_t stencil = 0);
+        void SetRenderTargets(uint32_t numRTVs, ColorBuffer** renderTargets, DepthBuffer* depthBuffer = nullptr);
+        void SetRenderTargetsSlice(uint32_t numRTVs, ColorBuffer** renderTargets, TextureArrayResource* depthResource, uint32_t depthArraySlice);
+        
+        // Limpia una capa específica de un recurso de profundidad
+        void ClearDepthSlice(TextureArrayResource* depthResource, uint32_t arraySlice, float depth = 1.0f, uint8_t stencil = 0);
         
         // --- PIPELINE Y ESTADO GLOBAL ---
         void SetViewport(const Math::Viewport& viewport);
-        void SetScissorRect(const Rect& rect);
+        void SetScissorRect(const Math::Rectangle& rect);
         void SetPipelineState(GraphicsPipelineState* pso);
         void SetRootSignature(RootSignature* rootSig);
-
         // --- ENLACE DE RECURSOS ---
-        void SetDescriptorHeaps(ID3D12DescriptorHeap** ppHeaps, uint32_t count);
-        void SetConstantBuffer(uint32_t rootParameterIndex, ConstantBuffer* buffer);
+        void SetDescriptorHeaps(std::initializer_list<DescriptorAllocator*> heaps);
+        
+        void SetConstantBuffer(uint32_t rootParameterIndex, const ConstantBufferBase& cb);
         void SetConstantBuffer(uint32_t rootParameterIndex, const DynamicAllocation& allocation);
-        void SetDescriptorTable(uint32_t rootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE baseDescriptor);
+        
+        void SetShaderResourceView(uint32_t rootParameterIndex, const DynamicAllocation& allocation);
+        
+        void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocator& allocator);
+        void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocation& allocation);
+        void SetDescriptorTable(uint32_t rootParameterIndex, const DescriptorAllocation& allocation, uint32_t offset);
         void SetDynamicDescriptorTable(uint32_t rootParameterIndex, D3D12_CPU_DESCRIPTOR_HANDLE cpuStagingDescriptor);
         void SetTexture(uint32_t rootParameterIndex, Texture2D* texture);
         
         // --- DIBUJO ---
         void SetPrimitiveTopology(PrimitiveTopology topology);
         void SetVertexBuffer(uint32_t startSlot, VertexBuffer* vertexBuffer);
-        void SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer* views);
+        void SetVertexBuffers(uint32_t startSlot, std::initializer_list<const VertexBuffer*> buffers);
         void SetIndexBuffer(IndexBuffer* indexBuffer);
         
+        void CopyBuffer(GraphicsResource* dest, GraphicsResource* src, size_t size);
         void DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation);
         void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation);
 
         // Sube valores de 32 bits (floats, ints) directamente a la Root Signature
         // Configura Push Constants (Vulkan) / 32-bit Root Constants (DX12)
         void SetPushConstants(uint32_t rootParameterIndex, uint32_t num32BitValues, const void* data, uint32_t destOffsetIn32BitValues = 0);
+        void SetPushConstant(uint32_t rootParameterIndex, uint32_t sourceData, uint32_t destOffsetIn32BitValues = 0);
         
     private:
-        inline D3D12_RESOURCE_STATES GetDX12ResourceState(ResourceState state);
+        static constexpr uint32_t MAX_BARRIERS = 16;
+        
+        D3D12_RESOURCE_BARRIER m_resourceBarriers[MAX_BARRIERS];
+        uint32_t m_numBarriersToFlush = 0;
         
         LinearAllocator* m_dynamicAllocator = nullptr;
         DynamicDescriptorAllocator* m_dynamicDescriptorAllocator = nullptr;

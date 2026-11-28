@@ -110,7 +110,9 @@ namespace Bruno
 
 			if (manip == static_cast<ManipFn>(std::flush)
 				|| manip == static_cast<ManipFn>(std::endl))
+			{
 				Flush();
+			}
 
 			return *this;
 		}

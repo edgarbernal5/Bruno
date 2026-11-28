@@ -12,9 +12,9 @@ namespace Bruno
 	public:
 		AssetImporterContext(EditorAssetManager& assetManager);
 
-		void AddMemoryOnlyAsset(std::shared_ptr<Asset> asset);
-		std::wstring GetAbsolutePath(const std::wstring& path);
-		AssetHandle ImportAsset(const std::wstring& filename);
+		void AddMemoryOnlyAsset(std::shared_ptr<Asset> asset) const;
+		std::wstring GetAbsolutePath(const std::wstring& path) const;
+		AssetHandle ImportAsset(const std::wstring& filename) const;
 	private:
 		EditorAssetManager& m_assetManager;
 	};

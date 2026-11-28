@@ -76,6 +76,10 @@
     <ClCompile Include="Source\Panels\ProfilerPanel.cpp">
       <Filter>Source\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Panels\Properties\PropertyGridFieldAsset.cpp" />
+    <ClCompile Include="Source\Panels\Shadows\ShadowsPanel.cpp">
+      <Filter>Source\Panels\Shadows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -107,6 +111,9 @@
     </Filter>
     <Filter Include="Source\AssetEditors">
       <UniqueIdentifier>{0da7311b-b4c2-426e-8764-e572c24c5caf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Panels\Shadows">
+      <UniqueIdentifier>{d76b08c8-f723-4b74-b5c1-2f5053db2e5a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -196,6 +203,10 @@
     </ClInclude>
     <ClInclude Include="Source\Panels\ProfilerPanel.h">
       <Filter>Source\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Panels\Properties\PropertyGridFieldAsset.h" />
+    <ClInclude Include="Source\Panels\Shadows\ShadowsPanel.h">
+      <Filter>Source\Panels\Shadows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

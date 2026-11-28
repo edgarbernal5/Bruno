@@ -2,6 +2,7 @@
 #include "DescriptorAllocator.h"
 
 #include "GraphicsDevice.h"
+#include "Berta/Core/Log.h"
 
 namespace Bruno 
 {
@@ -44,6 +45,8 @@ namespace Bruno
 
     DescriptorAllocation DescriptorAllocator::Allocate(uint32_t count) 
     {
+        BT_CORE_TRACE << "DescriptorAllocator::Allocate(" << count << "). Allocated = "<< m_allocatedCount <<". Capacity = " << m_capacity << std::endl;
+        
         if (m_allocatedCount + count > m_capacity)
         {
             // En un motor AAA real, aquí instanciaríamos un nuevo Heap y lo encadenaríamos,

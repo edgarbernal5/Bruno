@@ -12,8 +12,8 @@ namespace Bruno
         
         for (int i = 0; i < 2; ++i)
         {
-            m_vertexBuffer[i] = std::make_unique<VertexBuffer>(*device, initialVertexCapacity, sizeof(PrimitiveVertex), true);
-            m_indexBuffer[i] = std::make_unique<IndexBuffer>(*device, initialIndexCapacity, true);
+            m_vertexBuffer[i] = std::make_unique<VertexBuffer>(*device, initialVertexCapacity, sizeof(PrimitiveVertex));
+            m_indexBuffer[i] = std::make_unique<IndexBuffer>(*device, initialIndexCapacity, false);
         }
     }
 

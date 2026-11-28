@@ -4,15 +4,16 @@
 
 namespace Bruno
 {
-    inline uint32_t AlignU32(uint32_t valueToAlign, uint32_t alignment)
+    template <typename T>
+    constexpr uint32_t GetAlignedConstantBufferSize()
     {
-        alignment -= 1;
-        return valueToAlign + alignment & ~alignment;
+        return (sizeof(T) + 255) & ~255;
     }
-
-    inline uint64_t AlignU64(uint64_t valueToAlign, uint64_t alignment)
+    
+    template <typename T>
+    constexpr uint32_t GetAlignedSize(T alignment)
     {
         alignment -= 1;
-        return valueToAlign + alignment & ~alignment;
+        return (sizeof(T) + alignment) & ~alignment;
     }
 }

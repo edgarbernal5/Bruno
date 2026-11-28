@@ -20,7 +20,7 @@ namespace Bruno
 		std::shared_ptr<Asset> GetAssetRaw(AssetHandle assetHandle) override;
 		std::wstring GetAbsolutePath(const std::wstring& path);
 
-		AssetMetadata& GetMetadata(AssetHandle handle);
+		AssetMetadata& GetMetadata(const AssetHandle& handle);
 		const AssetMetadata& GetMetadata(const std::wstring& filename);
 		AssetHandle ImportAsset(const std::wstring& filename);
 
@@ -28,7 +28,7 @@ namespace Bruno
 		void GetAssetsDirectory(const std::wstring& directoryPath);
 		void ProcessDirectory(const std::wstring& directoryPath);
 		AssetType GetAssetTypeByExtension(const std::string& fileExtension);
-		bool IsMemoryAsset(AssetHandle handle);
+		bool IsMemoryAsset(const AssetHandle& handle);
 
 		std::wstring m_projectPath;
 		std::unordered_map<AssetHandle, std::shared_ptr<Asset>> m_loadedAssets;

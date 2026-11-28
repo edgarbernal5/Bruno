@@ -21,10 +21,32 @@ namespace Bruno
         InitializeDXGI();
         CreateDevice();
         
-        // C++14/17: Creación segura de memoria dinámica (RAII)
         m_directCommandQueue = std::make_unique<CommandQueue>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
         
-        m_srvDescriptorAllocator = std::make_unique<DescriptorAllocator>(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4096, true);
+        m_srvDescriptorAllocator = std::make_unique<DescriptorAllocator>
+        (
+            *this,
+            D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 
+            8192, //4096 
+            true
+        );
+        
+        m_rtvDescriptorAllocator = std::make_unique<DescriptorAllocator>
+        (
+            *this, 
+            D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 
+            128,  // Capacidad para 128 Render Targets simultáneos
+            false // Los RTVs NO son Shader Visible (regla de oro de DX12)
+        );
+        
+        m_dsvDescriptorAllocator = std::make_unique<DescriptorAllocator>
+        (
+            *this, 
+            D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 
+            32,
+            false
+        );
+        
         m_uploadContext = std::make_unique<UploadContext>(*this);
     }
 
@@ -42,13 +64,26 @@ namespace Bruno
     {
         UINT dxgiFactoryFlags = 0;
 
-#if defined(_DEBUG)
+#if defined(BT_DEBUG)
         // Encender la capa de depuración de DX12. ¡Te salvará horas de dolores de cabeza!
         Microsoft::WRL::ComPtr<ID3D12Debug> debugController;
         if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
         {
             debugController->EnableDebugLayer();
             dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG; // Opcional en DXGI 1.3+
+            
+            /*Microsoft::WRL::ComPtr<ID3D12Debug1> debugController1;
+            if (SUCCEEDED(debugController.As(&debugController1)))
+            {
+                debugController1->SetEnableGPUBasedValidation(TRUE);
+            }*/
+        }
+        
+        Microsoft::WRL::ComPtr<ID3D12DeviceRemovedExtendedDataSettings> dredSettings;
+        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings))))
+        {
+            dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+            dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
         }
 #endif
 
@@ -69,10 +104,14 @@ namespace Bruno
             adapter->GetDesc1(&desc);
 
             // Ignoramos el renderizador por software (Basic Render Driver)
-            if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
-
+            if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+            {
+                continue;
+            }
+            
             // Verificamos si soporta DX12 (Feature Level 11_0 es el mínimo para DX12 API)
-            if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr))) {
+            if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
+            {
                 hardwareAdapter = adapter;
                 break;
             }
